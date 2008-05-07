@@ -168,6 +168,123 @@ INSERT INTO `det_status` VALUES (1,'Obsolete record'),(2,'Online'),(3,'Offline')
 UNLOCK TABLES;
 
 --
+-- Table structure for table `electronics`
+--
+
+DROP TABLE IF EXISTS `electronics`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `electronics` (
+  `electronics_id` int(10) unsigned NOT NULL auto_increment,
+  `station_id` int(10) unsigned NOT NULL,
+  `type_id` int(10) unsigned NOT NULL,
+  `status_id` int(10) unsigned NOT NULL,
+  `startdate` date NOT NULL,
+  `enddate` date NOT NULL,
+  `batch_id` int(10) unsigned NOT NULL,
+  `serial` int(11) NOT NULL,
+  `is_master` tinyint(1) unsigned default NULL,
+  `has_gps` tinyint(1) unsigned default NULL,
+  `notes` text NOT NULL,
+  PRIMARY KEY  (`electronics_id`),
+  KEY `electronicsstation` (`station_id`),
+  KEY `electronicstype` (`type_id`),
+  KEY `electronicsstatus` (`status_id`),
+  KEY `electronicsbatch` (`batch_id`),
+  CONSTRAINT `electronicstype` FOREIGN KEY (`type_id`) REFERENCES `electronics_type` (`type_id`),
+  CONSTRAINT `electronicsstatus` FOREIGN KEY (`status_id`) REFERENCES `electronics_status` (`status_id`),
+  CONSTRAINT `electronicsbatch` FOREIGN KEY (`batch_id`) REFERENCES `electronics_batch` (`batch_id`),
+  CONSTRAINT `electronicsstation` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `electronics`
+--
+
+LOCK TABLES `electronics` WRITE;
+/*!40000 ALTER TABLE `electronics` DISABLE KEYS */;
+/*!40000 ALTER TABLE `electronics` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `electronics_batch`
+--
+
+DROP TABLE IF EXISTS `electronics_batch`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `electronics_batch` (
+  `batch_id` int(10) unsigned NOT NULL auto_increment,
+  `type_id` int(10) unsigned NOT NULL,
+  `number` int(10) unsigned NOT NULL,
+  `notes` text NOT NULL,
+  PRIMARY KEY  (`batch_id`),
+  UNIQUE KEY `type_and_number` (`type_id`,`number`),
+  CONSTRAINT `batchtype` FOREIGN KEY (`type_id`) REFERENCES `electronics_type` (`type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `electronics_batch`
+--
+
+LOCK TABLES `electronics_batch` WRITE;
+/*!40000 ALTER TABLE `electronics_batch` DISABLE KEYS */;
+/*!40000 ALTER TABLE `electronics_batch` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `electronics_status`
+--
+
+DROP TABLE IF EXISTS `electronics_status`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `electronics_status` (
+  `status_id` int(10) unsigned NOT NULL auto_increment,
+  `description` text NOT NULL,
+  PRIMARY KEY  (`status_id`),
+  UNIQUE KEY `description` (`description`(72))
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `electronics_status`
+--
+
+LOCK TABLES `electronics_status` WRITE;
+/*!40000 ALTER TABLE `electronics_status` DISABLE KEYS */;
+INSERT INTO `electronics_status` VALUES (1,'Obsolete record'),(2,'Online'),(3,'Offline');
+/*!40000 ALTER TABLE `electronics_status` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `electronics_type`
+--
+
+DROP TABLE IF EXISTS `electronics_type`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `electronics_type` (
+  `type_id` int(10) unsigned NOT NULL auto_increment,
+  `description` text NOT NULL,
+  PRIMARY KEY  (`type_id`),
+  UNIQUE KEY `description` (`description`(72))
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `electronics_type`
+--
+
+LOCK TABLES `electronics_type` WRITE;
+/*!40000 ALTER TABLE `electronics_type` DISABLE KEYS */;
+INSERT INTO `electronics_type` VALUES (1,'Nijmegen'),(2,'HiSPARC I'),(3,'HiSPARC II');
+/*!40000 ALTER TABLE `electronics_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `location`
 --
 
@@ -267,6 +384,64 @@ LOCK TABLES `organization` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `pc`
+--
+
+DROP TABLE IF EXISTS `pc`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `pc` (
+  `pc_id` int(10) unsigned NOT NULL auto_increment,
+  `station_id` int(10) unsigned NOT NULL,
+  `type_id` int(10) unsigned NOT NULL,
+  `name` text NOT NULL,
+  `ip` text NOT NULL,
+  `notes` text,
+  PRIMARY KEY  (`pc_id`),
+  UNIQUE KEY `name` (`name`(72)),
+  UNIQUE KEY `ip` (`ip`(15)),
+  KEY `pcstation` (`station_id`),
+  KEY `pctype` (`type_id`),
+  CONSTRAINT `pcstation` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`),
+  CONSTRAINT `pctype` FOREIGN KEY (`type_id`) REFERENCES `pc_type` (`type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `pc`
+--
+
+LOCK TABLES `pc` WRITE;
+/*!40000 ALTER TABLE `pc` DISABLE KEYS */;
+/*!40000 ALTER TABLE `pc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `pc_type`
+--
+
+DROP TABLE IF EXISTS `pc_type`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `pc_type` (
+  `type_id` int(10) unsigned NOT NULL auto_increment,
+  `description` text NOT NULL,
+  PRIMARY KEY  (`type_id`),
+  KEY `description` (`description`(72))
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `pc_type`
+--
+
+LOCK TABLES `pc_type` WRITE;
+/*!40000 ALTER TABLE `pc_type` DISABLE KEYS */;
+INSERT INTO `pc_type` VALUES (1,'Detector'),(2,'Detector / Buffer Database'),(3,'Buffer Database'),(4,'Local Database'),(5,'Buffer / Local Database'),(6,'Detector / Buffer / Local database');
+/*!40000 ALTER TABLE `pc_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `station`
 --
 
@@ -305,4 +480,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-05-06 13:07:33
+-- Dump completed on 2008-05-07 14:00:54

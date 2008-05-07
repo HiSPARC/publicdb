@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 from MySQLdb import connect
 import re
 
