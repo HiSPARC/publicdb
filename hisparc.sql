@@ -2,7 +2,7 @@
 --
 -- Host: localhost    Database: hisparc
 -- ------------------------------------------------------
--- Server version	5.0.51a-3ubuntu5
+-- Server version	5.0.51a-3ubuntu5.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -92,7 +92,7 @@ CREATE TABLE `contactposition` (
   `description` text NOT NULL,
   PRIMARY KEY  (`contactposition_id`),
   UNIQUE KEY `description` (`description`(72))
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
 --
@@ -106,13 +106,13 @@ INSERT INTO `contactposition` VALUES (1,'Docent'),(2,'Student'),(3,'Leerling'),(
 UNLOCK TABLES;
 
 --
--- Table structure for table `det_hisparc`
+-- Table structure for table `detector_hisparc`
 --
 
-DROP TABLE IF EXISTS `det_hisparc`;
+DROP TABLE IF EXISTS `detector_hisparc`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-CREATE TABLE `det_hisparc` (
+CREATE TABLE `detector_hisparc` (
   `detector_id` int(10) unsigned NOT NULL auto_increment,
   `station_id` int(10) unsigned NOT NULL,
   `status_id` int(10) unsigned NOT NULL,
@@ -129,27 +129,27 @@ CREATE TABLE `det_hisparc` (
   KEY `hisparcstation` (`station_id`),
   KEY `hisparcstatus` (`status_id`),
   CONSTRAINT `hisparcstation` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`),
-  CONSTRAINT `hisparcstatus` FOREIGN KEY (`status_id`) REFERENCES `det_status` (`status_id`)
+  CONSTRAINT `hisparcstatus` FOREIGN KEY (`status_id`) REFERENCES `detector_status` (`status_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
 SET character_set_client = @saved_cs_client;
 
 --
--- Dumping data for table `det_hisparc`
+-- Dumping data for table `detector_hisparc`
 --
 
-LOCK TABLES `det_hisparc` WRITE;
-/*!40000 ALTER TABLE `det_hisparc` DISABLE KEYS */;
-/*!40000 ALTER TABLE `det_hisparc` ENABLE KEYS */;
+LOCK TABLES `detector_hisparc` WRITE;
+/*!40000 ALTER TABLE `detector_hisparc` DISABLE KEYS */;
+/*!40000 ALTER TABLE `detector_hisparc` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
--- Table structure for table `det_status`
+-- Table structure for table `detector_status`
 --
 
-DROP TABLE IF EXISTS `det_status`;
+DROP TABLE IF EXISTS `detector_status`;
 SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = utf8;
-CREATE TABLE `det_status` (
+CREATE TABLE `detector_status` (
   `status_id` int(10) unsigned NOT NULL auto_increment,
   `description` text NOT NULL,
   PRIMARY KEY  (`status_id`),
@@ -158,13 +158,13 @@ CREATE TABLE `det_status` (
 SET character_set_client = @saved_cs_client;
 
 --
--- Dumping data for table `det_status`
+-- Dumping data for table `detector_status`
 --
 
-LOCK TABLES `det_status` WRITE;
-/*!40000 ALTER TABLE `det_status` DISABLE KEYS */;
-INSERT INTO `det_status` VALUES (1,'Obsolete record'),(2,'Online'),(3,'Offline');
-/*!40000 ALTER TABLE `det_status` ENABLE KEYS */;
+LOCK TABLES `detector_status` WRITE;
+/*!40000 ALTER TABLE `detector_status` DISABLE KEYS */;
+INSERT INTO `detector_status` VALUES (1,'Obsolete record'),(2,'Online'),(3,'Offline');
+/*!40000 ALTER TABLE `detector_status` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -191,10 +191,10 @@ CREATE TABLE `electronics` (
   KEY `electronicstype` (`type_id`),
   KEY `electronicsstatus` (`status_id`),
   KEY `electronicsbatch` (`batch_id`),
-  CONSTRAINT `electronicstype` FOREIGN KEY (`type_id`) REFERENCES `electronics_type` (`type_id`),
-  CONSTRAINT `electronicsstatus` FOREIGN KEY (`status_id`) REFERENCES `electronics_status` (`status_id`),
   CONSTRAINT `electronicsbatch` FOREIGN KEY (`batch_id`) REFERENCES `electronics_batch` (`batch_id`),
-  CONSTRAINT `electronicsstation` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`)
+  CONSTRAINT `electronicsstation` FOREIGN KEY (`station_id`) REFERENCES `station` (`station_id`),
+  CONSTRAINT `electronicsstatus` FOREIGN KEY (`status_id`) REFERENCES `electronics_status` (`status_id`),
+  CONSTRAINT `electronicstype` FOREIGN KEY (`type_id`) REFERENCES `electronics_type` (`type_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
 
@@ -353,6 +353,63 @@ INSERT INTO `location_status` VALUES (1,'Clusterkern');
 UNLOCK TABLES;
 
 --
+-- Table structure for table `monitor_pc_service`
+--
+
+DROP TABLE IF EXISTS `monitor_pc_service`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `monitor_pc_service` (
+  `pc_id` int(10) unsigned NOT NULL,
+  `service_id` int(10) unsigned NOT NULL,
+  `min_critical` text,
+  `max_critical` text,
+  `min_warning` text,
+  `max_warning` text,
+  PRIMARY KEY  (`pc_id`,`service_id`),
+  KEY `monitor_service` (`service_id`),
+  CONSTRAINT `monitor_pc` FOREIGN KEY (`pc_id`) REFERENCES `pc` (`pc_id`),
+  CONSTRAINT `monitor_service` FOREIGN KEY (`service_id`) REFERENCES `monitor_service` (`service_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `monitor_pc_service`
+--
+
+LOCK TABLES `monitor_pc_service` WRITE;
+/*!40000 ALTER TABLE `monitor_pc_service` DISABLE KEYS */;
+/*!40000 ALTER TABLE `monitor_pc_service` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `monitor_service`
+--
+
+DROP TABLE IF EXISTS `monitor_service`;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+CREATE TABLE `monitor_service` (
+  `service_id` int(10) unsigned NOT NULL auto_increment,
+  `description` text NOT NULL,
+  `min_critical` text,
+  `max_critical` text,
+  `min_warning` text,
+  `max_warning` text,
+  PRIMARY KEY  (`service_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Dumping data for table `monitor_service`
+--
+
+LOCK TABLES `monitor_service` WRITE;
+/*!40000 ALTER TABLE `monitor_service` DISABLE KEYS */;
+/*!40000 ALTER TABLE `monitor_service` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `organization`
 --
 
@@ -480,4 +537,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-05-07 14:00:54
+-- Dump completed on 2008-05-11 12:15:49
