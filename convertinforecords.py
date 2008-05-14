@@ -5,10 +5,12 @@ import re
 
 src = {
     'host': 'oust',
+    #'host': '127.0.0.1',
     'user': 'webread',
     'db': 'hisparc',
     'password': '',
     'port': 3306,
+    #'port': 3307,
 }
 dest = {
     'host': 'localhost',
@@ -131,23 +133,23 @@ class convert:
             cluster_id = self.get_cluster_id(clusname)
 
             sql  = "INSERT "
-            sql += "organization (name, cluster_id, url) "
+            sql += "organization (name, url) "
             sql += "VALUES ("
             sql += "'%s', " % name
-            sql += "'%s', " % cluster_id
             sql += "'%s')"  % url
             self.dest_transaction(sql, True)
 
             organization_id = self.get_organization_id(name)
 
             sql  = "INSERT "
-            sql += "location (name, organization_id, "
+            sql += "location (name, organization_id, cluster_id, "
             sql += "locationstatus_id, address, postalcode, pobox, "
             sql += "pobox_postalcode, city, country, phone, fax, url, "
             sql += "email) "
             sql += "VALUES ("
             sql += "'%s', " % name
             sql += "'%s', " % organization_id
+            sql += "'%s', " % cluster_id
             sql += "'%s', " % status
             sql += "'%s', " % address
             sql += "'%s', " % postalcode
@@ -185,7 +187,7 @@ class convert:
 
             station_id = self.get_station_id(number)
 
-            sql  = "INSERT det_hisparc (station_id, status_id, "
+            sql  = "INSERT detector_hisparc (station_id, status_id, "
             sql += "startdate, enddate, latitude, longitude, height, "
             sql += "password) "
             sql += "VALUES("

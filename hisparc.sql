@@ -295,6 +295,7 @@ CREATE TABLE `location` (
   `location_id` int(10) unsigned NOT NULL auto_increment,
   `name` text NOT NULL,
   `organization_id` int(10) unsigned NOT NULL,
+  `cluster_id` int(10) unsigned NOT NULL,
   `contact_id` int(10) unsigned default NULL,
   `locationstatus_id` int(10) unsigned default NULL,
   `address` text NOT NULL,
@@ -312,6 +313,8 @@ CREATE TABLE `location` (
   KEY `locationcontact` (`contact_id`),
   KEY `locationorganization` (`organization_id`),
   KEY `locationstatus` (`locationstatus_id`),
+  KEY `locationcluster` (`cluster_id`),
+  CONSTRAINT `locationcluster` FOREIGN KEY (`cluster_id`) REFERENCES `cluster` (`cluster_id`),
   CONSTRAINT `locationcontact` FOREIGN KEY (`contact_id`) REFERENCES `contact` (`contact_id`),
   CONSTRAINT `locationorganization` FOREIGN KEY (`organization_id`) REFERENCES `organization` (`organization_id`),
   CONSTRAINT `locationstatus` FOREIGN KEY (`locationstatus_id`) REFERENCES `location_status` (`status_id`)
@@ -362,10 +365,14 @@ SET character_set_client = utf8;
 CREATE TABLE `monitor_pc_service` (
   `pc_id` int(10) unsigned NOT NULL,
   `service_id` int(10) unsigned NOT NULL,
-  `min_critical` text,
-  `max_critical` text,
-  `min_warning` text,
-  `max_warning` text,
+  `use_min_critical` tinyint(1) default NULL,
+  `min_critical` double default NULL,
+  `use_max_critical` tinyint(1) default NULL,
+  `max_critical` double default NULL,
+  `use_min_warning` tinyint(1) default NULL,
+  `min_warning` double default NULL,
+  `use_max_warning` tinyint(1) default NULL,
+  `max_warning` double default NULL,
   PRIMARY KEY  (`pc_id`,`service_id`),
   KEY `monitor_service` (`service_id`),
   CONSTRAINT `monitor_pc` FOREIGN KEY (`pc_id`) REFERENCES `pc` (`pc_id`),
@@ -392,10 +399,10 @@ SET character_set_client = utf8;
 CREATE TABLE `monitor_service` (
   `service_id` int(10) unsigned NOT NULL auto_increment,
   `description` text NOT NULL,
-  `min_critical` text,
-  `max_critical` text,
-  `min_warning` text,
-  `max_warning` text,
+  `min_critical` double default NULL,
+  `max_critical` double default NULL,
+  `min_warning` double default NULL,
+  `max_warning` double default NULL,
   PRIMARY KEY  (`service_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
@@ -419,14 +426,11 @@ SET character_set_client = utf8;
 CREATE TABLE `organization` (
   `organization_id` int(10) unsigned NOT NULL auto_increment,
   `name` text NOT NULL,
-  `cluster_id` int(10) unsigned NOT NULL,
   `contact_id` int(10) unsigned default NULL,
   `url` text,
   PRIMARY KEY  (`organization_id`),
   UNIQUE KEY `name` (`name`(72)),
-  KEY `organizationcluster` (`cluster_id`),
   KEY `organizationcontact` (`contact_id`),
-  CONSTRAINT `organizationcluster` FOREIGN KEY (`cluster_id`) REFERENCES `cluster` (`cluster_id`),
   CONSTRAINT `organizationcontact` FOREIGN KEY (`contact_id`) REFERENCES `contact` (`contact_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 SET character_set_client = @saved_cs_client;
@@ -537,4 +541,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-05-11 12:15:49
+-- Dump completed on 2008-05-14 13:59:37
