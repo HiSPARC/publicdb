@@ -399,6 +399,7 @@ SET character_set_client = utf8;
 CREATE TABLE `monitor_service` (
   `service_id` int(10) unsigned NOT NULL auto_increment,
   `description` text NOT NULL,
+  `nagios_command` text NOT NULL,
   `min_critical` double default NULL,
   `max_critical` double default NULL,
   `min_warning` double default NULL,
@@ -541,4 +542,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2008-05-14 13:59:37
+-- Dump completed on 2008-05-15  9:23:42
