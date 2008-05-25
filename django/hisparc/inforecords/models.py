@@ -12,20 +12,20 @@ class Contactposition(models.Model):
 class Contact(models.Model):
     location = models.ForeignKey('Location', related_name='contacts', null=True, blank=True)
     contactposition = models.ForeignKey(Contactposition)
-    title = models.CharField(maxlength=20, blank=True)
-    firstname = models.CharField(maxlength=40)
-    prefix = models.CharField(maxlength=10, blank=True)
-    lastname = models.CharField(maxlength=40)
+    title = models.CharField(maxlength=20, null=True, blank=True)
+    first_name = models.CharField(maxlength=40)
+    prefix_last_name = models.CharField(maxlength=10, null=True, blank=True)
+    last_name = models.CharField(maxlength=40)
     url = models.URLField(null=True, blank=True)
     email = models.EmailField()
     phone_work = models.PhoneNumberField(null=True, blank=True)
     phone_home = models.PhoneNumberField(null=True, blank=True)
 
     def __str__(self):
-        return '%s %s %s' % (self.firstname, self.prefix, self.lastname)
+        return '%s %s %s' % (self.first_name, self.prefix_last_name, self.last_name)
 
     class Meta:
-        unique_together = [('firstname', 'prefix', 'lastname')]
+        unique_together = [('first_name', 'prefix_last_name', 'last_name')]
 
     class Admin:
         pass
@@ -71,6 +71,7 @@ class Location(models.Model):
     postalcode = models.CharField(maxlength=6)
     pobox = models.CharField(maxlength=9, null=True, blank=True)
     pobox_postalcode = models.CharField(maxlength=6, null=True, blank=True)
+    pobox_city = models.CharField(maxlength=40, null=True, blank=True)
     city = models.CharField(maxlength=40)
     country = models.CharField(maxlength=40)
     phone = models.PhoneNumberField(null=True, blank=True)
@@ -108,9 +109,9 @@ class DetectorHisparc(models.Model):
     status = models.ForeignKey(DetectorStatus)
     startdate = models.DateField()
     enddate = models.DateField(null=True, blank=True)
-    latitude = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
-    longitude = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
-    height = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
+    latitude = models.FloatField(null=True, max_digits=22, decimal_places=20, blank=True)
+    longitude = models.FloatField(null=True, max_digits=22, decimal_places=19, blank=True)
+    height = models.FloatField(null=True, max_digits=22, decimal_places=19, blank=True)
     direction = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
     translation_perp = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
     translation_long = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
@@ -122,7 +123,7 @@ class DetectorHisparc(models.Model):
     scintillator_3_long = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
     scintillator_4_perp = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
     scintillator_4_long = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
-    password = models.CharField(maxlength=10)
+    password = models.CharField(maxlength=40)
 
     def __str__(self):
         return str(self.station)

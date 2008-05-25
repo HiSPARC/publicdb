@@ -4,17 +4,17 @@ from MySQLdb import connect
 import re
 
 src = {
-    'host': 'oust',
-    #'host': '127.0.0.1',
+    #'host': 'oust',
+    'host': '127.0.0.1',
     'user': 'webread',
     'db': 'hisparc',
     'password': '',
-    'port': 3306,
-    #'port': 3307,
+    #'port': 3306,
+    'port': 3307,
 }
 dest = {
     'host': 'localhost',
-    'user': 'hisparc',
+    'user': 'hisparc_admin',
     'db': 'hisparc',
     'password' : 'Crapsih',
     'port': 3306,
@@ -23,6 +23,8 @@ dest = {
 class convert:
     nullstring = re.compile("''|'None'")
     prefix_re = re.compile("([a-z ]*)([A-Z][A-Za-z ]*)")
+    postcode = re.compile("(?<=[0-9]{4}).*(?=[A-Z]{2})")
+    postbus = re.compile("Postbus +")
 
     def __init__(self, src, dest):
         self.connect(src, dest)
@@ -64,16 +66,20 @@ class convert:
             contactposition_id, title, firstname, lastname, url, \
             email, phone_work, phone_home = r
 
-            if contactposition_id == 0: contactposition_id = ''
+            # hack: make UNKNOWN a 'docent'
+            if contactposition_id == 0: contactposition_id = 1
 
             p = self.prefix_re.search(lastname)
             prefix = p.group(1).strip()
             lastname = p.group(2)
 
+            #ugly hack starts here
+            if not email: email = 'nobody@nobody.com'
+
             sql  = "INSERT "
-            sql += "contact (contactposition_id, title, firstname, "
-            sql += "prefix, lastname, url, email, phone_work, "
-            sql += "phone_home) "
+            sql += "inforecords_contact (contactposition_id, title, "
+            sql += "first_name, prefix_last_name, last_name, url, email, "
+            sql += "phone_work, phone_home) "
             sql += "VALUES ("
             sql += "'%s', " % contactposition_id
             sql += "'%s', " % title
@@ -100,8 +106,8 @@ class convert:
 
             if name == 'ONBEKEND' or name == 'Wachtlijst': continue
 
-            sql  = "INSERT cluster (name, url) VALUES ('%s', '%s')" \
-                % (name, url)
+            sql  = "INSERT inforecords_cluster (name, url) "
+            sql += "VALUES ('%s', '%s')" % (name, url)
             self.dest_transaction(sql)
 
         self.dest_commit()
@@ -120,7 +126,12 @@ class convert:
             clusname, name, url , address, postalcode, pobox, \
             pobox_postalcode, city, phone, fax, email, status = r
             country = 'Netherlands'
-            if status == 0: status = ''
+            pobox_city = ''
+            status += 1
+
+            postalcode = self.postcode.sub("", str(postalcode))
+            pobox_postalcode = self.postcode.sub("", str(pobox_postalcode))
+            pobox = self.postbus.sub("", str(pobox))
 
             if name == 'ONBEKEND': continue
 
@@ -128,12 +139,15 @@ class convert:
             if address == '': address = 'zzz'
             if postalcode == '': postalcode = 'zzz'
             if city == '': city = 'zzz'
+            if pobox_postalcode == '9702HC Haren':
+                pobox_postalcode = '9702HC'
+                pobox_city = 'Haren'
             # end of ugly hacks
 
             cluster_id = self.get_cluster_id(clusname)
 
             sql  = "INSERT "
-            sql += "organization (name, url) "
+            sql += "inforecords_organization (name, url) "
             sql += "VALUES ("
             sql += "'%s', " % name
             sql += "'%s')"  % url
@@ -142,10 +156,10 @@ class convert:
             organization_id = self.get_organization_id(name)
 
             sql  = "INSERT "
-            sql += "location (name, organization_id, cluster_id, "
+            sql += "inforecords_location (name, organization_id, cluster_id, "
             sql += "locationstatus_id, address, postalcode, pobox, "
-            sql += "pobox_postalcode, city, country, phone, fax, url, "
-            sql += "email) "
+            sql += "pobox_postalcode, pobox_city, city, country, phone, fax, "
+            sql += "url, email) "
             sql += "VALUES ("
             sql += "'%s', " % name
             sql += "'%s', " % organization_id
@@ -155,6 +169,7 @@ class convert:
             sql += "'%s', " % postalcode
             sql += "'%s', " % pobox
             sql += "'%s', " % pobox_postalcode
+            sql += "'%s', " % pobox_city
             sql += "'%s', " % city
             sql += "'%s', " % country
             sql += "'%s', " % phone
@@ -175,21 +190,22 @@ class convert:
             number, locname, startdate, enddate, longitude, latitude, \
             height, password = r
             if not startdate: startdate = '2000-1-1'
+            if password == '': password = 'zzz'
 
             # status offline
             status = '3'
 
             location_id = self.get_location_id(locname)
 
-            sql  = "INSERT station (location_id, number) "
+            sql  = "INSERT inforecords_station (location_id, number) "
             sql += "VALUES ('%s', '%s')" % (location_id, number)
             self.dest_transaction(sql, True)
 
             station_id = self.get_station_id(number)
 
-            sql  = "INSERT detector_hisparc (station_id, status_id, "
-            sql += "startdate, enddate, latitude, longitude, height, "
-            sql += "password) "
+            sql  = "INSERT inforecords_detectorhisparc (station_id, "
+            sql += "status_id, startdate, enddate, latitude, longitude, "
+            sql += "height, password) "
             sql += "VALUES("
             sql += "'%s', " % station_id
             sql += "'%s', " % status
@@ -204,27 +220,27 @@ class convert:
         return
 
     def get_cluster_id(self, name):
-        sql = "SELECT cluster_id FROM cluster WHERE name = '%s'" % name
+        sql = "SELECT id FROM inforecords_cluster WHERE name = '%s'" % name
         self.dest_cursor.execute(sql)
 
         return self.dest_cursor.fetchone()[0]
 
     def get_organization_id(self, name):
-        sql  = "SELECT organization_id FROM organization "
+        sql  = "SELECT id FROM inforecords_organization "
         sql += "WHERE name = '%s'" % name
         self.dest_cursor.execute(sql)
 
         return self.dest_cursor.fetchone()[0]
     
     def get_location_id(self, name):
-        sql  = "SELECT location_id FROM location "
+        sql  = "SELECT id FROM inforecords_location "
         sql += "WHERE name = '%s'" % name
         self.dest_cursor.execute(sql)
 
         return self.dest_cursor.fetchone()[0]
 
     def get_station_id(self, number):
-        sql  = "SELECT station_id FROM station "
+        sql  = "SELECT id FROM inforecords_station "
         sql += "WHERE number = '%s'" % number
         self.dest_cursor.execute(sql)
 
