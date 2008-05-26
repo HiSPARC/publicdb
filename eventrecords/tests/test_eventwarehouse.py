@@ -2,6 +2,7 @@
 
 from MySQLdb import connect
 import re
+from optparse import OptionParser
 
 dest = {
     'host': 'localhost',
@@ -11,14 +12,15 @@ dest = {
     'port': 3306,
 }
 
-N = 10**2
-M = 10**3
-
 class test:
     nullstring = re.compile("''|'None'")
     event_id = 1
 
-    def __init__(self, dest):
+    def __init__(self, dest, engine, N, M):
+        self.engine = engine
+        self.N = N
+        self.M = M
+
         self.connect(dest)
         return
 
@@ -33,15 +35,15 @@ class test:
         return
 
     def test(self):
-        self.set_table_engine('InnoDB')
+        self.set_table_engine(self.engine)
 
         self.print_data_size()
-        self.insert_record(M)
+        self.insert_record(self.M)
 
-        for i in range(N-1):
+        for i in range(self.N-1):
             self.print_data_size()
-            self.insert_record(M)
-            #self.drop_first_traces(M)
+            self.insert_record(self.M)
+            self.drop_first_traces(self.M)
 
         self.print_data_size()
         return
@@ -81,22 +83,18 @@ class test:
        
 
     def drop_first_traces(self, num = 1):
-        sql  = "SELECT event_id FROM events_hisparc "
-        sql += "WHERE trace1 IS NOT NULL LIMIT %d " % num
+        sql  = "SELECT event_id FROM eventdata "
+        sql += "WHERE eventdatatype_id = 5 "
+        sql += "AND blobvalue IS NOT NULL LIMIT %d " % num
         self.cursor.execute(sql)
         
         for id, in self.cursor.fetchall():
-            sql  = "UPDATE events_hisparc "
-            sql += "SET trace1 = NULL, trace2 = NULL "
+            sql  = "DELETE FROM eventdata "
             sql += "WHERE event_id = %d " % id
+            sql += "AND (eventdatatype_id = 5 OR eventdatatype_id = 6)"
             self.transaction(sql)
 
         self.commit()
-        return
-
-    def optimize_table(self):
-        sql = "OPTIMIZE TABLE eventdata"
-        self.transaction(sql, True)
         return
 
     def print_data_size(self):
@@ -132,5 +130,17 @@ class test:
 
 
 if __name__ == '__main__':
-    app = test(dest)
+    parser = OptionParser()
+    parser.add_option("-e", "--engine", dest="engine",
+                      help="MySQL engine (MyISAM, InnoDB)")
+    parser.add_option("-n", dest="N", type="int",
+                      help="Number of transactions")
+    parser.add_option("-m", dest="M", type="int",
+                      help="Number of events per transaction")
+    (options, args) = parser.parse_args()
+
+    if not options.engine or not options.N or not options.M:
+        parser.error("All options are required!")
+
+    app = test(dest, options.engine, options.N, options.M)
     app.test()

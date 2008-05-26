@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from MySQLdb import connect
-from random import randint
+from optparse import OptionParser
 
 dest = {
     'host': 'localhost',
@@ -11,11 +11,12 @@ dest = {
     'port': 3306,
 }
 
-N = 10**1
-M = 10**5
-
 class test:
-    def __init__(self, dest):
+    def __init__(self, dest, engine, N, M):
+        self.engine = engine
+        self.N = N
+        self.M = M
+
         self.connect(dest)
         return
 
@@ -30,16 +31,15 @@ class test:
         return
 
     def test(self):
-        self.set_table_engine('MyISAM')
+        self.set_table_engine(self.engine)
 
         self.print_data_size()
-        self.insert_record(M)
+        self.insert_record(self.M)
 
-        for i in range(N-1):
+        for i in range(self.N-1):
             self.print_data_size()
-            self.insert_record(M)
-            self.drop_first_traces(M)
-            self.optimize_table()
+            self.insert_record(self.M)
+            self.drop_first_traces(self.M)
 
         self.print_data_size()
         return
@@ -66,22 +66,6 @@ class test:
         self.commit()
         return
 
-    def delete_random_record(self):
-        sql = "SELECT COUNT(*) FROM events_hisparc"
-        self.cursor.execute(sql)
-        numrows = self.cursor.fetchone()[0]
-
-        row = randint(0,numrows-1)
-
-        sql = "SELECT event_id FROM events_hisparc LIMIT %d, 1" % row
-        self.cursor.execute(sql)
-        id = self.cursor.fetchone()[0]
-
-        sql = "DELETE FROM events_hisparc WHERE event_id = %d" % id
-        self.transaction(sql, True)
-
-        return
-
     def drop_first_traces(self, num = 1):
         sql  = "SELECT event_id FROM events_hisparc "
         sql += "WHERE trace1 IS NOT NULL LIMIT %d " % num
@@ -94,11 +78,6 @@ class test:
             self.transaction(sql)
 
         self.commit()
-        return
-
-    def optimize_table(self):
-        sql = "OPTIMIZE TABLE events_hisparc"
-        self.transaction(sql, True)
         return
 
     def print_data_size(self):
@@ -133,5 +112,17 @@ class test:
 
 
 if __name__ == '__main__':
-    app = test(dest)
+    parser = OptionParser()
+    parser.add_option("-e", "--engine", dest="engine",
+                      help="MySQL engine (MyISAM, InnoDB)")
+    parser.add_option("-n", dest="N", type="int",
+                      help="Number of transactions")
+    parser.add_option("-m", dest="M", type="int",
+                      help="Number of events per transaction")
+    (options, args) = parser.parse_args()
+
+    if not options.engine or not options.N or not options.M:
+        parser.error("All options are required!")
+
+    app = test(dest, options.engine, options.N, options.M)
     app.test()
