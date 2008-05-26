@@ -4,13 +4,13 @@ from MySQLdb import connect
 import re
 
 src = {
-    #'host': 'oust',
-    'host': '127.0.0.1',
+    'host': 'oust',
+    #'host': '127.0.0.1',
     'user': 'webread',
     'db': 'hisparc',
     'password': '',
-    #'port': 3306,
-    'port': 3307,
+    'port': 3306,
+    #'port': 3307,
 }
 dest = {
     'host': 'localhost',
@@ -21,7 +21,7 @@ dest = {
 }
 
 class convert:
-    nullstring = re.compile("''|'None'")
+    nullstring = re.compile("'None'")
     prefix_re = re.compile("([a-z ]*)([A-Z][A-Za-z ]*)")
     postcode = re.compile("(?<=[0-9]{4}).*(?=[A-Z]{2})")
     postbus = re.compile("Postbus +")
@@ -103,11 +103,12 @@ class convert:
 
         for r in self.src_cursor.fetchall():
             name, url = r
+            country = 'Netherlands'
 
             if name == 'ONBEKEND' or name == 'Wachtlijst': continue
 
-            sql  = "INSERT inforecords_cluster (name, url) "
-            sql += "VALUES ('%s', '%s')" % (name, url)
+            sql  = "INSERT inforecords_cluster (name, country, url) "
+            sql += "VALUES ('%s', '%s', '%s')" % (name, country, url)
             self.dest_transaction(sql)
 
         self.dest_commit()
@@ -126,7 +127,7 @@ class convert:
             clusname, name, url , address, postalcode, pobox, \
             pobox_postalcode, city, phone, fax, email, status = r
             country = 'Netherlands'
-            pobox_city = ''
+            pobox_city = 'None'
             status += 1
 
             postalcode = self.postcode.sub("", str(postalcode))

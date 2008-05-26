@@ -54,6 +54,6 @@ UNLOCK TABLES;
 
 LOCK TABLES `inforecords_pctype` WRITE;
 
-INSERT INTO `inforecords_pctype` VALUES (1,'Detector'),(2,'Detector / Buffer Database'),(3,'Buffer Database'),(4,'Local Database'),(5,'Buffer / Local Database'),(6,'Detector / Buffer / Local database');
+INSERT INTO `inforecords_pctype` VALUES (1,'Detector'),(2,'Detector / Buffer Database'),(3,'Buffer Database'),(4,'Local Database'),(5,'Buffer / Local Database'),(6,'Detector / Buffer / Local database'),(7,'Admin PC');
 
 UNLOCK TABLES;

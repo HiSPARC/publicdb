@@ -14,7 +14,7 @@ class Contact(models.Model):
     contactposition = models.ForeignKey(Contactposition)
     title = models.CharField(maxlength=20, null=True, blank=True)
     first_name = models.CharField(maxlength=40)
-    prefix_last_name = models.CharField(maxlength=10, null=True, blank=True)
+    prefix_last_name = models.CharField(maxlength=10, blank=True)
     last_name = models.CharField(maxlength=40)
     url = models.URLField(null=True, blank=True)
     email = models.EmailField()
@@ -22,13 +22,15 @@ class Contact(models.Model):
     phone_home = models.PhoneNumberField(null=True, blank=True)
 
     def __str__(self):
-        return '%s %s %s' % (self.first_name, self.prefix_last_name, self.last_name)
+        return '%s %s %s %s' % (self.title, self.first_name, self.prefix_last_name, self.last_name)
 
     class Meta:
         unique_together = [('first_name', 'prefix_last_name', 'last_name')]
 
     class Admin:
-        pass
+        list_display = ('__str__', 'contactposition', 'email', 'phone_work', 'url')
+        list_filter = ('contactposition',)
+        ordering = ('last_name', 'first_name')
 
 class Organization(models.Model):
     name = models.CharField(maxlength=40, unique=True)
@@ -43,6 +45,7 @@ class Organization(models.Model):
 
 class Cluster(models.Model):
     name = models.CharField(maxlength=70, unique=True)
+    country = models.CharField(maxlength=40)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
@@ -50,7 +53,10 @@ class Cluster(models.Model):
         return self.name
 
     class Admin:
-        pass
+        list_display = ('name', 'country')
+        list_filter = ('country',)
+        ordering = ('country', 'name')
+
 
 class LocationStatus(models.Model):
     description = models.CharField(maxlength=40, unique=True)
@@ -92,8 +98,13 @@ class Station(models.Model):
 
     def __str__(self):
         return '%s - %s' % (self.number, self.location)
+
+    def cluster(self):
+        return self.location.cluster
+
     class Admin:
-        pass
+        list_display = ('number', 'location', 'cluster')
+        ordering = ('number',)
 
 class DetectorStatus(models.Model):
     description = models.CharField(maxlength=40, unique=True)
@@ -129,7 +140,8 @@ class DetectorHisparc(models.Model):
         return str(self.station)
 
     class Admin:
-        pass
+        list_display = ('__str__', 'status')
+        ordering = ('station',)
 
 class ElectronicsType(models.Model):
     description = models.CharField(maxlength=40, unique=True)
@@ -191,7 +203,7 @@ class Pc(models.Model):
     station = models.ForeignKey(Station)
     type = models.ForeignKey(PcType)
     name = models.CharField(maxlength=40, unique=True)
-    ip = models.IPAddressField(unique=True)
+    ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     
     def __str__(self):
@@ -210,6 +222,20 @@ class MonitorService(models.Model):
     
     def __str__(self):
         return self.description
+
+    class Admin:
+        pass
+
+class PcMonitorService(models.Model):
+    pc = models.ForeignKey(Pc)
+    monitor_service = models.ForeignKey(MonitorService)
+    override_min_critical = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
+    override_max_critical = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
+    override_min_warning = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
+    override_max_warning = models.FloatField(null=True, max_digits=22, decimal_places=21, blank=True)
+
+    def __str__(self):
+        return '%s - %s' % (self.pc, self.monitor_service)
 
     class Admin:
         pass
