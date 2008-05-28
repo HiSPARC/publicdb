@@ -144,12 +144,12 @@ set fontpath
 set fit noerrorvariables
 GNUTERM = "wxt"
 plot \
-'myisam-columns-100-1000.out' using ($0):($2/($0*1000*40 + 1000*20004)) \
-title "MyISAM (columns, 1000 events)" with lines, \
-'myisam-rows-100-1000.out' using ($0):($2/($0*1000*40 + 1000*20004)) \
-title "MyISAM (rows, 1000 events)" with lines, \
-'innodb-columns-100-1000.out' using ($0):($2/($0*1000*40 + 1000*20004)) \
-title "InnoDB (columns, 1000 events)" with lines, \
-'innodb-rows-100-1000.out' using ($0):($2/($0*1000*40 + 1000*20004)) \
-title "InnoDB (rows, 1000 events)" with lines
+'myisam-columns-100-10000.out' using ($0):($2/($0*10000*40 + 10000*20004)) \
+title "MyISAM (columns, 10000 events)" with lines, \
+'myisam-rows-100-10000.out' using ($0):($2/($0*10000*40 + 10000*20004)) \
+title "MyISAM (rows, 10000 events)" with lines, \
+'innodb-columns-100-10000.out' using ($0):($2/($0*10000*40 + 10000*20004)) \
+title "InnoDB (columns, 10000 events)" with lines, \
+'innodb-rows-100-10000.out' using ($0):($2/($0*10000*40 + 10000*20004)) \
+title "InnoDB (rows, 10000 events)" with lines
 #    EOF
