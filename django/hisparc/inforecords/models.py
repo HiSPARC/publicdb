@@ -3,7 +3,7 @@ from django.db import models
 class Contactposition(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -21,14 +21,14 @@ class Contact(models.Model):
     phone_work = models.PhoneNumberField(null=True, blank=True)
     phone_home = models.PhoneNumberField(null=True, blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s %s %s %s' % (self.title, self.first_name, self.prefix_last_name, self.last_name)
 
     class Meta:
         unique_together = [('first_name', 'prefix_last_name', 'last_name')]
 
     class Admin:
-        list_display = ('__str__', 'contactposition', 'email', 'phone_work', 'url')
+        list_display = ('__unicode__', 'contactposition', 'email', 'phone_work', 'url')
         list_filter = ('contactposition',)
         ordering = ('last_name', 'first_name')
 
@@ -37,7 +37,7 @@ class Organization(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Admin:
@@ -49,7 +49,7 @@ class Cluster(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Admin:
@@ -61,7 +61,7 @@ class Cluster(models.Model):
 class LocationStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -85,7 +85,7 @@ class Location(models.Model):
     url = models.URLField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Admin:
@@ -98,7 +98,7 @@ class Station(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True)
     number = models.IntegerField(unique=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s - %s' % (self.number, self.location)
 
     def cluster(self):
@@ -111,7 +111,7 @@ class Station(models.Model):
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -137,18 +137,19 @@ class DetectorHisparc(models.Model):
     scintillator_4_perp = models.FloatField(null=True, blank=True)
     scintillator_4_long = models.FloatField(null=True, blank=True)
     password = models.CharField(max_length=40)
+    upload_code = models.CharField(max_length=3)
 
-    def __str__(self):
-        return str(self.station)
+    def __unicode__(self):
+        return unicode(self.station)
 
     class Admin:
-        list_display = ('__str__', 'status')
+        list_display = ('__unicode__', 'status')
         ordering = ('station',)
 
 class ElectronicsType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -157,7 +158,7 @@ class ElectronicsType(models.Model):
 class ElectronicsStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -168,7 +169,7 @@ class ElectronicsBatch(models.Model):
     number = models.IntegerField(unique=True)
     notes = models.TextField()
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s: %s' % (self.type, self.number)
 
     class Admin:
@@ -186,7 +187,7 @@ class Electronics(models.Model):
     has_gps = models.BooleanField()
     notes = models.TextField(null=True, blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s / %s' % (self.batch, self.serial)
 
     class Admin:
@@ -195,7 +196,7 @@ class Electronics(models.Model):
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -208,7 +209,7 @@ class Pc(models.Model):
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
 
     class Admin:
@@ -222,7 +223,7 @@ class MonitorService(models.Model):
     min_warning = models.FloatField(null=True, blank=True)
     max_warning = models.FloatField(null=True, blank=True)
     
-    def __str__(self):
+    def __unicode__(self):
         return self.description
 
     class Admin:
@@ -236,7 +237,7 @@ class PcMonitorService(models.Model):
     override_min_warning = models.FloatField(null=True, blank=True)
     override_max_warning = models.FloatField(null=True, blank=True)
 
-    def __str__(self):
+    def __unicode__(self):
         return '%s - %s' % (self.pc, self.monitor_service)
 
     class Admin:
