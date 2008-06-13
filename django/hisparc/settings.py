@@ -79,5 +79,4 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.admin',
     'hisparc.inforecords',
-    'hisparc.eventrecords',
 )
