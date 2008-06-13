@@ -13,10 +13,10 @@ src = {
     #'port': 3307,
 }
 dest = {
-    'host': 'localhost',
-    'user': 'hisparc_admin',
-    'db': 'hisparc',
-    'password' : 'Crapsih',
+    'host': '192.16.192.183',
+    'user': 'hisparc',
+    'db': 'hisparc_final',
+    'password' : '',
     'port': 3306,
 }
 
@@ -25,6 +25,7 @@ class convert:
     prefix_re = re.compile("([a-z ]*)([A-Z][A-Za-z ]*)")
     postcode = re.compile("(?<=[0-9]{4}).*(?=[A-Z]{2})")
     postbus = re.compile("Postbus +")
+    upload_codes = {}
 
     def __init__(self, src, dest):
         self.connect(src, dest)
@@ -203,10 +204,11 @@ class convert:
             self.dest_transaction(sql, True)
 
             station_id = self.get_station_id(number)
+            upload_code = self.create_upload_code(location_id)
 
             sql  = "INSERT inforecords_detectorhisparc (station_id, "
             sql += "status_id, startdate, enddate, latitude, longitude, "
-            sql += "height, password) "
+            sql += "height, password, upload_code) "
             sql += "VALUES("
             sql += "'%s', " % station_id
             sql += "'%s', " % status
@@ -215,7 +217,8 @@ class convert:
             sql += "'%s', " % latitude
             sql += "'%s', " % longitude
             sql += "'%s', " % height
-            sql += "'%s')"  % password
+            sql += "'%s', " % password
+            sql += "'%s') " % upload_code
             self.dest_transaction(sql, True)
 
         return
@@ -246,6 +249,24 @@ class convert:
         self.dest_cursor.execute(sql)
 
         return self.dest_cursor.fetchone()[0]
+
+    def create_upload_code(self, location_id):
+        sql  = "SELECT city FROM inforecords_location "
+        sql += "WHERE id = '%s'" % location_id
+        self.dest_cursor.execute(sql)
+
+        city = self.dest_cursor.fetchone()[0]
+        l = city[0].upper()
+
+        # dark magic: generate A01,A02,etc. for Amsterdam,
+        # L01,L02,etc. for Leiden, etc.
+        try:
+            self.upload_codes[l] += 1
+        except KeyError:
+            self.upload_codes[l] = 1
+        upload_code = l + '%02d' % self.upload_codes[l]
+
+        return upload_code
 
     def dest_transaction(self, sql, commit = False):
         sql = self.nullstring.sub("NULL", sql)
