@@ -13,10 +13,10 @@ src = {
     #'port': 3307,
 }
 dest = {
-    'host': '192.16.192.183',
-    'user': 'hisparc',
-    'db': 'hisparc_final',
-    'password' : '',
+    'host': '127.0.0.1',
+    'user': 'hisparc_admin',
+    'db': 'hisparc',
+    'password' : 'Crapsih',
     'port': 3306,
 }
 
