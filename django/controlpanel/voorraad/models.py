@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from controlpanel.middleware import threadlocals
 from django.utils.safestring import mark_safe
 
-
 class Leverancier(models.Model):
 	naam = models.CharField(max_length=255)
 	adres = models.CharField(max_length=255)
@@ -27,13 +26,6 @@ class Leverancier(models.Model):
                 ordering = ['naam']
                 verbose_name_plural = 'Leveranciers'
 
-        class Admin:
-                list_display = ('naam','woonplaats','land','telefoon','contactpersoon')
-                list_filter = ('woonplaats','land')
-                search_fields = ('naam')
-                #ordering = ('naam')
-
-
 class Opbergplek(models.Model):
 	opbergplek = models.CharField(max_length=255,unique=True)
 
@@ -44,9 +36,6 @@ class Opbergplek(models.Model):
         class Meta:
                 ordering = ['opbergplek']
                 verbose_name_plural = 'Opbergplekken'
-
-        class Admin:
-                pass
 
 STATUS = (
         ('V', 'V'),
@@ -83,12 +72,6 @@ class Artikel(models.Model):
                 ordering = ['naam']
 		verbose_name_plural = 'Artikelen'
 
-        class Admin:
-                list_display = ('naam','opbergplek','aantal','leverancier','datum','commentaar')
-                list_filter = ('opbergplek','leverancier')
-                search_fields = ('naam')
-                #ordering = ('naam')
-
 class Apparatuur(models.Model):
         naam = models.CharField(max_length=255)
         opbergplek = models.ForeignKey(Opbergplek)
@@ -98,11 +81,6 @@ class Apparatuur(models.Model):
         # standaard waarde
         def __unicode__(self):
                 return self.naam
-
-        class Admin:
-                list_display = ('naam','opbergplek','aantal')
-                #list_filter = ('opbergplek')
-                search_fields = ('naam')
 
 	class Meta:
                 verbose_name_plural = 'Apparatuur'
@@ -122,12 +100,6 @@ class Reservering(models.Model):
         class Meta:
                 ordering = ['datum','artikel']
                 verbose_name_plural = 'Reserveringen'
-
-        class Admin:
-                list_display = ('cluster','artikel','aantal','datum','voldaan')
-                list_filter = ('cluster','voldaan')
-                search_fields = ('artikel')
-                 
 
 class Gebruikt(models.Model):
 	persoon = models.ForeignKey(User)
@@ -157,13 +129,6 @@ class Gebruikt(models.Model):
         class Meta:
                 ordering = ['datum','artikel']
                 verbose_name_plural = 'Gebruikt'
-
-        class Admin:
-                list_display = ('persoon','artikel','aantal','datum','cluster')
-                list_filter = ('persoon','cluster')
-                #search_fields = ('artikel')
-                #ordering = ('naam')
-
 
 class Bestel(models.Model):
         persoon = models.ForeignKey(User,blank=True)
@@ -197,10 +162,3 @@ class Bestel(models.Model):
         class Meta:
                 ordering = ['datumbesteld','artikel']
                 verbose_name_plural = 'Bestellen'
-
-        class Admin:
-                list_display = ('persoon','artikel','aantalbesteld','datumbesteld','levertijd','aantalgeleverd','datumgeleverd','voldaan')
-                list_filter = ('persoon','voldaan')
-                search_fields = ('artikel')
-                #ordering = ('naam') s
-

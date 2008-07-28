@@ -6,9 +6,6 @@ class Contactposition(models.Model):
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
-
 class Contact(models.Model):
     location = models.ForeignKey('Location', related_name='contacts', null=True, blank=True)
     contactposition = models.ForeignKey(Contactposition)
@@ -27,11 +24,6 @@ class Contact(models.Model):
     class Meta:
         unique_together = [('first_name', 'prefix_last_name', 'last_name')]
 
-    class Admin:
-        list_display = ('__unicode__', 'contactposition', 'email', 'phone_work', 'url')
-        list_filter = ('contactposition',)
-        ordering = ('last_name', 'first_name')
-
 class Organization(models.Model):
     name = models.CharField(max_length=40, unique=True)
     contact = models.ForeignKey(Contact, null=True, blank=True)
@@ -39,9 +31,6 @@ class Organization(models.Model):
 
     def __unicode__(self):
         return self.name
-
-    class Admin:
-        ordering = ('name',)
 
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
@@ -52,20 +41,12 @@ class Cluster(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        list_display = ('name', 'country')
-        list_filter = ('country',)
-        ordering = ('country', 'name')
-
-
 class LocationStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Location Status'
 
@@ -90,11 +71,6 @@ class Location(models.Model):
     def __unicode__(self):
         return self.name
 
-    class Admin:
-        list_display = ('name', 'organization', 'cluster')
-        list_filter = ('cluster',)
-        ordering = ('name',)
-
 class Station(models.Model):
     location = models.ForeignKey(Location)
     contact = models.ForeignKey(Contact, null=True, blank=True)
@@ -106,18 +82,12 @@ class Station(models.Model):
     def cluster(self):
         return self.location.cluster
 
-    class Admin:
-        list_display = ('number', 'location', 'cluster')
-        ordering = ('number',)
-
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Detector Status'
 
@@ -146,10 +116,6 @@ class DetectorHisparc(models.Model):
     def __unicode__(self):
         return unicode(self.station)
 
-    class Admin:
-        list_display = ('__unicode__', 'status')
-        ordering = ('station',)
-
     class Meta:
         verbose_name_plural = 'Detector HiSPARC'
 
@@ -159,8 +125,6 @@ class ElectronicsType(models.Model):
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Electronics Type'
 
@@ -170,8 +134,6 @@ class ElectronicsStatus(models.Model):
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Electronics Status'
 
@@ -183,8 +145,6 @@ class ElectronicsBatch(models.Model):
     def __unicode__(self):
         return '%s: %s' % (self.type, self.number)
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Electronics Batch'
 
@@ -203,8 +163,6 @@ class Electronics(models.Model):
     def __unicode__(self):
         return '%s / %s' % (self.batch, self.serial)
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Electronics'
 
@@ -214,8 +172,6 @@ class PcType(models.Model):
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'PC Type'
 
@@ -239,9 +195,6 @@ class Pc(models.Model):
     urlGenereer.short_description = 'VPN URL'
     urlGenereer.allow_tags = True
 
-    class Admin:
-        list_display = ('name', 'type', 'ip','urlGenereer','certificaatGenereer')
-        ordering = ('name',)
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
 
@@ -282,8 +235,6 @@ class MonitorService(models.Model):
     def __unicode__(self):
         return self.description
 
-    class Admin:
-        pass
     class Meta:
         verbose_name_plural = 'Monitor Services'
 
@@ -297,10 +248,6 @@ class PcMonitorService(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.pc, self.monitor_service)
-
-    class Admin:
-        list_display = ('pc','monitor_service')
-        ordering = ('pc','monitor_service')
 
     class Meta:
         verbose_name_plural = 'PC Monitor Services'
