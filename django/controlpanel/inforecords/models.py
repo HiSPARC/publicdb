@@ -66,6 +66,8 @@ class LocationStatus(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Location Status'
 
 class Location(models.Model):
     name = models.CharField(max_length=70, unique=True)
@@ -116,6 +118,8 @@ class DetectorStatus(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Detector Status'
 
 class DetectorHisparc(models.Model):
     station = models.ForeignKey(Station)
@@ -146,6 +150,9 @@ class DetectorHisparc(models.Model):
         list_display = ('__unicode__', 'status')
         ordering = ('station',)
 
+    class Meta:
+        verbose_name_plural = 'Detector HiSPARC'
+
 class ElectronicsType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     
@@ -154,6 +161,8 @@ class ElectronicsType(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Electronics Type'
 
 class ElectronicsStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -163,6 +172,8 @@ class ElectronicsStatus(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Electronics Status'
 
 class ElectronicsBatch(models.Model):
     type = models.ForeignKey(ElectronicsType)
@@ -174,6 +185,8 @@ class ElectronicsBatch(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Electronics Batch'
 
 class Electronics(models.Model):
     station = models.ForeignKey(Station)
@@ -192,6 +205,8 @@ class Electronics(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Electronics'
 
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -201,6 +216,8 @@ class PcType(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'PC Type'
 
 class Pc(models.Model):
     station = models.ForeignKey(Station)
@@ -212,8 +229,47 @@ class Pc(models.Model):
     def __unicode__(self):
         return self.name
 
+    def certificaatGenereer(self):
+            return '<a target=_blank href=http://vpn.hisparc.nl/certificaat/genereer/%s/%s.zip>Certificaat</a>' % (self.type_id,self.name)
+    certificaatGenereer.short_description = 'Meer info'
+    certificaatGenereer.allow_tags = True
+
+    def urlGenereer(self):
+	return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
+    urlGenereer.short_description = 'VPN URL'
+    urlGenereer.allow_tags = True
+
     class Admin:
-        pass
+        list_display = ('name', 'type', 'ip','urlGenereer','certificaatGenereer')
+        ordering = ('name',)
+    class Meta:
+        verbose_name_plural = 'PC en Certificaten'
+
+    def ipAdresGenereer(self,ipadres):
+	# bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
+
+	hexn = ''.join(["%02X" % long(i) for i in ipadres.split('.')])
+	n = long(hexn, 16) + 1
+	
+	d = 256 * 256 * 256
+	q = []
+	while d > 0:
+	        m,n = divmod(n,d)
+	        q.append(str(m))
+	        d = d/256
+
+	return '.'.join(q)
+
+    def save(self):
+                if self.id:
+                        super(Pc,self).save()
+                else:
+			if self.type_id == '7':
+				vorigip = Pc.objects.filter(type=7).order_by('-ip')[0].ip
+			else:
+                        	vorigip = Pc.objects.latest('ip').ip
+			self.ip = self.ipAdresGenereer(vorigip)
+                        super(Pc,self).save()
 
 class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -228,6 +284,8 @@ class MonitorService(models.Model):
 
     class Admin:
         pass
+    class Meta:
+        verbose_name_plural = 'Monitor Services'
 
 class PcMonitorService(models.Model):
     pc = models.ForeignKey(Pc)
@@ -241,4 +299,8 @@ class PcMonitorService(models.Model):
         return '%s - %s' % (self.pc, self.monitor_service)
 
     class Admin:
-        pass
+        list_display = ('pc','monitor_service')
+        ordering = ('pc','monitor_service')
+
+    class Meta:
+        verbose_name_plural = 'PC Monitor Services'
