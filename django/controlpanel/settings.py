@@ -67,10 +67,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'controlpanel.urls'
 
-TEMPLATE_DIRS = ( '/usr/local/hisparc/controlpanel/template'
+TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
+    '/home/david/work/HiSPARC/software/bzr/administration/django/controlpanel/templates',
 )
 
 INSTALLED_APPS = (
