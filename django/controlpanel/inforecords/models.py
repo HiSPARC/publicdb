@@ -23,6 +23,7 @@ class Contact(models.Model):
 
     class Meta:
         unique_together = [('first_name', 'prefix_last_name', 'last_name')]
+        ordering = ('last_name', 'first_name')
 
 class Organization(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -32,6 +33,9 @@ class Organization(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        ordering = ('name',)
+
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     country = models.CharField(max_length=40)
@@ -40,6 +44,9 @@ class Cluster(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        ordering = ('country', 'name')
 
 class LocationStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -71,6 +78,9 @@ class Location(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        ordering = ('name',)
+
 class Station(models.Model):
     location = models.ForeignKey(Location)
     contact = models.ForeignKey(Contact, null=True, blank=True)
@@ -81,6 +91,9 @@ class Station(models.Model):
 
     def cluster(self):
         return self.location.cluster
+
+    class Meta:
+        ordering = ('number',)
 
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -118,6 +131,7 @@ class DetectorHisparc(models.Model):
 
     class Meta:
         verbose_name_plural = 'Detector HiSPARC'
+        ordering = ('station__number',)
 
 class ElectronicsType(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -197,6 +211,7 @@ class Pc(models.Model):
 
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
+        ordering = ('name',)
 
     def ipAdresGenereer(self,ipadres):
 	# bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
@@ -251,3 +266,4 @@ class PcMonitorService(models.Model):
 
     class Meta:
         verbose_name_plural = 'PC Monitor Services'
+        ordering = ('pc','monitor_service')
