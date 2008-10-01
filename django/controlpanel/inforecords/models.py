@@ -199,13 +199,23 @@ class Pc(models.Model):
     def __unicode__(self):
         return self.name
 
+    def ipview(self):
+	if self.type_id == 7:
+		return ''
+	else:
+ 		return self.ip
+    ipview.short_description = 'Ip adres'
+
     def certificaatGenereer(self):
             return '<a target=_blank href=http://vpn.hisparc.nl/certificaat/genereer/%s/%s.zip>Certificaat</a>' % (self.type_id,self.name)
     certificaatGenereer.short_description = 'Meer info'
     certificaatGenereer.allow_tags = True
 
     def urlGenereer(self):
-	return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
+	if self.type_id == 7:
+		return ''
+	else:
+		return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
     urlGenereer.short_description = 'VPN URL'
     urlGenereer.allow_tags = True
 
@@ -232,7 +242,7 @@ class Pc(models.Model):
                 if self.id:
                         super(Pc,self).save()
                 else:
-			if self.type_id == '7':
+			if self.type_id == 7:
 				vorigip = Pc.objects.filter(type=7).order_by('-ip')[0].ip
 			else:
                         	vorigip = Pc.objects.latest('ip').ip

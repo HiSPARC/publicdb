@@ -21,7 +21,7 @@ class DetectorHisparcAdmin(admin.ModelAdmin):
     list_filter = ('status',)
 
 class PcAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'ip','urlGenereer','certificaatGenereer')
+    list_display = ('name', 'type', 'ipview','urlGenereer','certificaatGenereer')
 
 class PcMonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('pc','monitor_service')

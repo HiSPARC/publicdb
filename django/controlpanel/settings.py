@@ -1,6 +1,6 @@
 # Django settings for controlpanel project.
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -11,9 +11,9 @@ MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'inforecords'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'hisparc'             # Not used with sqlite3.
+DATABASE_USER = 'inforecords'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'Crapsih'         # Not used with sqlite3.
-DATABASE_HOST = ''             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_HOST = 'pique.nikhef.nl'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
@@ -40,7 +40,7 @@ MEDIA_ROOT = '/tmp/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://localhost/media'
+MEDIA_URL = 'http://vpn.hisparc.nl/media'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -71,7 +71,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    '/home/david/work/HiSPARC/software/bzr/administration/django/controlpanel/templates',
+    '/home/admhispa/http/controlpanel/templates',
 )
 
 INSTALLED_APPS = (
