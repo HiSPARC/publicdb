@@ -11,9 +11,9 @@ MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'           # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 DATABASE_NAME = 'inforecords'             # Or path to database file if using sqlite3.
-DATABASE_USER = 'inforecords'             # Not used with sqlite3.
+DATABASE_USER = 'hisparc'             # Not used with sqlite3.
 DATABASE_PASSWORD = 'Crapsih'         # Not used with sqlite3.
-DATABASE_HOST = 'pique.nikhef.nl'             # Set to empty string for localhost. Not used with sqlite3.
+DATABASE_HOST = 'localhost'             # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Local time zone for this installation. Choices can be found here:
