@@ -25,6 +25,7 @@ class PcAdmin(admin.ModelAdmin):
 
 class PcMonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('pc','monitor_service')
+    list_filter = ('pc',)
 
 admin.site.register(Contactposition)
 admin.site.register(Contact, ContactAdmin)

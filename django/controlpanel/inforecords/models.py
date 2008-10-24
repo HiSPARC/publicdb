@@ -243,9 +243,9 @@ class Pc(models.Model):
                         super(Pc,self).save()
                 else:
 			if self.type_id == 7:
-				vorigip = Pc.objects.filter(type=7).order_by('-ip')[0].ip
+				vorigip = Pc.objects.filter(type=7).latest('id').ip
 			else:
-                        	vorigip = Pc.objects.latest('ip').ip
+				vorigip = Pc.objects.exclude(type=7).latest('id').ip
 			self.ip = self.ipAdresGenereer(vorigip)
                         super(Pc,self).save()
 
