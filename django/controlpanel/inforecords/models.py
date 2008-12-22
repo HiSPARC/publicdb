@@ -7,7 +7,8 @@ class Contactposition(models.Model):
         return self.description
 
 class Contact(models.Model):
-    location = models.ForeignKey('Location', related_name='contacts', null=True, blank=True)
+    location = models.ForeignKey('Location', related_name='contacts',
+                                 null=True, blank=True)
     contactposition = models.ForeignKey(Contactposition)
     title = models.CharField(max_length=20, null=True, blank=True)
     first_name = models.CharField(max_length=40)
@@ -15,11 +16,12 @@ class Contact(models.Model):
     last_name = models.CharField(max_length=40)
     url = models.URLField(null=True, blank=True)
     email = models.EmailField()
-    phone_work = models.PhoneNumberField(null=True, blank=True)
-    phone_home = models.PhoneNumberField(null=True, blank=True)
+    phone_work = models.CharField(max_length=20, null=True, blank=True)
+    phone_home = models.CharField(max_length=20, null=True, blank=True)
 
     def __unicode__(self):
-        return '%s %s %s %s' % (self.title, self.first_name, self.prefix_last_name, self.last_name)
+        return "%s %s %s %s" % (self.title, self.first_name,
+                                self.prefix_last_name, self.last_name)
 
     class Meta:
         unique_together = [('first_name', 'prefix_last_name', 'last_name')]
@@ -61,7 +63,8 @@ class Location(models.Model):
     name = models.CharField(max_length=70, unique=True)
     organization = models.ForeignKey(Organization)
     cluster = models.ForeignKey(Cluster)
-    contact = models.ForeignKey(Contact, related_name='locations', null=True, blank=True)
+    contact = models.ForeignKey(Contact, related_name='locations', null=True,
+                                blank=True)
     locationstatus = models.ForeignKey(LocationStatus)
     address = models.CharField(max_length=40)
     postalcode = models.CharField(max_length=6)
@@ -70,8 +73,8 @@ class Location(models.Model):
     pobox_city = models.CharField(max_length=40, null=True, blank=True)
     city = models.CharField(max_length=40)
     country = models.CharField(max_length=40)
-    phone = models.PhoneNumberField(null=True, blank=True)
-    fax = models.PhoneNumberField(null=True, blank=True)
+    phone = models.CharField(max_length=20, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
     email = models.EmailField(null=True, blank=True)
     
@@ -85,6 +88,7 @@ class Station(models.Model):
     location = models.ForeignKey(Location)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     number = models.IntegerField(unique=True)
+    password = models.CharField(max_length=40)
 
     def __unicode__(self):
         return '%s - %s' % (self.number, self.location)
@@ -117,12 +121,16 @@ class DetectorHisparc(models.Model):
     translation_long = models.FloatField(null=True, blank=True)
     scintillator_1_perp = models.FloatField(null=True, blank=True)
     scintillator_1_long = models.FloatField(null=True, blank=True)
+    scintillator_1_angle = models.FloatField(null=True, blank=True)
     scintillator_2_perp = models.FloatField(null=True, blank=True)
     scintillator_2_long = models.FloatField(null=True, blank=True)
+    scintillator_2_angle = models.FloatField(null=True, blank=True)
     scintillator_3_perp = models.FloatField(null=True, blank=True)
     scintillator_3_long = models.FloatField(null=True, blank=True)
+    scintillator_3_angle = models.FloatField(null=True, blank=True)
     scintillator_4_perp = models.FloatField(null=True, blank=True)
     scintillator_4_long = models.FloatField(null=True, blank=True)
+    scintillator_4_angle = models.FloatField(null=True, blank=True)
     password = models.CharField(max_length=40)
     upload_code = models.CharField(max_length=3, unique=True)
 
@@ -141,6 +149,7 @@ class ElectronicsType(models.Model):
 
     class Meta:
         verbose_name_plural = 'Electronics Type'
+        ordering = ('description',)
 
 class ElectronicsStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -161,6 +170,7 @@ class ElectronicsBatch(models.Model):
 
     class Meta:
         verbose_name_plural = 'Electronics Batch'
+        ordering = ('type', 'number')
 
 class Electronics(models.Model):
     station = models.ForeignKey(Station)
@@ -179,6 +189,7 @@ class Electronics(models.Model):
 
     class Meta:
         verbose_name_plural = 'Electronics'
+        ordering = ('batch', 'serial')
 
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -199,55 +210,51 @@ class Pc(models.Model):
     def __unicode__(self):
         return self.name
 
-    def ipview(self):
-	if self.type_id == 7:
-		return ''
-	else:
- 		return self.ip
-    ipview.short_description = 'Ip adres'
+    def certificaat(self):
+        return "<a target=_blank href=http://vpn.hisparc.nl/certificaat/" \
+               "genereer/%s/%s.zip>Certificaat %s</a>" % (self.type_id,
+                                                          self.name, self.name)
+    certificaat.short_description = 'Certificaten'
+    certificaat.allow_tags = True
 
-    def certificaatGenereer(self):
-            return '<a target=_blank href=http://vpn.hisparc.nl/certificaat/genereer/%s/%s.zip>Certificaat</a>' % (self.type_id,self.name)
-    certificaatGenereer.short_description = 'Meer info'
-    certificaatGenereer.allow_tags = True
-
-    def urlGenereer(self):
-	if self.type_id == 7:
-		return ''
-	else:
-		return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
-    urlGenereer.short_description = 'VPN URL'
-    urlGenereer.allow_tags = True
+    def url(self):
+        if self.type.description == 'Admin PC':
+            return ''
+        else:
+            return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
+    url.short_description = 'VPN URL'
+    url.allow_tags = True
 
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
         ordering = ('name',)
 
     def ipAdresGenereer(self,ipadres):
-	# bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
+        # bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
+        hexn = ''.join(["%02X" % long(i) for i in ipadres.split('.')])
+        n = long(hexn, 16) + 1
 
-	hexn = ''.join(["%02X" % long(i) for i in ipadres.split('.')])
-	n = long(hexn, 16) + 1
-	
-	d = 256 * 256 * 256
-	q = []
-	while d > 0:
-	        m,n = divmod(n,d)
-	        q.append(str(m))
-	        d = d/256
+        d = 256 * 256 * 256
+        q = []
+        while d > 0:
+                m,n = divmod(n,d)
+                q.append(str(m))
+                d = d/256
 
-	return '.'.join(q)
+        return '.'.join(q)
 
     def save(self):
-                if self.id:
-                        super(Pc,self).save()
-                else:
-			if self.type_id == 7:
-				vorigip = Pc.objects.filter(type=7).latest('id').ip
-			else:
-				vorigip = Pc.objects.exclude(type=7).latest('id').ip
-			self.ip = self.ipAdresGenereer(vorigip)
-                        super(Pc,self).save()
+        if self.id:
+            super(Pc,self).save()
+        else:
+            if self.type.description == "Admin PC":
+                vorigip = Pc.objects.filter(type__description="Admin PC").\
+                          latest('id').ip
+            else:
+                vorigip = Pc.objects.exclude(type__description="Admin PC").\
+                          latest('id').ip
+            self.ip = self.ipAdresGenereer(vorigip)
+            super(Pc,self).save()
 
 class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -262,6 +269,7 @@ class MonitorService(models.Model):
 
     class Meta:
         verbose_name_plural = 'Monitor Services'
+        ordering = ('description',)
 
 class PcMonitorService(models.Model):
     pc = models.ForeignKey(Pc)

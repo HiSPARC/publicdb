@@ -1,0 +1,27 @@
+Make sure to apply these changes per revision, in reverse order! Otherwise, you
+may corrupt your database.
+
+-------------------------------------------------------------------------------
+Changed in revision 31:
+
+Passwords are used station-wide, not just for the scintillator device. Added
+support for the angle in which skiboxes are placed. Now, we can fully describe
+the station layout.
+
+Perform these changes manually:
+
+./manage.py dbshell:
+mysql> alter table inforecords_station add column password varchar(40) not null;
+mysql> alter table inforecords_detectorhisparc add column scintillator_1_angle double precision null;
+mysql> alter table inforecords_detectorhisparc add column scintillator_2_angle double precision null;
+mysql> alter table inforecords_detectorhisparc add column scintillator_3_angle double precision null;
+mysql> alter table inforecords_detectorhisparc add column scintillator_4_angle double precision null;
+
+./manage.py shell:
+In [28]: from inforecords.models import DetectorHisparc, Station
+
+In [29]: for d in DetectorHisparc.objects.select_related().all():
+    d.station.password = d.password
+    d.station.save()
+   ....:     
+   ....:     
