@@ -131,8 +131,6 @@ class DetectorHisparc(models.Model):
     scintillator_4_perp = models.FloatField(null=True, blank=True)
     scintillator_4_long = models.FloatField(null=True, blank=True)
     scintillator_4_angle = models.FloatField(null=True, blank=True)
-    password = models.CharField(max_length=40)
-    upload_code = models.CharField(max_length=3, unique=True)
 
     def __unicode__(self):
         return unicode(self.station)

@@ -1,5 +1,18 @@
 Make sure to apply these changes per revision, in reverse order! Otherwise, you
-may corrupt your database.
+may corrupt your database. Revert back to the specified revision if necessary.
+
+-------------------------------------------------------------------------------
+Changed in revision 32:
+
+Make sure to apply these changes ONLY AFTER you have applied the changes from
+revision 31. Otherwise, you will lose all stored station passwords.
+
+Dropped upload codes and passwords from the DetectorHisparc model.
+
+./manage dbshell:
+mysql> alter table inforecords_detectorhisparc drop column password;
+mysql> alter table inforecords_detectorhisparc drop column upload_code;
+
 
 -------------------------------------------------------------------------------
 Changed in revision 31:
