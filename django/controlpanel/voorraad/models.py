@@ -51,7 +51,7 @@ class Artikel(models.Model):
 	artikelnummer = models.CharField(max_length=255)
 	datum = models.DateTimeField(auto_now=True)
         opmerkingen = models.TextField(blank=True)
-	status = models.CharField(max_length=1, core=True, choices=STATUS)
+	status = models.CharField(max_length=1, choices=STATUS)
 
         # standaard waarde
         def __unicode__(self):
