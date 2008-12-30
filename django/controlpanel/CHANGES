@@ -2,7 +2,7 @@ Make sure to apply these changes per revision, in reverse order! Otherwise, you
 may corrupt your database. Revert back to the specified revision if necessary.
 
 -------------------------------------------------------------------------------
-Changed in revision 31.2:
+Changed in revision 30.1.2:
 
 Make sure to apply these changes ONLY AFTER you have applied the changes from
 revision 31.1. Otherwise, you will lose all stored station passwords.
@@ -15,7 +15,7 @@ mysql> alter table inforecords_detectorhisparc drop column upload_code;
 
 
 -------------------------------------------------------------------------------
-Changed in revision 31.1:
+Changed in revision 30.1.1:
 
 Passwords are used station-wide, not just for the scintillator device. Added
 support for the angle in which skiboxes are placed. Now, we can fully describe
