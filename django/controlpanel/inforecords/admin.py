@@ -11,9 +11,18 @@ class ClusterAdmin(admin.ModelAdmin):
     list_display = ('name', 'country')
     list_filter = ('country',)
 
+class StationInline(admin.StackedInline):
+    model = Station
+    extra = 1
+
 class LocationAdmin(admin.ModelAdmin):
     list_display = ('name', 'organization', 'cluster')
     list_filter = ('cluster',)
+    inlines = (StationInline,)
+
+class LocationInline(admin.StackedInline):
+    model = Location
+    extra = 1
 
 class StationAdmin(admin.ModelAdmin):
     list_display = ('number', 'location', 'cluster')
@@ -24,6 +33,9 @@ class DetectorHisparcAdmin(admin.ModelAdmin):
 
 class ElectronicsAdmin(admin.ModelAdmin):
     list_filter = ('batch',)
+
+class OrganizationAdmin(admin.ModelAdmin):
+    inlines = (LocationInline,)
 
 class PcAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'ip', 'url', 'certificaat')
@@ -37,7 +49,7 @@ class MonitorServiceAdmin(admin.ModelAdmin):
 
 admin.site.register(Contactposition)
 admin.site.register(Contact, ContactAdmin)
-admin.site.register(Organization)
+admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(Cluster, ClusterAdmin)
 admin.site.register(LocationStatus)
 admin.site.register(Location, LocationAdmin)

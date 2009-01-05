@@ -1,4 +1,5 @@
 from django.db import models
+from eventwarehouse import update_station_password, remove_station_password
 
 class Contactposition(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -15,7 +16,7 @@ class Contact(models.Model):
     prefix_last_name = models.CharField(max_length=10, blank=True)
     last_name = models.CharField(max_length=40)
     url = models.URLField(null=True, blank=True)
-    email = models.EmailField()
+    email = models.EmailField(null=True, blank=True)
     phone_work = models.CharField(max_length=20, null=True, blank=True)
     phone_home = models.CharField(max_length=20, null=True, blank=True)
 
@@ -66,8 +67,8 @@ class Location(models.Model):
     contact = models.ForeignKey(Contact, related_name='locations', null=True,
                                 blank=True)
     locationstatus = models.ForeignKey(LocationStatus)
-    address = models.CharField(max_length=40)
-    postalcode = models.CharField(max_length=6)
+    address = models.CharField(max_length=40, null=True, blank=True)
+    postalcode = models.CharField(max_length=6, null=True, blank=True)
     pobox = models.CharField(max_length=9, null=True, blank=True)
     pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
     pobox_city = models.CharField(max_length=40, null=True, blank=True)
@@ -95,6 +96,14 @@ class Station(models.Model):
 
     def cluster(self):
         return self.location.cluster
+
+    def save(self, force_insert=False, force_update=False):
+        update_station_password(self.number, self.password)
+        super(Station, self).save(force_insert, force_update)
+
+    def delete(self):
+        remove_station_password(self.number)
+        super(Station, self).delete()
 
     class Meta:
         ordering = ('number',)
