@@ -73,7 +73,6 @@ class Location(models.Model):
     pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
     pobox_city = models.CharField(max_length=40, null=True, blank=True)
     city = models.CharField(max_length=40)
-    country = models.CharField(max_length=40)
     phone = models.CharField(max_length=20, null=True, blank=True)
     fax = models.CharField(max_length=20, null=True, blank=True)
     url = models.URLField(null=True, blank=True)

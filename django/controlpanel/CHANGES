@@ -2,6 +2,16 @@ Make sure to apply these changes per revision, in reverse order! Otherwise, you
 may corrupt your database. Revert back to the specified revision if necessary.
 
 -------------------------------------------------------------------------------
+Changed in revision 34:
+
+Removed country field from the Location model. We already specify a cluster,
+so country is not needed.
+
+./manage dbshell:
+mysql> alter table inforecords_location drop column country;
+
+
+-------------------------------------------------------------------------------
 Changed in revision 30.1.2:
 
 Make sure to apply these changes ONLY AFTER you have applied the changes from
