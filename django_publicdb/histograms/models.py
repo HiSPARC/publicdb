@@ -44,7 +44,11 @@ class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('HistogramType')
     bins = SerializedDataField()
-    histogram = SerializedDataField()
+    histograms = SerializedDataField()
+
+    def __unicode__(self):
+        return "%d - %s - %s" % (self.source.station_id,
+                                 self.source.date.strftime('%c'), self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -53,6 +57,9 @@ class HistogramType(models.Model):
     name = models.CharField(max_length=40)
     code = models.CharField(max_length=20)
     description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
 
 class GeneratorState(models.Model):
     check_last_run = models.DateField()

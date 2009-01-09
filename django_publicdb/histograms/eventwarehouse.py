@@ -31,7 +31,42 @@ def check_for_new_events(last_event_id):
 
     return new_last_event_id, results
 
-def get_integrals(station_id, date):
+def get_eventtime_histogram(station_id, date):
+    conn = eventwarehouse_connection()
+    cursor = conn.cursor()
+    sql = "SELECT HOUR(time), COUNT(*) FROM event JOIN eventtype "\
+          "USING(eventtype_id) WHERE uploadcode = 'CIC' AND station_id = %d " \
+          "AND date = '%s' GROUP BY HOUR(time)" % (station_id, date)
+    cursor.execute(sql)
+    results = cursor.fetchall()
+
+    data = {}
+    for result in results:
+        hour, count = result
+        data[hour] = count
+
+    return data
+
+def get_pulseheights(station_id, date):
+    conn = eventwarehouse_connection()
+    cursor = conn.cursor()
+    sql = "SELECT cdt.uploadcode, cd.doublevalue FROM event e " \
+          "JOIN eventtype et USING(eventtype_id) " \
+          "JOIN calculateddata cd USING(event_id) " \
+          "JOIN calculateddatatype cdt USING(calculateddatatype_id) " \
+          "WHERE et.uploadcode = 'CIC' AND station_id = %d AND date = '%s' " \
+          "AND cdt.uploadcode IN ('PH1', 'PH2', 'PH3', 'PH4')" % \
+          (station_id, date)
+    cursor.execute(sql)
+
+    values = [[], [], [], []]
+    for type, value in cursor.fetchall():
+        scint_num = int(type[2])-1
+        values[scint_num].append(value)
+
+    return values
+
+def get_pulseintegrals(station_id, date):
     conn = eventwarehouse_connection()
     cursor = conn.cursor()
     sql = "SELECT cdt.uploadcode, cd.doublevalue FROM event e " \

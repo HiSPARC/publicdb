@@ -8,10 +8,10 @@ urlpatterns = patterns('',
     # Example:
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
 
-    (r'^update_check/', 'histograms.views.update_check'),
-    (r'^update_histograms/', 'histograms.views.update_histograms'),
+    (r'^update_check/', 'django_publicdb.histograms.views.update_check'),
+    (r'^update_histograms/', 'django_publicdb.histograms.views.update_histograms'),
 
-    (r'^gateway/', 'histograms.amfgateway.publicgateway'),
+    (r'^gateway/', 'django_publicdb.histograms.amfgateway.publicgateway'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
