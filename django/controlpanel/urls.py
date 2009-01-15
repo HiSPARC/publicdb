@@ -1,5 +1,6 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
+from django.views.generic.simple import direct_to_template
 from inforecords.views import *
 
 admin.autodiscover()
@@ -9,5 +10,5 @@ urlpatterns = patterns('',
     (r'^admin/(.*)', admin.site.root),
     (r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
     (r'^maakconfig$', maakconfig),
-    (r'^$', indexpagina),
+    (r'^$', direct_to_template, {'template': 'frontpage.html'}),
 )

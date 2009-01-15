@@ -30,7 +30,6 @@ class Contact(models.Model):
 
 class Organization(models.Model):
     name = models.CharField(max_length=40, unique=True)
-    contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
     def __unicode__(self):
@@ -64,8 +63,6 @@ class Location(models.Model):
     name = models.CharField(max_length=70, unique=True)
     organization = models.ForeignKey(Organization)
     cluster = models.ForeignKey(Cluster)
-    contact = models.ForeignKey(Contact, related_name='locations', null=True,
-                                blank=True)
     locationstatus = models.ForeignKey(LocationStatus)
     address = models.CharField(max_length=40, null=True, blank=True)
     postalcode = models.CharField(max_length=6, null=True, blank=True)
@@ -212,6 +209,8 @@ class Pc(models.Model):
     name = models.CharField(max_length=40, unique=True)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
+    services = models.ManyToManyField('MonitorService',
+                                      through='EnabledService')
     
     def __unicode__(self):
         return self.name
@@ -249,9 +248,9 @@ class Pc(models.Model):
 
         return '.'.join(q)
 
-    def save(self):
+    def save(self, force_insert=False, force_update=False):
         if self.id:
-            super(Pc,self).save()
+            super(Pc, self).save(force_insert, force_update)
         else:
             if self.type.description == "Admin PC":
                 vorigip = Pc.objects.filter(type__description="Admin PC").\
@@ -260,11 +259,20 @@ class Pc(models.Model):
                 vorigip = Pc.objects.exclude(type__description="Admin PC").\
                           latest('id').ip
             self.ip = self.ipAdresGenereer(vorigip)
-            super(Pc,self).save()
+
+            super(Pc, self).save(force_insert, force_update)
+            self.install_default_services()
+
+    def install_default_services(self):
+        if self.type.description != "Admin PC":
+            for service in MonitorService.objects. \
+                            filter(is_default_service=True):
+                EnabledService(pc=self, monitor_service=service).save()
 
 class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
     nagios_command = models.CharField(max_length=70)
+    is_default_service = models.BooleanField()
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)
@@ -277,17 +285,25 @@ class MonitorService(models.Model):
         verbose_name_plural = 'Monitor Services'
         ordering = ('description',)
 
-class PcMonitorService(models.Model):
+    def save(self, force_insert=False, force_update=False):
+        super(MonitorService, self).save(force_insert, force_update)
+
+        if self.is_default_service:
+            for pc in Pc.objects.exclude(type__description="Admin PC"):
+                try:
+                    service = EnabledService.objects.get(pc=pc,
+                                                         monitor_service=self)
+                except EnabledService.DoesNotExist:
+                    service = EnabledService(pc=pc, monitor_service=self)
+                    service.save()
+
+class EnabledService(models.Model):
     pc = models.ForeignKey(Pc)
     monitor_service = models.ForeignKey(MonitorService)
-    override_min_critical = models.FloatField(null=True, blank=True)
-    override_max_critical = models.FloatField(null=True, blank=True)
-    override_min_warning = models.FloatField(null=True, blank=True)
-    override_max_warning = models.FloatField(null=True, blank=True)
+    min_critical = models.FloatField(null=True, blank=True)
+    max_critical = models.FloatField(null=True, blank=True)
+    min_warning = models.FloatField(null=True, blank=True)
+    max_warning = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
         return '%s - %s' % (self.pc, self.monitor_service)
-
-    class Meta:
-        verbose_name_plural = 'PC Monitor Services'
-        ordering = ('pc','monitor_service')

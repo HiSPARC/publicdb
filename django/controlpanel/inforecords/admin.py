@@ -37,15 +37,22 @@ class ElectronicsAdmin(admin.ModelAdmin):
 class OrganizationAdmin(admin.ModelAdmin):
     inlines = (LocationInline,)
 
+class EnabledServiceAdmin(admin.ModelAdmin):
+    list_display = ('pc', 'monitor_service', 'min_critical', 'max_critical',
+                    'min_warning', 'max_warning')
+    list_filter = ('pc', 'monitor_service')
+
+class EnabledServiceInline(admin.TabularInline):
+    model = EnabledService
+    extra = 10
+
 class PcAdmin(admin.ModelAdmin):
     list_display = ('name', 'type', 'ip', 'url', 'certificaat')
-
-class PcMonitorServiceAdmin(admin.ModelAdmin):
-    list_display = ('pc','monitor_service')
-    list_filter = ('pc',)
+    inlines = (EnabledServiceInline,)
 
 class MonitorServiceAdmin(admin.ModelAdmin):
-    list_display = ('description', 'nagios_command')
+    list_display = ('description', 'is_default_service', 'nagios_command')
+    inlines = (EnabledServiceInline,)
 
 admin.site.register(Contactposition)
 admin.site.register(Contact, ContactAdmin)
@@ -63,4 +70,4 @@ admin.site.register(Electronics, ElectronicsAdmin)
 admin.site.register(PcType)
 admin.site.register(Pc, PcAdmin)
 admin.site.register(MonitorService, MonitorServiceAdmin)
-admin.site.register(PcMonitorService, PcMonitorServiceAdmin)
+admin.site.register(EnabledService, EnabledServiceAdmin)
