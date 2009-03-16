@@ -8,6 +8,8 @@ urlpatterns = patterns('',
     # Example:
     # (r'^django_app/', include('django_app.foo.urls')),
 
+    (r'^gateway/', 'django_app.coincidences.amfgateway.publicgateway'),
+
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     # (r'^admin/doc/', include('django.contrib.admindocs.urls')),
