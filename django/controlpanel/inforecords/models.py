@@ -232,7 +232,7 @@ class Pc(models.Model):
 
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
-        ordering = ('name',)
+        ordering = ('station',)
 
     def ipAdresGenereer(self,ipadres):
         # bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219

@@ -47,7 +47,8 @@ class EnabledServiceInline(admin.TabularInline):
     extra = 10
 
 class PcAdmin(admin.ModelAdmin):
-    list_display = ('name', 'type', 'ip', 'url', 'certificaat')
+    list_display = ('station', 'name', 'type', 'ip', 'url',
+                    'certificaat')
     inlines = (EnabledServiceInline,)
 
 class MonitorServiceAdmin(admin.ModelAdmin):
