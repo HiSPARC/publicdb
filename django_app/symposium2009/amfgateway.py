@@ -56,9 +56,17 @@ def send_results(request, pk, core_position, log_energy, error_estimate):
         coincidence.is_analyzed = True
         coincidence.save()
 
+def get_energy_data(request):
+    energies = []
+    coincidences = AnalyzedCoincidence.objects.filter(is_analyzed=True)
+    for c in coincidences:
+        energies.append(c.log_energy)
+    return energies
+
 
 services = { 'hisparc.get_services': get_services,
              'hisparc.get_coincidence': get_coincidence,
              'hisparc.send_results': send_results,
+             'hisparc.get_energy_data': get_energy_data,
            }
 publicgateway = DjangoGateway(services)
