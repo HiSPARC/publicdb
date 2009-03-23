@@ -1,7 +1,7 @@
 from pyamf.remoting.gateway.django import DjangoGateway
 from django.core.exceptions import ObjectDoesNotExist
 
-from coincidences.models import *
+from django_app.coincidences.models import *
 from models import *
 
 from numpy import average

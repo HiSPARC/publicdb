@@ -1,5 +1,5 @@
 from django.db import models
-from coincidences.models import *
+from django_app.coincidences.models import *
 
 class AnalyzedCoincidence(models.Model):
     coincidence = models.ForeignKey(Coincidence)
