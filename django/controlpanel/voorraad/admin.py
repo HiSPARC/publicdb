@@ -35,6 +35,10 @@ class BestelAdmin(admin.ModelAdmin):
     search_fields = ('artikel',)
     #ordering = ('naam') s
 
+class HisparcIIAdmin(admin.ModelAdmin):
+    list_display = ('serienummer', 'is_master', 'stationnummer',
+                    'opstelling', 'plaats', 'status', 'opmerkingen')
+
 admin.site.register(Leverancier, LeverancierAdmin)
 admin.site.register(Opbergplek)
 admin.site.register(Artikel, ArtikelAdmin)
@@ -42,3 +46,4 @@ admin.site.register(Apparatuur, ApparatuurAdmin)
 admin.site.register(Reservering, ReserveringAdmin)
 admin.site.register(Gebruikt, GebruiktAdmin)
 admin.site.register(Bestel, BestelAdmin)
+admin.site.register(HisparcII, HisparcIIAdmin)

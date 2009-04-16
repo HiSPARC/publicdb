@@ -162,3 +162,17 @@ class Bestel(models.Model):
         class Meta:
                 ordering = ['datumbesteld','artikel']
                 verbose_name_plural = 'Bestellen'
+
+class HisparcII(models.Model):
+	serienummer = models.IntegerField()
+	is_master = models.BooleanField(default=True)
+	stationnummer = models.IntegerField(blank=True, null=True)
+	opstelling = models.CharField(max_length=80, blank=True, null=True)
+	plaats = models.CharField(max_length=80, blank=True, null=True)
+	status = models.CharField(max_length=80, blank=True, null=True)
+	opmerkingen = models.TextField(blank=True, null=True)
+
+	class Meta:
+		verbose_name = 'HiSPARC II'
+		verbose_name_plural = 'HiSPARC II'
+		ordering = ['serienummer']
