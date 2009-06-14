@@ -1,4 +1,4 @@
-from django_app.coincidences.models import Coincidence, Event
+from django_publicdb.coincidences.models import Coincidence, Event
 from django.contrib import admin
 
     

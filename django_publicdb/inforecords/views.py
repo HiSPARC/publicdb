@@ -1,5 +1,5 @@
 from django.http import HttpResponse
-from controlpanel.inforecords.models import *
+from django_publicdb.inforecords.models import *
 import os
 import tempfile
 import zipfile
