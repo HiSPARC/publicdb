@@ -14,8 +14,10 @@ urlpatterns = patterns('',
 
     (r'^gateway/', 'django_publicdb.histograms.amfgateway.publicgateway'),
 
-    (r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
-    (r'^maakconfig$', maakconfig),
+    # DF: This should be looked into. With inforecords running on pique, how
+    # should we handle generating certificates and config on tietar?
+    #(r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
+    #(r'^maakconfig$', maakconfig),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
