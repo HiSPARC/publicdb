@@ -9,12 +9,11 @@ import datetime
 import logging
 import numpy
 
-from IPython.Shell import IPShellEmbed
-ipshell = IPShellEmbed()
-
 logger = logging.getLogger('jobs')
 
+MAX_PH = 1000
 BIN_PH_STEP = 10
+MAX_IN = 50000
 BIN_IN_STEP = 200
 
 def check_for_updates():
@@ -102,23 +101,17 @@ def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
     pulseheights = eventwarehouse.get_pulseheights(summary.station_id,
                                                    summary.date)
-    bins, histograms = create_histogram(pulseheights, BIN_PH_STEP)
+    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_STEP)
     save_histograms(summary, 'pulseheight', bins, histograms)
 
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     integrals = eventwarehouse.get_pulseintegrals(summary.station_id,
                                                   summary.date)
-    bins, histograms = create_histogram(integrals, BIN_IN_STEP)
+    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_STEP)
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
-def create_histogram(data, step):
-    high = []
-    for array in data:
-        if array:
-            high.append(max(array))
-    high = max(high)
-
+def create_histogram(data, high, step):
     histograms = []
     for array in data:
         hist, bins = numpy.histogram(array, bins=numpy.arange(0, high, step))
@@ -138,6 +131,5 @@ def save_histograms(summary, code, bins, histograms):
         h = DailyHistogram(source=summary, type=type)
     h.bins = bins
     h.histograms = histograms
-    ipshell()
     h.save()
     logger.debug("Saved succesfully")
