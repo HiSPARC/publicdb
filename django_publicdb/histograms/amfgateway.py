@@ -27,7 +27,7 @@ def get_timehistogram(request, station_id, date, type):
         histogram = None
 
     if histogram:
-        data += [histogram.bins, histogram.histograms]
+        data += [histogram.bins, histogram.values]
     else:
         data = None
 
@@ -49,7 +49,7 @@ def get_1dhistogram(request, station_id, date, type):
         histogram = None
 
     if histogram:
-        data += [histogram.bins, histogram.histograms]
+        data += [histogram.bins, histogram.values]
     else:
         data = None
 

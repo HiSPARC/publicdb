@@ -44,7 +44,7 @@ class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('HistogramType')
     bins = SerializedDataField()
-    histograms = SerializedDataField()
+    values = SerializedDataField()
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station_id,

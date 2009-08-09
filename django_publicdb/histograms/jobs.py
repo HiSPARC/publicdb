@@ -101,28 +101,28 @@ def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
     pulseheights = eventwarehouse.get_pulseheights(summary.station_id,
                                                    summary.date)
-    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_STEP)
-    save_histograms(summary, 'pulseheight', bins, histograms)
+    bins, values = create_histogram(pulseheights, MAX_PH, BIN_PH_STEP)
+    save_histograms(summary, 'pulseheight', bins, values)
 
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     integrals = eventwarehouse.get_pulseintegrals(summary.station_id,
                                                   summary.date)
-    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_STEP)
-    save_histograms(summary, 'pulseintegral', bins, histograms)
+    bins, values = create_histogram(integrals, MAX_IN, BIN_IN_STEP)
+    save_histograms(summary, 'pulseintegral', bins, values)
 
 def create_histogram(data, high, step):
-    histograms = []
+    values = []
     for array in data:
         hist, bins = numpy.histogram(array, bins=numpy.arange(0, high, step))
-        histograms.append(hist)
+        values.append(hist)
 
     bins = bins.tolist()
-    histograms = [x.tolist() for x in histograms]
+    values = [x.tolist() for x in values]
 
-    return bins, histograms
+    return bins, values
 
-def save_histograms(summary, slug, bins, histograms):
+def save_histograms(summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
     try:
@@ -130,6 +130,6 @@ def save_histograms(summary, slug, bins, histograms):
     except DailyHistogram.DoesNotExist:
         h = DailyHistogram(source=summary, type=type)
     h.bins = bins
-    h.histograms = histograms
+    h.values = values
     h.save()
     logger.debug("Saved succesfully")
