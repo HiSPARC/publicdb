@@ -122,9 +122,9 @@ def create_histogram(data, high, step):
 
     return bins, histograms
 
-def save_histograms(summary, code, bins, histograms):
-    logger.debug("Saving histogram %s for %s" % (code, summary))
-    type = HistogramType.objects.get(code=code)
+def save_histograms(summary, slug, bins, histograms):
+    logger.debug("Saving histogram %s for %s" % (slug, summary))
+    type = HistogramType.objects.get(slug=slug)
     try:
         h = DailyHistogram.objects.get(source=summary, type=type)
     except DailyHistogram.DoesNotExist:

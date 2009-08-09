@@ -58,7 +58,7 @@ def get_1dhistogram(request, station_id, date, type):
 def get_histogram(station_id, date, type):
     try:
         summary = Summary.objects.get(station_id=station_id, date=date)
-        histtype = HistogramType.objects.get(code=type)
+        histtype = HistogramType.objects.get(slug=type)
         histogram = DailyHistogram.objects.get(source=summary, type=histtype)
     except ObjectDoesNotExist:
         return None
