@@ -82,7 +82,8 @@ def update_all_histograms():
 
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
-    bins = range(24)
+    # Include the rightmost edge, so include 24
+    bins = range(25)
     data = eventwarehouse.get_eventtime_histogram(summary.station_id,
                                                   summary.date)
 
@@ -114,7 +115,8 @@ def update_pulseintegral_histogram(summary):
 def create_histogram(data, high, step):
     values = []
     for array in data:
-        hist, bins = numpy.histogram(array, bins=numpy.arange(0, high, step))
+        bins = numpy.arange(0, high + step / 2, step)
+        hist, bins = numpy.histogram(array, bins=bins, new=True)
         values.append(hist)
 
     bins = bins.tolist()
