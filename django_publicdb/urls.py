@@ -9,10 +9,12 @@ urlpatterns = patterns('',
     # Example:
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
 
-    (r'^update_check/', 'django_publicdb.histograms.views.update_check'),
-    (r'^update_histograms/', 'django_publicdb.histograms.views.update_histograms'),
+    (r'^update_check/$', 'django_publicdb.histograms.views.update_check'),
+    (r'^update_histograms/$', 'django_publicdb.histograms.views.update_histograms'),
 
-    (r'^gateway/', 'django_publicdb.histograms.amfgateway.publicgateway'),
+    (r'^gateway/$', 'django_publicdb.histograms.amfgateway.publicgateway'),
+
+    (r'^show/', include('django_publicdb.status_display.urls')),
 
     # DF: This should be looked into. With inforecords running on pique, how
     # should we handle generating certificates and config on tietar?

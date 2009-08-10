@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h3>Event Histogram (number of events per hour)</h3>
+<img src='{{ eventhistogram }}'>
+
+<h3>Pulse height histogram</h3>
+<img src='{{ pulseheighthistogram }}'>
+
+<h3>Pulse integral histogram</h3>
+<img src='{{ pulseintegralhistogram }}'>
+
+{% endblock %}
