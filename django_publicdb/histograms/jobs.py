@@ -11,10 +11,10 @@ import numpy
 
 logger = logging.getLogger('jobs')
 
-MAX_PH = 1000
-BIN_PH_STEP = 10
-MAX_IN = 50000
-BIN_IN_STEP = 200
+MAX_PH = 4000
+BIN_PH_STEP = MAX_PH / 200
+MAX_IN = 30000
+BIN_IN_STEP = MAX_IN / 200
 
 def check_for_updates():
     state = GeneratorState.objects.get()
