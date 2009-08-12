@@ -1,4 +1,5 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, \
+                             redirect
 from django_publicdb.histograms.models import *
 from django.conf import settings
 
@@ -8,6 +9,7 @@ import enthought.chaco.api as chaco
 import os
 from numpy import arange, pi, sin
 import datetime
+
 
 def status(request):
     """Show eventwarehouse status"""
@@ -38,7 +40,10 @@ def station_histograms(request, station_id, year, month, day):
 def station_yesterday(request, station_id):
     """Show yesterday's histograms for a particular station"""
 
-    return
+    yesterday = datetime.date.today() - datetime.timedelta(1)
+    return redirect(station_histograms, station_id=str(station_id),
+                    year=str(yesterday.year), month=str(yesterday.month),
+                    day=str(yesterday.day))
 
 def create_histogram(type, station_id, year, month, day, log=False):
     """Create a histogram and save it to disk"""
