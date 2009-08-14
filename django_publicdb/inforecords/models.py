@@ -40,6 +40,7 @@ class Organization(models.Model):
 
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
+    parent = models.ForeignKey('self', null=True, blank=True)
     country = models.CharField(max_length=40)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
@@ -48,7 +49,7 @@ class Cluster(models.Model):
         return self.name
 
     class Meta:
-        ordering = ('country', 'name')
+        ordering = ('name',)
 
 class LocationStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)

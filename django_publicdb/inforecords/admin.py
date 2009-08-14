@@ -8,7 +8,7 @@ class ContactAdmin(admin.ModelAdmin):
     list_filter = ('contactposition', 'location')
 
 class ClusterAdmin(admin.ModelAdmin):
-    list_display = ('name', 'country')
+    list_display = ('name', 'parent', 'country')
     list_filter = ('country',)
 
 class StationInline(admin.StackedInline):

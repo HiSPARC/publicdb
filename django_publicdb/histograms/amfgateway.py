@@ -72,12 +72,24 @@ def get_stations(request):
     stations and their coordinates as well as status information
 
     """
+
+    data = get_cluster_station_list(parent=None)
+
+    return data
+
+def get_cluster_station_list(parent):
+    if parent:
+        clusters = Cluster.objects.filter(parent=parent)
+    else:
+        clusters = Cluster.objects.filter(parent__isnull=True)
+
     data = []
-    for cluster in Cluster.objects.filter(country__icontains='netherlands'):
+    for cluster in clusters:
         c = {}
         c['name'] = cluster.name
         c['status'] = 1.0
-        c['contents'] = []
+        c['contents'] = get_cluster_station_list(parent=cluster)
+
         for station in Station.objects.filter(location__cluster=cluster):
             s = {}
             try:
@@ -92,7 +104,9 @@ def get_stations(request):
             if not s['longitude']:
                 s['longitude'] = 4.0
             s['status'] = 1.0
+
             c['contents'].append(s)
+
         data.append(c)
 
     return data
