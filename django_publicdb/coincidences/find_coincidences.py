@@ -1,6 +1,7 @@
 from MySQLdb import connect
 from math import sqrt, sin, cos, pi
 import zlib
+from django_publicdb.inforecords.models import DetectorHisparc, Station
 
 COINCIDENCE_WINDOW = 2e5    # in nanoseconds
 ADCOFFSET = 114.
@@ -29,22 +30,15 @@ def get_events(day, station, t1, t2):
     return: dict(event_id : {details,})
     """
     cursor = get_db_cursor()
-    query = "SELECT e.event_id, e.time, e.nanoseconds, " \
-            "edt.uploadcode, ed.blobvalue, cdt.uploadcode, cd.doublevalue " \
+    query = "SELECT e.event_id, e.time, e.nanoseconds " \
             "FROM event e " \
-            "JOIN eventdata ed USING (event_id) " \
-            "JOIN eventdatatype edt USING (eventdatatype_id) " \
-            "JOIN calculateddata cd USING (event_id) " \
-            "JOIN calculateddatatype cdt USING (calculateddatatype_id) " \
-            "WHERE e.date = '%s' AND station_id = %d " \
-            "AND e.time >= '%s' AND e.time <= '%s' " \
-            "AND edt.uploadcode IN ('TR1', 'TR2', 'TR3', 'TR4') " \
-            "AND cdt.uploadcode IN ('PH1', 'PH2', 'PH3', 'PH4','IN1', 'IN2', 'IN3', 'IN4')" \
-            % (day, station, t1, t2)
+            "WHERE e.station_id = %d AND e.eventtype_id = 1 " \
+            "AND e.date = '%s' AND e.time >= '%s' AND e.time <= '%s' " \
+            % (station, day, t1, t2)
     cursor.execute(query)
     
     events = {}
-    for eventID, t, n, edt_code, ed_blob, cdt_code, cd_double in cursor.fetchall():
+    for eventID, t, n in cursor.fetchall():
         t_spl = str(t).split(':')
         timestamp = int(t_spl[0])*3.6e12 + int(t_spl[1])*6e10 + int(t_spl[2])*1e9 + n
         
@@ -55,38 +49,30 @@ def get_events(day, station, t1, t2):
                                         ('PH1',0), ('PH2',0), ('PH3',0), ('PH4',0), \
                                         ('IN1',0), ('IN2',0), ('IN3',0), ('IN4',0), \
                                         ('TR1',0), ('TR2',0), ('TR3',0), ('TR4',0)])
-            if int(station) == 501: #NIKHEF
-                (events[int(eventID)])['latitude'] = 52.355905
-                (events[int(eventID)])['longitude'] = 4.951221
-            elif int(station) == 502: #Anton Pannekoek
-                (events[int(eventID)])['latitude'] = 52.355294
-                (events[int(eventID)])['longitude'] = 4.950215
-            elif int(station) == 503: #SARA
-                (events[int(eventID)])['latitude'] = 52.35619
-                (events[int(eventID)])['longitude'] = 4.952814
-            elif int(station) == 504: #MATRIX
-                (events[int(eventID)])['latitude'] = 52.357024
-                (events[int(eventID)])['longitude'] = 4.95445
-            elif int(station) == 505: #PIMU
-                (events[int(eventID)])['latitude'] = 52.357223
-                (events[int(eventID)])['longitude'] = 4.94841
-        
-        if cdt_code == 'PH1':
-            (events[int(eventID)])['PH1'] = float(cd_double) * ADCGAIN
-        elif cdt_code == 'PH2':
-            (events[int(eventID)])['PH2'] = float(cd_double) * ADCGAIN
-        elif cdt_code == 'PH3':
-            (events[int(eventID)])['PH3'] = float(cd_double) * ADCGAIN
-        elif cdt_code == 'PH4':
-            (events[int(eventID)])['PH4'] = float(cd_double) * ADCGAIN
-        elif cdt_code == 'IN1':
-            (events[int(eventID)])['IN1'] = float(cd_double) * ((ADCGAIN*2.5)/1000)
-        elif cdt_code == 'IN2':
-            (events[int(eventID)])['IN2'] = float(cd_double) * ((ADCGAIN*2.5)/1000)
-        elif cdt_code == 'IN3':
-            (events[int(eventID)])['IN3'] = float(cd_double) * ((ADCGAIN*2.5)/1000)
-        elif cdt_code == 'IN4':
-            (events[int(eventID)])['IN4'] = float(cd_double) * ((ADCGAIN*2.5)/1000)
+            
+            (events[int(eventID)])['latitude'] = \
+                (DetectorHisparc.objects.get( station__number = int(station) ) ).latitude
+            (events[int(eventID)])['longitude'] = \
+                (DetectorHisparc.objects.get( station__number = int(station) ) ).longitude
+            (events[int(eventID)])['height'] = \
+                (DetectorHisparc.objects.get( station__number = int(station) ) ).height
+
+            #if int(station) == 501: #NIKHEF
+                #(events[int(eventID)])['latitude'] = 52.355905
+                #(events[int(eventID)])['longitude'] = 4.951221
+            #elif int(station) == 502: #Anton Pannekoek
+                #(events[int(eventID)])['latitude'] = 52.355294
+                #(events[int(eventID)])['longitude'] = 4.950215
+            #elif int(station) == 503: #SARA
+                #(events[int(eventID)])['latitude'] = 52.35619
+                #(events[int(eventID)])['longitude'] = 4.952814
+                #(events[int(eventID)])['timestamp'] -= 15
+            #elif int(station) == 504: #MATRIX
+                #(events[int(eventID)])['latitude'] = 52.357024
+                #(events[int(eventID)])['longitude'] = 4.95445
+            #elif int(station) == 505: #PIMU
+                #(events[int(eventID)])['latitude'] = 52.357223
+                #(events[int(eventID)])['longitude'] = 4.94841
      
     return events
 
@@ -111,10 +97,11 @@ def search_coincidences(detectors, day, start, end):
                     double_ts[eventID] += 1
                 else:
                     double_ts[eventID] = 1
+            
             event_dict[eventID] = details
             timestamps.append(details['timestamp'])
             ts_dict[details['timestamp']] = eventID
-    
+            
     timestamps.sort()
     
     # iterate through the list with all timestamps to find coincidences
@@ -146,6 +133,9 @@ def search_coincidences(detectors, day, start, end):
     for eventID in double_ts:
         (event_dict[eventID])['timestamp'] -= double_ts[eventID]
     
+    # remove coincidinces with only two events
+    coincidences = filter_duos(coincidences)
+    
     # check if a coincidence is a subset of a previous coincidence
     coincidences = filter_subsets(coincidences)
  
@@ -155,12 +145,31 @@ def search_coincidences(detectors, day, start, end):
     # check the coincidence with a detector-specific coincidence window
     coincidences = filter_timediff_distance(coincidences, event_dict)
     
-    add_traces(event_dict, coincidences)
-#     print ']\n'.join( str(coincidences).split('], ') )
-#     print event_dict[(coincidences[0])[0]]
+    # add the traces of the events that have a coincidence
+    add_event_data(event_dict, coincidences)
+
+    #print ']\n'.join( str(coincidences).split('], ') )
+    #print event_dict[(coincidences[0])[0]]
 
     return event_dict, coincidences
 
+
+def filter_duos(coincidences):
+    """
+    Remove the coincidences with only
+    two events
+    """
+    to_be_removed = []
+    for coincidence in coincidences:
+        if len(coincidence) == 2:
+            to_be_removed.append(coincidence)
+    
+    for coincidence in to_be_removed:
+        coincidences.remove(coincidence)
+
+    
+    return coincidences
+    
 
 def filter_subsets(coincidences):
     """
@@ -263,49 +272,42 @@ def WGS84_xyz(lat, lon, h):
     return [X,Y,Z]
 
 
-def add_traces(event_dict, coincidences):
+def add_event_data(event_dict, coincidences):
     """
-    Add the traces to the events that have are part of a coincidence
+    Add the data (like traces, location) to the events that have are part of a coincidence
     """
     cursor = get_db_cursor()
 
     for coincidence in coincidences:
         for eventID in coincidence:
             if type(eventID) == type(123):
-                query = "SELECT edt.uploadcode, ed.blobvalue " \
+                query = "SELECT edt.uploadcode, ed.blobvalue , cdt.uploadcode, cd.doublevalue " \
                         "FROM event e " \
                         "JOIN eventdata ed USING (event_id) " \
                         "JOIN eventdatatype edt USING (eventdatatype_id) " \
-                        "WHERE e.event_id = %d " \
+                        "JOIN calculateddata cd USING (event_id) " \
+                        "JOIN calculateddatatype cdt USING (calculateddatatype_id) " \
+                        "WHERE e.station_id = %d AND e.eventtype_id = 1 " \
+                        "AND e.date = '%s' AND e.time = '%s' AND e.nanoseconds = '%s' " \
+                        "AND e.event_id = %d " \
                         "AND edt.uploadcode IN ('TR1', 'TR2', 'TR3', 'TR4') " \
-                        % (eventID)
+                        "AND cdt.uploadcode IN ('PH1', 'PH2', 'PH3', 'PH4','IN1', 'IN2', 'IN3', 'IN4')" \
+                        % ( (event_dict[eventID])['detector'], (event_dict[eventID])['date'], \
+                            (event_dict[eventID])['time'], (event_dict[eventID])['nanoseconds'], \
+                            eventID )
                 cursor.execute(query)
-    
-                for edt_code, ed_blob in cursor.fetchall():
-                    if edt_code == 'TR1':
+
+                for edt_code, ed_blob, cdt_code, cd_double in cursor.fetchall():
+                    if edt_code[:2] == 'TR':
                         trace = zlib.decompress( ed_blob )
                         trace = trace.split(',')
                         del(trace[-1])
                         trace = map(lambda x: ((int(x)*ADCGAIN) + ADCOFFSET), trace)
-                        (event_dict[eventID])['TR1'] = trace
-                    elif edt_code == 'TR2':
-                        trace = zlib.decompress( ed_blob )
-                        trace = trace.split(',')
-                        del(trace[-1])
-                        trace = map(lambda x: ((int(x)*ADCGAIN) + ADCOFFSET), trace)
-                        (event_dict[eventID])['TR2'] = trace
-                    elif edt_code == 'TR3':
-                        trace = zlib.decompress( ed_blob )
-                        trace = trace.split(',')
-                        del(trace[-1])
-                        trace = map(lambda x: ((int(x)*ADCGAIN) + ADCOFFSET), trace)
-                        (event_dict[eventID])['TR3'] = trace
-                    elif edt_code == 'TR4':
-                        trace = zlib.decompress( ed_blob )
-                        trace = trace.split(',')
-                        del(trace[-1])
-                        trace = map(lambda x: ((int(x)*ADCGAIN) + ADCOFFSET), trace)
-                        (event_dict[eventID])['TR4'] = trace
+                        (event_dict[eventID])[edt_code] = trace
+                    if cdt_code[:2] == 'PH':
+                        (event_dict[eventID])[cdt_code] = float(cd_double) * ADCGAIN
+                    if cdt_code[:2] == 'IN':
+                        (event_dict[eventID])[cdt_code] = float(cd_double) * ((ADCGAIN*2.5)/1000)
 
 
 def get_hourly_coincidences(detectors, date, hour):
