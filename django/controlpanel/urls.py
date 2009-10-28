@@ -11,4 +11,5 @@ urlpatterns = patterns('',
     (r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
     (r'^maakconfig$', maakconfig),
     (r'^$', direct_to_template, {'template': 'frontpage.html'}),
+    (r'^config/nagios$', create_nagios_config),
 )

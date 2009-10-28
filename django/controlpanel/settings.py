@@ -87,7 +87,8 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
-    'controlpanel.inforecords',
     'django.contrib.admin',
+    'django.contrib.admindocs',
+    'controlpanel.inforecords',
     'controlpanel.voorraad',
 )

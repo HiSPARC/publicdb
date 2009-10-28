@@ -1,4 +1,5 @@
 from django.http import HttpResponse
+from django.shortcuts import render_to_response
 from controlpanel.inforecords.models import *
 import os
 import tempfile
@@ -146,3 +147,52 @@ def maakconfig(request):
         # Het restarten van nagios, dnsmasq en openvpn om de nagios en dns configuratie door te voeren
         restartnagios = os.popen("sudo /etc/init.d/nagios stop && sudo /etc/init.d/nagios start && sudo /etc/init.d/dnsmasq condrestart && sudo /etc/init.d/openvpn restart")
         return HttpResponse(restartnagios)
+
+def create_nagios_config(request):
+    """Create a nagios config file
+
+    This function creates a nagios config file, ready for download.  It
+    works by passing a few objects (contacts, clusters and pc's) to a
+    template for rendering.  The only logic going on is for the pc's
+    services.  First, we don't want to monitor admin pc's.  Secondly, we
+    need to pass parameters to the nagios check which are taken from the
+    MonitorService model _unless_ they are overridden by the
+    EnabledService model.
+
+    """
+    # Start building the host list
+    hosts = []
+    for host in Pc.objects.exclude(type__description='Admin PC'):
+        services = []
+        for service in host.enabledservice_set.all():
+            check_command = service.monitor_service.nagios_command
+            # Let's see if we need to pass parameters to this service
+            if check_command.count('check_nrpe'):
+                # The following code will check four variables to see if
+                # they exist in the EnabledService instance 'service'.  If
+                # they do, assign the value locally using an exec
+                # statement.  If they don't, assign a value taken from the
+                # MonitorService model associated with the instance.
+                for var in ('min_critical', 'max_critical', 'min_warning',
+                            'max_warning'):
+                    if eval('service.%s' % var):
+                        exec('%s = service.%s' % (var, var))
+                    else:
+                        exec('%s = service.monitor_service.%s' % (var, var))
+                # Append the parameters to the check command
+                check_command += ('!%s:%s!%s:%s' %
+                                 (min_warning, max_warning, min_critical,
+                                  max_critical))
+            # Append this service to the hosts service list
+            services.append(
+                {'description': service.monitor_service.description,
+                 'check_command': check_command})
+        # Append this host to the hosts list
+        hosts.append({'pc': host, 'services': services})
+
+    # Render the template
+    return render_to_response('nagios.cfg',
+                              {'contacts': Contact.objects.all(),
+                               'clusters': Cluster.objects.all(),
+                               'hosts': hosts},
+                              mimetype='text/plain')
