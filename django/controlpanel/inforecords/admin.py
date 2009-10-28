@@ -26,6 +26,7 @@ class LocationInline(admin.StackedInline):
 
 class StationAdmin(admin.ModelAdmin):
     list_display = ('number', 'location', 'cluster')
+    search_fields = ('number', 'location__name', 'location__cluster__name')
 
 class DetectorHisparcAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'status')
@@ -49,6 +50,7 @@ class EnabledServiceInline(admin.TabularInline):
 class PcAdmin(admin.ModelAdmin):
     list_display = ('station', 'name', 'type', 'ip', 'url',
                     'certificaat')
+    ordering = ('station',)
     inlines = (EnabledServiceInline,)
 
 class MonitorServiceAdmin(admin.ModelAdmin):

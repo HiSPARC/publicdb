@@ -232,7 +232,7 @@ class Pc(models.Model):
 
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
-        ordering = ('station',)
+        ordering = ('name',)
 
     def ipAdresGenereer(self,ipadres):
         # bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
@@ -307,3 +307,6 @@ class EnabledService(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.pc, self.monitor_service)
+
+    class Meta:
+	ordering = ('pc', 'monitor_service')
