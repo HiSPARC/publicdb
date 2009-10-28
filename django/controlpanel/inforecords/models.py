@@ -273,6 +273,7 @@ class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
     nagios_command = models.CharField(max_length=70)
     is_default_service = models.BooleanField()
+    enable_active_checks = models.BooleanField(default=True)
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)
