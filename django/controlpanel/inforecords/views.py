@@ -85,7 +85,7 @@ def maakconfig(request):
         if not request.user.is_authenticated():
               return HttpResponse('Dat mag niet!')
 
-	pipe = os.popen("wget http://vpn.hisparc.nl/config/nagios -O /usr/local/nagios/etc/objects/hisparc.cfg")
+	pipe = os.popen("wget http://vpn.hisparc.nl/django/config/nagios -O /usr/local/nagios/etc/objects/hisparc.cfg")
 	output = pipe.readlines()
 	pipe.close()
         pipe = os.popen("sudo /etc/init.d/nagios force-reload")

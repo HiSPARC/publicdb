@@ -216,7 +216,7 @@ class Pc(models.Model):
         return self.name
 
     def certificaat(self):
-        return "<a target=_blank href=http://vpn.hisparc.nl/certificaat/" \
+        return "<a target=_blank href=http://vpn.hisparc.nl/django/certificaat/" \
                "genereer/%s/%s.zip>Certificaat %s</a>" % (self.type_id,
                                                           self.name, self.name)
     certificaat.short_description = 'Certificaten'
