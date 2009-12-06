@@ -113,7 +113,8 @@ def create_nagios_config(request):
     """
     # Start building the host list
     hosts = []
-    for host in Pc.objects.exclude(type__description='Admin PC'):
+    for host in (Pc.objects.exclude(type__description='Admin PC')
+                           .filter(is_active=True)):
         services = []
         for service in host.enabledservice_set.all():
             check_command = service.monitor_service.nagios_command

@@ -207,6 +207,7 @@ class Pc(models.Model):
     station = models.ForeignKey(Station)
     type = models.ForeignKey(PcType)
     name = models.CharField(max_length=40, unique=True)
+    is_active = models.BooleanField(default=False)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
