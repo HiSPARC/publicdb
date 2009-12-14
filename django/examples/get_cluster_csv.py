@@ -12,5 +12,5 @@ if __name__ == '__main__':
 
     for cluster in Cluster.objects.all().order_by('id'):
         for station in Station.objects.filter(location__cluster=cluster):
-            writer.writerow((station.number, cluster.id, station.password,
-                             station.location.name))
+            writer.writerow((station.number, cluster.name,
+                             station.password))
