@@ -208,6 +208,7 @@ class Pc(models.Model):
     station = models.ForeignKey(Station)
     type = models.ForeignKey(PcType)
     name = models.CharField(max_length=40, unique=True)
+    is_active = models.BooleanField(default=False)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
@@ -217,7 +218,7 @@ class Pc(models.Model):
         return self.name
 
     def certificaat(self):
-        return "<a target=_blank href=http://vpn.hisparc.nl/certificaat/" \
+        return "<a target=_blank href=http://vpn.hisparc.nl/django/certificaat/" \
                "genereer/%s/%s.zip>Certificaat %s</a>" % (self.type_id,
                                                           self.name, self.name)
     certificaat.short_description = 'Certificaten'
@@ -233,7 +234,7 @@ class Pc(models.Model):
 
     class Meta:
         verbose_name_plural = 'PC en Certificaten'
-        ordering = ('station',)
+        ordering = ('name',)
 
     def ipAdresGenereer(self,ipadres):
         # bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
@@ -274,6 +275,7 @@ class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
     nagios_command = models.CharField(max_length=70)
     is_default_service = models.BooleanField()
+    enable_active_checks = models.BooleanField(default=True)
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)
@@ -308,3 +310,6 @@ class EnabledService(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.pc, self.monitor_service)
+
+    class Meta:
+	ordering = ('pc', 'monitor_service')
