@@ -14,6 +14,8 @@ urlpatterns = patterns('',
 
     (r'^gateway/', 'django_publicdb.histograms.amfgateway.publicgateway'),
 
+    (r'^config/nagios$', create_nagios_config),
+
     # DF: This should be looked into. With inforecords running on pique, how
     # should we handle generating certificates and config on tietar?
     #(r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
