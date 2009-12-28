@@ -87,12 +87,12 @@ def update_eventtime_histogram(summary):
     # day.
     # timestamp at midnight (start of day) of date
     start = calendar.timegm(summary.date.timetuple())
-    # create bins, don't forget closing boundary
+    # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
     hist = numpy.histogram(timestamps, bins=bins)
-    # redefine bins and histogram
-    bins = range(24)
+    # redefine bins and histogram, don't forget right-most edge
+    bins = range(25)
     hist = hist[0].tolist()
 
     save_histograms(summary, 'eventtime', bins, hist)

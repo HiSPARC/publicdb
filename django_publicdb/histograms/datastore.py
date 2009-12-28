@@ -82,7 +82,10 @@ def get_pulseheights(cluster, station_id, date):
     :param date: date
 
     """
-    return get_event_data(cluster, station_id, date, 'pulseheights')
+    pulseheights = get_event_data(cluster, station_id, date,
+                                  'pulseheights')
+    # transpose, so we have 4 arrays of many pulseheights
+    return zip(*pulseheights)
 
 def get_integrals(cluster, station_id, date):
     """Get all event integrals
@@ -94,7 +97,9 @@ def get_integrals(cluster, station_id, date):
     :param date: date
 
     """
-    return get_event_data(cluster, station_id, date, 'integrals')
+    integrals = get_event_data(cluster, station_id, date, 'integrals')
+    # transpose, so we have 4 arrays of many integrals
+    return zip(*integrals)
 
 def get_event_data(cluster, station_id, date, quantity):
     """Get event data of a specific quantity
