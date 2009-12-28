@@ -17,13 +17,8 @@ DATABASE_PASSWORD = ''  # Not used with sqlite3.
 DATABASE_HOST = ''    # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
-# The following settings are used for accessing the eventwarehouse to insert,
-# update or remove station passwords.
-EVENTWAREHOUSE_NAME = 'eventwarehouse'
-EVENTWAREHOUSE_USER = 'analysis'
-EVENTWAREHOUSE_PASSWORD = 'Data4analysis!'
-EVENTWAREHOUSE_HOST = '127.0.0.1'
-EVENTWAREHOUSE_PORT = '3307'
+# Path of the mounted HiSPARC datastore root folder
+DATASTORE_PATH = '/tmp/datastore'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
