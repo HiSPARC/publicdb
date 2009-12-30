@@ -13,10 +13,10 @@ import datastore
 
 logger = logging.getLogger('histograms.jobs')
 
-MAX_PH = 1000
-BIN_PH_STEP = 10
-MAX_IN = 50000
-BIN_IN_STEP = 200
+MAX_PH = 4000
+BIN_PH_STEP = MAX_PH / 200
+MAX_IN = 30000
+BIN_IN_STEP = MAX_IN / 200
 
 def check_for_updates():
     state = GeneratorState.objects.get()
@@ -115,25 +115,26 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 def create_histogram(data, high, step):
-    histograms = []
+    values = []
     for array in data:
-        hist, bins = numpy.histogram(array, bins=numpy.arange(0, high, step))
-        histograms.append(hist)
+        bins = numpy.arange(0, high + step / 2, step)
+        hist, bins = numpy.histogram(array, bins=bins)
+        values.append(hist)
 
     bins = bins.tolist()
-    histograms = [x.tolist() for x in histograms]
+    values = [x.tolist() for x in values]
 
-    return bins, histograms
+    return bins, values
 
-def save_histograms(summary, code, bins, histograms):
-    logger.debug("Saving histogram %s for %s" % (code, summary))
-    type = HistogramType.objects.get(code=code)
+def save_histograms(summary, slug, bins, values):
+    logger.debug("Saving histogram %s for %s" % (slug, summary))
+    type = HistogramType.objects.get(slug=slug)
     try:
         h = DailyHistogram.objects.get(source=summary, type=type)
     except DailyHistogram.DoesNotExist:
         h = DailyHistogram(source=summary, type=type)
     h.bins = bins
-    h.histograms = histograms
+    h.values = values
     h.save()
     logger.debug("Saved succesfully")
 

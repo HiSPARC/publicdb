@@ -89,4 +89,5 @@ INSTALLED_APPS = (
     'django_publicdb.voorraad',
     'django_publicdb.histograms',
     'django_publicdb.coincidences',
+    'django_publicdb.status_display',
 )

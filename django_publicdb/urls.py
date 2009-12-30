@@ -9,10 +9,12 @@ urlpatterns = patterns('',
     # Example:
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
 
-    (r'^update_check/', 'django_publicdb.histograms.views.update_check'),
-    (r'^update_histograms/', 'django_publicdb.histograms.views.update_histograms'),
+    (r'^update_check/$', 'django_publicdb.histograms.views.update_check'),
+    (r'^update_histograms/$', 'django_publicdb.histograms.views.update_histograms'),
 
-    (r'^gateway/', 'django_publicdb.histograms.amfgateway.publicgateway'),
+    (r'^gateway/$', 'django_publicdb.histograms.amfgateway.publicgateway'),
+
+    (r'^show/', include('django_publicdb.status_display.urls')),
 
     (r'^config/nagios$', create_nagios_config),
 
@@ -26,5 +28,5 @@ urlpatterns = patterns('',
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
     # Uncomment the next line to enable the admin:
-    (r'^admin/(.*)', admin.site.root),
+    (r'^admin/', include(admin.site.urls)),
 )
