@@ -46,18 +46,20 @@ def get_stations(date):
 
     :param date: the date to check for
 
-    :return: a set of stations
+    :return: a list of stations
 
     """
     path = get_data_path(date)
 
-    station_set = set()
+    station_list = []
     with tables.openFile(path) as file:
         for cluster in file.listNodes('/hisparc'):
-            stations = [x['station_id'] for x in cluster.events]
-            station_set.update(stations)
+            for station in file.listNodes(cluster):
+                m = re.match('station_(?P<station>[0-9]+)',
+                             station._v_name)
+                station_list.append(int(m.group('station')))
 
-    return station_set
+    return station_list
 
 def get_event_timestamps(cluster, station_id, date):
     """Get event timestamps
@@ -113,9 +115,9 @@ def get_event_data(cluster, station_id, date, quantity):
     path = get_data_path(date)
 
     with tables.openFile(path) as file:
-        cluster = file.getNode('/hisparc', 'cluster_%s' % cluster.lower())
-        data = [x[quantity] for x in
-                cluster.events.readWhere('station_id==%d' % station_id)]
+        parent = file.getNode('/hisparc/cluster_%s/station_%d' %
+                              (cluster.lower(), station_id))
+        data = [x[quantity] for x in parent.events]
 
     return data
 

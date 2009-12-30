@@ -42,6 +42,7 @@ class Summary(models.Model):
     class Meta:
         verbose_name_plural = 'summaries'
         unique_together = (('station', 'date'),)
+        ordering = ('date', 'station')
 
 class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
@@ -55,6 +56,7 @@ class DailyHistogram(models.Model):
 
     class Meta:
         unique_together = (('source', 'type'),)
+        ordering = ('source', 'type')
 
 class HistogramType(models.Model):
     name = models.CharField(max_length=40)
