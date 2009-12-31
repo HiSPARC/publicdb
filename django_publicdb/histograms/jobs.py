@@ -14,9 +14,9 @@ import datastore
 logger = logging.getLogger('histograms.jobs')
 
 MAX_PH = 4000
-BIN_PH_STEP = MAX_PH / 200
+BIN_PH_NUM = 200
 MAX_IN = 30000
-BIN_IN_STEP = MAX_IN / 200
+BIN_IN_NUM = 200
 
 def check_for_updates():
     state = GeneratorState.objects.get()
@@ -25,26 +25,28 @@ def check_for_updates():
         return False
     else:
         last_check_time = time.mktime(state.check_last_run.timetuple())
-        state.check_last_run = datetime.datetime.now()
+        check_last_run = datetime.datetime.now()
         state.check_is_running = True
         state.save()
 
-        date_list = datastore.check_for_new_events(last_check_time)
+        try:
+            date_list = datastore.check_for_new_events(last_check_time)
 
-        for date in date_list:
-            logger.debug("New data on %s" % date.ctime())
-            for station in datastore.get_stations(date):
-                logger.debug("New data? for station %d" % station)
-                station = inforecords.Station.objects.get(number=station)
-                try:
-                    s = Summary.objects.get(station=station, date=date)
-                except Summary.DoesNotExist:
-                    s = Summary(station=station, date=date)
-                s.needs_update = True
-                s.save()
-
-    state.check_is_running = False
-    state.save()
+            for date in date_list:
+                logger.debug("New data on %s" % date.ctime())
+                for station in datastore.get_stations(date):
+                    logger.debug("New data? for station %d" % station)
+                    station = inforecords.Station.objects.get(number=station)
+                    try:
+                        s = Summary.objects.get(station=station, date=date)
+                    except Summary.DoesNotExist:
+                        s = Summary(station=station, date=date)
+                    s.needs_update = True
+                    s.save()
+            state.check_last_run = check_last_run
+        finally:
+            state.check_is_running = False
+            state.save()
 
     return True
 
@@ -54,25 +56,27 @@ def update_all_histograms():
     if state.update_is_running:
         return False
     else:
-        state.update_last_run = datetime.datetime.now()
+        update_last_run = datetime.datetime.now()
         state.update_is_running = True
         state.save()
 
-        num_histograms = 0
-        for summary in Summary.objects.filter(needs_update=True):
-            # updating histograms
-            number_of_events = update_eventtime_histogram(summary)
-            update_pulseheight_histogram(summary)
-            update_pulseintegral_histogram(summary)
-            # updated three histograms
-            num_histograms += 3
-            # updating summary
-            summary.needs_update = False
-            summary.number_of_events = number_of_events
-            summary.save()
-
-    state.update_is_running = False
-    state.save()
+        try:
+            num_histograms = 0
+            for summary in Summary.objects.filter(needs_update=True):
+                # updating histograms
+                number_of_events = update_eventtime_histogram(summary)
+                update_pulseheight_histogram(summary)
+                update_pulseintegral_histogram(summary)
+                # updated three histograms
+                num_histograms += 3
+                # updating summary
+                summary.needs_update = False
+                summary.number_of_events = number_of_events
+                summary.save()
+            state.update_last_run = update_last_run
+        finally:
+            state.update_is_running = False
+            state.save()
 
     return num_histograms
 
@@ -104,20 +108,20 @@ def update_pulseheight_histogram(summary):
     cluster, station_id = get_station_cluster_id(summary.station)
     pulseheights = datastore.get_pulseheights(cluster, station_id,
                                               summary.date)
-    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_STEP)
+    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
 
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
     integrals = datastore.get_integrals(cluster, station_id, summary.date)
-    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_STEP)
+    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
-def create_histogram(data, high, step):
+def create_histogram(data, high, samples):
     values = []
     for array in data:
-        bins = numpy.arange(0, high + step / 2, step)
+        bins = numpy.linspace(0, high, samples)
         hist, bins = numpy.histogram(array, bins=bins)
         values.append(hist)
 

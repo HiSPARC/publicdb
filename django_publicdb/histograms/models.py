@@ -61,8 +61,10 @@ class DailyHistogram(models.Model):
 class HistogramType(models.Model):
     name = models.CharField(max_length=40)
     slug = models.CharField(max_length=20)
-    description = models.TextField(blank=True)
     has_multiple_datasets = models.BooleanField()
+    bin_axis_title = models.CharField(max_length=40)
+    value_axis_title = models.CharField(max_length=40)
+    description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name

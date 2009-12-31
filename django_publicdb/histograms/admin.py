@@ -12,6 +12,7 @@ class DailyHistogramInline(admin.StackedInline):
 class SummaryAdmin(admin.ModelAdmin):
     list_display = ('station', 'date', 'needs_update', 'number_of_events')
     list_filter = ('station', 'needs_update', 'date')
+    list_editable = ('needs_update',)
     inlines = (DailyHistogramInline,)
 
 admin.site.register(GeneratorState, GeneratorStateAdmin)

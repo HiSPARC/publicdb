@@ -1,14 +1,14 @@
 from django.shortcuts import render_to_response, get_object_or_404, \
                              redirect
-from django_publicdb.histograms.models import *
 from django.conf import settings
-
-from django_publicdb.histograms.models import *
 
 import enthought.chaco.api as chaco
 import os
 from numpy import arange, pi, sin
 import datetime
+
+from django_publicdb.histograms.models import *
+from django_publicdb.inforecords.models import *
 
 
 def status(request):
@@ -51,17 +51,21 @@ def create_histogram(type, station_id, year, month, day, log=False):
     name = 'histogram-%s-%d-%d-%02d-%02d.png' % (type, station_id, year,
                                                  month, day)
     date = datetime.date(year, month, day)
-    source = get_object_or_404(Summary, station_id=station_id, date=date)
+    station = get_object_or_404(Station, number=station_id)
+    source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
     histogram = get_object_or_404(DailyHistogram, source=source, type=type)
     
     plot = create_histogram_plot(histogram.bins, histogram.values,
-                                 type.has_multiple_datasets, log)
+                                 type.has_multiple_datasets,
+                                 type.bin_axis_title,
+                                 type.value_axis_title, log)
     render_and_save_plot(plot, name)
 
     return settings.MEDIA_URL + name
 
-def create_histogram_plot(bins, values, has_multiple_datasets, log):
+def create_histogram_plot(bins, values, has_multiple_datasets,
+                          bin_axis_title, value_axis_title, log):
     """Convenience function for creating histogram plots"""
 
     if has_multiple_datasets:
@@ -102,11 +106,17 @@ def create_histogram_plot(bins, values, has_multiple_datasets, log):
     else:
         view.value_range.low_setting = 0
 
+    view.x_axis.title = bin_axis_title
+    view.y_axis.title = value_axis_title
+    view.x_axis.title_font = 'modern bold 16'
+    view.y_axis.title_font = 'modern bold 16'
+    view.x_axis.title_spacing = 20
+
     return view
 
 def render_and_save_plot(plot, name):
     plot.bounds = [500, 333]
-    plot.padding = 50
+    plot.padding = (60, 10, 10, 50)
     gc = chaco.PlotGraphicsContext(plot.outer_bounds)
     gc.render_component(plot)
     path = os.path.join(settings.MEDIA_ROOT, name)
