@@ -86,6 +86,10 @@ def get_pulseheights(cluster, station_id, date):
     """
     pulseheights = get_event_data(cluster, station_id, date,
                                   'pulseheights')
+    #FIXME
+    # need configurations for this
+    pulseheights = [[x * .57 for x in y] for y in pulseheights]
+
     # transpose, so we have 4 arrays of many pulseheights
     return zip(*pulseheights)
 
@@ -100,6 +104,10 @@ def get_integrals(cluster, station_id, date):
 
     """
     integrals = get_event_data(cluster, station_id, date, 'integrals')
+    #FIXME
+    # need configurations for this
+    integrals = [[x * .57 for x in y] for y in integrals]
+
     # transpose, so we have 4 arrays of many integrals
     return zip(*integrals)
 

@@ -5,10 +5,40 @@
 
 <head>
     <title>{% block title %}HiSPARC Public Database{% endblock %}</title>
+    <style type="text/css">
+        html {
+            font-family: "sans-serif";
+        }
+        #container {
+            margin: auto;
+            width: 850px;
+        }
+
+        #pageHeader {
+            background: url(http://localhost/mediaroot/static/header.png) top
+                right no-repeat;
+            height: 63px;
+            margin: 0;
+            padding: 0;
+        }
+        #pageHeader span {
+            display: none;
+        }
+    </style>
+    <style type="text/css">{% block css %}{% endblock %}</style>
 </head>
 
 <body>
-{% block content %}{% endblock %}
+<div id="container">
+
+    <h1 id="pageHeader"><span>Public Database</span></h1>
+
+    <div id="content">
+    {% block content %}{% endblock %}
+    </div>
+
+</div>
+
 </body>
 
 </html>

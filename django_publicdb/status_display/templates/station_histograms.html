@@ -1,14 +1,98 @@
 {% extends 'base.html' %}
 
+{% block css %}
+#graphs {
+    float: left;
+}
+
+#navigation {
+    float: right;
+    font-size: 9pt;
+    border-left: 1px solid black;
+    padding-left: 20px;
+}
+
+#yearlist > a, #monthlist > a {
+    margin-right: 10px;
+}
+
+#yearlist, #monthlist, #listLink {
+    margin-top: 20px;
+}
+
+#calendar .day, #calendar .dayname {
+    width: 25px;
+    height: 25px;
+    text-align: right;
+}
+
+#calendar .dayname {
+    font-size: 8pt;
+}
+
+a:link, a:visited {
+    color: black;
+    font-weight: bold;
+}
+
+{% endblock %}
+
 {% block content %}
 
-<h3>Event Histogram (number of events per hour)</h3>
-<img src='{{ eventhistogram }}'>
+<div id="header">
+    <h2>Station {{ station }} &mdash; {{ date|date:"D N j, Y" }}</h2>
+</div>
 
-<h3>Pulse height histogram</h3>
-<img src='{{ pulseheighthistogram }}'>
+<div id="graphs">
+    <h3>Event Histogram (number of events per hour)</h3>
+    <img src='{{ eventhistogram }}'>
 
-<h3>Pulse integral histogram</h3>
-<img src='{{ pulseintegralhistogram }}'>
+    <h3>Pulse height histogram</h3>
+    <img src='{{ pulseheighthistogram }}'>
+
+    <h3>Pulse integral histogram</h3>
+    <img src='{{ pulseintegralhistogram }}'>
+</div>
+
+<div id="navigation">
+    <table id="calendar">
+    <tr><th colspan="7">{{ thismonth.month }}</th></tr>
+    <tr>
+    {% for day in thismonth.days %}
+      <th class="dayname">{{ day }}</th>
+    {% endfor %}
+    </tr>
+    {% for week in thismonth.weeks %}
+      <tr>
+        {% for day in week %}
+          <td class="day">
+            {% if day.link %}
+              <a href='{% url status_display.views.station_histograms day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
+            {% else %}
+              {{ day.day }}
+            {% endif %}
+        {% endfor %}
+      </tr>
+    {% endfor %}
+    </table>
+
+    <div id="yearlist">
+    {% for year in year_list %}
+      <a href='{% url status_display.views.station_histograms year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a>
+    {% endfor %}
+    </div>
+    </p>
+
+    <div id="monthlist">
+    {% for month in month_list %}
+        {% ifequal forloop.counter0 6 %}<br>{% endifequal %}
+        <a href='{% url status_display.views.station_histograms month.link.0,month.link.1,month.link.2,month.link.3 %}'>{{ month.month }}</a>
+    {% endfor %}
+    </div>
+
+    <div id="listLink">
+        <a href="{% url status_display.views.stations %}">Station List</a>
+    </div>
+</div>
 
 {% endblock %}

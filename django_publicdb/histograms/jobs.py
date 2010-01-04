@@ -13,9 +13,9 @@ import datastore
 
 logger = logging.getLogger('histograms.jobs')
 
-MAX_PH = 4000
+MAX_PH = 2000
 BIN_PH_NUM = 200
-MAX_IN = 30000
+MAX_IN = 20000
 BIN_IN_NUM = 200
 
 def check_for_updates():
