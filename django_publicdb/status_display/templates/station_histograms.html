@@ -1,6 +1,26 @@
 {% extends 'base.html' %}
 
 {% block css %}
+#header * {
+    margin: 0px;
+    padding: 0px;
+}
+
+#header {
+    margin-bottom: 10px;
+}
+
+#stationNumber {
+    color: gray;
+    font-size: 10pt;
+}
+
+#date {
+    font-weight: bold;
+    font-size: 11pt;
+    margin-top: 5px;
+}
+
 #graphs {
     float: left;
 }
@@ -35,23 +55,49 @@ a:link, a:visited {
     font-weight: bold;
 }
 
+a.sourceLink {
+    float: right;
+    position: relative;
+    right: 11px;
+    top: 15px;
+    font-size: 8pt;
+    margin: 0;
+    padding: 0;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.histogram h3 {
+    margin-bottom: -10px;
+}
 {% endblock %}
 
 {% block content %}
 
 <div id="header">
-    <h2>Station {{ station }} &mdash; {{ date|date:"D N j, Y" }}</h2>
+    <h2>Station {{ station.location.name }}</h2>
+    <div id="stationNumber">{{ station.number }}</div>
+    <div id="date">{{ date|date:"D N j, Y" }}</div>
 </div>
 
 <div id="graphs">
-    <h3>Event Histogram (number of events per hour)</h3>
-    <img src='{{ eventhistogram }}'>
+    <div id="eventHistogram" class="histogram">
+        <h3>Event Histogram (number of events per hour)</h3>
+        <a href="{% url status_display.views.get_eventtime_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <img src='{{ eventhistogram }}'>
+    </div>
 
-    <h3>Pulse height histogram</h3>
-    <img src='{{ pulseheighthistogram }}'>
+    <div id="pulseheightHistogram" class="histogram">
+        <h3>Pulse height histogram</h3>
+        <a href="{% url status_display.views.get_pulseheight_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <img src='{{ pulseheighthistogram }}'>
+    </div>
 
-    <h3>Pulse integral histogram</h3>
-    <img src='{{ pulseintegralhistogram }}'>
+    <div id="pulseintegralHistogram" class="histogram">
+        <h3>Pulse integral histogram</h3>
+        <a href="{% url status_display.views.get_pulseintegral_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <img src='{{ pulseintegralhistogram }}'>
+    </div>
 </div>
 
 <div id="navigation">

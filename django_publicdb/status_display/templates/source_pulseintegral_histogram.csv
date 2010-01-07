@@ -1,0 +1,8 @@
+# HiSPARC pulseintegral histogram source
+#
+# Please note: the 'bin' is the left bin edge.  The width of the bin must
+# be determined from data.
+# 
+bin value1 value2 value3 value4
+{% for row in data %}{{ row.0 }},{{ row.1 }},{{ row.2 }},{{ row.3 }},{{ row.4 }}
+{% endfor %}

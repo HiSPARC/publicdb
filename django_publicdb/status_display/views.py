@@ -1,5 +1,6 @@
 from django.shortcuts import render_to_response, get_object_or_404, \
                              redirect
+from django.template import RequestContext
 from django.conf import settings
 
 import calendar
@@ -11,11 +12,6 @@ import datetime
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
 
-
-def status(request):
-    """Show eventwarehouse status"""
-
-    return
 
 def stations(request):
     """Show a list of stations, ordered by cluster"""
@@ -35,7 +31,8 @@ def stations(request):
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
-    return render_to_response('stations.html', {'clusters': clusters})
+    return render_to_response('stations.html', {'clusters': clusters},
+                              context_instance=RequestContext(request))
 
 def station_histograms(request, station_id, year, month, day):
     """Show daily histograms for a particular station"""
@@ -59,7 +56,7 @@ def station_histograms(request, station_id, year, month, day):
                                               year, month, day, log=True)
 
     return render_to_response('station_histograms.html',
-        { 'station': station_id,
+        { 'station': station,
           'date': datetime.date(year, month, day),
           'eventhistogram': eventhistogram,
           'pulseheighthistogram': pulseheighthistogram,
@@ -67,7 +64,8 @@ def station_histograms(request, station_id, year, month, day):
           'thismonth': thismonth,
           'month_list': month_list,
           'year_list': year_list,
-        })
+          'link': (station_id, year, month, day),
+        }, context_instance=RequestContext(request))
 
 def station(request, station_id):
     """Show most recent histograms for a particular station"""
@@ -78,6 +76,46 @@ def station(request, station_id):
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
+
+def get_eventtime_histogram_source(request, station_id, year, month, day):
+    data = get_histogram_source(station_id, year, month, day, 'eventtime')
+    response = render_to_response('source_eventtime_histogram.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=eventtime-%s-%s-%s-%s.csv' %
+        (station_id, year, month, day))
+    return response
+
+def get_pulseheight_histogram_source(request, station_id, year, month, day):
+    data = get_histogram_source(station_id, year, month, day,
+                                'pulseheight')
+    response = render_to_response('source_pulseheight_histogram.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=pulseheight-%s-%s-%s-%s.csv' %
+        (station_id, year, month, day))
+    return response
+
+def get_pulseintegral_histogram_source(request, station_id, year, month, day):
+    data = get_histogram_source(station_id, year, month, day,
+                                'pulseintegral')
+    response = render_to_response('source_pulseintegral_histogram.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=pulseintegral-%s-%s-%s-%s.csv' %
+        (station_id, year, month, day))
+    return response
+
+def get_histogram_source(station_id, year, month, day, type):
+    histogram = DailyHistogram.objects.get(
+                    source__station__number=int(station_id),
+                    source__date=datetime.date(int(year), int(month),
+                                               int(day)),
+                    type__slug=type)
+    if type == 'eventtime':
+        return zip(histogram.bins, histogram.values)
+    else:
+        return zip(histogram.bins, *histogram.values)
 
 def create_histogram(type, station, year, month, day, log=False):
     """Create a histogram and save it to disk"""
