@@ -1,4 +1,8 @@
 from django.db import models
+from django.core.urlresolvers import reverse
+import xmlrpclib
+
+from django.conf import settings
 
 class Contactposition(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -188,6 +192,7 @@ class Electronics(models.Model):
 
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
+    slug = models.CharField(max_length=20)
 
     def __unicode__(self):
         return self.description
@@ -208,12 +213,14 @@ class Pc(models.Model):
     def __unicode__(self):
         return self.name
 
-    def certificaat(self):
-        return "<a target=_blank href=http://vpn.hisparc.nl/django/certificaat/" \
-               "genereer/%s/%s.zip>Certificaat %s</a>" % (self.type_id,
-                                                          self.name, self.name)
-    certificaat.short_description = 'Certificaten'
-    certificaat.allow_tags = True
+    def keys(self):
+        return ("<a href=%s>Certificaat %s</a>" %
+                (reverse('django_publicdb.inforecords.views.keys',
+                         args=[self.name]),
+                 self.name))
+
+    keys.short_description = 'Certificaten'
+    keys.allow_tags = True
 
     def url(self):
         if self.type.description == 'Admin PC':
@@ -241,9 +248,11 @@ class Pc(models.Model):
 
         return '.'.join(q)
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+
         if self.id:
-            super(Pc, self).save(force_insert, force_update)
+            super(Pc, self).save(*args, **kwargs)
         else:
             if self.type.description == "Admin PC":
                 vorigip = Pc.objects.filter(type__description="Admin PC").\
@@ -253,8 +262,21 @@ class Pc(models.Model):
                           latest('id').ip
             self.ip = self.ipAdresGenereer(vorigip)
 
-            super(Pc, self).save(force_insert, force_update)
+            super(Pc, self).save(*args, **kwargs)
+
+            proxy.create_key(self.name, self.type.slug, self.ip)
+
+            #FIXME this doesn't check for preselected services
             self.install_default_services()
+
+        proxy.register_hosts_ip([(x.name, x.ip) for x in
+                                 Pc.objects.all()])
+        proxy.reload_nagios()
+
+    def delete(self, *args, **kwargs):
+        super(Pc, self).delete(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.reload_nagios()
 
     def install_default_services(self):
         if self.type.description != "Admin PC":
@@ -304,3 +326,13 @@ class EnabledService(models.Model):
 
     class Meta:
 	ordering = ('pc', 'monitor_service')
+
+    def save(self, *args, **kwargs):
+        super(EnabledService, self).save(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.reload_nagios()
+
+    def delete(self, *args, **kwargs):
+        super(EnabledService, self).delete(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.reload_nagios()

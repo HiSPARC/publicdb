@@ -18,10 +18,7 @@ urlpatterns = patterns('',
 
     (r'^config/nagios$', create_nagios_config),
 
-    # DF: This should be looked into. With inforecords running on pique, how
-    # should we handle generating certificates and config on tietar?
-    #(r'^certificaat/genereer/(.+)/(.+).zip$', genereer),
-    #(r'^maakconfig$', maakconfig),
+    (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
 
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:

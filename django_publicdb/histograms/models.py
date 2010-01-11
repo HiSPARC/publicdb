@@ -59,8 +59,8 @@ class DailyHistogram(models.Model):
         ordering = ('source', 'type')
 
 class HistogramType(models.Model):
-    name = models.CharField(max_length=40)
-    slug = models.CharField(max_length=20)
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.CharField(max_length=20, unique=True)
     has_multiple_datasets = models.BooleanField()
     bin_axis_title = models.CharField(max_length=40)
     value_axis_title = models.CharField(max_length=40)

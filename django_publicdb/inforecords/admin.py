@@ -49,7 +49,7 @@ class EnabledServiceInline(admin.TabularInline):
 
 class PcAdmin(admin.ModelAdmin):
     list_display = ('station', 'name', 'is_active', 'type', 'ip', 'url',
-                    'certificaat')
+                    'keys')
     list_filter = ('is_active',)
     ordering = ('station',)
     inlines = (EnabledServiceInline,)
