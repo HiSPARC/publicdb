@@ -4,10 +4,14 @@ from django.template import RequestContext
 from django.conf import settings
 
 import calendar
-import enthought.chaco.api as chaco
 import os
 from numpy import arange, pi, sin
 import datetime
+
+from enthought.etsconfig.api import ETSConfig
+ETSConfig.toolkit = 'null'
+ETSConfig.enable_toolkit = 'null'
+import enthought.chaco.api as chaco
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -182,7 +186,8 @@ def create_histogram_plot(bins, values, has_multiple_datasets,
         view.value_range.low_setting = 0
 
     #FIXME
-    view.value_range.high_setting = max([max(x) for x in datasets]) * 1.1
+    if datasets:
+        view.value_range.high_setting = max([max(x) for x in datasets]) * 1.1
 
     view.x_axis.title = bin_axis_title
     view.y_axis.title = value_axis_title

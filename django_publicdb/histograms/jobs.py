@@ -119,16 +119,19 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 def create_histogram(data, high, samples):
-    values = []
-    for array in data:
-        bins = numpy.linspace(0, high, samples)
-        hist, bins = numpy.histogram(array, bins=bins)
-        values.append(hist)
+    if data is None:
+        return [], []
+    else:
+        values = []
+        for array in data:
+            bins = numpy.linspace(0, high, samples)
+            hist, bins = numpy.histogram(array, bins=bins)
+            values.append(hist)
 
-    bins = bins.tolist()
-    values = [x.tolist() for x in values]
+        bins = bins.tolist()
+        values = [x.tolist() for x in values]
 
-    return bins, values
+        return bins, values
 
 def save_histograms(summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s" % (slug, summary))

@@ -262,9 +262,9 @@ class Pc(models.Model):
                           latest('id').ip
             self.ip = self.ipAdresGenereer(vorigip)
 
-            super(Pc, self).save(*args, **kwargs)
-
+            # First create keys, then issue final save
             proxy.create_key(self.name, self.type.slug, self.ip)
+            super(Pc, self).save(*args, **kwargs)
 
             #FIXME this doesn't check for preselected services
             self.install_default_services()
@@ -276,6 +276,8 @@ class Pc(models.Model):
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.register_hosts_ip([(x.name, x.ip) for x in
+                                 Pc.objects.all()])
         proxy.reload_nagios()
 
     def install_default_services(self):

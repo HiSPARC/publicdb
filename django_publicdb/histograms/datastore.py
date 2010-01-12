@@ -86,12 +86,15 @@ def get_pulseheights(cluster, station_id, date):
     """
     pulseheights = get_event_data(cluster, station_id, date,
                                   'pulseheights')
-    #FIXME
-    # need configurations for this
-    pulseheights = [[x * .57 for x in y] for y in pulseheights]
+    if pulseheights is None:
+        return None
+    else:
+        #FIXME
+        # need configurations for this
+        pulseheights = [[x * .57 for x in y] for y in pulseheights]
 
-    # transpose, so we have 4 arrays of many pulseheights
-    return zip(*pulseheights)
+        # transpose, so we have 4 arrays of many pulseheights
+        return zip(*pulseheights)
 
 def get_integrals(cluster, station_id, date):
     """Get all event integrals
@@ -104,12 +107,15 @@ def get_integrals(cluster, station_id, date):
 
     """
     integrals = get_event_data(cluster, station_id, date, 'integrals')
-    #FIXME
-    # need configurations for this
-    integrals = [[x * .57 for x in y] for y in integrals]
+    if integrals is None:
+        return None
+    else:
+        #FIXME
+        # need configurations for this
+        integrals = [[x * .57 for x in y] for y in integrals]
 
-    # transpose, so we have 4 arrays of many integrals
-    return zip(*integrals)
+        # transpose, so we have 4 arrays of many integrals
+        return zip(*integrals)
 
 def get_event_data(cluster, station_id, date, quantity):
     """Get event data of a specific quantity
@@ -125,7 +131,10 @@ def get_event_data(cluster, station_id, date, quantity):
     with tables.openFile(path) as file:
         parent = file.getNode('/hisparc/cluster_%s/station_%d' %
                               (cluster.lower(), station_id))
-        data = [x[quantity] for x in parent.events]
+        try:
+            data = [x[quantity] for x in parent.events]
+        except tables.NoSuchNodeError:
+            data = None
 
     return data
 
