@@ -54,14 +54,14 @@ class Cluster(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        super(Cluster, self).save(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Cluster, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        super(Cluster, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Cluster, self).delete(*args, **kwargs)
 
     class Meta:
         ordering = ('name',)
@@ -95,14 +95,14 @@ class Location(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        super(Location, self).save(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Location, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        super(Location, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Location, self).delete(*args, **kwargs)
 
     class Meta:
         ordering = ('name',)
@@ -120,16 +120,16 @@ class Station(models.Model):
         return self.location.cluster
 
     def save(self, *args, **kwargs):
+        super(Station, self).save(*args, **kwargs)
         update_station_password(self.number, self.password)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Station, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
+        super(Station, self).delete(*args, **kwargs)
         remove_station_password(self.number)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Station, self).delete(*args, **kwargs)
 
     class Meta:
         ordering = ('number',)
