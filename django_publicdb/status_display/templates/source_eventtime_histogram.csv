@@ -1,9 +1,9 @@
-# HiSPARC eventtime histogram source
-#
-# Please note: the 'bin' is the left bin edge.  The width of the bin is 1
-# hour.  So bin 0 means between 0:00 and 1:00.  Value means the number of
-# events which were measured during 1 hour.
-# 
-bin value
-{% for row in data %}{{ row.0 }},{{ row.1 }}
+;;"HiSPARC eventtime histogram source"
+
+;;"Please note: the 'bin' is the left bin edge.  The width of the bin is 1"
+;;"hour.  So bin 0 means between 0:00 and 1:00.  Value means the number of"
+;;"events which were measured during 1 hour."
+
+bin;value
+{% for row in data %}{{ row.0 }};{{ row.1 }}
 {% endfor %}
