@@ -101,10 +101,14 @@ class Station(models.Model):
 
     def save(self, force_insert=False, force_update=False):
         update_station_password(self.number, self.password)
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
         super(Station, self).save(force_insert, force_update)
 
     def delete(self):
         remove_station_password(self.number)
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
         super(Station, self).delete()
 
     class Meta:

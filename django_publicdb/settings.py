@@ -20,8 +20,9 @@ DATABASE_PORT = ''             # Set to empty string for default. Not used with 
 # Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = '/tmp/datastore'
 
-# VPN server XML-RPC Proxy
+# VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
+DATASTORE_PROXY = 'http://localhost:8002'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name

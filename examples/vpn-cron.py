@@ -30,8 +30,6 @@ CFG_URL = 'http://data.hisparc.nl/django/config/nagios'
 def reload_nagios():
     """Load nagios config and reload nagios, if necessary"""
 
-    print 'reload?'
-
     nagios_cfg = urllib2.urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(nagios_cfg).hexdigest()
 
