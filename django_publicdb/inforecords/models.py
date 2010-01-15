@@ -53,6 +53,16 @@ class Cluster(models.Model):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+        super(Cluster, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+        super(Cluster, self).delete(*args, **kwargs)
+
     class Meta:
         ordering = ('name',)
 
@@ -84,6 +94,16 @@ class Location(models.Model):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+        super(Location, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+        super(Location, self).delete(*args, **kwargs)
+
     class Meta:
         ordering = ('name',)
 
@@ -99,17 +119,17 @@ class Station(models.Model):
     def cluster(self):
         return self.location.cluster
 
-    def save(self, force_insert=False, force_update=False):
+    def save(self, *args, **kwargs):
         update_station_password(self.number, self.password)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Station, self).save(force_insert, force_update)
+        super(Station, self).save(*args, **kwargs)
 
-    def delete(self):
+    def delete(self, *args, **kwargs):
         remove_station_password(self.number)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-        super(Station, self).delete()
+        super(Station, self).delete(*args, **kwargs)
 
     class Meta:
         ordering = ('number',)
@@ -317,8 +337,8 @@ class MonitorService(models.Model):
         verbose_name_plural = 'Monitor Services'
         ordering = ('description',)
 
-    def save(self, force_insert=False, force_update=False):
-        super(MonitorService, self).save(force_insert, force_update)
+    def save(self, *args, **kwargs):
+        super(MonitorService, self).save(*args, **kwargs)
 
         if self.is_default_service:
             for pc in Pc.objects.exclude(type__description="Admin PC"):
