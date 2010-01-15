@@ -1,3 +1,4 @@
+#!/usr/bin/python
 """ Simple XML-RPC Server to run on the VPN server
 
     This daemon should be run on HiSPARC's VPN server.  It will handle the
@@ -17,6 +18,8 @@ import os
 import base64
 
 OPENVPN_DIR = '/home/david/tmp/openvpn'
+HOSTS_FILE = '/tmp/hosts-hisparc'
+FLAG = '/tmp/flag_nagios_reload'
 
 def create_key(host, type, ip):
     """create keys for a host and set up openvpn"""
@@ -37,9 +40,9 @@ def create_key(host, type, ip):
 def register_hosts_ip(host_list):
     """Register all hosts ips"""
 
-    with open('/home/david/tmp/hosts-hisparc', 'w') as file:
+    with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
-            file.write('%s\t%s\n' % (ip, host))
+            file.write('%s\t%s.his\n' % (ip, host))
     subprocess.check_call(['/sbin/service', 'dnsmasq', 'reload'])
 
     return True
@@ -75,7 +78,7 @@ def get_key(host, type):
 def reload_nagios():
     """Signal a reload of nagios"""
 
-    with open('/tmp/flag_nagios_reload', 'a') as file:
+    with open(FLAG, 'a') as file:
         pass
     return True
 
