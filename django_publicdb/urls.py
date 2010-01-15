@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     (r'^show/', include('django_publicdb.status_display.urls')),
 
     (r'^config/nagios$', create_nagios_config),
+    (r'^config/datastore$', create_datastore_config),
 
     (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
 

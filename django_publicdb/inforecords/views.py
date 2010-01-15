@@ -69,4 +69,12 @@ def create_nagios_config(request):
     return render_to_response('nagios.cfg',
                               {'contacts': Contact.objects.all(),
                                'clusters': Cluster.objects.all(),
-                               'hosts': hosts})
+                               'hosts': hosts},
+                              mimetype='text/plain')
+
+def create_datastore_config(request):
+    """Create the datastore configuration"""
+
+    return render_to_response('datastore.cfg',
+                              {'stations': Station.objects.all()},
+                              mimetype='text/plain')
