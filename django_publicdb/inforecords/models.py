@@ -4,6 +4,8 @@ import xmlrpclib
 
 from django.conf import settings
 
+from eventwarehouse import update_station_password, remove_station_password
+
 class Contactposition(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
@@ -96,6 +98,14 @@ class Station(models.Model):
 
     def cluster(self):
         return self.location.cluster
+
+    def save(self, force_insert=False, force_update=False):
+        update_station_password(self.number, self.password)
+        super(Station, self).save(force_insert, force_update)
+
+    def delete(self):
+        remove_station_password(self.number)
+        super(Station, self).delete()
 
     class Meta:
         ordering = ('number',)
