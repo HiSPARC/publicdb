@@ -35,8 +35,10 @@ def check_for_updates():
             for date, station_list in summary.iteritems():
                 for station, table_list in station_list.iteritems():
                     #FIXME
-                    if station == 7030 or station == 7300:
-                        break
+                    if (station == 7030 or station == 7300 or
+                        station == 8002 or station == 8013 or
+                        station == 8014 or station == 8015):
+                        continue
 
                     logger.debug("New data on %s for station %d" %
                                  (date.ctime(), station))
