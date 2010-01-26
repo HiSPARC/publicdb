@@ -19,11 +19,11 @@ def run():
         logger.info("Update check finished.")
 
     logger.info("Building new histograms...")
-    num_histograms = hg.jobs.update_all_histograms()
-    if num_histograms is False:
+    completed = hg.jobs.update_all_histograms()
+    if not completed:
         logger.info("Histograms did not complete a previous run yet")
     else:
-        logger.info("Finished building %d histograms" % num_histograms)
+        logger.info("Finished building histograms")
 
 
 if __name__ == '__main__':

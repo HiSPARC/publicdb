@@ -47,6 +47,19 @@ def station_histograms(request, station_id, year, month, day):
     day = int(day)
     
     station = get_object_or_404(Station, number=station_id)
+    tomorrow = (datetime.date(year, month, day) +
+                datetime.timedelta(days=1))
+    try:
+        config = (Configuration.objects.filter(source__station=station,
+                                               timestamp__lt=tomorrow)
+                                       .latest('timestamp'))
+        if config.slv_version.count('0') == 2:
+            has_slave = False
+        else:
+            has_slave = True
+    except Configuration.DoesNotExist:
+        config = None
+        has_slave = False
 
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
@@ -62,6 +75,8 @@ def station_histograms(request, station_id, year, month, day):
     return render_to_response('station_histograms.html',
         { 'station': station,
           'date': datetime.date(year, month, day),
+          'config': config,
+          'has_slave': has_slave,
           'eventhistogram': eventhistogram,
           'pulseheighthistogram': pulseheighthistogram,
           'pulseintegralhistogram': pulseintegralhistogram,

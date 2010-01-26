@@ -30,19 +30,29 @@ def check_for_updates():
         state.save()
 
         try:
-            date_list = datastore.check_for_new_events(last_check_time)
+            summary = datastore.check_for_new_events(last_check_time)
 
-            for date in date_list:
-                logger.debug("New data on %s" % date.ctime())
-                for station in datastore.get_stations(date):
-                    logger.debug("New data? for station %d" % station)
-                    station = inforecords.Station.objects.get(number=station)
-                    try:
-                        s = Summary.objects.get(station=station, date=date)
-                    except Summary.DoesNotExist:
-                        s = Summary(station=station, date=date)
-                    s.needs_update = True
-                    s.save()
+            for date, station_list in summary.iteritems():
+                for station, table_list in station_list.iteritems():
+                    #FIXME
+                    if station == 7030 or station == 7300:
+                        break
+
+                    logger.debug("New data on %s for station %d" %
+                                 (date.ctime(), station))
+                    station = (inforecords.Station.objects
+                                          .get(number=station))
+                    s, created = Summary.objects.get_or_create(
+                                    station=station, date=date)
+                    for table, num_events in table_list.iteritems():
+                        if (table == 'events' or table == 'config' or
+                            table == 'errors'):
+                            number_of = 'num_%s' % table
+                            update_type = 'needs_update_%s' % table
+                            if vars(s)[number_of] != num_events:
+                                s.needs_update = True
+                                vars(s)[update_type] = True
+                                s.save()
             state.check_last_run = check_last_run
         finally:
             state.check_is_running = False
@@ -61,24 +71,27 @@ def update_all_histograms():
         state.save()
 
         try:
-            num_histograms = 0
             for summary in Summary.objects.filter(needs_update=True):
-                # updating histograms
-                number_of_events = update_eventtime_histogram(summary)
-                update_pulseheight_histogram(summary)
-                update_pulseintegral_histogram(summary)
-                # updated three histograms
-                num_histograms += 3
-                # updating summary
+                if summary.needs_update_events:
+                    num_events = update_eventtime_histogram(summary)
+                    update_pulseheight_histogram(summary)
+                    update_pulseintegral_histogram(summary)
+                    summary.num_events = num_events
+                    summary.needs_update_events = False
+
+                if summary.needs_update_config:
+                    num_config = update_config(summary)
+                    summary.num_config = num_config
+                    summary.needs_update_config = False
+
                 summary.needs_update = False
-                summary.number_of_events = number_of_events
                 summary.save()
             state.update_last_run = update_last_run
         finally:
             state.update_is_running = False
             state.save()
 
-    return num_histograms
+    return True
 
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
@@ -98,7 +111,6 @@ def update_eventtime_histogram(summary):
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
     hist = hist[0].tolist()
-
     save_histograms(summary, 'eventtime', bins, hist)
     number_of_events = sum(hist)
     return number_of_events
@@ -117,6 +129,31 @@ def update_pulseintegral_histogram(summary):
     integrals = datastore.get_integrals(cluster, station_id, summary.date)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
+
+def update_config(summary):
+    logger.debug("Updating configuration messages for %s" % summary)
+    cluster, station_id = get_station_cluster_id(summary.station)
+    file, configs, blobs = datastore.get_config_messages(cluster,
+                                                        station_id,
+                                                        summary.date)
+    for config in configs[summary.num_config:]:
+        new_config = Configuration(source=summary)
+        for var in vars(new_config):
+            if (var == 'source' or var == 'id' or var == 'source_id' or
+                var[0] == '_'):
+                pass
+            elif var == 'mas_version' or var == 'slv_version':
+                vars(new_config)[var] = blobs[config[var]]
+            elif var == 'timestamp':
+                ts = datetime.datetime.fromtimestamp(config[var])
+                vars(new_config)[var] = ts
+            else:
+                vars(new_config)[var] = config[var]
+        new_config.save()
+
+    num_config = len(configs)
+    file.close()
+    return num_config
 
 def create_histogram(data, high, samples):
     if data is None:
