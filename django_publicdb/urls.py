@@ -10,7 +10,7 @@ urlpatterns = patterns('',
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
 
     (r'^$', 'django.views.generic.simple.redirect_to',
-     {'url': '/show/stations', 'permanent': False}),
+     {'url': 'show/stations', 'permanent': False}),
 
     (r'^update_check/$', 'django_publicdb.histograms.views.update_check'),
     (r'^update_histograms/$', 'django_publicdb.histograms.views.update_histograms'),
