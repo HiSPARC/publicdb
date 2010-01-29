@@ -63,6 +63,12 @@ class Cluster(models.Model):
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
 
+    def main_cluster(self):
+        if self.parent:
+            return self.parent.main_cluster()
+        else:
+            return self.name
+
     class Meta:
         ordering = ('name',)
 
