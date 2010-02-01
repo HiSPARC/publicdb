@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response
+from django.template import RequestContext
 from django.conf import settings
 
 import numpy as np
@@ -20,7 +21,7 @@ def data_display(request):
         {'energy_histogram': energy_histogram,
          'core_plot': core_plot,
          'scores': scores,
-        })
+        }, context_instance=RequestContext(request))
 
 def create_energy_histogram():
     """Create an energy histogram"""
@@ -39,7 +40,7 @@ def create_energy_histogram():
 
     plot = create_histogram_plot(bins, values, True,
                                  'Log energy (eV)', 'Count', log=False)
-    render_and_save_plot(plot, name, 500, 333)
+    render_and_save_plot(plot, name, 400, 266)
 
     return settings.MEDIA_URL + name
 
@@ -56,7 +57,7 @@ def create_core_plot():
     data.set_data('y', y)
     data.set_data('logenergy', logenergy)
 
-    image = chaco.ImageData.fromfile('symposium2009/map-flipped.png')
+    image = chaco.ImageData.fromfile('/var/www/django_publicdb/symposium2009/map-flipped.png')
     data.set_data('map', image.get_data())
 
     xbounds = (4.93772, 4.96952)
@@ -65,7 +66,7 @@ def create_core_plot():
     plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter',
               marker='circle', marker_size=3, color_mapper=chaco.autumn)
 
-    render_and_save_plot(plot, name, 500, 500)
+    render_and_save_plot(plot, name, 400, 400)
     return settings.MEDIA_URL + name
 
 def top_lijst():

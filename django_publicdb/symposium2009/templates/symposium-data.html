@@ -1,9 +1,29 @@
 {% extends "base.html" %}
 
+{% block head %}<meta http-equiv="refresh" content="60">{% endblock %}
+
 {% block css %}
-th, td {
+#graphs {
+    float: left;
+}
+
+#scores {
+    width: 220px;
+    float: right;
+    font-size: 80%;
+}
+
+table {
+    width: 100%;
+}
+
+th {
     text-align: left;
-    padding-right: 50px;
+}
+
+.student {
+    padding-left: 5px;
+    padding-right: 5px;
 }
 {% endblock %}
 
@@ -28,13 +48,15 @@ th, td {
     <h3>List of student scores</h3>
     <table>
     <tr>
-        <th>Rank</th><th>Student</th><th>Weighted Average Error</th>
+        <th class="rank">#</th>
+        <th class="student">Student</th>
+        <th class="error">Error</th>
     </tr>
     {% for student in scores %}
         <tr>
-            <td>{{ forloop.counter }}</td>
-            <td>{{ student.name }}</td>
-            <td>{{ student.wgh_error }}</td>
+            <td class="rank">{{ forloop.counter }}</td>
+            <td class="student">{{ student.name }}</td>
+            <td class="error">{{ student.wgh_error|floatformat:5 }}</td>
         </tr>
     {% endfor %}
     </table>
