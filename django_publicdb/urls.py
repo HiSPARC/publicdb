@@ -18,6 +18,7 @@ urlpatterns = patterns('',
     (r'^gateway/$', 'django_publicdb.histograms.amfgateway.publicgateway'),
 
     (r'^show/', include('django_publicdb.status_display.urls')),
+    (r'^symposium/', include('django_publicdb.symposium2009.urls')),
 
     (r'^config/nagios$', create_nagios_config),
     (r'^config/datastore$', create_datastore_config),

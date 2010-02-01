@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div id="header">
+    <h2>Symposium results</h2>
+</div>
+
+<div id="graphs">
+    <div id="energyHistogram">
+        <h3>Energy histogram</h3>
+        <img src="{{ energy_histogram }}">
+    </div>
+</div>
+
+{% endblock %}
