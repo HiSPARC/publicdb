@@ -1,5 +1,12 @@
 {% extends "base.html" %}
 
+{% block css %}
+th, td {
+    text-align: left;
+    padding-right: 50px;
+}
+{% endblock %}
+
 {% block content %}
 
 <div id="header">
@@ -11,6 +18,26 @@
         <h3>Energy histogram</h3>
         <img src="{{ energy_histogram }}">
     </div>
+    <div id="corePlot">
+        <h3>Shower core positions</h3>
+        <img src="{{ core_plot }}">
+    </div>
+</div>
+
+<div id="scores">
+    <h3>List of student scores</h3>
+    <table>
+    <tr>
+        <th>Rank</th><th>Student</th><th>Weighted Average Error</th>
+    </tr>
+    {% for student in scores %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ student.name }}</td>
+            <td>{{ student.wgh_error }}</td>
+        </tr>
+    {% endfor %}
+    </table>
 </div>
 
 {% endblock %}

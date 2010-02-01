@@ -94,4 +94,5 @@ INSTALLED_APPS = (
     'django_publicdb.histograms',
     'django_publicdb.coincidences',
     'django_publicdb.status_display',
+    'django_publicdb.symposium2009',
 )

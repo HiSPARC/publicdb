@@ -1,7 +1,7 @@
 from pyamf.remoting.gateway.django import DjangoGateway
 from django.core.exceptions import ObjectDoesNotExist
 
-from django_app.coincidences.models import *
+from django_publicdb.coincidences.models import *
 from models import *
 
 from numpy import average
@@ -69,4 +69,4 @@ services = { 'hisparc.get_services': get_services,
              'hisparc.send_results': send_results,
              'hisparc.get_energy_data': get_energy_data,
            }
-publicgateway = DjangoGateway(services)
+public_gateway = DjangoGateway(services)
