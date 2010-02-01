@@ -185,4 +185,4 @@ def save_histograms(summary, slug, bins, values):
     logger.debug("Saved succesfully")
 
 def get_station_cluster_id(station):
-    return station.cluster().name, station.number
+    return station.cluster().main_cluster(), station.number
