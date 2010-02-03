@@ -66,6 +66,11 @@ def create_core_plot():
     plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter',
               marker='circle', marker_size=3, color_mapper=chaco.autumn)
 
+    i = plot.index_range
+    i.low_setting, i.high_setting = xbounds
+    v = plot.value_range
+    v.low_setting, v.hvgh_setting = ybounds
+
     render_and_save_plot(plot, name, 400, 400)
     return settings.MEDIA_URL + name
 
