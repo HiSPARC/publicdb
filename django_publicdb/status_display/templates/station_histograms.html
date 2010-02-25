@@ -109,19 +109,19 @@ a.sourceLink {
     <div id="eventHistogram" class="histogram">
         <h3>Event Histogram (number of events per hour)</h3>
         <a href="{% url status_display.views.get_eventtime_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ eventhistogram }}'>
+        <img src='{{ eventhistogram }}' alt="Event time histogram">
     </div>
 
     <div id="pulseheightHistogram" class="histogram">
         <h3>Pulse height histogram</h3>
         <a href="{% url status_display.views.get_pulseheight_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ pulseheighthistogram }}'>
+        <img src='{{ pulseheighthistogram }}' alt="Pulse height histogram">
     </div>
 
     <div id="pulseintegralHistogram" class="histogram">
         <h3>Pulse integral histogram</h3>
         <a href="{% url status_display.views.get_pulseintegral_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ pulseintegralhistogram }}'>
+        <img src='{{ pulseintegralhistogram }}' alt="Pulse integral histogram">
     </div>
 </div>
 
@@ -152,7 +152,6 @@ a.sourceLink {
       <a href='{% url status_display.views.station_histograms year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a>
     {% endfor %}
     </div>
-    </p>
 
     <div id="monthlist">
     {% for month in month_list %}
@@ -174,8 +173,8 @@ a.sourceLink {
             <div class="keyvalue"><span class="key">Longitude:</span><span class="value">{{ config.gps_longitude }}</span></div>
             <div class="keyvalue"><span class="key">Altitude:</span><span class="value">{{ config.gps_altitude }}</span></div>
             <div id="maps">
-                <div class="mapLink"><a href="http://www.openstreetmap.org/?mlat={{ config.gps_latitude }}&mlon={{ config.gps_longitude }}&zoom=15">Openstreetmap</a></div>
-                <div class="mapLink"><a href="http://maps.google.com/?ll={{ config.gps_latitude }},{{ config.gps_longitude }}&z=15">Google Maps</a></div>
+                <div class="mapLink"><a href="http://www.openstreetmap.org/?mlat={{ config.gps_latitude }}&amp;mlon={{ config.gps_longitude }}&amp;zoom=15">Openstreetmap</a></div>
+                <div class="mapLink"><a href="http://maps.google.com/?ll={{ config.gps_latitude }},{{ config.gps_longitude }}&amp;z=15">Google Maps</a></div>
             </div>
         </div>
         <div id="master">
