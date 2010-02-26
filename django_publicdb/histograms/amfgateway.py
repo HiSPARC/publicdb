@@ -3,6 +3,8 @@ from models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django_publicdb.inforecords.models import *
 
+import random
+
 options_timehistogram = ['event time']
 options_1dhistogram = ['pulse heights', 'pulse integrals']
 
@@ -57,7 +59,8 @@ def get_1dhistogram(request, station_id, date, type):
 
 def get_histogram(station_id, date, type):
     try:
-        summary = Summary.objects.get(station_id=station_id, date=date)
+        summary = Summary.objects.get(station__number=station_id,
+                                      date=date)
         histtype = HistogramType.objects.get(slug=type)
         histogram = DailyHistogram.objects.get(source=summary, type=histtype)
     except ObjectDoesNotExist:
@@ -97,13 +100,14 @@ def get_cluster_station_list(parent):
             except ObjectDoesNotExist:
                 continue
             s['number'] = station.number
+            s['name'] = station.location.name
             s['latitude'] = detector.latitude
             if not s['latitude']:
                 s['latitude'] = 52.0
             s['longitude'] = detector.longitude
             if not s['longitude']:
                 s['longitude'] = 4.0
-            s['status'] = 1.0
+            s['status'] = random.random()
 
             c['contents'].append(s)
 
@@ -111,6 +115,11 @@ def get_cluster_station_list(parent):
 
     return data
 
+def get_station_info(request, station_id):
+    """Retrieve a station info page"""
+
+    html = Station.objects.get(number=station_id).info_page
+    return "<body>" + html + "</body>"
 
 services = {
     'hisparc.get_services': get_services,
@@ -119,6 +128,7 @@ services = {
     'hisparc.get_1dhistogram_options': get_1dhistogram_options,
     'hisparc.get_1dhistogram': get_1dhistogram,
     'hisparc.get_stations': get_stations,
+    'hisparc.get_station_info': get_station_info,
 }
 
 publicgateway = DjangoGateway(services)

@@ -118,6 +118,7 @@ class Station(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True)
     number = models.IntegerField(unique=True)
     password = models.CharField(max_length=40)
+    info_page = models.TextField(blank=True)
 
     def __unicode__(self):
         return '%s - %s' % (self.number, self.location)
