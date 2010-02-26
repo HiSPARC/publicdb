@@ -9,6 +9,7 @@ import logging
 import numpy
 
 from models import *
+from django_publicdb.inforecords.models import DetectorHisparc
 import datastore
 
 logger = logging.getLogger('histograms.jobs')
@@ -34,14 +35,18 @@ def check_for_updates():
 
             for date, station_list in summary.iteritems():
                 for station, table_list in station_list.iteritems():
-                    #FIXME
-                    if (station == 7030 or station == 7300 or
-                        station == 8002 or station == 8013 or
-                        station == 8014 or station == 8015):
-                        continue
-
                     logger.debug("New data on %s for station %d" %
                                  (date.ctime(), station))
+
+                    #FIXME
+                    if (station == 4 or station == 24 or
+                        station == 16 or station == 23 or
+                        station == 7030 or station == 7300 or
+                        station == 8002 or station == 8011 or
+                        station == 8013 or station == 8014 or
+                        station == 8015):
+                        continue
+
                     station = (inforecords.Station.objects
                                           .get(number=station))
                     s, created = Summary.objects.get_or_create(
@@ -94,6 +99,22 @@ def update_all_histograms():
             state.save()
 
     return True
+
+def update_gps_coordinates():
+    """Update GPS coordinates for all stations"""
+
+    for detector in DetectorHisparc.objects.all():
+        try:
+            config = (Configuration.objects
+                                   .filter(source__station=detector.station)
+                                   .latest('timestamp'))
+        except Configuration.DoesNotExist:
+            pass
+        else:
+            detector.latitude = config.gps_latitude
+            detector.longitude = config.gps_longitude
+            detector.height = config.gps_altitude
+            detector.save()
 
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)

@@ -25,6 +25,10 @@ def run():
     else:
         logger.info("Finished building histograms")
 
+    logger.info("Updating GPS coordinates...")
+    hg.jobs.update_gps_coordinates()
+    logger.info("Done.")
+
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
