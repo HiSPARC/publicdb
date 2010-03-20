@@ -1,0 +1,10 @@
+<html>
+<body>
+XML-RPC Methods:
+<ol>
+    {% for method in methods %}
+        <li>{{method.name}} {{method.help|linebreaks}}</li>
+    {% endfor %}
+</ol>
+</body>
+</html>

@@ -17,6 +17,7 @@ urlpatterns = patterns('',
     (r'^show/', include('django_publicdb.status_display.urls')),
     (r'^symposium/', include('django_publicdb.symposium2009.urls')),
     (r'^software-updates/', include('django_publicdb.updates.urls')),
+    (r'^raw_data/', include('django_publicdb.raw_data.urls')),
 
     (r'^config/nagios$', create_nagios_config),
     (r'^config/datastore$', create_datastore_config),

@@ -96,4 +96,5 @@ INSTALLED_APPS = (
     'django_publicdb.status_display',
     'django_publicdb.symposium2009',
     'django_publicdb.updates',
+    'django_publicdb.raw_data',
 )
