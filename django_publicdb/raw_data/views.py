@@ -47,11 +47,11 @@ def get_data_url(station_id, date, get_blobs=False):
     and provide a link to download that file.
 
     :param station_id: the HiSPARC station number
-    :param date: retrieve events from this day
+    :param date: a xmlrpclib.DateTime instance; retrieve events from this
+        day
 
     """
-
-    date = datetime.datetime.strptime(date, '%Y-%m-%d').date()
+    date = date.timetuple()
 
     datafile = get_raw_datafile(date)
     station_node = get_station_node(datafile, station_id)
@@ -77,10 +77,10 @@ def get_data_url(station_id, date, get_blobs=False):
 def get_raw_datafile(date):
     """Return a reference to the raw data file on a specified date"""
 
-    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.year,
-                                                           date.month))
-    name = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month,
-                                              date.day))
+    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.tm_year,
+                                                           date.tm_mon))
+    name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon,
+                                              date.tm_mday))
     try:
         datafile = tables.openFile(name, 'r')
     except IOError:
