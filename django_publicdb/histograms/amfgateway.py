@@ -96,7 +96,9 @@ def get_cluster_station_list(parent):
         for station in Station.objects.filter(location__cluster=cluster):
             s = {}
             try:
-                detector = DetectorHisparc.objects.get(station=station)
+                detector = (DetectorHisparc.objects
+                                           .filter(station=station)
+                                           .latest('startdate'))
             except ObjectDoesNotExist:
                 continue
             s['number'] = station.number
