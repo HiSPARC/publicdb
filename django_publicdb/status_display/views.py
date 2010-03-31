@@ -5,7 +5,7 @@ from django.conf import settings
 
 import calendar
 import os
-from numpy import arange, pi, sin
+from numpy import arange, pi, sin, linspace
 import datetime
 
 from enthought.etsconfig.api import ETSConfig
@@ -46,6 +46,13 @@ def station_histograms(request, station_id, year, month, day):
     month = int(month)
     day = int(day)
     
+    if (month, day) == (3, 31):
+        # This data is shown on April, 1st
+        april_fools_day = True
+        (month, day) = (3, 24)
+    else:
+        april_fools_day = False
+
     station = get_object_or_404(Station, number=station_id)
     tomorrow = (datetime.date(year, month, day) +
                 datetime.timedelta(days=1))
@@ -66,11 +73,13 @@ def station_histograms(request, station_id, year, month, day):
     year_list = nav_years(station)
 
     eventhistogram = create_histogram('eventtime', station, year, month,
-                                      day)
+                                      day, april_fools_day)
     pulseheighthistogram = create_histogram('pulseheight', station,
-                                            year, month, day, log=True)
+                                            year, month, day,
+                                            april_fools_day, log=True)
     pulseintegralhistogram = create_histogram('pulseintegral', station,
-                                              year, month, day, log=True)
+                                              year, month, day,
+                                              april_fools_day, log=True)
 
     return render_to_response('station_histograms.html',
         { 'station': station,
@@ -136,7 +145,8 @@ def get_histogram_source(station_id, year, month, day, type):
     else:
         return zip(histogram.bins, *histogram.values)
 
-def create_histogram(type, station, year, month, day, log=False):
+def create_histogram(type, station, year, month, day, april_fools_day,
+                     log=False):
     """Create a histogram and save it to disk"""
 
     name = 'histogram-%s-%d-%d-%02d-%02d.png' % (type, station.number,
@@ -145,7 +155,29 @@ def create_histogram(type, station, year, month, day, log=False):
     source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
     histogram = get_object_or_404(DailyHistogram, source=source, type=type)
-    
+
+    if april_fools_day:
+        if type.slug == 'eventtime':
+            histogram.values = [x * (1 + .15 * sin(y - .3 * pi)) for x, y
+                                in zip(histogram.values, linspace(0, 2 *
+                                                                  pi, 24))]
+        if type.slug == 'pulseheight':
+            w = []
+            for v in histogram.values:
+                u = []
+                for x in [0] * 10 + v[10:]:
+                    u.extend([.2 * x, .2 * x])
+                w.append([x + y for x, y in zip(v, u)])
+            histogram.values = w
+        if type.slug == 'pulseintegral':
+            w = []
+            for v in histogram.values:
+                u = []
+                for x in [0] * 10 + v[10:]:
+                    u.extend([.1 * x, .1 * x])
+                w.append([x + y for x, y in zip(v, u)])
+            histogram.values = w
+
     plot = create_histogram_plot(histogram.bins, histogram.values,
                                  type.has_multiple_datasets,
                                  type.bin_axis_title,

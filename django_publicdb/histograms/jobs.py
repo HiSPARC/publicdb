@@ -38,15 +38,6 @@ def check_for_updates():
                     logger.debug("New data on %s for station %d" %
                                  (date.ctime(), station))
 
-                    #FIXME
-                    if (station == 4 or station == 24 or
-                        station == 16 or station == 23 or
-                        station == 7030 or station == 7300 or
-                        station == 8002 or station == 8011 or
-                        station == 8013 or station == 8014 or
-                        station == 8015):
-                        continue
-
                     station = (inforecords.Station.objects
                                           .get(number=station))
                     s, created = Summary.objects.get_or_create(
