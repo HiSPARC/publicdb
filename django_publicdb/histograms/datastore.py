@@ -141,22 +141,78 @@ def get_integrals(cluster, station_id, date):
         # transpose, so we have 4 arrays of many integrals
         return zip(*integrals)
 
+def get_temperature(cluster, station_id, date):
+    """Get temperature data
+
+    :param cluster: string containing the cluster name
+    :param station_id: station number
+    :param date: date
+
+    """
+    return get_time_series(cluster, station_id, date, 'weather',
+                           'temp_outside')
+
+def get_barometer(cluster, station_id, date):
+    """Get barometer data
+
+    :param cluster: string containing the cluster name
+    :param station_id: station number
+    :param date: date
+
+    """
+    return get_time_series(cluster, station_id, date, 'weather',
+                           'barometer')
+
 def get_event_data(cluster, station_id, date, quantity):
     """Get event data of a specific quantity
 
     :param cluster: string containing the cluster name
     :param station_id: station number
     :param date: date
-    :param quantity: the specific event data type
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    return get_data(cluster, station_id, date, 'events', quantity)
+
+def get_data(cluster, station_id, date, table, quantity):
+    """Get data from the datastore from a table of a specific quantity
+
+    :param cluster: string containing the cluster name
+    :param station_id: station number
+    :param date: date
+    :param table: table name (e.g. 'events', 'weather', ...)
+    :param quantity: the specific event data type (e.g., 'pulseheights')
 
     """
     path = get_data_path(date)
 
     with tables.openFile(path) as file:
-        parent = file.getNode('/hisparc/cluster_%s/station_%d' %
-                              (cluster.lower(), station_id))
+        table = file.getNode('/hisparc/cluster_%s/station_%d' %
+                             (cluster.lower(), station_id), table)
         try:
-            data = [x[quantity] for x in parent.events]
+            data = [x[quantity] for x in table]
+        except tables.NoSuchNodeError:
+            data = None
+
+    return data
+
+def get_time_series(cluster, station_id, date, table, quantity):
+    """Get time series data from a table of a specific quantity
+
+    :param cluster: string containing the cluster name
+    :param station_id: station number
+    :param date: date
+    :param table: table name (e.g. 'events', 'weather', ...)
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    path = get_data_path(date)
+
+    with tables.openFile(path) as file:
+        table = file.getNode('/hisparc/cluster_%s/station_%d' %
+                             (cluster.lower(), station_id), table)
+        try:
+            data = [(x['timestamp'], x[quantity]) for x in table]
         except tables.NoSuchNodeError:
             data = None
 

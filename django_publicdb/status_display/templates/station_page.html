@@ -106,23 +106,44 @@ a.sourceLink {
 </div>
 
 <div id="graphs">
+{% if eventhistogram %}
     <div id="eventHistogram" class="histogram">
         <h3>Event Histogram (number of events per hour)</h3>
         <a href="{% url status_display.views.get_eventtime_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ eventhistogram }}' alt="Event time histogram">
     </div>
+{% endif %}
 
+{% if pulseheighthistogram %}
     <div id="pulseheightHistogram" class="histogram">
         <h3>Pulse height histogram</h3>
         <a href="{% url status_display.views.get_pulseheight_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ pulseheighthistogram }}' alt="Pulse height histogram">
     </div>
+{% endif %}
 
+{% if pulseintegralhistogram %}
     <div id="pulseintegralHistogram" class="histogram">
         <h3>Pulse integral histogram</h3>
         <a href="{% url status_display.views.get_pulseintegral_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ pulseintegralhistogram }}' alt="Pulse integral histogram">
     </div>
+{% endif %}
+
+{% if barometerdata %}
+    <div id="barometerData" class="histogram">
+        <h3>Barometer data</h3>
+        <a href="{% url status_display.views.get_barometer_dataset_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <img src='{{ barometerdata }}' alt="Barometer data">
+    </div>
+{% endif %}
+{% if temperaturedata %}
+    <div id="temperatureData" class="histogram">
+        <h3>Temperature data</h3>
+        <a href="{% url status_display.views.get_temperature_dataset_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <img src='{{ temperaturedata }}' alt="Temperature data">
+    </div>
+{% endif %}
 </div>
 
 <div id="navigation">
@@ -138,7 +159,7 @@ a.sourceLink {
         {% for day in week %}
           <td class="day">
             {% if day.link %}
-              <a href='{% url status_display.views.station_histograms day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
+              <a href='{% url status_display.views.station_page day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
             {% else %}
               {{ day.day }}
             {% endif %}
@@ -149,14 +170,14 @@ a.sourceLink {
 
     <div id="yearlist">
     {% for year in year_list %}
-      <a href='{% url status_display.views.station_histograms year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a>
+      <a href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a>
     {% endfor %}
     </div>
 
     <div id="monthlist">
     {% for month in month_list %}
         {% ifequal forloop.counter0 6 %}<br>{% endifequal %}
-        <a href='{% url status_display.views.station_histograms month.link.0,month.link.1,month.link.2,month.link.3 %}'>{{ month.month }}</a>
+        <a href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>{{ month.month }}</a>
     {% endfor %}
     </div>
 

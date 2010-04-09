@@ -35,10 +35,12 @@ class Summary(models.Model):
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
     num_errors = models.IntegerField(blank=True, null=True)
+    num_weather = models.IntegerField(blank=True, null=True)
     needs_update = models.BooleanField()
     needs_update_events = models.BooleanField()
     needs_update_config = models.BooleanField()
     needs_update_errors = models.BooleanField()
+    needs_update_weather = models.BooleanField()
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
@@ -158,12 +160,36 @@ class DailyHistogram(models.Model):
         unique_together = (('source', 'type'),)
         ordering = ('source', 'type')
 
+class DailyDataset(models.Model):
+    source = models.ForeignKey('Summary')
+    type = models.ForeignKey('DatasetType')
+    x = SerializedDataField()
+    y = SerializedDataField()
+
+    def __unicode__(self):
+        return "%d - %s - %s" % (self.source.station.number,
+                                 self.source.date.strftime('%c'), self.type)
+
+    class Meta:
+        unique_together = (('source', 'type'),)
+        ordering = ('source', 'type')
+
 class HistogramType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
     has_multiple_datasets = models.BooleanField()
     bin_axis_title = models.CharField(max_length=40)
     value_axis_title = models.CharField(max_length=40)
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+class DatasetType(models.Model):
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.CharField(max_length=20, unique=True)
+    x_axis_title = models.CharField(max_length=40)
+    y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
     def __unicode__(self):
