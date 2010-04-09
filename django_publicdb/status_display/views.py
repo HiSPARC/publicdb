@@ -2,6 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404, \
                              redirect
 from django.template import RequestContext
 from django.conf import settings
+from django.db.models import Q
 
 import calendar
 import os
@@ -96,7 +97,9 @@ def station_page(request, station_id, year, month, day):
 def station(request, station_id):
     """Show most recent histograms for a particular station"""
 
-    summary = (Summary.objects.filter(station__number=station_id)
+    summary = (Summary.objects.filter(Q(station__number=station_id),
+                                      Q(num_events__isnull=False) |
+                                      Q(num_weather__isnull=False))
                               .latest('date'))
     return redirect(station_page, station_id=str(station_id),
                     year=str(summary.date.year),
@@ -342,11 +345,15 @@ def nav_calendar(station, theyear, themonth):
         for day in week:
             if day.month == themonth:
                 try:
-                    summary = Summary.objects.get(station=station,
-                                                  date=day)
-                    link = (station.number, theyear, themonth, day.day)
+                    summary = (Summary.objects
+                                      .get(Q(station=station),
+                                           Q(date=day),
+                                           Q(num_events__isnull=False) |
+                                           Q(num_weather__isnull=False)))
                 except Summary.DoesNotExist:
                     link = None
+                else:
+                    link = (station.number, theyear, themonth, day.day)
                 days.append({'day': '%2d' % day.day, 'link': link})
             else:
                 days.append('')
@@ -357,9 +364,11 @@ def nav_calendar(station, theyear, themonth):
 def nav_months(station, theyear):
     """Create list of months with links"""
 
-    date_list = (Summary.objects.filter(station=station,
-                                       date__year=theyear).
-                 dates('date', 'month'))
+    date_list = (Summary.objects.filter(Q(station=station),
+                                        Q(date__year=theyear),
+                                        Q(num_events__isnull=False) |
+                                        Q(num_weather__isnull=False))
+                                .dates('date', 'month'))
 
     month_list = []
     for date in date_list:
@@ -376,8 +385,10 @@ def nav_months(station, theyear):
 def nav_years(station):
     """Create list of previous years"""
 
-    date_list = Summary.objects.filter(station=station).dates('date',
-                                                              'year')
+    date_list = (Summary.objects.filter(Q(station=station),
+                                        Q(num_events__isnull=False) |
+                                        Q(num_weather__isnull=False))
+                                .dates('date', 'year'))
 
     year_list = []
     for date in date_list:

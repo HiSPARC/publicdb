@@ -2,6 +2,16 @@ Make sure to apply these changes per revision, in reverse order! Otherwise, you
 may corrupt your database. Revert back to the specified revision if necessary.
 
 -------------------------------------------------------------------------------
+Changed in revision 86:
+
+Added support for weather station data.  You must first sync the database
+to make sure new tables are created and new fixtures are loaded.  Then:
+
+./manage dbshell:
+mysql> alter table histograms_summary add column `num_weather` integer;
+mysql> alter table histograms_summary add column `needs_update_weather` bool NOT NULL;
+
+-------------------------------------------------------------------------------
 Changed in revision 37:
 
 The changes in revision 35 were not applied correctly. You must first sync the
