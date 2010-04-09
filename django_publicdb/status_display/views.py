@@ -243,6 +243,12 @@ def create_histogram_plot(bins, values, has_multiple_datasets,
     if datasets:
         view.value_range.high_setting = max([max(x) for x in datasets]) * 1.1
 
+#    if has_multiple_datasets:
+#        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3',
+#                                      'scint4'], component=view.plots,
+#                                      align="ur", padding=10)
+#        view.overlays.append(legend)
+
     view.x_axis.title = bin_axis_title
     view.y_axis.title = value_axis_title
     view.x_axis.title_font = 'modern bold 16'
@@ -306,10 +312,10 @@ def render_and_save_plot(plot, name, width, height):
 def colors():
     """Generator function which returns color names"""
 
-    colors = [[1., 0., 0., .7,],
-              [0., 1., 0., .7,],
-              [0., 0., 1., .7,],
-              [1., 0., 1., .7,],
+    colors = [[0., 0., 0., .7],
+              [1., 0., 0., .7],
+              [0., 1., 0., .7],
+              [0., 1., 1., .7],
              ]
 
     for color in colors:

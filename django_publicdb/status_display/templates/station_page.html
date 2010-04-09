@@ -96,6 +96,17 @@ a.sourceLink {
     font-weight: bold;
     margin-right: 10px;
 }
+
+.warning {
+    background-color: #fcc;
+    padding: 10px;
+    border: 2px solid #f66;
+    margin-bottom: 20px;
+}
+
+.warning p {
+    margin: 0px;
+}
 {% endblock %}
 {% block content %}
 
@@ -103,6 +114,14 @@ a.sourceLink {
     <h2>Station {{ station.location.name }}</h2>
     <div id="stationNumber">{{ station.number }}</div>
     <div id="date">{{ date|date:"D N j, Y" }}</div>
+</div>
+
+<div class="warning">
+<p>As of March 26, 2010, we are migrating many terabytes of data from our
+original database to our new datastore.  As a result of this, a backlog in
+recent data is building up.  Recent graphs may show a lack of data, which
+does not reflect any physical process.  The graphs will be automatically
+updated when the backlog is finally processed.</p>
 </div>
 
 <div id="graphs">

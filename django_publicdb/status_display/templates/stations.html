@@ -4,8 +4,19 @@
 #stationList {
     font-size: 10pt;
 }
+
 ul {
     list-style: none;
+}
+
+.warning {
+    background-color: #fcc;
+    padding: 10px;
+    border: 2px solid #f66;
+}
+
+.warning p {
+    margin: 0px;
 }
 {% endblock %}
 
@@ -15,10 +26,18 @@ ul {
     <h2>List of stations, per cluster</h2>
 </div>
 
+<div class="warning">
+<p>As of March 26, 2010, we are migrating many terabytes of data from our
+original database to our new datastore.  As a result of this, a backlog in
+recent data is building up.  Recent graphs may show a lack of data, which
+does not reflect any physical process.  The graphs will be automatically
+updated when the backlog is finally processed.</p>
+</div>
+
 <div id="intro">
-The following is a list of stations, grouped per cluster.  If the station
+<p>The following is a list of stations, grouped per cluster.  If the station
 is a link, you can click on it to access its data.  If not, that means
-that this station has not yet uploaded data to our new datastore.
+that this station has not yet uploaded data to our new datastore.</p>
 </div>
 
 <div id="stationList">
