@@ -12,6 +12,9 @@ from enthought.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'null'
 ETSConfig.enable_toolkit = 'null'
 import enthought.chaco.api as chaco
+from enthought.chaco.scales.api import CalendarScaleSystem
+from enthought.chaco.scales_tick_generator import ScalesTickGenerator
+from enthought.chaco.scales_axis import PlotAxis as ScalesPlotAxis
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -38,7 +41,7 @@ def stations(request):
     return render_to_response('stations.html', {'clusters': clusters},
                               context_instance=RequestContext(request))
 
-def station_histograms(request, station_id, year, month, day):
+def station_page(request, station_id, year, month, day):
     """Show daily histograms for a particular station"""
 
     station_id = int(station_id)
@@ -71,8 +74,10 @@ def station_histograms(request, station_id, year, month, day):
                                             year, month, day, log=True)
     pulseintegralhistogram = create_histogram('pulseintegral', station,
                                               year, month, day, log=True)
+    barometerdata = plot_dataset('barometer', station, year, month, day)
+    temperaturedata = plot_dataset('temperature', station, year, month, day)
 
-    return render_to_response('station_histograms.html',
+    return render_to_response('station_page.html',
         { 'station': station,
           'date': datetime.date(year, month, day),
           'config': config,
@@ -80,6 +85,8 @@ def station_histograms(request, station_id, year, month, day):
           'eventhistogram': eventhistogram,
           'pulseheighthistogram': pulseheighthistogram,
           'pulseintegralhistogram': pulseintegralhistogram,
+          'barometerdata': barometerdata,
+          'temperaturedata': temperaturedata,
           'thismonth': thismonth,
           'month_list': month_list,
           'year_list': year_list,
@@ -91,7 +98,7 @@ def station(request, station_id):
 
     summary = (Summary.objects.filter(station__number=station_id)
                               .latest('date'))
-    return redirect(station_histograms, station_id=str(station_id),
+    return redirect(station_page, station_id=str(station_id),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
@@ -125,6 +132,26 @@ def get_pulseintegral_histogram_source(request, station_id, year, month, day):
         (station_id, year, month, day))
     return response
 
+def get_barometer_dataset_source(request, station_id, year, month, day):
+    data = get_dataset_source(station_id, year, month, day,
+                              'barometer')
+    response = render_to_response('source_barometer_dataset.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=barometer-%s-%s-%s-%s.csv' %
+        (station_id, year, month, day))
+    return response
+
+def get_temperature_dataset_source(request, station_id, year, month, day):
+    data = get_dataset_source(station_id, year, month, day,
+                              'temperature')
+    response = render_to_response('source_temperature_dataset.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=temperature-%s-%s-%s-%s.csv' %
+        (station_id, year, month, day))
+    return response
+
 def get_histogram_source(station_id, year, month, day, type):
     histogram = DailyHistogram.objects.get(
                     source__station__number=int(station_id),
@@ -136,6 +163,14 @@ def get_histogram_source(station_id, year, month, day, type):
     else:
         return zip(histogram.bins, *histogram.values)
 
+def get_dataset_source(station_id, year, month, day, type):
+    dataset = DailyDataset.objects.get(
+                source__station__number=int(station_id),
+                source__date=datetime.date(int(year), int(month),
+                                           int(day)),
+                type__slug=type)
+    return zip(dataset.x, dataset.y)
+
 def create_histogram(type, station, year, month, day, log=False):
     """Create a histogram and save it to disk"""
 
@@ -144,7 +179,11 @@ def create_histogram(type, station, year, month, day, log=False):
     date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
-    histogram = get_object_or_404(DailyHistogram, source=source, type=type)
+
+    try:
+        histogram = DailyHistogram.objects.get(source=source, type=type)
+    except DailyHistogram.DoesNotExist:
+        return None
     
     plot = create_histogram_plot(histogram.bins, histogram.values,
                                  type.has_multiple_datasets,
@@ -212,9 +251,53 @@ def create_histogram_plot(bins, values, has_multiple_datasets,
 
     return view
 
+def plot_dataset(type, station, year, month, day, log=False):
+    """Create a dataset plot and save it to disk"""
+
+    name = 'dataset-%s-%d-%d-%02d-%02d.png' % (type, station.number,
+                                               year, month, day)
+    date = datetime.date(year, month, day)
+    source = get_object_or_404(Summary, station=station, date=date)
+    type = DatasetType.objects.get(slug__exact=type)
+
+    try:
+        dataset = DailyDataset.objects.get(source=source, type=type)
+    except DailyDataset.DoesNotExist:
+        return None
+    
+    plot = create_dataset_plot(dataset.x, dataset.y, type.x_axis_title,
+                               type.y_axis_title, log)
+
+    width, height = 500, 150 
+    render_and_save_plot(plot, name, width, height)
+
+    return settings.MEDIA_URL + name
+
+def create_dataset_plot(x, y, x_axis_title, y_axis_title, log):
+    """Convenience function for creating histogram plots"""
+
+    color = monochrome()
+
+    data = chaco.ArrayPlotData(x=x, y=y)
+    plot = chaco.Plot(data=data)
+    plot.plot(('x', 'y'), color=color.next(), line_width=1.5)
+
+    tick_generator = ScalesTickGenerator(scale=CalendarScaleSystem())
+    bottom_axis = ScalesPlotAxis(plot, orientation="bottom",
+                                 tick_generator=tick_generator)
+    plot.index_axis = bottom_axis
+
+    plot.x_axis.title = x_axis_title
+    plot.y_axis.title = y_axis_title
+    plot.x_axis.title_font = 'modern bold 16'
+    plot.y_axis.title_font = 'modern bold 16'
+    plot.x_axis.title_spacing = 20
+
+    return plot
+
 def render_and_save_plot(plot, name, width, height):
     plot.bounds = [width, height]
-    plot.padding = (60, 10, 10, 50)
+    plot.padding = (80, 10, 10, 50)
     gc = chaco.PlotGraphicsContext(plot.outer_bounds)
     gc.render_component(plot)
     path = os.path.join(settings.MEDIA_ROOT, name)

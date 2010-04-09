@@ -38,27 +38,19 @@ def check_for_updates():
                     logger.debug("New data on %s for station %d" %
                                  (date.ctime(), station))
 
-                    #FIXME
-                    if (station == 4 or station == 24 or
-                        station == 16 or station == 23 or
-                        station == 7030 or station == 7300 or
-                        station == 8002 or station == 8011 or
-                        station == 8013 or station == 8014 or
-                        station == 8015):
-                        continue
-
                     station = (inforecords.Station.objects
                                           .get(number=station))
                     s, created = Summary.objects.get_or_create(
                                     station=station, date=date)
                     for table, num_events in table_list.iteritems():
                         if (table == 'events' or table == 'config' or
-                            table == 'errors'):
+                            table == 'errors' or table == 'weather'):
                             number_of = 'num_%s' % table
                             update_type = 'needs_update_%s' % table
                             if vars(s)[number_of] != num_events:
                                 s.needs_update = True
                                 vars(s)[update_type] = True
+                                vars(s)[number_of] = num_events
                                 s.save()
             state.check_last_run = check_last_run
         finally:
@@ -80,16 +72,19 @@ def update_all_histograms():
         try:
             for summary in Summary.objects.filter(needs_update=True):
                 if summary.needs_update_events:
-                    num_events = update_eventtime_histogram(summary)
+                    update_eventtime_histogram(summary)
                     update_pulseheight_histogram(summary)
                     update_pulseintegral_histogram(summary)
-                    summary.num_events = num_events
                     summary.needs_update_events = False
 
                 if summary.needs_update_config:
-                    num_config = update_config(summary)
-                    summary.num_config = num_config
+                    update_config(summary)
                     summary.needs_update_config = False
+
+                if summary.needs_update_weather:
+                    update_temperature_dataset(summary)
+                    update_barometer_dataset(summary)
+                    summary.needs_update_weather = False
 
                 summary.needs_update = False
                 summary.save()
@@ -135,8 +130,6 @@ def update_eventtime_histogram(summary):
     bins = range(25)
     hist = hist[0].tolist()
     save_histograms(summary, 'eventtime', bins, hist)
-    number_of_events = sum(hist)
-    return number_of_events
 
 def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
@@ -152,6 +145,19 @@ def update_pulseintegral_histogram(summary):
     integrals = datastore.get_integrals(cluster, station_id, summary.date)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
+
+def update_temperature_dataset(summary):
+    logger.debug("Updating temperature dataset for %s" % summary)
+    cluster, station_id = get_station_cluster_id(summary.station)
+    temperature = datastore.get_temperature(cluster, station_id,
+                                            summary.date)
+    save_dataset(summary, 'temperature', temperature)
+
+def update_barometer_dataset(summary):
+    logger.debug("Updating barometer dataset for %s" % summary)
+    cluster, station_id = get_station_cluster_id(summary.station)
+    barometer = datastore.get_barometer(cluster, station_id, summary.date)
+    save_dataset(summary, 'barometer', barometer)
 
 def update_config(summary):
     logger.debug("Updating configuration messages for %s" % summary)
@@ -174,9 +180,7 @@ def update_config(summary):
                 vars(new_config)[var] = config[var]
         new_config.save()
 
-    num_config = len(configs)
     file.close()
-    return num_config
 
 def create_histogram(data, high, samples):
     if data is None:
@@ -203,6 +207,19 @@ def save_histograms(summary, slug, bins, values):
     h.bins = bins
     h.values = values
     h.save()
+    logger.debug("Saved succesfully")
+
+def save_dataset(summary, slug, data):
+    logger.debug("Saving dataset %s for %s" % (slug, summary))
+    type = DatasetType.objects.get(slug=slug)
+    try:
+        d = DailyDataset.objects.get(source=summary, type=type)
+    except DailyDataset.DoesNotExist:
+        d = DailyDataset(source=summary, type=type)
+    x, y = zip(*data)
+    d.x = x
+    d.y = y
+    d.save()
     logger.debug("Saved succesfully")
 
 def get_station_cluster_id(station):
