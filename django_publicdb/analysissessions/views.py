@@ -57,7 +57,7 @@ def create_core_plot():
     data.set_data('y', y)
     data.set_data('logenergy', logenergy)
 
-    image = chaco.ImageData.fromfile('/var/www/django_publicdb/symposium2009/map-flipped.png')
+    image = chaco.ImageData.fromfile('/var/www/django_publicdb/analysissessions/map-flipped.png')
     data.set_data('map', image.get_data())
 
     xbounds = (4.93772, 4.96952)
