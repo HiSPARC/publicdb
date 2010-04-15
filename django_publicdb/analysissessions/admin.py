@@ -1,6 +1,7 @@
 from django.contrib import admin
 from models import *
 
+
 class AnalysisSessionAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     exclude = ('hash',)
