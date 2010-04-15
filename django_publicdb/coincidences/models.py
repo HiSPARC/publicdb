@@ -41,6 +41,10 @@ class Event(models.Model):
     class Meta:
         ordering = ('date', 'time', 'nanoseconds', 'station')
 
+    def __unicode__(self):
+        return '%d - %s %s %d' % (self.station.number, self.date, self.time,
+                                  self.nanoseconds)
+
 class Coincidence(models.Model):
     date = models.DateField()
     time = models.TimeField()
@@ -50,5 +54,9 @@ class Coincidence(models.Model):
     def num_events(self):
         return self.events.count()
     
+    def __unicode__(self):
+        return '%d-fold - %s %s %d' % (self.num_events(), self.date,
+                                       self.time, self.nanoseconds)
+
     class Meta:
         ordering = ('date', 'time', 'nanoseconds')

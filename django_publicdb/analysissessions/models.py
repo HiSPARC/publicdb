@@ -17,6 +17,10 @@ class AnalysisSession(models.Model):
     def save(self, *args, **kwargs):
         self.hash = hashlib.md5(self.slug).hexdigest()
         super(AnalysisSession, self).save(*args, **kwargs)
+        Student(session=self, name='Test student').save()
+
+    def __unicode__(self):
+        return self.title
 
 class AnalyzedCoincidence(models.Model):
     session = models.ForeignKey(AnalysisSession)
@@ -39,4 +43,4 @@ class Student(models.Model):
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
-        return self.name
+        return '%s - %s' % (self.session, self.name)
