@@ -32,11 +32,16 @@ def save_coincidence(event_list):
         date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
         timestamps.append((date_time, event['nanoseconds']))
 
+        pulseheights = [x * .57 if x != -999 else -999 for x in
+                        event['pulseheights']]
+        integrals = [x * .57 if x != -999 else -999 for x in
+                     event['integrals']]
+
         event = Event(date=date_time.date(), time=date_time.time(),
                       nanoseconds=event['nanoseconds'],
                       station=Station.objects.get(number=station),
-                      pulseheights=event['pulseheights'],
-                      integrals=event['integrals'], traces=traces)
+                      pulseheights=pulseheights, integrals=integrals,
+                      traces=traces)
         event.save()
         events.append(event)
 

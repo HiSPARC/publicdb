@@ -1,52 +1,76 @@
 from pyamf.remoting.gateway.django import DjangoGateway
-from django.core.exceptions import ObjectDoesNotExist
 
 from django_publicdb.coincidences.models import *
-from models import *
+from django_publicdb.analysissessions.models import *
+from django_publicdb.inforecords.models import *
+
+from views import top_lijst
 
 from numpy import average
+import datetime
+import calendar
 
 def get_services(request):
     return services.keys()
 
-def get_coincidence(request, student_name):
-    if not student_name:
-        coincidence = AnalyzedCoincidence.objects.all()[0]
+def get_coincidence(request, session_hash, student_name):
+    try:
+        session = AnalysisSession.objects.get(hash=session_hash)
+    except AnalysisSession.DoesNotExist:
+        raise Exception('No such analysis session!')
     else:
-        try:
-            student = Student.objects.get(name=student_name)
-        except ObjectDoesNotExist:
-            student = Student(name=student_name)
-            student.save()
+        if not session.in_progress:
+            raise Exception("Analysis session hasn't started yet or "
+                            "is already closed!")
 
-        try:
-            coincidence = AnalyzedCoincidence.objects.filter(
-                                student=student, is_analyzed=False)[0]
-        except IndexError:
-            coincidence = AnalyzedCoincidence.objects.filter(
-                                student=None)[0]
-            coincidence.student = student
-            coincidence.save()
+    if not student_name:
+        student = Student.objects.get(session=session,
+                                      name='Test student')
+    else:
+        student, is_created = Student.objects.get_or_create(
+                                    session=session, name=student_name)
+
+    ranking = top_lijst()
+    try:
+        rank = [x['name'] for x in ranking].index(student_name) + 1
+    except ValueError:
+        rank = None
+
+    coincidences = AnalyzedCoincidence.objects.filter(session=session)
+    try:
+        coincidence = coincidences.filter(student=student,
+                                          is_analyzed=False)[0]
+    except IndexError:
+        coincidence = coincidences.filter(student=None,
+                                          is_analyzed=False)[0]
+        coincidence.student = student
+        coincidence.save()
 
     events = []
-    for e in coincidence.coincidence.events.all():
-        signal = [e.pulseheight1, e.pulseheight2, e.pulseheight3,
-                  e.pulseheight4]
-        # remove signals which are -999 (=> 569.43) baseline error
-        signal = [x for x in signal if x < 500]
-        signal = average(signal)
-        # dirty way to estimate muon equivalent, using the wished-for muon
+    for event in coincidence.coincidence.events.all():
+        # don't pulseheights which are -999 (baseline error)
+        signal = [x for x in event.pulseheights if x != -999]
+        # dirty way to estimate muon equivalent, using the aimed-for muon
         # peak position
-        signal /= -227
-        event = {'latitude': e.latitude, 'longitude': e.longitude,
-                 'signal': signal}
-        events.append(event)
-    return coincidence.pk, events
+        mips = average(signal) / 200
+
+        station = event.station
+        detector = DetectorHisparc.objects.get(station=station)
+        dt = datetime.datetime.combine(event.date, event.time)
+        timestamp = calendar.timegm(dt.utctimetuple())
+        events.append({'timestamp': timestamp,
+                       'nanoseconds': event.nanoseconds,
+                       'mips': mips,
+                       'station': station.number,
+                       'latitude': detector.latitude,
+                       'longitude': detector.longitude,
+                       'traces': [list(x) for x in event.traces]})
+    return coincidence.pk, events, rank
 
 def send_results(request, pk, core_position, log_energy, error_estimate):
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
 
-    if coincidence.student.name == 'TestStudent':
+    if coincidence.student.name == 'Test student':
         return
     else:
         coincidence.core_position_x, coincidence.core_position_y = \
