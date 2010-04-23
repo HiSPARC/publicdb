@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     (r'^gateway/$', 'django_publicdb.histograms.amfgateway.publicgateway'),
 
     (r'^show/', include('django_publicdb.status_display.urls')),
-    (r'^symposium/', include('django_publicdb.symposium2009.urls')),
+    (r'^analysis-session/', include('django_publicdb.analysissessions.urls')),
     (r'^software-updates/', include('django_publicdb.updates.urls')),
     (r'^raw_data/', include('django_publicdb.raw_data.urls')),
 
