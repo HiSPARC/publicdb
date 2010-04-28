@@ -31,6 +31,8 @@ class AnalyzedCoincidence(models.Model):
     core_position_x = models.FloatField(null=True, blank=True)
     core_position_y = models.FloatField(null=True, blank=True)
     log_energy = models.FloatField(null=True, blank=True)
+    theta = models.FloatField(null=True, blank=True)
+    phi = models.FloatField(null=True, blank=True)
     error_estimate = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
