@@ -10,6 +10,9 @@ from numpy import average
 import datetime
 import calendar
 
+#FIXME
+import random
+
 def get_services(request):
     return services.keys()
 
@@ -30,7 +33,7 @@ def get_coincidence(request, session_hash, student_name):
         student, is_created = Student.objects.get_or_create(
                                     session=session, name=student_name)
 
-    ranking = top_lijst()
+    ranking = top_lijst(session.slug)
     try:
         rank = [x['name'] for x in ranking].index(student_name) + 1
     except ValueError:
@@ -76,6 +79,9 @@ def send_results(request, pk, core_position, log_energy, error_estimate):
         coincidence.core_position_x, coincidence.core_position_y = \
             core_position
         coincidence.log_energy = log_energy
+        #FIXME
+        coincidence.theta = random.normalvariate(22, 10)
+        coincidence.phi = random.uniform(0., 360.)
         coincidence.error_estimate = error_estimate
         coincidence.is_analyzed = True
         coincidence.save()

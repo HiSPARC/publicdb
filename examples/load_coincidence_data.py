@@ -37,8 +37,10 @@ def save_coincidence(event_list):
         integrals = [x * .57 if x != -999 else -999 for x in
                      event['integrals']]
 
+        dt = analyze_traces(traces)
+
         event = Event(date=date_time.date(), time=date_time.time(),
-                      nanoseconds=event['nanoseconds'],
+                      nanoseconds=event['nanoseconds'] - dt,
                       station=Station.objects.get(number=station),
                       pulseheights=pulseheights, integrals=integrals,
                       traces=traces)
@@ -52,6 +54,21 @@ def save_coincidence(event_list):
     coincidence.save()
     coincidence.events.add(*events)
 
+def analyze_traces(traces):
+    """Analyze traces and determine time of first particle"""
+
+    t = []
+    for trace in traces:
+        m = min(trace)
+        # No significant pulse (not lower than -20 mV)
+        if not m < -20:
+            continue
+        for i, v in enumerate(trace):
+            if v < .2 * m:
+                break
+        t.append(i * 2.5)
+    trace_timing = min(t)
+    return trace_timing
 
 if __name__ == '__main__':
     data = tables.openFile('/home/david/work/HiSPARC/data/100412/data.h5', 'r')
