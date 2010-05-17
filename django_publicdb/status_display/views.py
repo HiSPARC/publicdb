@@ -100,6 +100,7 @@ def station(request, station_id):
     summary = (Summary.objects.filter(Q(station__number=station_id),
                                       Q(num_events__isnull=False) |
                                       Q(num_weather__isnull=False))
+                              .filter(date__lt=datetime.date.today())
                               .latest('date'))
     return redirect(station_page, station_id=str(station_id),
                     year=str(summary.date.year),
