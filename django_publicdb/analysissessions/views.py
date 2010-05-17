@@ -48,7 +48,7 @@ def create_energy_histogram(slug, coincidences):
 
     plot = create_histogram_plot(bins, values, True,
                                  'Log energy (eV)', 'Count', log=False)
-    render_and_save_plot(plot, name, 400, 266)
+    render_and_save_plot(plot, name, 300, 200)
 
     return settings.MEDIA_URL + name
 
@@ -79,9 +79,9 @@ def create_core_plot(slug, coincidences):
     i = plot.index_range
     i.low_setting, i.high_setting = xbounds
     v = plot.value_range
-    v.low_setting, v.hvgh_setting = ybounds
+    v.low_setting, v.high_setting = ybounds
 
-    render_and_save_plot(plot, name, 400, 400)
+    render_and_save_plot(plot, name, 300, 300)
     return settings.MEDIA_URL + name
 
 def create_star_map(slug, coincidences):
@@ -141,7 +141,7 @@ def create_star_map(slug, coincidences):
     v = plot.value_range
     v.low_setting, v.hvgh_setting = ybounds
 
-    render_and_save_plot(plot, name, 400, 400)
+    render_and_save_plot(plot, name, 300, 300)
     return settings.MEDIA_URL + name
 
 def top_lijst(slug):

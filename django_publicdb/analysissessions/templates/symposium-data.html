@@ -3,14 +3,23 @@
 {% block head %}<meta http-equiv="refresh" content="60">{% endblock %}
 
 {% block css %}
+#header {
+    margin-top: -80px;
+}
+
 #graphs {
     float: left;
 }
 
 #scores {
+    margin-top: 40px;
     width: 220px;
     float: right;
     font-size: 80%;
+}
+
+h3 {
+    margin-bottom: 5px;
 }
 
 table {
@@ -27,7 +36,9 @@ th {
 }
 
 #starMap {
-    float: right;
+    position: absolute;
+    left: 500px;
+    top: 375px;
 }
 {% endblock %}
 
