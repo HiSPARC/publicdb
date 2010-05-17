@@ -50,7 +50,8 @@ def check_for_updates():
                             if vars(s)[number_of] != num_events:
                                 s.needs_update = True
                                 vars(s)[update_type] = True
-                                vars(s)[number_of] = num_events
+                                if table == 'events':
+                                    vars(s)[number_of] = num_events
                                 s.save()
             state.check_last_run = check_last_run
         finally:
@@ -78,7 +79,8 @@ def update_all_histograms():
                     summary.needs_update_events = False
 
                 if summary.needs_update_config:
-                    update_config(summary)
+                    num_config = update_config(summary)
+                    summary.num_config = num_config
                     summary.needs_update_config = False
 
                 if summary.needs_update_weather:
@@ -180,7 +182,9 @@ def update_config(summary):
                 vars(new_config)[var] = config[var]
         new_config.save()
 
+    num_config = len(configs)
     file.close()
+    return num_config
 
 def create_histogram(data, high, samples):
     if data is None:
