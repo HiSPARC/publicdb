@@ -3,7 +3,8 @@ from models import *
 from django.core.exceptions import ObjectDoesNotExist
 from django_publicdb.inforecords.models import *
 
-import random
+import datetime
+from math import exp
 
 options_timehistogram = ['event time']
 options_1dhistogram = ['pulse heights', 'pulse integrals']
@@ -103,13 +104,30 @@ def get_cluster_station_list(parent):
                 continue
             s['number'] = station.number
             s['name'] = station.location.name
-            s['latitude'] = detector.latitude
-            if not s['latitude']:
-                s['latitude'] = 52.0
-            s['longitude'] = detector.longitude
-            if not s['longitude']:
-                s['longitude'] = 4.0
-            s['status'] = random.random()
+            if detector.latitude:
+                s['latitude'] = detector.latitude
+            else:
+                continue
+            if detector.longitude:
+                s['longitude'] = detector.longitude
+            else:
+                continue
+            try:
+                last_data = (Summary.objects
+                                    .filter(station=station,
+                                            date__lte=datetime.date.today(),
+                                            num_events__gt=0)
+                                    .latest('date'))
+            except Summary.DoesNotExist:
+                continue
+            days_since_last_data = (datetime.date.today() -
+                                    last_data.date).days
+            if days_since_last_data <= 1:
+                status = 1.
+            else:
+                # Just some nice exponentially decreasing function
+                status = 1 / exp(days_since_last_data / 2.)
+            s['status'] = status
 
             c['contents'].append(s)
 
