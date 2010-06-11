@@ -11,9 +11,9 @@ class AnalysisSession(models.Model):
     starts = models.DateTimeField()
     ends = models.DateTimeField()
 
-    @property
     def in_progress(self):
         return self.starts <= datetime.datetime.now() < self.ends
+    in_progress.boolean = True
 
     def save(self, *args, **kwargs):
         self.hash = hashlib.md5(self.slug).hexdigest()

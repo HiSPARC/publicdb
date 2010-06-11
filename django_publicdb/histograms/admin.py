@@ -21,6 +21,7 @@ class SummaryAdmin(admin.ModelAdmin):
 
 class ConfigurationAdmin(admin.ModelAdmin):
     list_display = ('station', 'timestamp')
+    list_filter = ('timestamp',)
 
 admin.site.register(GeneratorState, GeneratorStateAdmin)
 admin.site.register(Summary, SummaryAdmin)

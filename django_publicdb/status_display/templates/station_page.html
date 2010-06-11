@@ -33,12 +33,16 @@
     padding-left: 20px;
 }
 
-#yearlist > a, #monthlist > a {
-    margin-right: 10px;
+#yearlist ul, #monthlist ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
 }
 
-#yearlist, #monthlist, #listLink {
-    margin-top: 20px;
+#yearlist ul li, #monthlist ul li {
+    display: inline;
+    line-height: 2;
+    margin-right: 10px;
 }
 
 #calendar .day, #calendar .dayname {
@@ -76,7 +80,7 @@ a.sourceLink {
     margin-top: 50px;
 }
 
-#config > div {
+#navigation > div, #config > div {
     padding-top: 10px;
     padding-bottom: 10px;
 }
@@ -123,6 +127,7 @@ a.sourceLink {
     <div id="date">{{ date|date:"D N j, Y" }}</div>
 </div>
 
+<!-->
 <div class="info">
 <p>Migration of our original database to the new datastore was succesful.
 We now have all data available and graphs can be accessed using this
@@ -138,6 +143,7 @@ backlog in recent data is building up.  Recent graphs may show a lack of
 data, which does not reflect any physical process.  The graphs will be
 automatically updated when the backlog is finally processed.</p>
 </div>
+-->
 
 <div id="graphs">
 {% if eventhistogram %}
@@ -203,16 +209,19 @@ automatically updated when the backlog is finally processed.</p>
     </table>
 
     <div id="yearlist">
+    <ul>
     {% for year in year_list %}
-      <a href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a>
+      <li><a href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>{{ year.year }}</a></li>
     {% endfor %}
+    </ul>
     </div>
 
     <div id="monthlist">
+    <ul>
     {% for month in month_list %}
-        {% ifequal forloop.counter0 6 %}<br>{% endifequal %}
-        <a href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>{{ month.month }}</a>
+        <li><a href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>{{ month.month }}</a></li>
     {% endfor %}
+    </ul>
     </div>
 
     <div id="listLink">
@@ -229,7 +238,6 @@ automatically updated when the backlog is finally processed.</p>
             <div class="keyvalue"><span class="key">Altitude:</span><span class="value">{{ config.gps_altitude }}</span></div>
             <div id="maps">
                 <div class="mapLink"><a href="http://www.openstreetmap.org/?mlat={{ config.gps_latitude }}&amp;mlon={{ config.gps_longitude }}&amp;zoom=15">Openstreetmap</a></div>
-                <div class="mapLink"><a href="http://maps.google.com/?ll={{ config.gps_latitude }},{{ config.gps_longitude }}&amp;z=15">Google Maps</a></div>
             </div>
         </div>
         <div id="master">

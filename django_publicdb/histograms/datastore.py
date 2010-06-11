@@ -31,7 +31,7 @@ def get_updated_files(rootdir, last_check_time):
                 for file in filenames:
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
-                    if mtime > last_check_time:
+                    if mtime >= last_check_time:
                         date = datetime.datetime.strptime(
                                     file, '%Y_%m_%d.h5').date()
                         if date != datetime.date.today():
@@ -213,6 +213,7 @@ def get_time_series(cluster, station_id, date, table, quantity):
                              (cluster.lower(), station_id), table)
         try:
             data = [(x['timestamp'], x[quantity]) for x in table]
+            data.sort()
         except tables.NoSuchNodeError:
             data = None
 

@@ -8,6 +8,7 @@ import calendar
 import os
 from numpy import arange, pi, sin
 import datetime
+import time
 
 from enthought.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'null'
@@ -288,9 +289,14 @@ def create_dataset_plot(x, y, x_axis_title, y_axis_title, log):
 
     color = monochrome()
 
+    #FIXME calendarscalesystem only uses local time, so adjust
+    x = [u + time.altzone for u in x]
+
     data = chaco.ArrayPlotData(x=x, y=y)
     plot = chaco.Plot(data=data)
-    plot.plot(('x', 'y'), color=color.next(), line_width=1.5)
+    #plot.plot(('x', 'y'), color=color.next(), line_width=1.5)
+    plot.plot(('x', 'y'), color=color.next(), type='scatter',
+              marker='circle', marker_size=0.5)
 
     tick_generator = ScalesTickGenerator(scale=CalendarScaleSystem())
     bottom_axis = ScalesPlotAxis(plot, orientation="bottom",

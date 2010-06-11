@@ -145,6 +145,7 @@ class Configuration(models.Model):
 
     def station(self):
         return self.source.station.number
+    station.admin_order_field = 'source__station__number'
 
 class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')

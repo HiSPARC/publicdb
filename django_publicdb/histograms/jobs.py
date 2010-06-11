@@ -35,9 +35,6 @@ def check_for_updates():
 
             for date, station_list in summary.iteritems():
                 for station, table_list in station_list.iteritems():
-                    logger.debug("New data on %s for station %d" %
-                                 (date.ctime(), station))
-
                     station = (inforecords.Station.objects
                                           .get(number=station))
                     s, created = Summary.objects.get_or_create(
@@ -45,12 +42,17 @@ def check_for_updates():
                     for table, num_events in table_list.iteritems():
                         if (table == 'events' or table == 'config' or
                             table == 'errors' or table == 'weather'):
+
                             number_of = 'num_%s' % table
                             update_type = 'needs_update_%s' % table
                             if vars(s)[number_of] != num_events:
+                                logger.debug("New data (%s) on %s for station %d" %
+                                             (table,
+                                              date.strftime("%a %b %d %Y"),
+                                              station.number))
                                 s.needs_update = True
                                 vars(s)[update_type] = True
-                                if table == 'events':
+                                if table == 'events' or table == 'weather':
                                     vars(s)[number_of] = num_events
                                 s.save()
             state.check_last_run = check_last_run
@@ -153,7 +155,10 @@ def update_temperature_dataset(summary):
     cluster, station_id = get_station_cluster_id(summary.station)
     temperature = datastore.get_temperature(cluster, station_id,
                                             summary.date)
-    save_dataset(summary, 'temperature', temperature)
+    ERR = -2**15
+    temperature = [(x, y) for x, y in temperature if y != ERR]
+    if temperature != []:
+        save_dataset(summary, 'temperature', temperature)
 
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
