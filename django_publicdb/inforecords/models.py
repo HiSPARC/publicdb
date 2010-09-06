@@ -4,8 +4,6 @@ import xmlrpclib
 
 from django.conf import settings
 
-from eventwarehouse import update_station_password, remove_station_password
-
 class Contactposition(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
@@ -128,13 +126,11 @@ class Station(models.Model):
 
     def save(self, *args, **kwargs):
         super(Station, self).save(*args, **kwargs)
-        update_station_password(self.number, self.password)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Station, self).delete(*args, **kwargs)
-        remove_station_password(self.number)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
 
