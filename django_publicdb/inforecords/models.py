@@ -286,6 +286,7 @@ class Pc(models.Model):
         return '.'.join(q)
 
     def save(self, *args, **kwargs):
+        self.name = self.name.lower().replace(' ', '')
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
