@@ -22,7 +22,7 @@ def get_coincidence(request, session_hash, student_name):
     except AnalysisSession.DoesNotExist:
         raise Exception('No such analysis session!')
     else:
-        if not session.in_progress:
+        if not session.in_progress():
             raise Exception("Analysis session hasn't started yet or "
                             "is already closed!")
 
