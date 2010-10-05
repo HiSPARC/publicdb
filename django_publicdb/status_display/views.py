@@ -246,7 +246,9 @@ def create_histogram_plot(bins, values, has_multiple_datasets,
 
     #FIXME
     if datasets:
-        view.value_range.high_setting = max([max(x) for x in datasets]) * 1.1
+        m = max([max(x) for x in datasets])
+        if m != 0:
+            view.value_range.high_setting = m * 1.1
 
 #    if has_multiple_datasets:
 #        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3',
