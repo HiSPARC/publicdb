@@ -197,7 +197,7 @@ def create_histogram(data, high, samples):
     else:
         values = []
         for array in data:
-            bins = numpy.linspace(0, high, samples)
+            bins = numpy.linspace(0, high, samples + 1)
             hist, bins = numpy.histogram(array, bins=bins)
             values.append(hist)
 
