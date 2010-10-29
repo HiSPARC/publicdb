@@ -73,7 +73,8 @@ def update_all_histograms():
         state.save()
 
         try:
-            for summary in Summary.objects.filter(needs_update=True):
+            for summary in (Summary.objects.filter(needs_update=True)
+                                   .reverse()):
                 if summary.needs_update_events:
                     update_eventtime_histogram(summary)
                     update_pulseheight_histogram(summary)
