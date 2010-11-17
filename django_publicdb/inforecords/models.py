@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from django.core.urlresolvers import reverse
 import xmlrpclib
 
@@ -28,13 +29,21 @@ class Contact(models.Model):
 
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
-    parent = models.ForeignKey('self', null=True, blank=True)
-    country = models.ForeignKey('Country', null=True, blank=True)
+    number = models.IntegerField(unique=True,blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    country = models.ForeignKey('Country', related_name='clusters')
     url = models.URLField(null=True, blank=True)
     def __unicode__(self):
         return self.name
 
-#    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):
+        if self.number==None:
+           if self.parent==None:
+              self.number = self.country.last_cluster_number()+1000
+           else:
+              self.number = self.parent.last_cluster_number()+100        
+        super(Cluster, self).save(*args, **kwargs)
+
 #        super(Cluster, self).save(*args, **kwargs)
 #        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
 #        proxy.reload_datastore()
@@ -49,14 +58,23 @@ class Cluster(models.Model):
             return self.parent.main_cluster()
         else:
             return self.name
+
     def last_station_number(self):
-	a = self.stations.al()
-	cluster_stations = self.stations.filter(number<90)
-	if cluster_stations.empty():
-            return 0
-	else:
-	    max_station_number=cluster_stations.aggregate(Max('number'))
-	    return max_station_number['number__max'] 
+	stations=self.stations.filter(number__lt=(self.number+90))
+        if stations:
+	    stationmax=stations.aggregate(Max('number'))
+	    return stationmax['number__max'] 
+        else:
+            return self.number-1 
+
+    def last_cluster_number(self):
+        clusters=self.children.all()
+        if clusters:
+            clustermax=clusters.aggregate(Max('number'))
+            return clusters['number__max']
+        else:
+            return self.number
+
     class Meta:
         ordering = ('name',)
 
@@ -87,7 +105,7 @@ class Contact_Information(models.Model):
 #        proxy.reload_datastore()
 
 class Station(models.Model):
-    number = models.IntegerField(unique=True)
+    number = models.IntegerField(unique=True,blank=True)
     contactinformation = models.ForeignKey('Contact_Information', related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     contact = models.ForeignKey(Contact,related_name='stations_contact')
@@ -96,14 +114,11 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '%s - %s' % (self.number, self.location)
-
-    def cluster(self):
-        return self.cluster
+        return '%s' % (self.number)
 
     def save(self, *args, **kwargs):
-        c=Cluster(self.cluster)
-        number = c.last_station_number()
+        if self.number==None:    
+           self.number = self.cluster.last_station_number()+1
         super(Station, self).save(*args, **kwargs)
 #       proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
 #       proxy.reload_datastore()
@@ -117,8 +132,20 @@ class Station(models.Model):
         ordering = ('number',)
 
 class Country(models.Model):
-	Name = models.CharField(max_length=40, unique=True)
-	Code = models.IntegerField(unique=True)
+    name = models.CharField(max_length=40, unique=True)
+    number = models.IntegerField(unique=True)
+    
+    def last_cluster_number(self):
+        clusters=self.clusters.all()
+        if clusters:
+            clustermax=cluster.aggregate(Max('number'))
+            return clusters['number__max']
+        else:
+            return self.number-1000
+
+    def __unicode__(self):
+        return self.name
+
 
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
