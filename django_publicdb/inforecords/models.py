@@ -136,10 +136,10 @@ class Country(models.Model):
     number = models.IntegerField(unique=True)
     
     def last_cluster_number(self):
-        clusters=self.clusters.all()
+        clusters=self.clusters.filter(parent=None)
         if clusters:
-            clustermax=cluster.aggregate(Max('number'))
-            return clusters['number__max']
+            clustermax=clusters.aggregate(Max('number'))
+            return clustermax['number__max']
         else:
             return self.number-1000
 
