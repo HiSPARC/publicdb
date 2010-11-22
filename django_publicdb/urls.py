@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import *
 from inforecords.views import *
-
+from inforecords.forms import *
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -23,7 +23,7 @@ urlpatterns = patterns('',
     (r'^config/datastore$', create_datastore_config),
 
     (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
-
+    (r'^wizard/$', ClusterWizard([ClusterForm, CountryForm])),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
