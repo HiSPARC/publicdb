@@ -20,12 +20,28 @@ class ClusterAdmin(admin.ModelAdmin):
 		urlpatterns += super(ClusterAdmin, self).get_urls()
 		return urlpatterns
 
+class StationAdmin(admin.ModelAdmin):
+        def get_urls(self):
+                def wrap(view):
+                        def wrapper(*args, **kwds):
+                                kwds['admin'] = self
+                                return self.admin_site.admin_view(view)(*args, **kwds)
+                        return update_wrapper(wrapper, view)
+                urlpatterns = patterns('',
+                        url(r'^wizardstation/$',
+                                wrap(create_station),
+                                name='inforecords_station_add')
+                )
+                urlpatterns += super(StationAdmin, self).get_urls()
+                return urlpatterns
+
 admin.site.register(Cluster, ClusterAdmin)
+admin.site.register(Station, StationAdmin)
 admin.site.register(Profession)
 admin.site.register(Contact)
 admin.site.register(Contact_Information)
 #admin.site.register(Cluster)
-admin.site.register(Station)
+#admin.site.register(Station)
 admin.site.register(Country)
 admin.site.register(DetectorStatus)
 admin.site.register(DetectorHisparc)

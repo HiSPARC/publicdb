@@ -5,6 +5,7 @@ from inforecords.forms import *
 from django.contrib import admin
 admin.autodiscover()
 
+
 urlpatterns = patterns('',
     # Example:
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
@@ -23,7 +24,6 @@ urlpatterns = patterns('',
     (r'^config/datastore$', create_datastore_config),
 
     (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
-    (r'^wizard/$', ClusterWizard([ClusterForm, CountryForm])),
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
     # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),

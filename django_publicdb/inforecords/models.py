@@ -71,7 +71,7 @@ class Cluster(models.Model):
         clusters=self.children.all()
         if clusters:
             clustermax=clusters.aggregate(Max('number'))
-            return clusters['number__max']
+            return clustermax['number__max']
         else:
             return self.number
 
@@ -79,8 +79,8 @@ class Cluster(models.Model):
         ordering = ('name',)
 
 class Contact_Information(models.Model):
-    Street_1 = models.CharField(max_length=40)
-    Street_2 = models.CharField(max_length=40, null=True, blank=True)
+    street_1 = models.CharField(max_length=40)
+    street_2 = models.CharField(max_length=40, null=True, blank=True)
     postalcode = models.CharField(max_length=6)
     city = models.CharField(max_length=40)
     pobox = models.CharField(max_length=9, null=True, blank=True)
@@ -93,6 +93,12 @@ class Contact_Information(models.Model):
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
     
+    def __unicode__(self):
+	return "%s %s" % (self.street_1, self.city)
+    
+    class Meta:
+	verbose_name = "Contact Information"
+	verbose_name_plural = "Contact Information"
 
 #    def save(self, *args, **kwargs):
 #        super(Location, self).save(*args, **kwargs)
@@ -145,7 +151,8 @@ class Country(models.Model):
 
     def __unicode__(self):
         return self.name
-
+    class Meta:
+       	verbose_name_plural = "Countries"
 
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
