@@ -1,10 +1,10 @@
 from django.conf.urls.defaults import *
 from inforecords.views import *
 from inforecords.forms import *
-# Uncomment the next two lines to enable the admin:
+from inforecords.adminwizard import adminwizard 
+#Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
-
 
 urlpatterns = patterns('',
     # Example:
@@ -30,4 +30,5 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
+    (r'^wizards/', include(adminwizard.urls))
 )
