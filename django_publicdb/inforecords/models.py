@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Max
 from django.core.urlresolvers import reverse
 import xmlrpclib
 
@@ -9,6 +10,14 @@ class Contactposition(models.Model):
 
     def __unicode__(self):
         return self.description
+
+#---
+class Profession(models.Model):
+    description = models.CharField(max_length=40, unique=True)
+
+    def __unicode__(self):
+        return self.description
+#---
 
 class Contact(models.Model):
     location = models.ForeignKey('Location', related_name='contacts',
@@ -22,6 +31,12 @@ class Contact(models.Model):
     email = models.EmailField(null=True, blank=True)
     phone_work = models.CharField(max_length=20, null=True, blank=True)
     phone_home = models.CharField(max_length=20, null=True, blank=True)
+#---
+    profession = models.ForeignKey(Profession, blank=True)
+    prefix_surname = models.CharField(max_length=10, blank=True)
+    surname = models.CharField(max_length=40)
+    contactinformation = models.ForeignKey('Contact_Information', related_name='contacts')
+#---
 
     def __unicode__(self):
         return "%s %s %s %s" % (self.title, self.first_name,
@@ -44,9 +59,12 @@ class Organization(models.Model):
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     parent = models.ForeignKey('self', null=True, blank=True)
-    country = models.CharField(max_length=40)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
+#---
+    number = models.IntegerField(unique=True,blank=True)
+    country = models.ForeignKey('Country', related_name='clusters')
+#---
 
     def __unicode__(self):
         return self.name
@@ -111,12 +129,36 @@ class Location(models.Model):
     class Meta:
         ordering = ('name',)
 
+#---
+class Contact_Information(models.Model):
+    street_1 = models.CharField(max_length=40)
+    street_2 = models.CharField(max_length=40, null=True, blank=True)
+    postalcode = models.CharField(max_length=6)
+    city = models.CharField(max_length=40)
+    pobox = models.CharField(max_length=9, null=True, blank=True)
+    pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
+    pobox_city = models.CharField(max_length=40, null=True, blank=True)
+    phone_work = models.CharField(max_length=20)
+    phone_home = models.CharField(max_length=20, null=True, blank=True)
+    fax = models.CharField(max_length=20, null=True, blank=True)
+    email_work = models.EmailField()
+    email_private = models.EmailField(null=True, blank=True)
+    url = models.URLField(null=True, blank=True)
+#---    
+
 class Station(models.Model):
     location = models.ForeignKey(Location)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     number = models.IntegerField(unique=True)
     password = models.CharField(max_length=40)
     info_page = models.TextField(blank=True)
+#---
+    name = models.CharField(max_length=70)
+    number = models.IntegerField(unique=True, blank=True)
+    contact_information = models.ForeignKey('Contact_Information', related_name='stations')
+    cluster = models.ForeignKey('Cluster', related_name='stations')
+    ict_contact = models.ForeignKey(Contact,related_name='stations_ict_contact')
+#---
 
     def __unicode__(self):
         return '%s - %s' % (self.number, self.location)
@@ -136,6 +178,12 @@ class Station(models.Model):
 
     class Meta:
         ordering = ('number',)
+
+#---
+class Country(models.Model):
+    name = models.CharField(max_length=40, unique=True)
+    number = models.IntegerField(unique=True)
+#---
 
 class DetectorStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
