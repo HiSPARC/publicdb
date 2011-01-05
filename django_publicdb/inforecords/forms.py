@@ -283,17 +283,18 @@ class ContactWizard(FormWizard):
 			first_name = data['contact_first_name'],
 			prefix_surname = data['contact_prefix_surname'],
 			surname = data['contact_surname'],
-			contactinformation = self.contact_information
+			contactinformation = contact_information
 			)
 		contact.save()
                 return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/contact')
-
+#		response = {"contact":contact,"contact_information":contact_information}
+#		return render_to_respone('summary.html',response)
         def process_step(self, request, form, step):
-                data = {}
-                data.update(form.cleaned_data)
-                if self.step==0 and data['contact_profession']!=None:
-			self.form_list=[ContactForm]
-
+                if form.is_valid():
+                        formtype=form.__class__.__name__
+                        if formtype=='ContactForm':
+                                if form.cleaned_data['contact_profession']!=None and ProfessionForm in self.form_list:
+                                        self.form_list.remove(ProfessionForm)
         def parse_params(self, request, admin=None, *args, **kwargs):
                 self._model_admin = admin
                 opts = Contact._meta
@@ -336,7 +337,6 @@ class SubClusterWizard(FormWizard):
                 )
                 subcluster.save()
                 return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/cluster')
-	
         def parse_params(self, request, admin=None, *args, **kwargs):
                 self._model_admin = admin
                 opts = Cluster._meta
