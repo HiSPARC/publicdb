@@ -4,6 +4,8 @@ from django.contrib.formtools.wizard import FormWizard
 from inforecords.models import *
 from django.http import HttpResponseRedirect
 from django.utils.encoding import force_unicode
+from django.shortcuts import render_to_response
+from django.utils.datastructures import SortedDict
 
 class ClusterForm(forms.Form):
 	cluster_name = forms.CharField(max_length=70,label='Cluster Name')
@@ -22,7 +24,7 @@ class CountryForm(forms.Form):
 class ContactForm(forms.Form):
 	contact_first_name = forms.CharField(max_length=40,label='First Name')
 	contact_prefix_surname = forms.CharField(max_length=10,label='Prefix surname',required=False)
-	contact_surname = forms.CharField(max_length=40, label='First Name')
+	contact_surname = forms.CharField(max_length=40, label='Surname')
 	contact_profession = forms.ModelChoiceField(queryset=Profession.objects.all(),empty_label='new profession', label='profession',required=False)
 	contact_title = forms.CharField(max_length=20, label='Title',required=False)
 	contact_street_1 = forms.CharField(max_length=40, label='street')
@@ -42,9 +44,9 @@ class ContactForm(forms.Form):
 class StationContactForm(forms.Form):
         stationcontact_first_name = forms.CharField(max_length=40,label='First Name')
         stationcontact_prefix_surname = forms.CharField(max_length=10, label='Prefix surname',required=False)
-        stationcontact_surname = forms.CharField(max_length=40, label='First Name')
+        stationcontact_surname = forms.CharField(max_length=40, label='Surname')
         stationcontact_profession = forms.ModelChoiceField(queryset=Profession.objects.all(),empty_label='new profession', label='profession',required=False)
-        stationcontact_title = forms.CharField(max_length=20, label='contact')
+        stationcontact_title = forms.CharField(max_length=20, label='title')
         stationcontact_street_1 = forms.CharField(max_length=40, label='street')
         stationcontact_street_2 = forms.CharField(max_length=40, label='street', required=False)
         stationcontact_postalcode = forms.CharField(max_length=6, label='postalcode')
@@ -193,7 +195,10 @@ class StationWizard(FormWizard):
 			info_page = data['station_infopage']
 			)
 		station.save()
-       		return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/station') 
+                modeldata= GetModelData(form_list)
+                response={"modeldata":modeldata}
+                return render_to_response('summary.html',response)
+
 	def process_step(self, request,form, step):
         	if form.is_valid():
 			formtype=form.__class__.__name__
@@ -283,17 +288,18 @@ class ContactWizard(FormWizard):
 			first_name = data['contact_first_name'],
 			prefix_surname = data['contact_prefix_surname'],
 			surname = data['contact_surname'],
-			contactinformation = self.contact_information
+			contactinformation = contact_information
 			)
 		contact.save()
-                return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/contact')
-
+		modeldata= GetModelData(form_list)
+		response={"modeldata":modeldata} 
+		return render_to_response('summary.html',response)
         def process_step(self, request, form, step):
-                data = {}
-                data.update(form.cleaned_data)
-                if self.step==0 and data['contact_profession']!=None:
-			self.form_list=[ContactForm]
-
+                if form.is_valid():
+                        formtype=form.__class__.__name__
+                        if formtype=='ContactForm':
+                                if form.cleaned_data['contact_profession']!=None and ProfessionForm in self.form_list:
+                                        self.form_list.remove(ProfessionForm)
         def parse_params(self, request, admin=None, *args, **kwargs):
                 self._model_admin = admin
                 opts = Contact._meta
@@ -335,8 +341,10 @@ class SubClusterWizard(FormWizard):
                         url = data['subcluster_url']
                 )
                 subcluster.save()
-                return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/cluster')
-	
+                modeldata= GetModelData(form_list)
+                response={"modeldata":modeldata}
+                return render_to_response('summary.html',response)
+
         def parse_params(self, request, admin=None, *args, **kwargs):
                 self._model_admin = admin
                 opts = Cluster._meta
@@ -386,7 +394,10 @@ class ClusterWizard(FormWizard):
     			url = data['cluster_url']
 		)
 		cluster.save()
-		return HttpResponseRedirect('http://192.168.122.26:8001/admin/inforecords/cluster')
+                modeldata= GetModelData(form_list)
+                response={"modeldata":modeldata}
+                return render_to_response('summary.html',response)
+
 	def process_step(self, request, form, step):
 		data = {}
 		data.update(form.cleaned_data)
@@ -419,4 +430,11 @@ class ClusterWizard(FormWizard):
 create_station = StationWizard([StationForm, StationContactForm, ProfessionForm, ContactForm, ICTProfessionForm])
 create_contact = ContactWizard([ContactForm, ProfessionForm])			
 create_cluster = ClusterWizard([ClusterForm, CountryForm])
-create_subcluster = SubClusterWizard([SubClusterForm]) 
+create_subcluster = SubClusterWizard([SubClusterForm])
+
+def GetModelData(forms):
+    model_data = SortedDict() 
+    for form in forms:
+    	for field in form:
+        	model_data[field.label] = form.cleaned_data[field.name]
+    return model_data 

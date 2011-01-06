@@ -134,7 +134,7 @@ class Station(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=40, unique=True)
-    number = models.IntegerField(unique=True)
+    number = models.IntegerField(unique=True,blank=True)
     
     def last_cluster_number(self):
         clusters=self.clusters.filter(parent=None)
@@ -149,6 +149,12 @@ class Country(models.Model):
     class Meta:
        	verbose_name_plural = "Countries"
 
+    def save(self, *args, **kwargs):
+	if self.number==None:
+	   countrymax=Country.objects.aggregate(Max('number'))
+	   self.number=countrymax['number__max']+10000
+        super(Country,self).save(*args, **kwargs)
+	
 class DetectorHisparc(models.Model):
     station = models.ForeignKey(Station)
     startdate = models.DateField()
