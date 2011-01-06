@@ -59,11 +59,12 @@ class Organization(models.Model):
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     parent = models.ForeignKey('self', null=True, blank=True)
+    country = models.CharField(max_length=40)
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 #---
     number = models.IntegerField(unique=True,blank=True)
-    country = models.ForeignKey('Country', related_name='clusters')
+    new_country = models.ForeignKey('Country', related_name='clusters')
 #---
 
     def __unicode__(self):
@@ -149,12 +150,11 @@ class Contact_Information(models.Model):
 class Station(models.Model):
     location = models.ForeignKey(Location)
     contact = models.ForeignKey(Contact, null=True, blank=True)
-    number = models.IntegerField(unique=True)
+    number = models.IntegerField(unique=True, blank=True)
     password = models.CharField(max_length=40)
     info_page = models.TextField(blank=True)
 #---
     name = models.CharField(max_length=70)
-    number = models.IntegerField(unique=True, blank=True)
     contact_information = models.ForeignKey('Contact_Information', related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     ict_contact = models.ForeignKey(Contact,related_name='stations_ict_contact')
