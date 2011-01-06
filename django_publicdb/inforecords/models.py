@@ -35,7 +35,7 @@ class Contact(models.Model):
     profession = models.ForeignKey(Profession, blank=True)
     prefix_surname = models.CharField(max_length=10, blank=True)
     surname = models.CharField(max_length=40)
-    contactinformation = models.ForeignKey('Contact_Information', related_name='contacts')
+    contactinformation = models.ForeignKey('ContactInformation', related_name='contacts')
 #---
 
     def __unicode__(self):
@@ -132,7 +132,7 @@ class Location(models.Model):
         ordering = ('name',)
 
 #---
-class Contact_Information(models.Model):
+class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
     postalcode = models.CharField(max_length=6)
@@ -156,16 +156,13 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 #---
     name = models.CharField(max_length=70)
-    contact_information = models.ForeignKey('Contact_Information', related_name='stations')
+    contact_information = models.ForeignKey('ContactInformation', related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     ict_contact = models.ForeignKey(Contact,related_name='stations_ict_contact')
 #---
 
     def __unicode__(self):
         return '%s - %s' % (self.number, self.location)
-
-    def cluster(self):
-        return self.location.cluster
 
     def save(self, *args, **kwargs):
         super(Station, self).save(*args, **kwargs)

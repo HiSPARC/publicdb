@@ -8,23 +8,8 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding model 'Country'
-        db.create_table('inforecords_country', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
-            ('number', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-        ))
-        db.send_create_signal('inforecords', ['Country'])
-
-        # Adding model 'Profession'
-        db.create_table('inforecords_profession', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('description', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
-        ))
-        db.send_create_signal('inforecords', ['Profession'])
-
-        # Adding model 'Contact_Information'
-        db.create_table('inforecords_contact_information', (
+        # Adding model 'ContactInformation'
+        db.create_table('inforecords_contactinformation', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('street_1', self.gf('django.db.models.fields.CharField')(max_length=40)),
             ('street_2', self.gf('django.db.models.fields.CharField')(max_length=40, null=True, blank=True)),
@@ -40,7 +25,22 @@ class Migration(SchemaMigration):
             ('email_private', self.gf('django.db.models.fields.EmailField')(max_length=75, null=True, blank=True)),
             ('url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True)),
         ))
-        db.send_create_signal('inforecords', ['Contact_Information'])
+        db.send_create_signal('inforecords', ['ContactInformation'])
+
+        # Adding model 'Country'
+        db.create_table('inforecords_country', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
+            ('number', self.gf('django.db.models.fields.IntegerField')(unique=True)),
+        ))
+        db.send_create_signal('inforecords', ['Country'])
+
+        # Adding model 'Profession'
+        db.create_table('inforecords_profession', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('description', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
+        ))
+        db.send_create_signal('inforecords', ['Profession'])
 
         # Adding field 'Cluster.number'
         db.add_column('inforecords_cluster', 'number', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True), keep_default=False)
@@ -58,13 +58,16 @@ class Migration(SchemaMigration):
         db.add_column('inforecords_contact', 'surname', self.gf('django.db.models.fields.CharField')(default='', max_length=40), keep_default=False)
 
         # Adding field 'Contact.contactinformation'
-        db.add_column('inforecords_contact', 'contactinformation', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='contacts', to=orm['inforecords.Contact_Information']), keep_default=False)
+        db.add_column('inforecords_contact', 'contactinformation', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='contacts', to=orm['inforecords.ContactInformation']), keep_default=False)
 
         # Adding field 'Station.name'
         db.add_column('inforecords_station', 'name', self.gf('django.db.models.fields.CharField')(default='', max_length=70), keep_default=False)
 
         # Adding field 'Station.contact_information'
-        db.add_column('inforecords_station', 'contact_information', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations', to=orm['inforecords.Contact_Information']), keep_default=False)
+        db.add_column('inforecords_station', 'contact_information', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations', to=orm['inforecords.ContactInformation']), keep_default=False)
+
+        # Adding field 'Station.cluster'
+        db.add_column('inforecords_station', 'cluster', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations', to=orm['inforecords.Cluster']), keep_default=False)
 
         # Adding field 'Station.ict_contact'
         db.add_column('inforecords_station', 'ict_contact', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations_ict_contact', to=orm['inforecords.Contact']), keep_default=False)
@@ -75,14 +78,14 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         
+        # Deleting model 'ContactInformation'
+        db.delete_table('inforecords_contactinformation')
+
         # Deleting model 'Country'
         db.delete_table('inforecords_country')
 
         # Deleting model 'Profession'
         db.delete_table('inforecords_profession')
-
-        # Deleting model 'Contact_Information'
-        db.delete_table('inforecords_contact_information')
 
         # Deleting field 'Cluster.number'
         db.delete_column('inforecords_cluster', 'number')
@@ -108,6 +111,9 @@ class Migration(SchemaMigration):
         # Deleting field 'Station.contact_information'
         db.delete_column('inforecords_station', 'contact_information_id')
 
+        # Deleting field 'Station.cluster'
+        db.delete_column('inforecords_station', 'cluster_id')
+
         # Deleting field 'Station.ict_contact'
         db.delete_column('inforecords_station', 'ict_contact_id')
 
@@ -129,7 +135,7 @@ class Migration(SchemaMigration):
         },
         'inforecords.contact': {
             'Meta': {'unique_together': "[('first_name', 'prefix_last_name', 'last_name')]", 'object_name': 'Contact'},
-            'contactinformation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'contacts'", 'to': "orm['inforecords.Contact_Information']"}),
+            'contactinformation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'contacts'", 'to': "orm['inforecords.ContactInformation']"}),
             'contactposition': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Contactposition']"}),
             'email': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
@@ -145,8 +151,8 @@ class Migration(SchemaMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'}),
             'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
-        'inforecords.contact_information': {
-            'Meta': {'object_name': 'Contact_Information'},
+        'inforecords.contactinformation': {
+            'Meta': {'object_name': 'ContactInformation'},
             'city': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'email_private': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
             'email_work': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
@@ -310,8 +316,9 @@ class Migration(SchemaMigration):
         },
         'inforecords.station': {
             'Meta': {'object_name': 'Station'},
+            'cluster': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.Cluster']"}),
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Contact']", 'null': 'True', 'blank': 'True'}),
-            'contact_information': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.Contact_Information']"}),
+            'contact_information': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.ContactInformation']"}),
             'ict_contact': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations_ict_contact'", 'to': "orm['inforecords.Contact']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'info_page': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
