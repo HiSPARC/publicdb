@@ -94,7 +94,7 @@ class StationWizard(FormWizard):
 		data= {}
 		for form in form_list:
 			data.update(form.cleaned_data)
-                station_contact_information = Contact_Information(
+                station_contact_information = ContactInformation(
                         street_1 = data['station_street_1'],
                         street_2 = data['station_street_2'],
                         postalcode = data['station_postalcode'],
@@ -111,7 +111,7 @@ class StationWizard(FormWizard):
                 )
 		station_contact_information.save()
 		if data['station_contact'] == None:
-			contact_contact_information = Contact_Information(
+			contact_contact_information = ContactInformation(
                         	street_1 = data['stationcontact_street_1'],
                         	street_2 = data['stationcontact_street_2'],
                         	postalcode = data['stationcontact_postalcode'],
@@ -147,7 +147,7 @@ class StationWizard(FormWizard):
 			stationcontact = data['station_contact']
 		
                 if data['station_ict_contact'] == None and data['station_contact_is_ict'] != True:
-                        ICT_contact_information = Contact_Information(
+                        ICT_contact_information = ContactInformation(
                                 street_1 = data['contact_street_1'],
                                 street_2 = data['contact_street_2'],
                                 postalcode = data['contact_postalcode'],
@@ -253,7 +253,7 @@ class ContactWizard(FormWizard):
                 data = {}
                 for form in form_list:
                         data.update(form.cleaned_data)
-                contact_information = Contact_Information(
+                contact_information = ContactInformation(
 			street_1 = data['contact_street_1'],
 			street_2 = data['contact_street_2'],
 			postalcode = data['contact_postalcode'],

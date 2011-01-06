@@ -100,20 +100,10 @@ class ContactInformation(models.Model):
 	verbose_name = "Contact Information"
 	verbose_name_plural = "Contact Information"
 
-    def save(self, *args, **kwargs):
-        super(Location, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
-
-    def delete(self, *args, **kwargs):
-        super(Location, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
-
 class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True,blank=True)
-    contact_information = models.ForeignKey('ContactInformation',
+    contactinformation = models.ForeignKey('ContactInformation',
                                             related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     contact = models.ForeignKey(Contact, related_name='stations_contact',

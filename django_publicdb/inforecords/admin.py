@@ -7,11 +7,10 @@ from forms import *
 
 admin.site.register(Profession)
 admin.site.register(Contact)
-admin.site.register(Contact_Information)
+admin.site.register(ContactInformation)
 admin.site.register(Cluster)
 admin.site.register(Station)
 admin.site.register(Country)
-admin.site.register(DetectorStatus)
 admin.site.register(DetectorHisparc)
 admin.site.register(ElectronicsType)
 admin.site.register(ElectronicsStatus)
