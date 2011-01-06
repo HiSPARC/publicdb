@@ -31,7 +31,7 @@ class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True,blank=True)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
-    new_country = models.ForeignKey('Country', related_name='clusters')
+    country = models.ForeignKey('Country', related_name='clusters')
     url = models.URLField(null=True, blank=True)
     def __unicode__(self):
         return self.name
