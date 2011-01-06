@@ -8,6 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
+        # Adding model 'Country'
+        db.create_table('inforecords_country', (
+            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
+            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
+            ('number', self.gf('django.db.models.fields.IntegerField')(unique=True)),
+        ))
+        db.send_create_signal('inforecords', ['Country'])
+
         # Adding model 'Profession'
         db.create_table('inforecords_profession', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -34,24 +42,11 @@ class Migration(SchemaMigration):
         ))
         db.send_create_signal('inforecords', ['Contact_Information'])
 
-        # Adding model 'Country'
-        db.create_table('inforecords_country', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(unique=True, max_length=40)),
-            ('number', self.gf('django.db.models.fields.IntegerField')(unique=True)),
-        ))
-        db.send_create_signal('inforecords', ['Country'])
-
         # Adding field 'Cluster.number'
-        db.add_column('inforecords_cluster', 'number', self.gf('django.db.models.fields.IntegerField')(default=0, unique=True, blank=True), keep_default=False)
+        db.add_column('inforecords_cluster', 'number', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True), keep_default=False)
 
-        # Renaming column for 'Cluster.country' to match new field type.
-        db.rename_column('inforecords_cluster', 'country', 'country_id')
-        # Changing field 'Cluster.country'
-        db.alter_column('inforecords_cluster', 'country_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Country']))
-
-        # Adding index on 'Cluster', fields ['country']
-        db.create_index('inforecords_cluster', ['country_id'])
+        # Adding field 'Cluster.new_country'
+        db.add_column('inforecords_cluster', 'new_country', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='clusters', to=orm['inforecords.Country']), keep_default=False)
 
         # Adding field 'Contact.profession'
         db.add_column('inforecords_contact', 'profession', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['inforecords.Profession'], blank=True), keep_default=False)
@@ -80,25 +75,20 @@ class Migration(SchemaMigration):
 
     def backwards(self, orm):
         
+        # Deleting model 'Country'
+        db.delete_table('inforecords_country')
+
         # Deleting model 'Profession'
         db.delete_table('inforecords_profession')
 
         # Deleting model 'Contact_Information'
         db.delete_table('inforecords_contact_information')
 
-        # Deleting model 'Country'
-        db.delete_table('inforecords_country')
-
         # Deleting field 'Cluster.number'
         db.delete_column('inforecords_cluster', 'number')
 
-        # Renaming column for 'Cluster.country' to match new field type.
-        db.rename_column('inforecords_cluster', 'country_id', 'country')
-        # Changing field 'Cluster.country'
-        db.alter_column('inforecords_cluster', 'country', self.gf('django.db.models.fields.CharField')(max_length=40))
-
-        # Removing index on 'Cluster', fields ['country']
-        db.delete_index('inforecords_cluster', ['country_id'])
+        # Deleting field 'Cluster.new_country'
+        db.delete_column('inforecords_cluster', 'new_country_id')
 
         # Deleting field 'Contact.profession'
         db.delete_column('inforecords_contact', 'profession_id')
@@ -129,10 +119,11 @@ class Migration(SchemaMigration):
         'inforecords.cluster': {
             'Meta': {'object_name': 'Cluster'},
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Contact']", 'null': 'True', 'blank': 'True'}),
-            'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'clusters'", 'to': "orm['inforecords.Country']"}),
+            'country': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '70'}),
-            'number': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'blank': 'True'}),
+            'new_country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'clusters'", 'to': "orm['inforecords.Country']"}),
+            'number': ('django.db.models.fields.IntegerField', [], {'blank': 'True'}),
             'parent': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Cluster']", 'null': 'True', 'blank': 'True'}),
             'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
@@ -302,7 +293,7 @@ class Migration(SchemaMigration):
             'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40'}),
             'notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'services': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['inforecords.MonitorService']", 'through': "'EnabledService'", 'symmetrical': 'False'}),
+            'services': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['inforecords.MonitorService']", 'through': "'EnabledService'"}),
             'station': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Station']"}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.PcType']"})
         },

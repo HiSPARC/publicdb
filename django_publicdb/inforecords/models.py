@@ -63,7 +63,8 @@ class Cluster(models.Model):
     contact = models.ForeignKey(Contact, null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 #---
-    number = models.IntegerField(unique=True,blank=True)
+    #number = models.IntegerField(unique=True,blank=True)
+    number = models.IntegerField(blank=True)
     new_country = models.ForeignKey('Country', related_name='clusters')
 #---
 
