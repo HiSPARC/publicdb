@@ -28,7 +28,7 @@ def stations(request):
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
-        for station in Station.objects.filter(location__cluster=cluster):
+        for station in Station.objects.filter(cluster=cluster):
             try:
                 Summary.objects.filter(station=station)[0]
                 link = station.number
@@ -36,7 +36,7 @@ def stations(request):
                 link = None
 
             stations.append({'number': station.number,
-                             'name': station.location.name,
+                             'name': station.name,
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
