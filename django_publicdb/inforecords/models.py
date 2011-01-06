@@ -5,73 +5,45 @@ import xmlrpclib
 
 from django.conf import settings
 
-class Contactposition(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-
-    def __unicode__(self):
-        return self.description
-
-#---
 class Profession(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
     def __unicode__(self):
         return self.description
-#---
 
 class Contact(models.Model):
-    location = models.ForeignKey('Location', related_name='contacts',
-                                 null=True, blank=True)
-    contactposition = models.ForeignKey(Contactposition)
+    profession = models.ForeignKey(Profession)
     title = models.CharField(max_length=20, null=True, blank=True)
     first_name = models.CharField(max_length=40)
-    prefix_last_name = models.CharField(max_length=10, blank=True)
-    last_name = models.CharField(max_length=40)
-    url = models.URLField(null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
-    phone_work = models.CharField(max_length=20, null=True, blank=True)
-    phone_home = models.CharField(max_length=20, null=True, blank=True)
-#---
-    profession = models.ForeignKey(Profession, blank=True)
     prefix_surname = models.CharField(max_length=10, blank=True)
     surname = models.CharField(max_length=40)
     contactinformation = models.ForeignKey('ContactInformation', related_name='contacts')
-#---
 
     def __unicode__(self):
         return "%s %s %s %s" % (self.title, self.first_name,
-                                self.prefix_last_name, self.last_name)
+                                self.prefix_surname, self.surname)
 
     class Meta:
-        unique_together = [('first_name', 'prefix_last_name', 'last_name')]
-        ordering = ('last_name', 'first_name')
-
-class Organization(models.Model):
-    name = models.CharField(max_length=40, unique=True)
-    url = models.URLField(null=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        ordering = ('name',)
+        unique_together = [('first_name', 'prefix_surname', 'surname')]
+        ordering = ('surname', 'first_name')
 
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
-    parent = models.ForeignKey('self', null=True, blank=True)
-    country = models.CharField(max_length=40)
-    contact = models.ForeignKey(Contact, null=True, blank=True)
-    url = models.URLField(null=True, blank=True)
-#---
-    #number = models.IntegerField(unique=True,blank=True)
-    number = models.IntegerField(blank=True)
+    number = models.IntegerField(unique=True,blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
     new_country = models.ForeignKey('Country', related_name='clusters')
-#---
-
+    url = models.URLField(null=True, blank=True)
     def __unicode__(self):
         return self.name
 
     def save(self, *args, **kwargs):
+        if self.number==None:
+           if self.parent==None:
+              self.number = self.country.last_cluster_number()+1000
+           else:
+              self.number = self.parent.last_cluster_number()+100        
+        super(Cluster, self).save(*args, **kwargs)
+
         super(Cluster, self).save(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
@@ -87,51 +59,25 @@ class Cluster(models.Model):
         else:
             return self.name
 
-    class Meta:
-        ordering = ('name',)
+    def last_station_number(self):
+	stations=self.stations.filter(number__lt=(self.number+90))
+        if stations:
+	    stationmax=stations.aggregate(Max('number'))
+	    return stationmax['number__max'] 
+        else:
+            return self.number-1 
 
-class LocationStatus(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-    
-    def __unicode__(self):
-        return self.description
-
-    class Meta:
-        verbose_name_plural = 'Location Status'
-
-class Location(models.Model):
-    name = models.CharField(max_length=70, unique=True)
-    organization = models.ForeignKey(Organization)
-    cluster = models.ForeignKey(Cluster)
-    locationstatus = models.ForeignKey(LocationStatus)
-    address = models.CharField(max_length=40, null=True, blank=True)
-    postalcode = models.CharField(max_length=6, null=True, blank=True)
-    pobox = models.CharField(max_length=9, null=True, blank=True)
-    pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
-    pobox_city = models.CharField(max_length=40, null=True, blank=True)
-    city = models.CharField(max_length=40)
-    phone = models.CharField(max_length=20, null=True, blank=True)
-    fax = models.CharField(max_length=20, null=True, blank=True)
-    url = models.URLField(null=True, blank=True)
-    email = models.EmailField(null=True, blank=True)
-    
-    def __unicode__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        super(Location, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
-
-    def delete(self, *args, **kwargs):
-        super(Location, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+    def last_cluster_number(self):
+        clusters=self.children.all()
+        if clusters:
+            clustermax=clusters.aggregate(Max('number'))
+            return clustermax['number__max']
+        else:
+            return self.number
 
     class Meta:
         ordering = ('name',)
 
-#---
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
@@ -146,25 +92,44 @@ class ContactInformation(models.Model):
     email_work = models.EmailField()
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
-#---    
-
-class Station(models.Model):
-    location = models.ForeignKey(Location)
-    contact = models.ForeignKey(Contact, null=True, blank=True)
-    number = models.IntegerField(unique=True, blank=True)
-    password = models.CharField(max_length=40)
-    info_page = models.TextField(blank=True)
-#---
-    name = models.CharField(max_length=70)
-    contact_information = models.ForeignKey('ContactInformation', related_name='stations')
-    cluster = models.ForeignKey('Cluster', related_name='stations')
-    ict_contact = models.ForeignKey(Contact,related_name='stations_ict_contact')
-#---
-
+    
     def __unicode__(self):
-        return '%s - %s' % (self.number, self.location)
+	return "%s %s" % (self.street_1, self.city)
+    
+    class Meta:
+	verbose_name = "Contact Information"
+	verbose_name_plural = "Contact Information"
 
     def save(self, *args, **kwargs):
+        super(Location, self).save(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+
+    def delete(self, *args, **kwargs):
+        super(Location, self).delete(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+
+class Station(models.Model):
+    name = models.CharField(max_length=70)
+    number = models.IntegerField(unique=True,blank=True)
+    contact_information = models.ForeignKey('ContactInformation',
+                                            related_name='stations')
+    cluster = models.ForeignKey('Cluster', related_name='stations')
+    contact = models.ForeignKey(Contact, related_name='stations_contact',
+                                null=True)
+    ict_contact = models.ForeignKey(Contact,
+                                    related_name='stations_ict_contact',
+                                    null=True)
+    password = models.CharField(max_length=40)
+    info_page = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return '%s' % (self.number)
+
+    def save(self, *args, **kwargs):
+        if self.number==None:    
+           self.number = self.cluster.last_station_number()+1
         super(Station, self).save(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
@@ -177,24 +142,25 @@ class Station(models.Model):
     class Meta:
         ordering = ('number',)
 
-#---
 class Country(models.Model):
     name = models.CharField(max_length=40, unique=True)
     number = models.IntegerField(unique=True)
-#---
-
-class DetectorStatus(models.Model):
-    description = models.CharField(max_length=40, unique=True)
     
-    def __unicode__(self):
-        return self.description
+    def last_cluster_number(self):
+        clusters=self.clusters.filter(parent=None)
+        if clusters:
+            clustermax=clusters.aggregate(Max('number'))
+            return clustermax['number__max']
+        else:
+            return self.number-1000
 
+    def __unicode__(self):
+        return self.name
     class Meta:
-        verbose_name_plural = 'Detector Status'
+       	verbose_name_plural = "Countries"
 
 class DetectorHisparc(models.Model):
     station = models.ForeignKey(Station)
-    status = models.ForeignKey(DetectorStatus)
     startdate = models.DateField()
     enddate = models.DateField(null=True, blank=True)
     latitude = models.FloatField(null=True, blank=True)
