@@ -1,7 +1,7 @@
 from django import forms
 from django.forms import fields, models, widgets
 from django.contrib.formtools.wizard import FormWizard
-from inforecords.models import *
+from django_publicdb.inforecords.models import *
 from django.http import HttpResponseRedirect
 from django.utils.encoding import force_unicode
 from django.shortcuts import render_to_response
