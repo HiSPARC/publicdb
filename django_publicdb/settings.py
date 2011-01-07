@@ -97,4 +97,5 @@ INSTALLED_APPS = (
     'django_publicdb.analysissessions',
     'django_publicdb.updates',
     'django_publicdb.raw_data',
+    'south',
 )
