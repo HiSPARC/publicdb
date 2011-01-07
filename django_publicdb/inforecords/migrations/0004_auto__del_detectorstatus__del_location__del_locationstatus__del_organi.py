@@ -35,6 +35,9 @@ class Migration(SchemaMigration):
         # Adding unique constraint on 'Cluster', fields ['number']
         db.create_unique('inforecords_cluster', ['number'])
 
+        # Removing unique constraint on 'Contact', fields ['first_name', 'last_name', 'prefix_last_name']
+        db.delete_unique('inforecords_contact', ['first_name', 'last_name', 'prefix_last_name'])
+
         # Deleting field 'Contact.last_name'
         db.delete_column('inforecords_contact', 'last_name')
 
@@ -61,9 +64,6 @@ class Migration(SchemaMigration):
 
         # Changing field 'Contact.profession'
         db.alter_column('inforecords_contact', 'profession_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Profession']))
-
-        # Removing unique constraint on 'Contact', fields ['first_name', 'last_name', 'prefix_last_name']
-        db.delete_unique('inforecords_contact', ['first_name', 'last_name', 'prefix_last_name'])
 
         # Adding unique constraint on 'Contact', fields ['prefix_surname', 'first_name', 'surname']
         db.create_unique('inforecords_contact', ['prefix_surname', 'first_name', 'surname'])
