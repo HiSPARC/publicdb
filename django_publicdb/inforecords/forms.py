@@ -11,23 +11,27 @@ from django.utils.datastructures import SortedDict
 
 #form to be used for creating main clusters.
 class ClusterForm(forms.Form):
+	form_name = 'create new main cluster'
 	cluster_name = forms.CharField(max_length=70,label='Cluster Name')
 	cluster_country = forms.ModelChoiceField(queryset=Country.objects.all(),required=False,empty_label='new country',label='country')
 	cluster_url = forms.URLField(required=False, label='url')
 
 #form to be used for creating subclusters. Contains no country field. Contains a parentfield containing only clusters that donot have a parent.  
 class SubClusterForm(forms.Form):
+	form_name = 'create new subcluster'
 	subcluster_name = forms.CharField(max_length= 70, label='Cluster Name')
 	parent = forms.ModelChoiceField(queryset=Cluster.objects.filter(parent=None),empty_label=None, label='parent cluster')
 	subcluster_url = forms.URLField(required=False, label='url')
 
 #form te be used for creating a country. Country number is not required and if no number is given should be created by country.save()
 class CountryForm(forms.Form):
+	form_name = 'Create new country'
 	country_name = forms.CharField(max_length=70,label='Country Name')
 	country_number = forms.IntegerField()
 
 #form for the creation of a contact.
 class ContactForm(forms.Form):
+	form_name = 'Create new contact'
 	contact_first_name = forms.CharField(max_length=40,label='First Name')
 	contact_prefix_surname = forms.CharField(max_length=10,label='Prefix surname',required=False)
 	contact_surname = forms.CharField(max_length=40, label='Surname')
@@ -51,12 +55,13 @@ class ContactForm(forms.Form):
 #another form for the creation of a contact. This is to make it easier to work with wizards that need multiple contacts to be created.
 #the different field names make it easier to keep track of which information you are using in the wizard.
 class StationContactForm(forms.Form):
+	form_name = 'create new contact'
         stationcontact_first_name = forms.CharField(max_length=40,label='First Name')
         stationcontact_prefix_surname = forms.CharField(max_length=10, label='Prefix surname',required=False)
         stationcontact_surname = forms.CharField(max_length=40, label='Surname')
 	#empty_label is used so as a way to see if the profession form should be shown by the wizard
         stationcontact_profession = forms.ModelChoiceField(queryset=Profession.objects.all(),empty_label='new profession', label='profession',required=False)
-        stationcontact_title = forms.CharField(max_length=20, label='title')
+        stationcontact_title = forms.CharField(max_length=20, label='title',required=False)
         stationcontact_street_1 = forms.CharField(max_length=40, label='street')
         stationcontact_street_2 = forms.CharField(max_length=40, label='street', required=False)
         stationcontact_postalcode = forms.CharField(max_length=6, label='postalcode')
@@ -73,6 +78,8 @@ class StationContactForm(forms.Form):
 
 #a form for the creation of a station.Contains two possible contacts and a boleanfield so you can use the main contact as the ict contact.
 class StationForm(forms.Form):
+	form_name = 'Create new station'
+	station_name = forms.CharField(max_length=40, label='name')
 	station_cluster = forms.ModelChoiceField(queryset=Cluster.objects.all(),empty_label=None,label='cluster')
         station_street_1 = forms.CharField(max_length=40, label='street')
         station_street_2 = forms.CharField(max_length=40, label='street', required=False)
@@ -95,8 +102,10 @@ class StationForm(forms.Form):
 
 #two professionforms again to make it easier to know which information you are using in a wizard with multiple contacts.
 class ProfessionForm(forms.Form):
+	form_name = 'create new profession'
 	profession_description = forms.CharField(max_length=40, label='profession')
 class ICTProfessionForm(forms.Form):
+	form_name = 'create new profession'
         ICTprofession_description = forms.CharField(max_length=40, label='profession')
 
 #a tweaked formwizard for the creation of a new station.
@@ -219,6 +228,7 @@ class StationWizard(FormWizard):
 		#we now have all the information we need to create and save the station
 		#the station number is generated in station.save()
 		station = Station(
+			name = data['station_name'],
 			contactinformation = station_contact_information,
 			cluster = data['station_cluster'],
 			contact = stationcontact,
@@ -230,8 +240,8 @@ class StationWizard(FormWizard):
 		#we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
 		#forms that were skipped are not in form_list and so are not included in the summary.
 		#and we add station number because it is not in any form.
-                modeldata= GetModelData(form_list)
-                modeldata['Station Number'] = station.number
+		modeldata= GetModelData(form_list)
+		modeldata.insert(0,'Station Number', station.number)
 		response={"modeldata":modeldata}
 		return render_to_response('summary.html',response)
 	#the following is called at the start of every step including the first step.
@@ -277,12 +287,18 @@ class StationWizard(FormWizard):
                         'root_path': admin.admin_site.root_path,
                         'app_label': opts.app_label})
 	#this renders the wizard. 
-	#todo I still need to remove the step x of y fields and add a title to the forms.
+	#formtype is a string with the name of the current form. 
+	#This is overwritten here for the contact forms so the user can see which he is using
 	#the forms are rendered as Adminforms
         def render_template(self, request, form, previous_fields, step, context=None):
-                from django.contrib.admin.helpers import AdminForm
+                formtype=form.form_name
+		if form.__class__.__name__=='StationContactForm':
+			formtype='Create new contact (main)'
+		if form.__class__.__name__=='ContactForm': 
+			formtype='Create new contact (ICT)'
+		from django.contrib.admin.helpers import AdminForm
                 form = AdminForm(form, [(
-                        'Step %d of %d' % (step + 1, self.num_steps()),
+                        formtype,
                         {'fields': form.base_fields.keys()}
                         )], {})
                 context = context or {}
@@ -381,12 +397,13 @@ class ContactWizard(FormWizard):
                         'app_label': opts.app_label})
 
         #this renders the wizard. 
-	#todo I still need to remove the step x of y fields and add a title to the forms.
         #the forms are rendered as Adminforms
+	#formtype is a string describing the current form which is printed in the template
         def render_template(self, request, form, previous_fields, step, context=None):
-                from django.contrib.admin.helpers import AdminForm
+                formtype = form.form_name
+		from django.contrib.admin.helpers import AdminForm
                 form = AdminForm(form, [(
-                        'Step %d of %d' % (step + 1, self.num_steps()),
+                        formtype,
                         {'fields': form.base_fields.keys()}
                         )], {})
                 context = context or {}
@@ -437,12 +454,13 @@ class SubClusterWizard(FormWizard):
                         'app_label': opts.app_label})
 
         #this renders the wizard.
-        #todo I still need to remove the step x of y fields and add a title to the forms.
         #the forms are rendered as Adminforms
+	#form type is a string describing the current form which is printed in the template
 	def render_template(self, request, form, previous_fields, step, context=None):
-                from django.contrib.admin.helpers import AdminForm
+                formtype = form.form_name
+		from django.contrib.admin.helpers import AdminForm
                 form = AdminForm(form, [(
-                        'Step %d of %d' % (step + 1, self.num_steps()),
+                        formtype,
                         {'fields': form.base_fields.keys()}
                         )], {})
                 context = context or {}
@@ -517,12 +535,13 @@ class ClusterWizard(FormWizard):
                         'app_label': opts.app_label})
 
         #this renders the wizard.
-        #todo I still need to remove the step x of y fields and add a title to the forms.
         #the forms are rendered as Adminforms
+	#formtype is a string that decribes the current form and is printed in the template
 	def render_template(self, request, form, previous_fields, step, context=None):
+		formtype = form.form_name
     		from django.contrib.admin.helpers import AdminForm
     		form = AdminForm(form, [(
-        		'Step %d of %d' % (step + 1, self.num_steps()),
+        		formtype,
         		{'fields': form.base_fields.keys()}
         		)], {})
     		context = context or {}
