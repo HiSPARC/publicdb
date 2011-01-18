@@ -229,10 +229,11 @@ class StationWizard(FormWizard):
 		station.save()
 		#we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
 		#forms that were skipped are not in form_list and so are not included in the summary.
-		#todo add station and clusternumbers to the summary
+		#and we add station number because it is not in any form.
                 modeldata= GetModelData(form_list)
-                response={"modeldata":modeldata}
-                return render_to_response('summary.html',response)
+                modeldata['Station Number'] = station.number
+		response={"modeldata":modeldata}
+		return render_to_response('summary.html',response)
 	#the following is called at the start of every step including the first step.
 	def process_step(self, request,form, step):
 		#with form.is_valid we check if we have completed a step. In the first step the form is not yet filled so invalid.
