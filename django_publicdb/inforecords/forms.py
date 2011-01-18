@@ -435,8 +435,9 @@ class SubClusterWizard(FormWizard):
                 )
                 subcluster.save()
 		#we get all the fields form the form and use them for a summary.
-		#todo add the clusternumber to the data.
+		#we manualy add the clusternumber 
                 modeldata= GetModelData(form_list)
+		modeldata.insert(0,'clusternumber', subcluster.number)
                 response={"modeldata":modeldata}
                 return render_to_response('summary.html',response)
 
@@ -504,8 +505,9 @@ class ClusterWizard(FormWizard):
 
                 #we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
                 #forms that were skipped are not in form_list and so are not included in the summary.
-		#todo add clusternumber to summary
+		#manualy add clusternumber to summary
                 modeldata= GetModelData(form_list)
+		modeldata.insert(0,'Clusternumber', cluster.number)
                 response={"modeldata":modeldata}
                 return render_to_response('summary.html',response)
 
