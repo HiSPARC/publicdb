@@ -94,7 +94,7 @@ def get_cluster_station_list(parent):
         c['status'] = 1.0
         c['contents'] = get_cluster_station_list(parent=cluster)
 
-        for station in Station.objects.filter(location__cluster=cluster):
+        for station in Station.objects.filter(cluster=cluster):
             s = {}
             try:
                 detector = (DetectorHisparc.objects
@@ -103,7 +103,7 @@ def get_cluster_station_list(parent):
             except ObjectDoesNotExist:
                 continue
             s['number'] = station.number
-            s['name'] = station.location.name
+            s['name'] = station.name
             if detector.latitude:
                 s['latitude'] = detector.latitude
             else:

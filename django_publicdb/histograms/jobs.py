@@ -233,4 +233,4 @@ def save_dataset(summary, slug, data):
     logger.debug("Saved succesfully")
 
 def get_station_cluster_id(station):
-    return station.cluster().main_cluster(), station.number
+    return station.cluster.main_cluster(), station.number
