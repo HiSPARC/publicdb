@@ -3,6 +3,7 @@ from django.db import models
 import zlib
 import cPickle as pickle
 import base64
+import numpy as np
 
 from django_publicdb.inforecords import models as inforecords
 
@@ -19,12 +20,20 @@ class SerializedDataField(models.Field):
         return 'LONGBLOB'
 
     def to_python(self, value):
-        try:
-            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-        except:
+        if isinstance(value, list):
             return value
         else:
-            return unpickled
+            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
+            if isinstance(unpickled, list):
+                data = []
+                for x in unpickled:
+                    if isinstance(x, np.ndarray):
+                        data.append(x.tolist())
+                    else:
+                        data.append(x)
+                return data
+            else:
+                return unpickled
 
     def get_db_prep_value(self, value):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
