@@ -22,18 +22,22 @@ class SerializedDataField(models.Field):
     def to_python(self, value):
         if isinstance(value, list):
             return value
-        else:
-            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-            if isinstance(unpickled, list):
-                data = []
-                for x in unpickled:
-                    if isinstance(x, np.ndarray):
-                        data.append(x.tolist())
-                    else:
-                        data.append(x)
-                return data
+        elif isinstance(value, unicode):
+            try:
+                unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
+            except PickleError:
+                return eval(value)
             else:
-                return unpickled
+                if isinstance(unpickled, list):
+                    data = []
+                    for x in unpickled:
+                        if isinstance(x, np.ndarray):
+                            data.append(x.tolist())
+                        else:
+                            data.append(x)
+                    return data
+                else:
+                    return unpickled
 
     def get_db_prep_value(self, value):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
