@@ -34,4 +34,6 @@ urlpatterns = patterns('',
 
     # (Temporary?) Ajax urls
     (r'^ajax/', include('django_publicdb.ajax.urls')),
+
+    (r'^jsparc/', include('django_publicdb.jsparc.urls')),
 )
