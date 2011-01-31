@@ -22,7 +22,7 @@ class SerializedDataField(models.Field):
     def to_python(self, value):
         if isinstance(value, list):
             return value
-        elif isinstance(value, unicode):
+        elif isinstance(value, unicode) or isinstance(value, str):
             try:
                 unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
             except PickleError:
