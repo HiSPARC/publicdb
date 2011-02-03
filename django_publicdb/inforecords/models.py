@@ -23,6 +23,10 @@ class Contact(models.Model):
         return "%s %s %s %s" % (self.title, self.first_name,
                                 self.prefix_surname, self.surname)
 
+    def email_work(self):
+        return self.contactinformation.email_work
+    email_work = property(email_work)
+
     class Meta:
         unique_together = [('first_name', 'prefix_surname', 'surname')]
         ordering = ('surname', 'first_name')
