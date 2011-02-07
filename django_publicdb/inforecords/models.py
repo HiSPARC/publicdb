@@ -27,6 +27,11 @@ class Contact(models.Model):
         return self.contactinformation.email_work
     email_work = property(email_work)
 
+    def name(self):
+        return "%s %s %s %s" % (self.title, self.first_name,
+                                self.prefix_surname, self.surname)
+    name = property(name)
+
     class Meta:
         unique_together = [('first_name', 'prefix_surname', 'surname')]
         ordering = ('surname', 'first_name')
@@ -100,6 +105,26 @@ class ContactInformation(models.Model):
     def __unicode__(self):
 	return "%s %s" % (self.street_1, self.city)
     
+    def type(self):
+        if self.contacts.all():
+           type = 'Contact'
+        elif self.stations.all():
+           type = 'Station'
+        else:
+           type = 'no owner'
+	return type
+    type = property(type)
+
+    def contact_owner(self):
+	if self.contacts.all():
+	   contact_owner = self.contacts.get().name
+	elif self.stations.all():
+           contact_owner = self.stations.get().name
+	else:
+           contact_owner = 'no owner'
+	return contact_owner
+    contact_owner = property(contact_owner)
+	    
     class Meta:
 	verbose_name = "Contact Information"
 	verbose_name_plural = "Contact Information"
