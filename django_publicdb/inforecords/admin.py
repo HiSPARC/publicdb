@@ -11,12 +11,14 @@ class ClusterAdmin(admin.ModelAdmin):
 
 class ContactInline(admin.StackedInline):
     model = Contact
-    extra = 0
+    extra = 0 #this stops empty forms being shown
+    max_num = 0 #this removes the add more button
     can_delete = False
 
 class StationInline(admin.StackedInline):
     model = Station
-    extra = 0
+    extra = 0 #this stops empty forms being shown
+    max_num = 0 #this removes the add more button
     can_delete = False
 
 class ContactAdmin(admin.ModelAdmin):
