@@ -11,7 +11,7 @@
 }
 
 #stationNumber {
-    color: gray;
+    color: black;
     font-size: 10pt;
 }
 
@@ -123,7 +123,7 @@ a.sourceLink {
 {% block content %}
 
 <div id="header">
-    <h2>Station {{ station.location.name }}</h2>
+    <h2>Station: {{ station.name }}</h2>
     <div id="stationNumber">{{ station.number }}</div>
     <div id="date">{{ date|date:"D N j, Y" }}</div>
 </div>
