@@ -16,6 +16,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 import tables
 import datetime
 import re
+import progressbar as pb
 
 from hisparc.analysis import coincidences
 
@@ -71,17 +72,26 @@ def analyze_traces(traces):
     return trace_timing
 
 if __name__ == '__main__':
-    data = tables.openFile('/home/david/work/HiSPARC/data/100412/data.h5', 'r')
+    data = tables.openFile('../data.h5', 'r')
     stations = data.listNodes('/')
     c_list, timestamps = coincidences.search_coincidences(data, stations)
 
-    for coincidence in c_list:
+    ndups = 0
+    nvalid = 0
+    progress = pb.ProgressBar(widgets=[pb.Percentage(), pb.Bar(),
+                                       pb.ETA()])
+    for coincidence in progress(c_list):
         if len(coincidence) >= 3:
             event_list = coincidences.get_events(data, stations,
                                                  coincidence, timestamps)
             station_list = [x[0] for x in event_list]
             if len(set(station_list)) == len(station_list):
                 save_coincidence(event_list)
+                nvalid += 1
             else:
-                print 'Duplicate stations; dropped.'
+                ndups += 1
+
+    if ndups:
+        print '%d duplicate stations dropped' % ndups
+    print "Succesfully stored %d coincidences" % nvalid
     data.close()
