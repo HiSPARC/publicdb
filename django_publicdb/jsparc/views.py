@@ -15,8 +15,8 @@ from django_publicdb.inforecords.models import *
 def get_coincidence(request):
     """Return a coincidence for jsparc client test"""
 
-    session_hash = request.GET.get('session_hash', '')
-    student_name = request.GET.get('student_name', '')
+    session_hash = request.GET.get('session_hash', None)
+    student_name = request.GET.get('student_name', None)
 
     try:
         session = AnalysisSession.objects.get(hash=session_hash)
@@ -50,13 +50,9 @@ def get_coincidence(request):
         coincidence.student = student
         coincidence.save()
 
-    l = len(Coincidence.objects.all())
-    idx = randrange(l)
-
-    c = Coincidence.objects.all()[idx]
-
+    c = coincidence
     events = []
-    for e in c.events.all():
+    for e in c.coincidence.events.all():
         s = e.station
         d = s.detectorhisparc_set.all().reverse()[0]
 
@@ -69,8 +65,11 @@ def get_coincidence(request):
                      integrals=e.integrals)
         events.append(event)
 
-    data = dict(timestamp=calendar.timegm(datetime.datetime.combine(c.date, c.time).utctimetuple()),
-                nanoseconds=c.nanoseconds, events=events)
+    data = dict(pk=c.pk, timestamp=calendar.timegm(datetime.datetime
+                                                  .combine(c.coincidence.date,
+                                                           c.coincidence.time)
+                                                  .utctimetuple()),
+                nanoseconds=c.coincidence.nanoseconds, events=events)
 
     response = HttpResponse(json.dumps(data), mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
