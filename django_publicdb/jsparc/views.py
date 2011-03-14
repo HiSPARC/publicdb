@@ -27,7 +27,8 @@ def coin_cors(request):
                      lat=d.latitude, lon=d.longitude, alt=d.height,
                      status='on', detectors=len(e.traces),
                      traces=e.traces, pulseheights=e.pulseheights,
-                     integrals=e.integrals)
+                     integrals=e.integrals,
+                     mips=[x / 200. for x in e.pulseheights])
         events.append(event)
 
     data = dict(timestamp=calendar.timegm(datetime.datetime.combine(c.date, c.time).utctimetuple()),
