@@ -119,7 +119,7 @@ class ContactInformation(models.Model):
 	if self.contacts.all():
 	   contact_owner = self.contacts.get().name
 	elif self.stations.all():
-           contact_owner = self.stations.get().name
+           contact_owner = self.stations.all()[0].name
 	else:
            contact_owner = 'no owner'
 	return contact_owner

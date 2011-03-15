@@ -43,16 +43,16 @@ class EnabledServiceAdmin(admin.ModelAdmin):
     list_filter = ('pc', 'monitor_service')
 
 class StationAdmin(admin.ModelAdmin):
-   list_display = ('number','name', 'contactinformation', 'cluster')
-   search_fields = ('number', 'name', 'cluster__name')
+    list_display = ('number','name', 'contactinformation', 'cluster')
+    search_fields = ('number', 'name', 'cluster__name')
 
 class ContactInformationAdmin(admin.ModelAdmin):
-   def owner_name(self,obj):
-      return obj.contact_owner
-   list_display = ('owner_name','street_1','street_2','city','type')
-   def type(self,obj):
-      return obj.type 
-   inlines = (ContactInline,StationInline)
+    def owner_name(self,obj):
+       return obj.contact_owner
+    list_display = ('owner_name','street_1','street_2','city','type')
+    def type(self,obj):
+       return obj.type 
+    inlines = (ContactInline,StationInline)
 
 class EnabledServiceInline(admin.TabularInline):
     model = EnabledService
