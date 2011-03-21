@@ -97,18 +97,39 @@ def top_lijst(slug):
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
-def send_results(request, pk, core_position, log_energy, error_estimate):
+def result(request):
+    session_hash = request.GET['session_hash']
+    student_name = request.GET['student_name']
+    pk = request.GET['pk']
+    lat = request.GET['lat']
+    lon = request.GET['lon']
+    log_energy = request.GET['logEnergy']
+    error_estimate = request.GET['error']
+    
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
+    assert coincidence.session.hash == session_hash
+    assert coincidence.student.name == student_name
 
     if coincidence.student.name == 'Test student':
         return
     else:
-        coincidence.core_position_x, coincidence.core_position_y = \
-            core_position
+        coincidence.core_position_x = lon
+        coincidence.core_position_y = lat
         coincidence.log_energy = log_energy
-        #FIXME
-        coincidence.theta = random.normalvariate(22, 10)
-        coincidence.phi = random.uniform(0., 360.)
         coincidence.error_estimate = error_estimate
         coincidence.is_analyzed = True
+        #FIXME
+        coincidence.theta = 0
+        coincidence.phi = 0
         coincidence.save()
+        
+    ranking = top_lijst(coincidence.session.slug)
+    try:
+        rank = [x['name'] for x in ranking].index(student_name) + 1
+    except ValueError:
+        rank = None
+
+    response = HttpResponse(json.dumps(dict(msg="OK [result stored]",rank=rank)),
+                            mimetype='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
