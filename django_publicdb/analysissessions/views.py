@@ -31,6 +31,7 @@ def data_display(request, slug):
          'core_plot': core_plot,
          'star_map': star_map,
          'scores': scores,
+         'slug': slug,
         }, context_instance=RequestContext(request))
 
 def create_energy_histogram(slug, coincidences):
