@@ -77,7 +77,7 @@ th {
         <tr>
             <td class="rank">{{ forloop.counter }}</td>
             <td class="student">{{ student.name }}</td>
-            <td class="error">{{ student.wgh_error|floatformat:5 }}</td>
+            <td class="error">{{ student.wgh_error|floatformat:8 }}</td>
         </tr>
     {% endfor %}
     </table>

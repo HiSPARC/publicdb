@@ -156,7 +156,10 @@ def top_lijst(slug):
             if ac.error_estimate:
                 error.append(ac.error_estimate)
                 num_events += 1
+        error.sort()
         if error:
+            if len(error) > 1 and slug != 'leerlingensymposium-2010':
+                error = error[:-1]
             avg_error = np.average(error)
             wgh_error = avg_error / num_events
             min_error = min(error)
