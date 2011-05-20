@@ -58,10 +58,12 @@ th {
         <img src="{{ core_plot }}">
     </div>
     {% ifnotequal slug 'leerlingensymposium-2011' %}
-    <div id="starMap">
-        <h3>Star map</h3>
-        <img src="{{ star_map }}">
-    </div>
+        {% ifnotequal slug 'middelharnis2011' %}
+            <div id="starMap">
+                <h3>Star map</h3>
+                <img src="{{ star_map }}">
+            </div>
+        {% endifnotequal %}
     {% endifnotequal %}
 </div>
 
