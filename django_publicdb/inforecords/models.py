@@ -103,7 +103,7 @@ class ContactInformation(models.Model):
     url = models.URLField(null=True, blank=True)
     
     def __unicode__(self):
-	return "%s %s" % (self.street_1, self.city)
+	return "%s %s %s" % (self.city, self.street_1, self.email_work)
     
     def type(self):
         if self.contacts.all():
@@ -116,7 +116,20 @@ class ContactInformation(models.Model):
     type = property(type)
 
     def contact_owner(self):
-	if self.contacts.all():
+        contacts = self.contacts.all()
+        stations = self.stations.all()
+
+        contact_str = []
+        if contacts:
+            contact_str.extend([x.name for x in contacts])
+        if stations:
+            contact_str.extend(['%s (%d)' % (x.name, x.number) for x in
+                                stations])
+        return ', '.join(contact_str)
+
+
+	if contacts:
+            
 	   contact_owner = self.contacts.get().name
 	elif self.stations.all():
            contact_owner = self.stations.all()[0].name
@@ -126,6 +139,7 @@ class ContactInformation(models.Model):
     contact_owner = property(contact_owner)
 	    
     class Meta:
+        ordering = ['city', 'street_1', 'email_work']
 	verbose_name = "Contact Information"
 	verbose_name_plural = "Contact Information"
 
