@@ -99,3 +99,9 @@ INSTALLED_APPS = (
     'django_publicdb.raw_data',
     'south',
 )
+EMAIL_HOST = 'smtp.nikhef.nl'
+EMAIL_PORT = 25
+#EMAIL_USE_TLS = True
+ 
+RECAPTCHA_PUB_KEY = '6LcJxcUSAAAAAEjLvw_9iD1LFSNRCsZajGKMrMJL'
+RECAPTCHA_PRIVATE_KEY = '6LcJxcUSAAAAAAahcS7rNlfGNbrp9_8u1eOrDt4_' 

@@ -1,6 +1,8 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
 
 import numpy as np
 from numpy import pi, arccos, arcsin, arctan2, sin, cos
@@ -10,9 +12,11 @@ import datetime
 import calendar
 
 from models import *
+from forms import *
 from django_publicdb.status_display.views import create_histogram_plot, \
                                                  render_and_save_plot
 import enthought.chaco.api as chaco
+from recaptcha.client import captcha
 
 def data_display(request, slug):
     """Simple data display for symposium results"""
@@ -183,3 +187,56 @@ def get_core_positions(coincidences):
         logenergy.append(c.log_energy)
 
     return x, y, logenergy
+
+def get_request(request):
+    if request.method == 'POST':
+        check_captcha = captcha.submit(
+            request.POST['recaptcha_challenge_field'], 
+            request.POST['recaptcha_response_field'], 
+            settings.RECAPTCHA_PRIVATE_KEY, 
+            request.META['REMOTE_ADDR']
+         )
+        if check_captcha.is_valid is False:
+	    pass_captcha = False
+            html_captcha = captcha.displayhtml(
+                settings.RECAPTCHA_PUB_KEY, 
+                error=check_captcha.error_code 
+             )
+        else:
+            pass_captcha = True
+        form = SessionRequestForm(request.POST)
+        if pass_captcha :
+            if form.is_valid():
+                data= {}
+                data.update(form.cleaned_data)
+                new_request=SessionRequest(
+                    first_name = data['first_name'],
+                    sur_name = data['sur_name'],
+                    email = data['email'],
+                    school = data['school'],
+                    cluster = data['cluster'],
+                    start_date = data['start_date'],
+                    mail_send = False,
+                    session_created = False,
+                    url = GenerateUrl()
+                )
+                new_request.save()
+                new_request.SendMail()               
+                return HttpResponseRedirect('http://hisparc.nl') 
+    else:    
+        form = SessionRequestForm()
+        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
+    return render_to_response('request.html', {
+        'form': form,'html_captcha': html_captcha,
+    })
+
+def confirm_request(request,url):
+    srequest = get_object_or_404(SessionRequest, url=url) 
+    if srequest.session_created == False:
+        SessionRequest.create_session(srequest)
+         
+    return render_to_response('confirm.html', {
+        'id' : srequest.sid,'pin': srequest.pin
+    })
+         
+

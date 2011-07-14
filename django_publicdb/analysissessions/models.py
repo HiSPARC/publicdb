@@ -1,5 +1,9 @@
 from django.db import models
 from django_publicdb.coincidences.models import *
+from django_publicdb.inforecords.models import *
+from django.core.mail import send_mail
+from random import choice ,randint
+import string
 
 import datetime
 import hashlib
@@ -47,3 +51,48 @@ class Student(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.session, self.name)
+
+class SessionRequest(models.Model):
+   first_name = models.CharField(max_length=50)
+   sur_name = models.CharField(max_length=50)
+   email = models.EmailField()
+   school = models.CharField(max_length=50)
+   cluster = models.ForeignKey('inforecords.Cluster')
+   start_date = models.DateField()
+   mail_send = models.BooleanField()
+   session_created = models.BooleanField()
+   url = models.CharField(max_length=20)
+   sid = models.CharField(max_length=50,blank=True,null=True)    
+   pin = models.IntegerField(blank=True,null=True)
+
+   def create_session(self):
+        self.sid = self.school+str(self.id)
+        self.pin = randint(1000,9999)
+        #create session her
+        self.session_created = True         
+        self.save()
+        return [self.sid,self.pin]        
+
+   def GenerateUrl():
+	url = ''.join([choice(chars) for i in range(20)])
+        while SessionRequest.objects.filter(url=url).length>0:
+		url = ''.join([choice(chars) for i in range(20)])
+        return url
+
+   def SendMail(self):
+        subject = 'HiSparc Analysissession request'
+        message = 'please follow the following link to create your analysissession: http://127.0.0.1:8000/analysis-session/request/'+self.url
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+	self.save()
+
+
+def GenerateUrl():
+    chars=string.letters + string.digits
+    url = ''.join([choice(chars) for i in range(20)])
+    while SessionRequest.objects.filter(url=url).count()>0:
+            url = ''.join([choice(chars) for i in range(20)])
+    return url
+

@@ -54,8 +54,8 @@ class Cluster(models.Model):
         super(Cluster, self).save(*args, **kwargs)
 
         super(Cluster, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+      #  proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+      #  proxy.reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Cluster, self).delete(*args, **kwargs)
