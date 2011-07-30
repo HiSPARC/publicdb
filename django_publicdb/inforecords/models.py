@@ -52,15 +52,11 @@ class Cluster(models.Model):
            else:
               self.number = self.parent.last_cluster_number()+100        
         super(Cluster, self).save(*args, **kwargs)
-
-        super(Cluster, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Cluster, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        reload_datastore()
 
     def main_cluster(self):
         if self.parent:
@@ -164,13 +160,11 @@ class Station(models.Model):
         if self.number==None:    
            self.number = self.cluster.last_station_number()+1
         super(Station, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Station, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        reload_datastore()
 
     class Meta:
         ordering = ('number',)
@@ -427,3 +421,14 @@ class EnabledService(models.Model):
         super(EnabledService, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
+
+
+def reload_datastore():
+    """Reload the datastore configuration"""
+
+    try:
+        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy.reload_datastore()
+    except:
+        #FIXME logging!
+        pass
