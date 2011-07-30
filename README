@@ -1,1 +1,57 @@
-This directory contains the code for the public database, running on pique.
+HiSPARC Public Database README
+==============================
+
+
+Overview
+--------
+
+The HiSPARC Public Database is a Django application which stores derived
+data and displays it for public use.  It exposes an API to download raw
+detector data from the datastore, as well as an API to participate in
+analysis sessions.
+
+
+Setting up a personal development environment
+---------------------------------------------
+
+We recommend you use virtualenv (with virtualenvwrapper) to set up an
+isolated python environment.  Throughout this document we assume you have
+pip installed and we prefer that above easy_install.  You can install pip
+with::
+
+    $ easy_install pip
+
+Create a clean environment with::
+
+    $ mkvirtualenv publicdb --no-site-packages --distribute
+
+where you can replace *publicdb* with any name you like.  If the
+environment is not already automatically activated, do that with::
+
+    $ workon publicdb
+
+and populate this environment with all prerequisites, using::
+
+    $ pip install ipython==0.10.2
+
+    $ pip install Cython==0.14.1
+    $ pip install numpy==1.6.0
+
+    $ pip install chaco==4.0.0
+    $ pip install enable==4.0.0
+    $ pip install pyface==4.0.0
+    $ pip install traits==4.0.0
+    $ pip install traitsui==4.0.1
+
+    $ pip install tables==2.1.2
+
+    $ pip install Django==1.1.4
+    $ pip install South==0.7.3
+
+You now have all the prerequisites for running the publicdb django app.
+
+Navigate to the `django_publicdb` folder and populate (and migrate) a test
+database with::
+
+    $ ./manage.py syncdb
+    $ ./manage.py migrate
