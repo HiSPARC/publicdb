@@ -10,13 +10,12 @@ from numpy import arange, pi, sin
 import datetime
 import time
 
-from enthought.etsconfig.api import ETSConfig
+from traits.etsconfig.api import ETSConfig
 ETSConfig.toolkit = 'null'
-ETSConfig.enable_toolkit = 'null'
-import enthought.chaco.api as chaco
-from enthought.chaco.scales.api import CalendarScaleSystem
-from enthought.chaco.scales_tick_generator import ScalesTickGenerator
-from enthought.chaco.scales_axis import PlotAxis as ScalesPlotAxis
+import chaco.api as chaco
+from chaco.scales.api import CalendarScaleSystem
+from chaco.scales_tick_generator import ScalesTickGenerator
+#from chaco.scales_axis import PlotAxis as ScalesPlotAxis
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
