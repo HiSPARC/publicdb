@@ -18,7 +18,8 @@ DATABASE_HOST = ''    # Set to empty string for localhost. Not used with sqlite3
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '/tmp/datastore'
+# DEV_ONLY
+DATASTORE_PATH = '../datastore'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -43,7 +44,8 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/tmp/mediaroot/'
+# DEV_ONLY
+MEDIA_ROOT = '../mediaroot/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -56,6 +58,7 @@ MEDIA_URL = 'http://localhost/mediaroot/'
 ADMIN_MEDIA_PREFIX = '/django/media/'
 
 # Make this unique, and don't share it with anybody.
+# DEV_ONLY
 SECRET_KEY = '7f69c4q0%&uthoar406i*bcbeq6+j!ttphnjor_ctsauxj*z*y'
 
 # List of callables that know how to import templates from various sources.
