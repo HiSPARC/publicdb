@@ -46,6 +46,7 @@ and populate this environment with all prerequisites, using::
     $ pip install tables==2.1.2
 
     $ pip install pyamf==0.6.1
+    $ pip install pil==1.1.7
 
     $ pip install Django==1.1.4
     $ pip install South==0.7.3
@@ -57,3 +58,30 @@ database with::
 
     $ ./manage.py syncdb
     $ ./manage.py migrate
+
+
+Hints for running a development publicdb server
+-----------------------------------------------
+
+First, we assume that you're working in the virtualenv you created
+previously::
+
+    $ workon publicdb
+
+In order to create a tiny copy of the datastore for development purposes,
+do::
+
+    $ cd scripts/
+    $ python download_test_datastore.py
+
+You can start the Django development server from inside the Django app
+directory (the one containing your settings.py) with::
+
+    $ ./manage.py runserver
+
+The settings point to a temporary mediaroot in the source tree, and a HTTP
+server running on port 8008 to serve the files.  If you want to serve
+files from that directory using a development server, change to the
+directory *above* the ``mediaroot`` directory and do::
+
+    $ python -m SimpleHTTPServer 8008

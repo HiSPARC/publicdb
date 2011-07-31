@@ -3,3 +3,4 @@ public.db
 initial_data.json
 *.h5
 datastore/*
+mediaroot/*.png
