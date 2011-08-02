@@ -15,7 +15,6 @@ ETSConfig.toolkit = 'null'
 import chaco.api as chaco
 from chaco.scales.api import CalendarScaleSystem
 from chaco.scales_tick_generator import ScalesTickGenerator
-#from chaco.scales_axis import PlotAxis as ScalesPlotAxis
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -300,7 +299,7 @@ def create_dataset_plot(x, y, x_axis_title, y_axis_title, log):
               marker='circle', marker_size=0.5)
 
     tick_generator = ScalesTickGenerator(scale=CalendarScaleSystem())
-    bottom_axis = ScalesPlotAxis(plot, orientation="bottom",
+    bottom_axis = chaco.PlotAxis(plot, orientation="bottom",
                                  tick_generator=tick_generator)
     plot.index_axis = bottom_axis
 
