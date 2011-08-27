@@ -4,6 +4,7 @@ from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 
 import os
+import time
 import tables
 import datetime
 import urlparse
@@ -131,4 +132,15 @@ def download_form(request):
     })
 
 def download_data(request, station_id, start_date, end_date):
-    raise Exception("Yeah")
+    generator = generate_station_data_between_dates(station_id,
+                                                    start_date, end_date)
+    filename = "data_%s_%s_%s.csv" % (station_id, start_date, end_date)
+
+    response = HttpResponse(generator, mimetype='text/csv')
+    response['Content-Disposition'] = 'attachment; filename=%s' % filename
+    return response
+
+def generate_station_data_between_dates(station_id, start_date, end_date):
+    while True:
+        yield "1024\t256\t128\n"
+        time.sleep(1)
