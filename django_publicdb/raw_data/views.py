@@ -1,6 +1,7 @@
 from django.http import HttpResponse
 from django.template import loader, Context
 from django.conf import settings
+from django.shortcuts import render_to_response, redirect
 
 import os
 import tables
@@ -10,6 +11,9 @@ import tempfile
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
+
+from forms import DataDownloadForm
+
 
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
@@ -109,3 +113,22 @@ def get_target():
     #FIXME (for debugging only, sets extra permissions)
     #os.chmod(file.name, 0644)
     return tables.openFile(file.name, 'w')
+
+def download_form(request):
+    if request.method == 'POST':
+        form = DataDownloadForm(request.POST)
+        if form.is_valid():
+            station_id = form.cleaned_data['station']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            return redirect(download_data, station_id, start_date,
+                            end_date)
+    else:
+        form = DataDownloadForm()
+
+    return render_to_response('rawdata/data_download_form.html', {
+        'form': form,
+    })
+
+def download_data(request, station_id, start_date, end_date):
+    raise Exception("Yeah")
