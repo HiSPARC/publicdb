@@ -3,17 +3,27 @@ from django.template import loader, Context
 from django.conf import settings
 from django.shortcuts import render_to_response, redirect
 
+import csv
+import datetime
 import os
 import time
 import tables
 import datetime
 import urlparse
 import tempfile
+import StringIO
+import numpy as np
+import zlib
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
 from forms import DataDownloadForm
+from inforecords.models import Station
+
+
+ADC_THRESHOLD = 20
+ADC_TIME_PER_SAMPLE = 2.5
 
 
 def call_xmlrpc(request):
@@ -122,6 +132,7 @@ def download_form(request):
             station_id = form.cleaned_data['station']
             start_date = form.cleaned_data['start_date']
             end_date = form.cleaned_data['end_date']
+            get_timings = form.cleaned_data['get_timings']
             return redirect(download_data, station_id, start_date,
                             end_date)
     else:
@@ -141,6 +152,97 @@ def download_data(request, station_id, start_date, end_date):
     return response
 
 def generate_station_data_between_dates(station_id, start_date, end_date):
-    while True:
-        yield "1024\t256\t128\n"
-        time.sleep(1)
+    station = Station.objects.get(number=station_id)
+    start_date = datetime.datetime.strptime(start_date, '%Y-%m-%d').date()
+    end_date = datetime.datetime.strptime(end_date, '%Y-%m-%d').date()
+
+    date = start_date
+    while date < end_date:
+        try:
+            yield get_station_data_for_date(station, date)
+        except (tables.NoSuchNodeError, IOError):
+            pass
+        date += datetime.timedelta(days=1)
+
+def get_station_data_for_date(station, date):
+    data = get_datafile_for_date(date)
+    events, blobs = get_event_tables_for_station(data, station)
+    csv_data = events_as_csv(events, blobs)
+
+    data.close()
+    return csv_data
+
+def get_datafile_for_date(date):
+    datastore = settings.DATASTORE_PATH
+    filename = '%s_%s_%s.h5' % (date.year, date.month, date.day)
+    path = os.path.join(datastore, str(date.year), str(date.month), filename)
+    return tables.openFile(path, 'r')
+
+def get_event_tables_for_station(data, station):
+    group = data.getNode('/hisparc', 'cluster_%s/station_%d' %
+                        (station.cluster.name.lower(), station.number))
+    return group.events, group.blobs
+
+def events_as_csv(events, blobs):
+    output = StringIO.StringIO()
+    writer = csv.writer(output, delimiter='\t')
+
+    for event in events:
+        datetime_string = time.asctime(time.gmtime(event['timestamp']))
+        detector_timings = get_timings_from_traces(event, blobs)
+        writer.writerow(flatten([datetime_string, event['timestamp'],
+                         event['nanoseconds'], event['ext_timestamp'],
+                         event['n_peaks'], event['pulseheights'],
+                         event['integrals'], detector_timings]))
+    return output.getvalue()
+
+def flatten(list_of_objects):
+    result = []
+    for element in list_of_objects:
+        if (isinstance(element, tuple) or isinstance(element, list) or
+            isinstance(element, np.ndarray)):
+            result.extend(flatten(element))
+        else:
+            result.append(element)
+    return result
+
+def get_timings_from_traces(event, blobs):
+    traces = get_traces(blobs, event)
+    return [reconstruct_time_from_trace(trace) for trace in traces]
+
+def get_traces(traces_table, event):
+    """Retrieve traces from table and reconstruct them"""
+
+    if type(event) != list:
+        idxs = event['traces']
+    else:
+        idxs = event
+
+    traces = []
+    for idx in idxs:
+        trace = zlib.decompress(traces_table[idx]).split(',')
+        if trace[-1] == '':
+            del trace[-1]
+        trace = np.array([int(x) for x in trace])
+        traces.append(trace)
+    return traces
+
+def reconstruct_time_from_trace(trace):
+    """Reconstruct time of measurement from a trace"""
+
+    t = trace[:100]
+    baseline = np.mean(t)
+
+    trace = trace - baseline
+    threshold = ADC_THRESHOLD
+
+    value = np.nan
+    for i, t in enumerate(trace):
+        if t >= threshold:
+            value = i
+            break
+
+    if value is not np.nan:
+        return value * ADC_TIME_PER_SAMPLE
+    else:
+        return -999

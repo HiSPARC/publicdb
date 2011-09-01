@@ -6,3 +6,4 @@ class DataDownloadForm(forms.Form):
     station = forms.ModelChoiceField(queryset=inforecords.Station.objects.all())
     start_date = forms.DateField()
     end_date = forms.DateField()
+    get_timings = forms.BooleanField(required=False)
