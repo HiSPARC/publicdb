@@ -223,10 +223,12 @@ def get_request(request):
                 new_request.GenerateUrl() 
                 new_request.save()
                 new_request.SendMail()               
-                return HttpResponseRedirect('http://hisparc.nl') 
-    else:    
+                return HttpResponseRedirect('http://www.hisparc.nl') 
+            else:
+                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
+    else:
         form = SessionRequestForm()
-        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
+        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     return render_to_response('request.html', {
         'form': form,'html_captcha': html_captcha,
     })
