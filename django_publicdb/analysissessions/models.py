@@ -99,7 +99,7 @@ class SessionRequest(models.Model):
    def find_coincidence(self,date,session):
         datastore_path = os.path.abspath(settings.DATASTORE_PATH)+'/'+str(date.year)+'/'+str(date.month)+'/'
         data = tables.openFile(datastore_path+str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5', 'r')
-        stations = data.listNodes('/hisparc/cluster_nl')
+        stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
         nvalid = 0
