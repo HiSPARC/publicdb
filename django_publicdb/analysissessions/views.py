@@ -17,6 +17,7 @@ from django_publicdb.status_display.views import create_histogram_plot, \
                                                  render_and_save_plot
 import enthought.chaco.api as chaco
 from recaptcha.client import captcha
+import djangotasks
 
 def data_display(request, slug):
     """Simple data display for symposium results"""
@@ -218,8 +219,8 @@ def get_request(request):
                     start_date = data['start_date'],
                     mail_send = False,
                     session_created = False,
-                    url = GenerateUrl()
                 )
+                new_request.GenerateUrl() 
                 new_request.save()
                 new_request.SendMail()               
                 return HttpResponseRedirect('http://hisparc.nl') 
@@ -231,12 +232,27 @@ def get_request(request):
     })
 
 def confirm_request(request,url):
-    srequest = get_object_or_404(SessionRequest, url=url) 
-    if srequest.session_created == False:
-        SessionRequest.create_session(srequest)
-         
-    return render_to_response('confirm.html', {
-        'id' : srequest.sid,'pin': srequest.pin
-    })
-         
+    sessionrequest = get_object_or_404(SessionRequest, url=url)
+    if sessionrequest.session_confirmed==False:
+       sessionrequest.sid = sessionrequest.school+str(sessionrequest.id)
+       sessionrequest.pin = randint(1000,9999)
+       starts=datetime.datetime.now()
+       ends=datetime.datetime.now()
+       session = AnalysisSession(starts = starts,
+                                 ends = ends,
+                                 pin = str(sessionrequest.id),
+                                 title = sessionrequest.sid
+                                )
 
+       sessionrequest.session_confirmed=True
+       sessionrequest.save() 
+    return render_to_response('confirm.html', {
+        'id' : sessionrequest.sid,'pin': sessionrequest.pin
+    })
+
+def create_request(url):
+    for sessionrequest in SessionRequest.objects.filter(session_confirmed=True).filter(session_created=False):
+       print sessionrequest.id
+       sessionrequest.save()
+       sessionrequest.create_session() 
+    return HttpResponseRedirect('http://hisparc.nl') 
