@@ -18,7 +18,9 @@ class StudentAdmin(admin.ModelAdmin):
     list_display = ('name', 'session')
     list_filter = ('session',)
 
-
+class SessionRequestAdmin(admin.ModelAdmin):
+    lis_filter = ('email',)
 admin.site.register(AnalysisSession, AnalysisSessionAdmin)
 admin.site.register(AnalyzedCoincidence, AnalyzedCoincidenceAdmin)
 admin.site.register(Student, StudentAdmin)
+admin.site.register(SessionRequest, SessionRequestAdmin)

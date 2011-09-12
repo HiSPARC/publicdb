@@ -9,16 +9,16 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASE_ENGINE = 'sqlite3'      # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+DATABASE_ENGINE = 'mysql'      # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
-DATABASE_NAME = '../public.db'     # Or path to database file if using sqlite3.
-DATABASE_USER = ''      # Not used with sqlite3.
-DATABASE_PASSWORD = ''  # Not used with sqlite3.
+DATABASE_NAME = 'hisparc'     # Or path to database file if using sqlite3.
+DATABASE_USER = 'hisparc'      # Not used with sqlite3.
+DATABASE_PASSWORD = 'g3h3im!'  # Not used with sqlite3.
 DATABASE_HOST = ''    # Set to empty string for localhost. Not used with sqlite3.
 DATABASE_PORT = ''             # Set to empty string for default. Not used with sqlite3.
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '/tmp/datastore'
+DATASTORE_PATH = '/home/bwal/hisparc/a-sesions/datastore'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -99,3 +99,9 @@ INSTALLED_APPS = (
     'django_publicdb.raw_data',
     'south',
 )
+EMAIL_HOST = 'smtp.nikhef.nl'
+EMAIL_PORT = 25
+#EMAIL_USE_TLS = True
+ 
+RECAPTCHA_PUB_KEY = '6LcJxcUSAAAAAEjLvw_9iD1LFSNRCsZajGKMrMJL'
+RECAPTCHA_PRIVATE_KEY = '6LcJxcUSAAAAAAahcS7rNlfGNbrp9_8u1eOrDt4_' 

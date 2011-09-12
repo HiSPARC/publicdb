@@ -54,13 +54,13 @@ class Cluster(models.Model):
         super(Cluster, self).save(*args, **kwargs)
 
         super(Cluster, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+      #  proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+      #  proxy.reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Cluster, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+      #  proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+      #  proxy.reload_datastore()
 
     def main_cluster(self):
         if self.parent:
@@ -164,13 +164,13 @@ class Station(models.Model):
         if self.number==None:    
            self.number = self.cluster.last_station_number()+1
         super(Station, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+       # proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+       # proxy.reload_datastore()
 
     def delete(self, *args, **kwargs):
         super(Station, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+       # proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+       # proxy.reload_datastore()
 
     class Meta:
         ordering = ('number',)
@@ -338,7 +338,7 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         self.name = self.name.lower().replace(' ', '')
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+       # proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
             super(Pc, self).save(*args, **kwargs)
@@ -352,22 +352,22 @@ class Pc(models.Model):
             self.ip = self.ipAdresGenereer(vorigip)
 
             # First create keys, then issue final save
-            proxy.create_key(self.name, self.type.slug, self.ip)
+           # proxy.create_key(self.name, self.type.slug, self.ip)
             super(Pc, self).save(*args, **kwargs)
 
             #FIXME this doesn't check for preselected services
             self.install_default_services()
 
-        proxy.register_hosts_ip([(x.name, x.ip) for x in
-                                 Pc.objects.all()])
-        proxy.reload_nagios()
+       # proxy.register_hosts_ip([(x.name, x.ip) for x in
+       #                      Pc.objects.all()])
+       # proxy.reload_nagios()
 
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.register_hosts_ip([(x.name, x.ip) for x in
-                                 Pc.objects.all()])
-        proxy.reload_nagios()
+       # proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+       # proxy.register_hosts_ip([(x.name, x.ip) for x in
+       #                          Pc.objects.all()])
+       #  proxy.reload_nagios()
 
     def install_default_services(self):
         if self.type.description != "Admin PC":
@@ -420,10 +420,10 @@ class EnabledService(models.Model):
 
     def save(self, *args, **kwargs):
         super(EnabledService, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+       # proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+       # proxy.reload_nagios()
 
     def delete(self, *args, **kwargs):
         super(EnabledService, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+       # proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+       # proxy.reload_nagios()
