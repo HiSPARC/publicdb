@@ -1,6 +1,6 @@
 from django import forms
 from models import *
-from inforecords.models import *
+from django_publicdb.inforecords.models import *
 from datetime import date
 from django.forms.extras.widgets import SelectDateWidget
 
