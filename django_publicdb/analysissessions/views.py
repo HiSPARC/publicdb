@@ -17,7 +17,6 @@ from django_publicdb.status_display.views import create_histogram_plot, \
                                                  render_and_save_plot
 import enthought.chaco.api as chaco
 from recaptcha.client import captcha
-import djangotasks
 
 def data_display(request, slug):
     """Simple data display for symposium results"""
