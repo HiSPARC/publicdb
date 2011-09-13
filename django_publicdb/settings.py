@@ -11,7 +11,7 @@ MANAGERS = ADMINS
 
 DATABASE_ENGINE = 'mysql'      # 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
-DATABASE_NAME = 'hisparc'     # Or path to database file if using sqlite3.
+DATABASE_NAME = 'hisparcdev'     # Or path to database file if using sqlite3.
 DATABASE_USER = 'hisparc'      # Not used with sqlite3.
 DATABASE_PASSWORD = 'g3h3im!'  # Not used with sqlite3.
 DATABASE_HOST = ''    # Set to empty string for localhost. Not used with sqlite3.

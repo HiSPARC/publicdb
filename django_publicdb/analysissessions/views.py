@@ -253,7 +253,6 @@ def confirm_request(request,url):
 
 def create_request(url):
     for sessionrequest in SessionRequest.objects.filter(session_confirmed=True).filter(session_created=False):
-       print sessionrequest.id
        sessionrequest.save()
        sessionrequest.create_session() 
-    return HttpResponseRedirect('http://hisparc.nl') 
+    return HttpResponseRedirect('') 

@@ -75,8 +75,6 @@ class SessionRequest(models.Model):
    pin = models.IntegerField(blank=True,null=True)
 
    def create_session(self):
-#        self.sid = self.school+str(self.id)
-#        self.pin = randint(1000,9999)
         starts=datetime.datetime.now()
         ends=datetime.datetime.now()
         session = AnalysisSession(starts = starts,
@@ -86,12 +84,12 @@ class SessionRequest(models.Model):
                                   title = self.sid
                                  )
         session.save()
-#        create_session.create_session(100,self.cluster,self.start_date,session)
         eventsdone = 0
         date=self.start_date
         while((eventsdone<100) and (date<datetime.date.today())):
             eventsdone += self.find_coincidence(date,session)
             date = date + datetime.timedelta(days=1)
+        self.sendmail_created()
         self.session_created = True         
         self.save()
         return [self.sid,self.pin]        
@@ -184,5 +182,14 @@ class SessionRequest(models.Model):
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
         self.mail_send = True
 	self.save()
+
+   def sendmail_created(self):
+        subject = 'HiSparc Analysissession created'
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)   
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+        self.save()
 
 
