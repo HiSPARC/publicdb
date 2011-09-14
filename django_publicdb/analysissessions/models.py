@@ -75,8 +75,6 @@ class SessionRequest(models.Model):
    pin = models.IntegerField(blank=True,null=True)
 
    def create_session(self):
-#        self.sid = self.school+str(self.id)
-#        self.pin = randint(1000,9999)
         starts=datetime.datetime.now()
         ends=datetime.datetime.now()
         session = AnalysisSession(starts = starts,
@@ -86,19 +84,25 @@ class SessionRequest(models.Model):
                                   title = self.sid
                                  )
         session.save()
-#        create_session.create_session(100,self.cluster,self.start_date,session)
         eventsdone = 0
         date=self.start_date
-        while((eventsdone<100) and (date<datetime.date.today())):
-            eventsdone += self.find_coincidence(date,session)
-            date = date + datetime.timedelta(days=1)
+        try:
+            while((eventsdone<100) and (date<datetime.date.today())):
+                eventsdone += self.find_coincidence(date,session)
+                date = date + datetime.timedelta(days=1)
+                self.sendmail_created()
+        except:
+                print "creation of session "+self.sid+" failed\n"
+                print "Error:", sys.exc_info()[0]
+                self.sendmail_failed()
         self.session_created = True         
         self.save()
         return [self.sid,self.pin]        
 
    def find_coincidence(self,date,session):
-        datastore_path = os.path.abspath(settings.DATASTORE_PATH+'/'+str(date.year)+'/'+str(date.month)+'/')
-        data = tables.openFile(datastore_path+'/'+str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5', 'r')
+        file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
+        datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
+        data = tables.openFile(datastore_path, 'r')
         stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
@@ -184,4 +188,21 @@ class SessionRequest(models.Model):
         self.mail_send = True
 	self.save()
 
+   def sendmail_created(self):
+        subject = 'HiSparc Analysissession created'
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)   
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+        self.save()
+
+   def sendmail_failed(self):
+        subject = 'HiSparc Analysissession creation failed'
+        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected' 
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+        self.save()
 
