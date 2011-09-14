@@ -86,10 +86,14 @@ class SessionRequest(models.Model):
         session.save()
         eventsdone = 0
         date=self.start_date
-        while((eventsdone<100) and (date<datetime.date.today())):
-            eventsdone += self.find_coincidence(date,session)
-            date = date + datetime.timedelta(days=1)
-        self.sendmail_created()
+        try:
+            while((eventsdone<100) and (date<datetime.date.today())):
+                eventsdone += self.find_coincidence(date,session)
+                date = date + datetime.timedelta(days=1)
+                self.sendmail_created()
+        except:
+                print "creation of session "+self.sid+" failed\n"
+                print "Error:", sys.exc_info()[0]
         self.session_created = True         
         self.save()
         return [self.sid,self.pin]        

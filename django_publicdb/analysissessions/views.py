@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
 from django.core.mail import send_mail
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 
 import numpy as np
 from numpy import pi, arccos, arcsin, arctan2, sin, cos
@@ -222,7 +222,7 @@ def get_request(request):
                 new_request.GenerateUrl() 
                 new_request.save()
                 new_request.SendMail()               
-                return HttpResponseRedirect('http://www.hisparc.nl') 
+                return render_to_response('thankyou.html') 
             else:
                 html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
     else:
@@ -255,4 +255,4 @@ def create_request(url):
     for sessionrequest in SessionRequest.objects.filter(session_confirmed=True).filter(session_created=False):
        sessionrequest.save()
        sessionrequest.create_session() 
-    return HttpResponseRedirect('') 
+    return HttpResponse('') 
