@@ -94,6 +94,7 @@ class SessionRequest(models.Model):
         except:
                 print "creation of session "+self.sid+" failed\n"
                 print "Error:", sys.exc_info()[0]
+                self.sendmail_failed()
         self.session_created = True         
         self.save()
         return [self.sid,self.pin]        
@@ -196,4 +197,12 @@ class SessionRequest(models.Model):
         self.mail_send = True
         self.save()
 
+   def sendmail_failed(self):
+        subject = 'HiSparc Analysissession creation failed'
+        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected' 
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+        self.save()
 
