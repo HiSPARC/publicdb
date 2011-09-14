@@ -97,8 +97,8 @@ class SessionRequest(models.Model):
         return [self.sid,self.pin]        
 
    def find_coincidence(self,date,session):
-        datastore_path = os.path.abspath(settings.DATASTORE_PATH)+'/'+str(date.year)+'/'+str(date.month)+'/'
-        data = tables.openFile(datastore_path+str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5', 'r')
+        datastore_path = os.path.abspath(settings.DATASTORE_PATH+'/'+str(date.year)+'/'+str(date.month)+'/')
+        data = tables.openFile(datastore_path+'/'+str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5', 'r')
         stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
@@ -177,7 +177,7 @@ class SessionRequest(models.Model):
 
    def SendMail(self):
         subject = 'HiSparc Analysissession request'
-        message = 'please follow the following link to create your analysissession: http://127.0.0.1:8000/analysis-session/request/'+self.url
+        message = 'please follow the following link to create your analysissession: http://vilaine.nikhef.nl/django/analysis-session/request/'+self.url
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
