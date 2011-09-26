@@ -66,15 +66,19 @@ class SessionRequest(models.Model):
    email = models.EmailField()
    school = models.CharField(max_length=50)
    cluster = models.ForeignKey('inforecords.Cluster')
+   events_to_create = models.IntegerField()
+   events_created = models.IntegerField()
    start_date = models.DateField()
    mail_send = models.BooleanField()
    session_confirmed = models.BooleanField()
    session_created = models.BooleanField()
+   session_pending = models.BooleanField()
    url = models.CharField(max_length=20)
    sid = models.CharField(max_length=50,blank=True,null=True)    
    pin = models.IntegerField(blank=True,null=True)
 
    def create_session(self):
+        self.session_pending=False
         starts=datetime.datetime.now()
         ends=datetime.datetime.now()
         session = AnalysisSession(starts = starts,
@@ -84,18 +88,22 @@ class SessionRequest(models.Model):
                                   title = self.sid
                                  )
         session.save()
-        eventsdone = 0
         date=self.start_date
-        try:
-            while((eventsdone<100) and (date<datetime.date.today())):
-                eventsdone += self.find_coincidence(date,session)
-                date = date + datetime.timedelta(days=1)
-                self.sendmail_created()
-        except:
-                print "creation of session "+self.sid+" failed\n"
-                print "Error:", sys.exc_info()[0]
-                self.sendmail_failed()
-        self.session_created = True         
+        while((self.events_created<self.events_to_create) and (date<datetime.date.today())):
+            try:
+               self.events_created += self.find_coincidence(date,session)
+            except Exception, msg:
+               print "creation of session "+self.sid+" failed\n"
+               print "Error:", msg   
+            date = date + datetime.timedelta(days=1)
+        if self.events_created <= 0:
+            self.sendmail_zero()
+        elif self.events_created <= self.events_to_create:
+            self.sendmail_created_less()
+            self.session_created=True
+        else:
+            self.sendmail_created()
+            self.session_created=True
         self.save()
         return [self.sid,self.pin]        
 
@@ -190,14 +198,23 @@ class SessionRequest(models.Model):
 
    def sendmail_created(self):
         subject = 'HiSparc Analysissession created'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)   
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)   
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
         self.mail_send = True
         self.save()
 
-   def sendmail_failed(self):
+   def sendmail_created_less(self):
+        subject = 'HiSparc Analysissession created with less events'
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created) 
+        sender = 'info@hisparc.nl'
+        mail = self.email
+        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        self.mail_send = True
+        self.save()
+
+   def sendmail_zero(self):
         subject = 'HiSparc Analysissession creation failed'
         message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected' 
         sender = 'info@hisparc.nl'
