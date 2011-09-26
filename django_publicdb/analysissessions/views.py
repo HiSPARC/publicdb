@@ -218,6 +218,9 @@ def get_request(request):
                     start_date = data['start_date'],
                     mail_send = False,
                     session_created = False,
+                    session_pending = True,
+                    events_to_create = data['number_of_events'],
+                    events_created = 0,
                 )
                 new_request.GenerateUrl() 
                 new_request.save()
@@ -252,7 +255,7 @@ def confirm_request(request,url):
     })
 
 def create_request(url):
-    for sessionrequest in SessionRequest.objects.filter(session_confirmed=True).filter(session_created=False):
+    for sessionrequest in SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True):
        sessionrequest.save()
        sessionrequest.create_session() 
     return HttpResponse('') 

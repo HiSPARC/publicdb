@@ -15,13 +15,18 @@ from django_publicdb.inforecords.models import *
 def get_coincidence(request):
     """Return a coincidence for jsparc client test"""
 
-    session_hash = request.GET.get('session_hash', None)
+    session_title = request.GET.get('session_title', None)
+    session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
 
     try:
-        session = AnalysisSession.objects.get(hash=session_hash)
+        session = AnalysisSession.objects.get(hash=session_title)
+        if session.pin != session_pin:
+            raise ValueError('Wrong pin for this session')
     except AnalysisSession.DoesNotExist:
         raise Exception('No such analysis session!')
+    except ValueError:
+        raise
     else:
         if not session.in_progress():
             raise Exception("Analysis session hasn't started yet or "
