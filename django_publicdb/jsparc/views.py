@@ -20,7 +20,7 @@ def get_coincidence(request):
     student_name = request.GET.get('student_name', None)
 
     try:
-        session = AnalysisSession.objects.get(hash=session_title)
+        session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
             raise ValueError('Wrong pin for this session')
     except AnalysisSession.DoesNotExist:
