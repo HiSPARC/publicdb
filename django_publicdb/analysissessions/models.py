@@ -5,12 +5,13 @@ from django.core.mail import send_mail
 from hisparc.analysis import coincidences
 from hisparc import publicdb
 from random import choice ,randint
+from django.template.defaultfilters import slugify
+from datetime import timedelta
 
 import string
 import datetime
 import hashlib
 import tables
-import datetime
 import sys
 import os
 import re
@@ -80,11 +81,12 @@ class SessionRequest(models.Model):
    def create_session(self):
         self.session_pending=False
         starts=datetime.datetime.now()
-        ends=datetime.datetime.now()
+        length=timedelta(weeks=4)
+        ends=starts+length
         session = AnalysisSession(starts = starts,
                                   ends = ends,
                                   pin = str(self.pin),
-                                  slug = self.url,
+                                  slug = slugify(self.sid),
                                   title = self.sid
                                  )
         session.save()
