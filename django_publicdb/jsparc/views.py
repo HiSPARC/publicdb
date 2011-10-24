@@ -14,11 +14,11 @@ from django_publicdb.inforecords.models import *
 
 def get_coincidence(request):
     """Return a coincidence for jsparc client test"""
-
+    print("got request")
     session_title = request.GET.get('session_title', None)
     session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
-
+    print(session_title)
     try:
         session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
