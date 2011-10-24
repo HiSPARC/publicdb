@@ -103,7 +103,7 @@ def top_lijst(slug):
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
 def result(request):
-    session_hash = request.GET['session_hash']
+    session_title = request.GET['session_title']
     student_name = request.GET['student_name']
     pk = request.GET['pk']
     lat = request.GET['lat']
@@ -112,7 +112,7 @@ def result(request):
     error_estimate = request.GET['error']
     
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
-    assert coincidence.session.hash == session_hash
+    assert coincidence.session.title == session_title
     assert coincidence.student.name == student_name
 
     if coincidence.student.name == 'Test student':
