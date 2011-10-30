@@ -187,9 +187,12 @@ class Country(models.Model):
        	verbose_name_plural = "Countries"
 
     def save(self, *args, **kwargs):
-	if self.number==None:
-	   countrymax=Country.objects.aggregate(Max('number'))
-	   self.number=countrymax['number__max']+10000
+        if self.number == None:
+            if Country.objects.count() > 0:
+                countrymax = Country.objects.aggregate(Max('number'))
+                self.number = countrymax['number__max'] + 10000
+            else:
+                self.number = 0
         super(Country,self).save(*args, **kwargs)
 	
 class DetectorHisparc(models.Model):
