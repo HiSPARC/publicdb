@@ -29,7 +29,7 @@ def save_coincidence(event_list):
     events = []
 
     for station, event, traces in event_list:
-        station = int(re.match('s(\d+)', station._v_name).group(1))
+        station = int(re.match('station_(\d+)', station._v_name).group(1))
         date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
         timestamps.append((date_time, event['nanoseconds']))
 
@@ -72,8 +72,8 @@ def analyze_traces(traces):
     return trace_timing
 
 if __name__ == '__main__':
-    data = tables.openFile('../data.h5', 'r')
-    stations = data.listNodes('/')
+    data = tables.openFile('../datastore/2011/5/2011_5_13.h5', 'r')
+    stations = data.listNodes('/hisparc/cluster_amsterdam')
     c_list, timestamps = coincidences.search_coincidences(data, stations)
 
     ndups = 0
