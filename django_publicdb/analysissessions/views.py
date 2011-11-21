@@ -29,6 +29,7 @@ def data_display(request, slug):
     core_plot = create_core_plot(slug, coincidences)
     star_map = create_star_map(slug, coincidences)
     scores = top_lijst(slug)
+    title = session.title
 
     return render_to_response('symposium-data.html',
         {'energy_histogram': energy_histogram,
@@ -36,6 +37,7 @@ def data_display(request, slug):
          'star_map': star_map,
          'scores': scores,
          'slug': slug,
+         'title':title,
         }, context_instance=RequestContext(request))
 
 def create_energy_histogram(slug, coincidences):
