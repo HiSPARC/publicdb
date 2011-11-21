@@ -6,12 +6,14 @@ import base64
 import numpy as np
 
 from django_publicdb.inforecords import models as inforecords
+from south.modelsinspector import add_introspection_rules
 
 
 class SerializedDataField(models.Field):
     # This makes sure that to_python() will be called when objects are
     # initialized
     __metaclass__ = models.SubfieldBase
+    add_introspection_rules([], ["^django_publicdb\.coincidences\.models\.SerializedDataField"])
 
     def __init__(self, *args, **kwargs):
         super(SerializedDataField, self).__init__(*args, **kwargs)
