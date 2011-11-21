@@ -114,7 +114,7 @@ class SessionRequest(models.Model):
         datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
         data = tables.openFile(datastore_path, 'r')
 
-        stations = self.get_stations_for_session()
+        stations = self.get_stations_for_session(data)
 
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
@@ -136,8 +136,7 @@ class SessionRequest(models.Model):
         data.close()
         return nvalid
 
-   def get_stations_for_session(self):
-        #return data.listNodes('/hisparc/cluster_'+self.cluster.name)
+   def get_stations_for_session(self, data):
         main_cluster = self.cluster.main_cluster()
         cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
 
