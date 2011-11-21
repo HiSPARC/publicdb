@@ -191,7 +191,7 @@ class SessionRequest(models.Model):
 
    def SendMail(self):
         subject = 'HiSparc Analysissession request'
-        message = 'please follow the following link to create your analysissession: http://vilaine.nikhef.nl/django/analysis-session/request/'+self.url
+        message = 'please follow the following link to create your analysissession: http://data.hisparc.nl/django/analysis-session/request/'+self.url
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
@@ -200,7 +200,7 @@ class SessionRequest(models.Model):
 
    def sendmail_created(self):
         subject = 'HiSparc Analysissession created'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)+'\nduring your session you can view the results at:\nhttp://vilaine.nikhef.nl/django/analysis-session/'+slugify(self.sid)+'/data'   
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data'   
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
@@ -209,7 +209,7 @@ class SessionRequest(models.Model):
 
    def sendmail_created_less(self):
         subject = 'HiSparc Analysissession created with less events'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created) 
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data' 
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
