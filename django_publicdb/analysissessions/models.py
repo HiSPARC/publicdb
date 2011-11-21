@@ -113,7 +113,9 @@ class SessionRequest(models.Model):
         file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
         datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
         data = tables.openFile(datastore_path, 'r')
-        stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
+
+        stations = self.get_stations_for_session()
+
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
         nvalid = 0
@@ -134,6 +136,20 @@ class SessionRequest(models.Model):
         data.close()
         return nvalid
 
+   def get_stations_for_session(self):
+        #return data.listNodes('/hisparc/cluster_'+self.cluster.name)
+        main_cluster = self.cluster.main_cluster()
+        cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
+
+        stations = []
+        for station in Station.objects.filter(cluster=self.cluster):
+            station_group_name = 'station_%d' % station.number
+            station_group = data.getNode(cluster_group_name,
+                                         station_group_name)
+            stations.append(station_group)
+
+        return stations
+  
    def save_coincidence(self,event_list,session):
         timestamps = []
         events = []
