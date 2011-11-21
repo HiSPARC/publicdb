@@ -14,14 +14,19 @@ from django_publicdb.inforecords.models import *
 
 def get_coincidence(request):
     """Return a coincidence for jsparc client test"""
-
-    session_hash = request.GET.get('session_hash', None)
+    print("got request")
+    session_title = request.GET.get('session_title', None)
+    session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
-
+    print(session_title)
     try:
-        session = AnalysisSession.objects.get(hash=session_hash)
+        session = AnalysisSession.objects.get(title=session_title)
+        if session.pin != session_pin:
+            raise ValueError('Wrong pin for this session')
     except AnalysisSession.DoesNotExist:
         raise Exception('No such analysis session!')
+    except ValueError:
+        raise
     else:
         if not session.in_progress():
             raise Exception("Analysis session hasn't started yet or "
@@ -98,7 +103,7 @@ def top_lijst(slug):
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
 def result(request):
-    session_hash = request.GET['session_hash']
+    session_title = request.GET['session_title']
     student_name = request.GET['student_name']
     pk = request.GET['pk']
     lat = request.GET['lat']
@@ -107,7 +112,7 @@ def result(request):
     error_estimate = request.GET['error']
     
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
-    assert coincidence.session.hash == session_hash
+    assert coincidence.session.title == session_title
     assert coincidence.student.name == student_name
 
     if coincidence.student.name == 'Test student':

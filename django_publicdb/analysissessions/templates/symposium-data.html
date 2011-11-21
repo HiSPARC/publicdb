@@ -45,7 +45,7 @@ th {
 {% block content %}
 
 <div id="header">
-    <h2>Symposium results</h2>
+    <h2>{{title}} Results</h2>
 </div>
 
 <div id="graphs">
@@ -53,6 +53,7 @@ th {
         <h3>Energy histogram</h3>
         <img src="{{ energy_histogram }}">
     </div>
+{% comment %} 
     <div id="corePlot">
         <h3>Shower core positions</h3>
         <img src="{{ core_plot }}">
@@ -65,6 +66,7 @@ th {
             </div>
         {% endifnotequal %}
     {% endifnotequal %}
+{% endcomment %}
 </div>
 
 <div id="scores">
