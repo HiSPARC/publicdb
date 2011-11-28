@@ -116,7 +116,7 @@ class SessionRequest(models.Model):
         ndups = 0
         nvalid = 0
         try:
-           stations = get_stations_for_session(data)
+           stations = self.get_stations_for_session(data)
         except Exception, msg:
            print "Error in get_stations_for_session(data)"
            print "Error:", msg
