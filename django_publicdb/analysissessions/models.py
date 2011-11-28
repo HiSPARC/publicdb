@@ -113,10 +113,16 @@ class SessionRequest(models.Model):
         file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
         datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
         data = tables.openFile(datastore_path, 'r')
-        stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
-        c_list, timestamps = coincidences.search_coincidences(data, stations)
         ndups = 0
         nvalid = 0
+        try:
+           stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
+        except Exception, msg:
+           print "Error in '/hisparc/cluster_'+self.cluster.name"
+           print "Error:", msg
+           data.close()
+           return nvalid 
+        c_list, timestamps = coincidences.search_coincidences(data, stations)
         for coincidence in c_list:
             if len(coincidence) >= 3:
                 event_list = coincidences.get_events(data, stations,
