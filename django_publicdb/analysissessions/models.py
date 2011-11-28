@@ -80,6 +80,7 @@ class SessionRequest(models.Model):
 
    def create_session(self):
         self.session_pending=False
+        self.save()
         starts=datetime.datetime.now()
         length=timedelta(weeks=4)
         ends=starts+length
