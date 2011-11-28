@@ -80,6 +80,7 @@ class SessionRequest(models.Model):
 
    def create_session(self):
         self.session_pending=False
+        self.save()
         starts=datetime.datetime.now()
         length=timedelta(weeks=4)
         ends=starts+length
@@ -116,7 +117,7 @@ class SessionRequest(models.Model):
         ndups = 0
         nvalid = 0
         try:
-           stations = get_stations_for_session(data)
+           stations = self.get_stations_for_session(data)
         except Exception, msg:
            print "Error in get_stations_for_session(data)"
            print "Error:", msg
