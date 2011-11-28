@@ -116,7 +116,7 @@ class SessionRequest(models.Model):
         ndups = 0
         nvalid = 0
         try:
-           stations = data.listNodes('/hisparc/cluster_'+self.cluster.name)
+           stations = data.listNodes('/hisparc/cluster_'+self.cluster.name.lower())
         except Exception, msg:
            print "Error in '/hisparc/cluster_'+self.cluster.name"
            print "Error:", msg
