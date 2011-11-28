@@ -116,9 +116,9 @@ class SessionRequest(models.Model):
         ndups = 0
         nvalid = 0
         try:
-           stations = data.listNodes('/hisparc/cluster_'+self.cluster.name.lower())
+           stations = get_stations_for_session(data)
         except Exception, msg:
-           print "Error in '/hisparc/cluster_'+self.cluster.name"
+           print "Error in get_stations_for_session(data)"
            print "Error:", msg
            data.close()
            return nvalid 
@@ -140,6 +140,19 @@ class SessionRequest(models.Model):
         data.close()
         return nvalid
 
+   def get_stations_for_session(self, data):
+        main_cluster = self.cluster.main_cluster()
+        cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
+
+        stations = []
+        for station in Station.objects.filter(cluster=self.cluster):
+            station_group_name = 'station_%d' % station.number
+            station_group = data.getNode(cluster_group_name,
+                                         station_group_name)
+            stations.append(station_group)
+
+        return stations
+  
    def save_coincidence(self,event_list,session):
         timestamps = []
         events = []
