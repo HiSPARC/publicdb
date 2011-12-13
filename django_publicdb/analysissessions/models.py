@@ -92,7 +92,8 @@ class SessionRequest(models.Model):
                                  )
         session.save()
         date=self.start_date
-        while((self.events_created<self.events_to_create) and (date<datetime.date.today())):
+        enddate=date+length
+        while((self.events_created<self.events_to_create) and (date<enddate)):
             try:
                self.events_created += self.find_coincidence(date,session)
             except Exception, msg:
@@ -145,13 +146,19 @@ class SessionRequest(models.Model):
         main_cluster = self.cluster.main_cluster()
         cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
 
+        try:
+            cluster_group = data.getNode(cluster_group_name)
+        except tables.NodeError:
+            return []
+
         stations = []
         for station in Station.objects.filter(cluster=self.cluster):
             station_group_name = 'station_%d' % station.number
-            station_group = data.getNode(cluster_group_name,
-                                         station_group_name)
-            stations.append(station_group)
 
+            if station_group_name in cluster_group:
+                station_group = data.getNode(cluster_group_name,
+                                             station_group_name)
+                stations.append(station_group)
         return stations
   
    def save_coincidence(self,event_list,session):
