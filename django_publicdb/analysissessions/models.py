@@ -92,7 +92,8 @@ class SessionRequest(models.Model):
                                  )
         session.save()
         date=self.start_date
-        while((self.events_created<self.events_to_create) and (date<datetime.date.today())):
+        enddate=date+length
+        while((self.events_created<self.events_to_create) and (date<enddate)):
             try:
                self.events_created += self.find_coincidence(date,session)
             except Exception, msg:
