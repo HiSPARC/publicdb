@@ -135,6 +135,7 @@ def get_integrals(cluster, station_id, date):
         return None
     else:
         #FIXME
+        #ADL - Multiply by 2.5 for mVns integral (x * .57 * 2.5).
         # need configurations for this
         integrals = [[x * .57 for x in y] for y in integrals]
 
