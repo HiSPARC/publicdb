@@ -9,19 +9,16 @@ from forms import *
 adminwizard=AdminSite(name='adminwizard')
 
 class SubClusterAdmin(admin.ModelAdmin):
-	def get_urls(self):
-		def wrap(view):
-			def wrapper(*args, **kwds):
-				kwds['admin'] = self
-				return self.admin_site.admin_view(view)(*args, **kwds)
-			return update_wrapper(wrapper, view)
-		urlpatterns = patterns('',
-			url(r'^add/$',
-				wrap(create_subcluster),
-				name='inforecords_subcluster_add')
-		)
-		urlpatterns += super(SubClusterAdmin, self).get_urls()
-		return urlpatterns
+    def get_urls(self):
+        def wrap(view):
+            def wrapper(*args, **kwds):
+                kwds['admin'] = self
+                return self.admin_site.admin_view(view)(*args, **kwds)
+            return update_wrapper(wrapper, view)
+        urlpatterns = patterns('', url(r'^add/$', wrap(create_subcluster),
+                               name='inforecords_subcluster_add'))
+        urlpatterns += super(SubClusterAdmin, self).get_urls()
+        return urlpatterns
 
 class StationAdmin(admin.ModelAdmin):
         def get_urls(self):

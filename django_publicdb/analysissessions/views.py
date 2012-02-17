@@ -133,7 +133,7 @@ def create_star_map(slug, coincidences):
         x.append(r * sin(ra))
         y.append(r * cos(ra))
         logenergy.append(c.log_energy)
-        
+
     data.set_data('x', x)
     data.set_data('y', y)
     data.set_data('logenergy', logenergy)
@@ -193,16 +193,16 @@ def get_core_positions(coincidences):
 def get_request(request):
     if request.method == 'POST':
         check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'], 
-            request.POST['recaptcha_response_field'], 
-            settings.RECAPTCHA_PRIVATE_KEY, 
+            request.POST['recaptcha_challenge_field'],
+            request.POST['recaptcha_response_field'],
+            settings.RECAPTCHA_PRIVATE_KEY,
             request.META['REMOTE_ADDR']
          )
         if check_captcha.is_valid is False:
-	    pass_captcha = False
+            pass_captcha = False
             html_captcha = captcha.displayhtml(
-                settings.RECAPTCHA_PUB_KEY, 
-                error=check_captcha.error_code 
+                settings.RECAPTCHA_PUB_KEY,
+                error=check_captcha.error_code
              )
         else:
             pass_captcha = True
@@ -224,12 +224,12 @@ def get_request(request):
                     events_to_create = data['number_of_events'],
                     events_created = 0,
                 )
-                new_request.GenerateUrl() 
+                new_request.GenerateUrl()
                 new_request.save()
-                new_request.SendMail()               
-                return render_to_response('thankyou.html') 
+                new_request.SendMail()
+                return render_to_response('thankyou.html')
             else:
-                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
+                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:
         form = SessionRequestForm()
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
@@ -251,7 +251,7 @@ def confirm_request(request,url):
                                 )
 
        sessionrequest.session_confirmed=True
-       sessionrequest.save() 
+       sessionrequest.save()
     return render_to_response('confirm.html', {
         'id' : sessionrequest.sid,'pin': sessionrequest.pin
     })
@@ -261,7 +261,7 @@ def create_request(url):
     for sessionrequest in sessionlist:
        sessionrequest.session_confirmed=False
        sessionrequest.save()
-    
+
     for sessionrequest in sessionlist:
-       sessionrequest.create_session() 
-    return HttpResponse('') 
+       sessionrequest.create_session()
+    return HttpResponse('')

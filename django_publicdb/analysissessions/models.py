@@ -16,6 +16,7 @@ import sys
 import os
 import re
 
+
 class AnalysisSession(models.Model):
     title = models.CharField(max_length=40, blank=False, unique=True)
     slug = models.SlugField(unique=True)
@@ -36,6 +37,7 @@ class AnalysisSession(models.Model):
     def __unicode__(self):
         return self.title
 
+
 class AnalyzedCoincidence(models.Model):
     session = models.ForeignKey(AnalysisSession)
     coincidence = models.ForeignKey(Coincidence)
@@ -54,12 +56,14 @@ class AnalyzedCoincidence(models.Model):
     class Meta:
         ordering = ('coincidence',)
 
+
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession)
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
         return '%s - %s' % (self.session, self.name)
+
 
 class SessionRequest(models.Model):
    first_name = models.CharField(max_length=50)
@@ -75,7 +79,7 @@ class SessionRequest(models.Model):
    session_created = models.BooleanField()
    session_pending = models.BooleanField()
    url = models.CharField(max_length=20)
-   sid = models.CharField(max_length=50,blank=True,null=True)    
+   sid = models.CharField(max_length=50,blank=True,null=True)
    pin = models.IntegerField(blank=True,null=True)
 
    def create_session(self):
@@ -98,7 +102,7 @@ class SessionRequest(models.Model):
                self.events_created += self.find_coincidence(date,session)
             except Exception, msg:
                print "creation of session "+self.sid+" failed\n"
-               print "Error:", msg   
+               print "Error:", msg
             date = date + datetime.timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
@@ -109,7 +113,7 @@ class SessionRequest(models.Model):
             self.sendmail_created()
             self.session_created=True
         self.save()
-        return [self.sid,self.pin]        
+        return [self.sid, self.pin]
 
    def find_coincidence(self,date,session):
         file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
@@ -123,7 +127,7 @@ class SessionRequest(models.Model):
            print "Error in get_stations_for_session(data)"
            print "Error:", msg
            data.close()
-           return nvalid 
+           return nvalid
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         for coincidence in c_list:
             if len(coincidence) >= 3:
@@ -160,7 +164,7 @@ class SessionRequest(models.Model):
                                              station_group_name)
                 stations.append(station_group)
         return stations
-  
+
    def save_coincidence(self,event_list,session):
         timestamps = []
         events = []
@@ -210,24 +214,24 @@ class SessionRequest(models.Model):
         return trace_timing
 
    def GenerateUrl(self):
-        chars=string.letters + string.digits
-	newurl = ''.join([choice(chars) for i in range(20)])
+        chars = string.letters + string.digits
+        newurl = ''.join([choice(chars) for i in range(20)])
         if SessionRequest.objects.filter(url=newurl):
-		newurl = ''.join([choice(chars) for i in range(20)])
-        self.url=newurl
+            newurl = ''.join([choice(chars) for i in range(20)])
+        self.url = newurl
 
    def SendMail(self):
         subject = 'HiSparc Analysissession request'
         message = 'please follow the following link to create your analysissession: http://data.hisparc.nl/django/analysis-session/request/'+self.url
         sender = 'info@hisparc.nl'
         mail = self.email
-        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        send_mail(subject,message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
-	self.save()
+        self.save()
 
    def sendmail_created(self):
         subject = 'HiSparc Analysissession created'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data'   
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data'
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
@@ -236,7 +240,7 @@ class SessionRequest(models.Model):
 
    def sendmail_created_less(self):
         subject = 'HiSparc Analysissession created with less events'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data' 
+        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data'
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)
@@ -245,7 +249,7 @@ class SessionRequest(models.Model):
 
    def sendmail_zero(self):
         subject = 'HiSparc Analysissession creation failed'
-        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected' 
+        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected'
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject,message,sender,[self.email,],fail_silently=False)

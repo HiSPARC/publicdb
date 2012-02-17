@@ -61,7 +61,7 @@ def create_nagios_config(request):
             services.append(
                 {'description': service.monitor_service.description,
                  'check_command': check_command,
-		 'active_checks': service.monitor_service.enable_active_checks})
+                 'active_checks': service.monitor_service.enable_active_checks})
         # Append this host to the hosts list
         hosts.append({'pc': host, 'services': services})
 

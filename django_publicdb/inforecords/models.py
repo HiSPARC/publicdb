@@ -50,7 +50,7 @@ class Cluster(models.Model):
            if self.parent==None:
               self.number = self.country.last_cluster_number()+1000
            else:
-              self.number = self.parent.last_cluster_number()+100        
+              self.number = self.parent.last_cluster_number()+100
         super(Cluster, self).save(*args, **kwargs)
 
         super(Cluster, self).save(*args, **kwargs)
@@ -69,12 +69,12 @@ class Cluster(models.Model):
             return self.name
 
     def last_station_number(self):
-	stations=self.stations.filter(number__lt=(self.number+90))
+        stations=self.stations.filter(number__lt=(self.number+90))
         if stations:
-	    stationmax=stations.aggregate(Max('number'))
-	    return stationmax['number__max'] 
+            stationmax=stations.aggregate(Max('number'))
+            return stationmax['number__max']
         else:
-            return self.number-1 
+            return self.number-1
 
     def last_cluster_number(self):
         clusters=self.children.all()
@@ -101,10 +101,10 @@ class ContactInformation(models.Model):
     email_work = models.EmailField()
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
-    
+
     def __unicode__(self):
-	return "%s %s %s" % (self.city, self.street_1, self.email_work)
-    
+        return "%s %s %s" % (self.city, self.street_1, self.email_work)
+
     def type(self):
         if self.contacts.all():
            type = 'Contact'
@@ -112,8 +112,8 @@ class ContactInformation(models.Model):
            type = 'Station'
         else:
            type = 'no owner'
-	return type
-    type = property(type)
+        return type
+        type = property(type)
 
     def contact_owner(self):
         contacts = self.contacts.all()
@@ -125,23 +125,20 @@ class ContactInformation(models.Model):
         if stations:
             contact_str.extend(['%s (%d)' % (x.name, x.number) for x in
                                 stations])
-        return ', '.join(contact_str)
-
-
-	if contacts:
-            
-	   contact_owner = self.contacts.get().name
-	elif self.stations.all():
+            return ', '.join(contact_str)
+        if contacts:
+            contact_owner = self.contacts.get().name
+        elif self.stations.all():
            contact_owner = self.stations.all()[0].name
-	else:
+        else:
            contact_owner = 'no owner'
-	return contact_owner
-    contact_owner = property(contact_owner)
-	    
+           return contact_owner
+        contact_owner = property(contact_owner)
+
     class Meta:
         ordering = ['city', 'street_1', 'email_work']
-	verbose_name = "Contact Information"
-	verbose_name_plural = "Contact Information"
+        verbose_name = "Contact Information"
+        verbose_name_plural = "Contact Information"
 
 class Station(models.Model):
     name = models.CharField(max_length=70)
@@ -161,7 +158,7 @@ class Station(models.Model):
         return '%s' % (self.number)
 
     def save(self, *args, **kwargs):
-        if self.number==None:    
+        if self.number==None:
            self.number = self.cluster.last_station_number()+1
         super(Station, self).save(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
@@ -178,7 +175,7 @@ class Station(models.Model):
 class Country(models.Model):
     name = models.CharField(max_length=40, unique=True)
     number = models.IntegerField(unique=True,blank=True)
-    
+
     def last_cluster_number(self):
         clusters=self.clusters.filter(parent=None)
         if clusters:
@@ -190,14 +187,14 @@ class Country(models.Model):
     def __unicode__(self):
         return self.name
     class Meta:
-       	verbose_name_plural = "Countries"
+        verbose_name_plural = "Countries"
 
     def save(self, *args, **kwargs):
-	if self.number==None:
-	   countrymax=Country.objects.aggregate(Max('number'))
-	   self.number=countrymax['number__max']+10000
-        super(Country,self).save(*args, **kwargs)
-	
+        if self.number==None:
+            countrymax=Country.objects.aggregate(Max('number'))
+            self.number=countrymax['number__max']+10000
+            super(Country,self).save(*args, **kwargs)
+
 class DetectorHisparc(models.Model):
     station = models.ForeignKey(Station)
     startdate = models.DateField()
@@ -230,7 +227,7 @@ class DetectorHisparc(models.Model):
 
 class ElectronicsType(models.Model):
     description = models.CharField(max_length=40, unique=True)
-    
+
     def __unicode__(self):
         return self.description
 
@@ -240,7 +237,7 @@ class ElectronicsType(models.Model):
 
 class ElectronicsStatus(models.Model):
     description = models.CharField(max_length=40, unique=True)
-    
+
     def __unicode__(self):
         return self.description
 
@@ -297,7 +294,7 @@ class Pc(models.Model):
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
                                       through='EnabledService')
-    
+
     def __unicode__(self):
         return self.name
 
@@ -384,7 +381,7 @@ class MonitorService(models.Model):
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)
     max_warning = models.FloatField(null=True, blank=True)
-    
+
     def __unicode__(self):
         return self.description
 
@@ -416,7 +413,7 @@ class EnabledService(models.Model):
         return '%s - %s' % (self.pc, self.monitor_service)
 
     class Meta:
-	ordering = ('pc', 'monitor_service')
+        ordering = ('pc', 'monitor_service')
 
     def save(self, *args, **kwargs):
         super(EnabledService, self).save(*args, **kwargs)
