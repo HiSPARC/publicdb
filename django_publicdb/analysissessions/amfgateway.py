@@ -94,9 +94,8 @@ def get_energy_data(request):
     return energies
 
 
-services = { 'hisparc.get_services': get_services,
-             'hisparc.get_coincidence': get_coincidence,
-             'hisparc.send_results': send_results,
-             'hisparc.get_energy_data': get_energy_data,
-           }
+services = {'hisparc.get_services': get_services,
+            'hisparc.get_coincidence': get_coincidence,
+            'hisparc.send_results': send_results,
+            'hisparc.get_energy_data': get_energy_data}
 public_gateway = DjangoGateway(services)
