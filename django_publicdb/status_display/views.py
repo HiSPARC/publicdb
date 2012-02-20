@@ -58,7 +58,11 @@ def station_page(request, station_id, year, month, day):
     day = int(day)
 
     station = get_object_or_404(Station, number=station_id)
+
+    # Use yesterday and tomorrow to add previous/next (yesterday/tomorrow) links
+    yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
     tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
+
     try:
         config = (Configuration.objects.filter(source__station=station,
                                                timestamp__lt=tomorrow)
