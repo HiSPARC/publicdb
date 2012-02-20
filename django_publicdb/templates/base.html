@@ -17,12 +17,16 @@
             width: 850px;
         }
         #pageHeader {
-            background: url({{ MEDIA_URL }}/static/header.png) top
-                right no-repeat;
+            background: url({{ MEDIA_URL }}/static/header.png) top right no-repeat;
             height: 63px;
+            width: 200px;
             margin: 0;
             padding: 0;
+            left: 630px;
+            display: inline-block;
+            position: relative;
         }
+
         #pageHeader span {
             display: none;
         }
@@ -32,9 +36,9 @@
 
 <body>
 <div id="container">
-
+<a href="http://www.hisparc.nl">
     <h1 id="pageHeader"><span>Public Database</span></h1>
-
+</a>
     <div id="content">
     {% block content %}{% endblock %}
     </div>
