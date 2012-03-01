@@ -13,16 +13,19 @@ import logging
 logging.basicConfig(level=logging.INFO, filename='/tmp/test.log')
 logger = logging.getLogger('test')
 
+
 def get_services(request, arg1, arg2):
     logger.info('%r, %r' % (arg1, arg2))
     return services.keys()
 
+
 def get_timehistogram_options(request):
     return options_timehistogram
 
+
 def get_timehistogram(request, station_id, date, type):
     options = options_timehistogram
-    
+
     if type == options[0]:
         histogram = get_histogram(station_id, date, 'eventtime')
         data = ['Event time distribution', 'counts per hour']
@@ -36,8 +39,10 @@ def get_timehistogram(request, station_id, date, type):
 
     return data
 
+
 def get_1dhistogram_options(request):
     return options_1dhistogram
+
 
 def get_1dhistogram(request, station_id, date, type):
     options = options_1dhistogram
@@ -58,6 +63,7 @@ def get_1dhistogram(request, station_id, date, type):
 
     return data
 
+
 def get_histogram(station_id, date, type):
     try:
         summary = Summary.objects.get(station__number=station_id,
@@ -68,6 +74,7 @@ def get_histogram(station_id, date, type):
         return None
     else:
         return histogram
+
 
 def get_stations(request):
     """Get HiSPARC stations locations and status
@@ -80,6 +87,7 @@ def get_stations(request):
     data = get_cluster_station_list(parent=None)
 
     return data
+
 
 def get_cluster_station_list(parent):
     if parent:
@@ -135,6 +143,7 @@ def get_cluster_station_list(parent):
 
     return data
 
+
 def get_station_info(request, station_id):
     """Retrieve a station info page"""
 
@@ -148,7 +157,6 @@ services = {
     'hisparc.get_1dhistogram_options': get_1dhistogram_options,
     'hisparc.get_1dhistogram': get_1dhistogram,
     'hisparc.get_stations': get_stations,
-    'hisparc.get_station_info': get_station_info,
-}
+    'hisparc.get_station_info': get_station_info}
 
 publicgateway = DjangoGateway(services)
