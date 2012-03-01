@@ -1,8 +1,11 @@
+# Python
+*.pyc
+*.pyo
+
 # Eclipse
 .pydevproject
 .metadata
 .project
-
 
 # OS generated files
 .DS_Store*
