@@ -173,7 +173,8 @@ class SessionRequest(models.Model):
 
            pulseheights = [x * .57 if x != -999 else -999
                            for x in event['pulseheights']]
-           integrals = [x * .57 if x != -999 else -999
+           # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
+           integrals = [x * .57 * 2.5 if x != -999 else -999
                         for x in event['integrals']]
 
            dt = self.analyze_traces(traces)

@@ -138,10 +138,9 @@ def get_integrals(cluster, station_id, date):
     if integrals is None:
         return None
     else:
-        #FIXME
-        #ADL - Multiply by 2.5 for mVns integral (x * .57 * 2.5).
+        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
         # need configurations for this
-        integrals = [[x * .57 for x in y] for y in integrals]
+        integrals = [[x * .57 * 2.5 for x in y] for y in integrals]
 
         # transpose, so we have 4 arrays of many integrals
         return zip(*integrals)
