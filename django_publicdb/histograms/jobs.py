@@ -156,8 +156,8 @@ def update_temperature_dataset(summary):
     cluster, station_id = get_station_cluster_id(summary.station)
     temperature = datastore.get_temperature(cluster, station_id,
                                             summary.date)
-    ERR = -2**15
-    temperature = [(x, y) for x, y in temperature if y != ERR]
+    ERR = [-999, -2**15] #ADL: or just y >= −273?
+    temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         save_dataset(summary, 'temperature', temperature)
 
