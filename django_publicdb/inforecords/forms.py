@@ -8,7 +8,7 @@ from django.utils.encoding import force_unicode
 from django.shortcuts import render_to_response
 from django.utils.datastructures import SortedDict
 
-#The following forms are used in the form wizzards
+#The following forms are used in the form wizards
 #Some are used in multiple wizards
 
 
@@ -21,7 +21,7 @@ class ClusterForm(forms.Form):
 
 
 #form to be used for creating subclusters. Contains no country field.
-# Contains a parentfield containing only clusters that donot have a parent.
+# Contains a parentfield containing only clusters that do not have a parent.
 class SubClusterForm(forms.Form):
     form_name = 'create new subcluster'
     subcluster_name = forms.CharField(max_length=70, label='Cluster Name')
@@ -29,7 +29,7 @@ class SubClusterForm(forms.Form):
     subcluster_url = forms.URLField(label='url', required=False)
 
 
-#form te be used for creating a country. Country number is not required and
+#form to be used for creating a country. Country number is not required and
 # if no number is given should be created by country.save()
 class CountryForm(forms.Form):
     form_name = 'Create new country'
@@ -86,7 +86,7 @@ class StationContactForm(forms.Form):
     stationcontact_url = forms.URLField(label='url', required=False)
 
 
-#a form for the creation of a station.Contains two possible contacts and a boleanfield so you can use the main contact as the ict contact.
+#a form for the creation of a station.Contains two possible contacts and a booleanfield so you can use the main contact as the ict contact.
 class StationForm(forms.Form):
     form_name = 'Create new station'
     station_name = forms.CharField(max_length=40, label='name')
@@ -126,12 +126,12 @@ class ICTProfessionForm(forms.Form):
 #This wizard should be called with the following forms in this order:
 # StationForm, StationContactForm, ProfessionForm, ContactForm, ICTProfessionForm
 #If called with other forms or in an other order the wizard wont work correctly.
-#The stationcontactform is used for the main contact
+#The stationcontact form is used for the main contact
 #The contact form is used for the ict contact.
 class StationWizard(FormWizard):
     @property
 
-    #this is needed for intergration in the admin tool.
+    #this is needed for integration in the admin tool.
     def __name__(self):
         return self.__class__.__name__
 
@@ -141,8 +141,9 @@ class StationWizard(FormWizard):
         data = {}
         for form in form_list:
             data.update(form.cleaned_data)
-        #create the contact information for the station itself.
-        #any fields left blank should will be left blank. required fields need to be required in the form.
+            #create the contact information for the station itself.
+            #any fields left blank will be left blank.
+            #required fields need to be required in the form.
             station_contact_information = ContactInformation(
                     street_1=data['station_street_1'],
                     street_2=data['station_street_2'],
@@ -158,8 +159,10 @@ class StationWizard(FormWizard):
                     email_private=data['station_email_private'],
                     url=data['station_url'])
         station_contact_information.save()
-        #If no stationcontact was given(empy_label=create new contact). the stationcontact form is used.
-        #create and save the contact contact information.the form used for the main contact is the station contact form.
+        #If no stationcontact was given(empty_label=create new contact).
+        #the stationcontact form is used.
+        #create and save the contact contact information.
+        #the form used for the main contact is the stationcontact form.
         if data['station_contact'] == None:
             contact_contact_information = ContactInformation(
                     street_1=data['stationcontact_street_1'],
@@ -176,12 +179,12 @@ class StationWizard(FormWizard):
                     email_private=data['stationcontact_email_private'],
                     url=data['stationcontact_url'])
             contact_contact_information.save()
-            #if no profesion was given(empty_label=creat new profession).
+            #if no profession was given(empty_label=create new profession).
             if data['stationcontact_profession']==None:
                 profession = Profession(
                         description=data['profession_description'])
                 profession.save()
-            #otherwise the use the profession form the stationcontactform
+            #otherwise the use the profession from the stationcontact form
             else:
                 profession = data['stationcontact_profession']
                 #we now have all the information to create and save the stationcontact.
@@ -196,42 +199,42 @@ class StationWizard(FormWizard):
         #if a stationcontact was given then this is the contact.
         else:
             stationcontact = data['station_contact']
-        #if no ict contact was given and the bolean station_contact_is_ist is False. The contact form was used for ict contact.
+        #if no ict contact was given and the boolean station_contact_is_ist is False. The contact form was used for ict contact.
         #the contact information for the ict contact is saved. The form used for the ict contact is the contact form.
-            if (data['station_ict_contact'] == None and
-                data['station_contact_is_ict'] == False):
-                ICT_contact_information = ContactInformation(
-                        street_1=data['contact_street_1'],
-                        street_2=data['contact_street_2'],
-                        postalcode=data['contact_postalcode'],
-                        city=data['contact_city'],
-                        pobox=data['contact_pobox'],
-                        pobox_postalcode=data['contact_pobox_postalcode'],
-                        pobox_city=data['contact_pobox_city'],
-                        phone_work=data['contact_phone_work'],
-                        phone_home=data['contact_phone_home'],
-                        fax=data['contact_fax'],
-                        email_work=data['contact_email_work'],
-                        email_private=data['contact_email_private'],
-                        url=data['contact_url'])
-                ICT_contact_information.save()
+        if (data['station_ict_contact'] == None and
+            data['station_contact_is_ict'] == False):
+            ICT_contact_information = ContactInformation(
+                    street_1=data['contact_street_1'],
+                    street_2=data['contact_street_2'],
+                    postalcode=data['contact_postalcode'],
+                    city=data['contact_city'],
+                    pobox=data['contact_pobox'],
+                    pobox_postalcode=data['contact_pobox_postalcode'],
+                    pobox_city=data['contact_pobox_city'],
+                    phone_work=data['contact_phone_work'],
+                    phone_home=data['contact_phone_home'],
+                    fax=data['contact_fax'],
+                    email_work=data['contact_email_work'],
+                    email_private=data['contact_email_private'],
+                    url=data['contact_url'])
+            ICT_contact_information.save()
             #if no profession was given the ict_profession form was used.
-                if data['contact_profession']==None:
-                    ictprofession = Profession(
-                         description=data['ICTprofession_description'])
-                    ictprofession.save()
-                else:
-                    ictprofession = data['contact_profession']
+            if data['contact_profession']==None:
+                ictprofession = Profession(
+                        description=data['ICTprofession_description'])
+                ictprofession.save()
+            else:
+                ictprofession = data['contact_profession']
             #we can now create and save the ict contact.
-                station_ict_contact = Contact(
-                        profession=ictprofession,
-                        title=data['contact_title'],
-                        first_name=data['contact_first_name'],
-                        prefix_surname=data['contact_prefix_surname'],
-                        surname=data['contact_surname'],
-                        contactinformation=ICT_contact_information)
+            station_ict_contact = Contact(
+                    profession=ictprofession,
+                    title=data['contact_title'],
+                    first_name=data['contact_first_name'],
+                    prefix_surname=data['contact_prefix_surname'],
+                    surname=data['contact_surname'],
+                    contactinformation=ICT_contact_information)
             station_ict_contact.save()
-        #the bolean station_contact_is_ict is true so we use the stationcontact created above as ict contact.
+        #the boolean station_contact_is_ict is true so we use the stationcontact created above as ict contact.
         elif data['station_contact_is_ict']:
             station_ict_contact = stationcontact
         #the ict contact was given in the form so we use that ict contact.
@@ -248,39 +251,39 @@ class StationWizard(FormWizard):
                 password=data['station_password'],
                 info_page=data['station_infopage'])
         station.save()
-        #we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
+        #we now create a dictionary containing all the fields form the forms actually used in the wizard so we can show a summary.
         #forms that were skipped are not in form_list and so are not included in the summary.
         #and we add station number because it is not in any form.
         modeldata = GetModelData(form_list)
         modeldata.insert(0,'Station Number', station.number)
-        response={"modeldata":modeldata}
+        response = {"modeldata":modeldata}
         return render_to_response('summary.html', response)
 
     #the following is called at the start of every step including the first step.
     def process_step(self, request, form, step):
         #with form.is_valid we check if we have completed a step. In the first step the form is not yet filled so invalid.
-        #if the form is filled incorrectly the wizard will show it again and we shouldnot do anything here.
-            if form.is_valid():
+        #if the form is filled incorrectly the wizard will show it again and we should not do anything here.
+        if form.is_valid():
             #first we check which form was just filled.
             formtype = form.__class__.__name__
             if formtype=='StationForm':
-                #if station_contact is not empy we dont need the stationcontactform and professionform.
+                #if station_contact is not empty we do not need the stationcontact form and profession form.
                 #we will remove those form the form_list so they will not be used.
-                #I also check to see if it is actualy present so we dont get an error trying to remove it.
+                #I also check to see if it is actually present so we do not get an error trying to remove it.
                 if (form.cleaned_data['station_contact']!=None and
                     StationContactForm in self.form_list):
                     self.form_list.remove(StationContactForm)
                     self.form_list.remove(ProfessionForm)
-                #If station_ict_contact is not empty contact form and ictprofessionform can be removed.
+                #If station_ict_contact is not empty contact form and ict profession form can be removed.
                 if (form.cleaned_data['station_ict_contact']!=None and
                     ContactForm in self.form_list):
                     self.form_list.remove(ContactForm)
                     self.form_list.remove(ICTProfessionForm)
-                #If station_contact_is_ict is true we can also remove contact form and ictprofession form.
-                    if (form.cleaned_data['station_contact_is_ict']==True and
-                        ContactForm in self.form_list):
-                        self.form_list.remove(ContactForm)
-                        self.form_list.remove(ICTProfessionForm)
+                #If station_contact_is_ict is true we can also remove contact form and ict profession form.
+                if (form.cleaned_data['station_contact_is_ict']==True and
+                    ContactForm in self.form_list):
+                    self.form_list.remove(ContactForm)
+                    self.form_list.remove(ICTProfessionForm)
             if formtype=='StationContactForm':
                 #in stationcontactform we only need to check if profession is empty and remove the profession form if it is not.
                 if (form.cleaned_data['stationcontact_profession']!=None and
@@ -333,28 +336,28 @@ class ContactWizard(FormWizard):
 
     #what to do when the wizard is finished
     def done(self, request, form_list):
-            #all given data is verified and stored in data
-            data = {}
-            for form in form_list:
-                data.update(form.cleaned_data)
+        #all given data is verified and stored in data
+        data = {}
+        for form in form_list:
+            data.update(form.cleaned_data)
         #first we create and save the contact information.
         #if a field in the form was empty is will be created empty here.
         #validation and requiring fields is done in the form
-            contact_information = ContactInformation(
-                    street_1=data['contact_street_1'],
-                    street_2=data['contact_street_2'],
-                    postalcode=data['contact_postalcode'],
-                    city=data['contact_city'],
-                    pobox=data['contact_pobox'],
-                    pobox_postalcode=data['contact_pobox_postalcode'],
-                    pobox_city=data['contact_pobox_city'],
-                    phone_work=data['contact_phone_work'],
-                    phone_home=data['contact_phone_home'],
-                    fax=data['contact_fax'],
-                    email_work=data['contact_email_work'],
-                    email_private=data['contact_email_private'],
-                    url=data['contact_url'])
-            contact_information.save()
+        contact_information = ContactInformation(
+                street_1=data['contact_street_1'],
+                street_2=data['contact_street_2'],
+                postalcode=data['contact_postalcode'],
+                city=data['contact_city'],
+                pobox=data['contact_pobox'],
+                pobox_postalcode=data['contact_pobox_postalcode'],
+                pobox_city=data['contact_pobox_city'],
+                phone_work=data['contact_phone_work'],
+                phone_home=data['contact_phone_home'],
+                fax=data['contact_fax'],
+                email_work=data['contact_email_work'],
+                email_private=data['contact_email_private'],
+                url=data['contact_url'])
+        contact_information.save()
         #if no contact_profession was given the profession form was show
         #we use this form to create a new contact
         if data['contact_profession']==None:
@@ -372,8 +375,8 @@ class ContactWizard(FormWizard):
                 surname=data['contact_surname'],
                 contactinformation=contact_information)
         contact.save()
-                #we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
-                #forms that were skipped are not in form_list and so are not included in the summary.
+        #we now create a dictionary containing all the fields form the forms actually used in the wizard so we can show a summary.
+        #forms that were skipped are not in form_list and so are not included in the summary.
         modeldata = GetModelData(form_list)
         response = {"modeldata":modeldata}
         return render_to_response('summary.html', response)
@@ -381,7 +384,7 @@ class ContactWizard(FormWizard):
         #the following is called at the start of every step including the first step.
     def process_step(self, request, form, step):
         #with form.is_valid we check if we have completed a step. In the first step the form is not yet filled so invalid.
-        #if the form is filled incorrectly the wizard will show it again and we shouldnot do anything here.
+        #if the form is filled incorrectly the wizard will show it again and we should not do anything here.
         if form.is_valid():
             #first we check which form was just filled.
             formtype = form.__class__.__name__
@@ -409,18 +412,18 @@ class ContactWizard(FormWizard):
     #formtype is a string describing the current form which is printed in the template
     def render_template(self, request, form, previous_fields, step, context=None):
         formtype = form.form_name
-        form = AdminForm(form, [(formtype,
-                    {'fields': form.base_fields.keys()})], {})
+        form = AdminForm(form,
+                         [(formtype, {'fields': form.base_fields.keys()})], {})
         context = context or {}
         context.update({'media': self._model_admin.media + form.media})
         return super(ContactWizard, self).render_template(request, form,
-                                                          previous_fields, step,
-                                                          context)
+                                                          previous_fields,
+                                                          step, context)
 
-#the sublclusterwizard did not need to be a formwizard, but it is implemented as a wizard to keep single aproach.
+#the subcluster wizard did not need to be a formwizard, but it is implemented as a wizard to keep single approach.
 class SubClusterWizard(FormWizard):
     @property
-    #this is needed for intergration in the admin tool.
+    #this is needed for integration in the admin tool.
     def __name__(self):
         return self.__class__.__name__
     #what to do when the wizard is finished
@@ -460,8 +463,8 @@ class SubClusterWizard(FormWizard):
     #form type is a string describing the current form which is printed in the template
     def render_template(self, request, form, previous_fields, step, context=None):
         formtype = form.form_name
-        form = AdminForm(form, [(formtype,
-                {'fields': form.base_fields.keys()})], {})
+        form = AdminForm(form,
+                         [(formtype,{'fields': form.base_fields.keys()})], {})
         context = context or {}
         context.update({'media': self._model_admin.media + form.media})
         return super(SubClusterWizard, self).render_template(request, form,
@@ -495,9 +498,9 @@ class ClusterWizard(FormWizard):
                           url=data['cluster_url'])
         cluster.save()
 
-        #we now create a dictionary containing all the fields form the forms actualy used in the wizard so we can show a summary.
+        #we now create a dictionary containing all the fields form the forms actually used in the wizard so we can show a summary.
         #forms that were skipped are not in form_list and so are not included in the summary.
-        #manualy add clusternumber to summary
+        #manually add clusternumber to summary
         modeldata = GetModelData(form_list)
         modeldata.insert(0,'Clusternumber', cluster.number)
         response = {"modeldata":modeldata}
@@ -505,12 +508,12 @@ class ClusterWizard(FormWizard):
 
     def process_step(self, request, form, step):
         #with form.is_valid we check if we have completed a step. In the first step the form is not yet filled so invalid.
-        #if the form is filled incorrectly the wizard will show it again and we shouldnot do anything here.
+        #if the form is filled incorrectly the wizard will show it again and we should not do anything here.
         if form.is_valid():
             #first we check which form was just filled.
             formtype = form.__class__.__name__
             if formtype=='ClusterForm':
-            #if cluster_contry is not empy we donot need to show the contry form
+            #if cluster_contry is not empty we do not need to show the country form
             #we remove it from the form_list
                 if (form.cleaned_data['cluster_country']!=None and
                     CountryForm in self.form_list):
@@ -533,17 +536,16 @@ class ClusterWizard(FormWizard):
     #formtype is a string that decribes the current form and is printed in the template
     def render_template(self, request, form, previous_fields, step, context=None):
         formtype = form.form_name
-            form = AdminForm(form, [(formtype,
-                    {'fields': form.base_fields.keys()})], {})
-            context = context or {}
-            context.update({'media': self._model_admin.media + form.media})
-            return super(ClusterWizard, self).render_template(request, form,
-                                                              previous_fields,
-                                                              step, context)
+        form = AdminForm(form,
+                         [(formtype, {'fields': form.base_fields.keys()})], {})
+        context = context or {}
+        context.update({'media': self._model_admin.media + form.media})
+        return super(ClusterWizard, self).render_template(request, form,
+                                                          previous_fields,
+                                                          step, context)
 
 #these are used to call the wizards.
-create_station = StationWizard([StationForm, StationContactForm, ProfessionForm,
-                                ContactForm, ICTProfessionForm])
+create_station = StationWizard([StationForm, StationContactForm, ProfessionForm, ContactForm, ICTProfessionForm])
 create_contact = ContactWizard([ContactForm, ProfessionForm])
 create_cluster = ClusterWizard([ClusterForm, CountryForm])
 create_subcluster = SubClusterWizard([SubClusterForm])

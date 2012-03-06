@@ -1,5 +1,4 @@
-from django.shortcuts import render_to_response, get_object_or_404, \
-                             redirect
+from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
@@ -35,7 +34,8 @@ def stations(request):
             except IndexError:
                 link = None
 
-            stations.append({'number': station.number, 'name': station.name,
+            stations.append({'number': station.number,
+                             'name': station.name,
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
@@ -88,14 +88,19 @@ def station_page(request, station_id, year, month, day):
     temperaturedata = plot_dataset('temperature', station, year, month, day)
 
     return render_to_response('station_page.html',
-        {'station': station, 'date': datetime.date(year, month, day),
-         'config': config, 'has_slave': has_slave,
+        {'station': station,
+         'date': datetime.date(year, month, day),
+         'config': config,
+         'has_slave': has_slave,
          'eventhistogram': eventhistogram,
          'pulseheighthistogram': pulseheighthistogram,
          'pulseintegralhistogram': pulseintegralhistogram,
-         'barometerdata': barometerdata, 'temperaturedata': temperaturedata,
-         'thismonth': thismonth, 'month_list': month_list,
-         'year_list': year_list, 'link': (station_id, year, month, day)},
+         'barometerdata': barometerdata,
+         'temperaturedata': temperaturedata,
+         'thismonth': thismonth,
+         'month_list': month_list,
+         'year_list': year_list,
+         'link': (station_id, year, month, day)},
         context_instance=RequestContext(request))
 
 
@@ -199,7 +204,8 @@ def create_histogram(type, station, year, month, day, log=False):
     plot = create_histogram_plot(histogram.bins, histogram.values,
                                  type.has_multiple_datasets,
                                  type.bin_axis_title,
-                                 type.value_axis_title, log)
+                                 type.value_axis_title,
+                                 log)
 
     width, height = 500, 333
     if type.slug == 'eventtime':
@@ -258,9 +264,8 @@ def create_histogram_plot(bins, values, has_multiple_datasets,
             view.value_range.high_setting = m * 1.1
 
 #    if has_multiple_datasets:
-#        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3',
-#                                      'scint4'], component=view.plots,
-#                                      align="ur", padding=10)
+#        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3', 'scint4'],
+#                              component=view.plots, align="ur", padding=10)
 #        view.overlays.append(legend)
 
     view.x_axis.title = bin_axis_title
@@ -388,16 +393,16 @@ def nav_months(station, theyear):
     date_list = (Summary.objects.filter(Q(station=station),
                                         Q(date__year=theyear),
                                         Q(num_events__isnull=False) |
-                                        Q(num_weather__isnull=False)).
-                         dates('date', 'month'))
+                                        Q(num_weather__isnull=False))
+                        .dates('date', 'month'))
 
     month_list = []
     for date in date_list:
         name = calendar.month_name[date.month][:3]
         first_day = (Summary.objects.filter(station=station,
                                             date__year=date.year,
-                                            date__month=date.month).
-                             dates('date', 'day')[0])
+                                            date__month=date.month)
+                            .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
         month_list.append({'month': name, 'link': link})
 
@@ -409,14 +414,14 @@ def nav_years(station):
 
     date_list = (Summary.objects.filter(Q(station=station),
                                         Q(num_events__isnull=False) |
-                                        Q(num_weather__isnull=False)).
-                         dates('date', 'year'))
+                                        Q(num_weather__isnull=False))
+                        .dates('date', 'year'))
 
     year_list = []
     for date in date_list:
         first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year).
-                             dates('date', 'day')[0])
+                                            date__year=date.year)
+                            .dates('date', 'day')[0])
         link = (station.number, date.year, first_day.month, first_day.day)
         year_list.append({'year': date.year, 'link': link})
 

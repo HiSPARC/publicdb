@@ -27,7 +27,8 @@ class AnalysisSession(models.Model):
 
     def in_progress(self):
         return self.starts <= datetime.datetime.now() < self.ends
-#FIXME
+    
+#FIXME: What is this for?
     in_progress.boolean = True
 
     def save(self, *args, **kwargs):
@@ -89,8 +90,11 @@ class SessionRequest(models.Model):
         starts = datetime.datetime.now()
         length = timedelta(weeks=4)
         ends = starts + length
-        session = AnalysisSession(starts=starts, ends=ends, pin=str(self.pin),
-                                  slug=slugify(self.sid), title=self.sid)
+        session = AnalysisSession(starts=starts,
+                                  ends=ends,
+                                  pin=str(self.pin),
+                                  slug=slugify(self.sid),
+                                  title=self.sid)
         session.save()
         date = self.start_date
         enddate = date + length
@@ -99,23 +103,24 @@ class SessionRequest(models.Model):
             try:
                self.events_created += self.find_coincidence(date,session)
             except Exception, msg:
-               print "creation of session "+self.sid+" failed\n"
+               print "creation of session " + self.sid + " failed\n"
                print "Error:", msg
             date = date + datetime.timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
         elif self.events_created <= self.events_to_create:
             self.sendmail_created_less()
-            self.session_created=True
+            self.session_created = True
         else:
             self.sendmail_created()
-            self.session_created=True
+            self.session_created = True
         self.save()
         return [self.sid, self.pin]
 
    def find_coincidence(self,date,session):
-        file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
-        datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
+        file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
+        datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
+                                      str(date.month), file)
         data = tables.openFile(datastore_path, 'r')
         ndups = 0
         nvalid = 0
@@ -178,11 +183,13 @@ class SessionRequest(models.Model):
                         for x in event['integrals']]
 
            dt = self.analyze_traces(traces)
-           event = Event(date=date_time.date(), time=date_time.time(),
-                      nanoseconds=event['nanoseconds'] - dt,
-                      station=Station.objects.get(number=station),
-                      pulseheights=pulseheights, integrals=integrals,
-                      traces=traces)
+           event = Event(date=date_time.date(),
+                         time=date_time.time(),
+                         nanoseconds=event['nanoseconds'] - dt,
+                         station=Station.objects.get(number=station),
+                         pulseheights=pulseheights,
+                         integrals=integrals,
+                         traces=traces)
            event.save()
            events.append(event)
 
@@ -221,7 +228,8 @@ class SessionRequest(models.Model):
 
    def SendMail(self):
         subject = 'HiSparc Analysissession request'
-        message = 'please follow the following link to create your analysissession: http://data.hisparc.nl/django/analysis-session/request/' + self.url
+        message = ('Please follow the following link to create your '
+                   'analysissession: http://data.hisparc.nl/django/analysis-session/request/' + self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -230,7 +238,12 @@ class SessionRequest(models.Model):
 
    def sendmail_created(self):
         subject = 'HiSparc Analysissession created'
-        message = ('your analysissession has been created.\n' + 'id=' + self.sid + '\n' + 'pin=' + str(self.pin) + '\n' + 'events created =' + str(self.events_created) + '\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
+        message = ('Your analysissession has been created.'
+                   '\nid=' + self.sid +
+                   '\npin=' + str(self.pin) +
+                   '\nEvents created =' + str(self.events_created) +
+                   '\nDuring your session you can view the results at:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -239,7 +252,13 @@ class SessionRequest(models.Model):
 
    def sendmail_created_less(self):
         subject = 'HiSparc Analysissession created with less events'
-        message = ('your analysissession has been created.\n' + 'id=' + self.sid + '\n' + 'pin=' + str(self.pin) + '\n However we were unable to find the amount of events you requested. \n Events created = ' + str(self.events_created) + '\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid)+'/data')
+        message = ('Your analysissession has been created.'
+                   '\nid=' + self.sid +
+                   '\npin=' + str(self.pin) +
+                   '\nHowever we were unable to find the amount of events you requested.'
+                   '\nEvents created = ' + str(self.events_created) +
+                   '\nDuring your session you can view the results at:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid)+'/data')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -248,7 +267,9 @@ class SessionRequest(models.Model):
 
    def sendmail_zero(self):
         subject = 'HiSparc Analysissession creation failed'
-        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected'
+        message = ('Your analysissession has been not been created.'
+                   '\nPlease try selecting a different data set.'
+                   '\nPerhaps there was no data for the date and/or stations you selected')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
