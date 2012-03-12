@@ -355,8 +355,9 @@ class Pc(models.Model):
             #FIXME this doesn't check for preselected services
             self.install_default_services()
 
-        proxy.register_hosts_ip([(x.name, x.ip) for x in
-                             Pc.objects.all()])
+        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
+        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
+        proxy.register_hosts_ip(aliases)
         proxy.reload_nagios()
 
     def delete(self, *args, **kwargs):
