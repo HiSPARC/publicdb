@@ -27,7 +27,7 @@ class AnalysisSession(models.Model):
 
     def in_progress(self):
         return self.starts <= datetime.datetime.now() < self.ends
-    
+
 #FIXME: What is this for?
     in_progress.boolean = True
 
@@ -105,7 +105,7 @@ class SessionRequest(models.Model):
             except Exception, msg:
                print "creation of session " + self.sid + " failed\n"
                print "Error:", msg
-            date = date + datetime.timedelta(days=1)
+            date += timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
         elif self.events_created <= self.events_to_create:
@@ -227,7 +227,7 @@ class SessionRequest(models.Model):
         self.url = newurl
 
    def SendMail(self):
-        subject = 'HiSparc Analysissession request'
+        subject = 'HiSPARC Analysissession request'
         message = ('Please follow the following link to create your '
                    'analysissession: http://data.hisparc.nl/django/analysis-session/request/' + self.url)
         sender = 'info@hisparc.nl'
@@ -237,7 +237,7 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created(self):
-        subject = 'HiSparc Analysissession created'
+        subject = 'HiSPARC Analysissession created'
         message = ('Your analysissession has been created.'
                    '\nid=' + self.sid +
                    '\npin=' + str(self.pin) +
@@ -251,7 +251,7 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created_less(self):
-        subject = 'HiSparc Analysissession created with less events'
+        subject = 'HiSPARC Analysissession created with less events'
         message = ('Your analysissession has been created.'
                    '\nid=' + self.sid +
                    '\npin=' + str(self.pin) +
@@ -266,7 +266,7 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_zero(self):
-        subject = 'HiSparc Analysissession creation failed'
+        subject = 'HiSPARC Analysissession creation failed'
         message = ('Your analysissession has been not been created.'
                    '\nPlease try selecting a different data set.'
                    '\nPerhaps there was no data for the date and/or stations you selected')

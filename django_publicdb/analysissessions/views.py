@@ -50,8 +50,8 @@ def create_energy_histogram(slug, coincidences):
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
     values = [v1.tolist(), v2.tolist()]
 
-    plot = create_histogram_plot(bins, values, True, 'Log energy (eV)', 'Count',
-                                 log=False)
+    plot = create_histogram_plot(bins, values, True, 'Log energy (eV)',
+                                 'Count', log=False)
     render_and_save_plot(plot, name, 300, 200)
 
     return settings.MEDIA_URL + name
@@ -237,8 +237,8 @@ def confirm_request(request,url):
     if sessionrequest.session_confirmed==False:
        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
        sessionrequest.pin = randint(1000,9999)
-       starts=datetime.datetime.now()
-       ends=datetime.datetime.now()
+       starts = datetime.datetime.now()
+       ends = datetime.datetime.now()
        session = AnalysisSession(starts = starts, ends = ends,
                                  pin = str(sessionrequest.id),
                                  title = sessionrequest.sid)
