@@ -227,9 +227,9 @@ class SessionRequest(models.Model):
         self.url = newurl
 
    def SendMail(self):
-        subject = 'HiSPARC Analysissession request'
-        message = ('Please follow the following link to create your '
-                   'analysissession: http://data.hisparc.nl/django/analysis-session/request/' + self.url)
+        subject = 'HiSPARC Analysis Session request'
+        message = ('Please click on this link to confirm your request for an analysis session:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/request/' + self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -237,12 +237,14 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created(self):
-        subject = 'HiSPARC Analysissession created'
-        message = ('Your analysissession has been created.'
-                   '\nid=' + self.sid +
-                   '\npin=' + str(self.pin) +
-                   '\nEvents created =' + str(self.events_created) +
-                   '\nDuring your session you can view the results at:'
+        subject = 'HiSPARC Analysis Session created'
+        message = ('Your analysis session has been created.'
+                   '\nTitle = ' + self.sid +
+                   '\nPin = ' + str(self.pin) +
+                   '\nEvents created = ' + str(self.events_created) +
+                   '\n\nGo here to start analysing events:'
+                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\n\nDuring the session you can view the results at:'
                    '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
         sender = 'info@hisparc.nl'
         mail = self.email
@@ -251,14 +253,16 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created_less(self):
-        subject = 'HiSPARC Analysissession created with less events'
-        message = ('Your analysissession has been created.'
-                   '\nid=' + self.sid +
-                   '\npin=' + str(self.pin) +
+        subject = 'HiSPARC Analysis Session created with less events'
+        message = ('Your analysis session has been created.'
+                   '\nTitle = ' + self.sid +
+                   '\nPin = ' + str(self.pin) +
                    '\nHowever we were unable to find the amount of events you requested.'
                    '\nEvents created = ' + str(self.events_created) +
-                   '\nDuring your session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid)+'/data')
+                   '\n\nGo here to start analysing events:'
+                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\n\nDuring the session you can view the results at:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -266,10 +270,10 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_zero(self):
-        subject = 'HiSPARC Analysissession creation failed'
-        message = ('Your analysissession has been not been created.'
-                   '\nPlease try selecting a different data set.'
-                   '\nPerhaps there was no data for the date and/or stations you selected')
+        subject = 'HiSPARC Analysis Session creation failed'
+        message = ('Your analysis session could not be created.'
+                   '\nPerhaps there was no data for the date and/or stations you selected'
+                   '\nPlease try selecting a different data set.')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
