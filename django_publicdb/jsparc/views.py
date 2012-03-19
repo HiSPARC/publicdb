@@ -113,7 +113,7 @@ def result(request):
 
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
     assert coincidence.session.hash == session_hash
-    assert coincidence.student.name == student_name
+    assert coincidence.student.name.lower() == student_name.lower()
 
     if coincidence.student.name == 'Test student':
         return
