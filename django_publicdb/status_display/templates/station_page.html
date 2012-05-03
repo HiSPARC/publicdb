@@ -75,6 +75,13 @@ a.sourceLink {
     text-decoration: none;
 }
 
+a.currentDate {
+    color: white;
+    background: black;
+    padding: 2px;
+    border-radius: 2px;
+}
+
 .histogram h3 {
     margin-bottom: -10px;
 }
@@ -198,10 +205,8 @@ automatically updated when the backlog is finally processed.</p>
     <div id="yearlist">
     <ul>
     {% for year in year_list %}
-      <li><a href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>
-        {% if thisyear == year %}<i>{% endif %}
+      <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>
         {{ year.year }}
-        {% if thisyear == year %}</i>{% endif %}
       </a></li>
     {% endfor %}
     </ul>
@@ -210,10 +215,8 @@ automatically updated when the backlog is finally processed.</p>
     <div id="monthlist">
     <ul>
     {% for month in month_list %}
-        <li><a href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>
-        {% if thismonth == month %}<i>{% endif %}
+        <li><a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>
         {{ month.month }}
-        {% if thismonth == month %}</i>{% endif %}
         </a></li>
     {% endfor %}
     </ul>
@@ -231,7 +234,7 @@ automatically updated when the backlog is finally processed.</p>
         {% for day in week %}
           <td class="day">
             {% if day.link %}
-              <a href='{% url status_display.views.station_page day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
+              <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url status_display.views.station_page day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
             {% else %}
               {{ day.day }}
             {% endif %}

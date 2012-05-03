@@ -78,6 +78,7 @@ def station_page(request, station_id, year, month, day):
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
     year_list = nav_years(station)
+    current_date = {'year': year, 'month': calendar.month_name[month][:3], 'day': day}
 
     eventhistogram = create_histogram('eventtime', station, year, month, day)
     pulseheighthistogram = create_histogram('pulseheight', station,
@@ -100,6 +101,7 @@ def station_page(request, station_id, year, month, day):
          'thismonth': thismonth,
          'month_list': month_list,
          'year_list': year_list,
+         'current_date': current_date,
          'link': (station_id, year, month, day)},
         context_instance=RequestContext(request))
 
