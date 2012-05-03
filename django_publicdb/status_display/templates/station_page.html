@@ -191,6 +191,10 @@ automatically updated when the backlog is finally processed.</p>
 
 <div id="navigation">
 
+    <div id="listLink">
+        <a href="{% url status_display.views.stations %}">Station List</a>
+    </div>
+
     <div id="yearlist">
     <ul>
     {% for year in year_list %}
@@ -236,9 +240,6 @@ automatically updated when the backlog is finally processed.</p>
     {% endfor %}
     </table>
 
-    <div id="listLink">
-        <a href="{% url status_display.views.stations %}">Station List</a>
-    </div>
 </div>
 
 <div id="config">
