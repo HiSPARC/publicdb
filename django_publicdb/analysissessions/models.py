@@ -227,8 +227,8 @@ class SessionRequest(models.Model):
         self.url = newurl
 
    def SendMail(self):
-        subject = 'HiSPARC Analysis Session request'
-        message = ('Please click on this link to confirm your request for an analysis session:'
+        subject = 'HiSPARC analysis session request'
+        message = ('Please click on this link to confirm your request for an analysis session with jSparc:'
                    '\nhttp://data.hisparc.nl/django/analysis-session/request/' + self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
@@ -237,8 +237,8 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created(self):
-        subject = 'HiSPARC Analysis Session created'
-        message = ('Your analysis session has been created.'
+        subject = 'HiSPARC analysis session created'
+        message = ('Your analysis session for jSparc has been created.'
                    '\nTitle = ' + self.sid +
                    '\nPin = ' + str(self.pin) +
                    '\nEvents created = ' + str(self.events_created) +
@@ -253,11 +253,11 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_created_less(self):
-        subject = 'HiSPARC Analysis Session created with less events'
-        message = ('Your analysis session has been created.'
+        subject = 'HiSPARC analysis session created with less events'
+        message = ('Your analysis session for jSparc has been created.'
                    '\nTitle = ' + self.sid +
                    '\nPin = ' + str(self.pin) +
-                   '\nHowever we were unable to find the amount of events you requested.'
+                   '\nHowever, we were unable to find the amount of events you requested.'
                    '\nEvents created = ' + str(self.events_created) +
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
@@ -270,8 +270,8 @@ class SessionRequest(models.Model):
         self.save()
 
    def sendmail_zero(self):
-        subject = 'HiSPARC Analysis Session creation failed'
-        message = ('Your analysis session could not be created.'
+        subject = 'HiSPARC analysis session creation failed'
+        message = ('Your analysis session for jSparc could not be created.'
                    '\nPerhaps there was no data for the date and/or stations you selected'
                    '\nPlease try selecting a different data set.')
         sender = 'info@hisparc.nl'
