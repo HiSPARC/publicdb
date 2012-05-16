@@ -198,29 +198,6 @@ automatically updated when the backlog is finally processed.</p>
 
 <div id="navigation">
 
-    <div id="listLink">
-        <a href="{% url status_display.views.stations %}">Station List</a>
-    </div>
-
-    <div id="yearlist">
-    <ul>
-    {% for year in year_list %}
-      <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url status_display.views.station_page year.link.0,year.link.1,year.link.2,year.link.3 %}'>
-        {{ year.year }}
-      </a></li>
-    {% endfor %}
-    </ul>
-    </div>
-
-    <div id="monthlist">
-    <ul>
-    {% for month in month_list %}
-        <li><a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url status_display.views.station_page month.link.0,month.link.1,month.link.2,month.link.3 %}'>
-        {{ month.month }}
-        </a></li>
-    {% endfor %}
-    </ul>
-    </div>
 
     <table id="calendar">
     <tr><th colspan="7">{{ thismonth.month }}</th></tr>
@@ -242,6 +219,32 @@ automatically updated when the backlog is finally processed.</p>
       </tr>
     {% endfor %}
     </table>
+
+    <div id="monthlist">
+    <ul>
+    {% for month in month_list %}
+      {% if month.link %}
+        <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url status_display.views.station_page month.link.0, month.link.1, month.link.2, month.link.3 %}'>{{ month.month }}</a>
+      {% else %}
+        {{ month.month }}
+      {% endif %}
+    {% endfor %}
+    </ul>
+    </div>
+
+    <div id="yearlist">
+    <ul>
+    {% for year in year_list %}
+      <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url status_display.views.station_page year.link.0, year.link.1, year.link.2, year.link.3 %}'>
+        {{ year.year }}
+      </a></li>
+    {% endfor %}
+    </ul>
+    </div>
+
+    <div id="listLink">
+        <a href="{% url status_display.views.stations %}">Station List</a>
+    </div>
 
 </div>
 
