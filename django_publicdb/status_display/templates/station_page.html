@@ -198,6 +198,8 @@ automatically updated when the backlog is finally processed.</p>
 
 <div id="navigation">
 
+    <a class='nextprev' href='{% url status_display.views.station_page station.number, prev.year, prev.month, prev.day %}'>&larr;</a>
+    <a class='nextprev' href='{% url status_display.views.station_page station.number, next.year, next.month, next.day %}'>&rarr;</a>
 
     <table id="calendar">
     <tr><th colspan="7">{{ thismonth.month }}</th></tr>

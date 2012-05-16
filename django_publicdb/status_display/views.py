@@ -59,10 +59,22 @@ def station_page(request, station_id, year, month, day):
 
     station = get_object_or_404(Station, number=station_id)
 
-    # Use yesterday and tomorrow to add previous/next (yesterday/tomorrow) links
+    # Use yesterday and tomorrow to add previous/next links
     yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
     tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
 
+    # Use < [>] or <= [>=]?
+    previous = (Summary.objects.filter(Q(station__number=station_id),
+                                       Q(num_events__isnull=False) |
+                                       Q(num_weather__isnull=False))
+                              .filter(date__le=yesterday)
+                              .latest('date')).date
+    # what is the correct syntax first / earliest ?
+    next = (Summary.objects.filter(Q(station__number=station_id),
+                                   Q(num_events__isnull=False) |
+                                   Q(num_weather__isnull=False))
+                           .filter(date__ge=tomorrow)
+                           .first('date')).date
     try:
         config = (Configuration.objects.filter(source__station=station,
                                                timestamp__lt=tomorrow)
@@ -102,6 +114,8 @@ def station_page(request, station_id, year, month, day):
          'month_list': month_list,
          'year_list': year_list,
          'current_date': current_date,
+         'prev': previous,
+         'next': next,
          'link': (station_id, year, month, day)},
         context_instance=RequestContext(request))
 
