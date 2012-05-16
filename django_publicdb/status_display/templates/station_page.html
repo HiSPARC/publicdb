@@ -213,7 +213,7 @@ automatically updated when the backlog is finally processed.</p>
         {% for day in week %}
           <td class="day">
             {% if day.link %}
-              <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url status_display.views.station_page day.link.0,day.link.1,day.link.2,day.link.3 %}'>{{ day.day }}</a>
+              <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url status_display.views.station_page day.link.0, day.link.1, day.link.2, day.link.3 %}'>{{ day.day }}</a>
             {% else %}
               {{ day.day }}
             {% endif %}
