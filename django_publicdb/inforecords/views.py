@@ -6,7 +6,10 @@ import xmlrpclib
 import base64
 
 from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
+
+@login_required
 def keys(request, host):
     """Return a zip-file containing the hosts OpenVPN keys"""
 
