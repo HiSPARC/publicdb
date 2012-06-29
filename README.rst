@@ -21,37 +21,71 @@ with::
 
     $ easy_install pip
 
+And virtualenv/virtualenvwrapper with::
+
+    $ pip install virtualenvwrapper
+
 Create a clean environment with::
 
-    $ mkvirtualenv publicdb --no-site-packages --distribute
+    $ mkvirtualenv publicdb
 
 where you can replace *publicdb* with any name you like.  If the
 environment is not already automatically activated, do that with::
 
     $ workon publicdb
 
-and populate this environment with all prerequisites, using::
+We will now populate this environment with all prerequisites.  To
+duplicate the environment used while writing this documentation, use the
+following instructions, including version numbers.  To install the latest
+versions of the software, drop the `==<version>` part.  For example, you
+can install ipython 0.10.2 using::
 
-    $ pip install ipython==0.10.2
+    $ pip install ipython==0.12.1
 
-    $ pip install Cython==0.14.1
-    $ pip install numpy==1.6.0
+Alternatively, install the latest version with::
 
-    $ pip install chaco==4.0.0
-    $ pip install enable==4.0.0
-    $ pip install pyface==4.0.0
-    $ pip install traits==4.0.0
-    $ pip install traitsui==4.0.1
+    $ pip install ipython
 
-    $ pip install tables==2.1.2
+The complete requirements and installation instructions are::
+
+    $ pip install ipython==0.12.1
+
+    $ pip install Cython==0.16
+    $ pip install numpy==1.6.2
+
+    $ pip install enable==4.2.1
+    $ pip install chaco==4.2.0
+
+    $ pip install numexpr==2.0.1
+    $ pip install tables==2.3.1
 
     $ pip install pyamf==0.6.1
-    $ pip install pil==1.1.7
+
+    $ pip install recaptcha-client==1.0.6
 
     $ pip install Django==1.1.4
     $ pip install South==0.7.3
 
 You now have all the prerequisites for running the publicdb django app.
+For reference, the results from `pip freeze`::
+
+    $ pip freeze
+    Cython==0.16
+    Django==1.1.4
+    PIL==1.1.7
+    PyAMF==0.6.1
+    South==0.7.3
+    chaco==4.2.0
+    enable==4.2.1
+    ipython==0.12.1
+    numexpr==2.0.1
+    numpy==1.6.2
+    pyface==4.2.0
+    recaptcha-client==1.0.6
+    tables==2.3.1
+    traits==4.2.0
+    traitsui==4.2.0
+    wsgiref==0.1.2
 
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
 database with::

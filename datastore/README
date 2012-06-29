@@ -1,0 +1,2 @@
+This directory contains a partial copy of the datastore.  Fill it using
+scripts/download_test_datastore.py.
