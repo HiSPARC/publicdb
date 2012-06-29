@@ -67,7 +67,8 @@ def download_and_store_station_data(f, station, date):
     start = datetime.combine(date, time(0, 0, 0))
     end = start + timedelta(days=1)
 
-    station_group = get_or_create_station_group(f, station.cluster.name,
+    cluster = station.cluster.main_cluster()
+    station_group = get_or_create_station_group(f, cluster,
                                                 station.number)
 
     download_data(f, station_group, station.number, start, end,
