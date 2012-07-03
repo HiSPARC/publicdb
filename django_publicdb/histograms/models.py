@@ -12,10 +12,7 @@ class SerializedDataField(models.Field):
     # initialized
     __metaclass__ = models.SubfieldBase
 
-    def __init__(self, *args, **kwargs):
-        super(SerializedDataField, self).__init__(*args, **kwargs)
-
-    def db_type(self):
+    def db_type(self, connection):
         return 'LONGBLOB'
 
     def to_python(self, value):
@@ -26,8 +23,9 @@ class SerializedDataField(models.Field):
         else:
             return unpickled
 
-    def get_db_prep_value(self, value):
+    def get_prep_value(self, value):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
+
 
 class Summary(models.Model):
     station = models.ForeignKey(inforecords.Station)
