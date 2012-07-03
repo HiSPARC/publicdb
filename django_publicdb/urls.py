@@ -1,6 +1,9 @@
 from django.conf.urls.defaults import *
+from django.views.generic import RedirectView
+
 from inforecords.views import *
 from inforecords.forms import *
+
 #Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -9,8 +12,7 @@ urlpatterns = patterns('',
     # Example:
     # (r'^django_publicdb/', include('django_publicdb.foo.urls')),
 
-    (r'^$', 'django.views.generic.simple.redirect_to',
-     {'url': 'show/stations', 'permanent': False}),
+    (r'^$', RedirectView.as_view(url='show/stations', permanent=False)),
 
     (r'^show/', include('django_publicdb.status_display.urls')),
     (r'^analysis-session/', include('django_publicdb.analysissessions.urls')),
