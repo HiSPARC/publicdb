@@ -28,8 +28,5 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
 
-    # (Temporary?) Ajax urls
-    (r'^ajax/', include('django_publicdb.ajax.urls')),
-
     (r'^jsparc/', include('django_publicdb.jsparc.urls')),
 )
