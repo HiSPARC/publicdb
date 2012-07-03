@@ -3,6 +3,13 @@
 {% block css %}
 #stationList {
     font-size: 10pt;
+    -webkit-column-count: 2;
+       -moz-column-count: 2;
+            column-count: 2;
+}
+
+.cluster {
+    display:inline-block;
 }
 
 ul {
@@ -58,19 +65,34 @@ that this station has not yet uploaded data to our new datastore.</p>
 
 <div id="stationList">
 {% for cluster in clusters %}
-    <h3>{{ cluster.name }}</h3>
-    <ul>
-    {% for station in cluster.stations %}
-        <li>
-        {% if station.link %}
-            <a href="{% url status_display.views.station station.link %}">
-        {% endif %}
-        <span id="stationNumber">{{ station.number }}</span> &mdash; <span id="stationName">{{ station.name }}</span>
-        {% if station.link %}</a>{% endif %}
-        </li>
-    {% endfor %}
-    </ul>
+ <div class="cluster">
+  <h3>{{ cluster.name }}</h3>
+  <ul>
+  {% for station in cluster.stations %}
+   <li>
+   {% if station.link %}<a href="{% url status_display.views.station station.link %}">{% endif %}
+    {{ station.number }} &mdash; {{ station.name }}
+   {% if station.link %}</a>{% endif %}
+   </li>
+  {% endfor %}
+  </ul>
+ <div>
 {% endfor %}
 </div>
+
+<!--
+Add an option/switch to show a list of stations sorted by station number.
+<div id="stationListAlt">
+{% for station in allstations %}
+ <ul>
+  <li>
+  {% if station.link %}<a href="{% url status_display.views.station station.link %}">{% endif %}
+   {{ station.number }} &mdash; {{ station.name }}
+  {% if station.link %}</a>{% endif %}
+  </li>
+ </ul>
+{% endfor %}
+-->
+
 
 {% endblock %}

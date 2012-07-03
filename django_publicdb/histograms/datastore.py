@@ -5,6 +5,7 @@ import tables
 
 from django.conf import settings
 
+
 def check_for_new_events(last_check_time):
     """Check for new events since last check
 
@@ -14,6 +15,7 @@ def check_for_new_events(last_check_time):
     rootdir = settings.DATASTORE_PATH
     file_list = get_updated_files(rootdir, last_check_time)
     return get_event_summary(file_list)
+
 
 def get_updated_files(rootdir, last_check_time):
     """Check for updated data files
@@ -39,6 +41,7 @@ def get_updated_files(rootdir, last_check_time):
 
     return file_list
 
+
 def get_event_summary(file_list):
     """Summarize event numbers per station
 
@@ -62,6 +65,7 @@ def get_event_summary(file_list):
 
     return summary
 
+
 def get_stations(date):
     """Get all stations with data on specified date
 
@@ -79,8 +83,7 @@ def get_stations(date):
     with tables.openFile(path) as file:
         for cluster in file.listNodes('/hisparc'):
             for station in file.listNodes(cluster):
-                m = re.match('station_(?P<station>[0-9]+)',
-                             station._v_name)
+                m = re.match('station_(?P<station>[0-9]+)', station._v_name)
                 station_list.append(int(m.group('station')))
 
     return station_list
@@ -98,6 +101,7 @@ def get_event_timestamps(cluster, station_id, date):
     """
     return get_event_data(cluster, station_id, date, 'timestamp')
 
+
 def get_pulseheights(cluster, station_id, date):
     """Get all event pulse heights
 
@@ -108,8 +112,7 @@ def get_pulseheights(cluster, station_id, date):
     :param date: date
 
     """
-    pulseheights = get_event_data(cluster, station_id, date,
-                                  'pulseheights')
+    pulseheights = get_event_data(cluster, station_id, date, 'pulseheights')
     if pulseheights is None:
         return None
     else:
@@ -119,6 +122,7 @@ def get_pulseheights(cluster, station_id, date):
 
         # transpose, so we have 4 arrays of many pulseheights
         return zip(*pulseheights)
+
 
 def get_integrals(cluster, station_id, date):
     """Get all event integrals
@@ -134,13 +138,13 @@ def get_integrals(cluster, station_id, date):
     if integrals is None:
         return None
     else:
-        #FIXME
-        #ADL - Multiply by 2.5 for mVns integral (x * .57 * 2.5).
+        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
         # need configurations for this
-        integrals = [[x * .57 for x in y] for y in integrals]
+        integrals = [[x * .57 * 2.5 for x in y] for y in integrals]
 
         # transpose, so we have 4 arrays of many integrals
         return zip(*integrals)
+
 
 def get_temperature(cluster, station_id, date):
     """Get temperature data
@@ -150,8 +154,8 @@ def get_temperature(cluster, station_id, date):
     :param date: date
 
     """
-    return get_time_series(cluster, station_id, date, 'weather',
-                           'temp_outside')
+    return get_time_series(cluster, station_id, date, 'weather', 'temp_outside')
+
 
 def get_barometer(cluster, station_id, date):
     """Get barometer data
@@ -161,8 +165,8 @@ def get_barometer(cluster, station_id, date):
     :param date: date
 
     """
-    return get_time_series(cluster, station_id, date, 'weather',
-                           'barometer')
+    return get_time_series(cluster, station_id, date, 'weather', 'barometer')
+
 
 def get_event_data(cluster, station_id, date, quantity):
     """Get event data of a specific quantity
@@ -174,6 +178,7 @@ def get_event_data(cluster, station_id, date, quantity):
 
     """
     return get_data(cluster, station_id, date, 'events', quantity)
+
 
 def get_data(cluster, station_id, date, table, quantity):
     """Get data from the datastore from a table of a specific quantity
@@ -196,6 +201,7 @@ def get_data(cluster, station_id, date, table, quantity):
             data = None
 
     return data
+
 
 def get_time_series(cluster, station_id, date, table, quantity):
     """Get time series data from a table of a specific quantity
@@ -220,6 +226,7 @@ def get_time_series(cluster, station_id, date, table, quantity):
 
     return data
 
+
 def get_data_path(date):
     """Return path to data file
 
@@ -233,6 +240,7 @@ def get_data_path(date):
     rootdir = settings.DATASTORE_PATH
     file = '%d_%d_%d.h5' % (date.year, date.month, date.day)
     return os.path.join(rootdir, str(date.year), str(date.month), file)
+
 
 def get_config_messages(cluster, station_id, date):
     """Get configuration messages
