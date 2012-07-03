@@ -99,6 +99,14 @@ a.currentDate {
     padding-bottom: 10px;
 }
 
+#prev {
+    float: left;
+}
+
+#next {
+    float: right;
+}
+
 .sectionTitle {
     font-size: 120%;
     font-weight: bold;
@@ -202,10 +210,12 @@ automatically updated when the backlog is finally processed.</p>
 
 <div id="navigation">
 
-{% comment %}
-    <a class='nextprev' href='{% url status_display.views.station_page station.number, prev.year, prev.month, prev.day %}'>&larr;</a>
-    <a class='nextprev' href='{% url status_display.views.station_page station.number, next.year, next.month, next.day %}'>&rarr;</a>
-{% endcomment %}
+    {% if prev %}
+        <a class='nextprev' id='prev' href='{% url status_display.views.station_page station.number, prev.year, prev.month, prev.day %}'>&larr;</a>
+    {% endif %}
+    {% if next %}
+        <a class='nextprev' id='next' href='{% url status_display.views.station_page station.number, next.year, next.month, next.day %}'>&rarr;</a>
+    {% endif %}
 
     <table id="calendar">
     <tr><th colspan="7">{{ thismonth.month }}</th></tr>

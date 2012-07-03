@@ -61,18 +61,24 @@ def station_page(request, station_id, year, month, day):
     yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
     tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
 
-    # Use < [>] or <= [>=]?
-#    previous = (Summary.objects.filter(Q(station__number=station_id),
-#                                       Q(num_events__isnull=False) |
-#                                       Q(num_weather__isnull=False))
-#                              .filter(date__le=yesterday)
-#                              .latest('date')).date
-    # what is the correct syntax first / earliest ?
-#    next = (Summary.objects.filter(Q(station__number=station_id),
-#                                   Q(num_events__isnull=False) |
-#                                   Q(num_weather__isnull=False))
-#                           .filter(date__ge=tomorrow)
-#                           .first('date')).date
+    try:
+        previous = (Summary.objects.filter(Q(station__number=station_id),
+                                           Q(num_events__isnull=False) |
+                                           Q(num_weather__isnull=False))
+                                   .filter(date__lte=yesterday)
+                                   .latest('date')).date
+    except Summary.DoesNotExist:
+        previous = None
+
+    try:
+        next = (Summary.objects.filter(Q(station__number=station_id),
+                                       Q(num_events__isnull=False) |
+                                       Q(num_weather__isnull=False))
+                               .filter(date__gte=tomorrow)
+                               .order_by('date'))[0].date
+    except IndexError:
+        next = None
+
     try:
         config = (Configuration.objects.filter(source__station=station,
                                                timestamp__lt=tomorrow)
@@ -112,8 +118,8 @@ def station_page(request, station_id, year, month, day):
          'month_list': month_list,
          'year_list': year_list,
          'current_date': current_date,
-#         'prev': previous,
-#         'next': next,
+         'prev': previous,
+         'next': next,
          'link': (station_id, year, month, day)},
         context_instance=RequestContext(request))
 
