@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load url from future %}
+
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
 {% block css %}
@@ -171,7 +173,7 @@ automatically updated when the backlog is finally processed.</p>
 {% if eventhistogram %}
     <div id="eventHistogram" class="histogram">
         <h3>Event Histogram (number of events per hour)</h3>
-        <a href="{% url status_display.views.get_eventtime_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ eventhistogram }}' alt="Event time histogram">
     </div>
 {% endif %}
@@ -179,7 +181,7 @@ automatically updated when the backlog is finally processed.</p>
 {% if pulseheighthistogram %}
     <div id="pulseheightHistogram" class="histogram">
         <h3>Pulse height histogram</h3>
-        <a href="{% url status_display.views.get_pulseheight_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ pulseheighthistogram }}' alt="Pulse height histogram">
     </div>
 {% endif %}
@@ -187,7 +189,7 @@ automatically updated when the backlog is finally processed.</p>
 {% if pulseintegralhistogram %}
     <div id="pulseintegralHistogram" class="histogram">
         <h3>Pulse integral histogram</h3>
-        <a href="{% url status_display.views.get_pulseintegral_histogram_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ pulseintegralhistogram }}' alt="Pulse integral histogram">
     </div>
 {% endif %}
@@ -195,14 +197,14 @@ automatically updated when the backlog is finally processed.</p>
 {% if barometerdata %}
     <div id="barometerData" class="histogram">
         <h3>Barometer data</h3>
-        <a href="{% url status_display.views.get_barometer_dataset_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ barometerdata }}' alt="Barometer data">
     </div>
 {% endif %}
 {% if temperaturedata %}
     <div id="temperatureData" class="histogram">
         <h3>Temperature data</h3>
-        <a href="{% url status_display.views.get_temperature_dataset_source link.0,link.1,link.2,link.3 %}" class="sourceLink">Source</a><br>
+        <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <img src='{{ temperaturedata }}' alt="Temperature data">
     </div>
 {% endif %}
@@ -211,10 +213,10 @@ automatically updated when the backlog is finally processed.</p>
 <div id="navigation">
 
     {% if prev %}
-        <a class='nextprev' id='prev' href='{% url status_display.views.station_page station.number, prev.year, prev.month, prev.day %}'>&larr;</a>
+        <a class='nextprev' id='prev' href='{% url 'status_display.views.station_page' station.number prev.year prev.month prev.day %}'>&larr;</a>
     {% endif %}
     {% if next %}
-        <a class='nextprev' id='next' href='{% url status_display.views.station_page station.number, next.year, next.month, next.day %}'>&rarr;</a>
+        <a class='nextprev' id='next' href='{% url 'status_display.views.station_page' station.number next.year next.month next.day %}'>&rarr;</a>
     {% endif %}
 
     <table id="calendar">
@@ -229,7 +231,7 @@ automatically updated when the backlog is finally processed.</p>
         {% for day in week %}
           <td class="day">
             {% if day.link %}
-              <a class='{% ifequal current_date.day day.day %}currentDate{% endifequal %}' href='{% url status_display.views.station_page day.link.0, day.link.1, day.link.2, day.link.3 %}'>{{ day.day }}</a>
+              <a class='{% ifequal current_date.day day.day %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
             {% else %}
               {{ day.day }}
             {% endif %}
@@ -242,7 +244,7 @@ automatically updated when the backlog is finally processed.</p>
     <ul>
     {% for month in month_list %}
       {% if month.link %}
-        <a class='{% ifequal current_date.month month.month %}currentDate{% endifequal %}' href='{% url status_display.views.station_page month.link.0, month.link.1, month.link.2, month.link.3 %}'>{{ month.month }}</a>
+        <a class='{% ifequal current_date.month month.month %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
       {% else %}
         {{ month.month }}
       {% endif %}
@@ -253,7 +255,7 @@ automatically updated when the backlog is finally processed.</p>
     <div id="yearlist">
     <ul>
     {% for year in year_list %}
-      <li><a class='{% ifequal current_date.year year.year %}currentDate{% endifequal %}' href='{% url status_display.views.station_page year.link.0, year.link.1, year.link.2, year.link.3 %}'>
+      <li><a class='{% ifequal current_date.year year.year %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>
         {{ year.year }}
       </a></li>
     {% endfor %}
@@ -261,7 +263,7 @@ automatically updated when the backlog is finally processed.</p>
     </div>
 
     <div id="listLink">
-        <a href="{% url status_display.views.stations %}">Station List</a>
+        <a href="{% url 'status_display.views.stations' %}">Station List</a>
     </div>
 
 </div>

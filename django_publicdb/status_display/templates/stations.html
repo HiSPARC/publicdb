@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load url from future %}
+
 {% block css %}
 #stationList {
     font-size: 10pt;
@@ -70,7 +72,7 @@ that this station has not yet uploaded data to our new datastore.</p>
   <ul>
   {% for station in cluster.stations %}
    <li>
-   {% if station.link %}<a href="{% url status_display.views.station station.link %}">{% endif %}
+   {% if station.link %}<a href="{% url 'status_display.views.station' station.link %}">{% endif %}
     {{ station.number }} &mdash; {{ station.name }}
    {% if station.link %}</a>{% endif %}
    </li>
@@ -86,7 +88,7 @@ Add an option/switch to show a list of stations sorted by station number.
 {% for station in allstations %}
  <ul>
   <li>
-  {% if station.link %}<a href="{% url status_display.views.station station.link %}">{% endif %}
+  {% if station.link %}<a href="{% url 'status_display.views.station' station.link %}">{% endif %}
    {{ station.number }} &mdash; {{ station.name }}
   {% if station.link %}</a>{% endif %}
   </li>
