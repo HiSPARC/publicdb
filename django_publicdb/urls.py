@@ -1,7 +1,6 @@
 from django.conf.urls.defaults import *
 from inforecords.views import *
 from inforecords.forms import *
-from inforecords.adminwizard import adminwizard 
 #Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
@@ -30,7 +29,6 @@ urlpatterns = patterns('',
 
     # Uncomment the next line to enable the admin:
     (r'^admin/', include(admin.site.urls)),
-    (r'^wizards/', include(adminwizard.urls)),
 
     # (Temporary?) Ajax urls
     (r'^ajax/', include('django_publicdb.ajax.urls')),
