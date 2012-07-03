@@ -12,8 +12,6 @@ urlpatterns = patterns('',
     (r'^$', 'django.views.generic.simple.redirect_to',
      {'url': 'show/stations', 'permanent': False}),
 
-    (r'^gateway/$', 'django_publicdb.histograms.amfgateway.publicgateway'),
-
     (r'^show/', include('django_publicdb.status_display.urls')),
     (r'^analysis-session/', include('django_publicdb.analysissessions.urls')),
     (r'^software-updates/', include('django_publicdb.updates.urls')),
