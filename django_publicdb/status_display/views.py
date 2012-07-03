@@ -393,7 +393,7 @@ def nav_calendar(station, theyear, themonth):
                     link = None
                 else:
                     link = (station.number, theyear, themonth, day.day)
-                days.append({'day': '%2d' % day.day, 'link': link})
+                days.append({'day': day.day, 'link': link})
             else:
                 days.append('')
         weeks.append(days)
