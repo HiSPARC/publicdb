@@ -10,146 +10,11 @@
         $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ]);
     });
 </script>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/station_page.css" />
+
 {% endblock %}
 
 {% block css %}
-#header * {
-    margin: 0px;
-    padding: 0px;
-}
-
-#header {
-    margin-bottom: 10px;
-}
-
-#stationNumber {
-    color: black;
-    font-size: 10pt;
-}
-
-#date {
-    font-weight: bold;
-    font-size: 11pt;
-    margin-top: 5px;
-}
-
-#graphs {
-    float: left;
-    width: 591px;
-}
-
-#navigation, #config {
-    float: right;
-    width: 220px;
-    font-size: 9pt;
-    border-left: 1px solid black;
-    padding-left: 20px;
-}
-
-#yearlist ul, #monthlist ul {
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
-}
-
-#yearlist ul li, #monthlist ul li {
-    display: inline;
-    line-height: 2;
-    margin-right: 10px;
-}
-
-#calendar .day, #calendar .dayname {
-    width: 25px;
-    height: 25px;
-    text-align: right;
-}
-
-#calendar .day a {
-    padding: 2px;
-}
-
-#calendar .dayname {
-    font-size: 8pt;
-}
-
-a:link, a:visited {
-    color: black;
-    font-weight: bold;
-}
-
-a.sourceLink {
-    float: right;
-    position: relative;
-    right: 11px;
-    top: 15px;
-    font-size: 8pt;
-    margin: 0;
-    padding: 0;
-    font-weight: bold;
-    text-decoration: none;
-}
-
-a.currentDate {
-    color: white;
-    background: black;
-    padding: 2px;
-    border-radius: 2px;
-}
-
-.histogram h3 {
-    margin-bottom: -10px;
-}
-
-#config {
-    margin-top: 50px;
-}
-
-#navigation > div, #config > div {
-    padding-top: 10px;
-    padding-bottom: 10px;
-}
-
-#prev {
-    float: left;
-}
-
-#next {
-    float: right;
-}
-
-.sectionTitle {
-    font-size: 120%;
-    font-weight: bold;
-    text-decoration: underline;
-}
-
-.keyvalue, .mapLink {
-    margin-top: 5px;
-    margin-bottom: 5px;
-}
-
-.key {
-    font-weight: bold;
-    margin-right: 10px;
-}
-
-.info {
-    background-color: #efe;
-    padding: 10px;
-    border: 2px solid #8f8;
-    margin-bottom: 20px;
-}
-
-.info p, .warning p {
-    margin: 0px;
-}
-
-.warning {
-    background-color: #fee;
-    padding: 10px;
-    border: 2px solid #f88;
-    margin-bottom: 20px;
-}
 {% endblock %}
 
 {% block content %}
@@ -293,15 +158,15 @@ automatically updated when the backlog is finally processed.</p>
         <div id="master">
             <div class="sectionTitle">Master</div>
             <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
-            <div class="keyvalue"><span style="color:#444;" class="key">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
-            <div class="keyvalue"><span style="color:#D22;" class="key">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
+            <div class="keyvalue"><span style="color:#444;" class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
+            <div class="keyvalue"><span style="color:#D22;" class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
         </div>
         {% if has_slave %}
             <div id="slave">
                 <div class="sectionTitle">Slave</div>
                 <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.slv_version }}</span></div>
-                <div class="keyvalue"><span style="color:#1C2;" class="key">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
-                <div class="keyvalue"><span style="color:#1CC;" class="key">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
+                <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
+                <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
             </div>
         {% endif %}
     {% endif %}

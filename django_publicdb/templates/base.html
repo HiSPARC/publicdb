@@ -9,30 +9,7 @@
     <title>{% block title %}HiSPARC Public Database{% endblock %}</title>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
     <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/flot/0.7/jquery.flot.min.js"></script>
-    {% block head %}{% endblock %}
-    <style type="text/css">
-        html {
-            font-family: sans-serif;
-        }
-        #container {
-            margin: auto;
-            width: 850px;
-        }
-        #pageHeader {
-            background: url({{ MEDIA_URL }}/static/header.png) top right no-repeat;
-            height: 63px;
-            width: 200px;
-            margin: 0;
-            padding: 0;
-            left: 630px;
-            display: inline-block;
-            position: relative;
-        }
-
-        #pageHeader span {
-            display: none;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/base.css" />
     <style type="text/css">{% block css %}{% endblock %}</style>
 </head>
 
