@@ -108,8 +108,6 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    # DF: Relative path, just for running test server!
-    'templates',
 )
 
 INSTALLED_APPS = (
@@ -129,6 +127,7 @@ INSTALLED_APPS = (
     'django_publicdb.analysissessions',
     'django_publicdb.updates',
     'django_publicdb.raw_data',
+    'django_publicdb.default',
     'south',
 )
 
