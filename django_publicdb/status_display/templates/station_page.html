@@ -5,12 +5,16 @@
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
 {% block head %}
+<<<<<<< HEAD
 <script type="text/javascript">
     $(document).ready(function() {
         $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ]);
     });
 </script>
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
+=======
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/station_page.css" />
+>>>>>>> Remove placeholder plot
 
 {% endblock %}
 
@@ -25,8 +29,6 @@
 </div>
 
 <div id="graphs">
-
-<div id="placeholder" style="height:300px"></div>
 
 {% if eventhistogram %}
     <div id="eventHistogram" class="histogram">
