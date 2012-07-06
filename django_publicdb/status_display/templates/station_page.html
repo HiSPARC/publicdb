@@ -5,17 +5,9 @@
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
 {% block head %}
-<<<<<<< HEAD
-<script type="text/javascript">
-    $(document).ready(function() {
-        $.plot($("#placeholder"), [ [[0, 0], [1, 1]] ]);
-    });
-</script>
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
-=======
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/station_page.css" />
->>>>>>> Remove placeholder plot
-
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
 {% endblock %}
 
 {% block css %}
@@ -32,25 +24,34 @@
 
 {% if eventhistogram %}
     <div id="eventHistogram" class="histogram">
-        <h3>Event Histogram (number of events per hour)</h3>
+        <h3>Event histogram (number of events per hour)</h3>
         <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ eventhistogram }}' alt="Event time histogram">
+        <div id="eh_histogram" style="width: 500px; height:331px;"></div>
+        <script type="text/javascript">
+            $.plot($("#eh_histogram"), {{ eventhistogram.data }}, eh_options);});
+        </script>
     </div>
 {% endif %}
 
 {% if pulseheighthistogram %}
     <div id="pulseheightHistogram" class="histogram">
-        <h3>Pulse height histogram</h3>
+        <h3>Pulseheight histogram</h3>
         <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ pulseheighthistogram }}' alt="Pulse height histogram">
+        <div id="ph_histogram" style="width: 500px; height:331px;"></div>
+        <script type="text/javascript">
+            $.plot($("#ph_histogram"), {{ pulseheighthistogram.data }}, ph_options);});
+        </script>
     </div>
 {% endif %}
 
 {% if pulseintegralhistogram %}
     <div id="pulseintegralHistogram" class="histogram">
-        <h3>Pulse integral histogram</h3>
+        <h3>Pulseintegral histogram</h3>
         <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ pulseintegralhistogram }}' alt="Pulse integral histogram">
+        <div id="pi_histogram" style="width: 500px; height:331px;"></div>
+        <script type="text/javascript">
+            $.plot($("#pi_histogram"), {{ pulseintegralhistogram.data }}, pi_options);});
+        </script>
     </div>
 {% endif %}
 
@@ -58,67 +59,73 @@
     <div id="barometerData" class="histogram">
         <h3>Barometer data</h3>
         <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ barometerdata }}' alt="Barometer data">
+        <div id="bd_histogram" style="width: 500px; height:331px;"></div>
+        <script type="text/javascript">
+            $.plot($("#bd_histogram"), {{ barometerdata.data }}, bd_options);});
+        </script>
     </div>
 {% endif %}
 {% if temperaturedata %}
     <div id="temperatureData" class="histogram">
         <h3>Temperature data</h3>
         <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <img src='{{ temperaturedata }}' alt="Temperature data">
+        <div id="td_histogram" style="width: 500px; height:331px;"></div>
+        <script type="text/javascript">
+            $.plot($("#td_histogram"), {{ temperaturedata.data }}, td_options);});
+        </script>
     </div>
 {% endif %}
 </div>
 
 <div id="navigation">
 
-    {% if prev %}
-        <a class='nextprev' id='prev' href='{% url 'status_display.views.station_page' station.number prev.year prev.month prev.day %}'>&larr;</a>
-    {% endif %}
-    {% if next %}
-        <a class='nextprev' id='next' href='{% url 'status_display.views.station_page' station.number next.year next.month next.day %}'>&rarr;</a>
-    {% endif %}
+  {% if prev %}
+     <a class='nextprev' id='prev' href='{% url 'status_display.views.station_page' station.number prev.year prev.month prev.day %}'>&larr;</a>
+  {% endif %}
+  {% if next %}
+     <a class='nextprev' id='next' href='{% url 'status_display.views.station_page' station.number next.year next.month next.day %}'>&rarr;</a>
+  {% endif %}
 
     <table id="calendar">
     <tr><th colspan="7">{{ thismonth.month }}</th></tr>
     <tr>
-    {% for day in thismonth.days %}
-      <th class="dayname">{{ day }}</th>
-    {% endfor %}
+      {% for day in thismonth.days %}
+        <th class="dayname">{{ day }}</th>
+      {% endfor %}
     </tr>
-    {% for week in thismonth.weeks %}
-      <tr>
-        {% for day in week %}
-          <td class="day">
-            {% if day.link %}
-              <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
-            {% else %}
-              {{ day.day }}
-            {% endif %}
-        {% endfor %}
-      </tr>
-    {% endfor %}
+      {% for week in thismonth.weeks %}
+        <tr>
+          {% for day in week %}
+            <td class="day">
+              {% if day.link %}
+                <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
+              {% else %}
+                {{ day.day }}
+              {% endif %}
+          {% endfor %}
+        </tr>
+      {% endfor %}
     </table>
 
     <div id="monthlist">
     <ul>
-    {% for month in month_list %}
-      {% if month.link %}
-        <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
-      {% else %}
-        {{ month.month }}
-      {% endif %}
-    {% endfor %}
+      {% for month in month_list %}
+        {% if month.link %}
+          <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
+        {% else %}
+          {{ month.month }}
+        {% endif %}
+      {% endfor %}
     </ul>
     </div>
 
     <div id="yearlist">
     <ul>
-    {% for year in year_list %}
-      <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>
-        {{ year.year }}
-      </a></li>
-    {% endfor %}
+      {% for year in year_list %}
+        <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>
+          {{ year.year }}
+        </a></li>
+      {% endfor %}
     </ul>
     </div>
 
