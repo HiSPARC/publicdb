@@ -8,7 +8,7 @@ html {
 }
 
 #pageHeader {
-    background: url({{ MEDIA_URL }}/static/header.png) top right no-repeat;
+    background: url(../header.png) top right no-repeat;
     height: 63px;
     width: 200px;
     margin: 0;
