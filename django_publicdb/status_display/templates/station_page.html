@@ -107,7 +107,7 @@ automatically updated when the backlog is finally processed.</p>
         {% for day in week %}
           <td class="day">
             {% if day.link %}
-              <a class='{% ifequal current_date.day day.day %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
+              <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
             {% else %}
               {{ day.day }}
             {% endif %}
@@ -120,7 +120,7 @@ automatically updated when the backlog is finally processed.</p>
     <ul>
     {% for month in month_list %}
       {% if month.link %}
-        <a class='{% ifequal current_date.month month.month %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
+        <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
       {% else %}
         {{ month.month }}
       {% endif %}
@@ -131,7 +131,7 @@ automatically updated when the backlog is finally processed.</p>
     <div id="yearlist">
     <ul>
     {% for year in year_list %}
-      <li><a class='{% ifequal current_date.year year.year %}currentDate{% endifequal %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>
+      <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>
         {{ year.year }}
       </a></li>
     {% endfor %}
