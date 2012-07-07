@@ -1,0 +1,31 @@
+#stationList {
+    font-size: 10pt;
+    -webkit-column-count: 2;
+       -moz-column-count: 2;
+            column-count: 2;
+}
+
+.cluster {
+    display:inline-block;
+}
+
+ul {
+    list-style: none;
+}
+
+.info {
+    background-color: #efe;
+    padding: 10px;
+    border: 2px solid #8f8;
+    margin-bottom: 20px;
+}
+
+.info p, .warning p {
+    margin: 0px;
+}
+
+.warning {
+    background-color: #fee;
+    padding: 10px;
+    border: 2px solid #f88;
+}
