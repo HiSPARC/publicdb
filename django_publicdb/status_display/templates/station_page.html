@@ -27,7 +27,7 @@
         <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <div id="eh_histogram" style="width: 500px; height:331px;"></div>
         <script type="text/javascript">
-            $.plot($("#eh_histogram"), {{ eventhistogram.data }}, eh_options);});
+            $.plot($("#eh_histogram"), {{ eventhistogram.data }}, eh_options);
         </script>
     </div>
 {% endif %}
@@ -38,7 +38,7 @@
         <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <div id="ph_histogram" style="width: 500px; height:331px;"></div>
         <script type="text/javascript">
-            $.plot($("#ph_histogram"), {{ pulseheighthistogram.data }}, ph_options);});
+            $.plot($("#ph_histogram"), {{ pulseheighthistogram.data }}, ph_options);
         </script>
     </div>
 {% endif %}
@@ -49,7 +49,7 @@
         <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <div id="pi_histogram" style="width: 500px; height:331px;"></div>
         <script type="text/javascript">
-            $.plot($("#pi_histogram"), {{ pulseintegralhistogram.data }}, pi_options);});
+            $.plot($("#pi_histogram"), {{ pulseintegralhistogram.data }}, pi_options);
         </script>
     </div>
 {% endif %}
@@ -60,7 +60,7 @@
         <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <div id="bd_histogram" style="width: 500px; height:331px;"></div>
         <script type="text/javascript">
-            $.plot($("#bd_histogram"), {{ barometerdata.data }}, bd_options);});
+            $.plot($("#bd_histogram"), {{ barometerdata.data }}, bd_options);
         </script>
     </div>
 {% endif %}
@@ -70,7 +70,7 @@
         <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
         <div id="td_histogram" style="width: 500px; height:331px;"></div>
         <script type="text/javascript">
-            $.plot($("#td_histogram"), {{ temperaturedata.data }}, td_options);});
+            $.plot($("#td_histogram"), {{ temperaturedata.data }}, td_options);
         </script>
     </div>
 {% endif %}

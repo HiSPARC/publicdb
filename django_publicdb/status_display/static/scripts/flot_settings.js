@@ -105,6 +105,11 @@ var _bd_options = {
     },
 };
 
+var eh_options = {};
+var ph_options = {};
+var pi_options = {};
+var td_options = {};
+var bd_options = {};
 $.extend(true, eh_options, base_options, _eh_options);
 $.extend(true, ph_options, base_options, _ph_options);
 $.extend(true, pi_options, base_options, _pi_options);

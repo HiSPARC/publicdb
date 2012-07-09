@@ -7,11 +7,11 @@
     <link rel="icon" type="image/vnd.microsoft.icon" href="http://www.hisparc.nl/favicon.ico" />
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
     <title>{% block title %}HiSPARC Public Database{% endblock %}</title>
-    <script type="text/javascript" src="../scripts/jquery-1.7.2.min.js"></script>
-    <script type="text/javascript" src="../scripts/jquery.flot.min.js"></script>
-    <script type="text/javascript" src="../scripts/jquery.flot.axislabels.js"></script>
-    <script type="text/javascript" src="../scripts/excanvas.min.js"></script>
-    <link rel="stylesheet" type="text/css" media="screen" href="../styles/base.css" />
+    <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery.flot.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery.flot.axislabels.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}/scripts/excanvas.min.js"></script>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/base.css" />
     {% block head %}{% endblock %}
     <style type="text/css">{% block css %}{% endblock %}</style>
 </head>
