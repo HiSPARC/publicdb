@@ -23,7 +23,18 @@ var base_options = {
             size: 12,
         },
     },
-    
+    y2axis: {
+        alignTicksWithAxis: 1,
+        axisLabel: '',
+        position: "right",
+        labelWidth: 0,
+    },
+    x2axis: {
+        alignTicksWithAxis: 1,
+        axisLabel: '',
+        position: "top",
+        labelHeight: 0,
+    },
     grid: {
         show: true,
         aboveData: 0,
@@ -46,22 +57,10 @@ var _eh_options = {
         axisLabel: 'Number of events',
         min: 0,
     },
-    y2axis: {
-        alignTicksWithAxis: 1,
-        axisLabel: '',
-        position: "right",
-        labelWidth: 0,
-    },
     xaxis: {
         axisLabel : 'Hour of day (UTC)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         max: 24,
-    },
-    x2axis: {
-        alignTicksWithAxis: 1,
-        axisLabel: '',
-        position: "top",
-        labelHeight: 0,
     },
 };
 
