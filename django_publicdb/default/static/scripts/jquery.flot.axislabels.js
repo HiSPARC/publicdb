@@ -206,20 +206,20 @@ Improvements by Mark Cote.
     CssTransformAxisLabel.prototype.calculateOffsets = function(box) {
         var offsets = { x: 0, y: 0, degrees: 0 };
         if (this.position == 'bottom') {
-            offsets.x = box.left + box.width/2 - this.labelWidth/2;
+            offsets.x = Math.floor(box.left + box.width/2 - this.labelWidth/2);
             offsets.y = box.top + box.height - this.labelHeight;
         } else if (this.position == 'top') {
-            offsets.x = box.left + box.width/2 - this.labelWidth/2;
+            offsets.x = Math.floor(box.left + box.width/2 - this.labelWidth/2);
             offsets.y = box.top;
         } else if (this.position == 'left') {
             offsets.degrees = -90;
-            offsets.x = box.left - this.labelWidth/2 + this.labelHeight/2;
-            offsets.y = box.height/2 + box.top;
+            offsets.x = Math.floor(box.left - this.labelWidth/2 + this.labelHeight/2) + 0.5;
+            offsets.y = Math.floor(box.height/2 + box.top);
         } else if (this.position == 'right') {
             offsets.degrees = 90;
-            offsets.x = box.left + box.width - this.labelWidth/2
-                        - this.labelHeight/2;
-            offsets.y = box.height/2 + box.top;
+            offsets.x = Math.floor(box.left + box.width - this.labelWidth/2
+                        - this.labelHeight/2);
+            offsets.y = Math.floor(box.height/2 + box.top);
         }
         return offsets;
     };
