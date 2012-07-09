@@ -68,7 +68,7 @@ var _ph_options = {
     yaxis: {
         axisLabel: 'Count',
         min: 1,
-        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000],
+        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
         tickLength: 4,
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
@@ -83,7 +83,7 @@ var _pi_options = {
     yaxis: {
         axisLabel: 'Count',
         min: 1,
-        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000],
+        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
         tickLength: 4,
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
@@ -95,6 +95,15 @@ var _pi_options = {
 };
 
 var _td_options = {
+    series: {
+        lines: {
+            show: false,
+        },
+        points: {
+            show: true,
+            radius: 0,
+        },
+    },
     yaxis: {
         axisLabel: 'Temperature (°C)',
     },
