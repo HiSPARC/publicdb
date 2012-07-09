@@ -37,10 +37,15 @@
     padding: 0px;
 }
 
-#yearlist ul li, #monthlist ul li {
+#yearlist li, #monthlist li {
     display: inline;
     line-height: 2;
     margin-right: 10px;
+}
+
+#monthlist li {
+    display: inline-block;
+    width: 23px;
 }
 
 #calendar .day, #calendar .dayname {
