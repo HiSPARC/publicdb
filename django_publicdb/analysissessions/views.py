@@ -14,7 +14,6 @@ import calendar
 from models import *
 from forms import *
 from recaptcha.client import captcha
-import chaco.api as chaco
 
 
 def data_display(request, slug):
