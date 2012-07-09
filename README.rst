@@ -105,6 +105,11 @@ directory (the one containing your settings.py) with::
 
     $ ./manage.py runserver
 
+Run the django-cron.py in the examples folder to generate the histograms
+for the downloaded data::
+
+    $ python django-cron.py
+
 The settings point to a temporary mediaroot in the source tree, and a HTTP
 server running on port 8008 to serve the files.  If you want to serve
 files from that directory using a development server, change to the
