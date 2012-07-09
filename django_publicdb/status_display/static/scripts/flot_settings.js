@@ -1,5 +1,5 @@
 var base_options = {
-    colors: ["#222"],
+    colors: ["#222", "#D22", "#1C2", "#1CC",],
     series: {
         lines: {
             lineWidth: 1,
@@ -10,7 +10,7 @@ var base_options = {
     yaxis: {
         tickLength: 4,
         tickColor: "#000",
-        labelWidth: 35,
+        labelWidth: 45,
         font: {
             size: 12,
         },
@@ -23,6 +23,7 @@ var base_options = {
             size: 12,
         },
     },
+    
     grid: {
         show: true,
         aboveData: 0,
@@ -42,17 +43,29 @@ var base_options = {
 
 var _eh_options = {
     yaxis: {
-        axisLabel: 'Number of Events',
+        axisLabel: 'Number of events',
         min: 0,
+    },
+    y2axis: {
+        alignTicksWithAxis: 1,
+        axisLabel: '',
+        position: "right",
+        labelWidth: 0,
     },
     xaxis: {
         axisLabel : 'Hour of day (UTC)',
-        ticks: [0, 4, 8, 12, 16, 20, 24],
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        max: 24,
+    },
+    x2axis: {
+        alignTicksWithAxis: 1,
+        axisLabel: '',
+        position: "top",
+        labelHeight: 0,
     },
 };
 
 var _ph_options = {
-    colors: ["#222", "#D22", "#1C2", "#1CC",],
     yaxis: {
         axisLabel: 'Count',
         min: 1,
@@ -61,7 +74,6 @@ var _ph_options = {
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
         inverseTransform: function (N) { return Math.exp(N); },
-        labelWidth: 35,
     },
     xaxis: {
         axisLabel: 'Pulseheight (mV)',
@@ -69,7 +81,6 @@ var _ph_options = {
 };
 
 var _pi_options = {
-    colors: ["#222", "#D22", "#1C2", "#1CC",],
     yaxis: {
         axisLabel: 'Count',
         min: 1,
@@ -78,7 +89,6 @@ var _pi_options = {
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
         inverseTransform: function (N) { return Math.exp(N); },
-        labelWidth: 35,
     },
     xaxis: {
         axisLabel: 'Pulseintegral (mVns)',
@@ -91,17 +101,28 @@ var _td_options = {
     },
     xaxis: {
         axisLabel: 'Hour of day (UTC)',
-        ticks: [0, 4, 8, 12, 16, 20, 24],
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        max: 24,
     },
 };
 
 var _bd_options = {
+    series: {
+        lines: {
+            show: false,
+        },
+        points: {
+            show: true,
+            radius: 0,
+        },
+    },
     yaxis: {
         axisLabel: 'Air pressure (hPa)',
     },
     xaxis: {
         axisLabel: 'Hour of day (UTC)',
-        ticks: [0, 4, 8, 12, 16, 20, 24],
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        max: 24,
     },
 };
 
