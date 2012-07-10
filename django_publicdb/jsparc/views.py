@@ -134,7 +134,7 @@ def result(request):
     except ValueError:
         rank = None
 
-    response = HttpResponse(json.dumps(dict(msg="OK [result stored]",rank=rank)),
+    response = HttpResponse(json.dumps(dict(msg="OK [result stored]", rank=rank)),
                             mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
