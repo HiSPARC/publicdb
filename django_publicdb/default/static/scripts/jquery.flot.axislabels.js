@@ -214,7 +214,7 @@ Improvements by Mark Cote.
         } else if (this.position == 'left') {
             offsets.degrees = -90;
             offsets.x = Math.floor(box.left - this.labelWidth/2 + this.labelHeight/2) + 0.5;
-            offsets.y = Math.floor(box.height/2 + box.top);
+            offsets.y = Math.floor(box.height/2 + box.top) + 0.5;
         } else if (this.position == 'right') {
             offsets.degrees = 90;
             offsets.x = Math.floor(box.left + box.width - this.labelWidth/2
