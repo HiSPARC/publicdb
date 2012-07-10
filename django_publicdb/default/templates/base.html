@@ -10,7 +10,7 @@
     <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery.flot.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}/scripts/jquery.flot.axislabels.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}/scripts/excanvas.min.js"></script>
+    <!--[if lte IE 8]><script type="text/javascript" src="{{ STATIC_URL }}/scripts/excanvas.min.js"></script><![endif]-->
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}/styles/base.css" />
     {% block head %}{% endblock %}
     <style type="text/css">{% block css %}{% endblock %}</style>
