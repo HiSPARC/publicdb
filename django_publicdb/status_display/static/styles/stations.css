@@ -6,26 +6,24 @@
 }
 
 .cluster {
-    display:inline-block;
+    display: block;
 }
 
 ul {
     list-style: none;
 }
 
-.info {
-    background-color: #efe;
-    padding: 10px;
-    border: 2px solid #8f8;
-    margin-bottom: 20px;
+li {
 }
 
-.info p, .warning p {
-    margin: 0px;
+#stationList a {
+    font-size: 10pt;
+    color: #23B;
+    text-decoration: none;
 }
 
-.warning {
-    background-color: #fee;
-    padding: 10px;
-    border: 2px solid #f88;
+#stationList a:hover {
+    color: #005;
+    text-decoration: underline;
 }
+
