@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% load url from future %}
-{% load fix_histogram_data %}
+{% load fix_data %}
 
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
@@ -75,7 +75,7 @@
         <script type="text/javascript">
             $.plot($("#bd_histogram"), [
               {% for data in barometerdata.data %}
-                {data: {{ data }}, yaxis: 1},
+                {data: {{ data|fix_timestamps_in_data|slice_data:50 }}, yaxis: 1},
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
         </script>
@@ -89,7 +89,7 @@
         <script type="text/javascript">
             $.plot($("#td_histogram"), [
               {% for data in temperaturedata.data %}
-                {data: {{ data }}, yaxis: 1},
+                {data: {{ data|fix_timestamps_in_data|slice_data:50 }}, yaxis: 1},
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], td_options);
         </script>
