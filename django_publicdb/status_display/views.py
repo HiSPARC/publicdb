@@ -283,14 +283,14 @@ def nav_months(station, theyear):
                                         Q(num_weather__isnull=False))
                         .dates('date', 'month'))
 
-    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1,13)]
+    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
         first_day = (Summary.objects.filter(station=station,
                                             date__year=date.year,
                                             date__month=date.month)
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
-        month_list[date.month]['link'] = link
+        month_list[date.month - 1]['link'] = link
 
     return month_list
 
