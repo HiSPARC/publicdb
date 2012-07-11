@@ -1,3 +1,5 @@
+/* Header */
+
 #header * {
     margin: 0px;
     padding: 0px;
@@ -18,11 +20,30 @@
     margin-top: 5px;
 }
 
+/* Graphs */
+
 #graphs {
     float: left;
     width: 591px;
 }
 
+.histogram {
+    width: 590px;
+}
+
+.plot {
+    display: block;
+}
+
+.x2Axis .tickLabel {
+    display: none;
+}
+
+.y2Axis .tickLabel {
+    display: none;
+}
+
+/* Sidebar */
 #navigation, #config {
     float: right;
     width: 220px;
@@ -83,20 +104,6 @@ a.currentDate {
     border-radius: 2px;
 }
 
-.histogram {
-    width: 590px;
-}
-
-.plot {
-    display: block;
-}
-.x2Axis .tickLabel {
-    display: none;
-}
-.y2Axis .tickLabel {
-    display: none;
-}
-
 #config {
     margin-top: 50px;
 }
@@ -144,22 +151,4 @@ a.currentDate {
 
 .ch4 {
     color:#1CC;
-}
-
-.info {
-    background-color: #efe;
-    padding: 10px;
-    border: 2px solid #8f8;
-    margin-bottom: 20px;
-}
-
-.warning {
-    background-color: #fee;
-    padding: 10px;
-    border: 2px solid #f88;
-    margin-bottom: 20px;
-}
-
-.info p, .warning p {
-    margin: 0px;
 }
