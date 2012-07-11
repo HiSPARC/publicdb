@@ -60,6 +60,7 @@ var _eh_options = {
     xaxis: {
         axisLabel : 'Hour of day (UTC)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
         max: 24,
     },
 };
@@ -68,7 +69,7 @@ var _ph_options = {
     yaxis: {
         axisLabel: 'Count',
         min: 1,
-        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
+        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         tickLength: 4,
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
@@ -82,8 +83,8 @@ var _ph_options = {
 var _pi_options = {
     yaxis: {
         axisLabel: 'Count',
+        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         min: 1,
-        ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000, 50000, 100000],
         tickLength: 4,
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
@@ -110,6 +111,7 @@ var _td_options = {
     xaxis: {
         axisLabel: 'Hour of day (UTC)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
         max: 24,
     },
 };
@@ -130,6 +132,7 @@ var _bd_options = {
     xaxis: {
         axisLabel: 'Hour of day (UTC)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
         max: 24,
     },
 };
