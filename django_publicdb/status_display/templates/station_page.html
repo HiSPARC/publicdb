@@ -100,7 +100,7 @@
             $.extend(true, bd_options, bd_labels)
             $.plot($("#bd_histogram"), [
               {% for data in barometerdata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50 }}, yaxis: 1},
+                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
         </script>
@@ -122,7 +122,7 @@
             $.extend(true, td_options, td_labels)
             $.plot($("#td_histogram"), [
               {% for data in temperaturedata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50 }}, yaxis: 1},
+                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], td_options);
         </script>
