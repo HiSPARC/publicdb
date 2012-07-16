@@ -3,7 +3,8 @@
 {% block title %}Session request{% endblock %}
 {% block content %}
 
-<form action="" method="post">
+<form action="{% url analysissessions.views.validate_request_form %}" method="post">
+{% csrf_token %}
 {{ form.as_p }}
 {{ html_captcha|safe }}
 <input type="submit" value="Submit" />

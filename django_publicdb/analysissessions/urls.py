@@ -1,7 +1,11 @@
 from django.conf.urls.defaults import *
 
-urlpatterns = patterns('django_publicdb.analysissessions',
-                       (r'^(?P<slug>[\w-]+)/data/$', 'views.data_display'),
-                       (r'^request/(\w{20})/$','views.confirm_request'),
-                       (r'^request/create','views.create_request'),
-                       (r'^request/$', 'views.get_request'))
+urlpatterns = patterns(
+    'django_publicdb.analysissessions.views',
+    ( r'^(?P<slug>[\w-]+)/data/$', 'data_display' ),
+
+    ( r'^request/$',               'request_form' ),
+    ( r'^request/validate$',       'validate_request_form' ),
+    ( r'^request/create',          'create_request' ),
+    ( r'^request/(\w{20})/$',      'confirm_request' )
+)
