@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from operator import itemgetter
 import calendar
 import os
 from numpy import arange, pi, sin
@@ -14,7 +15,7 @@ from django_publicdb.inforecords.models import *
 
 
 def stations(request):
-    """Show a list of stations, ordered by cluster"""
+    """Show a list of stations, ordered by subcluster"""
 
     clusters = []
     for cluster in Cluster.objects.all():
@@ -38,6 +39,46 @@ def stations(request):
     #                     key=itemgetter('number'))
 
     return render_to_response('stations.html', {'clusters': clusters},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_number(request):
+    """Show a list of stations, ordered by number"""
+
+    stations = []
+    for station in Station.objects.all():
+        try:
+            Summary.objects.filter(station=station)[0]
+            link = station.number
+        except IndexError:
+            link = None
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link})
+
+    return render_to_response('stations_by_number.html', {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_name(request):
+    """Show a list of stations, ordered by station name"""
+
+    stations = []
+    for station in Station.objects.all():
+        try:
+            Summary.objects.filter(station=station)[0]
+            link = station.number
+        except IndexError:
+            link = None
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link})
+
+    stations = sorted(stations, key=itemgetter('name'))
+
+    return render_to_response('stations_by_name.html', {'stations': stations},
                               context_instance=RequestContext(request))
 
 

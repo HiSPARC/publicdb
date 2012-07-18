@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
+{% block content %}
+
+<div id="header">
+    <h2>List of stations, by name</h2>
+</div>
+
+<div id="intro">
+    <p>The following is a list of stations ordered by station name.  If the station
+    is a link, you can click on it to access its data.  If not, that means
+    that this station has not yet uploaded data to our datastore.</p>
+</div>
+
+<div id="stationList">
+    <ul>
+      {% for station in stations %}
+        <li>
+          {% if station.link %}
+            <a href="{% url 'status_display.views.station' station.link %}">{{ station.name }} ({{ station.number }})</a>
+          {% else %}
+            {{ station.name }} ({{ station.number }})
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}
