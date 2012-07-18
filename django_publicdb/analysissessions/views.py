@@ -279,8 +279,7 @@ def validate_request_form( request ):
 
     return render_to_response('thankyou.html')
 
-def confirm_request(request,url):
-
+def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
 
     if sessionrequest.session_confirmed==False:
@@ -306,7 +305,7 @@ def confirm_request(request,url):
     )
 
 
-def create_request(url):
+def create_request(request):
     sessionlist = SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True)
     for sessionrequest in sessionlist:
        sessionrequest.session_confirmed=False
