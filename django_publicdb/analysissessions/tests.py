@@ -3,6 +3,9 @@ import time
 import string
 import sys
 
+import json
+import urllib
+
 from django.core import mail
 from django.test import LiveServerTestCase
 
@@ -16,7 +19,7 @@ from selenium.webdriver.remote.webelement import WebElement
 # http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver_remote/selenium.webdriver.remote.webelement.html#module-selenium.webdriver.remote.webelement
 
 class MySeleniumTests(LiveServerTestCase):
-    #fixtures = ['user-data.json']
+    fixtures = ['tests_inforecords']
 
     #---------------------------------------------------------------------------
     # Setup and teardown
@@ -58,7 +61,7 @@ class MySeleniumTests(LiveServerTestCase):
 
         regexp_url = re.compile( 'http://\S+' )
 
-        number_of_students = 1
+        number_of_students = 10
 
         #-----------------------------------------------------------------------
         # 1. Request an analysis session via the website
@@ -74,11 +77,11 @@ class MySeleniumTests(LiveServerTestCase):
             ( "id_sur_name",         "Sur" ),
             ( "id_email",            "test@test.test" ),
             ( "id_school",           "Test School" ),
-            ( "id_cluster",          "Amsterdam" ),
-            ( "id_start_date_year",  "2012" ),
-            ( "id_start_date_month", "January" ),
+            ( "id_cluster",          "Science Park" ),
+            ( "id_start_date_year",  "2010" ),
+            ( "id_start_date_month", "May" ),
             ( "id_start_date_day",   "1" ),
-            ( "id_number_of_events", "5" )
+            ( "id_number_of_events", "10" )
         ]:
 
             inputElement = driver.find_element_by_id( field )
@@ -121,15 +124,18 @@ class MySeleniumTests(LiveServerTestCase):
         sys.stdout.flush()
 
         for var_name, regexp in [
-            ( "session_id",          r"^.*(id=\S).*$" ),
-            ( "session_pin",         r"^.*(pin=\S).*$" ),
-            ( "url_session_results", r".*(http://\S).*$" )
+            ( "session_title",          r"^.*Title = (.+)$" ),
+            ( "session_pin",         r"^.*Pin = (\S+)$" ),
+            ( "session_events",      r"^.*Events created = (\S+)$" ),
+            ( "url_session_results", r".*(http://\S+/analysis-session/\S+)$" )
         ]:
-            match = re.search( regexp, mail.outbox[ 0 ].body )
+            match = re.search( regexp, mail.outbox[ 1 ].body, re.MULTILINE )
 
             self.assertNotEqual( match, None )
 
-            eval( var_name + " = '" + self.changeUrlToLocal( match.group( 0 )  )+ "'" )
+            exec( var_name + " = '" + self.changeUrlToLocal( match.group( 1 )  ) + "'" )
+
+        self.assertEqual( session_events, '1030' )
 
         #-----------------------------------------------------------------------
         # 5. Simulate analyses sessions
@@ -138,27 +144,59 @@ class MySeleniumTests(LiveServerTestCase):
 
         for student_nr in range( 1, number_of_students ):
 
-            # Go to the jSparc analysis website
+            print "Simulating student nr %s..." % student_nr
 
-            driver.get( 'http://data.hisparc.nl/media/jsparc/shower.htm' )
+            #--------------------------------------
+            # Request data for a single coincidence
 
-            # Fill in the required fields for identification
+            params = urllib.urlencode( {
+                "session_title" : session_title,
+                "session_pin"   : session_pin,
+                "student_name"  : "Student %s" % student_nr
+            } )
 
-            for field, input in [
-                ( "sessionTitle", session_id ),
-                ( "sessionPin",   session_pin ),
-                ( "studentName",  "Student " + student_nr )
-            ]:
-                inputElement = driver.find_element_by_id( field )
-                inputElement.send_keys( input )
+            response = urllib.urlopen(
+                '%s%s?%s' % (
+                    self.live_server_url,
+                    '/jsparc/get_coincidence/',
+                    params
+                )
+            )
 
-            # Find the submit button and click it
+            self.assertEqual( response.getcode(), 200 )
+            self.assertEqual( response.info().getmaintype(), "application" )
+            self.assertEqual( response.info().getsubtype(),  "json" )
 
-            self.clickSubmitForm
+            data = json.loads( response.read() )
 
-            # An alert popup shows up and needs to be clicked
+            #-------------------------
+            # Push data back to jSparc
 
-            driver.switchTo().alert().accept();
+            params = urllib.urlencode( {
+                "session_title" : session_title,
+                "student_name"  : "Student %s" % student_nr,
+                "pk"            : data[ 'pk' ],
+                "lat"           : data[ 'events' ][ 0 ][ 'lat' ],
+                "lon"           : data[ 'events' ][ 0 ][ 'lon' ],
+                "logEnergy"     : 15,
+                "error"         : 1
+            } )
+
+            response = urllib.urlopen(
+                '%s%s?%s' % (
+                    self.live_server_url,
+                    '/jsparc/result/',
+                    params
+                )
+            )
+
+            self.assertEqual( response.getcode(), 200 )
+            self.assertEqual( response.info().getmaintype(), "application" )
+            self.assertEqual( response.info().getsubtype(),  "json" )
+
+            data = json.loads( response.read() )
+
+            self.assertEqual( data[ 'msg' ], "OK [result stored]" )
 
         #-----------------------------------------------------------------------
         # 6. Check the results from the analyses sessions
@@ -173,8 +211,8 @@ class MySeleniumTests(LiveServerTestCase):
 
         # Check whether the energy spectrum exists on the server
 
-        image     = driver.find_element_xpath( "div[@id=energyHistogram]/img" )
-        image_url = image.get_attribute( "src" )
+        #image     = driver.find_element_xpath( "div[@id=energyHistogram]/img" )
+        #image_url = image.get_attribute( "src" )
 
-        driver.get( image_url )
+        #driver.get( image_url )
 
