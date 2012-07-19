@@ -32,11 +32,6 @@ def stations(request):
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
-    # Add option to station page for list of stations sorted by number
-    #allstations = sorted([station
-    #                      for cluster in clusters
-    #                      for station in cluster.stations],
-    #                     key=itemgetter('number'))
 
     return render_to_response('stations.html', {'clusters': clusters},
                               context_instance=RequestContext(request))
@@ -57,7 +52,8 @@ def stations_by_number(request):
                          'name': station.name,
                          'link': link})
 
-    return render_to_response('stations_by_number.html', {'stations': stations},
+    return render_to_response('stations_by_number.html',
+                              {'stations': stations},
                               context_instance=RequestContext(request))
 
 
@@ -82,6 +78,31 @@ def stations_by_name(request):
                               context_instance=RequestContext(request))
 
 
+def stations_on_map(request):
+    """Show all stations on a map"""
+
+    today = datetime.datetime.utcnow()
+    tomorrow = today + datetime.timedelta(days=1)
+    stations = []
+    for detector in DetectorHisparc.objects.exclude(enddate__lt=today):
+        try:
+            Summary.objects.filter(station=detector.station)[0]
+            link = detector.station.number
+        except IndexError:
+            link = None
+
+        if link:
+            stations.append({'number': detector.station.number,
+                             'name': detector.station.name,
+                             'link': link,
+                             'longitude': detector.longitude,
+                             'latitude': detector.latitude,
+                             'altitude': detector.height})
+
+    return render_to_response('stations_on_map.html', {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
 def station_page(request, station_id, year, month, day):
     """Show daily histograms for a particular station"""
 
@@ -93,8 +114,8 @@ def station_page(request, station_id, year, month, day):
     station = get_object_or_404(Station, number=station_id)
 
     # Use yesterday and tomorrow to add previous/next links
-    yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
-    tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
+    yesterday = datetime.date(year, month, day) - datetime.timedelta(days=1)
+    tomorrow = datetime.date(year, month, day) + datetime.timedelta(days=1)
 
     try:
         previous = (Summary.objects.filter(Q(station__number=station_id),
@@ -129,7 +150,9 @@ def station_page(request, station_id, year, month, day):
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
     year_list = nav_years(station)
-    current_date = {'year': year, 'month': calendar.month_name[month][:3], 'day': day}
+    current_date = {'year': year,
+                    'month': calendar.month_name[month][:3],
+                    'day': day}
 
     eventhistogram = create_histogram('eventtime', station, year, month, day)
     pulseheighthistogram = create_histogram('pulseheight', station,

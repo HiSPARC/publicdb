@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+    <style>
+    .olControlAttribution {position: absolute !important; font-size: 10px !important; bottom: 0 !important; right: 0 !important; background: rgba(255,255,255,0.7); font-family: Arial !important; padding: 2px 4px !important; border-radius: 5px 0 0 0 !important;}
+    .olControlScaleLine {position: absolute !important; bottom: 0px !important; left: 0 !important; background: rgba(255,255,255,0.7); font-family: Arial !important; padding: 2px 4px !important; border-radius: 0 5px 0 0 !important;}
+    </style>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.12/OpenLayers.js"></script>
+    <script type="text/javascript">
+
+        $(document).ready(function() {
+            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
+            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+            var options = {
+                controls: [
+                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.ScaleLine()
+                ]
+            };
+            map = new OpenLayers.Map("stationMap", options);
+            var mapLayer = new OpenLayers.Layer.OSM();
+            map.addLayer(mapLayer);
+            map.setCenter(new OpenLayers.LonLat(4.950, 52.355)
+                                        .transform(fromProjection, toProjection), 5);
+
+            var stationLayer = new OpenLayers.Layer.Vector("stations");
+            {% for station in stations %}
+            {% if station.longitude and station.latitude %} 
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
+                                       .transform(fromProjection, toProjection),
+                {stationid: {{ station.number }}},
+                {fillColor: '#3143D1',
+                 fillOpacity: 0.8,
+                 pointRadius: 4,
+                 stroke: false,
+                 });
+            stationLayer.addFeatures(feature);
+            {% endif %}
+            {% endfor %}
+            map.addLayer(stationLayer);
+        });
+        
+        function stationLink(link) {
+            
+        };
+    </script>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="header">
+    <h2>Map of stations</h2>
+</div>
+
+<div id="intro">
+    <p>The following is a map with all active stations shown on it, based on their last known GPS location.  If the station
+    is a link, you can click on it to access its data.  If not, that means
+    that this station has not yet uploaded data to our datastore.</p>
+</div>
+
+<div style="width:100%; height:500px;" id="stationMap">
+
+</div>
+
+{% endblock %}
