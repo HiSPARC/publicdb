@@ -29,21 +29,42 @@
             var feature = new OpenLayers.Feature.Vector(
                 new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
                                        .transform(fromProjection, toProjection),
-                {stationid: {{ station.number }}},
+                {id: {{ station.number }},
+                 name: "{{ station.name }}",
+                 link: {{ station.link }}},
                 {fillColor: '#3143D1',
                  fillOpacity: 0.8,
                  pointRadius: 4,
                  stroke: false,
-                 });
+                });
             stationLayer.addFeatures(feature);
             {% endif %}
             {% endfor %}
             map.addLayer(stationLayer);
-        });
-        
-        function stationLink(link) {
+
+            selectControl = new OpenLayers.Control.SelectFeature(
+                [stationLayer],
+                {clickout: true, toggle: false, multiple: false, hover: false,
+                 toggleKey: "ctrlKey", multipleKey: "shiftKey"
+                }
+            );
+            map.addControl(selectControl);
+            selectControl.activate();
             
-        };
+            stationLayer.events.on({
+                "featureselected": function(e) {
+                    attr = e.feature.attributes
+                    stationInfo("Station: <a href='http://data.hisparc.nl/django/show/stations/" + attr.link + "'> " + attr.name +
+                                " (" + attr.id + ")</a>"
+                    );
+                },
+
+            });
+        });
+
+        function stationInfo(text) {
+            $('#selectedStation').html(text);            
+        }
     </script>
 
 {% endblock %}
@@ -55,13 +76,14 @@
 </div>
 
 <div id="intro">
-    <p>The following is a map with all active stations shown on it, based on their last known GPS location.  If the station
-    is a link, you can click on it to access its data.  If not, that means
-    that this station has not yet uploaded data to our datastore.</p>
+    <p>The following is a map with all active stations shown on it, based on their last known GPS location.
+    Clicking on a station will show some info about it and give you a link to its data page.</p>
 </div>
 
 <div id="stationMap">
+</div>
 
+<div id="selectedStation">
 </div>
 
 {% endblock %}
