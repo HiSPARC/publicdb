@@ -4,10 +4,6 @@
 
 {% block head %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
-    <style>
-    .olControlAttribution {position: absolute !important; font-size: 10px !important; bottom: 0 !important; right: 0 !important; background: rgba(255,255,255,0.7); font-family: Arial !important; padding: 2px 4px !important; border-radius: 5px 0 0 0 !important;}
-    .olControlScaleLine {position: absolute !important; bottom: 0px !important; left: 0 !important; background: rgba(255,255,255,0.7); font-family: Arial !important; padding: 2px 4px !important; border-radius: 0 5px 0 0 !important;}
-    </style>
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.12/OpenLayers.js"></script>
     <script type="text/javascript">
 
@@ -64,7 +60,7 @@
     that this station has not yet uploaded data to our datastore.</p>
 </div>
 
-<div style="width:100%; height:500px;" id="stationMap">
+<div id="stationMap">
 
 </div>
 
