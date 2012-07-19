@@ -106,10 +106,12 @@ def update_all_histograms():
 def update_gps_coordinates():
     """Update GPS coordinates for all stations"""
 
+    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
     for detector in DetectorHisparc.objects.all():
         try:
             config = (Configuration.objects
-                                   .filter(source__station=detector.station)
+                                   .filter(source__station=detector.station,
+                                           timestamp__lt=tomorrow)
                                    .latest('timestamp'))
         except Configuration.DoesNotExist:
             pass
