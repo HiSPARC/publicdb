@@ -1,3 +1,22 @@
+#stationListPages {
+    font-size: 10pt;
+    float: right;
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 2px 5px;
+}
+
+#stationListPages a {
+    color: #23B;
+    text-decoration: none;
+}
+
+#stationListPages a:hover {
+    color: #005;
+    text-decoration: underline;
+}
+
+
 #stationList {
     font-size: 10pt;
     -webkit-column-count: 2;
@@ -34,7 +53,7 @@ li {
 
 #stationMap {
     width: 100%;
-    height: 500px; 
+    height: 500px;
 }
 
 .olControlAttribution {
