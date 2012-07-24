@@ -6,6 +6,12 @@
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.12/OpenLayers.js"></script>
     <script type="text/javascript">
+        var pointStyle = {
+            fillColor: '#E23F1E',
+            fillOpacity: 0.8,
+            pointRadius: 3,
+            stroke: false,
+        };
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -20,6 +26,7 @@
             map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
+
             map.setCenter(new OpenLayers.LonLat(4.950, 52.355)
                                         .transform(fromProjection, toProjection), 5);
 
@@ -32,15 +39,33 @@
                 {id: {{ station.number }},
                  name: "{{ station.name }}",
                  link: {{ station.link }}},
-                {fillColor: '#3143D1',
-                 fillOpacity: 0.8,
-                 pointRadius: 4,
-                 stroke: false,
-                });
+                pointStyle
+                );
             stationLayer.addFeatures(feature);
             {% endif %}
             {% endfor %}
             map.addLayer(stationLayer);
+            
+            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+
+            map.events.register('zoomend', this, function(event) {
+                var zLevel = map.getZoom();
+                if (zLevel <= 5) {
+                    $('circle').attr('r', '3');
+                }
+                else if (zLevel <= 8) {
+                    $('circle').attr('r', '4');
+                }
+                else if (zLevel <= 11) {
+                    $('circle').attr('r', '5');
+                }
+                else if (zLevel <= 14) {
+                    $('circle').attr('r', '6');
+                }
+                else if (zLevel <= 18) {
+                    $('circle').attr('r', '8');
+                }
+            });
 
             selectControl = new OpenLayers.Control.SelectFeature(
                 [stationLayer],
