@@ -8,12 +8,17 @@
 {% block head %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript">
+        function downloadGraph(target) {
+            var dataurl = $(target + ' .base')[0].toDataURL();
+            window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
+        }
+    </script>
 {% endblock %}
 
 {% block content %}
 <div id="header">
-    <h2>Station: {{ station.name }}</h2>
-    <div id="stationNumber">{{ station.number }}</div>
+    <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
     <div id="date">{{ date|date:"D N j, Y" }}</div>
 </div>
 
@@ -22,8 +27,12 @@
   {% if eventhistogram %}
     <div id="eventHistogram" class="histogram">
         <h3>Event histogram (number of events per hour)</h3>
-        <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <div class="plot" id="eh_histogram" style="height: 200px;"></div>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#eh_histogram')">Image</a> |
+            <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+        </div>
+        <br>
+        <div class="plot" id="eh_histogram"></div>
         <script type="text/javascript">
             eh_labels = {yaxis: {
                           axisLabel: "{{ eventhistogram.y_label }}",
@@ -44,8 +53,11 @@
   {% if pulseheighthistogram %}
     <div id="pulseheightHistogram" class="histogram">
         <h3>Pulseheight histogram</h3>
-        <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <div class="plot" id="ph_histogram" style="height: 300px;"></div>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#ph_histogram')">Image</a> |
+            <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+        </div>
+        <div class="plot" id="ph_histogram"></div>
         <script type="text/javascript">
             ph_labels = {yaxis: {
                           axisLabel: "{{ pulseheighthistogram.y_label }}",
@@ -66,8 +78,11 @@
   {% if pulseintegralhistogram %}
     <div id="pulseintegralHistogram" class="histogram">
         <h3>Pulseintegral histogram</h3>
-        <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <div class="plot" id="pi_histogram" style="height: 300px;"></div>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#pi_histogram')">Image</a> |
+            <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+        </div>
+        <div class="plot" id="pi_histogram"></div>
         <script type="text/javascript">
             pi_labels = {yaxis: {
                           axisLabel: "{{ pulseintegralhistogram.y_label }}",
@@ -88,8 +103,11 @@
   {% if barometerdata %}
     <div id="barometerData" class="histogram">
         <h3>Barometer data</h3>
-        <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <div class="plot" id="bd_histogram" style="height: 200px;"></div>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#bd_histogram')">Image</a> |
+            <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+        </div>
+        <div class="plot" id="bd_histogram"></div>
         <script type="text/javascript">
             bd_labels = {yaxis: {
                           axisLabel: "{{ barometerdata.y_label }}",
@@ -110,8 +128,11 @@
   {% if temperaturedata %}
     <div id="temperatureData" class="histogram">
         <h3>Temperature data</h3>
-        <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}" class="sourceLink">Source</a><br>
-        <div class="plot" id="td_histogram" style="height: 200px;"></div>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#td_histogram')">Image</a> |
+            <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+        </div>
+        <div class="plot" id="td_histogram"></div>
         <script type="text/javascript">
             td_labels = {yaxis: {
                           axisLabel: "{{ temperaturedata.y_label }}",

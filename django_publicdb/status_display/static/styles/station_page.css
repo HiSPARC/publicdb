@@ -2,153 +2,138 @@
 
 #header * {
     margin: 0px;
-    padding: 0px;
-}
+    padding: 0px;}
 
 #header {
-    margin-bottom: 10px;
-}
+    margin-bottom: 10px;}
 
 #stationNumber {
     color: black;
-    font-size: 10pt;
-}
+    font-size: 10pt;}
 
 #date {
     font-weight: bold;
     font-size: 11pt;
-    margin-top: 5px;
-}
+    margin-top: 5px;}
 
 /* Graphs */
 
 #graphs {
     float: left;
-    width: 591px;
-}
+    width: 591px;}
+
+#eh_histogram, #bd_histogram, #td_histogram {
+    height: 200px;}
+
+#ph_histogram, #pi_histogram {
+    height: 300px;}
 
 .histogram {
-    width: 590px;
-}
+    width: 591px;}
 
 .plot {
-    display: block;
-}
+    display: block;}
 
 .x2Axis .tickLabel {
-    display: none;
-}
+    display: none;}
 
 .y2Axis .tickLabel {
-    display: none;
-}
+    display: none;}
 
-/* Sidebar */
-#navigation, #config {
-    float: right;
-    width: 220px;
-    font-size: 9pt;
-    border-left: 1px solid black;
-    padding-left: 20px;
-}
+h3 {
+    display: inline-block;}
 
-#yearlist ul, #monthlist ul {
-    list-style-type: none;
-    margin: 0px;
-    padding: 0px;
-}
-
-#yearlist li, #monthlist li {
-    display: inline;
-    line-height: 2;
-    margin-right: 10px;
-}
-
-#monthlist li {
-    display: inline-block;
-    width: 23px;
-}
-
-#calendar .day, #calendar .dayname {
-    width: 25px;
-    height: 25px;
-    text-align: right;
-}
-
-#calendar .day a {
-    padding: 2px;
-}
-
-#calendar .dayname {
-    font-size: 8pt;
-}
-
-a:link, a:visited {
-    color: black;
-    font-weight: bold;
-}
-
-a.sourceLink {
+.sourceLink {
     float: right;
     position: relative;
     right: 1px;
     font-size: 8pt;
     font-weight: bold;
-    text-decoration: none;
-}
+    margin: 27px 0px 0px 0px;
+    padding: 0px;}
+
+.sourceLink a {
+    text-decoration: none;}
+
+
+/* Sidebar */
+
+#navigation, #config {
+    float: right;
+    width: 220px;
+    font-size: 9pt;
+    border-left: 1px solid black;
+    padding-left: 20px;}
+
+#yearlist ul, #monthlist ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;}
+
+#yearlist li, #monthlist li {
+    display: inline;
+    line-height: 2;
+    margin-right: 10px;}
+
+#monthlist li {
+    display: inline-block;
+    width: 23px;}
+
+#calendar .day, #calendar .dayname {
+    width: 25px;
+    height: 25px;
+    text-align: right;}
+
+#calendar .day a {
+    padding: 2px;}
+
+#calendar .dayname {
+    font-size: 8pt;}
+
+a:link, a:visited {
+    color: black;
+    font-weight: bold;}
 
 a.currentDate {
     color: white;
     background: black;
     padding: 2px;
-    border-radius: 2px;
-}
+    border-radius: 2px;}
 
 #config {
-    margin-top: 50px;
-}
+    margin-top: 50px;}
 
 #navigation > div, #config > div {
     padding-top: 10px;
-    padding-bottom: 10px;
-}
+    padding-bottom: 10px;}
 
 #prev {
-    float: left;
-}
+    float: left;}
 
 #next {
-    float: right;
-}
+    float: right;}
 
 .sectionTitle {
     font-size: 120%;
     font-weight: bold;
-    text-decoration: underline;
-}
+    text-decoration: underline;}
 
 .keyvalue, .mapLink {
     margin-top: 5px;
-    margin-bottom: 5px;
-}
+    margin-bottom: 5px;}
 
 .key {
     font-weight: bold;
-    margin-right: 10px;
-}
+    margin-right: 10px;}
 
 .ch1 {
-    color:#444;
-}
+    color:#444;}
 
 .ch2 { 
-    color:#D22;
-}
+    color:#D22;}
 
 .ch3 {
-    color:#1C2;
-}
+    color:#1C2;}
 
 .ch4 {
-    color:#1CC;
-}
+    color:#1CC;}

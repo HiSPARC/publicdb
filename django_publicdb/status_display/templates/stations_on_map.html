@@ -10,8 +10,7 @@
             fillColor: '#E23F1E',
             fillOpacity: 0.8,
             pointRadius: 3,
-            stroke: false,
-        };
+            stroke: false,};
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -20,15 +19,12 @@
                 controls: [
                     new OpenLayers.Control.Navigation(),
                     new OpenLayers.Control.Attribution(),
-                    new OpenLayers.Control.ScaleLine()
-                ]
-            };
+                    new OpenLayers.Control.ScaleLine()]};
             map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
 
-            map.setCenter(new OpenLayers.LonLat(4.950, 52.355)
-                                        .transform(fromProjection, toProjection), 5);
+            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
 
             var stationLayer = new OpenLayers.Layer.Vector("stations");
             {% for station in stations %}
@@ -39,8 +35,7 @@
                 {id: {{ station.number }},
                  name: "{{ station.name }}",
                  link: {{ station.link }}},
-                pointStyle
-                );
+                pointStyle);
             stationLayer.addFeatures(feature);
             {% endif %}
             {% endfor %}
@@ -51,28 +46,21 @@
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                }
+                    $('circle').attr('r', '3');}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                }
+                    $('circle').attr('r', '4');}
                 else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                }
+                    $('circle').attr('r', '5');}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                }
+                    $('circle').attr('r', '6');}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                }
+                    $('circle').attr('r', '8');}
             });
 
             selectControl = new OpenLayers.Control.SelectFeature(
                 [stationLayer],
                 {clickout: true, toggle: false, multiple: false, hover: false,
-                 toggleKey: "ctrlKey", multipleKey: "shiftKey"
-                }
-            );
+                 toggleKey: "ctrlKey", multipleKey: "shiftKey"});
             map.addControl(selectControl);
             selectControl.activate();
             
@@ -80,11 +68,7 @@
                 "featureselected": function(e) {
                     attr = e.feature.attributes
                     stationInfo("Station: <a href='../stations/" + attr.link + "'> " + attr.name +
-                                " (" + attr.id + ")</a>"
-                    );
-                },
-
-            });
+                                " (" + attr.id + ")</a>");},});
         });
 
         function stationInfo(text) {
