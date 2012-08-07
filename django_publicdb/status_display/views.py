@@ -37,6 +37,31 @@ def stations(request):
                               context_instance=RequestContext(request))
 
 
+def stations_by_country(request):
+    """Show a list of stations, ordered by country, cluster and subcluster"""
+
+    countries = []
+    for country in Countries.objects.all():
+        clusters = []
+        for cluster in Cluster.objects.filter(country=country):
+            stations = []
+            for station in Station.objects.filter(cluster=cluster):
+                try:
+                    Summary.objects.filter(station=station)[0]
+                    link = station.number
+                except IndexError:
+                    link = None
+
+                stations.append({'number': station.number,
+                                 'name': station.name,
+                                 'link': link})
+            clusters.append({'name': cluster.name, 'stations': stations})
+        countries.append({'name': country.name, 'clusters': clusters})
+
+    return render_to_response('stations_by_country.html', {'countries': countries},
+                              context_instance=RequestContext(request))
+
+
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 

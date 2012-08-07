@@ -45,19 +45,4 @@
   {% endfor %}
 </div>
 
-<!--
-Add an option/switch to show a list of stations sorted by station number.
-<div id="stationListAlt">
-{% for station in allstations %}
- <ul>
-  <li>
-  {% if station.link %}<a href="{% url 'status_display.views.station' station.link %}">{% endif %}
-   {{ station.number }} &mdash; {{ station.name }}
-  {% if station.link %}</a>{% endif %}
-  </li>
- </ul>
-{% endfor %}
--->
-
-
 {% endblock %}
