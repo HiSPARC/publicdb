@@ -109,10 +109,13 @@ a.currentDate {
     padding-bottom: 10px;}
 
 #prev {
-    float: left;}
+    float: left;
+    margin-right: -1em;}
 
 #next {
-    float: right;}
+    float: right;
+    right: 1em;
+    position: relative;}
 
 .sectionTitle {
     font-size: 120%;
