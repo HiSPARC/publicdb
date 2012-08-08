@@ -46,15 +46,20 @@
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');}
+                    $('circle').attr('r', '3');
+                    pointStyle.pointRadius = 3;}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');}
+                    $('circle').attr('r', '4');
+                    pointStyle.pointRadius = 4;}
                 else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');}
+                    $('circle').attr('r', '5');
+                    pointStyle.pointRadius = 5;}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');}
+                    $('circle').attr('r', '6');
+                    pointStyle.pointRadius = 6;}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');}
+                    $('circle').attr('r', '8');
+                    pointStyle.pointRadius = 8;}
             });
 
             selectControl = new OpenLayers.Control.SelectFeature(
