@@ -19,7 +19,8 @@
             var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
             var options = {
                 controls: [
-                    new OpenLayers.Control.Navigation(),
+                    new OpenLayers.Control.Navigation(
+                        {dragPanOptions: {enableKinetic: true}}),
                     new OpenLayers.Control.Attribution(),
                     new OpenLayers.Control.ScaleLine()]};
             map = new OpenLayers.Map("stationMap", options);

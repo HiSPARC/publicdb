@@ -11,6 +11,66 @@
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+  {% if config %}
+    <script type="text/javascript">
+        var pointStyle = {
+            fillColor: '#E23F1E',
+            fillOpacity: 0.8,
+            pointRadius: 6,
+            stroke: false,};
+
+        $(document).ready(function() {
+            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
+            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+            var options = {
+                controls: [
+                    new OpenLayers.Control.Navigation(
+                        {dragPanOptions: {enableKinetic: true}}),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.ScaleLine()]};
+            map = new OpenLayers.Map("stationMap", options);
+            var mapLayer = new OpenLayers.Layer.OSM();
+            map.addLayer(mapLayer);
+
+            map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }}).transform(fromProjection, toProjection), 16);
+
+            var stationLayer = new OpenLayers.Layer.Vector("stations");
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                       .transform(fromProjection, toProjection),
+                {id: {{ station.number }},
+                 name: "{{ station.name }}"},
+                pointStyle);
+            stationLayer.addFeatures(feature);
+            map.addLayer(stationLayer);
+            
+            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+
+            map.events.register('zoomend', this, function(event) {
+                var zLevel = map.getZoom();
+                if (zLevel <= 5) {
+                    $('circle').attr('r', '3');
+                    pointStyle.pointRadius = 3;}
+                else if (zLevel <= 8) {
+                    $('circle').attr('r', '4');
+                    pointStyle.pointRadius = 4;}
+                else if (zLevel <= 11) {
+                    $('circle').attr('r', '5');
+                    pointStyle.pointRadius = 5;}
+                else if (zLevel <= 14) {
+                    $('circle').attr('r', '6');
+                    pointStyle.pointRadius = 6;}
+                else if (zLevel <= 18) {
+                    $('circle').attr('r', '8');
+                    pointStyle.pointRadius = 8;}
+            });
+        });
+
+        function stationInfo(text) {
+            $('#selectedStation').html(text);            
+        }
+    </script>
+  {% endif %}
     <script type="text/javascript">
         function downloadGraph(target) {
             var dataurl = $(target + ' .base')[0].toDataURL();
@@ -214,15 +274,6 @@
 
 <div id="config">
   {% if config %}
-    <div id="stationPosition">
-        <div class="sectionTitle">Position</div>
-        <div class="keyvalue"><span class="key">Latitude:</span><span class="value">{{ config.gps_latitude }}</span></div>
-        <div class="keyvalue"><span class="key">Longitude:</span><span class="value">{{ config.gps_longitude }}</span></div>
-        <div class="keyvalue"><span class="key">Altitude:</span><span class="value">{{ config.gps_altitude }}</span></div>
-        <div id="maps">
-            <div class="mapLink"><a href="http://www.openstreetmap.org/?mlat={{ config.gps_latitude }}&amp;mlon={{ config.gps_longitude }}&amp;zoom=15">Openstreetmap</a></div>
-        </div>
-    </div>
     <div id="master">
         <div class="sectionTitle">Master</div>
         <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
@@ -237,6 +288,13 @@
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
     </div>
     {% endif %}
+    <div id="stationPosition">
+        <div class="sectionTitle">Position</div>
+        <div class="keyvalue"><span class="key">Latitude:</span><span class="value">{{ config.gps_latitude }}</span></div>
+        <div class="keyvalue"><span class="key">Longitude:</span><span class="value">{{ config.gps_longitude }}</span></div>
+        <div class="keyvalue"><span class="key">Altitude:</span><span class="value">{{ config.gps_altitude }}</span></div>
+        <div id="stationMap"></div>
+    </div>
   {% endif %}
 </div>
 

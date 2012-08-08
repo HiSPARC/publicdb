@@ -57,7 +57,7 @@ var _eh_options = {
 var _ph_options = {
     yaxis: {
         axisLabel: 'Count',
-        min: 1,
+        min: 0.5,
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         tickLength: 4,
         tickColor: "#000",
@@ -71,7 +71,7 @@ var _pi_options = {
     yaxis: {
         axisLabel: 'Count',
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
-        min: 1,
+        min: 0.5,
         tickLength: 4,
         tickColor: "#000",
         transform: function (N) { return Math.log(N); },
