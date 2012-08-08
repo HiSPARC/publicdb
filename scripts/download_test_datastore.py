@@ -63,7 +63,7 @@ def download_and_store_data_for_date(date):
 def get_datastore_file_for_date(date):
     return open_or_create_file(datastore_path, date)
 
-def download_and_store_station_data(f, station, date):
+def download_and_store_station_data(f, station, date, get_blobs=True):
     start = datetime.combine(date, time(0, 0, 0))
     end = start + timedelta(days=1)
 
@@ -72,7 +72,7 @@ def download_and_store_station_data(f, station, date):
                                                 station.number)
 
     download_data(f, station_group, station.number, start, end,
-                  get_blobs=True)
+                  get_blobs=get_blobs)
 
 def open_or_create_file(data_dir, date):
     """Open an existing file or create a new one
