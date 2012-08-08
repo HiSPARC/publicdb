@@ -29,7 +29,8 @@ DATABASES = {
 
 # Path of the mounted HiSPARC datastore root folder
 # DEV_ONLY
-DATASTORE_PATH = '/tmp/datastore'
+DATASTORE_PATH = '/var/www/publicdb_datastore'
+TEST_DATASTORE_PATH = '/var/www/publicdb_datastore/test'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -60,7 +61,7 @@ MEDIA_ROOT = '/var/www/django_publicdb_media'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://localhost:81/django_publicdb_media/'
+MEDIA_URL = 'http://localhost/django_publicdb_media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -131,6 +132,7 @@ INSTALLED_APPS = (
     'django_publicdb.voorraad',
     'django_publicdb.histograms',
     'django_publicdb.coincidences',
+    'django_publicdb.jsparc',
     'django_publicdb.status_display',
     'django_publicdb.analysissessions',
     'django_publicdb.updates',
@@ -160,7 +162,7 @@ LOGGING = {
         'file': {
             'level': 'DEBUG',
             'class': 'logging.FileHandler',
-            'filename': 'debug.log'
+            'filename': '/home/cblam/Projects/hisparc/publicdb/django_publicdb/test_debug.log'
         }
     },
     'loggers': {
