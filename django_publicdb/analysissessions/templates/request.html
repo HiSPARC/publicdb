@@ -3,7 +3,7 @@
 {% block title %}Session request{% endblock %}
 {% block content %}
 
-<form action="{% url analysissessions.views.validate_request_form %}" method="post">
+<form action="{% url django_publicdb.analysissessions.views.validate_request_form %}" method="post">
 {% csrf_token %}
 {{ form.as_p }}
 {{ html_captcha|safe }}
