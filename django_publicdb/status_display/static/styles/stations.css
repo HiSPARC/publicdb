@@ -3,58 +3,54 @@
     float: right;
     border: 1px solid;
     border-radius: 5px;
-    padding: 2px 5px;
-}
+    padding: 2px 5px;}
 
 #stationListPages a {
     color: #23B;
-    text-decoration: none;
-}
+    text-decoration: none;}
 
 #stationListPages a:hover {
     color: #005;
-    text-decoration: underline;
-}
-
+    text-decoration: underline;}
 
 #stationList {
     font-size: 10pt;
     -webkit-column-count: 2;
     -moz-column-count: 2;
-    column-count: 2;
-}
+    column-count: 2;}
 
 .cluster {
     display: block;
     -webkit-column-break-inside: avoid;
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;
-    break-inside: avoid-column;
-}
+    break-inside: avoid-column;}
+
+.country h1 {
+    -moz-column-span: all;
+    -webkit-column-span: all;
+    column-span: all;
+    border-top: black solid 1px;
+    padding-top: 10px;}
 
 ul {
-    list-style: none;
-}
+    list-style: none;}
 
 li {
-    line-height:140%
-}
+    line-height:140%}
 
 #stationList a {
     font-size: 10pt;
     color: #23B;
-    text-decoration: none;
-}
+    text-decoration: none;}
 
 #stationList a:hover {
     color: #005;
-    text-decoration: underline;
-}
+    text-decoration: underline;}
 
 #stationMap {
     width: 100%;
-    height: 500px;
-}
+    height: 500px;}
 
 .olControlAttribution {
     position: absolute !important;
@@ -64,8 +60,7 @@ li {
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
     padding: 2px 4px !important;
-    border-radius: 5px 0 0 0 !important;
-}
+    border-radius: 5px 0 0 0 !important;}
 
 .olControlScaleLine {
     position: absolute !important;
@@ -74,9 +69,7 @@ li {
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
     padding: 2px 4px !important;
-    border-radius: 0 5px 0 0 !important;
-}
+    border-radius: 0 5px 0 0 !important;}
 
 #selectedStation {
-    margin: 10px;
-}
+    margin: 10px;}
