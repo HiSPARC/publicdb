@@ -1,14 +1,15 @@
+# Python
 import re
+import datetime
 import time
 import string
 import sys
+import os
 
 import json
 import urllib
 
-from django.core import mail
-from django.test import LiveServerTestCase
-
+# Selenium
 from selenium    import webdriver
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -18,6 +19,14 @@ from selenium.webdriver.remote.webelement import WebElement
 # Selenium WebElement (result of find_element method in webdriver) documentation:
 # http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver_remote/selenium.webdriver.remote.webelement.html#module-selenium.webdriver.remote.webelement
 
+# Django
+from django.core import mail
+from django.conf import settings
+from django.test import LiveServerTestCase
+
+# Publicdb
+from django_publicdb.tests import datastore as tests_datastore
+
 class MyAnalysisSessionsTests(LiveServerTestCase):
     fixtures = ['tests_inforecords']
 
@@ -26,13 +35,42 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        print "setUp"
         self.driver = webdriver.Firefox()
+
+        # The tests require a data file. We will download some data and put it
+        # in a test directory. It needs to be writable by the user who initiates
+        # the tests.
+
+        self.original_datastore_path = settings.DATASTORE_PATH
+
+        tests_datastore.setup_test_datastore_directory(os.path.join(
+            settings.TEST_DATASTORE_PATH,
+            "analysissessions"
+        ))
+
+        # Download real data of stations 3201, 3202 and 3203 on 25 March 2011.
+        # There are 52 coincidences.
+
+        date = datetime.date(2011, 3, 25)
+
+        file = tests_datastore.get_datafile_path(date)
+
+        if not os.path.exists(file):
+            tests_datastore.download_data_station(3201, date, get_blobs=True)
+            tests_datastore.download_data_station(3202, date, get_blobs=True)
+            tests_datastore.download_data_station(3203, date, get_blobs=True)
+
+        self.assertTrue(os.path.exists(file))
+
+        #
+
         super(MyAnalysisSessionsTests, self).setUp()
 
     def tearDown(self):
-        print "tearDown"
         super(MyAnalysisSessionsTests, self).tearDown()
+
+        settings.DATASTORE_PATH = self.original_datastore_path
+
         #self.driver.quit()
 
     #---------------------------------------------------------------------------
@@ -54,7 +92,12 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         #-----------------------------------------------------------------------
         # Contents
-        #
+        # 1. Request an analysis session via the website
+        # 2. Check the email with the link to confirm a session request
+        # 3. Initiate the creation of the session
+        # 4. Check the email with the session details
+        # 5. Simulate analyses sessions
+        # 6. Check the results from the analyses sessions
         #-----------------------------------------------------------------------
 
         #-----------------------------------------------------------------------
@@ -80,10 +123,10 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
             ("id_sur_name",         "Sur"),
             ("id_email",            "test@test.test"),
             ("id_school",           "Test School"),
-            ("id_cluster",          "Science Park"),
-            ("id_start_date_year",  "2010"),
-            ("id_start_date_month", "May"),
-            ("id_start_date_day",   "1"),
+            ("id_cluster",          "Middelharnis"),
+            ("id_start_date_year",  "2011"),
+            ("id_start_date_month", "March"),
+            ("id_start_date_day",   "20"),
             ("id_number_of_events", "10")
         ]:
 
@@ -140,7 +183,7 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
             exec(var_name + " = '" + self.changeUrlToLocal(match.group(1) ) + "'")
 
-        self.assertEqual(session_events, '1030')
+        self.assertEqual(session_events, '52')
 
         #-----------------------------------------------------------------------
         # 5. Simulate analyses sessions
