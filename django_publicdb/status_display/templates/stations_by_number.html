@@ -2,7 +2,7 @@
 
 {% load url from future %}
 
-{% block head %}
+{% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
 {% endblock %}
 
@@ -16,7 +16,6 @@
     <a href="../stations_by_name" target="_top">order by name</a><br />
     <a href="../stations_on_map" target="_top">stations on map</a>
 </div>
-
 
 <div id="header">
     <h2>List of stations, by number</h2>

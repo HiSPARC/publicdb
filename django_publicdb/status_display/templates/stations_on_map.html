@@ -2,8 +2,11 @@
 
 {% load url from future %}
 
-{% block head %}
+{% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
+{% block head %}
     <script type="text/javascript">
         var pointStyle = {
             fillColor: '#E23F1E',

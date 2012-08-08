@@ -9,13 +9,13 @@
     <title>{% block title %}HiSPARC Public Database{% endblock %}</title>
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/base.css" />
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/OpenLayers-2.12.css" />
+    {% block head_styles %}{% endblock %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.7.2.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot-0.7.min.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot.axislabels.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.12-subset.js"></script>
     <!--[if lte IE 8]><script type="text/javascript" src="{{ STATIC_URL }}scripts/excanvas.min.js"></script><![endif]-->
     {% block head %}{% endblock %}
-    <style type="text/css">{% block css %}{% endblock %}</style>
 </head>
 
 <body>

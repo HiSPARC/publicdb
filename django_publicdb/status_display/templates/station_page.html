@@ -5,8 +5,11 @@
 
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
-{% block head %}
+{% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
+{% endblock %}
+
+{% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
     <script type="text/javascript">
         function downloadGraph(target) {
@@ -31,7 +34,6 @@
             <a onclick="downloadGraph('#eh_histogram')">Image</a> |
             <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
         </div>
-        <br>
         <div class="plot" id="eh_histogram"></div>
         <script type="text/javascript">
             eh_labels = {yaxis: {
@@ -176,6 +178,7 @@
               {% else %}
                 {{ day.day }}
               {% endif %}
+            </td>
           {% endfor %}
         </tr>
       {% endfor %}
