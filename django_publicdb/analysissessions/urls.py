@@ -6,6 +6,6 @@ urlpatterns = patterns(
 
     ( r'^request/$',               'request_form' ),
     ( r'^request/validate$',       'validate_request_form' ),
-    ( r'^request/create',          'create_request' ),
-    ( r'^request/(\w{20})/$',      'confirm_request' )
+    ( r'^request/(\w{20})/$',      'confirm_request' ),
+    ( r'^request/create',          'create_request' )
 )
