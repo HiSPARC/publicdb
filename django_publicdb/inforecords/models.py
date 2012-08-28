@@ -32,6 +32,11 @@ class Contact(models.Model):
                                 self.prefix_surname, self.surname)
     name = property(name)
 
+    def save(self, *args, **kwargs):
+        super(Contact, self).save(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.reload_nagios()
+
     class Meta:
         unique_together = [('first_name', 'prefix_surname', 'surname')]
         ordering = ('surname', 'first_name')
@@ -137,6 +142,11 @@ class ContactInformation(models.Model):
            contact_owner = 'no owner'
 	return contact_owner
     contact_owner = property(contact_owner)
+
+    def save(self, *args, **kwargs):
+        super(ContactInformation, self).save(*args, **kwargs)
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.reload_nagios()
 	    
     class Meta:
         ordering = ['city', 'street_1', 'email_work']
