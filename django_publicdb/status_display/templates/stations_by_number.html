@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_stations.html' %}
 
 {% load url from future %}
 
@@ -6,28 +6,17 @@
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
 {% endblock %}
 
-{% block content %}
+{% block header %}
+    List of stations, by number
+{% endblock %}
 
-<div id="stationListPages">
-    Station Lists:<br />
-    <a href="../stations" target="_top">order by cluster</a><br />
-    <a href="../stations_by_country" target="_top">order by country</a><br />
-    <a href="../stations_by_number" target="_top">order by number</a><br />
-    <a href="../stations_by_name" target="_top">order by name</a><br />
-    <a href="../stations_on_map" target="_top">stations on map</a>
-</div>
+{% block intro %}
+    The following is a list of stations ordered by station number. If the station
+    is a link, you can click on it to access its data. If not, that means
+    that this station has not yet uploaded data to our datastore.
+{% endblock %}
 
-<div id="header">
-    <h2>List of stations, by number</h2>
-</div>
-
-<div id="intro">
-    <p>The following is a list of stations ordered by station number.  If the station
-    is a link, you can click on it to access its data.  If not, that means
-    that this station has not yet uploaded data to our datastore.</p>
-</div>
-
-<div id="stationList">
+{% block list %}
     <ul>
       {% for station in stations %}
         <li>
@@ -39,6 +28,4 @@
         </li>
       {% endfor %}
     </ul>
-</div>
-
 {% endblock %}

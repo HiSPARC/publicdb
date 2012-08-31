@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block navigation %}
+
+<div id="stationListPages">
+    Station lists:<br />
+    <a href="../stations" target="_top">order by cluster</a><br />
+    <a href="../stations_by_country" target="_top">order by country</a><br />
+    <a href="../stations_by_number" target="_top">order by number</a><br />
+    <a href="../stations_by_name" target="_top">order by name</a><br />
+    <a href="../stations_on_map" target="_top">stations on map</a>
+</div>
+
+{% endblock %}
+
+{% block content %}
+
+<div id="header">
+    <h2>{% block header %}List of stations{% endblock %}</h2>
+</div>
+
+<div id="intro">
+    <p>{% block intro %}The following is a list of stations.{% endblock %}</p>
+</div>
+
+<div id="stationList">
+  {% block list %}{% endblock %}
+</div>
+
+{% block map %}
+{% endblock %}
+
+{% endblock %}

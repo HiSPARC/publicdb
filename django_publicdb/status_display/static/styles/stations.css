@@ -19,6 +19,13 @@
     -moz-column-count: 2;
     column-count: 2;}
 
+.country h1 {
+    -moz-column-span: all;
+    -webkit-column-span: all;
+    column-span: all;
+    padding-top: 10px;
+    font-size: 32px;}
+
 .cluster {
     display: block;
     -webkit-column-break-inside: avoid;
@@ -26,17 +33,14 @@
     column-break-inside: avoid;
     break-inside: avoid-column;}
 
-.country h1 {
-    -moz-column-span: all;
-    -webkit-column-span: all;
-    column-span: all;
-    border-top: black solid 1px;
-    padding-top: 10px;}
+.cluster h3 {
+    margin-top: 0px;}
 
-ul {
+#stationList ul {
+    margin: 0px 0px 15px 0px;
     list-style: none;}
 
-li {
+#stationList li {
     line-height:140%}
 
 #stationList a {

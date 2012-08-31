@@ -121,6 +121,7 @@ def stations_on_map(request):
         if link:
             stations.append({'number': detector.station.number,
                              'name': detector.station.name,
+                             'cluster': detector.station.cluster,
                              'link': link,
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
