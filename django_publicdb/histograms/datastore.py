@@ -1,6 +1,8 @@
 import os
 import re
 import datetime
+from operator import itemgetter
+
 import tables
 
 from django.conf import settings
@@ -196,11 +198,11 @@ def get_data(cluster, station_id, date, table, quantity):
         table = file.getNode('/hisparc/cluster_%s/station_%d' %
                              (cluster.lower(), station_id), table)
         try:
-            data = [x[quantity] for x in table]
+            data = table.col(quantity)
         except tables.NoSuchNodeError:
             data = None
 
-    return data
+    return data.tolist()
 
 
 def get_time_series(cluster, station_id, date, table, quantity):
@@ -219,8 +221,10 @@ def get_time_series(cluster, station_id, date, table, quantity):
         table = file.getNode('/hisparc/cluster_%s/station_%d' %
                              (cluster.lower(), station_id), table)
         try:
-            data = [(x['timestamp'], x[quantity]) for x in table]
-            data.sort()
+            col1 = table.col('timestamp')
+            col2 = table.col(quantity)
+            data = zip(col1, col2)
+            data.sort(key=itemgetter(0))
         except tables.NoSuchNodeError:
             data = None
 

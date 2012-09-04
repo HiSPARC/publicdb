@@ -226,7 +226,7 @@ def get_request(request):
             {'form': form, 'html_captcha': html_captcha})
 
 
-def confirm_request(request,url):
+def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed==False:
        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
@@ -243,7 +243,7 @@ def confirm_request(request,url):
             {'id' : sessionrequest.sid, 'pin': sessionrequest.pin})
 
 
-def create_request(url):
+def create_request(request):
     sessionlist = SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True)
     for sessionrequest in sessionlist:
        sessionrequest.session_confirmed=False
