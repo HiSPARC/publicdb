@@ -23,10 +23,13 @@
         <ul>
           {% for station in cluster.stations %}
             <li>
+                <span class='statusBall {% if station.status %}up{% else %}down{% endif %}'></span>
               {% if station.link %}
-                <a href="{% url 'status_display.views.station' station.link %}">{{ station.number }} &mdash; {{ station.name }}</a>
+                <a href="{% url 'status_display.views.station' station.link %}">
+                  {{ station.number }} &mdash; {{ station.name }}
+                </a>
               {% else %}
-                {{ station.number }} &mdash; {{ station.name }}
+                  {{ station.number }} &mdash; {{ station.name }}
               {% endif %}
             </li>
           {% endfor %}

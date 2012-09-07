@@ -6,6 +6,8 @@ from django.db.models import Q
 from operator import itemgetter
 import calendar
 import os
+import re
+import urllib2
 from numpy import arange, pi, sin
 import datetime
 import time
@@ -17,6 +19,7 @@ from django_publicdb.inforecords.models import *
 def stations(request):
     """Show a list of stations, ordered by subcluster"""
 
+    down_list = retrieve_down_list()
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
@@ -24,12 +27,15 @@ def stations(request):
             try:
                 Summary.objects.filter(station=station)[0]
                 link = station.number
+                status = get_station_status(station, down_list)
             except IndexError:
                 link = None
+                status = False
 
             stations.append({'number': station.number,
                              'name': station.name,
-                             'link': link})
+                             'link': link,
+                             'status': status})
         clusters.append({'name': cluster.name, 'stations': stations})
 
     return render_to_response('stations.html', {'clusters': clusters},
@@ -223,6 +229,26 @@ def station(request, station_id):
                     day=str(summary.date.day))
 
 
+def retrieve_down_list():
+    """Get Nagios page which lists DOWN hosts"""
+
+    req = urllib2.urlopen('http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=4', timeout=3)
+    res = req.read()
+    down_list = re.findall("host=([a-z0-9]+)\' title", res)
+
+    return down_list
+
+
+def get_station_status(station, down_list):
+    """Return current status of requested station"""
+
+    name = Pc.objects.filter(station=station)[0].name
+
+    if name in down_list:
+        return False
+    else:
+        return True
+
 def get_eventtime_histogram_source(request, station_id, year, month, day):
     data = get_histogram_source(station_id, year, month, day, 'eventtime')
     response = render_to_response('source_eventtime_histogram.csv',
@@ -309,6 +335,7 @@ def create_histogram(type, station, year, month, day):
                                      type.value_axis_title)
     return plot_object
 
+
 def plot_dataset(type, station, year, month, day, log=False):
     """Create a dataset plot object"""
 
@@ -325,6 +352,7 @@ def plot_dataset(type, station, year, month, day, log=False):
                                      type.y_axis_title)
     return plot_object
 
+
 def create_plot_object(x_values, y_series, x_label, y_label):
     if type(y_series[0]) != list:
         y_series = [y_series]
@@ -334,6 +362,7 @@ def create_plot_object(x_values, y_series, x_label, y_label):
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
+
 
 def nav_calendar(station, theyear, themonth):
     """Create a month calendar with links"""
