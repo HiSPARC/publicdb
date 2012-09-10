@@ -19,7 +19,9 @@ from django_publicdb.inforecords.models import *
 def stations(request):
     """Show a list of stations, ordered by subcluster"""
 
-    down_list = retrieve_down_list()
+    down = down_list()
+    problem = problem_list()
+    up = up_list()
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
@@ -27,10 +29,10 @@ def stations(request):
             try:
                 Summary.objects.filter(station=station)[0]
                 link = station.number
-                status = get_station_status(station, down_list)
+                status = get_station_status(station, down, problem, up)
             except IndexError:
                 link = None
-                status = False
+                status = 'unknown'
 
             stations.append({'number': station.number,
                              'name': station.name,
@@ -113,6 +115,9 @@ def stations_by_name(request):
 def stations_on_map(request):
     """Show all stations on a map"""
 
+    down = down_list()
+    problem = problem_list()
+    up = up_list()
     today = datetime.datetime.utcnow()
     tomorrow = today + datetime.timedelta(days=1)
     stations = []
@@ -120,14 +125,16 @@ def stations_on_map(request):
         try:
             Summary.objects.filter(station=detector.station)[0]
             link = detector.station.number
+            status = get_station_status(detector.station, down, problem, up)
         except IndexError:
             link = None
-
+            status = 'unknown'
         if link:
             stations.append({'number': detector.station.number,
                              'name': detector.station.name,
                              'cluster': detector.station.cluster,
                              'link': link,
+                             'status': status,
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
@@ -229,25 +236,59 @@ def station(request, station_id):
                     day=str(summary.date.day))
 
 
-def retrieve_down_list():
+def down_list():
     """Get Nagios page which lists DOWN hosts"""
 
-    req = urllib2.urlopen('http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=4', timeout=3)
-    res = req.read()
-    down_list = re.findall("host=([a-z0-9]+)\' title", res)
+    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=4'
+    down_list = retrieve_station_status(url)
 
     return down_list
 
 
-def get_station_status(station, down_list):
+def problem_list():
+    """Get Nagios page which lists hosts with a problem"""
+
+    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
+    problem_list = retrieve_station_status(url)
+
+    return problem_list
+
+
+def up_list():
+    """Get Nagios page which lists UP hosts"""
+
+    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=2'
+    up_list = retrieve_station_status(url)
+
+    return up_list
+
+
+def retrieve_station_status(url):
+    """Get station list from Nagios page which lists hosts of certain level"""
+
+    try:
+        req = urllib2.urlopen(url, timeout=3)
+        res = req.read()
+        station_list = re.findall("host=([a-z0-9]+)\' title", res)
+    except urllib2.URLError:
+        station_list = []
+
+    return station_list
+
+
+def get_station_status(station, down, problem, up):
     """Return current status of requested station"""
 
     name = Pc.objects.filter(station=station)[0].name
 
-    if name in down_list:
-        return False
+    if name in down:
+        return 'down'
+    elif name in problem:
+        return 'problem'
+    elif name in up:
+        return 'up'
     else:
-        return True
+        return 'unknown'
 
 def get_eventtime_histogram_source(request, station_id, year, month, day):
     data = get_histogram_source(station_id, year, month, day, 'eventtime')

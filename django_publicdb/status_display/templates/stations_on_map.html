@@ -9,10 +9,14 @@
 {% block head %}
     <script type="text/javascript">
         var pointStyle = {
-            fillColor: '#E23F1E',
+            fillColor: '#1BAF16',
             fillOpacity: 0.8,
             pointRadius: 3,
             stroke: false};
+        var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#E23F1E'});
+        var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#E3D21E'});
+        var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#1BAF16'});
+        var pointStyle_unknown = $.extend(true, {}, pointStyle, {fillColor:'#0C54C0'});
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -39,7 +43,7 @@
                  name: "{{ station.name }}",
                  cluster: "{{ station.cluster }}",
                  link: {{ station.link }}},
-                pointStyle);
+                pointStyle_{{ station.status }});
             stationLayer.addFeatures(feature);
             {% endif %}
             {% endfor %}
@@ -50,20 +54,17 @@
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                    pointStyle.pointRadius = 3;}
+                    setPointRadius(3);}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                    pointStyle.pointRadius = 4;}
+                    setPointRadius(4);}
                 else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                    pointStyle.pointRadius = 5;}
+                    setPointRadius(5);}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                    pointStyle.pointRadius = 6;}
+                    setPointRadius(6);}
+                else if (zLevel <= 16) {
+                    setPointRadius(7);}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                    pointStyle.pointRadius = 8;}
+                    setPointRadius(8);}
             });
 
             selectControl = new OpenLayers.Control.SelectFeature(
@@ -80,6 +81,15 @@
                                 " (" + attr.id + ")</a><br />Cluster: " + attr.cluster);}});
         });
 
+        function setPointRadius(size) {
+            $('circle').attr('r', size.toString());
+            pointStyle.pointRadius = size;
+            pointStyle_down.pointRadius = size;
+            pointStyle_problem.pointRadius = size;
+            pointStyle_up.pointRadius = size;
+            pointStyle_unknown.pointRadius = size;
+        }
+
         function stationInfo(text) {
             $('#selectedStation').html(text);            
         }
@@ -91,8 +101,9 @@
 {% endblock %}
 
 {% block intro %}
-    The following is a map with all active stations shown on it, based on their last known GPS location.
-    Clicking on a station will show some info about it and give you a link to its data page.</p>
+    The following is a map with all stations shown on it, based on their last known GPS location.
+    Clicking on a station will show some info about it and give you a link to its data page.
+    The color of a station indicates its current status, green (red) indicates the station is up (down).</p>
 {% endblock %}
 
 {% block map %}

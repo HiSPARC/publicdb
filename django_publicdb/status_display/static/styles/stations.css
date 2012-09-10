@@ -62,8 +62,15 @@
 .down {
     background-color: red;}
 
+.problem {
+    background-color: gold;}
+
 .up {
     background-color: green;}
+
+.unknown {
+    visibility: hidden;
+    background-color: blue;}
 
 #stationMap {
     width: 100%;
