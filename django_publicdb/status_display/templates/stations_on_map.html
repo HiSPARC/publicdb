@@ -10,13 +10,13 @@
     <script type="text/javascript">
         var pointStyle = {
             fillColor: '#1BAF16',
-            fillOpacity: 0.8,
+            fillOpacity: 0.7,
             pointRadius: 3,
             stroke: false};
-        var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#E23F1E'});
-        var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#E3D21E'});
-        var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#1BAF16'});
-        var pointStyle_unknown = $.extend(true, {}, pointStyle, {fillColor:'#0C54C0'});
+        var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#F00'});
+        var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#FFD700'});
+        var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#008000'});
+        var pointStyle_unknown = $.extend(true, {}, pointStyle, {fillColor:'#00F'});
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -27,7 +27,7 @@
                         {dragPanOptions: {enableKinetic: true}}),
                     new OpenLayers.Control.Attribution(),
                     new OpenLayers.Control.ScaleLine()]};
-            map = new OpenLayers.Map("stationMap", options);
+            var map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
 
@@ -49,7 +49,7 @@
             {% endfor %}
             map.addLayer(stationLayer);
             
-            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
@@ -67,7 +67,7 @@
                     setPointRadius(8);}
             });
 
-            selectControl = new OpenLayers.Control.SelectFeature(
+            var selectControl = new OpenLayers.Control.SelectFeature(
                 [stationLayer],
                 {clickout: true, toggle: false, multiple: false, hover: false,
                  toggleKey: "ctrlKey", multipleKey: "shiftKey"});
@@ -76,7 +76,7 @@
             
             stationLayer.events.on({
                 "featureselected": function(e) {
-                    attr = e.feature.attributes
+                    var attr = e.feature.attributes
                     stationInfo("Station: <a href='../stations/" + attr.link + "'> " + attr.name +
                                 " (" + attr.id + ")</a><br />Cluster: " + attr.cluster);}});
         });
@@ -103,7 +103,11 @@
 {% block intro %}
     The following is a map with all stations shown on it, based on their last known GPS location.
     Clicking on a station will show some info about it and give you a link to its data page.
-    The color of a station indicates its current status, green (red) indicates the station is up (down).</p>
+    The color of a station indicates its current status:
+    <span class='statusBall down'></span> down,
+    <span class='statusBall problem'></span> problem,
+    <span class='statusBall up'></span> up,
+    <span class='statusBall unknown' style="visibility: visible;"></span> unknown.</p>
 {% endblock %}
 
 {% block map %}

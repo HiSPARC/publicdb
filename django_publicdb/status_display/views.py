@@ -19,9 +19,7 @@ from django_publicdb.inforecords.models import *
 def stations(request):
     """Show a list of stations, ordered by subcluster"""
 
-    down = down_list()
-    problem = problem_list()
-    up = up_list()
+    down, problem, up = status_lists()
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
@@ -29,10 +27,9 @@ def stations(request):
             try:
                 Summary.objects.filter(station=station)[0]
                 link = station.number
-                status = get_station_status(station, down, problem, up)
             except IndexError:
                 link = None
-                status = 'unknown'
+            status = get_station_status(station, down, problem, up)
 
             stations.append({'number': station.number,
                              'name': station.name,
@@ -47,6 +44,7 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+    down, problem, up = status_lists()
     countries = []
     for country in Country.objects.all():
         clusters = []
@@ -58,10 +56,12 @@ def stations_by_country(request):
                     link = station.number
                 except IndexError:
                     link = None
+                status = get_station_status(station, down, problem, up)
 
                 stations.append({'number': station.number,
                                  'name': station.name,
-                                 'link': link})
+                                 'link': link,
+                                 'status': status})
             clusters.append({'name': cluster.name, 'stations': stations})
         countries.append({'name': country.name, 'number': country.number, 'clusters': clusters})
 
@@ -74,6 +74,7 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    down, problem, up = status_lists()
     stations = []
     for station in Station.objects.all():
         try:
@@ -81,10 +82,12 @@ def stations_by_number(request):
             link = station.number
         except IndexError:
             link = None
+        status = get_station_status(station, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
-                         'link': link})
+                         'link': link,
+                         'status': status})
 
     return render_to_response('stations_by_number.html',
                               {'stations': stations},
@@ -94,6 +97,7 @@ def stations_by_number(request):
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
+    down, problem, up = status_lists()
     stations = []
     for station in Station.objects.all():
         try:
@@ -101,10 +105,12 @@ def stations_by_name(request):
             link = station.number
         except IndexError:
             link = None
+        status = get_station_status(station, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
-                         'link': link})
+                         'link': link,
+                         'status': status})
 
     stations = sorted(stations, key=itemgetter('name'))
 
@@ -115,9 +121,7 @@ def stations_by_name(request):
 def stations_on_map(request):
     """Show all stations on a map"""
 
-    down = down_list()
-    problem = problem_list()
-    up = up_list()
+    down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
     tomorrow = today + datetime.timedelta(days=1)
     stations = []
@@ -125,10 +129,10 @@ def stations_on_map(request):
         try:
             Summary.objects.filter(station=detector.station)[0]
             link = detector.station.number
-            status = get_station_status(detector.station, down, problem, up)
         except IndexError:
             link = None
-            status = 'unknown'
+        status = get_station_status(detector.station, down, problem, up)
+
         if link:
             stations.append({'number': detector.station.number,
                              'name': detector.station.name,
@@ -236,6 +240,14 @@ def station(request, station_id):
                     day=str(summary.date.day))
 
 
+def status_lists():
+    down = down_list()
+    problem = problem_list()
+    up = up_list()
+
+    return down, problem, up
+
+
 def down_list():
     """Get Nagios page which lists DOWN hosts"""
 
@@ -267,7 +279,7 @@ def retrieve_station_status(url):
     """Get station list from Nagios page which lists hosts of certain level"""
 
     try:
-        req = urllib2.urlopen(url, timeout=3)
+        req = urllib2.urlopen(url, timeout=2)
         res = req.read()
         station_list = re.findall("host=([a-z0-9]+)\' title", res)
     except urllib2.URLError:
@@ -279,7 +291,10 @@ def retrieve_station_status(url):
 def get_station_status(station, down, problem, up):
     """Return current status of requested station"""
 
-    name = Pc.objects.filter(station=station)[0].name
+    try:
+        name = Pc.objects.filter(station=station)[0].name
+    except IndexError:
+        return 'unknown'
 
     if name in down:
         return 'down'

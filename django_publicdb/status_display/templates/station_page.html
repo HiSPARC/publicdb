@@ -22,8 +22,8 @@
     <script type="text/javascript">
       {% if config %}
         var pointStyle = {
-            fillColor: '#E23F1E',
-            fillOpacity: 0.8,
+            fillColor: '#00F',
+            fillOpacity: 0.7,
             pointRadius: 6,
             stroke: false};
 
@@ -36,7 +36,7 @@
                         {dragPanOptions: {enableKinetic: true}}),
                     new OpenLayers.Control.Attribution(),
                     new OpenLayers.Control.ScaleLine()]};
-            map = new OpenLayers.Map("stationMap", options);
+            var map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
 
@@ -54,29 +54,31 @@
             stationLayer.addFeatures(feature);
             map.addLayer(stationLayer);
             
-            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                    pointStyle.pointRadius = 3;}
+                    setPointRadius(3);}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                    pointStyle.pointRadius = 4;}
+                    setPointRadius(4);}
                 else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                    pointStyle.pointRadius = 5;}
+                    setPointRadius(5);}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                    pointStyle.pointRadius = 6;}
+                    setPointRadius(6);}
+                else if (zLevel <= 16) {
+                    setPointRadius(7);}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                    pointStyle.pointRadius = 8;}
+                    setPointRadius(8);}
             });
         });
 
       {% endif %}
+
+        function setPointRadius(size) {
+            $('circle').attr('r', size.toString());
+            pointStyle.pointRadius = size;
+        }
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
