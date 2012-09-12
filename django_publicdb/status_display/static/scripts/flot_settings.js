@@ -18,11 +18,13 @@ var base_options = {
         font: {
             size: 12,},},
     y2axis: {
+        tickLength: 2,
         alignTicksWithAxis: 1,
         axisLabel: '',
         position: "right",
         labelWidth: 0,},
     x2axis: {
+        tickLength: 2,
         alignTicksWithAxis: 1,
         axisLabel: '',
         position: "top",
