@@ -50,8 +50,7 @@ def get_coincidence(request):
         coincidence = coincidences.filter(student=student,
                                           is_analyzed=False)[0]
     except IndexError:
-        coincidence = coincidences.filter(student=None,
-                                          is_analyzed=False)[0]
+        coincidence = coincidences.filter(student=None, is_analyzed=False)[0]
         coincidence.student = student
         coincidence.save()
 
@@ -61,8 +60,9 @@ def get_coincidence(request):
         s = e.station
         d = s.detectorhisparc_set.all().reverse()[0]
 
-
-        event = dict(timestamp=calendar.timegm(datetime.datetime.combine(e.date, e.time).utctimetuple()),
+        event = dict(timestamp=calendar.timegm(datetime.datetime
+                                               .combine(e.date, e.time)
+                                               .utctimetuple()),
                      nanoseconds=e.nanoseconds, number=s.number,
                      lat=d.latitude, lon=d.longitude, alt=d.height,
                      status='on', detectors=len(e.traces),
@@ -72,14 +72,15 @@ def get_coincidence(request):
         events.append(event)
 
     data = dict(pk=c.pk, timestamp=calendar.timegm(datetime.datetime
-                                                  .combine(c.coincidence.date,
-                                                           c.coincidence.time)
-                                                  .utctimetuple()),
+                                                   .combine(c.coincidence.date,
+                                                            c.coincidence.time)
+                                                   .utctimetuple()),
                 nanoseconds=c.coincidence.nanoseconds, events=events)
 
     response = HttpResponse(json.dumps(data), mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
 
 def top_lijst(slug):
     coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug,
@@ -101,6 +102,7 @@ def top_lijst(slug):
                            'num_events': num_events})
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
+
 
 def result(request):
     session_title = request.GET['session_title']

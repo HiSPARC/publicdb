@@ -35,7 +35,7 @@
 
             var stationLayer = new OpenLayers.Layer.Vector("stations");
             {% for station in stations %}
-            {% if station.longitude and station.latitude %} 
+              {% if station.longitude and station.latitude %} 
             var feature = new OpenLayers.Feature.Vector(
                 new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
                                        .transform(fromProjection, toProjection),
@@ -45,7 +45,7 @@
                  link: {{ station.link }}},
                 pointStyle_{{ station.status }});
             stationLayer.addFeatures(feature);
-            {% endif %}
+              {% endif %}
             {% endfor %}
             map.addLayer(stationLayer);
             
