@@ -24,6 +24,7 @@ def keys(request, host):
                                        host.name)
     return response
 
+
 def create_nagios_config(request):
     """Create a nagios config file
 
@@ -74,6 +75,7 @@ def create_nagios_config(request):
                                'clusters': Cluster.objects.all(),
                                'hosts': hosts},
                               mimetype='text/plain')
+
 
 def create_datastore_config(request):
     """Create the datastore configuration"""
