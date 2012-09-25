@@ -206,7 +206,10 @@ class SessionRequest(models.Model):
                 if v < .2 * m:
                     break
             t.append(i * 2.5)
-        trace_timing = min(t)
+        if len(t) > 0:
+            trace_timing = min(t)
+        else:
+            trace_timing = -999
         return trace_timing
 
    def GenerateUrl(self):
