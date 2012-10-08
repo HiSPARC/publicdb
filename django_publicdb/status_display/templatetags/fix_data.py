@@ -9,6 +9,7 @@ def fix_histogram_data(value):
 
     return value + [[value[-1][0] + (value[-1][0] - value[-2][0]), value[-1][1]]]
 
+
 @register.filter
 def fix_timestamps_in_data(values):
     """Convert timestamps to hour of day"""
@@ -19,14 +20,23 @@ def fix_timestamps_in_data(values):
     values = [list(u) for u in zip(hours_in_day, y)]
     return values
 
+
 @register.filter
 def slice_data(values, arg):
     """Get every nth value from the list"""
 
     return values[::arg]
 
+
 @register.filter
 def round_data(values, arg):
     """Round every value to nth decimal place"""
 
     return [[round(x, arg), round(y, arg)] for x, y, in values]
+
+
+@register.filter
+def real_temperature(values):
+    """Only allow physically possible temperatures"""
+
+    return [[x, y] for x, y in values if -273 < y]

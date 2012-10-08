@@ -162,7 +162,7 @@
 
   {% if barometerdata %}
     <div id="barometerData" class="histogram">
-        <h3>Barometer data</h3>
+        <h3>Barometer data{% if temperaturedata.source == 'KNMI' %} (KNMI){% endif %}</h3>
         <div class="sourceLink">
             <a onclick="downloadGraph('#bd_histogram')">Image</a> |
             <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
@@ -178,7 +178,11 @@
             $.extend(true, bd_options, bd_labels)
             $.plot($("#bd_histogram"), [
               {% for data in barometerdata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                {% if barometerdata.source == 'KNMI' %}
+                  {data:  {{ data }}, yaxis: 1},
+                {% else %}
+                  {data: {{ data|slice_data:50|round_data:2|fix_timestamps_in_data }}, yaxis: 1},
+                {% endif %}
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
         </script>
@@ -187,7 +191,7 @@
 
   {% if temperaturedata %}
     <div id="temperatureData" class="histogram">
-        <h3>Temperature data</h3>
+        <h3>Temperature data{% if temperaturedata.source == 'KNMI' %} (KNMI){% endif %}</h3>
         <div class="sourceLink">
             <a onclick="downloadGraph('#td_histogram')">Image</a> |
             <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
@@ -203,7 +207,11 @@
             $.extend(true, td_options, td_labels)
             $.plot($("#td_histogram"), [
               {% for data in temperaturedata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                {% if temperaturedata.source == 'KNMI' %}
+                  {data:  {{ data }}, yaxis: 1},
+                {% else %}
+                  {data: {{ data|real_temperature|slice_data:50|round_data:2|fix_timestamps_in_data }}, yaxis: 1},
+                {% endif %}
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], td_options);
         </script>

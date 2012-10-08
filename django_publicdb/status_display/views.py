@@ -9,6 +9,10 @@ import os
 from numpy import arange, pi, sin
 import datetime
 import time
+from urllib import urlencode
+from urllib2 import urlopen, HTTPError, URLError
+from socket import timeout
+from csv import DictReader
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -310,6 +314,7 @@ def create_histogram(type, station, year, month, day):
                                      type.value_axis_title)
     return plot_object
 
+
 def plot_dataset(type, station, year, month, day, log=False):
     """Create a dataset plot object"""
 
@@ -319,22 +324,60 @@ def plot_dataset(type, station, year, month, day, log=False):
 
     try:
         dataset = DailyDataset.objects.get(source=source, type=type)
+        plot_object = create_plot_object(dataset.x, dataset.y,
+                                         type.x_axis_title, type.y_axis_title)
     except DailyDataset.DoesNotExist:
-        return None
-
-    plot_object = create_plot_object(dataset.x, dataset.y, type.x_axis_title,
-                                     type.y_axis_title)
+        if type.slug in ('temperature', 'barometer'):
+            dataset = get_KNMI_weather(station, date, type)
+            plot_object = create_plot_object(dataset['x'], dataset['y'],
+                                             type.x_axis_title, type.y_axis_title,
+                                             'KNMI')
+        else:
+            return None
     return plot_object
 
-def create_plot_object(x_values, y_series, x_label, y_label):
+
+def get_KNMI_weather(station, date, type):
+    """Get weather data from closest KNMI station"""
+
+    url = 'http://www.knmi.nl/klimatologie/uurgegevens/getdata_uur.cgi'
+
+    if type.slug == 'temperature':
+        var = 'T'
+    elif type.slug == 'barometer':
+        var = 'P'
+    knmi_station = closest_KNMI(station)
+    params = urlencode({'start': date.strftime('%Y%m%d') + '01',
+                        'end': date.strftime('%Y%m%d') + '24', 'inseason': 1,
+                        'vars': var, 'stns': knmi_station, 'zipped': 0})
+    response = urlopen(url, params)
+    info = DictReader(response, fieldnames=['station','date','hour', type])
+    dataset = [(row['hour'], row[type]) for row in info
+               if not row['station'].startswith('#')]
+    hours, values = zip(*dataset)
+    x = [int(hour) - 1 for hour in hours]
+    y = [float(value) / 10. for value in values]
+    dataset = {'x': x, 'y': y}
+
+    return dataset
+
+
+def closest_KNMI(station):
+    """Find closest KNMI Station"""
+    return 240
+
+
+def create_plot_object(x_values, y_series, x_label, y_label, source='HiSPARC'):
     if type(y_series[0]) != list:
         y_series = [y_series]
 
     data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
             y_values in y_series]
 
-    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
+    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label,
+                   'source': source}
     return plot_object
+
 
 def nav_calendar(station, theyear, themonth):
     """Create a month calendar with links"""
