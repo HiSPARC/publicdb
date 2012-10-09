@@ -6,13 +6,12 @@ from django.db.models import Q
 from operator import itemgetter
 import calendar
 import os
-from numpy import arange, pi, sin
+from numpy import arange, pi, sin, cos, radians, sqrt, arctan2, array, genfromtxt
 import datetime
 import time
 from urllib import urlencode
 from urllib2 import urlopen, HTTPError, URLError
 from socket import timeout
-from csv import DictReader
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -342,29 +341,59 @@ def get_KNMI_weather(station, date, type):
 
     url = 'http://www.knmi.nl/klimatologie/uurgegevens/getdata_uur.cgi'
 
-    if type.slug == 'temperature':
-        var = 'T'
-    elif type.slug == 'barometer':
-        var = 'P'
-    knmi_station = closest_KNMI(station)
+    tomorrow = date + datetime.timedelta(days=1)
+
+    try:
+        config = (Configuration.objects.filter(source__station=station,
+                                               timestamp__lt=tomorrow)
+                                       .latest('timestamp'))
+        knmi_station = closest_KNMI(config.gps_longitude, config.gps_latitude)
+    except Configuration.DoesNotExist:
+        knmi_station = 260
+
     params = urlencode({'start': date.strftime('%Y%m%d') + '01',
                         'end': date.strftime('%Y%m%d') + '24', 'inseason': 1,
-                        'vars': var, 'stns': knmi_station, 'zipped': 0})
+                        'vars': 'T:P', 'stns': knmi_station, 'zipped': 0})
     response = urlopen(url, params)
-    info = DictReader(response, fieldnames=['station','date','hour', type])
-    dataset = [(row['hour'], row[type]) for row in info
-               if not row['station'].startswith('#')]
-    hours, values = zip(*dataset)
-    x = [int(hour) - 1 for hour in hours]
-    y = [float(value) / 10. for value in values]
-    dataset = {'x': x, 'y': y}
+    res = genfromtxt(response, delimiter=',', filling_values=-999,
+                     dtype=([('station', 'u2'), ('date', 'u4'), ('hour', 'u1'),
+                             ('temperature', 'f4'), ('barometer', 'f4')]))
+
+    dataset = {'x': res['hour'].tolist(), 'y': res[type.slug].tolist()}
 
     return dataset
 
 
-def closest_KNMI(station):
+def closest_KNMI(lon1, lat1):
     """Find closest KNMI Station"""
-    return 240
+    KNMI = ((210, 4.419, 52.165), (225, 4.575, 52.463), (235, 4.785, 52.924),
+            (240, 4.774, 52.301), (242, 4.942, 53.255), (249, 4.979, 52.644),
+            (251, 5.346, 53.393), (257, 4.603, 52.506), (260, 5.177, 52.101),
+            (265, 5.274, 52.130), (267, 5.384, 52.896), (269, 5.526, 52.458),
+            (270, 5.755, 53.225), (273, 5.889, 52.703), (275, 5.888, 52.061),
+            (277, 6.196, 53.409), (278, 6.263, 52.437), (279, 6.575, 52.750),
+            (280, 6.586, 53.125), (283, 6.650, 52.073), (286, 7.150, 53.196),
+            (290, 6.897, 52.273), (310, 3.596, 51.442), (319, 3.862, 51.226),
+            (323, 3.884, 51.527), (330, 4.124, 51.993), (340, 4.349, 51.448),
+            (344, 4.444, 51.955), (348, 4.927, 51.972), (350, 4.933, 51.568),
+            (356, 5.145, 51.858), (370, 5.414, 51.446), (375, 5.706, 51.657),
+            (377, 5.764, 51.197), (380, 5.768, 50.910), (391, 6.196, 51.498))
+
+    KNMI_stations = [{'stn': x[0], 'lon': x[1], 'lat': x[2]} for x in KNMI]
+    stns = array([KNMI_station['stn'] for KNMI_station in KNMI_stations])
+    lat2 = array([KNMI_station['lat'] for KNMI_station in KNMI_stations])
+    lon2 = array([KNMI_station['lon'] for KNMI_station in KNMI_stations])
+
+    R = 6371  # km Radius of earth
+    dLat = radians(lat2 - lat1)
+    dLon = radians(lon2 - lon1)
+    a = sin(dLat / 2) ** 2 + cos(radians(lat1)) * cos(radians(lat2)) * sin(dLon / 2) ** 2
+    c = 2 * arctan2(sqrt(a), sqrt(1 - a))
+    distance = R * c
+
+    closet = stns[min(enumerate(distance), key=itemgetter(1))[0]]
+
+    return closet
 
 
 def create_plot_object(x_values, y_series, x_label, y_label, source='HiSPARC'):
