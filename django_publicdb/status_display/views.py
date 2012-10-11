@@ -395,12 +395,16 @@ def nav_years(station):
                                         Q(num_weather__isnull=False))
                         .dates('date', 'year'))
 
+    valid_years = [date.year for date in date_list
+                   if 2002 <= date.year <= datetime.datetime.now().year]
     year_list = []
-    for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year)
-                            .dates('date', 'day')[0])
-        link = (station.number, date.year, first_day.month, first_day.day)
-        year_list.append({'year': date.year, 'link': link})
-
+    for year in range(valid_years[0], valid_years[-1] + 1):
+        if year in valid_years:
+            first_day = (Summary.objects.filter(station=station,
+                                                date__year=year)
+                                .dates('date', 'day')[0])
+            link = (station.number, year, first_day.month, first_day.day)
+            year_list.append({'year': year, 'link': link})
+        else:
+            year_list.append({'year': year, 'link': None})
     return year_list

@@ -72,21 +72,23 @@ h3 {
     padding: 0px;}
 
 #yearlist li, #monthlist li {
-    display: inline;
-    line-height: 2;
-    margin-right: 10px;}
+    display: inline-block;
+    line-height: 2;}
 
 #monthlist li {
-    display: inline-block;
-    width: 23px;}
+    width: 23px;
+    margin-right: 10px;}
+
+#yearlist li {
+    margin-right: 7px;}
 
 #calendar .day, #calendar .dayname {
     width: 25px;
     height: 25px;
     text-align: right;}
 
-#calendar .day a {
-    padding: 2px;}
+#calendar .day a, #yearlist li a, #monthlist li a, .nolink{
+    padding: 3px;}
 
 #calendar .dayname {
     font-size: 8pt;}
@@ -97,9 +99,8 @@ a:link, a:visited {
 
 a.currentDate {
     color: white;
-    background: black;
-    padding: 2px;
-    border-radius: 2px;}
+    background: #075EBB;
+    border-radius: 3px;}
 
 #config {
     margin-top: 50px;}

@@ -249,7 +249,7 @@
           {% if month.link %}
             <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
           {% else %}
-            {{ month.month }}
+            <span class="nolink">{{ month.month }}</span>
           {% endif %}
         </li>
       {% endfor %}
@@ -259,7 +259,13 @@
     <div id="yearlist">
     <ul>
       {% for year in year_list %}
-        <li><a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>{{ year.year }}</a></li>
+        <li>
+          {% if year.link %}
+            <a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>{{ year.year }}</a>
+          {% else %}
+            <span class="nolink">{{ year.year }}</span>
+          {% endif %}
+        </li>
       {% endfor %}
     </ul>
     </div>
