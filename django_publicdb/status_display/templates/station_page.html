@@ -179,7 +179,7 @@
             $.plot($("#bd_histogram"), [
               {% for data in barometerdata.data %}
                 {% if barometerdata.source == 'KNMI' %}
-                  {data:  {{ data|fix_hour|real_pressure|divide_data:10 }}, yaxis: 1},
+                  {data:  {{ data|fix_hour|real_pressure|divide_data:10|round_data:2 }}, yaxis: 1},
                 {% else %}
                   {data: {{ data|slice_data:50|round_data:2|fix_timestamps_in_data }}, yaxis: 1},
                 {% endif %}
@@ -208,7 +208,7 @@
             $.plot($("#td_histogram"), [
               {% for data in temperaturedata.data %}
                 {% if temperaturedata.source == 'KNMI' %}
-                  {data:  {{ data|fix_hour|real_temperature|round_data:2|divide_data:10 }}, yaxis: 1},
+                  {data:  {{ data|fix_hour|real_temperature|divide_data:10|round_data:2 }}, yaxis: 1},
                 {% else %}
                   {data: {{ data|real_temperature|slice_data:50|round_data:2|fix_timestamps_in_data }}, yaxis: 1},
                 {% endif %}
