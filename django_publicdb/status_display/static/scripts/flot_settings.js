@@ -88,7 +88,7 @@ var _td_options = {
             show: false,},
         points: {
             show: true,
-            radius: 0,},},
+            radius: 0.1,},},
     yaxis: {
         axisLabel: 'Temperature (°C)',},
     xaxis: {
@@ -104,7 +104,7 @@ var _bd_options = {
             show: false,},
         points: {
             show: true,
-            radius: 0,},},
+            radius: 0.1,},},
     yaxis: {
         axisLabel: 'Air pressure (hPa)',},
     xaxis: {
