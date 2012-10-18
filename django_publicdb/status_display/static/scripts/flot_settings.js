@@ -1,3 +1,6 @@
+function HideTickLabels(v, axis) {
+    return " ";}
+
 var base_options = {
     colors: ["#222", "#D22", "#1C2", "#1CC",],
     series: {
@@ -6,39 +9,54 @@ var base_options = {
             steps: true,},
         shadowSize: 0,},
     yaxis: {
-        tickLength: 4,
+        show: true,
+        position: "left",
+        color: "#000",
         tickColor: "#000",
-        labelWidth: 45,
         font: {
-            size: 12,},},
+            size: 12,},
+        tickLength: 4,
+        tickDecimals: 0,
+        labelWidth: 33,
+        axisLabelUseCanvas: true,
+        axisLabelFontSizePixels: 16,},
     xaxis: {
-        tickLength: 4,
+        show: true,
+        position: "bottom",
+        color: "#000",
         tickColor: "#000",
-        labelHeight: 20,
         font: {
-            size: 12,},},
+            size: 12,},
+        tickLength: 4,
+        tickDecimals: 0,
+        labelHeight: 23,
+        axisLabelUseCanvas: true,
+        axisLabelFontSizePixels: 16,},
     y2axis: {
-        tickLength: 2,
-        alignTicksWithAxis: 1,
-        axisLabel: '',
+        show: true,
         position: "right",
-        labelWidth: 0,},
-    x2axis: {
         tickLength: 2,
         alignTicksWithAxis: 1,
         axisLabel: '',
+        labelWidth: 11,
+        tickFormatter: HideTickLabels,},
+    x2axis: {
+        show: true,
         position: "top",
-        labelHeight: 0,},
+        tickLength: 2,
+        alignTicksWithAxis: 1,
+        axisLabel: '',
+        labelHeight: 0,
+        tickFormatter: HideTickLabels,},
     grid: {
         show: true,
         aboveData: 0,
         color: "#000",
-        backgroundColor: "#FFF",
-        labelMargin: 4,
+        backgroundColor: "rgba(255, 255, 255, 0)",
+        labelMargin: 7,
         axisMargin: 0,
-        borderWidth: 1,
-        borderColor: "#000",
-        minBorderMargin: 1,
+        borderWidth: 0,
+        minBorderMargin: 0,
         clickable: false,
         hoverable: false,
         autoHighlight: false,},
@@ -46,11 +64,14 @@ var base_options = {
 };
 
 var _eh_options = {
+    series: {
+        lines: {
+            lineWidth: 1.5,},},
     yaxis: {
         axisLabel: 'Number of events',
         min: 0,},
     xaxis: {
-        axisLabel : 'Hour of day (UTC)',
+        axisLabel: 'Hour of day (UTC)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         min: 0,
         max: 24,},
@@ -59,12 +80,10 @@ var _eh_options = {
 var _ph_options = {
     yaxis: {
         axisLabel: 'Count',
-        min: 0.5,
+        min: 0.7,
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
-        tickLength: 4,
-        tickColor: "#000",
-        transform: function (N) { return Math.log(N); },
-        inverseTransform: function (N) { return Math.exp(N); },},
+        transform: function (N) {return Math.log(N);},
+        inverseTransform: function (N) {return Math.exp(N);},},
     xaxis: {
         axisLabel: 'Pulseheight (mV)',},
 };
@@ -73,11 +92,9 @@ var _pi_options = {
     yaxis: {
         axisLabel: 'Count',
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
-        min: 0.5,
-        tickLength: 4,
-        tickColor: "#000",
-        transform: function (N) { return Math.log(N); },
-        inverseTransform: function (N) { return Math.exp(N); },},
+        min: 0.7,
+        transform: function (N) {return Math.log(N);},
+        inverseTransform: function (N) {return Math.exp(N);},},
     xaxis: {
         axisLabel: 'Pulseintegral (mVns)',},
 };
