@@ -17,7 +17,7 @@
             fillColor: '#E23F1E',
             fillOpacity: 0.8,
             pointRadius: 6,
-            stroke: false,};
+            stroke: false};
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -94,8 +94,8 @@
         </div>
         <div class="plot" id="eh_histogram"></div>
         <script type="text/javascript">
-            eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}",},
-                         xaxis: {axisLabel: "{{ eventhistogram.x_label }}",},}
+            eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
+                         xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
             $.extend(true, eh_options, eh_labels)
             $.plot($("#eh_histogram"), [
               {% for data in eventhistogram.data %}
@@ -115,8 +115,8 @@
         </div>
         <div class="plot" id="ph_histogram"></div>
         <script type="text/javascript">
-            ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}",},
-                         xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}",},}
+            ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
+                         xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
             $.extend(true, ph_options, ph_labels)
             $.plot($("#ph_histogram"), [
               {% for data in pulseheighthistogram.data %}
@@ -136,8 +136,8 @@
         </div>
         <div class="plot" id="pi_histogram"></div>
         <script type="text/javascript">
-            pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}",},
-                         xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}",},}
+            pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
+                         xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
             $.extend(true, pi_options, pi_labels)
             $.plot($("#pi_histogram"), [
               {% for data in pulseintegralhistogram.data %}
@@ -157,8 +157,8 @@
         </div>
         <div class="plot" id="bd_histogram"></div>
         <script type="text/javascript">
-            bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}",},
-                         xaxis: {axisLabel: "{{ barometerdata.x_label }}",},}
+            bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
+                         xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
             $.extend(true, bd_options, bd_labels)
             $.plot($("#bd_histogram"), [
               {% for data in barometerdata.data %}
@@ -178,8 +178,8 @@
         </div>
         <div class="plot" id="td_histogram"></div>
         <script type="text/javascript">
-            td_labels = {yaxis: {axisLabel: "{{ temperaturedata.y_label }}",},
-                         xaxis: {axisLabel: "{{ temperaturedata.x_label }}",},}
+            td_labels = {yaxis: {axisLabel: "{{ temperaturedata.y_label }}"},
+                         xaxis: {axisLabel: "{{ temperaturedata.x_label }}"}}
             $.extend(true, td_options, td_labels)
             $.plot($("#td_histogram"), [
               {% for data in temperaturedata.data %}
