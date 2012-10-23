@@ -7,10 +7,18 @@
 
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
+    <!--[if lte IE 7]><style type="text/css" media="all">
+        #yearlist li, #monthlist li {
+            display: inline;}
+    </style><![endif]-->
 {% endblock %}
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <!--[if lte IE 8]><script type="text/javascript">
+        var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
+        var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
+    </script><![endif]-->
     <script type="text/javascript">
       {% if config %}
         var pointStyle = {

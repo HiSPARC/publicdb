@@ -32,7 +32,8 @@
     width: 591px;}
 
 .plot {
-    display: block;}
+    display: block;
+    clear: both;}
 
 .x2Axis .tickLabel {
     display: none;}
@@ -46,7 +47,7 @@ h3 {
 .sourceLink {
     float: right;
     position: relative;
-    right: 1px;
+    right: 20px;
     font-size: 8pt;
     font-weight: bold;
     margin: 27px 0px 0px 0px;

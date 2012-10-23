@@ -105,7 +105,10 @@ var _td_options = {
             show: false},
         points: {
             show: true,
-            radius: 0.1}},
+            radius: .75,
+            lineWidth: 0.00001,
+            fill: true,
+            fillColor: "#222"}},
     yaxis: {
         axisLabel: 'Temperature (°C)'},
     xaxis: {
@@ -121,7 +124,10 @@ var _bd_options = {
             show: false},
         points: {
             show: true,
-            radius: 0.1}},
+            radius: .75,
+            lineWidth: 0.00001,
+            fill: true,
+            fillColor: "#222"}},
     yaxis: {
         axisLabel: 'Air pressure (hPa)'},
     xaxis: {
