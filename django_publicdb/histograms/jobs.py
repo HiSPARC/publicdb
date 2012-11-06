@@ -1,4 +1,4 @@
-""" Various maintenance jobs that can either be executed by cron, are by
+""" Various maintenance jobs that can either be executed by cron or by
     accessing a view.
 
 """
@@ -19,6 +19,7 @@ BIN_PH_NUM = 200
 MAX_IN = 20000
 BIN_IN_NUM = 200
 
+
 def check_for_updates():
     state = GeneratorState.objects.get()
 
@@ -38,7 +39,7 @@ def check_for_updates():
                     station = (inforecords.Station.objects
                                           .get(number=station))
                     s, created = Summary.objects.get_or_create(
-                                    station=station, date=date)
+                                        station=station, date=date)
                     for table, num_events in table_list.iteritems():
                         if (table == 'events' or table == 'config' or
                             table == 'errors' or table == 'weather'):
@@ -61,6 +62,7 @@ def check_for_updates():
             state.save()
 
     return True
+
 
 def update_all_histograms():
     state = GeneratorState.objects.get()
@@ -100,13 +102,16 @@ def update_all_histograms():
 
     return True
 
+
 def update_gps_coordinates():
     """Update GPS coordinates for all stations"""
 
+    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
     for detector in DetectorHisparc.objects.all():
         try:
             config = (Configuration.objects
-                                   .filter(source__station=detector.station)
+                                   .filter(source__station=detector.station,
+                                           timestamp__lt=tomorrow)
                                    .latest('timestamp'))
         except Configuration.DoesNotExist:
             pass
@@ -116,6 +121,7 @@ def update_gps_coordinates():
             detector.height = config.gps_altitude
             detector.save()
 
+
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
@@ -123,8 +129,7 @@ def update_eventtime_histogram(summary):
                                                 summary.date)
 
     # creating a histogram with bins consisting of timestamps instead of
-    # hours saves us from having to convert all timestamps to hours of
-    # day.
+    # hours saves us from having to convert all timestamps to hours of day.
     # timestamp at midnight (start of day) of date
     start = calendar.timegm(summary.date.timetuple())
     # create bins, don't forget right-most edge
@@ -136,6 +141,7 @@ def update_eventtime_histogram(summary):
     hist = hist[0].tolist()
     save_histograms(summary, 'eventtime', bins, hist)
 
+
 def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
@@ -144,6 +150,7 @@ def update_pulseheight_histogram(summary):
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
 
+
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
@@ -151,15 +158,16 @@ def update_pulseintegral_histogram(summary):
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
+
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    temperature = datastore.get_temperature(cluster, station_id,
-                                            summary.date)
-    ERR = -2**15
-    temperature = [(x, y) for x, y in temperature if y != ERR]
+    temperature = datastore.get_temperature(cluster, station_id, summary.date)
+    ERR = [-999, -2**15]
+    temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         save_dataset(summary, 'temperature', temperature)
+
 
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
@@ -167,12 +175,12 @@ def update_barometer_dataset(summary):
     barometer = datastore.get_barometer(cluster, station_id, summary.date)
     save_dataset(summary, 'barometer', barometer)
 
+
 def update_config(summary):
     logger.debug("Updating configuration messages for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    file, configs, blobs = datastore.get_config_messages(cluster,
-                                                        station_id,
-                                                        summary.date)
+    file, configs, blobs = datastore.get_config_messages(cluster, station_id,
+                                                         summary.date)
     for config in configs[summary.num_config:]:
         new_config = Configuration(source=summary)
         for var in vars(new_config):
@@ -192,6 +200,7 @@ def update_config(summary):
     file.close()
     return num_config
 
+
 def create_histogram(data, high, samples):
     if data is None:
         return [], []
@@ -207,6 +216,7 @@ def create_histogram(data, high, samples):
 
         return bins, values
 
+
 def save_histograms(summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
@@ -218,6 +228,7 @@ def save_histograms(summary, slug, bins, values):
     h.values = values
     h.save()
     logger.debug("Saved succesfully")
+
 
 def save_dataset(summary, slug, data):
     logger.debug("Saving dataset %s for %s" % (slug, summary))
@@ -231,6 +242,7 @@ def save_dataset(summary, slug, data):
     d.y = y
     d.save()
     logger.debug("Saved succesfully")
+
 
 def get_station_cluster_id(station):
     return station.cluster.main_cluster(), station.number

@@ -1,0 +1,104 @@
+{% extends 'base_stations.html' %}
+
+{% load url from future %}
+
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
+{% block head %}
+    <script type="text/javascript">
+        var pointStyle = {
+            fillColor: '#E23F1E',
+            fillOpacity: 0.8,
+            pointRadius: 3,
+            stroke: false,};
+
+        $(document).ready(function() {
+            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
+            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+            var options = {
+                controls: [
+                    new OpenLayers.Control.Navigation(
+                        {dragPanOptions: {enableKinetic: true}}),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.ScaleLine()]};
+            map = new OpenLayers.Map("stationMap", options);
+            var mapLayer = new OpenLayers.Layer.OSM();
+            map.addLayer(mapLayer);
+
+            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+
+            var stationLayer = new OpenLayers.Layer.Vector("stations");
+            {% for station in stations %}
+            {% if station.longitude and station.latitude %} 
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
+                                       .transform(fromProjection, toProjection),
+                {id: {{ station.number }},
+                 name: "{{ station.name }}",
+                 cluster: "{{ station.cluster }}",
+                 link: {{ station.link }}},
+                pointStyle);
+            stationLayer.addFeatures(feature);
+            {% endif %}
+            {% endfor %}
+            map.addLayer(stationLayer);
+            
+            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+
+            map.events.register('zoomend', this, function(event) {
+                var zLevel = map.getZoom();
+                if (zLevel <= 5) {
+                    $('circle').attr('r', '3');
+                    pointStyle.pointRadius = 3;}
+                else if (zLevel <= 8) {
+                    $('circle').attr('r', '4');
+                    pointStyle.pointRadius = 4;}
+                else if (zLevel <= 11) {
+                    $('circle').attr('r', '5');
+                    pointStyle.pointRadius = 5;}
+                else if (zLevel <= 14) {
+                    $('circle').attr('r', '6');
+                    pointStyle.pointRadius = 6;}
+                else if (zLevel <= 18) {
+                    $('circle').attr('r', '8');
+                    pointStyle.pointRadius = 8;}
+            });
+
+            selectControl = new OpenLayers.Control.SelectFeature(
+                [stationLayer],
+                {clickout: true, toggle: false, multiple: false, hover: false,
+                 toggleKey: "ctrlKey", multipleKey: "shiftKey"});
+            map.addControl(selectControl);
+            selectControl.activate();
+            
+            stationLayer.events.on({
+                "featureselected": function(e) {
+                    attr = e.feature.attributes
+                    stationInfo("Station: <a href='../stations/" + attr.link + "'> " + attr.name +
+                                " (" + attr.id + ")</a><br />Cluster: " + attr.cluster);},});
+        });
+
+        function stationInfo(text) {
+            $('#selectedStation').html(text);            
+        }
+    </script>
+{% endblock %}
+
+{% block header %}
+    Map of stations
+{% endblock %}
+
+{% block intro %}
+    The following is a map with all active stations shown on it, based on their last known GPS location.
+    Clicking on a station will show some info about it and give you a link to its data page.</p>
+{% endblock %}
+
+{% block map %}
+<div id="stationMap">
+</div>
+
+<div id="selectedStation">
+</div>
+{% endblock %}

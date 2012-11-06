@@ -3,7 +3,6 @@ from django.contrib import admin
 from models import *
 from django.utils.encoding import force_unicode
 from django.utils.functional import update_wrapper
-from forms import *
 
 class ClusterAdmin(admin.ModelAdmin):
     list_display = ('number','name', 'parent', 'country')
@@ -31,8 +30,8 @@ class ContactAdmin(admin.ModelAdmin):
     email_work_link.allow_tags = True
 
 class CountryAdmin(admin.ModelAdmin):
-	list_display = ('number','name')
-	ordering = ['number']
+    list_display = ('number','name')
+    ordering = ['number']
 
 class ElectronicsAdmin(admin.ModelAdmin):
     list_filter = ('batch',)
@@ -51,7 +50,7 @@ class ContactInformationAdmin(admin.ModelAdmin):
        return obj.contact_owner
     list_display = ('owner_name','street_1','street_2','city','type')
     def type(self,obj):
-       return obj.type 
+       return obj.type
     inlines = (ContactInline,StationInline)
 
 class EnabledServiceInline(admin.TabularInline):

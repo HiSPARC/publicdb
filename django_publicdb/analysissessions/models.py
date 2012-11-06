@@ -4,7 +4,7 @@ from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
 from hisparc.analysis import coincidences
 from hisparc import publicdb
-from random import choice ,randint
+from random import choice, randint
 from django.template.defaultfilters import slugify
 from datetime import timedelta
 
@@ -16,6 +16,7 @@ import sys
 import os
 import re
 
+
 class AnalysisSession(models.Model):
     title = models.CharField(max_length=40, blank=False, unique=True)
     slug = models.SlugField(unique=True)
@@ -26,6 +27,8 @@ class AnalysisSession(models.Model):
 
     def in_progress(self):
         return self.starts <= datetime.datetime.now() < self.ends
+
+#FIXME: What is this for?
     in_progress.boolean = True
 
     def save(self, *args, **kwargs):
@@ -35,6 +38,7 @@ class AnalysisSession(models.Model):
 
     def __unicode__(self):
         return self.title
+
 
 class AnalyzedCoincidence(models.Model):
     session = models.ForeignKey(AnalysisSession)
@@ -54,12 +58,14 @@ class AnalyzedCoincidence(models.Model):
     class Meta:
         ordering = ('coincidence',)
 
+
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession)
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
         return '%s - %s' % (self.session, self.name)
+
 
 class SessionRequest(models.Model):
    first_name = models.CharField(max_length=50)
@@ -75,55 +81,56 @@ class SessionRequest(models.Model):
    session_created = models.BooleanField()
    session_pending = models.BooleanField()
    url = models.CharField(max_length=20)
-   sid = models.CharField(max_length=50,blank=True,null=True)    
-   pin = models.IntegerField(blank=True,null=True)
+   sid = models.CharField(max_length=50, blank=True, null=True)
+   pin = models.IntegerField(blank=True, null=True)
 
    def create_session(self):
         self.session_pending=False
         self.save()
-        starts=datetime.datetime.now()
-        length=timedelta(weeks=4)
-        ends=starts+length
-        session = AnalysisSession(starts = starts,
-                                  ends = ends,
-                                  pin = str(self.pin),
-                                  slug = slugify(self.sid),
-                                  title = self.sid
-                                 )
+        starts = datetime.datetime.now()
+        length = timedelta(weeks=4)
+        ends = starts + length
+        session = AnalysisSession(starts=starts,
+                                  ends=ends,
+                                  pin=str(self.pin),
+                                  slug=slugify(self.sid),
+                                  title=self.sid)
         session.save()
-        date=self.start_date
-        enddate=date+length
-        while((self.events_created<self.events_to_create) and (date<enddate)):
+        date = self.start_date
+        enddate = date + length
+        while((self.events_created < self.events_to_create) and
+              (date < enddate)):
             try:
                self.events_created += self.find_coincidence(date,session)
             except Exception, msg:
-               print "creation of session "+self.sid+" failed\n"
-               print "Error:", msg   
-            date = date + datetime.timedelta(days=1)
+               print "creation of session " + self.sid + " failed\n"
+               print "Error:", msg
+            date += timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
         elif self.events_created <= self.events_to_create:
             self.sendmail_created_less()
-            self.session_created=True
+            self.session_created = True
         else:
             self.sendmail_created()
-            self.session_created=True
+            self.session_created = True
         self.save()
-        return [self.sid,self.pin]        
+        return [self.sid, self.pin]
 
    def find_coincidence(self,date,session):
-        file = str(date.year)+'_'+str(date.month)+'_'+str(date.day)+'.h5'
-        datastore_path = os.path.join(settings.DATASTORE_PATH,str(date.year),str(date.month),file)
+        file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
+        datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
+                                      str(date.month), file)
         data = tables.openFile(datastore_path, 'r')
         ndups = 0
         nvalid = 0
         try:
-           stations = self.get_stations_for_session(data)
+            stations = self.get_stations_for_session(data)
         except Exception, msg:
-           print "Error in get_stations_for_session(data)"
-           print "Error:", msg
-           data.close()
-           return nvalid 
+            print "Error in get_stations_for_session(data)"
+            print "Error:", msg
+            data.close()
+            return nvalid
         c_list, timestamps = coincidences.search_coincidences(data, stations)
         for coincidence in c_list:
             if len(coincidence) >= 3:
@@ -135,7 +142,6 @@ class SessionRequest(models.Model):
                     nvalid += 1
                 else:
                     ndups += 1
-
         if ndups:
             print '%d duplicate stations dropped' % ndups
         print "Succesfully stored %d coincidences" % nvalid
@@ -160,7 +166,7 @@ class SessionRequest(models.Model):
                                              station_group_name)
                 stations.append(station_group)
         return stations
-  
+
    def save_coincidence(self,event_list,session):
         timestamps = []
         events = []
@@ -171,26 +177,29 @@ class SessionRequest(models.Model):
            timestamps.append((date_time, event['nanoseconds']))
 
            pulseheights = [x * .57 if x not in [-999, -1] else x for x in
-                        event['pulseheights']]
+                           event['pulseheights']]
            integrals = [x * .57 * 2.5 if x not in [-999, -1] else x for x in
-                     event['integrals']]
+                        event['integrals']]
 
            dt = self.analyze_traces(traces)
-           event = Event(date=date_time.date(), time=date_time.time(),
-                      nanoseconds=event['nanoseconds'] - dt,
-                      station=Station.objects.get(number=station),
-                      pulseheights=pulseheights, integrals=integrals,
-                      traces=traces)
+           event = Event(date=date_time.date(),
+                         time=date_time.time(),
+                         nanoseconds=event['nanoseconds'] - dt,
+                         station=Station.objects.get(number=station),
+                         pulseheights=pulseheights,
+                         integrals=integrals,
+                         traces=traces)
            event.save()
            events.append(event)
 
         first_timestamp = sorted(timestamps)[0]
         coincidence = Coincidence(date=first_timestamp[0].date(),
-                              time=first_timestamp[0].time(),
-                              nanoseconds=first_timestamp[1])
+                                  time=first_timestamp[0].time(),
+                                  nanoseconds=first_timestamp[1])
         coincidence.save()
         coincidence.events.add(*events)
-        analyzed_coincidence = AnalyzedCoincidence(session=session,coincidence=coincidence)
+        analyzed_coincidence = AnalyzedCoincidence(session=session,
+                                                   coincidence=coincidence)
         analyzed_coincidence.save()
 
    def analyze_traces(self,traces):
@@ -213,45 +222,63 @@ class SessionRequest(models.Model):
         return trace_timing
 
    def GenerateUrl(self):
-        chars=string.letters + string.digits
-	newurl = ''.join([choice(chars) for i in range(20)])
+        chars = string.letters + string.digits
+        newurl = ''.join([choice(chars) for i in range(20)])
         if SessionRequest.objects.filter(url=newurl):
-		newurl = ''.join([choice(chars) for i in range(20)])
-        self.url=newurl
+            newurl = ''.join([choice(chars) for i in range(20)])
+        self.url = newurl
 
    def SendMail(self):
-        subject = 'HiSparc Analysissession request'
-        message = 'please follow the following link to create your analysissession: http://data.hisparc.nl/django/analysis-session/request/'+self.url
+        subject = 'HiSPARC analysis session request'
+        message = ('Please click on this link to confirm your request for an analysis session with jSparc:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/request/' + self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
-        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        send_mail(subject, message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
-	self.save()
+        self.save()
 
    def sendmail_created(self):
-        subject = 'HiSparc Analysissession created'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n'+'events created ='+str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data'   
+        subject = 'HiSPARC analysis session created'
+        message = ('Your analysis session for jSparc has been created.'
+                   '\nTitle = ' + self.sid +
+                   '\nPin = ' + str(self.pin) +
+                   '\nEvents created = ' + str(self.events_created) +
+                   '\n\nGo here to start analysing events:'
+                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\n\nDuring the session you can view the results at:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
         sender = 'info@hisparc.nl'
         mail = self.email
-        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        send_mail(subject, message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
         self.save()
 
    def sendmail_created_less(self):
-        subject = 'HiSparc Analysissession created with less events'
-        message = 'your analysissession has been created.\n'+'id='+self.sid+'\n'+'pin='+str(self.pin)+'\n However we were unable to find the amount of events you requested. \n Events created = '+ str(self.events_created)+'\nduring your session you can view the results at:\nhttp://data.hisparc.nl/django/analysis-session/'+slugify(self.sid)+'/data' 
+        subject = 'HiSPARC analysis session created with less events'
+        message = ('Your analysis session for jSparc has been created.'
+                   '\nTitle = ' + self.sid +
+                   '\nPin = ' + str(self.pin) +
+                   '\nHowever, we were unable to find the amount of events you requested.'
+                   '\nEvents created = ' + str(self.events_created) +
+                   '\n\nGo here to start analysing events:'
+                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\n\nDuring the session you can view the results at:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
         sender = 'info@hisparc.nl'
         mail = self.email
-        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        send_mail(subject, message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
         self.save()
 
    def sendmail_zero(self):
-        subject = 'HiSparc Analysissession creation failed'
-        message = 'your analysissession has been not been created.\n Please try selecting a different data set.\n Perhaps there was no data for the date and/or stations you selected' 
+        subject = 'HiSPARC analysis session creation failed'
+        message = ('Your analysis session for jSparc could not be created.'
+                   '\nPerhaps there was no data for the date and/or stations you selected'
+                   '\nPlease try selecting a different data set.')
         sender = 'info@hisparc.nl'
         mail = self.email
-        send_mail(subject,message,sender,[self.email,],fail_silently=False)
+        send_mail(subject, message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
         self.save()
 

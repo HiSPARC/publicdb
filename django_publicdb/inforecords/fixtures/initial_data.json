@@ -1,0 +1,103 @@
+[
+    {
+        "pk": 1, 
+        "model": "inforecords.profession", 
+        "fields": {
+            "description": "Software Engineer"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.contact", 
+        "fields": {
+            "first_name": "John", 
+            "surname": "Doe", 
+            "title": "", 
+            "profession": 1, 
+            "contactinformation": 2, 
+            "prefix_surname": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.cluster", 
+        "fields": {
+            "url": "", 
+            "country": 1, 
+            "name": "Amsterdam", 
+            "parent": null, 
+            "number": 0
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "inforecords.cluster", 
+        "fields": {
+            "url": "", 
+            "country": 1, 
+            "name": "Science Park", 
+            "parent": 1, 
+            "number": 500
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "inforecords.contactinformation", 
+        "fields": {
+            "city": "Amsterdam", 
+            "fax": "", 
+            "pobox_postalcode": "", 
+            "phone_work": "020-5925015", 
+            "url": "", 
+            "email_private": "", 
+            "email_work": "info@hisparc.nl", 
+            "pobox": "", 
+            "phone_home": "", 
+            "postalcode": "1234AB", 
+            "street_1": "Coder's Lane 1", 
+            "street_2": "", 
+            "pobox_city": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.contactinformation", 
+        "fields": {
+            "city": "Amsterdam", 
+            "fax": "", 
+            "pobox_postalcode": "", 
+            "phone_work": "020-5922000", 
+            "url": "", 
+            "email_private": "", 
+            "email_work": "info@nikhef.nl", 
+            "pobox": "", 
+            "phone_home": "", 
+            "postalcode": "1098XG", 
+            "street_1": "Science Park 105", 
+            "street_2": "", 
+            "pobox_city": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.station", 
+        "fields": {
+            "name": "Nikhef", 
+            "contactinformation": 1, 
+            "number": 501, 
+            "cluster": 2, 
+            "contact": 1, 
+            "ict_contact": 1, 
+            "info_page": "", 
+            "password": "Foobar"
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.country", 
+        "fields": {
+            "name": "The Netherlands", 
+            "number": 0
+        }
+    }
+]

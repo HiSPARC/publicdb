@@ -13,10 +13,8 @@ import calendar
 
 from models import *
 from forms import *
-from django_publicdb.status_display.views import create_histogram_plot, \
-                                                 render_and_save_plot
-import enthought.chaco.api as chaco
 from recaptcha.client import captcha
+
 
 def data_display(request, slug):
     """Simple data display for symposium results"""
@@ -24,7 +22,6 @@ def data_display(request, slug):
     session = get_object_or_404(AnalysisSession, slug=slug)
     coincidences = AnalyzedCoincidence.objects.filter(session=session,
                                                       is_analyzed=True)
-
     energy_histogram = create_energy_histogram(slug, coincidences)
     core_plot = create_core_plot(slug, coincidences)
     star_map = create_star_map(slug, coincidences)
@@ -32,13 +29,10 @@ def data_display(request, slug):
     title = session.title
 
     return render_to_response('symposium-data.html',
-        {'energy_histogram': energy_histogram,
-         'core_plot': core_plot,
-         'star_map': star_map,
-         'scores': scores,
-         'slug': slug,
-         'title':title,
-        }, context_instance=RequestContext(request))
+        {'energy_histogram': energy_histogram, 'core_plot': core_plot,
+         'star_map': star_map, 'scores': scores, 'slug': slug, 'title':title},
+        context_instance=RequestContext(request))
+
 
 def create_energy_histogram(slug, coincidences):
     """Create an energy histogram"""
@@ -53,11 +47,9 @@ def create_energy_histogram(slug, coincidences):
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
     values = [v1.tolist(), v2.tolist()]
 
-    plot = create_histogram_plot(bins, values, True,
-                                 'Log energy (eV)', 'Count', log=False)
-    render_and_save_plot(plot, name, 300, 200)
-
-    return settings.MEDIA_URL + name
+    plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
+                                     'Count')
+    return plot_object
 
 def create_core_plot(slug, coincidences):
     """Create a plot showing analyzed shower cores"""
@@ -86,8 +78,8 @@ def create_core_plot(slug, coincidences):
     data.set_data('map', image.get_data())
 
     plot.img_plot('map', xbounds=xbounds, ybounds=ybounds)
-    plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter',
-              marker='circle', marker_size=3, color_mapper=chaco.autumn)
+    plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter', marker='circle',
+              marker_size=3, color_mapper=chaco.autumn)
 
     i = plot.index_range
     i.low_setting, i.high_setting = xbounds
@@ -96,6 +88,7 @@ def create_core_plot(slug, coincidences):
 
     render_and_save_plot(plot, name, 300, 326)
     return settings.MEDIA_URL + name
+
 
 def create_star_map(slug, coincidences):
     """Create a star map showing analyzed shower origins"""
@@ -107,8 +100,7 @@ def create_star_map(slug, coincidences):
 
     lat = np.radians(52.3559179545)
     lon = 4.95114534876
-    J2000 = calendar.timegm(datetime.datetime(2000, 1, 1,
-                                              12).utctimetuple())
+    J2000 = calendar.timegm(datetime.datetime(2000, 1, 1, 12).utctimetuple())
     logenergy = []
     x = []
     y = []
@@ -133,21 +125,20 @@ def create_star_map(slug, coincidences):
         x.append(r * sin(ra))
         y.append(r * cos(ra))
         logenergy.append(c.log_energy)
-        
+
     data.set_data('x', x)
     data.set_data('y', y)
     data.set_data('logenergy', logenergy)
 
-    image_file = os.path.join(settings.MEDIA_ROOT, 'static',
-                              'starmap.gif')
+    image_file = os.path.join(settings.MEDIA_ROOT, 'static', 'starmap.gif')
     image = chaco.ImageData.fromfile(image_file)
     data.set_data('map', image.get_data())
 
     xbounds = (-1, 1)
     ybounds = (-1, 1)
     plot.img_plot('map', xbounds=xbounds, ybounds=ybounds)
-    plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter',
-              marker='circle', marker_size=3, color_mapper=chaco.autumn)
+    plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter', marker='circle',
+              marker_size=3, color_mapper=chaco.autumn)
 
     i = plot.index_range
     i.low_setting, i.high_setting = xbounds
@@ -156,6 +147,7 @@ def create_star_map(slug, coincidences):
 
     render_and_save_plot(plot, name, 300, 300)
     return settings.MEDIA_URL + name
+
 
 def top_lijst(slug):
     coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug,
@@ -181,87 +173,82 @@ def top_lijst(slug):
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
+
 def get_core_positions(coincidences):
     x, y, logenergy = [], [], []
     for c in coincidences:
         x.append(c.core_position_x)
         y.append(c.core_position_y)
         logenergy.append(c.log_energy)
-
     return x, y, logenergy
+
 
 def get_request(request):
     if request.method == 'POST':
         check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'], 
-            request.POST['recaptcha_response_field'], 
-            settings.RECAPTCHA_PRIVATE_KEY, 
-            request.META['REMOTE_ADDR']
-         )
+            request.POST['recaptcha_challenge_field'],
+            request.POST['recaptcha_response_field'],
+            settings.RECAPTCHA_PRIVATE_KEY,
+            request.META['REMOTE_ADDR'])
         if check_captcha.is_valid is False:
-	    pass_captcha = False
-            html_captcha = captcha.displayhtml(
-                settings.RECAPTCHA_PUB_KEY, 
-                error=check_captcha.error_code 
-             )
+            pass_captcha = False
+            html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY,
+                                               error=check_captcha.error_code)
         else:
             pass_captcha = True
         form = SessionRequestForm(request.POST)
         if pass_captcha :
             if form.is_valid():
-                data= {}
+                data = {}
                 data.update(form.cleaned_data)
                 new_request=SessionRequest(
-                    first_name = data['first_name'],
-                    sur_name = data['sur_name'],
-                    email = data['email'],
-                    school = data['school'],
-                    cluster = data['cluster'],
-                    start_date = data['start_date'],
-                    mail_send = False,
-                    session_created = False,
-                    session_pending = True,
-                    events_to_create = data['number_of_events'],
-                    events_created = 0,
-                )
-                new_request.GenerateUrl() 
+                        first_name = data['first_name'],
+                        sur_name = data['sur_name'],
+                        email = data['email'],
+                        school = data['school'],
+                        cluster = data['cluster'],
+                        start_date = data['start_date'],
+                        mail_send = False,
+                        session_created = False,
+                        session_pending = True,
+                        events_to_create = data['number_of_events'],
+                        events_created = 0)
+                new_request.GenerateUrl()
                 new_request.save()
-                new_request.SendMail()               
-                return render_to_response('thankyou.html') 
+                new_request.SendMail()
+                return render_to_response('thankyou.html')
             else:
-                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY) 
+                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:
         form = SessionRequestForm()
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-    return render_to_response('request.html', {
-        'form': form,'html_captcha': html_captcha,
-    })
+    return render_to_response('request.html',
+            {'form': form, 'html_captcha': html_captcha})
 
-def confirm_request(request,url):
+
+def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed==False:
-       sessionrequest.sid = sessionrequest.school+str(sessionrequest.id)
+       sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
        sessionrequest.pin = randint(1000,9999)
-       starts=datetime.datetime.now()
-       ends=datetime.datetime.now()
-       session = AnalysisSession(starts = starts,
-                                 ends = ends,
+       starts = datetime.datetime.now()
+       ends = datetime.datetime.now()
+       session = AnalysisSession(starts = starts, ends = ends,
                                  pin = str(sessionrequest.id),
-                                 title = sessionrequest.sid
-                                )
+                                 title = sessionrequest.sid)
 
        sessionrequest.session_confirmed=True
-       sessionrequest.save() 
-    return render_to_response('confirm.html', {
-        'id' : sessionrequest.sid,'pin': sessionrequest.pin
-    })
+       sessionrequest.save()
+    return render_to_response('confirm.html',
+            {'id' : sessionrequest.sid, 'pin': sessionrequest.pin})
 
-def create_request(url):
+
+def create_request(request):
     sessionlist = SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True)
     for sessionrequest in sessionlist:
        sessionrequest.session_confirmed=False
        sessionrequest.save()
-    
+
     for sessionrequest in sessionlist:
-       sessionrequest.create_session() 
-    return HttpResponse('') 
+       sessionrequest.create_session()
+    return HttpResponse('')

@@ -16,7 +16,7 @@ def call_xmlrpc(request):
     if request.method == 'POST':
         # Process XML-RPC call
         response = HttpResponse(mimetype='text/xml')
-        response.write(dispatcher._marshaled_dispatch(request.raw_post_data))
+        response.write(dispatcher._marshaled_dispatch(request.body))
         response['Content-length'] = str(len(response.content))
         return response
     else:

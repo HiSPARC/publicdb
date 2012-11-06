@@ -110,10 +110,10 @@ def result(request):
     lon = request.GET['lon']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
-    
+
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
-    assert coincidence.session.title == session_title
-    assert coincidence.student.name == student_name
+    assert coincidence.session.hash == session_hash
+    assert coincidence.student.name.lower() == student_name.lower()
 
     if coincidence.student.name == 'Test student':
         return
@@ -127,14 +127,14 @@ def result(request):
         coincidence.theta = 0
         coincidence.phi = 0
         coincidence.save()
-        
+
     ranking = top_lijst(coincidence.session.slug)
     try:
         rank = [x['name'] for x in ranking].index(student_name) + 1
     except ValueError:
         rank = None
 
-    response = HttpResponse(json.dumps(dict(msg="OK [result stored]",rank=rank)),
+    response = HttpResponse(json.dumps(dict(msg="OK [result stored]", rank=rank)),
                             mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
