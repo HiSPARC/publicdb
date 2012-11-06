@@ -25,6 +25,10 @@ And virtualenv/virtualenvwrapper with::
 
     $ pip install virtualenvwrapper
 
+Add this line to your login file (.bashrc) and restart your Terminal::
+
+    source [PATHTO]/virtualenvwrapper.sh
+
 Create a clean environment with::
 
     $ mkvirtualenv publicdb
@@ -38,7 +42,7 @@ We will now populate this environment with all prerequisites.  To
 duplicate the environment used while writing this documentation, use the
 following instructions, including version numbers.  To install the latest
 versions of the software, drop the `==<version>` part.  For example, you
-can install ipython 0.10.2 using::
+can install ipython 0.12.1 using::
 
     $ pip install ipython==0.12.1
 
@@ -53,17 +57,12 @@ The complete requirements and installation instructions are::
     $ pip install Cython==0.16
     $ pip install numpy==1.6.2
 
-    $ pip install enable==4.2.1
-    $ pip install chaco==4.2.0
-
     $ pip install numexpr==2.0.1
     $ pip install tables==2.3.1
 
-    $ pip install pyamf==0.6.1
-
     $ pip install recaptcha-client==1.0.6
 
-    $ pip install Django==1.1.4
+    $ pip install Django==1.4
     $ pip install South==0.7.3
 
 You now have all the prerequisites for running the publicdb django app.
@@ -71,20 +70,13 @@ For reference, the results from `pip freeze`::
 
     $ pip freeze
     Cython==0.16
-    Django==1.1.4
-    PIL==1.1.7
-    PyAMF==0.6.1
+    Django==1.4
     South==0.7.3
-    chaco==4.2.0
-    enable==4.2.1
     ipython==0.12.1
     numexpr==2.0.1
     numpy==1.6.2
-    pyface==4.2.0
     recaptcha-client==1.0.6
     tables==2.3.1
-    traits==4.2.0
-    traitsui==4.2.0
     wsgiref==0.1.2
 
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
@@ -108,14 +100,12 @@ do::
     $ cd scripts/
     $ python download_test_datastore.py
 
+Run the django-cron.py in the examples folder to generate the histograms
+for the downloaded data::
+
+    $ python django-cron.py
+
 You can start the Django development server from inside the Django app
 directory (the one containing your settings.py) with::
 
     $ ./manage.py runserver
-
-The settings point to a temporary mediaroot in the source tree, and a HTTP
-server running on port 8008 to serve the files.  If you want to serve
-files from that directory using a development server, change to the
-directory *above* the ``mediaroot`` directory and do::
-
-    $ python -m SimpleHTTPServer 8008

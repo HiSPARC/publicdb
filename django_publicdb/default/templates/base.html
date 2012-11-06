@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+    <link rel="icon" type="image/vnd.microsoft.icon" href="http://www.hisparc.nl/favicon.ico" />
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>{% block title %}HiSPARC Public Database{% endblock %}</title>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/base.css" />
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/OpenLayers-2.12.css" />
+    {% block head_styles %}{% endblock %}
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.8.2.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot-0.8a.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot.axislabels.min.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.12-subset.min.js"></script>
+    <!--[if lte IE 8]><script type="text/javascript" src="{{ STATIC_URL }}scripts/excanvas.min.js"></script><![endif]-->
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    <div id="container">
+        <a href="http://www.hisparc.nl"><h1 id="pageHeader"><span>Public Database</span></h1></a>
+        <div id="content">
+            {% block navigation %}{% endblock %}
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,79 @@
+#stationListPages {
+    font-size: 10pt;
+    float: right;
+    border: 1px solid;
+    border-radius: 5px;
+    padding: 2px 5px;}
+
+#stationListPages a {
+    color: #23B;
+    text-decoration: none;}
+
+#stationListPages a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+#stationList {
+    font-size: 10pt;
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;}
+
+.country h1 {
+    -moz-column-span: all;
+    -webkit-column-span: all;
+    column-span: all;
+    padding-top: 10px;
+    font-size: 32px;}
+
+.cluster {
+    display: block;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    column-break-inside: avoid;
+    break-inside: avoid-column;}
+
+.cluster h3 {
+    margin-top: 0px;}
+
+#stationList ul {
+    margin: 0px 0px 15px 0px;
+    list-style: none;}
+
+#stationList li {
+    line-height:140%}
+
+#stationList a {
+    font-size: 10pt;
+    color: #23B;
+    text-decoration: none;}
+
+#stationList a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+#stationMap {
+    width: 100%;
+    height: 500px;}
+
+.olControlAttribution {
+    position: absolute !important;
+    font-size: 10px !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 5px 0 0 0 !important;}
+
+.olControlScaleLine {
+    position: absolute !important;
+    bottom: 0px !important;
+    left: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 0 5px 0 0 !important;}
+
+#selectedStation {
+    margin: 10px;}

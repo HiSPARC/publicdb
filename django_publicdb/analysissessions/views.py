@@ -13,10 +13,7 @@ import calendar
 
 from models import *
 from forms import *
-from django_publicdb.status_display.views import create_histogram_plot, \
-                                                 render_and_save_plot
 from recaptcha.client import captcha
-import chaco.api as chaco
 
 
 def data_display(request, slug):
@@ -50,12 +47,9 @@ def create_energy_histogram(slug, coincidences):
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
     values = [v1.tolist(), v2.tolist()]
 
-    plot = create_histogram_plot(bins, values, True, 'Log energy (eV)',
-                                 'Count', log=False)
-    render_and_save_plot(plot, name, 300, 200)
-
-    return settings.MEDIA_URL + name
-
+    plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
+                                     'Count')
+    return plot_object
 
 def create_core_plot(slug, coincidences):
     """Create a plot showing analyzed shower cores"""

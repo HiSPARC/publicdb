@@ -1,0 +1,168 @@
+/* Header */
+
+#header * {
+    margin: 0px;
+    padding: 0px;}
+
+#header {
+    margin-bottom: 10px;}
+
+#stationNumber {
+    color: black;
+    font-size: 10pt;}
+
+#date {
+    font-weight: bold;
+    font-size: 11pt;
+    margin-top: 5px;}
+
+/* Graphs */
+
+#graphs {
+    float: left;
+    width: 591px;}
+
+#eh_histogram, #bd_histogram, #td_histogram {
+    height: 200px;}
+
+#ph_histogram, #pi_histogram {
+    height: 300px;}
+
+.histogram {
+    width: 591px;}
+
+.plot {
+    display: block;
+    clear: both;}
+
+.x2Axis .tickLabel {
+    display: none;}
+
+.y2Axis .tickLabel {
+    display: none;}
+
+h3 {
+    display: inline-block;}
+
+.sourceLink {
+    float: right;
+    position: relative;
+    right: 20px;
+    font-size: 8pt;
+    font-weight: bold;
+    margin: 27px 0px 0px 0px;
+    padding: 0px;}
+
+.sourceLink a {
+    cursor: pointer;
+    text-decoration: none;}
+
+
+/* Sidebar */
+
+#navigation, #config {
+    float: right;
+    width: 220px;
+    font-size: 9pt;
+    border-left: 1px solid black;
+    padding-left: 20px;}
+
+#yearlist ul, #monthlist ul {
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;}
+
+#yearlist li, #monthlist li {
+    display: inline-block;
+    line-height: 2;}
+
+#monthlist li {
+    width: 23px;
+    margin-right: 10px;}
+
+#yearlist li {
+    margin-right: 7px;}
+
+#calendar .day, #calendar .dayname {
+    width: 25px;
+    height: 25px;
+    text-align: right;}
+
+#calendar .day a, #yearlist li a, #monthlist li a, .nolink{
+    padding: 3px;}
+
+#calendar .dayname {
+    font-size: 8pt;}
+
+a:link, a:visited {
+    color: black;
+    font-weight: bold;}
+
+a.currentDate {
+    color: white;
+    background: #075EBB;
+    border-radius: 3px;}
+
+#config {
+    margin-top: 50px;}
+
+#navigation > div, #config > div {
+    padding-top: 10px;
+    padding-bottom: 10px;}
+
+#prev {
+    float: left;
+    margin-right: -1em;}
+
+#next {
+    float: right;
+    right: 1em;
+    position: relative;}
+
+.sectionTitle {
+    font-size: 120%;
+    font-weight: bold;
+    text-decoration: underline;}
+
+.keyvalue {
+    margin-top: 5px;
+    margin-bottom: 5px;}
+
+#stationMap {
+    width: 100%;
+    height: 200px;}
+
+.olControlAttribution {
+    position: absolute !important;
+    font-size: 10px !important;
+    bottom: 185px !important;
+    right: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 0 0 0 5px !important;}
+
+.olControlScaleLine {
+    position: absolute !important;
+    bottom: 0px !important;
+    left: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 0 5px 0 0 !important;}
+
+.key {
+    font-weight: bold;
+    margin-right: 10px;}
+
+.ch1 {
+    color:#444;}
+
+.ch2 { 
+    color:#D22;}
+
+.ch3 {
+    color:#1C2;}
+
+.ch4 {
+    color:#1CC;}

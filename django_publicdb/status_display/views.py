@@ -3,24 +3,19 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from operator import itemgetter
 import calendar
 import os
 from numpy import arange, pi, sin
 import datetime
 import time
 
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'null'
-import chaco.api as chaco
-from chaco.scales.api import CalendarScaleSystem
-from chaco.scales_tick_generator import ScalesTickGenerator
-
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
 
 
 def stations(request):
-    """Show a list of stations, ordered by cluster"""
+    """Show a list of stations, ordered by subcluster"""
 
     clusters = []
     for cluster in Cluster.objects.all():
@@ -37,13 +32,102 @@ def stations(request):
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
-    # Add option to station page for list of stations sorted by number
-    #allstations = sorted([station
-    #                      for cluster in clusters
-    #                      for station in cluster.stations],
-    #                     key=itemgetter('number'))
 
     return render_to_response('stations.html', {'clusters': clusters},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_country(request):
+    """Show a list of stations, ordered by country, cluster and subcluster"""
+
+    countries = []
+    for country in Country.objects.all():
+        clusters = []
+        for cluster in Cluster.objects.filter(country=country):
+            stations = []
+            for station in Station.objects.filter(cluster=cluster):
+                try:
+                    Summary.objects.filter(station=station)[0]
+                    link = station.number
+                except IndexError:
+                    link = None
+
+                stations.append({'number': station.number,
+                                 'name': station.name,
+                                 'link': link})
+            clusters.append({'name': cluster.name, 'stations': stations})
+        countries.append({'name': country.name, 'number': country.number, 'clusters': clusters})
+
+    countries = sorted(countries, key=itemgetter('number'))
+
+    return render_to_response('stations_by_country.html', {'countries': countries},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_number(request):
+    """Show a list of stations, ordered by number"""
+
+    stations = []
+    for station in Station.objects.all():
+        try:
+            Summary.objects.filter(station=station)[0]
+            link = station.number
+        except IndexError:
+            link = None
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link})
+
+    return render_to_response('stations_by_number.html',
+                              {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_name(request):
+    """Show a list of stations, ordered by station name"""
+
+    stations = []
+    for station in Station.objects.all():
+        try:
+            Summary.objects.filter(station=station)[0]
+            link = station.number
+        except IndexError:
+            link = None
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link})
+
+    stations = sorted(stations, key=itemgetter('name'))
+
+    return render_to_response('stations_by_name.html', {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
+def stations_on_map(request):
+    """Show all stations on a map"""
+
+    today = datetime.datetime.utcnow()
+    tomorrow = today + datetime.timedelta(days=1)
+    stations = []
+    for detector in DetectorHisparc.objects.exclude(enddate__lt=today):
+        try:
+            Summary.objects.filter(station=detector.station)[0]
+            link = detector.station.number
+        except IndexError:
+            link = None
+
+        if link:
+            stations.append({'number': detector.station.number,
+                             'name': detector.station.name,
+                             'cluster': detector.station.cluster,
+                             'link': link,
+                             'longitude': detector.longitude,
+                             'latitude': detector.latitude,
+                             'altitude': detector.height})
+
+    return render_to_response('stations_on_map.html', {'stations': stations},
                               context_instance=RequestContext(request))
 
 
@@ -58,8 +142,8 @@ def station_page(request, station_id, year, month, day):
     station = get_object_or_404(Station, number=station_id)
 
     # Use yesterday and tomorrow to add previous/next links
-    yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
-    tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
+    yesterday = datetime.date(year, month, day) - datetime.timedelta(days=1)
+    tomorrow = datetime.date(year, month, day) + datetime.timedelta(days=1)
 
     try:
         previous = (Summary.objects.filter(Q(station__number=station_id),
@@ -94,13 +178,15 @@ def station_page(request, station_id, year, month, day):
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
     year_list = nav_years(station)
-    current_date = {'year': year, 'month': calendar.month_name[month][:3], 'day': day}
+    current_date = {'year': year,
+                    'month': calendar.month_name[month][:3],
+                    'day': day}
 
     eventhistogram = create_histogram('eventtime', station, year, month, day)
     pulseheighthistogram = create_histogram('pulseheight', station,
-                                            year, month, day, log=True)
+                                            year, month, day)
     pulseintegralhistogram = create_histogram('pulseintegral', station,
-                                              year, month, day, log=True)
+                                              year, month, day)
     barometerdata = plot_dataset('barometer', station, year, month, day)
     temperaturedata = plot_dataset('temperature', station, year, month, day)
 
@@ -207,11 +293,9 @@ def get_dataset_source(station_id, year, month, day, type):
     return zip(dataset.x, dataset.y)
 
 
-def create_histogram(type, station, year, month, day, log=False):
-    """Create a histogram and save it to disk"""
+def create_histogram(type, station, year, month, day):
+    """Create a histogram object"""
 
-    name = 'histogram-%s-%d-%d-%02d-%02d.png' % (type, station.number,
-                                                 year, month, day)
     date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
@@ -221,87 +305,14 @@ def create_histogram(type, station, year, month, day, log=False):
     except DailyHistogram.DoesNotExist:
         return None
 
-    plot = create_histogram_plot(histogram.bins, histogram.values,
-                                 type.has_multiple_datasets,
-                                 type.bin_axis_title,
-                                 type.value_axis_title,
-                                 log)
-
-    width, height = 500, 333
-    if type.slug == 'eventtime':
-        height = 150
-    render_and_save_plot(plot, name, width, height)
-
-    return settings.MEDIA_URL + name
-
-
-def create_histogram_plot(bins, values, has_multiple_datasets,
-                          bin_axis_title, value_axis_title, log):
-    """Convenience function for creating histogram plots"""
-
-    if has_multiple_datasets:
-        datasets = values
-        color = colors()
-    else:
-        # simulate multiple datasets
-        datasets = [values]
-        color = monochrome()
-
-    view = chaco.DataView()
-    index = chaco.ArrayDataSource(bins)
-    view.index_range.add(index)
-    index_mapper = chaco.LinearMapper(range=view.index_range)
-
-    for values in datasets:
-        values.append(values[-1])
-
-        value = chaco.ArrayDataSource(values)
-        view.value_range.add(value)
-
-        if log:
-            value_mapper = chaco.LogMapper(range=view.value_range)
-        else:
-            value_mapper = chaco.LinearMapper(range=view.value_range)
-
-        plot = chaco.LinePlot(index=index, value=value,
-                              index_mapper=index_mapper,
-                              value_mapper=value_mapper,
-                              render_style='connectedhold',
-                              color=color.next(),
-                              line_width=1.5)
-        view.add(plot)
-
-    if log:
-        view.value_mapper = chaco.LogMapper()
-        view.value_range.low_setting = 1
-    else:
-        view.value_range.low_setting = 0
-
-    #FIXME
-    if datasets:
-        m = max([max(x) for x in datasets])
-        if m != 0:
-            view.value_range.high_setting = m * 1.1
-
-#    if has_multiple_datasets:
-#        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3', 'scint4'],
-#                              component=view.plots, align="ur", padding=10)
-#        view.overlays.append(legend)
-
-    view.x_axis.title = bin_axis_title
-    view.y_axis.title = value_axis_title
-    view.x_axis.title_font = 'modern bold 16'
-    view.y_axis.title_font = 'modern bold 16'
-    view.x_axis.title_spacing = 20
-
-    return view
-
+    plot_object = create_plot_object(histogram.bins[:-1], histogram.values,
+                                     type.bin_axis_title,
+                                     type.value_axis_title)
+    return plot_object
 
 def plot_dataset(type, station, year, month, day, log=False):
-    """Create a dataset plot and save it to disk"""
+    """Create a dataset plot object"""
 
-    name = 'dataset-%s-%d-%d-%02d-%02d.png' % (type, station.number,
-                                               year, month, day)
     date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = DatasetType.objects.get(slug__exact=type)
@@ -311,72 +322,19 @@ def plot_dataset(type, station, year, month, day, log=False):
     except DailyDataset.DoesNotExist:
         return None
 
-    plot = create_dataset_plot(dataset.x, dataset.y, type.x_axis_title,
-                               type.y_axis_title, log)
+    plot_object = create_plot_object(dataset.x, dataset.y, type.x_axis_title,
+                                     type.y_axis_title)
+    return plot_object
 
-    width, height = 500, 150
-    render_and_save_plot(plot, name, width, height)
+def create_plot_object(x_values, y_series, x_label, y_label):
+    if type(y_series[0]) != list:
+        y_series = [y_series]
 
-    return settings.MEDIA_URL + name
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
+            y_values in y_series]
 
-
-def create_dataset_plot(x, y, x_axis_title, y_axis_title, log):
-    """Convenience function for creating histogram plots"""
-
-    color = monochrome()
-
-    #FIXME calendarscalesystem only uses local time, so adjust
-    x = [u + time.altzone for u in x]
-
-    data = chaco.ArrayPlotData(x=x, y=y)
-    plot = chaco.Plot(data=data)
-    #plot.plot(('x', 'y'), color=color.next(), line_width=1.5)
-    plot.plot(('x', 'y'), color=color.next(), type='scatter',
-              marker='circle', marker_size=0.5)
-
-    tick_generator = ScalesTickGenerator(scale=CalendarScaleSystem())
-    bottom_axis = chaco.PlotAxis(plot, orientation="bottom",
-                                 tick_generator=tick_generator)
-    plot.index_axis = bottom_axis
-
-    plot.x_axis.title = x_axis_title
-    plot.y_axis.title = y_axis_title
-    plot.x_axis.title_font = 'modern bold 16'
-    plot.y_axis.title_font = 'modern bold 16'
-    plot.x_axis.title_spacing = 20
-
-    return plot
-
-
-def render_and_save_plot(plot, name, width, height):
-    plot.bounds = [width, height]
-    plot.padding = (80, 10, 10, 50)
-    gc = chaco.PlotGraphicsContext(plot.outer_bounds)
-    gc.render_component(plot)
-    path = os.path.join(settings.MEDIA_ROOT, name)
-    gc.save(path)
-
-
-def colors():
-    """Generator function which returns color names"""
-
-    colors = [[0., 0., 0., .7],
-              [1., 0., 0., .7],
-              [0., 1., 0., .7],
-              [0., 1., 1., .7]]
-
-    for color in colors:
-        yield color
-
-
-def monochrome():
-    """Generator function which returns monochrome color names"""
-
-    color = 'black'
-
-    while True:
-        yield color
-
+    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
+    return plot_object
 
 def nav_calendar(station, theyear, themonth):
     """Create a month calendar with links"""
@@ -392,7 +350,8 @@ def nav_calendar(station, theyear, themonth):
             if day.month == themonth:
                 try:
                     summary = (Summary.objects
-                                      .get(Q(station=station), Q(date=day),
+                                      .get(Q(station=station),
+                                           Q(date=day),
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False)))
                 except Summary.DoesNotExist:
@@ -416,15 +375,14 @@ def nav_months(station, theyear):
                                         Q(num_weather__isnull=False))
                         .dates('date', 'month'))
 
-    month_list = []
+    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
-        name = calendar.month_name[date.month][:3]
         first_day = (Summary.objects.filter(station=station,
                                             date__year=date.year,
                                             date__month=date.month)
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
-        month_list.append({'month': name, 'link': link})
+        month_list[date.month - 1]['link'] = link
 
     return month_list
 
@@ -437,12 +395,16 @@ def nav_years(station):
                                         Q(num_weather__isnull=False))
                         .dates('date', 'year'))
 
+    valid_years = [date.year for date in date_list
+                   if 2002 <= date.year <= datetime.datetime.now().year]
     year_list = []
-    for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year)
-                            .dates('date', 'day')[0])
-        link = (station.number, date.year, first_day.month, first_day.day)
-        year_list.append({'year': date.year, 'link': link})
-
+    for year in range(valid_years[0], valid_years[-1] + 1):
+        if year in valid_years:
+            first_day = (Summary.objects.filter(station=station,
+                                                date__year=year)
+                                .dates('date', 'day')[0])
+            link = (station.number, year, first_day.month, first_day.day)
+            year_list.append({'year': year, 'link': link})
+        else:
+            year_list.append({'year': year, 'link': None})
     return year_list
