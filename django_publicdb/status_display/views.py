@@ -32,7 +32,6 @@ def stations(request):
                              'link': link})
         clusters.append({'name': cluster.name, 'stations': stations})
 
-
     return render_to_response('stations.html', {'clusters': clusters},
                               context_instance=RequestContext(request))
 

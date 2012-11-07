@@ -23,8 +23,8 @@ def data_display(request, slug):
     coincidences = AnalyzedCoincidence.objects.filter(session=session,
                                                       is_analyzed=True)
     energy_histogram = create_energy_histogram(slug, coincidences)
-    core_plot = create_core_plot(slug, coincidences)
-    star_map = create_star_map(slug, coincidences)
+    core_plot = None # create_core_plot(slug, coincidences)
+    star_map = None # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
     title = session.title
 
@@ -36,8 +36,6 @@ def data_display(request, slug):
 
 def create_energy_histogram(slug, coincidences):
     """Create an energy histogram"""
-
-    name = 'symposium-energy-%s.png' % slug
 
     energies = [x.log_energy for x in coincidences]
     good_energies = [x.log_energy for x in
@@ -51,10 +49,9 @@ def create_energy_histogram(slug, coincidences):
                                      'Count')
     return plot_object
 
+
 def create_core_plot(slug, coincidences):
     """Create a plot showing analyzed shower cores"""
-
-    name = 'symposium-cores-%s.png' % slug
 
     if 'middelharnis' in slug:
         xbounds = (4.15268, 4.16838)
@@ -64,9 +61,6 @@ def create_core_plot(slug, coincidences):
         xbounds = (4.93772, 4.96952)
         ybounds = (52.34542, 52.36592)
         filename = 'map-flipped.png'
-
-    data = chaco.ArrayPlotData()
-    plot = chaco.Plot(data)
 
     x, y, logenergy = get_core_positions(coincidences)
     data.set_data('x', x)
@@ -87,7 +81,7 @@ def create_core_plot(slug, coincidences):
     v.low_setting, v.high_setting = ybounds
 
     render_and_save_plot(plot, name, 300, 326)
-    return settings.MEDIA_URL + name
+    return plot_object
 
 
 def create_star_map(slug, coincidences):
@@ -147,6 +141,17 @@ def create_star_map(slug, coincidences):
 
     render_and_save_plot(plot, name, 300, 300)
     return settings.MEDIA_URL + name
+
+
+def create_plot_object(x_values, y_series, x_label, y_label):
+    if type(y_series[0]) != list:
+        y_series = [y_series]
+
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
+            y_values in y_series]
+
+    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
+    return plot_object
 
 
 def top_lijst(slug):

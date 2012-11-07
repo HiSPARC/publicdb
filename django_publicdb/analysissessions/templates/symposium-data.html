@@ -1,29 +1,39 @@
 {% extends "base.html" %}
 
+{% load fix_data %}
+
+{% block title %}{{ title }} - jSparc analysis results {% endblock %}
+
+
+{% block head_styles %}
+        <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/results.css" />
+{% endblock %}
+
 {% block head %}
     <meta http-equiv="refresh" content="60">
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/results.css" />
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings_results.js"></script>
 {% endblock %}
 
 {% block content %}
 
 <div id="header">
-    <h2>{{title}} Results</h2>
+    <h2>{{ title }} Results</h2>
 </div>
 
 <div id="graphs">
     <div id="energyHistogram">
         <h3>Energy histogram</h3>
-        <div class="plot" id="en_histogram" style="height:351px;"></div>
+        <div class="plot" id="en_histogram" style="height: 300px; width: 591px;"></div>
         <script type="text/javascript">
+            en_labels = {yaxis: {axisLabel: "{{ energy_histogram.y_label }}"},
+                         xaxis: {axisLabel: "{{ energy_histogram.x_label }}"}}
+            $.extend(true, en_options, en_labels)
             $.plot($("#en_histogram"), [
               {% for data in energy_histogram.data %}
                 {data: {{ data|fix_histogram_data }}, yaxis: 1},
               {% endfor %}
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], en_options);
         </script>
-
     </div>
 {% comment %} 
     <div id="corePlot">
