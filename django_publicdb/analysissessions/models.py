@@ -68,23 +68,23 @@ class Student(models.Model):
 
 
 class SessionRequest(models.Model):
-   first_name = models.CharField(max_length=50)
-   sur_name = models.CharField(max_length=50)
-   email = models.EmailField()
-   school = models.CharField(max_length=50)
-   cluster = models.ForeignKey('inforecords.Cluster')
-   events_to_create = models.IntegerField()
-   events_created = models.IntegerField()
-   start_date = models.DateField()
-   mail_send = models.BooleanField()
-   session_confirmed = models.BooleanField()
-   session_created = models.BooleanField()
-   session_pending = models.BooleanField()
-   url = models.CharField(max_length=20)
-   sid = models.CharField(max_length=50, blank=True, null=True)
-   pin = models.IntegerField(blank=True, null=True)
+    first_name = models.CharField(max_length=50)
+    sur_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    school = models.CharField(max_length=50)
+    cluster = models.ForeignKey('inforecords.Cluster')
+    events_to_create = models.IntegerField()
+    events_created = models.IntegerField()
+    start_date = models.DateField()
+    mail_send = models.BooleanField()
+    session_confirmed = models.BooleanField()
+    session_created = models.BooleanField()
+    session_pending = models.BooleanField()
+    url = models.CharField(max_length=20)
+    sid = models.CharField(max_length=50, blank=True, null=True)
+    pin = models.IntegerField(blank=True, null=True)
 
-   def create_session(self):
+    def create_session(self):
         self.session_pending=False
         self.save()
         starts = datetime.datetime.now()
@@ -117,7 +117,7 @@ class SessionRequest(models.Model):
         self.save()
         return [self.sid, self.pin]
 
-   def find_coincidence(self,date,session):
+    def find_coincidence(self,date,session):
         file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
         datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
                                       str(date.month), file)
@@ -148,7 +148,7 @@ class SessionRequest(models.Model):
         data.close()
         return nvalid
 
-   def get_stations_for_session(self, data):
+    def get_stations_for_session(self, data):
         main_cluster = self.cluster.main_cluster()
         cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
 
@@ -167,30 +167,30 @@ class SessionRequest(models.Model):
                 stations.append(station_group)
         return stations
 
-   def save_coincidence(self,event_list,session):
+    def save_coincidence(self, event_list,session):
         timestamps = []
         events = []
 
         for station, event, traces in event_list:
-           station = int(re.match('station_(\d+)', station._v_name).group(1))
-           date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
-           timestamps.append((date_time, event['nanoseconds']))
+            station = int(re.match('station_(\d+)', station._v_name).group(1))
+            date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
+            timestamps.append((date_time, event['nanoseconds']))
 
-           pulseheights = [x * .57 if x not in [-999, -1] else x for x in
-                           event['pulseheights']]
-           integrals = [x * .57 * 2.5 if x not in [-999, -1] else x for x in
-                        event['integrals']]
+            pulseheights = [x * .57 if x not in [-999, -1] else x for x in
+                            event['pulseheights']]
+            integrals = [x * .57 * 2.5 if x not in [-999, -1] else x for x in
+                         event['integrals']]
 
-           dt = self.analyze_traces(traces)
-           event = Event(date=date_time.date(),
-                         time=date_time.time(),
-                         nanoseconds=event['nanoseconds'] - dt,
-                         station=Station.objects.get(number=station),
-                         pulseheights=pulseheights,
-                         integrals=integrals,
-                         traces=traces)
-           event.save()
-           events.append(event)
+            dt = self.analyze_traces(traces)
+            event = Event(date=date_time.date(),
+                          time=date_time.time(),
+                          nanoseconds=event['nanoseconds'] - dt,
+                          station=Station.objects.get(number=station),
+                          pulseheights=pulseheights,
+                          integrals=integrals,
+                          traces=traces)
+            event.save()
+            events.append(event)
 
         first_timestamp = sorted(timestamps)[0]
         coincidence = Coincidence(date=first_timestamp[0].date(),
@@ -202,7 +202,7 @@ class SessionRequest(models.Model):
                                                    coincidence=coincidence)
         analyzed_coincidence.save()
 
-   def analyze_traces(self,traces):
+    def analyze_traces(self,traces):
         """Analyze traces and determine time of first particle"""
 
         t = []
@@ -221,14 +221,14 @@ class SessionRequest(models.Model):
             trace_timing = -999
         return trace_timing
 
-   def GenerateUrl(self):
+    def GenerateUrl(self):
         chars = string.letters + string.digits
         newurl = ''.join([choice(chars) for i in range(20)])
         if SessionRequest.objects.filter(url=newurl):
             newurl = ''.join([choice(chars) for i in range(20)])
         self.url = newurl
 
-   def SendMail(self):
+    def SendMail(self):
         subject = 'HiSPARC analysis session request'
         message = ('Please click on this link to confirm your request for an analysis session with jSparc:'
                    '\nhttp://data.hisparc.nl/django/analysis-session/request/' + self.url)
@@ -238,7 +238,7 @@ class SessionRequest(models.Model):
         self.mail_send = True
         self.save()
 
-   def sendmail_created(self):
+    def sendmail_created(self):
         subject = 'HiSPARC analysis session created'
         message = ('Your analysis session for jSparc has been created.'
                    '\nTitle = ' + self.sid +
@@ -254,7 +254,7 @@ class SessionRequest(models.Model):
         self.mail_send = True
         self.save()
 
-   def sendmail_created_less(self):
+    def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
         message = ('Your analysis session for jSparc has been created.'
                    '\nTitle = ' + self.sid +
@@ -271,7 +271,7 @@ class SessionRequest(models.Model):
         self.mail_send = True
         self.save()
 
-   def sendmail_zero(self):
+    def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
         message = ('Your analysis session for jSparc could not be created.'
                    '\nPerhaps there was no data for the date and/or stations you selected'
@@ -281,4 +281,3 @@ class SessionRequest(models.Model):
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
         self.mail_send = True
         self.save()
-

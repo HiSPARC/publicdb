@@ -189,10 +189,10 @@ class Country(models.Model):
     def last_cluster_number(self):
         clusters=self.clusters.filter(parent=None)
         if clusters:
-            clustermax=clusters.aggregate(Max('number'))
+            clustermax = clusters.aggregate(Max('number'))
             return clustermax['number__max']
         else:
-            return self.number-1000
+            return self.number - 1000
 
     def __unicode__(self):
         return self.name
@@ -206,7 +206,7 @@ class Country(models.Model):
                 self.number = countrymax['number__max'] + 10000
             else:
                 self.number = 0
-        super(Country,self).save(*args, **kwargs)
+        super(Country, self).save(*args, **kwargs)
 
 
 class DetectorHisparc(models.Model):
