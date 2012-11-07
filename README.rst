@@ -16,13 +16,14 @@ Setting up a personal development environment
 
 Besides all the Python packages that will need to be installed next
 you also need the HDF5 libraries.  These are required to work with
-the h5 data files and to install the python tables package.
+the h5 data files and to install the python tables package.  So download
+the source::
 
     $ wget http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8.9/src/hdf5-1.8.9.tar.gz
     $ tar xvzf hdf5-1.8.9.tar.gz
     $ cd hdf5-1.8.9
     
-Then apply this patch:
+Then apply this patch::
 
     ===================================================================
     --- CMakeLists.txt	(revision 22471)
@@ -31,7 +32,7 @@ Then apply this patch:
     -        ${HDF5_SOURCE_DIR}/release_docs/Using_CMake.txt
     +        ${HDF5_SOURCE_DIR}/release_docs/USING_CMake.txt
 
-And continue the build
+And continue the build::
              
     $ ./configure --prefix=/usr/local
     $ make
