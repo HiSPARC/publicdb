@@ -14,6 +14,30 @@ analysis sessions.
 Setting up a personal development environment
 ---------------------------------------------
 
+Besides all the Python packages that will need to be installed next
+you also need the HDF5 libraries.  These are required to work with
+the h5 data files and to install the python tables package.
+
+    $ wget http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8.9/src/hdf5-1.8.9.tar.gz
+    $ tar xvzf hdf5-1.8.9.tar.gz
+    $ cd hdf5-1.8.9
+    
+Then apply this patch:
+
+    ===================================================================
+    --- CMakeLists.txt	(revision 22471)
+    +++ CMakeLists.txt	(working copy)
+    @@ -884,7 +884,7 @@
+    -        ${HDF5_SOURCE_DIR}/release_docs/Using_CMake.txt
+    +        ${HDF5_SOURCE_DIR}/release_docs/USING_CMake.txt
+
+And continue the build
+             
+    $ ./configure --prefix=/usr/local
+    $ make
+    $ make install
+    $ ldconfig
+
 We recommend you use virtualenv (with virtualenvwrapper) to set up an
 isolated python environment.  Throughout this document we assume you have
 pip installed and we prefer that above easy_install.  You can install pip
@@ -62,7 +86,7 @@ The complete requirements and installation instructions are::
 
     $ pip install recaptcha-client==1.0.6
 
-    $ pip install Django==1.4
+    $ pip install Django==1.4.2
     $ pip install South==0.7.3
 
 You now have all the prerequisites for running the publicdb django app.
@@ -70,7 +94,7 @@ For reference, the results from `pip freeze`::
 
     $ pip freeze
     Cython==0.16
-    Django==1.4
+    Django==1.4.2
     South==0.7.3
     ipython==0.12.1
     numexpr==2.0.1
