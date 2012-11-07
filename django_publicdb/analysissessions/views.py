@@ -201,7 +201,7 @@ def get_request(request):
             if form.is_valid():
                 data = {}
                 data.update(form.cleaned_data)
-                new_request=SessionRequest(
+                new_request = SessionRequest(
                         first_name = data['first_name'],
                         sur_name = data['sur_name'],
                         email = data['email'],
@@ -223,7 +223,8 @@ def get_request(request):
         form = SessionRequestForm()
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     return render_to_response('request.html',
-            {'form': form, 'html_captcha': html_captcha})
+            {'form': form, 'html_captcha': html_captcha},
+            RequestContext(request, {}))
 
 
 def confirm_request(request, url):

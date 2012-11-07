@@ -1,9 +1,9 @@
-{% extends "admin/base_site.html" %}
+{% extends "base.html" %}
 
-{% block title %}Session request{% endblock %}
+{% block title %}jSparc | Session request{% endblock %}
 {% block content %}
 
-<form action="" method="post">
+<form action="" method="post">{% csrf_token %}
 {{ form.as_p }}
 {{ html_captcha|safe }}
 <input type="submit" value="Submit" />
