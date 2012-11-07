@@ -16,7 +16,7 @@ logger = logging.getLogger('histograms.jobs')
 
 MAX_PH = 2000
 BIN_PH_NUM = 200
-MAX_IN = 20000
+MAX_IN = 50000
 BIN_IN_NUM = 200
 
 
