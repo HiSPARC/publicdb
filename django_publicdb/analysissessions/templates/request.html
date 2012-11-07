@@ -1,11 +1,18 @@
 {% extends "base.html" %}
-
 {% block title %}jSparc | Session request{% endblock %}
+{% block head_styles %}<style type="text/css" media="all">#pageHeader {position: absolute;}</style>{% endblock %}
 {% block content %}
 
-<form action="" method="post">{% csrf_token %}
-{{ form.as_p }}
-{{ html_captcha|safe }}
-<input type="submit" value="Submit" />
-</form>
+<div id="header">
+    <h2>jSparc Session Request Form</h2>
+</div>
+
+<div id='reqform'>
+    <form action="" method="post">{% csrf_token %}
+        {{ form.as_p }}
+        {{ html_captcha|safe }}
+        <input type="submit" value="Submit" />
+    </form>
+</div>
+
 {% endblock %}
