@@ -112,7 +112,7 @@ def result(request):
     error_estimate = request.GET['error']
 
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
-    assert coincidence.session.hash == session_hash
+    assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
     if coincidence.student.name == 'Test student':
