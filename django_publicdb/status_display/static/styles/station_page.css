@@ -55,7 +55,7 @@ h3 {
 
 .sourceLink a {
     cursor: pointer;
-    text-decoration: none;}
+    text-decoration: underline;}
 
 
 /* Sidebar */
@@ -120,9 +120,8 @@ a.currentDate {
     position: relative;}
 
 .sectionTitle {
-    font-size: 120%;
-    font-weight: bold;
-    text-decoration: underline;}
+    font-size: 130%;
+    font-weight: bold;}
 
 .keyvalue {
     margin-top: 5px;
