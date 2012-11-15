@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect, HttpResponse
+from django.views.decorators.csrf import csrf_protect
 
 import numpy as np
 from numpy import pi, arccos, arcsin, arctan2, sin, cos
@@ -188,6 +189,7 @@ def get_core_positions(coincidences):
     return x, y, logenergy
 
 
+@csrf_protect
 def get_request(request):
     if request.method == 'POST':
         check_captcha = captcha.submit(
