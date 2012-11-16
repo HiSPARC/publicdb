@@ -23,8 +23,8 @@
       {% if config %}
         var pointStyle = {
             fillColor: '#00F',
-            fillOpacity: 0.7,
-            pointRadius: 6,
+            fillOpacity: 0.8,
+            pointRadius: 7,
             stroke: false};
 
         $(document).ready(function() {
@@ -59,17 +59,17 @@
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    setPointRadius(3);}
-                else if (zLevel <= 8) {
                     setPointRadius(4);}
-                else if (zLevel <= 11) {
+                else if (zLevel <= 8) {
                     setPointRadius(5);}
-                else if (zLevel <= 14) {
+                else if (zLevel <= 11) {
                     setPointRadius(6);}
-                else if (zLevel <= 16) {
+                else if (zLevel <= 14) {
                     setPointRadius(7);}
-                else if (zLevel <= 18) {
+                else if (zLevel <= 16) {
                     setPointRadius(8);}
+                else if (zLevel <= 18) {
+                    setPointRadius(9);}
             });
         });
 
@@ -224,7 +224,7 @@
               {% if day.link %}
                 <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
               {% else %}
-                {{ day.day }}
+                <span class="nolink">{{ day.day }}</span>
               {% endif %}
             </td>
           {% endfor %}
@@ -258,6 +258,10 @@
         </li>
       {% endfor %}
     </ul>
+    </div>
+
+    <div id="statusLink">
+        <a href="{% url 'status_display.views.station_status' station.number %}">Station Status</a>
     </div>
 
     <div id="listLink">
