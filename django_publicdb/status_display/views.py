@@ -192,7 +192,7 @@ def stations_on_map(request, subcluster=None):
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
-        for detector in DetectorHisparc.objects.exclude(enddate__lt=today).filter(station__cluster__name=cluster):
+        for detector in DetectorHisparc.objects.exclude(enddate__lt=today).filter(station__cluster__name=cluster).filter(station__pc__is_active=True):
             try:
                 Summary.objects.filter(station=detector.station)[0]
                 link = detector.station.number
