@@ -1,6 +1,7 @@
 {% extends 'base_stations.html' %}
 
 {% load url from future %}
+{% load fix_strings %}
 
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
@@ -9,10 +10,16 @@
 {% block head %}
     <script type="text/javascript">
         var pointStyle = {
-            fillColor: '#E23F1E',
+            fillColor: '#1BAF16',
             fillOpacity: 0.8,
+            strokeOpacity: 0.8,
+            strokeWidth: 1,
             pointRadius: 3,
-            stroke: false};
+            cursor: 'pointer'};
+        var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#F00'});
+        var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#FFD700'});
+        var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#008000'});
+        var pointStyle_unknown = $.extend(true, {}, pointStyle, {fillColor:'#00F'});
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -23,15 +30,15 @@
                         {dragPanOptions: {enableKinetic: true}}),
                     new OpenLayers.Control.Attribution(),
                     new OpenLayers.Control.ScaleLine()]};
-            map = new OpenLayers.Map("stationMap", options);
+            var map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
 
             map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
-
-            var stationLayer = new OpenLayers.Layer.Vector("stations");
-            {% for station in stations %}
-            {% if station.longitude and station.latitude %} 
+      {% for cluster in clusters %}
+            var {{ cluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ cluster.name }}");
+        {% for station in cluster.stations %}
+          {% if station.longitude and station.latitude %} 
             var feature = new OpenLayers.Feature.Vector(
                 new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
                                        .transform(fromProjection, toProjection),
@@ -39,66 +46,84 @@
                  name: "{{ station.name }}",
                  cluster: "{{ station.cluster }}",
                  link: {{ station.link }}},
-                pointStyle);
-            stationLayer.addFeatures(feature);
-            {% endif %}
-            {% endfor %}
-            map.addLayer(stationLayer);
-            
-            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
-
+                pointStyle_{{ station.status }});
+            {{ cluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+          {% endif %}
+        {% endfor %}
+            map.addLayer({{ cluster.name|slugify|remove_hyphens }});
+      {% endfor %}
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                    pointStyle.pointRadius = 3;}
+                    setPointRadius(2);}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                    pointStyle.pointRadius = 4;}
-                else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                    pointStyle.pointRadius = 5;}
+                    setPointRadius(3);}
+                else if (zLevel <= 10) {
+                    setPointRadius(4);}
+                else if (zLevel <= 12) {
+                    setPointRadius(5);}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                    pointStyle.pointRadius = 6;}
+                    setPointRadius(6);}
+                else if (zLevel <= 16) {
+                    setPointRadius(7);}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                    pointStyle.pointRadius = 8;}
+                    setPointRadius(8);}
             });
+            
+          {% if focus %}
+            var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
+            map.zoomToExtent(bounds);
+          {% endif %}
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
-            selectControl = new OpenLayers.Control.SelectFeature(
-                [stationLayer],
+            var selectControl = new OpenLayers.Control.SelectFeature(
+                [{% for cluster in clusters %}{{ cluster.name|slugify|remove_hyphens }}, {% endfor %}],
                 {clickout: true, toggle: false, multiple: false, hover: false,
                  toggleKey: "ctrlKey", multipleKey: "shiftKey"});
             map.addControl(selectControl);
             selectControl.activate();
-            
-            stationLayer.events.on({
-                "featureselected": function(e) {
-                    attr = e.feature.attributes
-                    stationInfo("Station: <a href='../stations/" + attr.link + "'> " + attr.name +
-                                " (" + attr.id + ")</a><br />Cluster: " + attr.cluster);}});
+            {% for cluster in clusters %}
+            {{ cluster.name|slugify|remove_hyphens }}.events.on({
+                "featureselected": function(e) {showStationInfo(e);}});
+            {% endfor %}
         });
 
-        function stationInfo(text) {
-            $('#selectedStation').html(text);            
+        function setPointRadius(size) {
+            $('circle').attr('r', size.toString());
+            pointStyle.pointRadius = size;
+            pointStyle_down.pointRadius = size;
+            pointStyle_problem.pointRadius = size;
+            pointStyle_up.pointRadius = size;
+            pointStyle_unknown.pointRadius = size;
+        }
+
+        function showStationInfo(e) {
+            var attr = e.feature.attributes
+            stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name +
+                        " (" + attr.id + ")</a>");
+            clusterLink(attr.cluster);}
+
+        function stationLink(text) {
+            $('#stationLink').html(text);            
+        }
+
+        function clusterLink(text) {
+            $('#clusterLink').html(text);            
         }
     </script>
 {% endblock %}
 
 {% block header %}
-    Map of stations
-{% endblock %}
-
-{% block intro %}
-    The following is a map with all active stations shown on it, based on their last known GPS location.
-    Clicking on a station will show some info about it and give you a link to its data page.</p>
+    Map of HiSPARC stations
 {% endblock %}
 
 {% block map %}
-<div id="stationMap">
-</div>
+    <div id="stationMap">
+    </div>
+{% endblock %}
 
-<div id="selectedStation">
-</div>
+{% block sidebar %}
+    <div class="sectionTitle">Selected Station</div>
+    <p><b>Station</b> <br /><span id="stationLink">None</span><br />
+    <b>Cluster</b> <br /><span id="clusterLink">None</span></p>
 {% endblock %}

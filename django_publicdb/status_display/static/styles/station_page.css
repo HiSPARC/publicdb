@@ -12,13 +12,16 @@
     font-size: 10pt;}
 
 #date {
-    font-weight: bold;
+    font-weight: normal;
     font-size: 11pt;
     margin-top: 5px;}
 
+#header > #dataLink, #header > #listLink {
+    font-size: 10pt;}
+
 /* Graphs */
 
-#graphs {
+#graphs, #nagios {
     float: left;
     width: 591px;}
 
@@ -88,7 +91,7 @@ h3 {
     height: 25px;
     text-align: right;}
 
-#calendar .day a, #yearlist li a, #monthlist li a, .nolink{
+#calendar .day a, #yearlist li a, #monthlist li a, .nolink {
     padding: 3px;}
 
 #calendar .dayname {
@@ -104,7 +107,7 @@ a.currentDate {
     border-radius: 3px;}
 
 #config {
-    margin-top: 50px;}
+    margin-top: 30px;}
 
 #navigation > div, #config > div {
     padding-top: 10px;

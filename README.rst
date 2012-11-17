@@ -26,8 +26,8 @@ the source::
 Then apply this patch::
 
     ===================================================================
-    --- CMakeLists.txt	(revision 22471)
-    +++ CMakeLists.txt	(working copy)
+    --- CMakeLists.txt (revision 22471)
+    +++ CMakeLists.txt (working copy)
     @@ -884,7 +884,7 @@
     -        ${HDF5_SOURCE_DIR}/release_docs/Using_CMake.txt
     +        ${HDF5_SOURCE_DIR}/release_docs/USING_CMake.txt

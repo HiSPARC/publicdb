@@ -7,19 +7,14 @@
 {% endblock %}
 
 {% block header %}
-    List of stations, by name
-{% endblock %}
-
-{% block intro %}
-    The following is a list of stations ordered by station name. If the station
-    is a link, you can click on it to access its data. If not, that means
-    that this station has not yet uploaded data to our datastore.
+    List of HiSPARC stations, by name
 {% endblock %}
 
 {% block list %}
     <ul>
       {% for station in stations %}
         <li>
+            <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
           {% if station.link %}
             <a href="{% url 'status_display.views.station' station.link %}">{{ station.name }} ({{ station.number }})</a>
           {% else %}

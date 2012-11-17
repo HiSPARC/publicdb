@@ -22,9 +22,9 @@
     <script type="text/javascript">
       {% if config %}
         var pointStyle = {
-            fillColor: '#E23F1E',
+            fillColor: '#00F',
             fillOpacity: 0.8,
-            pointRadius: 6,
+            pointRadius: 7,
             stroke: false};
 
         $(document).ready(function() {
@@ -36,7 +36,7 @@
                         {dragPanOptions: {enableKinetic: true}}),
                     new OpenLayers.Control.Attribution(),
                     new OpenLayers.Control.ScaleLine()]};
-            map = new OpenLayers.Map("stationMap", options);
+            var map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
 
@@ -54,29 +54,31 @@
             stationLayer.addFeatures(feature);
             map.addLayer(stationLayer);
             
-            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                    pointStyle.pointRadius = 3;}
+                    setPointRadius(4);}
                 else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                    pointStyle.pointRadius = 4;}
+                    setPointRadius(5);}
                 else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                    pointStyle.pointRadius = 5;}
+                    setPointRadius(6);}
                 else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                    pointStyle.pointRadius = 6;}
+                    setPointRadius(7);}
+                else if (zLevel <= 16) {
+                    setPointRadius(8);}
                 else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                    pointStyle.pointRadius = 8;}
+                    setPointRadius(9);}
             });
         });
 
       {% endif %}
+
+        function setPointRadius(size) {
+            $('circle').attr('r', size.toString());
+            pointStyle.pointRadius = size;
+        }
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -222,7 +224,7 @@
               {% if day.link %}
                 <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
               {% else %}
-                {{ day.day }}
+                <span class="nolink">{{ day.day }}</span>
               {% endif %}
             </td>
           {% endfor %}
@@ -258,8 +260,12 @@
     </ul>
     </div>
 
+    <div id="statusLink">
+        <a href="{% url 'status_display.views.station_status' station.number %}">Station Status</a>
+    </div>
+
     <div id="listLink">
-        <a href="{% url 'status_display.views.stations' %}">Station List</a>
+        <a href="{% url 'status_display.views.stations' %}">Stations List</a>
     </div>
 
 </div>
