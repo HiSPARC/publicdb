@@ -1,9 +1,12 @@
-#stationListPages {
+#header {
+    margin-bottom: 10px;}
+
+#stationListPages, #stationListLegend, #stationListSidebar {
     font-size: 10pt;
     float: right;
-    border: 1px solid;
-    border-radius: 5px;
-    padding: 2px 5px;}
+    width: 170px;
+    border-left: 1px solid black;
+    padding-left: 15px;}
 
 #stationListPages a {
     color: #23B;
@@ -13,8 +16,26 @@
     color: #005;
     text-decoration: underline;}
 
+#stationListLegend, #stationListSidebar {
+    margin-top: 20px;}
+
+.sectionTitle {
+    margin-top: 10px;
+    font-size: 110%;
+    font-weight: bold;}
+
 #stationList {
+    float: left;
+    width: 660px;
     font-size: 10pt;
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;}
+
+#intro {
+    font-size: 10pt;}
+
+.country {
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;}
@@ -33,31 +54,53 @@
     column-break-inside: avoid;
     break-inside: avoid-column;}
 
+.cluster h1 {
+    margin-top: 0px;}
+
+.subcluster {
+    display: block;
+    -webkit-column-break-inside: avoid;
+    -moz-column-break-inside: avoid;
+    column-break-inside: avoid;
+    break-inside: avoid-column;}
+
 .cluster h3 {
     margin-top: 0px;}
 
 #stationList ul {
     margin: 0px 0px 15px 0px;
+    padding-left: 15px;
     list-style: none;}
 
 #stationList li {
     line-height:140%}
 
-#stationList a {
+#stationList ul a {
     font-size: 10pt;
     color: #23B;
     text-decoration: none;}
 
-#stationList a:hover {
+#stationList ul a:hover {
     color: #005;
     text-decoration: underline;}
+
+h2 {
+    font-size: 24px;
+    margin-top: 0px;}
+
+h3 a, h2 a, h1 a {
+    color: #000;
+    text-decoration: none;}
 
 .statusBall {
     width: 8px;
     height: 8px;
     border-radius: 4px;
     display: inline-block;
-    opacity: 0.5;}
+    opacity: 0.3;}
+
+.statusBall:hover {
+    opacity: 0.8;}
 
 .down {
     background-color: red;}
@@ -73,7 +116,8 @@
     background-color: blue;}
 
 #stationMap {
-    width: 100%;
+    float: left;
+    width: 660px;
     height: 500px;}
 
 .olControlAttribution {
@@ -94,6 +138,3 @@
     font-family: Arial !important;
     padding: 2px 4px !important;
     border-radius: 0 5px 0 0 !important;}
-
-#selectedStation {
-    margin: 10px;}

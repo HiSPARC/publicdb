@@ -4,20 +4,11 @@
 
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+    <style type="text/css" media="all">#stationList {-webkit-column-count: 1; -moz-column-count: 1; column-count: 1;}</style>
 {% endblock %}
 
 {% block header %}
-    List of stations, per country
-{% endblock %}
-
-{% block intro %}
-    The following is a list of stations, grouped per country. If the station
-    is a link, you can click on it to access its data. If not, that means
-    that this station has not yet uploaded data to our datastore.
-    The color in front of a station indicates its current status:
-    <span class='statusBall down'></span> down,
-    <span class='statusBall problem'></span> problem,
-    <span class='statusBall up'></span> up.
+    List of HiSPARC stations
 {% endblock %}
 
 {% block list %}
@@ -26,19 +17,40 @@
         <h1>{{ country.name }}</h1>
           {% for cluster in country.clusters %}
             <div class="cluster">
-                <h3>{{ cluster.name }}</h3>
+                <h2><a href="{% url 'status_display.views.stations_on_map' cluster.name %}">{{ cluster.name }}</a></h2>
                 <ul>
                   {% for station in cluster.stations %}
                     <li>
-                        <span class='statusBall {{ station.status }}'></span>
+                        <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
                       {% if station.link %}
-                        <a href="{% url 'status_display.views.station' station.link %}">{{ station.number }} &mdash; {{ station.name }}</a>
+                        <a href="{% url 'status_display.views.station' station.link %}">
+                          {{ station.number }} &mdash; {{ station.name }}
+                        </a>
                       {% else %}
-                        {{ station.number }} &mdash; {{ station.name }}
+                          {{ station.number }} &mdash; {{ station.name }}
                       {% endif %}
                     </li>
                   {% endfor %}
                 </ul>
+                {% for subcluster in cluster.subclusters %}
+                <div class="subcluster">
+                    <h3><a href="{% url 'status_display.views.stations_on_map' subcluster.name %}">{{ subcluster.name }}</a></h3>
+                    <ul>
+                      {% for station in subcluster.stations %}
+                        <li>
+                            <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+                          {% if station.link %}
+                            <a href="{% url 'status_display.views.station' station.link %}">
+                              {{ station.number }} &mdash; {{ station.name }}
+                            </a>
+                          {% else %}
+                              {{ station.number }} &mdash; {{ station.name }}
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
             </div>
           {% endfor %}
     </div>

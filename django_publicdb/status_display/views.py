@@ -17,6 +17,12 @@ from django_publicdb.inforecords.models import *
 
 
 def stations(request):
+    """Show the station list"""
+
+    return redirect(stations_by_country)
+
+
+def stations_by_subcluster(request):
     """Show a list of stations, ordered by subcluster"""
 
     down, problem, up = status_lists()
@@ -37,7 +43,48 @@ def stations(request):
                              'status': status})
         clusters.append({'name': cluster.name, 'stations': stations})
 
-    return render_to_response('stations.html', {'clusters': clusters},
+    return render_to_response('stations_by_subcluster.html', {'clusters': clusters},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_cluster(request):
+    """Show a list of stations, ordered by subcluster"""
+
+    down, problem, up = status_lists()
+    clusters = []
+    for cluster in Cluster.objects.filter(parent=None):
+        subclusters = []
+        for subcluster in Cluster.objects.filter(parent=cluster):
+            stations = []
+            for station in Station.objects.filter(cluster=subcluster):
+                try:
+                    Summary.objects.filter(station=station)[0]
+                    link = station.number
+                except IndexError:
+                    link = None
+                status = get_station_status(station, down, problem, up)
+
+                stations.append({'number': station.number,
+                                 'name': station.name,
+                                 'link': link,
+                                 'status': status})
+            subclusters.append({'name': subcluster.name, 'stations': stations})
+        stations = []
+        for station in Station.objects.filter(cluster=cluster):
+            try:
+                Summary.objects.filter(station=station)[0]
+                link = station.number
+            except IndexError:
+                link = None
+            status = get_station_status(station, down, problem, up)
+
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'link': link,
+                             'status': status})
+        clusters.append({'name': cluster.name, 'subclusters': subclusters, 'stations': stations})
+
+    return render_to_response('stations_by_cluster.html', {'clusters': clusters},
                               context_instance=RequestContext(request))
 
 
@@ -48,7 +95,23 @@ def stations_by_country(request):
     countries = []
     for country in Country.objects.all():
         clusters = []
-        for cluster in Cluster.objects.filter(country=country):
+        for cluster in Cluster.objects.filter(country=country).filter(parent=None):
+            subclusters = []
+            for subcluster in Cluster.objects.filter(parent=cluster):
+                stations = []
+                for station in Station.objects.filter(cluster=subcluster):
+                    try:
+                        Summary.objects.filter(station=station)[0]
+                        link = station.number
+                    except IndexError:
+                        link = None
+                    status = get_station_status(station, down, problem, up)
+
+                    stations.append({'number': station.number,
+                                     'name': station.name,
+                                     'link': link,
+                                     'status': status})
+                subclusters.append({'name': subcluster.name, 'stations': stations})
             stations = []
             for station in Station.objects.filter(cluster=cluster):
                 try:
@@ -62,7 +125,7 @@ def stations_by_country(request):
                                  'name': station.name,
                                  'link': link,
                                  'status': status})
-            clusters.append({'name': cluster.name, 'stations': stations})
+            clusters.append({'name': cluster.name, 'subclusters': subclusters, 'stations': stations})
         countries.append({'name': country.name, 'number': country.number, 'clusters': clusters})
 
     countries = sorted(countries, key=itemgetter('number'))
@@ -118,22 +181,24 @@ def stations_by_name(request):
                               context_instance=RequestContext(request))
 
 
-def stations_on_map(request):
-    """Show all stations on a map"""
+def stations_on_map(request, subcluster=None):
+    """Show all stations from a subcluster on a map"""
 
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
     tomorrow = today + datetime.timedelta(days=1)
-    stations = []
-    for detector in DetectorHisparc.objects.exclude(enddate__lt=today):
-        try:
-            Summary.objects.filter(station=detector.station)[0]
-            link = detector.station.number
-        except IndexError:
-            link = None
-        status = get_station_status(detector.station, down, problem, up)
-
-        if link:
+    if subcluster:
+        get_object_or_404(Cluster, name=subcluster)
+    clusters = []
+    for cluster in Cluster.objects.all():
+        stations = []
+        for detector in DetectorHisparc.objects.exclude(enddate__lt=today).filter(station__cluster__name=cluster):
+            try:
+                Summary.objects.filter(station=detector.station)[0]
+                link = detector.station.number
+            except IndexError:
+                link = None
+            status = get_station_status(detector.station, down, problem, up)
             stations.append({'number': detector.station.number,
                              'name': detector.station.name,
                              'cluster': detector.station.cluster,
@@ -142,9 +207,11 @@ def stations_on_map(request):
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
-
-    return render_to_response('stations_on_map.html', {'stations': stations},
-                              context_instance=RequestContext(request))
+        clusters.append({'name': cluster.name, 'stations': stations})
+    return render_to_response('stations_on_map.html',
+        {'clusters': clusters,
+         'focus': subcluster},
+        context_instance=RequestContext(request))
 
 
 def station_page(request, station_id, year, month, day):
@@ -223,6 +290,33 @@ def station_page(request, station_id, year, month, day):
          'prev': previous,
          'next': next,
          'link': (station_id, year, month, day)},
+        context_instance=RequestContext(request))
+
+
+def station_status(request, station_id):
+    """Show daily histograms for a particular station"""
+
+    station_id = int(station_id)
+
+    station = get_object_or_404(Station, number=station_id)
+    pc = get_object_or_404(Pc, station=station)
+
+    try:
+        config = (Configuration.objects.filter(source__station=station)
+                                       .latest('timestamp'))
+        if config.slv_version.count('0') == 2:
+            has_slave = False
+        else:
+            has_slave = True
+    except Configuration.DoesNotExist:
+        config = None
+        has_slave = False
+
+    return render_to_response('station_status.html',
+        {'station': station,
+         'pc': pc,
+         'config': config,
+         'has_slave': has_slave},
         context_instance=RequestContext(request))
 
 
