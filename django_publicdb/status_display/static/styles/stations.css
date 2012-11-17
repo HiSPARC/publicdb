@@ -73,7 +73,7 @@
     list-style: none;}
 
 #stationList li {
-    line-height:140%}
+    line-height: 140%}
 
 #stationList ul a {
     font-size: 10pt;
@@ -91,6 +91,10 @@ h2 {
 h3 a, h2 a, h1 a {
     color: #000;
     text-decoration: none;}
+
+h3 a:hover, h2 a:hover, h1 a:hover {
+    color: #027;
+    text-decoration: underline;}
 
 .statusBall {
     width: 8px;

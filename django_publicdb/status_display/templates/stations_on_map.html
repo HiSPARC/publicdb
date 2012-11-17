@@ -12,8 +12,10 @@
         var pointStyle = {
             fillColor: '#1BAF16',
             fillOpacity: 0.8,
+            strokeOpacity: 0.8,
+            strokeWidth: 1,
             pointRadius: 3,
-            stroke: false};
+            cursor: 'pointer'};
         var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#F00'});
         var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#FFD700'});
         var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#008000'});
@@ -53,10 +55,12 @@
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
-                    setPointRadius(3);}
+                    setPointRadius(2);}
                 else if (zLevel <= 8) {
+                    setPointRadius(3);}
+                else if (zLevel <= 10) {
                     setPointRadius(4);}
-                else if (zLevel <= 11) {
+                else if (zLevel <= 12) {
                     setPointRadius(5);}
                 else if (zLevel <= 14) {
                     setPointRadius(6);}
@@ -95,7 +99,7 @@
 
         function showStationInfo(e) {
             var attr = e.feature.attributes
-            stationLink("<a href='{% url 'status_display.views.stations_by_subcluster' %}" + attr.link + "'> " + attr.name +
+            stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name +
                         " (" + attr.id + ")</a>");
             clusterLink(attr.cluster);}
 
