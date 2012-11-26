@@ -7,6 +7,7 @@ class EventAdmin(admin.ModelAdmin):
 
 class CoincidenceAdmin(admin.ModelAdmin):
     list_display = ('date', 'time', 'nanoseconds', 'num_events')
+    raw_id_fields = ('events',)
 
 
 admin.site.register(Event, EventAdmin)
