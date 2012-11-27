@@ -45,7 +45,8 @@
                 {id: {{ station.number }},
                  name: "{{ station.name }}",
                  cluster: "{{ station.cluster }}",
-                 link: {{ station.link }}},
+                 link: {{ station.link }},
+                 status: "{{ station.status }}"},
                 pointStyle_{{ station.status }});
             {{ cluster.name|slugify|remove_hyphens }}.addFeatures(feature);
           {% endif %}
@@ -99,7 +100,8 @@
 
         function showStationInfo(e) {
             var attr = e.feature.attributes
-            stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name +
+            stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "/status'><span class='statusBall " + attr.status + "'></span></a>" +
+                        "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name +
                         " (" + attr.id + ")</a>");
             clusterLink(attr.cluster);}
 

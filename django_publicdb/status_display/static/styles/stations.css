@@ -40,22 +40,8 @@
     -moz-column-count: 2;
     column-count: 2;}
 
-.country h1 {
-    -moz-column-span: all;
-    -webkit-column-span: all;
-    column-span: all;
-    padding-top: 10px;
-    font-size: 32px;}
-
 .cluster {
-    display: block;
-    -webkit-column-break-inside: avoid;
-    -moz-column-break-inside: avoid;
-    column-break-inside: avoid;
-    break-inside: avoid-column;}
-
-.cluster h1 {
-    margin-top: 0px;}
+    display: block;}
 
 .subcluster {
     display: block;
@@ -64,7 +50,19 @@
     column-break-inside: avoid;
     break-inside: avoid-column;}
 
-.cluster h3 {
+.country h1 {
+    -moz-column-span: all;
+    -webkit-column-span: all;
+    column-span: all;
+    font-size: 32px;}
+
+.country:first-child h1 {
+    margin-top: 0px;}
+
+.cluster:first-child h2 {
+    margin-top: 0px;}
+
+.subcluster:first-child h3 {
     margin-top: 0px;}
 
 #stationList ul {
@@ -97,6 +95,7 @@ h3 a:hover, h2 a:hover, h1 a:hover {
     text-decoration: underline;}
 
 .statusBall {
+    background-color: grey;
     width: 8px;
     height: 8px;
     border-radius: 4px;

@@ -17,21 +17,23 @@
         <h1>{{ country.name }}</h1>
           {% for cluster in country.clusters %}
             <div class="cluster">
-                <h2><a href="{% url 'status_display.views.stations_on_map' cluster.name %}">{{ cluster.name }}</a></h2>
-                <ul>
-                  {% for station in cluster.stations %}
-                    <li>
-                        <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
-                      {% if station.link %}
-                        <a href="{% url 'status_display.views.station' station.link %}">
-                          {{ station.number }} &mdash; {{ station.name }}
-                        </a>
-                      {% else %}
-                          {{ station.number }} &mdash; {{ station.name }}
-                      {% endif %}
-                    </li>
-                  {% endfor %}
-                </ul>
+                <div class="subcluster">
+                    <h2><a href="{% url 'status_display.views.stations_on_map' cluster.name %}">{{ cluster.name }}</a></h2>
+                    <ul>
+                      {% for station in cluster.stations %}
+                        <li>
+                            <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+                          {% if station.link %}
+                            <a href="{% url 'status_display.views.station' station.link %}">
+                              {{ station.number }} &mdash; {{ station.name }}
+                            </a>
+                          {% else %}
+                              {{ station.number }} &mdash; {{ station.name }}
+                          {% endif %}
+                        </li>
+                      {% endfor %}
+                    </ul>
+                </div>
                 {% for subcluster in cluster.subclusters %}
                 <div class="subcluster">
                     <h3><a href="{% url 'status_display.views.stations_on_map' subcluster.name %}">{{ subcluster.name }}</a></h3>

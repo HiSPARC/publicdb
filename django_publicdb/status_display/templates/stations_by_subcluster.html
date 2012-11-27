@@ -12,7 +12,7 @@
 
 {% block list %}
   {% for cluster in clusters %}
-    <div class="cluster">
+    <div class="subcluster">
         <h3><a href="{% url 'status_display.views.stations_on_map' cluster.name %}">{{ cluster.name }}</a></h3>
         <ul>
           {% for station in cluster.stations %}
