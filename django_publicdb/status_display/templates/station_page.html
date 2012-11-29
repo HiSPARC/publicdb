@@ -259,11 +259,11 @@
       {% endfor %}
     </ul>
     </div>
-
+  {% if is_active %}
     <div id="statusLink">
         <a href="{% url 'status_display.views.station_status' station.number %}">Station Status</a>
     </div>
-
+  {% endif %}
     <div id="listLink">
         <a href="{% url 'status_display.views.stations' %}">Stations List</a>
     </div>

@@ -260,6 +260,8 @@ def station_page(request, station_id, year, month, day):
         config = None
         has_slave = False
 
+    is_active = Pc.objects.filter(station__number=station_id)[0].is_active
+
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
     year_list = nav_years(station)
@@ -291,7 +293,8 @@ def station_page(request, station_id, year, month, day):
          'current_date': current_date,
          'prev': previous,
          'next': next,
-         'link': (station_id, year, month, day)},
+         'link': (station_id, year, month, day),
+         'is_active': is_active},
         context_instance=RequestContext(request))
 
 
@@ -301,7 +304,13 @@ def station_status(request, station_id):
     station_id = int(station_id)
 
     station = get_object_or_404(Station, number=station_id)
-    pc = get_object_or_404(Pc, station=station)
+    pc = get_object_or_404(Pc, station=station, is_active=True)
+
+    try:
+        Summary.objects.filter(station=station)[0]
+        has_data = True
+    except IndexError:
+        has_data = False
 
     try:
         config = (Configuration.objects.filter(source__station=station)
@@ -318,7 +327,8 @@ def station_status(request, station_id):
         {'station': station,
          'pc': pc,
          'config': config,
-         'has_slave': has_slave},
+         'has_slave': has_slave,
+         'has_data': has_data},
         context_instance=RequestContext(request))
 
 

@@ -16,12 +16,14 @@
 {% block content %}
 <div id="header">
     <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
-<div id="dataLink">
-    <a href="{% url 'status_display.views.station' station.number %}">Station Data</a>
-</div>
-<div id="listLink">
-    <a href="{% url 'status_display.views.stations' %}">Stations List</a>
-</div>
+  {% if has_data %}
+    <div id="dataLink">
+        <a href="{% url 'status_display.views.station' station.number %}">Station Data</a>
+    </div>
+  {% endif %}
+    <div id="listLink">
+        <a href="{% url 'status_display.views.stations' %}">Stations List</a>
+    </div>
 </div>
 
 <iframe width="100%" height="600" frameborder="0" scrolling="auto" src="http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?host={{ pc.name }}&style=detail"></iframe>
