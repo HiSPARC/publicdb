@@ -118,7 +118,7 @@ class ContactInformation(models.Model):
         else:
            type = 'no owner'
         return type
-        type = property(type)
+    type = property(type)
 
     def contact_owner(self):
         contacts = self.contacts.all()
@@ -126,20 +126,20 @@ class ContactInformation(models.Model):
 
         contact_str = []
         if contacts:
-            contact_str.extend([x.name for x in contacts])
+            contact_str.extend([contact.name for contact in contacts])
         if stations:
-            contact_str.extend(['%s (%d)' % (x.name, x.number) for x in
-                                stations])
-            return ', '.join(contact_str)
+            contact_str.extend(['%s (%d)' % (station.name, station.number)
+                                for station in stations])
+        return ', '.join(contact_str)
+
         if contacts:
             contact_owner = self.contacts.get().name
         elif self.stations.all():
            contact_owner = self.stations.all()[0].name
         else:
            contact_owner = 'no owner'
-
         return contact_owner
-        contact_owner = property(contact_owner)
+    contact_owner = property(contact_owner)
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)
