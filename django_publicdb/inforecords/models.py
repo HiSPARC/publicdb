@@ -322,12 +322,12 @@ class Pc(models.Model):
         return self.name
 
     def keys(self):
-        return ("<a href=%s>Certificaat %s</a>" %
+        return ("<a href=%s>Certificate %s</a>" %
                 (reverse('django_publicdb.inforecords.views.keys',
                          args=[self.name]),
                  self.name))
 
-    keys.short_description = 'Certificaten'
+    keys.short_description = 'Certificates'
     keys.allow_tags = True
 
     def url(self):
@@ -335,11 +335,11 @@ class Pc(models.Model):
             return ''
         else:
             return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
-    url.short_description = 'VPN URL'
+    url.short_description = 'VNC URL'
     url.allow_tags = True
 
     class Meta:
-        verbose_name_plural = 'PC en Certificaten'
+        verbose_name_plural = 'PC and Certificates'
         ordering = ('name',)
 
     def ipAdresGenereer(self,ipadres):
@@ -438,6 +438,7 @@ class EnabledService(models.Model):
         return '%s - %s' % (self.pc, self.monitor_service)
 
     class Meta:
+        verbose_name_plural = 'Enabled Services'
         ordering = ('pc', 'monitor_service')
 
     def save(self, *args, **kwargs):
