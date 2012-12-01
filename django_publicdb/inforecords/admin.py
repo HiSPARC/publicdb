@@ -49,7 +49,7 @@ class EnabledServiceAdmin(admin.ModelAdmin):
     list_filter = ('pc', 'monitor_service')
 
 class StationAdmin(admin.ModelAdmin):
-    list_display = ('number', 'name', 'contactinformation', 'cluster')
+    list_display = ('number', 'name', 'cluster', 'contactinformation', 'contact')
     search_fields = ('number', 'name', 'cluster__name')
     list_filter = ('cluster__country',)
     list_per_page = 200

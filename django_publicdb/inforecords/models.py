@@ -44,54 +44,6 @@ class Contact(models.Model):
         ordering = ('surname', 'first_name')
 
 
-class Cluster(models.Model):
-    name = models.CharField(max_length=70, unique=True)
-    number = models.IntegerField(unique=True,blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
-    country = models.ForeignKey('Country', related_name='clusters')
-    url = models.URLField(null=True, blank=True)
-    def __unicode__(self):
-        return self.name
-
-    def save(self, *args, **kwargs):
-        if self.number==None:
-           if self.parent==None:
-              self.number = self.country.last_cluster_number()+1000
-           else:
-              self.number = self.parent.last_cluster_number()+100
-        super(Cluster, self).save(*args, **kwargs)
-        reload_datastore()
-
-    def delete(self, *args, **kwargs):
-        super(Cluster, self).delete(*args, **kwargs)
-        reload_datastore()
-
-    def main_cluster(self):
-        if self.parent:
-            return self.parent.main_cluster()
-        else:
-            return self.name
-
-    def last_station_number(self):
-        stations=self.stations.filter(number__lt=(self.number+90))
-        if stations:
-            stationmax=stations.aggregate(Max('number'))
-            return stationmax['number__max']
-        else:
-            return self.number-1
-
-    def last_cluster_number(self):
-        clusters=self.children.all()
-        if clusters:
-            clustermax=clusters.aggregate(Max('number'))
-            return clustermax['number__max']
-        else:
-            return self.number
-
-    class Meta:
-        ordering = ('name',)
-
-
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
@@ -152,6 +104,55 @@ class ContactInformation(models.Model):
         verbose_name_plural = "Contact Information"
 
 
+class Cluster(models.Model):
+    name = models.CharField(max_length=70, unique=True)
+    number = models.IntegerField(unique=True,blank=True)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    country = models.ForeignKey('Country', related_name='clusters')
+    url = models.URLField(null=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def save(self, *args, **kwargs):
+        if self.number==None:
+           if self.parent==None:
+              self.number = self.country.last_cluster_number()+1000
+           else:
+              self.number = self.parent.last_cluster_number()+100
+        super(Cluster, self).save(*args, **kwargs)
+        reload_datastore()
+
+    def delete(self, *args, **kwargs):
+        super(Cluster, self).delete(*args, **kwargs)
+        reload_datastore()
+
+    def main_cluster(self):
+        if self.parent:
+            return self.parent.main_cluster()
+        else:
+            return self.name
+
+    def last_station_number(self):
+        stations=self.stations.filter(number__lt=(self.number+90))
+        if stations:
+            stationmax=stations.aggregate(Max('number'))
+            return stationmax['number__max']
+        else:
+            return self.number-1
+
+    def last_cluster_number(self):
+        clusters=self.children.all()
+        if clusters:
+            clustermax=clusters.aggregate(Max('number'))
+            return clustermax['number__max']
+        else:
+            return self.number
+
+    class Meta:
+        ordering = ('name',)
+
+
 class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True,blank=True)
@@ -182,20 +183,22 @@ class Station(models.Model):
     class Meta:
         ordering = ('number',)
 
+
 class Country(models.Model):
     name = models.CharField(max_length=40, unique=True)
     number = models.IntegerField(unique=True,blank=True)
 
+    def __unicode__(self):
+        return self.name
+
     def last_cluster_number(self):
-        clusters=self.clusters.filter(parent=None)
+        clusters = self.clusters.filter(parent=None)
         if clusters:
             clustermax = clusters.aggregate(Max('number'))
             return clustermax['number__max']
         else:
             return self.number - 1000
 
-    def __unicode__(self):
-        return self.name
     class Meta:
         verbose_name_plural = "Countries"
 
@@ -347,9 +350,9 @@ class Pc(models.Model):
         d = 256 * 256 * 256
         q = []
         while d > 0:
-                m,n = divmod(n,d)
+                m, n = divmod(n, d)
                 q.append(str(m))
-                d = d/256
+                d = d / 256
 
         return '.'.join(q)
 
@@ -383,8 +386,7 @@ class Pc(models.Model):
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.register_hosts_ip([(x.name, x.ip) for x in
-                                 Pc.objects.all()])
+        proxy.register_hosts_ip([(x.name, x.ip) for x in Pc.objects.all()])
         proxy.reload_nagios()
 
     def install_default_services(self):
