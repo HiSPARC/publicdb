@@ -17,7 +17,7 @@ from django_publicdb.inforecords.models import *
 
 
 def stations(request):
-    """Show the station list"""
+    """Show the default station list"""
 
     return redirect(stations_by_country)
 
@@ -347,6 +347,12 @@ def station(request, station_id):
 
 
 def status_lists():
+    """Get various station status lists from Nagios
+
+    :return: down, problem, up. Each of these is a list containing
+        station short names that have the status their name implies.
+
+    """
     down = down_list()
     problem = problem_list()
     up = up_list()
@@ -395,8 +401,12 @@ def retrieve_station_status(url):
 
 
 def get_station_status(station, down, problem, up):
-    """Return current status of requested station"""
+    """Check if station is in down, problem or up list.
 
+    :return: A string denoting the current status of requested station,
+        if the station occurs in multiple lists, the worst case is returned.
+
+    """
     try:
         name = Pc.objects.filter(station=station)[0].name
     except IndexError:
@@ -410,6 +420,7 @@ def get_station_status(station, down, problem, up):
         return 'up'
     else:
         return 'unknown'
+
 
 def get_eventtime_histogram_source(request, station_id, year, month, day):
     data = get_histogram_source(station_id, year, month, day, 'eventtime')

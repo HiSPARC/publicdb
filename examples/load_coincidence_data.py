@@ -78,8 +78,7 @@ if __name__ == '__main__':
 
     ndups = 0
     nvalid = 0
-    progress = pb.ProgressBar(widgets=[pb.Percentage(), pb.Bar(),
-                                       pb.ETA()])
+    progress = pb.ProgressBar(widgets=[pb.Percentage(), pb.Bar(), pb.ETA()])
     for coincidence in progress(c_list):
         if len(coincidence) >= 3:
             event_list = coincidences.get_events(data, stations,
