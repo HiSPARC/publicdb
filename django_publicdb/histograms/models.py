@@ -49,6 +49,7 @@ class Summary(models.Model):
         unique_together = (('station', 'date'),)
         ordering = ('date', 'station')
 
+
 class Configuration(models.Model):
     source = models.ForeignKey('Summary')
     timestamp = models.DateTimeField()
@@ -145,6 +146,7 @@ class Configuration(models.Model):
         return self.source.station.number
     station.admin_order_field = 'source__station__number'
 
+
 class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('HistogramType')
@@ -158,6 +160,7 @@ class DailyHistogram(models.Model):
     class Meta:
         unique_together = (('source', 'type'),)
         ordering = ('source', 'type')
+
 
 class DailyDataset(models.Model):
     source = models.ForeignKey('Summary')
@@ -173,6 +176,7 @@ class DailyDataset(models.Model):
         unique_together = (('source', 'type'),)
         ordering = ('source', 'type')
 
+
 class HistogramType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
@@ -184,6 +188,7 @@ class HistogramType(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class DatasetType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
@@ -193,6 +198,7 @@ class DatasetType(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class GeneratorState(models.Model):
     check_last_run = models.DateTimeField()
