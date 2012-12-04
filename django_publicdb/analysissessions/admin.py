@@ -21,7 +21,7 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class SessionRequestAdmin(admin.ModelAdmin):
-    lis_filter = ('email',)
+    list_display = ('cluster', 'school', 'name', 'start_date')
 
 
 admin.site.register(AnalysisSession, AnalysisSessionAdmin)

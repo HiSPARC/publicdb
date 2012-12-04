@@ -28,7 +28,6 @@ class AnalysisSession(models.Model):
     def in_progress(self):
         return self.starts <= datetime.datetime.now() < self.ends
 
-#FIXME: What is this for?
     in_progress.boolean = True
 
     def save(self, *args, **kwargs):
@@ -84,27 +83,31 @@ class SessionRequest(models.Model):
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
 
+    def name(self):
+        return "%s %s" % (self.first_name, self.sur_name)
+    name = property(name)
+
     def create_session(self):
-        self.session_pending=False
+        self.session_pending = False
         self.save()
         starts = datetime.datetime.now()
-        length = timedelta(weeks=4)
-        ends = starts + length
+        session_length = timedelta(weeks=4)
+        ends = starts + session_length
         session = AnalysisSession(starts=starts,
                                   ends=ends,
                                   pin=str(self.pin),
                                   slug=slugify(self.sid),
                                   title=self.sid)
         session.save()
-        date = self.start_date
-        enddate = date + length
-        while((self.events_created < self.events_to_create) and
-              (date < enddate)):
+        startdate = self.start_date
+        search_length = timedelta(weeks=3)
+        enddate = startdate + search_length
+        while (self.events_created < self.events_to_create and date < enddate):
             try:
-               self.events_created += self.find_coincidence(date,session)
+               self.events_created += self.find_coincidence(date, session)
             except Exception, msg:
-               print "creation of session " + self.sid + " failed\n"
-               print "Error:", msg
+               print "Creation of session " + self.sid + " failed."
+               print "Error: ", msg
             date += timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
@@ -117,7 +120,7 @@ class SessionRequest(models.Model):
         self.save()
         return [self.sid, self.pin]
 
-    def find_coincidence(self,date,session):
+    def find_coincidence(self, date, session):
         file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
         datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
                                       str(date.month), file)
@@ -138,7 +141,7 @@ class SessionRequest(models.Model):
                                                      coincidence, timestamps)
                 station_list = [x[0] for x in event_list]
                 if len(set(station_list)) == len(station_list):
-                    self.save_coincidence(event_list,session)
+                    self.save_coincidence(event_list, session)
                     nvalid += 1
                 else:
                     ndups += 1
@@ -167,7 +170,7 @@ class SessionRequest(models.Model):
                 stations.append(station_group)
         return stations
 
-    def save_coincidence(self, event_list,session):
+    def save_coincidence(self, event_list, session):
         timestamps = []
         events = []
 
@@ -202,7 +205,7 @@ class SessionRequest(models.Model):
                                                    coincidence=coincidence)
         analyzed_coincidence.save()
 
-    def analyze_traces(self,traces):
+    def analyze_traces(self, traces):
         """Analyze traces and determine time of first particle"""
 
         t = []
@@ -274,8 +277,8 @@ class SessionRequest(models.Model):
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
         message = ('Your analysis session for jSparc could not be created.'
-                   '\nPerhaps there was no data for the date and/or stations you selected'
-                   '\nPlease try selecting a different data set.')
+                   '\nPerhaps there was no data for the date and/or stations you selected.'
+                   '\nPlease try selecting a different cluster or date.')
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)

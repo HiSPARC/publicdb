@@ -139,7 +139,7 @@ class Cluster(models.Model):
             stationmax=stations.aggregate(Max('number'))
             return stationmax['number__max']
         else:
-            return self.number-1
+            return self.number - 1
 
     def last_cluster_number(self):
         clusters=self.children.all()

@@ -82,7 +82,9 @@ def stations_by_cluster(request):
                              'name': station.name,
                              'link': link,
                              'status': status})
-        clusters.append({'name': cluster.name, 'subclusters': subclusters, 'stations': stations})
+        clusters.append({'name': cluster.name,
+                         'subclusters': subclusters,
+                         'stations': stations})
 
     return render_to_response('stations_by_cluster.html', {'clusters': clusters},
                               context_instance=RequestContext(request))
@@ -260,7 +262,10 @@ def station_page(request, station_id, year, month, day):
         config = None
         has_slave = False
 
-    is_active = Pc.objects.filter(station__number=station_id)[0].is_active
+    try:
+        is_active = Pc.objects.filter(station__number=station_id)[0].is_active
+    except Pc.DoesNotExist:
+        is_active = False
 
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)

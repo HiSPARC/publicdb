@@ -209,17 +209,17 @@ def get_request(request):
                 data = {}
                 data.update(form.cleaned_data)
                 new_request = SessionRequest(
-                        first_name = data['first_name'],
-                        sur_name = data['sur_name'],
-                        email = data['email'],
-                        school = data['school'],
-                        cluster = data['cluster'],
-                        start_date = data['start_date'],
-                        mail_send = False,
-                        session_created = False,
-                        session_pending = True,
-                        events_to_create = data['number_of_events'],
-                        events_created = 0)
+                        first_name=data['first_name'],
+                        sur_name=data['sur_name'],
+                        email=data['email'],
+                        school=data['school'],
+                        cluster=data['cluster'],
+                        start_date=data['start_date'],
+                        mail_send=False,
+                        session_created=False,
+                        session_pending=True,
+                        events_to_create=data['number_of_events'],
+                        events_created=0)
                 new_request.GenerateUrl()
                 new_request.save()
                 new_request.SendMail()
@@ -236,27 +236,29 @@ def get_request(request):
 
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
-    if sessionrequest.session_confirmed==False:
+    if sessionrequest.session_confirmed == False:
        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
-       sessionrequest.pin = randint(1000,9999)
+       sessionrequest.pin = randint(1000, 9999)
        starts = datetime.datetime.now()
        ends = datetime.datetime.now()
-       session = AnalysisSession(starts = starts, ends = ends,
-                                 pin = str(sessionrequest.id),
-                                 title = sessionrequest.sid)
+       session = AnalysisSession(starts=starts,
+                                 ends=ends,
+                                 pin=str(sessionrequest.id),
+                                 title=sessionrequest.sid)
 
-       sessionrequest.session_confirmed=True
+       sessionrequest.session_confirmed = True
        sessionrequest.save()
     return render_to_response('confirm.html',
-            {'id' : sessionrequest.sid, 'pin': sessionrequest.pin})
+            {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
 
 
 def create_request(request):
-    sessionlist = SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True)
+    sessionlist = (SessionRequest.objects.filter(session_confirmed=True)
+                                         .filter(session_pending=True))
     for sessionrequest in sessionlist:
-       sessionrequest.session_confirmed=False
-       sessionrequest.save()
+        sessionrequest.session_confirmed=False
+        sessionrequest.save()
 
     for sessionrequest in sessionlist:
-       sessionrequest.create_session()
+        sessionrequest.create_session()
     return HttpResponse('')
