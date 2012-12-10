@@ -192,19 +192,24 @@ def get_core_positions(coincidences):
 @csrf_protect
 def get_request(request):
     if request.method == 'POST':
-        check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'],
-            request.POST['recaptcha_response_field'],
-            settings.RECAPTCHA_PRIVATE_KEY,
-            request.META['REMOTE_ADDR'])
-        if check_captcha.is_valid is False:
-            pass_captcha = False
-            html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY,
-                                               error=check_captcha.error_code)
+        if settings.RECAPTCHA_ENABLED:
+            check_captcha = captcha.submit(
+                request.POST['recaptcha_challenge_field'],
+                request.POST['recaptcha_response_field'],
+                settings.RECAPTCHA_PRIVATE_KEY,
+                request.META['REMOTE_ADDR'])
+            if check_captcha.is_valid is False:
+                pass_captcha = False
+                html_captcha = captcha.displayhtml(
+                    settings.RECAPTCHA_PUB_KEY,
+                    error=check_captcha.error_code)
+            else:
+                pass_captcha = True
         else:
             pass_captcha = True
+
         form = SessionRequestForm(request.POST)
-        if pass_captcha :
+        if pass_captcha:
             if form.is_valid():
                 data = {}
                 data.update(form.cleaned_data)
@@ -228,7 +233,11 @@ def get_request(request):
                 html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:
         form = SessionRequestForm()
-        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
+        if settings.RECAPTCHA_ENABLED:
+            html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
+        else:
+            html_captcha = "reCAPTCHA disabled"
+
     return render_to_response('request.html',
             {'form': form, 'html_captcha': html_captcha},
             RequestContext(request, {}))

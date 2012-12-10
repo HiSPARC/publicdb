@@ -29,6 +29,11 @@ DATASTORE_PATH = '../datastore'
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
 
+# reCAPTCHA settings
+RECAPTCHA_ENABLED = False
+RECAPTCHA_PUB_KEY = 'foobar'
+RECAPTCHA_PRIVATE_KEY = 'foobaz'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
