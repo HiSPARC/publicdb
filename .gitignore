@@ -19,3 +19,6 @@ datastore/
 ehthumbs.db
 Icon?
 Thumbs.db
+
+# Vim
+*.swp

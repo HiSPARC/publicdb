@@ -34,6 +34,9 @@ RECAPTCHA_ENABLED = False
 RECAPTCHA_PUB_KEY = 'foobar'
 RECAPTCHA_PRIVATE_KEY = 'foobaz'
 
+# E-mail settings
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # although not all choices may be available on all operating systems.
