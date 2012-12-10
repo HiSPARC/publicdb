@@ -99,9 +99,9 @@ class SessionRequest(models.Model):
                                   slug=slugify(self.sid),
                                   title=self.sid)
         session.save()
-        startdate = self.start_date
+        date = self.start_date
         search_length = timedelta(weeks=3)
-        enddate = startdate + search_length
+        enddate = self.start_date + search_length
         while (self.events_created < self.events_to_create and date < enddate):
             try:
                self.events_created += self.find_coincidence(date, session)
