@@ -66,8 +66,9 @@ def get_coincidence(request):
                      nanoseconds=e.nanoseconds, number=s.number,
                      lat=d.latitude, lon=d.longitude, alt=d.height,
                      status='on', detectors=len(e.traces),
-                     traces=e.traces, pulseheights=e.pulseheights,
-                     integrals=e.integrals,
+                     traces=e.traces,
+                     pulseheights=[np.asscalar(u) for u in e.pulseheights],
+                     integrals=[np.asscalar(u) for u in e.integrals],
                      mips=[x / 200. for x in e.pulseheights])
         events.append(event)
 
