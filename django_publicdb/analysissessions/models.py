@@ -103,11 +103,7 @@ class SessionRequest(models.Model):
         search_length = timedelta(weeks=3)
         enddate = self.start_date + search_length
         while (self.events_created < self.events_to_create and date < enddate):
-            try:
-               self.events_created += self.find_coincidence(date, session)
-            except Exception, msg:
-               print "Creation of session " + self.sid + " failed."
-               print "Error: ", msg
+            self.events_created += self.find_coincidence(date, session)
             date += timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
