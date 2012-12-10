@@ -2,6 +2,7 @@
 HiSPARC_coincidences.db
 public.db
 *.h5
+datastore/
 
 # Python
 *.pyc
@@ -18,3 +19,6 @@ public.db
 ehthumbs.db
 Icon?
 Thumbs.db
+
+# Vim
+*.swp
