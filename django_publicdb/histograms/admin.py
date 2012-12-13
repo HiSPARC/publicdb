@@ -33,8 +33,8 @@ class SummaryAdmin(admin.ModelAdmin):
 
 
 class ConfigurationAdmin(admin.ModelAdmin):
-    list_display = ('station', 'timestamp')
-    list_filter = ('timestamp',)
+    list_display = ('station', 'master', 'slave', 'timestamp')
+    list_filter = ('timestamp', 'source__station__number')
     raw_id_fields = ('source',)
 
 

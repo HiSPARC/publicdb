@@ -3,6 +3,7 @@ from django.db import models
 import zlib
 import cPickle as pickle
 import base64
+import re
 
 from django_publicdb.inforecords import models as inforecords
 
@@ -145,6 +146,27 @@ class Configuration(models.Model):
     def station(self):
         return self.source.station.number
     station.admin_order_field = 'source__station__number'
+
+    def master(self):
+        master = re.search(r'\d+', self.mas_version).group()
+        return master
+    master.admin_order_field = 'mas_version'
+
+    def slave(self):
+        slave = re.search(r'\d+', self.slv_version).group()
+        if slave == '0':
+            slave = 'no slave'
+        return slave
+    slave.admin_order_field = 'slv_version'
+
+    def master_fpga(self):
+        master_fpga = re.findall(r'\d+', self.mas_version)[1]
+        return master_fpga
+
+    def slave_fpga(self):
+        slave_fpga = re.findall(r'\d+', self.slv_version)[1]
+
+        return slave_fpga
 
 
 class DailyHistogram(models.Model):
