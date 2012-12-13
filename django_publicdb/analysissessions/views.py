@@ -227,7 +227,7 @@ def get_request(request):
                 new_request.GenerateUrl()
                 new_request.save()
                 new_request.SendMail()
-                return render_to_response('thankyou.html')
+                return render_to_response('thankyou.html', {'data': data})
             else:
                 html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:

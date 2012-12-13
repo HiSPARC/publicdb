@@ -229,8 +229,9 @@ class SessionRequest(models.Model):
 
     def SendMail(self):
         subject = 'HiSPARC analysis session request'
-        message = ('Please click on this link to confirm your request for an analysis session with jSparc:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/request/' + self.url)
+        message = ('Hello %s,'
+                   '\n\nPlease click on this link to confirm your request for an analysis session with jSparc:'
+                   '\nhttp://data.hisparc.nl/django/analysis-session/request/%s') % (self.name, self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -239,14 +240,16 @@ class SessionRequest(models.Model):
 
     def sendmail_created(self):
         subject = 'HiSPARC analysis session created'
-        message = ('Your analysis session for jSparc has been created.'
-                   '\nTitle = ' + self.sid +
-                   '\nPin = ' + str(self.pin) +
-                   '\nEvents created = ' + str(self.events_created) +
+        message = ('Hello %s,'
+                   '\n\nYour analysis session for jSparc has been created.'
+                   '\nTitle = %s'
+                   '\nPin = %d'
+                   '\nEvents created = %d'
                    '\n\nGo here to start analysing events:'
-                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
+                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
+                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -255,15 +258,17 @@ class SessionRequest(models.Model):
 
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
-        message = ('Your analysis session for jSparc has been created.'
-                   '\nTitle = ' + self.sid +
-                   '\nPin = ' + str(self.pin) +
+        message = ('Hello %s,'
+                   '\n\nYour analysis session for jSparc has been created.'
+                   '\nTitle = %s'
+                   '\nPin = %d'
                    '\nHowever, we were unable to find the amount of events you requested.'
-                   '\nEvents created = ' + str(self.events_created) +
+                   '\nEvents created = %d'
                    '\n\nGo here to start analysing events:'
-                   '\nhttp://data.hisparc.nl/media/jsparc/shower.htm'
+                   '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/' + slugify(self.sid) + '/data')
+                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
+                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -272,9 +277,10 @@ class SessionRequest(models.Model):
 
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
-        message = ('Your analysis session for jSparc could not be created.'
+        message = ('Hello %s,'
+                   '\n\nYour analysis session for jSparc could not be created.'
                    '\nPerhaps there was no data for the date and/or stations you selected.'
-                   '\nPlease try selecting a different cluster or date.')
+                   '\nPlease try selecting a different cluster or date.') % self.name
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)

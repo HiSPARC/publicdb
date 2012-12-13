@@ -14,7 +14,7 @@ from django_publicdb.inforecords.models import *
 
 def get_coincidence(request):
     """Return a coincidence for jsparc client test"""
-    print("got request")
+    print("got jSparc coincidence request")
     session_title = request.GET.get('session_title', None)
     session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
@@ -63,20 +63,26 @@ def get_coincidence(request):
         event = dict(timestamp=calendar.timegm(datetime.datetime
                                                .combine(e.date, e.time)
                                                .utctimetuple()),
-                     nanoseconds=e.nanoseconds, number=s.number,
-                     lat=d.latitude, lon=d.longitude, alt=d.height,
-                     status='on', detectors=len(e.traces),
+                     nanoseconds=e.nanoseconds,
+                     number=s.number,
+                     lat=d.latitude,
+                     lon=d.longitude,
+                     alt=d.height,
+                     status='on',
+                     detectors=len(e.traces),
                      traces=e.traces,
                      pulseheights=[np.asscalar(u) for u in e.pulseheights],
                      integrals=[np.asscalar(u) for u in e.integrals],
                      mips=[x / 200. for x in e.pulseheights])
         events.append(event)
 
-    data = dict(pk=c.pk, timestamp=calendar.timegm(datetime.datetime
-                                                   .combine(c.coincidence.date,
-                                                            c.coincidence.time)
-                                                   .utctimetuple()),
-                nanoseconds=c.coincidence.nanoseconds, events=events)
+    data = dict(pk=c.pk,
+                timestamp=calendar.timegm(datetime.datetime
+                                                  .combine(c.coincidence.date,
+                                                           c.coincidence.time)
+                                                  .utctimetuple()),
+                nanoseconds=c.coincidence.nanoseconds,
+                events=events)
 
     response = HttpResponse(json.dumps(data), mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
