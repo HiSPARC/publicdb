@@ -227,7 +227,8 @@ def get_request(request):
                 new_request.GenerateUrl()
                 new_request.save()
                 new_request.SendMail()
-                return render_to_response('thankyou.html', {'data': data})
+                return render_to_response('thankyou.html', {'data': data},
+                        context_instance=RequestContext(request))
             else:
                 html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:
@@ -257,7 +258,8 @@ def confirm_request(request, url):
        sessionrequest.session_confirmed = True
        sessionrequest.save()
     return render_to_response('confirm.html',
-            {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
+            {'id': sessionrequest.sid, 'pin': sessionrequest.pin},
+            context_instance=RequestContext(request))
 
 
 def create_request(request):
