@@ -13,12 +13,20 @@ from django_publicdb.inforecords.models import *
 
 
 def get_coincidence(request):
-    """Return a coincidence for jsparc client test"""
+    """Return a coincidence for jSparc client"""
     print("got jSparc coincidence request")
     session_title = request.GET.get('session_title', None)
     session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
-    print(session_title)
+
+    if session_title.lower() == 'example':
+        count = AnalyzedCoincidence.objects.count()
+        random_index = randint(0, count - 1)
+        coincidence = AnalyzedCoincidence.objects.all()[random_index]
+        events = get_events(coincidence)
+        response = data_json(coincidence, events)
+        return response
+
     try:
         session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
@@ -54,9 +62,14 @@ def get_coincidence(request):
         coincidence.student = student
         coincidence.save()
 
-    c = coincidence
+    events = get_events(coincidence)
+    response = data_json(coincidence, events)
+    return response
+
+
+def get_events(coincidence):
     events = []
-    for e in c.coincidence.events.all():
+    for e in coincidence.coincidence.events.all():
         s = e.station
         d = s.detectorhisparc_set.all().reverse()[0]
 
@@ -75,15 +88,16 @@ def get_coincidence(request):
                      integrals=[np.asscalar(u) for u in e.integrals],
                      mips=[x / 200. for x in e.pulseheights])
         events.append(event)
+    return events
 
-    data = dict(pk=c.pk,
-                timestamp=calendar.timegm(datetime.datetime
-                                                  .combine(c.coincidence.date,
-                                                           c.coincidence.time)
-                                                  .utctimetuple()),
-                nanoseconds=c.coincidence.nanoseconds,
-                events=events)
 
+def data_json(coincidence, events):
+    data = dict(pk=coincidence.pk,
+            timestamp=calendar.timegm(datetime.datetime
+                    .combine(coincidence.coincidence.date,
+                             coincidence.coincidence.time).utctimetuple()),
+            nanoseconds=coincidence.coincidence.nanoseconds,
+            events=events)
     response = HttpResponse(json.dumps(data), mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -120,30 +134,44 @@ def result(request):
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
 
+    # Possible break
+    if session_title.lower() == 'example':
+        return test_result()
+
     coincidence = AnalyzedCoincidence.objects.get(pk=pk)
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
+    # Possible break
     if coincidence.student.name == 'Test student':
-        return
-    else:
-        coincidence.core_position_x = lon
-        coincidence.core_position_y = lat
-        coincidence.log_energy = log_energy
-        coincidence.error_estimate = error_estimate
-        coincidence.is_analyzed = True
-        #FIXME
-        coincidence.theta = 0
-        coincidence.phi = 0
-        coincidence.save()
+        return test_result()
+
+    coincidence.core_position_x = lon
+    coincidence.core_position_y = lat
+    coincidence.log_energy = log_energy
+    coincidence.error_estimate = error_estimate
+    coincidence.is_analyzed = True
+    #FIXME
+    coincidence.theta = 0
+    coincidence.phi = 0
+    coincidence.save()
 
     ranking = top_lijst(coincidence.session.slug)
     try:
         rank = [x['name'] for x in ranking].index(student_name) + 1
     except ValueError:
         rank = None
+    msg = "OK [result stored]"
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
+                            mimetype='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
-    response = HttpResponse(json.dumps(dict(msg="OK [result stored]", rank=rank)),
+
+def test_result():
+    msg = "Test session, result not stored"
+    rank = randint(0, 10)
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
                             mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
