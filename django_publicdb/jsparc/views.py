@@ -134,7 +134,7 @@ def result(request):
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
 
-    # Possible break
+    # If session is example, do not save result.
     if session_title.lower() == 'example':
         return test_result()
 
@@ -142,8 +142,8 @@ def result(request):
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
-    # Possible break
-    if coincidence.student.name == 'Test student':
+    # If student is test student, do not save result.
+    if coincidence.student.name.lower() == 'test student':
         return test_result()
 
     coincidence.core_position_x = lon
@@ -170,7 +170,7 @@ def result(request):
 
 def test_result():
     msg = "Test session, result not stored"
-    rank = randint(0, 10)
+    rank = randint(1, 10)
     response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
                             mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
