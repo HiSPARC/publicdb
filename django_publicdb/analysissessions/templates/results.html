@@ -2,7 +2,7 @@
 
 {% load fix_data %}
 
-{% block title %}{{ title }} - jSparc analysis results {% endblock %}
+{% block title %}{{ session.title }} - jSparc analysis results {% endblock %}
 
 
 {% block head_styles %}
@@ -17,7 +17,7 @@
 {% block content %}
 
 <div id="header">
-    <h2>{{ title }} Results</h2>
+    <h2>{{ session.title }} Results</h2>
 </div>
 
 <div id="graphs">
@@ -49,6 +49,14 @@
         {% endifnotequal %}
     {% endifnotequal %}
 {% endcomment %}
+</div>
+
+<div id="session">
+    <div class="sectionTitle">Session details</div>
+    <div class="keyvalue"><span class="key">Title</span><span class="value">{{ session.title }}</span></div>
+    <div class="keyvalue"><span class="key">PIN</span><span class="value">{{ session.pin }}</span></div>
+    <div class="keyvalue"><span class="key">Start date</span><span class="value">{{ session.starts|date:'j M Y' }}</span></div>
+    <div class="keyvalue"><span class="key">End date</span><span class="value">{{ session.ends|date:'j M Y' }}</span></div>
 </div>
 
 <div id="scores">

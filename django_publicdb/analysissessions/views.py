@@ -27,10 +27,15 @@ def data_display(request, slug):
     star_map = None # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
     title = session.title
+    pin = session.pin
 
-    return render_to_response('symposium-data.html',
-        {'energy_histogram': energy_histogram, 'core_plot': core_plot,
-         'star_map': star_map, 'scores': scores, 'slug': slug, 'title':title},
+    return render_to_response('results.html',
+        {'energy_histogram': energy_histogram,
+         'core_plot': core_plot,
+         'star_map': star_map,
+         'scores': scores,
+         'slug': slug,
+         'session': session},
         context_instance=RequestContext(request))
 
 
