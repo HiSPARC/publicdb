@@ -275,8 +275,8 @@
     <div id="master">
         <div class="sectionTitle">Master</div>
         <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
-        <div class="keyvalue"><span style="color:#222;" class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
-        <div class="keyvalue"><span style="color:#D22;" class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
     </div>
     {% if has_slave %}
     <div id="slave">
