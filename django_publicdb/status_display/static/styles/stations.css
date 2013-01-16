@@ -1,7 +1,9 @@
 #header {
     margin-bottom: 10px;}
 
-#stationListPages, #stationListLegend, #stationListSidebar {
+#stationListPages,
+#stationListLegend,
+#stationListSidebar {
     font-size: 10pt;
     float: right;
     width: 170px;
@@ -16,7 +18,8 @@
     color: #005;
     text-decoration: underline;}
 
-#stationListLegend, #stationListSidebar {
+#stationListLegend,
+#stationListSidebar {
     margin-top: 20px;}
 
 .sectionTitle {
@@ -73,12 +76,14 @@
 #stationList li {
     line-height: 140%}
 
-#stationList ul a {
+#stationList ul a,
+#stationLink a {
     font-size: 10pt;
     color: #23B;
     text-decoration: none;}
 
-#stationList ul a:hover {
+#stationList ul a:hover,
+#stationLink a:hover {
     color: #005;
     text-decoration: underline;}
 
@@ -86,11 +91,15 @@ h2 {
     font-size: 24px;
     margin-top: 0px;}
 
-h3 a, h2 a, h1 a {
+h3 a,
+h2 a,
+h1 a {
     color: #000;
     text-decoration: none;}
 
-h3 a:hover, h2 a:hover, h1 a:hover {
+h3 a:hover,
+h2 a:hover,
+h1 a:hover {
     color: #027;
     text-decoration: underline;}
 

@@ -88,6 +88,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div id="header">
     <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
     <div id="date">{{ date|date:"D N j, Y" }}</div>
@@ -203,11 +204,24 @@
 
 <div id="navigation">
 
+    <div class="keyvalue">
+        <span class="key">Stations</span>
+        <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
+        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+    </div>
+
+    <div class="keyvalue"><span class="key">Station</span>
+        <span class="value"><a href="{% url 'status_display.views.station' station.number %}" class="currentPage">Data</a></span>
+        {% if is_active %}<span class="value"><a href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% else %}<span class="value nolink">Status</span>{% endif %}
+        {% if has_config %}<span class="value"><a href="{% url 'status_display.views.station_config' station.number %}">Config</a></span>{% else %}<span class="value nolink">Config</span>{% endif %}
+    </div>
+
+
   {% if prev %}
-     <a class='nextprev' id='prev' href='{% url 'status_display.views.station_page' station.number prev.year prev.month prev.day %}'>&larr;</a>
+     <a class='nextprev' id='prev' href='{% url 'status_display.views.station_data' station.number prev.year prev.month prev.day %}'>&larr;</a>
   {% endif %}
   {% if next %}
-     <a class='nextprev' id='next' href='{% url 'status_display.views.station_page' station.number next.year next.month next.day %}'>&rarr;</a>
+     <a class='nextprev' id='next' href='{% url 'status_display.views.station_data' station.number next.year next.month next.day %}'>&rarr;</a>
   {% endif %}
 
     <table id="calendar">
@@ -222,7 +236,7 @@
           {% for day in week %}
             <td class="day">
               {% if day.link %}
-                <a class='{% if current_date.day == day.day %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
+                <a {% if current_date.day == day.day %}class='currentDate'{% endif %} href='{% url 'status_display.views.station_data' day.link.0 day.link.1 day.link.2 day.link.3 %}'>{{ day.day }}</a>
               {% else %}
                 <span class="nolink">{{ day.day }}</span>
               {% endif %}
@@ -237,7 +251,7 @@
       {% for month in month_list %}
         <li>
           {% if month.link %}
-            <a class='{% if current_date.month == month.month %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
+            <a {% if current_date.month == month.month %}class='currentDate'{% endif %} href='{% url 'status_display.views.station_data' month.link.0 month.link.1 month.link.2 month.link.3 %}'>{{ month.month }}</a>
           {% else %}
             <span class="nolink">{{ month.month }}</span>
           {% endif %}
@@ -251,21 +265,13 @@
       {% for year in year_list %}
         <li>
           {% if year.link %}
-            <a class='{% if current_date.year == year.year %}currentDate{% endif %}' href='{% url 'status_display.views.station_page' year.link.0 year.link.1 year.link.2 year.link.3 %}'>{{ year.year }}</a>
+            <a {% if current_date.year == year.year %}class='currentDate'{% endif %} href='{% url 'status_display.views.station_data' year.link.0 year.link.1 year.link.2 year.link.3 %}'>{{ year.year }}</a>
           {% else %}
             <span class="nolink">{{ year.year }}</span>
           {% endif %}
         </li>
       {% endfor %}
     </ul>
-    </div>
-  {% if is_active %}
-    <div id="statusLink">
-        <a href="{% url 'status_display.views.station_status' station.number %}">Station Status</a>
-    </div>
-  {% endif %}
-    <div id="listLink">
-        <a href="{% url 'status_display.views.stations' %}">Stations List</a>
     </div>
 
 </div>

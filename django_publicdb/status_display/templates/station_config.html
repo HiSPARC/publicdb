@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+{% load fix_data %}
+
+{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}{% endblock %}
+
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
+    <!--[if lte IE 7]><style type="text/css" media="all">
+        #yearlist li, #monthlist li {
+            display: inline;}
+    </style><![endif]-->
+{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript">
+      {% if config %}
+        var pointStyle = {
+            fillColor: '#B85C32',
+            fillOpacity: 0.8,
+            pointRadius: 7,
+            stroke: true};
+        var nowPointStyle = {
+            fillColor: '#2A7AE2',
+            fillOpacity: 1,
+            pointRadius: 7,
+            stroke: true};
+
+        $(document).ready(function() {
+            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
+            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+            var options = {
+                controls: [
+                    new OpenLayers.Control.Navigation(
+                        {dragPanOptions: {enableKinetic: true}}),
+                    new OpenLayers.Control.Attribution(),
+                    new OpenLayers.Control.ScaleLine()]};
+            var map = new OpenLayers.Map("gpsMap", options);
+            var mapLayer = new OpenLayers.Layer.OSM();
+            map.addLayer(mapLayer);
+
+            map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                        .transform(fromProjection, toProjection), 16);
+
+            var gpsLayer = new OpenLayers.Layer.Vector("gps");
+            {% for gps in gpstrack %}
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point{{ gps }}.transform(fromProjection, toProjection), {},
+                pointStyle);
+            gpsLayer.addFeatures(feature);
+            {% endfor %}
+
+            var feature = new OpenLayers.Feature.Vector(
+                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }}).transform(fromProjection, toProjection), {},
+                nowPointStyle);
+            gpsLayer.addFeatures(feature);
+
+            map.addLayer(gpsLayer);
+
+            var bounds = gpsLayer.getDataExtent();
+            map.zoomToExtent(bounds);
+
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+
+            map.events.register('zoomend', this, function(event) {
+                var zLevel = map.getZoom();
+                if (zLevel <= 5) {
+                    setPointRadius(2);}
+                else if (zLevel <= 8) {
+                    setPointRadius(3);}
+                else if (zLevel <= 11) {
+                    setPointRadius(4);}
+                else if (zLevel <= 14) {
+                    setPointRadius(5);}
+                else if (zLevel <= 16) {
+                    setPointRadius(6);}
+                else if (zLevel <= 18) {
+                    setPointRadius(7);}
+            });
+        });
+
+      {% endif %}
+
+        function setPointRadius(size) {
+            $('circle').attr('r', size.toString());
+            pointStyle.pointRadius = size;
+        }
+
+        function downloadGraph(target) {
+            var dataurl = $(target + ' .flot-base')[0].toDataURL();
+            window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
+        }
+    </script>
+{% endblock %}
+
+{% block content %}
+<div id="header">
+    <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
+    <div id="date">{% now "D N j, Y" %}</div>
+</div>
+
+<div id="graphs">
+
+  {% if voltagegraph %}
+    <div id="voltageGraph" class="histogram">
+        <h3>PMT Voltage</h3>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#vg_histogram')">Image</a>
+        </div>
+        <div class="plot" id="vg_histogram"></div>
+        <script type="text/javascript">
+            vg_labels = {yaxis: {axisLabel: "{{ voltagegraph.y_label }}"},
+                         xaxis: {axisLabel: "{{ voltagegraph.x_label }}"}}
+            $.extend(true, vg_options, vg_labels)
+            $.plot($("#vg_histogram"), [
+              {% for data in voltagegraph.data %}
+                {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+              {% endfor %}
+                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], vg_options);
+        </script>
+    </div>
+  {% endif %}
+
+  {% if currentgraph %}
+    <div id="currentGraph" class="histogram">
+        <h3>PMT Current</h3>
+        <div class="sourceLink">
+            <a onclick="downloadGraph('#cg_histogram')">Image</a>
+        </div>
+        <div class="plot" id="cg_histogram"></div>
+        <script type="text/javascript">
+            cg_labels = {yaxis: {axisLabel: "{{ currentgraph.y_label }}"},
+                         xaxis: {axisLabel: "{{ currentgraph.x_label }}"}}
+            $.extend(true, cg_options, cg_labels)
+            $.plot($("#cg_histogram"), [
+              {% for data in currentgraph.data %}
+                {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+              {% endfor %}
+                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], cg_options);
+        </script>
+    </div>
+  {% endif %}
+
+    <div id="gpsPositions">
+        <h3>GPS Positions</h3>
+        <div id="gpsMap"></div>
+    </div>
+</div>
+
+<div id="navigation">
+
+    <div class="keyvalue">
+        <span class="key">Stations</span>
+        <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
+        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+    </div>
+
+    <div class="keyvalue"><span class="key">Station</span>
+        {% if has_data %}<span class="value"><a href="{% url 'status_display.views.station' station.number %}">Data</a></span>{% else %}<span class="value nolink">Data</span>{% endif %}
+        {% if is_active %}<span class="value"><a href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% else %}<span class="value nolink">Status</span>{% endif %}
+        <span class="value"><a href="{% url 'status_display.views.station_config' station.number %}" class="currentPage">Config</a></span>
+    </div>
+
+</div>
+
+<div id="config">
+  {% if config %}
+    <div class="sectionTitle">Current configuration</div>
+    <div id="master">
+        <div class="sectionTitle">Master</div>
+        <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
+        <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
+    </div>
+    {% if has_slave %}
+    <div id="slave">
+        <div class="sectionTitle">Slave</div>
+        <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.slv_version }}</span></div>
+        <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
+    </div>
+    {% endif %}
+    <div id="settings">
+        <div class="sectionTitle">Settings</div>
+        <div class="keyvalue"><span class="key">Thresholds</span>
+        {% if config.mas_ch1_thres_low == -30.21 and config.mas_ch1_thres_high == -70.11 and config.mas_ch2_thres_low == -30.21 and config.mas_ch2_thres_high == -70.11 and config.slv_ch1_thres_low == -30.21 and config.slv_ch1_thres_high == -70.11 and config.slv_ch2_thres_low == -30.21 and config.slv_ch2_thres_high == -70.11 %}
+        <span class="value good">&#x2713;</span></div>
+        {% else %}
+        <span class="value bad">&#x2717;</span></div>
+        {% endif %}
+
+        <div class="keyvalue"><span class="key">Data reduction</span>
+        <span class="value {% if config.reduce_data %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span></div>
+        <div class="keyvalue"><span class="key">Start DAQ mode</span>
+        <span class="value {% if config.startmode %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span></div>
+        
+    </div>
+    <div id="stationPosition">
+        <div class="sectionTitle">Position</div>
+        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude }}</span></div>
+        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude }}</span></div>
+        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude }}</span></div>
+    </div>
+
+  {% endif %}
+</div>
+
+{% endblock %}
