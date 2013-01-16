@@ -237,6 +237,7 @@ def station_page(request, station_id, year, month, day):
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False))
                                    .filter(date__lte=yesterday)
+                                   .filter(date__gte=datetime.date(2003, 1, 1))
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
