@@ -168,7 +168,10 @@
 <div id="config">
   {% if config %}
     <div class="sectionTitle">Current configuration</div>
-    <div class="keyvalue"><span class="key">Since</span><span class="value">{{ config.timestamp|date:"D, j N Y" }}</span></div>
+    <div class="keyvalue">
+        <span class="key">Since</span>
+        <span class="value">{{ config.timestamp|date:"D, j N Y" }}</span>
+    </div>
     <div id="master">
         <div class="sectionTitle">Master</div>
         <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
@@ -185,17 +188,40 @@
     {% endif %}
     <div id="settings">
         <div class="sectionTitle">Settings</div>
-        <div class="keyvalue"><span class="key">Thresholds</span>
-        {% if config.mas_ch1_thres_low == -30.21 and config.mas_ch1_thres_high == -70.11 and config.mas_ch2_thres_low == -30.21 and config.mas_ch2_thres_high == -70.11 and config.slv_ch1_thres_low == -30.21 and config.slv_ch1_thres_high == -70.11 and config.slv_ch2_thres_low == -30.21 and config.slv_ch2_thres_high == -70.11 %}
-        <span class="value good">&#x2713;</span></div>
-        {% else %}
-        <span class="value bad">&#x2717;</span></div>
-        {% endif %}
-
-        <div class="keyvalue"><span class="key">Data reduction</span>
-        <span class="value {% if config.reduce_data %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span></div>
-        <div class="keyvalue"><span class="key">Start DAQ mode</span>
-        <span class="value {% if config.startmode %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span></div>
+        <div class="keyvalue">
+            <span class="key">Trigger</span>
+          {% if has_slave and config.trig_low_signals == 3 and config.trig_high_signals == 2 and config.trig_and_or and config.trig_external == 0 %}
+            <span class="value good">&#x2713;</span>
+          {% elif not has_slave and config.trig_low_signals == 2 and config.trig_high_signals == 0 and not config.trig_and_or and config.trig_external == 0 %}
+            <span class="value good">&#x2713;</span>
+          {% else %}
+            <span class="value bad">&#x2717;</span>
+          {% endif %}
+        </div>
+        <div class="keyvalue">
+            <span class="key">Thresholds</span>
+          {% if config.mas_ch1_thres_low == -30.21 and config.mas_ch1_thres_high == -70.11 and config.mas_ch2_thres_low == -30.21 and config.mas_ch2_thres_high == -70.11 and config.slv_ch1_thres_low == -30.21 and config.slv_ch1_thres_high == -70.11 and config.slv_ch2_thres_low == -30.21 and config.slv_ch2_thres_high == -70.11 %}
+            <span class="value good">&#x2713;</span>
+          {% else %}
+            <span class="value bad">&#x2717;</span>
+          {% endif %}
+        </div>
+        <div class="keyvalue">
+            <span class="key">Coincidence window</span>
+          {% if config.precoinctime == 1.0 and config.coinctime == 1.5 and config.postcoinctime == 3.5 %}
+            <span class="value good">&#x2713;</span>
+          {% else %}
+            <span class="value bad">&#x2717;</span>
+          {% endif %}
+        </div>
+        <div class="keyvalue">
+            <span class="key">Data reduction</span>
+            <span class="value {% if config.reduce_data %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span>
+        </div>
+        <div class="keyvalue">
+            <span class="key">Start DAQ mode</span>
+            <span class="value {% if config.startmode %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span>
+        </div>
         
     </div>
     <div id="stationPosition">
