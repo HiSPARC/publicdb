@@ -98,7 +98,7 @@
 {% block content %}
 <div id="header">
     <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
-    <div id="date">{% now "D N j, Y" %}</div>
+    <div id="date">{% now "D, j N Y" %}</div>
 </div>
 
 <div id="graphs">
@@ -168,6 +168,7 @@
 <div id="config">
   {% if config %}
     <div class="sectionTitle">Current configuration</div>
+    <div class="keyvalue"><span class="key">Since</span><span class="value">{{ config.timestamp|date:"D, j N Y" }}</span></div>
     <div id="master">
         <div class="sectionTitle">Master</div>
         <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
