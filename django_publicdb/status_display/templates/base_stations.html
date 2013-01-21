@@ -18,23 +18,24 @@
 
 {% block map %}{% endblock %}
 
-<div id="stationListPages">
-    <div class="sectionTitle">Stations List</div>
-    <p>
-    <a href="{% url 'status_display.views.stations_by_country' %}" target="_top">order by country</a><br />
-    <a href="{% url 'status_display.views.stations_by_cluster' %}" target="_top">order by cluster</a><br />
-    <a href="{% url 'status_display.views.stations_by_subcluster' %}" target="_top">order by subcluster</a><br />
-    <a href="{% url 'status_display.views.stations_by_name' %}" target="_top">order by name</a><br />
-    <a href="{% url 'status_display.views.stations_by_number' %}" target="_top">order by number</a></p>
 
-    <div class="sectionTitle">Maps</div>
-    <p>
-    <a href="{% url 'status_display.views.stations_on_map' %}" target="_top">show all stations</a><br />
-    <span style='color: #000; font-weight: bold;'>Cluster</span> &larr; Link to map</p>
+<div id="navigation">
+    <div class="sectionTitle">Stations</div>
+    <div class="keyvalue">
+        <span class="key">List by</span>
+        <span class="value"><a href="{% url 'status_display.views.stations_by_country' %}">Location</a></span>
+        <span class="value"><a href="{% url 'status_display.views.stations_by_name' %}">Name</a></span>
+        <span class="value"><a href="{% url 'status_display.views.stations_by_number' %}">Number</a></span>
+    </div>
+    <div class="keyvalue">
+        <span class="key">Map</span>
+        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Overview</a></span>
+        <span class="value">Cluster from list</span>
+    </div>
 
 </div>
 
-<div id="stationListLegend">
+<div id="legend">
     <div class="sectionTitle">Data Availability</div>
     <p><span style='color: #23B;'>Station</span> &larr; Link to data<br />
     Station &larr; No data received</p>
@@ -46,7 +47,7 @@
     <span class='statusBall'></span> &larr; Link to status</p>
 </div>
 
-<div id="stationListSidebar">
+<div id="sidebar">
     {% block sidebar %}{% endblock %}    
 </div>
 {% endblock %}

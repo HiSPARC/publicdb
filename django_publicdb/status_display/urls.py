@@ -2,8 +2,6 @@ from django.conf.urls.defaults import *
 
 urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^stations/$', 'stations'),
-    (r'^stations_by_subcluster/$', 'stations_by_subcluster'),
-    (r'^stations_by_cluster/$', 'stations_by_cluster'),
     (r'^stations_by_country/$', 'stations_by_country'),
     (r'^stations_by_name/$', 'stations_by_name'),
     (r'^stations_by_number/$', 'stations_by_number'),

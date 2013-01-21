@@ -20,74 +20,6 @@ def stations(request):
     return redirect(stations_by_country)
 
 
-def stations_by_subcluster(request):
-    """Show a list of stations, ordered by subcluster"""
-
-    down, problem, up = status_lists()
-    clusters = []
-    for cluster in Cluster.objects.all():
-        stations = []
-        for station in Station.objects.filter(cluster=cluster):
-            try:
-                Summary.objects.filter(station=station)[0]
-                link = station.number
-            except IndexError:
-                link = None
-            status = get_station_status(station, down, problem, up)
-
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'link': link,
-                             'status': status})
-        clusters.append({'name': cluster.name, 'stations': stations})
-
-    return render_to_response('stations_by_subcluster.html', {'clusters': clusters},
-                              context_instance=RequestContext(request))
-
-
-def stations_by_cluster(request):
-    """Show a list of stations, ordered by subcluster"""
-
-    down, problem, up = status_lists()
-    clusters = []
-    for cluster in Cluster.objects.filter(parent=None):
-        subclusters = []
-        for subcluster in Cluster.objects.filter(parent=cluster):
-            stations = []
-            for station in Station.objects.filter(cluster=subcluster):
-                try:
-                    Summary.objects.filter(station=station)[0]
-                    link = station.number
-                except IndexError:
-                    link = None
-                status = get_station_status(station, down, problem, up)
-
-                stations.append({'number': station.number,
-                                 'name': station.name,
-                                 'link': link,
-                                 'status': status})
-            subclusters.append({'name': subcluster.name, 'stations': stations})
-        stations = []
-        for station in Station.objects.filter(cluster=cluster):
-            try:
-                Summary.objects.filter(station=station)[0]
-                link = station.number
-            except IndexError:
-                link = None
-            status = get_station_status(station, down, problem, up)
-
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'link': link,
-                             'status': status})
-        clusters.append({'name': cluster.name,
-                         'subclusters': subclusters,
-                         'stations': stations})
-
-    return render_to_response('stations_by_cluster.html', {'clusters': clusters},
-                              context_instance=RequestContext(request))
-
-
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
@@ -111,7 +43,8 @@ def stations_by_country(request):
                                      'name': station.name,
                                      'link': link,
                                      'status': status})
-                subclusters.append({'name': subcluster.name, 'stations': stations})
+                subclusters.append({'name': subcluster.name,
+                                    'stations': stations})
             stations = []
             for station in Station.objects.filter(cluster=cluster):
                 try:
@@ -125,12 +58,17 @@ def stations_by_country(request):
                                  'name': station.name,
                                  'link': link,
                                  'status': status})
-            clusters.append({'name': cluster.name, 'subclusters': subclusters, 'stations': stations})
-        countries.append({'name': country.name, 'number': country.number, 'clusters': clusters})
+            clusters.append({'name': cluster.name,
+                             'subclusters': subclusters,
+                             'stations': stations})
+        countries.append({'number': country.number,
+                          'name': country.name,
+                          'clusters': clusters})
 
     countries = sorted(countries, key=itemgetter('number'))
 
-    return render_to_response('stations_by_country.html', {'countries': countries},
+    return render_to_response('stations_by_country.html',
+                              {'countries': countries},
                               context_instance=RequestContext(request))
 
 
@@ -209,7 +147,9 @@ def stations_on_map(request, subcluster=None):
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
-        clusters.append({'name': cluster.name, 'stations': stations})
+        clusters.append({'name': cluster.name,
+                         'stations': stations})
+
     return render_to_response('stations_on_map.html',
         {'clusters': clusters,
          'focus': subcluster},
