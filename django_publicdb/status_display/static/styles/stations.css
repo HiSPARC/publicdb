@@ -1,23 +1,19 @@
 #header {
     margin-bottom: 10px;}
 
-
-
-.sectionTitle {
-    margin-top: 10px;
-    font-size: 110%;
-    font-weight: bold;}
-
+#stationMap,
 #stationList {
     float: left;
-    width: 600px;
+    width: 600px;}
+
+#stationList {
     font-size: 10pt;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;}
 
-#intro {
-    font-size: 10pt;}
+#stationMap {
+    height: 500px;}
 
 .country {
     -webkit-column-count: 2;
@@ -40,15 +36,6 @@
     column-span: all;
     font-size: 32px;}
 
-.country:first-child h1 {
-    margin-top: 0px;}
-
-.cluster:first-child h2 {
-    margin-top: 0px;}
-
-.subcluster:first-child h3 {
-    margin-top: 0px;}
-
 #stationList ul {
     margin: 0px 0px 15px 0px;
     padding-left: 15px;
@@ -58,7 +45,8 @@
     line-height: 140%}
 
 #stationList ul a,
-#stationLink a {
+#stationLink a,
+#clusterLink a {
     font-size: 10pt;
     color: #23B;
     text-decoration: none;}
@@ -108,11 +96,6 @@ h1 a:hover {
     visibility: hidden;
     background-color: blue;}
 
-#stationMap {
-    float: left;
-    width: 660px;
-    height: 500px;}
-
 .olControlAttribution {
     position: absolute !important;
     font-size: 10px !important;
@@ -147,16 +130,16 @@ h1 a:hover {
     border-left: 1px solid black;
     padding-left: 20px;}
 
-#stationListPages a {
-    color: #23B;
-    text-decoration: none;}
-
-#stationListPages a:hover {
-    color: #005;
-    text-decoration: underline;}
-
+#navigation .nolink {
+    font-weight: normal;
+    color: black;}
+    
+#navigation .nolink:hover {
+    text-decoration: none;
+    color: black;}
+    
 #navigation a,
-.nolink {
+#navigation .nolink {
     padding: 3px;}
 
 #navigation a:hover {
@@ -169,10 +152,10 @@ h1 a:hover {
     color: #25B;
     text-decoration: none;}
 
-a.currentDate:hover,
-a.currentPage:hover,
-a.currentDate,
-a.currentPage {
+#navigation a.currentDate:hover,
+#navigation a.currentPage:hover,
+#navigation a.currentDate,
+#navigation a.currentPage {
     color: white;
     background: #075EBB;}
 
@@ -181,11 +164,12 @@ a.currentPage {
     padding-top: 10px;
     padding-bottom: 10px;}
 
-#navigation .sectionTitle {
-    padding-top: 5px;
-    padding-bottom: 5px;
+.sectionTitle {
+    margin-top: 5px;
     font-size: 130%;
-    font-weight: bold;}
+    font-weight: bold;
+    padding-top: 5px;
+    padding-bottom: 5px;}
 
 .keyvalue {
     margin-top: 5px;
@@ -194,6 +178,9 @@ a.currentPage {
 .key {
     font-weight: bold;
     margin-right: 10px;}
+
+.thin {
+    font-weight: normal;}
 
 .value {
     margin-right: 2px;}

@@ -44,7 +44,8 @@
                                        .transform(fromProjection, toProjection),
                 {id: {{ station.number }},
                  name: "{{ station.name }}",
-                 cluster: "{{ station.cluster }}",
+                 subcluster: "{{ station.cluster }}",
+                 cluster: "{{ station.cluster.parent }}",
                  link: {{ station.link }},
                  status: "{{ station.status }}"},
                 pointStyle_{{ station.status }});
@@ -73,7 +74,7 @@
             
           {% if focus %}
             var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
-            map.zoomToExtent(bounds);
+            if (bounds) {map.zoomToExtent(bounds);}
           {% endif %}
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
@@ -101,9 +102,10 @@
         function showStationInfo(e) {
             var attr = e.feature.attributes
             stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "/status'><span class='statusBall " + attr.status + "'></span></a>" +
-                        "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name +
-                        " (" + attr.id + ")</a>");
-            clusterLink(attr.cluster);}
+                        "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name + " (" + attr.id + ")</a>");
+            if (attr.cluster == "None") {cluster = ""}
+            else {cluster = " (" + attr.cluster + ")"}
+            clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.subcluster + "'> " + attr.subcluster + cluster + "</a>");}
 
         function stationLink(text) {
             $('#stationLink').html(text);            
@@ -124,8 +126,17 @@
     </div>
 {% endblock %}
 
+{% block current_mapcluster %}{% if focus %}currentPage{% endif %}{% endblock %}
+{% block current_map %}{% if not focus %}currentPage{% endif %}{% endblock %}
+
 {% block sidebar %}
     <div class="sectionTitle">Selected Station</div>
-    <p><b>Station</b> <br /><span id="stationLink">None</span><br />
-    <b>Cluster</b> <br /><span id="clusterLink">None</span></p>
+    <div class="keyvalue">
+        <span class="key">Station</span><br />
+        <span class="value" id="stationLink">None</span>
+    </div>
+    <div class="keyvalue">
+        <span class="key">Cluster</span><br />
+        <span class="value" id="clusterLink">None</span>
+    </div>
 {% endblock %}
