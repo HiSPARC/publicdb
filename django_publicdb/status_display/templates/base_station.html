@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>{% block header %}Station: {{ station.number }} &mdash; {{ station.name }}{% endblock %}</h2>
+        <div id="date">{% block date %}{% now "D, j N Y" %}{% endblock %}</div>
+    </div>
+    
+    {% block data %}
+    {% endblock %}
+    
+    <div id="navigation">
+        <div class="keyvalue">
+            <span class="key">Stations</span>
+            <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
+            <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+        </div>
+    
+        <div class="keyvalue"><span class="key">Station</span>
+            <span class="value {% if not has_data %}nolink">Data</span>{% else %}"><a class="{% block current_data %}{% endblock %}" href="{% url 'status_display.views.station' station.number %}">Data</a></span>{% endif %}
+            <span class="value {% if not is_active %}nolink">Status</span>{% else %}"><a class="{% block current_status %}{% endblock %}" href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% endif %}
+            <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status_display.views.station_config' station.number %}">Config</a></span>{% endif %}
+        </div>
+      {% block navigation_sidebar %}{% endblock %}
+    </div>
+    
+    <div id="config">
+      {% block config %}{% endblock %}
+    </div>
+
+{% endblock %}

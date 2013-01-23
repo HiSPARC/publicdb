@@ -244,6 +244,7 @@ def station_data(request, station_id, year, month, day):
          'prev': previous,
          'next': next,
          'link': (station_id, year, month, day),
+         'has_data': True,
          'is_active': is_active,
          'has_config': has_config},
         context_instance=RequestContext(request))
@@ -273,6 +274,7 @@ def station_status(request, station_id):
         {'station': station,
          'pc': pc,
          'has_data': has_data,
+         'is_active': True,
          'has_config': has_config},
         context_instance=RequestContext(request))
 
@@ -325,7 +327,8 @@ def station_config(request, station_id):
          'gpstrack': gpstrack,
          'has_slave': has_slave,
          'has_data': has_data,
-         'is_active': is_active},
+         'is_active': is_active,
+         'has_config': True},
         context_instance=RequestContext(request))
 
 

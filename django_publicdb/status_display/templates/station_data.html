@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_station.html' %}
 
 {% load url from future %}
 {% load fix_data %}
@@ -87,136 +87,121 @@
     </script>
 {% endblock %}
 
-{% block content %}
+{% block date %}{{ date|date:"D, j N Y" }}{% endblock %}
 
-<div id="header">
-    <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
-    <div id="date">{{ date|date:"D, j N Y" }}</div>
-</div>
-
-<div id="graphs">
-
-  {% if eventhistogram %}
-    <div id="eventHistogram" class="histogram">
-        <h3>Event histogram (number of events per hour)</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#eh_histogram')">Image</a> |
-            <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+{% block data %}
+    <div id="graphs">
+    
+      {% if eventhistogram %}
+        <div id="eventHistogram" class="histogram">
+            <h3>Event histogram (number of events per hour)</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#eh_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="eh_histogram"></div>
+            <script type="text/javascript">
+                eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
+                $.extend(true, eh_options, eh_labels)
+                $.plot($("#eh_histogram"), [
+                  {% for data in eventhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], eh_options);
+            </script>
         </div>
-        <div class="plot" id="eh_histogram"></div>
-        <script type="text/javascript">
-            eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
-                         xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
-            $.extend(true, eh_options, eh_labels)
-            $.plot($("#eh_histogram"), [
-              {% for data in eventhistogram.data %}
-                {data: {{ data|fix_histogram_data }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], eh_options);
-        </script>
-    </div>
-  {% endif %}
-
-  {% if pulseheighthistogram %}
-    <div id="pulseheightHistogram" class="histogram">
-        <h3>Pulseheight histogram</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#ph_histogram')">Image</a> |
-            <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+      {% endif %}
+    
+      {% if pulseheighthistogram %}
+        <div id="pulseheightHistogram" class="histogram">
+            <h3>Pulseheight histogram</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#ph_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="ph_histogram"></div>
+            <script type="text/javascript">
+                ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
+                $.extend(true, ph_options, ph_labels)
+                $.plot($("#ph_histogram"), [
+                  {% for data in pulseheighthistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ph_options);
+            </script>
         </div>
-        <div class="plot" id="ph_histogram"></div>
-        <script type="text/javascript">
-            ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
-                         xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
-            $.extend(true, ph_options, ph_labels)
-            $.plot($("#ph_histogram"), [
-              {% for data in pulseheighthistogram.data %}
-                {data: {{ data|fix_histogram_data }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ph_options);
-        </script>
-    </div>
-  {% endif %}
-
-  {% if pulseintegralhistogram %}
-    <div id="pulseintegralHistogram" class="histogram">
-        <h3>Pulseintegral histogram</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#pi_histogram')">Image</a> |
-            <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+      {% endif %}
+    
+      {% if pulseintegralhistogram %}
+        <div id="pulseintegralHistogram" class="histogram">
+            <h3>Pulseintegral histogram</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#pi_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="pi_histogram"></div>
+            <script type="text/javascript">
+                pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
+                $.extend(true, pi_options, pi_labels)
+                $.plot($("#pi_histogram"), [
+                  {% for data in pulseintegralhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], pi_options);
+            </script>
         </div>
-        <div class="plot" id="pi_histogram"></div>
-        <script type="text/javascript">
-            pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
-                         xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
-            $.extend(true, pi_options, pi_labels)
-            $.plot($("#pi_histogram"), [
-              {% for data in pulseintegralhistogram.data %}
-                {data: {{ data|fix_histogram_data }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], pi_options);
-        </script>
-    </div>
-  {% endif %}
-
-  {% if barometerdata %}
-    <div id="barometerData" class="histogram">
-        <h3>Barometer data</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#bd_histogram')">Image</a> |
-            <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+      {% endif %}
+    
+      {% if barometerdata %}
+        <div id="barometerData" class="histogram">
+            <h3>Barometer data</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#bd_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="bd_histogram"></div>
+            <script type="text/javascript">
+                bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
+                             xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
+                $.extend(true, bd_options, bd_labels)
+                $.plot($("#bd_histogram"), [
+                  {% for data in barometerdata.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
+            </script>
         </div>
-        <div class="plot" id="bd_histogram"></div>
-        <script type="text/javascript">
-            bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
-                         xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
-            $.extend(true, bd_options, bd_labels)
-            $.plot($("#bd_histogram"), [
-              {% for data in barometerdata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
-        </script>
-    </div>
-  {% endif %}
-
-  {% if temperaturedata %}
-    <div id="temperatureData" class="histogram">
-        <h3>Temperature data</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#td_histogram')">Image</a> |
-            <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+      {% endif %}
+    
+      {% if temperaturedata %}
+        <div id="temperatureData" class="histogram">
+            <h3>Temperature data</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#td_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="td_histogram"></div>
+            <script type="text/javascript">
+                td_labels = {yaxis: {axisLabel: "{{ temperaturedata.y_label }}"},
+                             xaxis: {axisLabel: "{{ temperaturedata.x_label }}"}}
+                $.extend(true, td_options, td_labels)
+                $.plot($("#td_histogram"), [
+                  {% for data in temperaturedata.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], td_options);
+            </script>
         </div>
-        <div class="plot" id="td_histogram"></div>
-        <script type="text/javascript">
-            td_labels = {yaxis: {axisLabel: "{{ temperaturedata.y_label }}"},
-                         xaxis: {axisLabel: "{{ temperaturedata.x_label }}"}}
-            $.extend(true, td_options, td_labels)
-            $.plot($("#td_histogram"), [
-              {% for data in temperaturedata.data %}
-                {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], td_options);
-        </script>
+      {% endif %}
     </div>
-  {% endif %}
-</div>
+{% endblock %}
 
-<div id="navigation">
+{% block current_data %}currentPage{% endblock %}
 
-    <div class="keyvalue">
-        <span class="key">Stations</span>
-        <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
-        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
-    </div>
-
-    <div class="keyvalue"><span class="key">Station</span>
-        <span class="value"><a href="{% url 'status_display.views.station' station.number %}" class="currentPage">Data</a></span>
-        {% if is_active %}<span class="value"><a href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% else %}<span class="value nolink">Status</span>{% endif %}
-        {% if has_config %}<span class="value"><a href="{% url 'status_display.views.station_config' station.number %}">Config</a></span>{% else %}<span class="value nolink">Config</span>{% endif %}
-    </div>
-
-
+{% block navigation_sidebar %}
   {% if prev %}
      <a class='nextprev' id='prev' href='{% url 'status_display.views.station_data' station.number prev.year prev.month prev.day %}'>&larr;</a>
   {% endif %}
@@ -273,10 +258,9 @@
       {% endfor %}
     </ul>
     </div>
+{% endblock %}
 
-</div>
-
-<div id="config">
+{% block config %}
   {% if config %}
     <div id="master">
         <div class="sectionTitle">Master</div>
@@ -300,6 +284,4 @@
         <div id="stationMap"></div>
     </div>
   {% endif %}
-</div>
-
 {% endblock %}

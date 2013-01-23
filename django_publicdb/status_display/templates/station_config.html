@@ -1,9 +1,9 @@
-{% extends 'base.html' %}
+{% extends 'base_station.html' %}
 
 {% load url from future %}
 {% load fix_data %}
 
-{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}{% endblock %}
+{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Configuration{% endblock %}
 
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
@@ -18,15 +18,17 @@
     <script type="text/javascript">
       {% if config %}
         var pointStyle = {
+            pointRadius: 6,
             fillColor: '#B85C32',
             fillOpacity: 0.8,
-            pointRadius: 7,
-            stroke: true};
+            stroke: true,
+            strokeWidth: 0.5};
         var nowPointStyle = {
+            pointRadius: 6,
             fillColor: '#2A7AE2',
             fillOpacity: 1,
-            pointRadius: 7,
-            stroke: true};
+            stroke: true,
+            strokeWidth: 0.5};
 
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
@@ -73,11 +75,11 @@
                 else if (zLevel <= 11) {
                     setPointRadius(4);}
                 else if (zLevel <= 14) {
-                    setPointRadius(5);}
+                    setPointRadius(4);}
                 else if (zLevel <= 16) {
-                    setPointRadius(6);}
+                    setPointRadius(5);}
                 else if (zLevel <= 18) {
-                    setPointRadius(7);}
+                    setPointRadius(6);}
             });
         });
 
@@ -95,77 +97,58 @@
     </script>
 {% endblock %}
 
-{% block content %}
-<div id="header">
-    <h2>Station: {{ station.number }} &mdash; {{ station.name }}</h2>
-    <div id="date">{% now "D, j N Y" %}</div>
-</div>
-
-<div id="graphs">
-
-  {% if voltagegraph %}
-    <div id="voltageGraph" class="histogram">
-        <h3>PMT Voltage</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#vg_histogram')">Image</a>
+{% block data %}
+    <div id="graphs">
+      {% if voltagegraph %}
+        <div id="voltageGraph" class="histogram">
+            <h3>PMT Voltage</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#vg_histogram')">Image</a>
+            </div>
+            <div class="plot" id="vg_histogram"></div>
+            <script type="text/javascript">
+                vg_labels = {yaxis: {axisLabel: "{{ voltagegraph.y_label }}"},
+                             xaxis: {axisLabel: "{{ voltagegraph.x_label }}"}}
+                $.extend(true, vg_options, vg_labels)
+                $.plot($("#vg_histogram"), [
+                  {% for data in voltagegraph.data %}
+                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], vg_options);
+            </script>
         </div>
-        <div class="plot" id="vg_histogram"></div>
-        <script type="text/javascript">
-            vg_labels = {yaxis: {axisLabel: "{{ voltagegraph.y_label }}"},
-                         xaxis: {axisLabel: "{{ voltagegraph.x_label }}"}}
-            $.extend(true, vg_options, vg_labels)
-            $.plot($("#vg_histogram"), [
-              {% for data in voltagegraph.data %}
-                {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], vg_options);
-        </script>
-    </div>
-  {% endif %}
-
-  {% if currentgraph %}
-    <div id="currentGraph" class="histogram">
-        <h3>PMT Current</h3>
-        <div class="sourceLink">
-            <a onclick="downloadGraph('#cg_histogram')">Image</a>
+      {% endif %}
+    
+      {% if currentgraph %}
+        <div id="currentGraph" class="histogram">
+            <h3>PMT Current</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#cg_histogram')">Image</a>
+            </div>
+            <div class="plot" id="cg_histogram"></div>
+            <script type="text/javascript">
+                cg_labels = {yaxis: {axisLabel: "{{ currentgraph.y_label }}"},
+                             xaxis: {axisLabel: "{{ currentgraph.x_label }}"}}
+                $.extend(true, cg_options, cg_labels)
+                $.plot($("#cg_histogram"), [
+                  {% for data in currentgraph.data %}
+                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], cg_options);
+            </script>
         </div>
-        <div class="plot" id="cg_histogram"></div>
-        <script type="text/javascript">
-            cg_labels = {yaxis: {axisLabel: "{{ currentgraph.y_label }}"},
-                         xaxis: {axisLabel: "{{ currentgraph.x_label }}"}}
-            $.extend(true, cg_options, cg_labels)
-            $.plot($("#cg_histogram"), [
-              {% for data in currentgraph.data %}
-                {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
-              {% endfor %}
-                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], cg_options);
-        </script>
+      {% endif %}
+    
+        <div id="gpsPositions">
+            <h3>GPS Positions</h3>
+            <div id="gpsMap"></div>
+        </div>
     </div>
-  {% endif %}
+{% endblock %}
 
-    <div id="gpsPositions">
-        <h3>GPS Positions</h3>
-        <div id="gpsMap"></div>
-    </div>
-</div>
+{% block current_config %}currentPage{% endblock %}
 
-<div id="navigation">
-
-    <div class="keyvalue">
-        <span class="key">Stations</span>
-        <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
-        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
-    </div>
-
-    <div class="keyvalue"><span class="key">Station</span>
-        {% if has_data %}<span class="value"><a href="{% url 'status_display.views.station' station.number %}">Data</a></span>{% else %}<span class="value nolink">Data</span>{% endif %}
-        {% if is_active %}<span class="value"><a href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% else %}<span class="value nolink">Status</span>{% endif %}
-        <span class="value"><a href="{% url 'status_display.views.station_config' station.number %}" class="currentPage">Config</a></span>
-    </div>
-
-</div>
-
-<div id="config">
+{% block config %}
   {% if config %}
     <div class="sectionTitle">Current configuration</div>
     <div class="keyvalue">
@@ -229,9 +212,8 @@
         <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude }}</span></div>
         <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude }}</span></div>
         <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude }}</span></div>
+        <div class="keyvalue"><span class="key gpsBall curr"></span><span class="value">Current position</span></div>
+        <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Old positions</span></div>
     </div>
-
   {% endif %}
-</div>
-
 {% endblock %}

@@ -7,10 +7,6 @@
 #header {
     margin-bottom: 15px;}
 
-#stationNumber {
-    color: black;
-    font-size: 10pt;}
-
 #date {
     font-weight: normal;
     font-size: 11pt;
@@ -200,3 +196,13 @@ a.currentPage {
 
 .good {color:#091;}
 .bad {color:#F11;}
+
+.gpsBall {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    display: inline-block;
+    opacity: 0.8;}
+
+.curr {background-color: #2A7AE2;}
+.old {background-color: #B85C32;}
