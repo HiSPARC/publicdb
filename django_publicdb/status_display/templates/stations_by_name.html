@@ -2,6 +2,8 @@
 
 {% load url from future %}
 
+{% block current_name %}currentPage{% endblock %}
+
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
 {% endblock %}
@@ -24,5 +26,3 @@
       {% endfor %}
     </ul>
 {% endblock %}
-
-{% block current_name %}currentPage{% endblock %}

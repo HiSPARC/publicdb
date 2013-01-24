@@ -2,6 +2,8 @@
 
 {% load url from future %}
 
+{% block current_status %}currentPage{% endblock %}
+
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Status{% endblock %}
 
 {% block head_styles %}
@@ -11,8 +13,6 @@
             display: inline;}
     </style><![endif]-->
 {% endblock %}
-
-{% block current_status %}currentPage{% endblock %}
 
 {% block data %}
     <div id="nagios">

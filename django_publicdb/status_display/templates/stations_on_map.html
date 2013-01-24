@@ -3,6 +3,9 @@
 {% load url from future %}
 {% load fix_strings %}
 
+{% block current_mapcluster %}{% if focus %}currentPage{% endif %}{% endblock %}
+{% block current_map %}{% if not focus %}currentPage{% endif %}{% endblock %}
+
 {% block head_styles %}
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
 {% endblock %}
@@ -125,9 +128,6 @@
     <div id="stationMap">
     </div>
 {% endblock %}
-
-{% block current_mapcluster %}{% if focus %}currentPage{% endif %}{% endblock %}
-{% block current_map %}{% if not focus %}currentPage{% endif %}{% endblock %}
 
 {% block sidebar %}
     <div class="sectionTitle">Selected Station</div>

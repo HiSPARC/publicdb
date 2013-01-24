@@ -3,6 +3,8 @@
 {% load url from future %}
 {% load fix_data %}
 
+{% block current_data %}currentPage{% endblock %}
+
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
 {% block head_styles %}
@@ -198,8 +200,6 @@
       {% endif %}
     </div>
 {% endblock %}
-
-{% block current_data %}currentPage{% endblock %}
 
 {% block navigation_sidebar %}
   {% if prev %}

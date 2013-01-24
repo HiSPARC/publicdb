@@ -3,6 +3,8 @@
 {% load url from future %}
 {% load fix_data %}
 
+{% block current_config %}currentPage{% endblock %}
+
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Configuration{% endblock %}
 
 {% block head_styles %}
@@ -145,8 +147,6 @@
         </div>
     </div>
 {% endblock %}
-
-{% block current_config %}currentPage{% endblock %}
 
 {% block config %}
   {% if config %}
