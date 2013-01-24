@@ -202,6 +202,8 @@
 {% endblock %}
 
 {% block navigation_sidebar %}
+    {{ block.super }}
+
   {% if prev %}
      <a class='nextprev' id='prev' href='{% url 'status_display.views.station_data' station.number prev.year prev.month prev.day %}'>&larr;</a>
   {% endif %}

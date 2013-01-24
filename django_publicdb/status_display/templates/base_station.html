@@ -19,8 +19,9 @@
     
     {% block data %}
     {% endblock %}
-    
+
     <div id="navigation">
+      {% block navigation_sidebar %}
         <div class="keyvalue">
             <span class="key">Stations</span>
             <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
@@ -32,7 +33,7 @@
             <span class="value {% if not is_active %}nolink">Status</span>{% else %}"><a class="{% block current_status %}{% endblock %}" href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>{% endif %}
             <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status_display.views.station_config' station.number %}">Config</a></span>{% endif %}
         </div>
-      {% block navigation_sidebar %}{% endblock %}
+      {% endblock %}
     </div>
     
     <div id="config">
