@@ -4,7 +4,7 @@
 
 {% block current_status %}currentPage{% endblock %}
 
-{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Status{% endblock %}
+{% block title %}{{ block.super }} - Status{% endblock %}
 
 {% block head_styles %}
     {{ block.super }}

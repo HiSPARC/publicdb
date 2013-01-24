@@ -5,7 +5,7 @@
 
 {% block current_data %}currentPage{% endblock %}
 
-{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
+{% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
 
 {% block head_styles %}
     {{ block.super }}

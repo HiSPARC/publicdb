@@ -5,8 +5,7 @@
 
 {% block current_config %}currentPage{% endblock %}
 
-{% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Configuration{% endblock %}
-
+{% block title %}{{ block.super }} - Configuration{% endblock %}
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>

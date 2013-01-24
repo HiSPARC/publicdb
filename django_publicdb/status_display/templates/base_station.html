@@ -6,6 +6,10 @@
     <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
 {% endblock %}
 
+{% block title %}
+    HiSPARC Station: {{ station.number }} - {{ station.name }}
+{% endblock %}
+
 {% block content %}
 
     <div id="header">
