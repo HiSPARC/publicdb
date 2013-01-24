@@ -1,7 +1,6 @@
 #header {
     margin-bottom: 10px;}
 
-#stationMap,
 #stationList {
     float: left;
     width: 609px;}
@@ -13,6 +12,8 @@
     column-count: 2;}
 
 #stationMap {
+    float: left;
+    width: 585px;
     height: 500px;}
 
 .country {
