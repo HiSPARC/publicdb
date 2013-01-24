@@ -7,13 +7,6 @@
 
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }} - Configuration{% endblock %}
 
-{% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
-    <!--[if lte IE 7]><style type="text/css" media="all">
-        #yearlist li, #monthlist li {
-            display: inline;}
-    </style><![endif]-->
-{% endblock %}
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>

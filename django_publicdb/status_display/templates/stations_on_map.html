@@ -6,10 +6,6 @@
 {% block current_mapcluster %}{% if focus %}currentPage{% endif %}{% endblock %}
 {% block current_map %}{% if not focus %}currentPage{% endif %}{% endblock %}
 
-{% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
-{% endblock %}
-
 {% block head %}
     <script type="text/javascript">
         var pointStyle = {

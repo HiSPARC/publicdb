@@ -8,7 +8,7 @@
 {% block title %}HiSPARC Station: {{ station.number }} - {{ station.name }}, Date: {{ date|date:"N j, Y" }}{% endblock %}
 
 {% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/station_page.css" />
+    {{ block.super }}
     <!--[if lte IE 7]><style type="text/css" media="all">
         #yearlist li, #monthlist li {
             display: inline;}

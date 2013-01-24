@@ -2,6 +2,10 @@
 
 {% load url from future %}
 
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
 {% block content %}
 
 <div id="header">
