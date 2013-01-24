@@ -14,10 +14,9 @@
 
 /* Graphs */
 
-#graphs,
-#gpsPositions {
+#graphs {
     float: left;
-    width: 591px;}
+    width: 609px;}
 
 #nagios {
     width: 850px;
@@ -39,8 +38,9 @@
 #pi_histogram {
     height: 300px;}
 
-.histogram {
-    width: 591px;}
+.histogram,
+#gpsPositions {
+    width: 600px;}
 
 .plot {
     display: block;
@@ -58,7 +58,7 @@ h3 {
 .sourceLink {
     float: right;
     position: relative;
-    right: 20px;
+    right: 15px;
     font-size: 8pt;
     margin: 27px 0 0 0;
     padding: 0;}
