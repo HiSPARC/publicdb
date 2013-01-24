@@ -2,51 +2,68 @@
 
 {% load url from future %}
 
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
 {% block content %}
 
-<div id="header">
-    <h2>{% block header %}List of HiSPARC stations{% endblock %}</h2>
-</div>
+    <div id="header">
+        <h2>{% block header %}List of HiSPARC stations{% endblock %}</h2>
+    </div>
+    
+    <div id="stationList">
+      {% block list %}{% endblock %}
+    </div>
+    
+    {% block map %}{% endblock %}
+    
+    
+    <div id="navigation">
+      {% block navigation_sidebar %}
+        <div class="sectionTitle">Stations</div>
+        <div class="keyvalue">
+            <span class="key">List by</span>
+            <span class="value"><a class="{% block current_location %}{% endblock %}" href="{% url 'status_display.views.stations_by_country' %}">Location</a></span>
+            <span class="value"><a class="{% block current_name %}{% endblock %}" href="{% url 'status_display.views.stations_by_name' %}">Name</a></span>
+            <span class="value"><a class="{% block current_number %}{% endblock %}" href="{% url 'status_display.views.stations_by_number' %}">Number</a></span>
+        </div>
+        <div class="keyvalue">
+            <span class="key">Map</span>
+            <span class="value"><a class="{% block current_map %}{% endblock %}" href="{% url 'status_display.views.stations_on_map' %}">Overview</a></span>
+            <span class="value"><a class="nolink  {% block current_mapcluster %}{% endblock %}">Cluster from list</a></span>
+        </div>
+      {% endblock %}
+    </div>
+    
+    <div id="legend">
+      {% block legend %}
+        <div class="sectionTitle">Data Availability</div>
+        <div class="keyvalue">
+            <span class="key thin" style='color: #23B;'>Station</span><span class="value">Link to data</span><br />
+        </div>
+        <div class="keyvalue">
+            <span class="key thin">Station</span><span class="value">No data received</span>
+        </div>
+    
+        <div class="sectionTitle">Current Status</div>
+        <div class="keyvalue">
+            <span class='key statusBall up'></span><span class="value">Up</span><br />
+        </div>
+        <div class="keyvalue">
+            <span class='key statusBall problem'></span><span class="value">Problem</span><br />
+        </div>
+        <div class="keyvalue">
+            <span class='key statusBall down'></span><span class="value">Down</span><br />
+        </div>
+        <div class="keyvalue">
+            <span class='key statusBall'></span><span class="value">&larr; Link to status</span>
+        </div>
+      {% endblock %}
+    </div>
+    
+    <div id="sidebar">
+      {% block sidebar %}{% endblock %}    
+    </div>
 
-<div id="intro">
-  {% block intro %}{% endblock %}
-</div>
-
-<div id="stationList">
-  {% block list %}{% endblock %}
-</div>
-
-{% block map %}{% endblock %}
-
-<div id="stationListPages">
-    <div class="sectionTitle">Stations List</div>
-    <p>
-    <a href="{% url 'status_display.views.stations_by_country' %}" target="_top">order by country</a><br />
-    <a href="{% url 'status_display.views.stations_by_cluster' %}" target="_top">order by cluster</a><br />
-    <a href="{% url 'status_display.views.stations_by_subcluster' %}" target="_top">order by subcluster</a><br />
-    <a href="{% url 'status_display.views.stations_by_name' %}" target="_top">order by name</a><br />
-    <a href="{% url 'status_display.views.stations_by_number' %}" target="_top">order by number</a></p>
-
-    <div class="sectionTitle">Maps</div>
-    <p>
-    <a href="{% url 'status_display.views.stations_on_map' %}" target="_top">show all stations</a><br />
-    <span style='color: #000; font-weight: bold;'>Cluster</span> &larr; Link to map</p>
-
-</div>
-
-<div id="stationListLegend">
-    <div class="sectionTitle">Data Availability</div>
-    <p><span style='color: #23B;'>Station</span> &larr; Link to data<br />
-    Station &larr; No data received</p>
-
-    <div class="sectionTitle">Current Status</div>
-    <p><span class='statusBall up'></span> Up<br />
-    <span class='statusBall problem'></span> Problem<br />
-    <span class='statusBall down'></span> Down<br />
-    <span class='statusBall'></span> &larr; Link to status</p>
-</div>
-
-<div id="stationListSidebar">
-    {% block sidebar %}{% endblock %}    
-</div>
 {% endblock %}

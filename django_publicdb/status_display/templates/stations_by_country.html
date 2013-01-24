@@ -2,8 +2,10 @@
 
 {% load url from future %}
 
+{% block current_location %}currentPage{% endblock %}
+
 {% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
+    {{ block.super }}
     <style type="text/css" media="all">#stationList {-webkit-column-count: 1; -moz-column-count: 1; column-count: 1;}</style>
 {% endblock %}
 

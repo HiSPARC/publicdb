@@ -6,12 +6,25 @@
     float: left;
 }
 
-#scores {
+
+#session, #scores {
     margin-top: 40px;
     width: 220px;
     float: right;
     font-size: 80%;
 }
+
+.sectionTitle {
+    font-size: 130%;
+    font-weight: bold;}
+
+.keyvalue {
+    margin-top: 5px;
+    margin-bottom: 5px;}
+
+.key {
+    font-weight: bold;
+    margin-right: 10px;}
 
 h3 {
     margin-bottom: 5px;

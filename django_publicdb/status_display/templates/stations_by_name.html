@@ -2,9 +2,7 @@
 
 {% load url from future %}
 
-{% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
-{% endblock %}
+{% block current_name %}currentPage{% endblock %}
 
 {% block header %}
     List of HiSPARC stations, by name

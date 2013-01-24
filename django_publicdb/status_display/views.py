@@ -5,89 +5,19 @@ from django.db.models import Q
 
 from operator import itemgetter
 import calendar
-import os
-import re
-import urllib2
 from numpy import arange, pi, sin
 import datetime
 import time
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
+from nagios import *
 
 
 def stations(request):
     """Show the default station list"""
 
     return redirect(stations_by_country)
-
-
-def stations_by_subcluster(request):
-    """Show a list of stations, ordered by subcluster"""
-
-    down, problem, up = status_lists()
-    clusters = []
-    for cluster in Cluster.objects.all():
-        stations = []
-        for station in Station.objects.filter(cluster=cluster):
-            try:
-                Summary.objects.filter(station=station)[0]
-                link = station.number
-            except IndexError:
-                link = None
-            status = get_station_status(station, down, problem, up)
-
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'link': link,
-                             'status': status})
-        clusters.append({'name': cluster.name, 'stations': stations})
-
-    return render_to_response('stations_by_subcluster.html', {'clusters': clusters},
-                              context_instance=RequestContext(request))
-
-
-def stations_by_cluster(request):
-    """Show a list of stations, ordered by subcluster"""
-
-    down, problem, up = status_lists()
-    clusters = []
-    for cluster in Cluster.objects.filter(parent=None):
-        subclusters = []
-        for subcluster in Cluster.objects.filter(parent=cluster):
-            stations = []
-            for station in Station.objects.filter(cluster=subcluster):
-                try:
-                    Summary.objects.filter(station=station)[0]
-                    link = station.number
-                except IndexError:
-                    link = None
-                status = get_station_status(station, down, problem, up)
-
-                stations.append({'number': station.number,
-                                 'name': station.name,
-                                 'link': link,
-                                 'status': status})
-            subclusters.append({'name': subcluster.name, 'stations': stations})
-        stations = []
-        for station in Station.objects.filter(cluster=cluster):
-            try:
-                Summary.objects.filter(station=station)[0]
-                link = station.number
-            except IndexError:
-                link = None
-            status = get_station_status(station, down, problem, up)
-
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'link': link,
-                             'status': status})
-        clusters.append({'name': cluster.name,
-                         'subclusters': subclusters,
-                         'stations': stations})
-
-    return render_to_response('stations_by_cluster.html', {'clusters': clusters},
-                              context_instance=RequestContext(request))
 
 
 def stations_by_country(request):
@@ -113,7 +43,8 @@ def stations_by_country(request):
                                      'name': station.name,
                                      'link': link,
                                      'status': status})
-                subclusters.append({'name': subcluster.name, 'stations': stations})
+                subclusters.append({'name': subcluster.name,
+                                    'stations': stations})
             stations = []
             for station in Station.objects.filter(cluster=cluster):
                 try:
@@ -127,12 +58,17 @@ def stations_by_country(request):
                                  'name': station.name,
                                  'link': link,
                                  'status': status})
-            clusters.append({'name': cluster.name, 'subclusters': subclusters, 'stations': stations})
-        countries.append({'name': country.name, 'number': country.number, 'clusters': clusters})
+            clusters.append({'name': cluster.name,
+                             'subclusters': subclusters,
+                             'stations': stations})
+        countries.append({'number': country.number,
+                          'name': country.name,
+                          'clusters': clusters})
 
     countries = sorted(countries, key=itemgetter('number'))
 
-    return render_to_response('stations_by_country.html', {'countries': countries},
+    return render_to_response('stations_by_country.html',
+                              {'countries': countries},
                               context_instance=RequestContext(request))
 
 
@@ -211,14 +147,16 @@ def stations_on_map(request, subcluster=None):
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
-        clusters.append({'name': cluster.name, 'stations': stations})
+        clusters.append({'name': cluster.name,
+                         'stations': stations})
+
     return render_to_response('stations_on_map.html',
         {'clusters': clusters,
          'focus': subcluster},
         context_instance=RequestContext(request))
 
 
-def station_page(request, station_id, year, month, day):
+def station_data(request, station_id, year, month, day):
     """Show daily histograms for a particular station"""
 
     station_id = int(station_id)
@@ -237,6 +175,7 @@ def station_page(request, station_id, year, month, day):
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False))
                                    .filter(date__lte=yesterday)
+                                   .filter(date__gte=datetime.date(2002, 1, 1))
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
@@ -263,9 +202,15 @@ def station_page(request, station_id, year, month, day):
         has_slave = False
 
     try:
-        is_active = Pc.objects.filter(station__number=station_id)[0].is_active
+        is_active = Pc.objects.filter(station=station)[0].is_active
     except Pc.DoesNotExist:
         is_active = False
+
+    try:
+        Configuration.objects.filter(source__station=station)[0]
+        has_config = True
+    except Configuration.DoesNotExist:
+        has_config = False
 
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
@@ -282,7 +227,7 @@ def station_page(request, station_id, year, month, day):
     barometerdata = plot_dataset('barometer', station, year, month, day)
     temperaturedata = plot_dataset('temperature', station, year, month, day)
 
-    return render_to_response('station_page.html',
+    return render_to_response('station_data.html',
         {'station': station,
          'date': datetime.date(year, month, day),
          'config': config,
@@ -299,7 +244,9 @@ def station_page(request, station_id, year, month, day):
          'prev': previous,
          'next': next,
          'link': (station_id, year, month, day),
-         'is_active': is_active},
+         'has_data': True,
+         'is_active': is_active,
+         'has_config': has_config},
         context_instance=RequestContext(request))
 
 
@@ -318,7 +265,42 @@ def station_status(request, station_id):
         has_data = False
 
     try:
-        config = (Configuration.objects.filter(source__station=station)
+        Configuration.objects.filter(source__station=station)[0]
+        has_config = True
+    except Configuration.DoesNotExist:
+        has_config = False
+
+    return render_to_response('station_status.html',
+        {'station': station,
+         'pc': pc,
+         'has_data': has_data,
+         'is_active': True,
+         'has_config': has_config},
+        context_instance=RequestContext(request))
+
+
+def station_config(request, station_id):
+    """Show configuration history for a particular station"""
+
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    station_id = int(station_id)
+
+    station = get_object_or_404(Station, number=station_id)
+
+    try:
+        Summary.objects.filter(station=station)[0]
+        has_data = True
+    except IndexError:
+        has_data = False
+
+    try:
+        is_active = Pc.objects.filter(station=station)[0].is_active
+    except Pc.DoesNotExist:
+        is_active = False
+
+    try:
+        config = (Configuration.objects.filter(source__station=station,
+                                               timestamp__lt=tomorrow)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
@@ -328,12 +310,25 @@ def station_status(request, station_id):
         config = None
         has_slave = False
 
-    return render_to_response('station_status.html',
+    if config:
+        configs = (Configuration.objects.filter(source__station=station)
+                                        .filter(timestamp__gte=datetime.date(2002, 1, 1))
+                                        .order_by('timestamp'))
+
+    voltagegraph = plot_config('voltage', configs)
+    currentgraph = plot_config('current', configs)
+    gpstrack = get_gpspositions(configs)
+
+    return render_to_response('station_config.html',
         {'station': station,
-         'pc': pc,
          'config': config,
+         'voltagegraph': voltagegraph,
+         'currentgraph': currentgraph,
+         'gpstrack': gpstrack,
          'has_slave': has_slave,
-         'has_data': has_data},
+         'has_data': has_data,
+         'is_active': is_active,
+         'has_config': True},
         context_instance=RequestContext(request))
 
 
@@ -345,86 +340,10 @@ def station(request, station_id):
                                       Q(num_weather__isnull=False))
                               .filter(date__lt=datetime.date.today())
                               .latest('date'))
-    return redirect(station_page, station_id=str(station_id),
+    return redirect(station_data, station_id=str(station_id),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
-
-
-def status_lists():
-    """Get various station status lists from Nagios
-
-    :return: down, problem, up. Each of these is a list containing
-        station short names that have the status their name implies.
-
-    """
-    down = down_list()
-    problem = problem_list()
-    up = up_list()
-
-    return down, problem, up
-
-
-def down_list():
-    """Get Nagios page which lists DOWN hosts"""
-
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=4'
-    down_list = retrieve_station_status(url)
-
-    return down_list
-
-
-def problem_list():
-    """Get Nagios page which lists hosts with a problem"""
-
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
-    problem_list = retrieve_station_status(url)
-
-    return problem_list
-
-
-def up_list():
-    """Get Nagios page which lists UP hosts"""
-
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=2'
-    up_list = retrieve_station_status(url)
-
-    return up_list
-
-
-def retrieve_station_status(url):
-    """Get station list from Nagios page which lists hosts of certain level"""
-
-    try:
-        req = urllib2.urlopen(url, timeout=2)
-        res = req.read()
-        station_list = re.findall("host=([a-z0-9]+)\' title", res)
-    except urllib2.URLError:
-        station_list = []
-
-    return station_list
-
-
-def get_station_status(station, down, problem, up):
-    """Check if station is in down, problem or up list.
-
-    :return: A string denoting the current status of requested station,
-        if the station occurs in multiple lists, the worst case is returned.
-
-    """
-    try:
-        name = Pc.objects.filter(station=station)[0].name
-    except IndexError:
-        return 'unknown'
-
-    if name in down:
-        return 'down'
-    elif name in problem:
-        return 'problem'
-    elif name in up:
-        return 'up'
-    else:
-        return 'unknown'
 
 
 def get_eventtime_histogram_source(request, station_id, year, month, day):
@@ -531,10 +450,40 @@ def plot_dataset(type, station, year, month, day, log=False):
     return plot_object
 
 
-def create_plot_object(x_values, y_series, x_label, y_label):
-    if type(y_series[0]) != list:
-        y_series = [y_series]
+def plot_config(type, configs):
+    """Create a plot object from station configs"""
 
+    timestamps = [calendar.timegm(config.timestamp.utctimetuple())
+                  for config in configs]
+    x_label = 'Date (month/year)'
+
+    if type == 'voltage':
+        values = [[config.mas_ch1_voltage, config.mas_ch2_voltage,
+                   config.slv_ch1_voltage, config.slv_ch2_voltage]
+                  for config in configs]
+        values = zip(*values)
+        y_label = 'PMT Voltage (V)'
+    elif type == 'current':
+        values = [[config.mas_ch1_current, config.mas_ch2_current,
+                   config.slv_ch1_current, config.slv_ch2_current]
+                  for config in configs]
+        values = zip(*values)
+        y_label = 'PMT Current (mA)'
+    plot_object = create_plot_object(timestamps, values, x_label, y_label)
+    return plot_object
+
+
+def get_gpspositions(configs):
+    """Get all unique gps positions from the configs"""
+
+    gps = [(config.gps_longitude, config.gps_latitude) for config in configs
+           if config.gps_longitude != 0.0 and config.gps_latitude != 0.0]
+    return set(gps)
+
+
+def create_plot_object(x_values, y_series, x_label, y_label):
+    if type(y_series[0]) != list and type(y_series[0]) != tuple:
+            y_series = [y_series]
     data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
             y_values in y_series]
 

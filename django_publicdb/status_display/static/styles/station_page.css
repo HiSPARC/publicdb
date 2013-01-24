@@ -1,34 +1,42 @@
 /* Header */
 
 #header * {
-    margin: 0px;
-    padding: 0px;}
+    margin: 0;
+    padding: 0;}
 
 #header {
-    margin-bottom: 10px;}
-
-#stationNumber {
-    color: black;
-    font-size: 10pt;}
+    margin-bottom: 15px;}
 
 #date {
     font-weight: normal;
     font-size: 11pt;
     margin-top: 5px;}
 
-#header > #dataLink, #header > #listLink {
-    font-size: 10pt;}
-
 /* Graphs */
 
-#graphs, #nagios {
+#graphs,
+#gpsPositions {
     float: left;
     width: 591px;}
 
-#eh_histogram, #bd_histogram, #td_histogram {
+#nagios {
+    width: 850px;
+    height: 600px;
+    position: absolute;
+    z-index: -1;}
+
+#gpsPositions {
+    margin-bottom: 20px;}
+
+#eh_histogram,
+#bd_histogram,
+#td_histogram,
+#vg_histogram ,
+#cg_histogram {
     height: 200px;}
 
-#ph_histogram, #pi_histogram {
+#ph_histogram,
+#pi_histogram {
     height: 300px;}
 
 .histogram {
@@ -52,30 +60,32 @@ h3 {
     position: relative;
     right: 20px;
     font-size: 8pt;
-    font-weight: bold;
-    margin: 27px 0px 0px 0px;
-    padding: 0px;}
+    margin: 27px 0 0 0;
+    padding: 0;}
 
 .sourceLink a {
-    cursor: pointer;
-    text-decoration: underline;}
+    padding: 3px;
+    cursor: pointer;}
 
 
 /* Sidebar */
 
-#navigation, #config {
+#navigation,
+#config {
     float: right;
     width: 220px;
     font-size: 9pt;
     border-left: 1px solid black;
     padding-left: 20px;}
 
-#yearlist ul, #monthlist ul {
+#yearlist ul,
+#monthlist ul {
     list-style-type: none;
-    margin: 0px;
-    padding: 0px;}
+    margin: 0;
+    padding: 0;}
 
-#yearlist li, #monthlist li {
+#yearlist li,
+#monthlist li {
     display: inline-block;
     line-height: 2;}
 
@@ -86,30 +96,45 @@ h3 {
 #yearlist li {
     margin-right: 7px;}
 
-#calendar .day, #calendar .dayname {
+#calendar .day,
+#calendar .dayname {
     width: 25px;
     height: 25px;
     text-align: right;}
 
-#calendar .day a, #yearlist li a, #monthlist li a, .nolink {
+#navigation a,
+.nolink {
     padding: 3px;}
+
+#next,
+#prev {
+    padding: 0 !important;}
+
+a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+a {
+    font-weight: bold;
+    border-radius: 3px;
+    color: #25B;
+    text-decoration: none;}
+
+a.currentDate:hover,
+a.currentPage:hover,
+a.currentDate,
+a.currentPage {
+    color: white;
+    background: #075EBB;}
 
 #calendar .dayname {
     font-size: 8pt;}
 
-a:link, a:visited {
-    color: black;
-    font-weight: bold;}
-
-a.currentDate {
-    color: white;
-    background: #075EBB;
-    border-radius: 3px;}
-
 #config {
     margin-top: 30px;}
 
-#navigation > div, #config > div {
+#navigation > div,
+#config > div {
     padding-top: 10px;
     padding-bottom: 10px;}
 
@@ -130,6 +155,13 @@ a.currentDate {
     margin-top: 5px;
     margin-bottom: 5px;}
 
+.value {
+    margin-right: 2px;}
+
+#gpsMap {
+    width: 100%;
+    height: 250px;}
+
 #stationMap {
     width: 100%;
     height: 200px;}
@@ -137,16 +169,16 @@ a.currentDate {
 .olControlAttribution {
     position: absolute !important;
     font-size: 10px !important;
-    bottom: 185px !important;
+    bottom: 0 !important;
     right: 0 !important;
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
     padding: 2px 4px !important;
-    border-radius: 0 0 0 5px !important;}
+    border-radius: 5 0 0 0 !important;}
 
 .olControlScaleLine {
     position: absolute !important;
-    bottom: 0px !important;
+    bottom: 0 !important;
     left: 0 !important;
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
@@ -157,14 +189,20 @@ a.currentDate {
     font-weight: bold;
     margin-right: 10px;}
 
-.ch1 {
-    color:#444;}
+.ch1 {color:#222;}
+.ch2 {color:#D22;}
+.ch3 {color:#1C2;}
+.ch4 {color:#1CC;}
 
-.ch2 { 
-    color:#D22;}
+.good {color:#091;}
+.bad {color:#F11;}
 
-.ch3 {
-    color:#1C2;}
+.gpsBall {
+    width: 8px;
+    height: 8px;
+    border-radius: 4px;
+    display: inline-block;
+    opacity: 0.8;}
 
-.ch4 {
-    color:#1CC;}
+.curr {background-color: #2A7AE2;}
+.old {background-color: #B85C32;}

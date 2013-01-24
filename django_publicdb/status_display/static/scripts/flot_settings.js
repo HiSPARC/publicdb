@@ -137,8 +137,30 @@ var _bd_options = {
         max: 24}
 };
 
+var _vg_options = {
+    xaxis: {
+        axisLabel: 'Date',
+        mode: "time",
+        timeformat: "%m/%Y"},
+    yaxis: {
+        axisLabel: 'PMT Voltage (V)',
+        min: 300}
+    }
+
+var _cg_options = {
+    xaxis: {
+        axisLabel: 'Date',
+        mode: "time",
+        timeformat: "%m/%Y"},
+    yaxis: {
+        axisLabel: 'PMT Current (mV)',
+        min: 0}
+    }
+
 var eh_options = $.extend(true, {}, base_options, _eh_options);
 var ph_options = $.extend(true, {}, base_options, _ph_options);
 var pi_options = $.extend(true, {}, base_options, _pi_options);
 var td_options = $.extend(true, {}, base_options, _td_options);
 var bd_options = $.extend(true, {}, base_options, _bd_options);
+var vg_options = $.extend(true, {}, base_options, _vg_options);
+var cg_options = $.extend(true, {}, base_options, _cg_options);
