@@ -1,8 +1,8 @@
 /* Header */
 
 #header * {
-    margin: 0px;
-    padding: 0px;}
+    margin: 0;
+    padding: 0;}
 
 #header {
     margin-bottom: 15px;}
@@ -60,8 +60,8 @@ h3 {
     position: relative;
     right: 20px;
     font-size: 8pt;
-    margin: 27px 0px 0px 0px;
-    padding: 0px;}
+    margin: 27px 0 0 0;
+    padding: 0;}
 
 .sourceLink a {
     padding: 3px;
@@ -81,8 +81,8 @@ h3 {
 #yearlist ul,
 #monthlist ul {
     list-style-type: none;
-    margin: 0px;
-    padding: 0px;}
+    margin: 0;
+    padding: 0;}
 
 #yearlist li,
 #monthlist li {
@@ -108,7 +108,7 @@ h3 {
 
 #next,
 #prev {
-    padding: 0px !important;}
+    padding: 0 !important;}
 
 a:hover {
     color: #005;
@@ -174,7 +174,7 @@ a.currentPage {
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
     padding: 2px 4px !important;
-    border-radius: 5 0 0 0px !important;}
+    border-radius: 5 0 0 0 !important;}
 
 .olControlScaleLine {
     position: absolute !important;
