@@ -16,4 +16,7 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/pulseintegral/(?P<station_id>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_pulseintegral_histogram_source'),
     (r'^source/barometer/(?P<station_id>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_barometer_dataset_source'),
     (r'^source/temperature/(?P<station_id>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_temperature_dataset_source'),
+    (r'^source/voltage/(?P<station_id>\d+)/$', 'get_voltage_config_source'),
+    (r'^source/current/(?P<station_id>\d+)/$', 'get_current_config_source'),
+    (r'^source/gps/(?P<station_id>\d+)/$', 'get_gps_config_source'),
 )

@@ -97,7 +97,8 @@
         <div id="voltageGraph" class="histogram">
             <h3>PMT Voltage</h3>
             <div class="sourceLink">
-                <a onclick="downloadGraph('#vg_histogram')">Image</a>
+                <a onclick="downloadGraph('#vg_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_voltage_config_source' station.number %}">Source</a>
             </div>
             <div class="plot" id="vg_histogram"></div>
             <script type="text/javascript">
@@ -117,7 +118,8 @@
         <div id="currentGraph" class="histogram">
             <h3>PMT Current</h3>
             <div class="sourceLink">
-                <a onclick="downloadGraph('#cg_histogram')">Image</a>
+                <a onclick="downloadGraph('#cg_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_current_config_source' station.number %}">Source</a>
             </div>
             <div class="plot" id="cg_histogram"></div>
             <script type="text/javascript">
@@ -135,6 +137,9 @@
     
         <div id="gpsPositions">
             <h3>GPS Positions</h3>
+            <div class="sourceLink">
+                <a href="{% url 'status_display.views.get_gps_config_source' station.number %}">Source</a>
+            </div>
             <div id="gpsMap"></div>
         </div>
     </div>

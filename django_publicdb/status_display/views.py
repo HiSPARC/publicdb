@@ -396,6 +396,33 @@ def get_temperature_dataset_source(request, station_id, year, month, day):
     return response
 
 
+def get_voltage_config_source(request, station_id):
+    data = get_config_source(station_id, 'voltage')
+    response = render_to_response('source_voltage_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=voltage-%s.csv' % station_id)
+    return response
+
+
+def get_current_config_source(request, station_id):
+    data = get_config_source(station_id, 'current')
+    response = render_to_response('source_current_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=current-%s.csv' % station_id)
+    return response
+
+
+def get_gps_config_source(request, station_id):
+    data = get_config_source(station_id, 'gps')
+    response = render_to_response('source_gps_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=gps-%s.csv' % station_id)
+    return response
+
+
 def get_histogram_source(station_id, year, month, day, type):
     histogram = DailyHistogram.objects.get(
             source__station__number=int(station_id),
@@ -413,6 +440,25 @@ def get_dataset_source(station_id, year, month, day, type):
             source__date=datetime.date(int(year), int(month), int(day)),
             type__slug=type)
     return zip(dataset.x, dataset.y)
+
+
+def get_config_source(station_id, type):
+    configs = (Configuration.objects.filter(source__station__number=station_id)
+                                    .filter(timestamp__gte=datetime.date(2002, 1, 1))
+                                    .order_by('timestamp'))
+    if type == 'voltage':
+        data = configs.values_list('timestamp', 'mas_ch1_voltage', 'mas_ch2_voltage', 'slv_ch1_voltage', 'slv_ch2_voltage')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+    elif type == 'current':
+        data = configs.values_list('timestamp', 'mas_ch1_current', 'mas_ch2_current', 'slv_ch1_current', 'slv_ch2_current')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+    elif type == 'gps':
+        data = configs.values_list('timestamp', 'gps_latitude', 'gps_longitude', 'gps_altitude')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3]] for row in data]
+    else:
+        data = None
+
+    return data
 
 
 def create_histogram(type, station, year, month, day):

@@ -1,0 +1,5 @@
+# "HiSPARC GPS positions configuration source"
+#
+# timestamp (seconds after 1970-1-1)	latitude	longitude	altitude
+{% for row in data %}{{ row.0 }}	{{ row.1 }}	{{ row.2 }}	{{ row.3 }}
+{% endfor %}
