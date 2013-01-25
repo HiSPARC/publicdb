@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    500 - Server Error
+{% endblock %}
+
+{% block head_styles %}
+<style type="text/css">
+    #notfound {
+        width: 600px;
+        height: 413px;
+        margin: 0 auto;
+        background: white url('{{ STATIC_URL }}500.png') center no-repeat;}
+    #help {
+        width: 600px;
+        margin: 0 auto;
+        text-align: center;
+        font-size: 11pt;}
+    a {
+        color: #25B;
+        text-decoration: none;}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div id="notfound"></div>
+
+<div id="help">
+    Well this is not supposed to happen, you can go back home and try again: <a href="http://data.hisparc.nl">http://data.hisparc.nl</a>.<br />
+    Or contact us: beheer [at] hisparc.nl.
+</div>
+{% endblock %}
