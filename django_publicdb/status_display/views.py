@@ -1,4 +1,5 @@
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.shortcuts import (render_to_response, get_object_or_404,
+                              get_list_or_404, redirect)
 from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
@@ -163,18 +164,24 @@ def station_data(request, station_id, year, month, day):
     year = int(year)
     month = int(month)
     day = int(day)
+    date = datetime.date(year, month, day)
+
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
 
     station = get_object_or_404(Station, number=station_id)
+    data = get_object_or_404(Summary.objects.filter(Q(num_events__isnull=False) |
+                                                    Q(num_weather__isnull=False)),
+                                                    station=station, date=date)
 
-    # Use yesterday and tomorrow to add previous/next links
-    yesterday = datetime.date(year, month, day) - datetime.timedelta(days=1)
-    tomorrow = datetime.date(year, month, day) + datetime.timedelta(days=1)
+    # Use next_day and prev_day to add previous/next links
+    prev_day = date - datetime.timedelta(days=1)
+    next_day = date + datetime.timedelta(days=1)
 
     try:
         previous = (Summary.objects.filter(Q(station__number=station_id),
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False))
-                                   .filter(date__lte=yesterday)
+                                   .filter(date__lte=prev_day)
                                    .filter(date__gte=datetime.date(2002, 1, 1))
                                    .latest('date')).date
     except Summary.DoesNotExist:
@@ -184,14 +191,15 @@ def station_data(request, station_id, year, month, day):
         next = (Summary.objects.filter(Q(station__number=station_id),
                                        Q(num_events__isnull=False) |
                                        Q(num_weather__isnull=False))
-                               .filter(date__gte=tomorrow)
+                               .filter(date__gte=next_day)
+                               .filter(date__lt=tomorrow)
                                .order_by('date'))[0].date
     except IndexError:
         next = None
 
     try:
         config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=tomorrow)
+                                               timestamp__lt=next_day)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
@@ -203,13 +211,13 @@ def station_data(request, station_id, year, month, day):
 
     try:
         is_active = Pc.objects.filter(station=station)[0].is_active
-    except Pc.DoesNotExist:
+    except IndexError:
         is_active = False
 
     try:
         Configuration.objects.filter(source__station=station)[0]
         has_config = True
-    except Configuration.DoesNotExist:
+    except IndexError:
         has_config = False
 
     thismonth = nav_calendar(station, year, month)
@@ -219,17 +227,15 @@ def station_data(request, station_id, year, month, day):
                     'month': calendar.month_name[month][:3],
                     'day': day}
 
-    eventhistogram = create_histogram('eventtime', station, year, month, day)
-    pulseheighthistogram = create_histogram('pulseheight', station,
-                                            year, month, day)
-    pulseintegralhistogram = create_histogram('pulseintegral', station,
-                                              year, month, day)
-    barometerdata = plot_dataset('barometer', station, year, month, day)
-    temperaturedata = plot_dataset('temperature', station, year, month, day)
+    eventhistogram = create_histogram('eventtime', station, date)
+    pulseheighthistogram = create_histogram('pulseheight', station, date)
+    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
+    barometerdata = plot_dataset('barometer', station, date)
+    temperaturedata = plot_dataset('temperature', station, date)
 
     return render_to_response('station_data.html',
         {'station': station,
-         'date': datetime.date(year, month, day),
+         'date': date,
          'config': config,
          'has_slave': has_slave,
          'eventhistogram': eventhistogram,
@@ -267,7 +273,7 @@ def station_status(request, station_id):
     try:
         Configuration.objects.filter(source__station=station)[0]
         has_config = True
-    except Configuration.DoesNotExist:
+    except IndexError:
         has_config = False
 
     return render_to_response('station_status.html',
@@ -286,6 +292,10 @@ def station_config(request, station_id):
     station_id = int(station_id)
 
     station = get_object_or_404(Station, number=station_id)
+    configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
+                              source__station=station,
+                              timestamp__gte=datetime.date(2002, 1, 1),
+                              timestamp__lt=tomorrow)
 
     try:
         Summary.objects.filter(station=station)[0]
@@ -295,25 +305,14 @@ def station_config(request, station_id):
 
     try:
         is_active = Pc.objects.filter(station=station)[0].is_active
-    except Pc.DoesNotExist:
+    except IndexError:
         is_active = False
 
-    try:
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=tomorrow)
-                                       .latest('timestamp'))
-        if config.slv_version.count('0') == 2:
-            has_slave = False
-        else:
-            has_slave = True
-    except Configuration.DoesNotExist:
-        config = None
+    config = configs[-1]
+    if config.slv_version.count('0') == 2:
         has_slave = False
-
-    if config:
-        configs = (Configuration.objects.filter(source__station=station)
-                                        .filter(timestamp__gte=datetime.date(2002, 1, 1))
-                                        .order_by('timestamp'))
+    else:
+        has_slave = True
 
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
@@ -461,10 +460,9 @@ def get_config_source(station_id, type):
     return data
 
 
-def create_histogram(type, station, year, month, day):
+def create_histogram(type, station, date):
     """Create a histogram object"""
 
-    date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
 
@@ -479,10 +477,9 @@ def create_histogram(type, station, year, month, day):
     return plot_object
 
 
-def plot_dataset(type, station, year, month, day, log=False):
+def plot_dataset(type, station, date, log=False):
     """Create a dataset plot object"""
 
-    date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = DatasetType.objects.get(slug__exact=type)
 
