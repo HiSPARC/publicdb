@@ -28,15 +28,14 @@ def stations_by_country(request):
     countries = []
     for country in Country.objects.all():
         clusters = []
-        for cluster in Cluster.objects.filter(country=country).filter(parent=None):
+        for cluster in Cluster.objects.filter(country=country, parent=None):
             subclusters = []
             for subcluster in Cluster.objects.filter(parent=cluster):
                 stations = []
                 for station in Station.objects.filter(cluster=subcluster):
-                    try:
-                        Summary.objects.filter(station=station)[0]
+                    if station_has_data(station):
                         link = station.number
-                    except IndexError:
+                    else:
                         link = None
                     status = get_station_status(station, down, problem, up)
 
@@ -48,10 +47,9 @@ def stations_by_country(request):
                                     'stations': stations})
             stations = []
             for station in Station.objects.filter(cluster=cluster):
-                try:
-                    Summary.objects.filter(station=station)[0]
+                if station_has_data(station):
                     link = station.number
-                except IndexError:
+                else:
                     link = None
                 status = get_station_status(station, down, problem, up)
 
@@ -79,10 +77,9 @@ def stations_by_number(request):
     down, problem, up = status_lists()
     stations = []
     for station in Station.objects.all():
-        try:
-            Summary.objects.filter(station=station)[0]
+        if station_has_data(station):
             link = station.number
-        except IndexError:
+        else:
             link = None
         status = get_station_status(station, down, problem, up)
 
@@ -102,10 +99,9 @@ def stations_by_name(request):
     down, problem, up = status_lists()
     stations = []
     for station in Station.objects.all():
-        try:
-            Summary.objects.filter(station=station)[0]
+        if station_has_data(station):
             link = station.number
-        except IndexError:
+        else:
             link = None
         status = get_station_status(station, down, problem, up)
 
@@ -125,19 +121,18 @@ def stations_on_map(request, subcluster=None):
 
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
-    tomorrow = today + datetime.timedelta(days=1)
+
     if subcluster:
         get_object_or_404(Cluster, name=subcluster)
     clusters = []
     for cluster in Cluster.objects.all():
         stations = []
         for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
-                                        .filter(station__cluster__name=cluster)
-                                        .filter(station__pc__is_active=True)):
-            try:
-                Summary.objects.filter(station=detector.station)[0]
+                                        .filter(station__cluster__name=cluster,
+                                                station__pc__is_active=True)):
+            if station_has_data(detector.station):
                 link = detector.station.number
-            except IndexError:
+            else:
                 link = None
             status = get_station_status(detector.station, down, problem, up)
             stations.append({'number': detector.station.number,
@@ -166,33 +161,32 @@ def station_data(request, station_id, year, month, day):
     day = int(day)
     date = datetime.date(year, month, day)
 
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-
     station = get_object_or_404(Station, number=station_id)
-    data = get_object_or_404(Summary.objects.filter(Q(num_events__isnull=False) |
-                                                    Q(num_weather__isnull=False)),
-                                                    station=station, date=date)
+    data = get_object_or_404(Summary.objects.filter(Q(station=station),
+                                                    Q(date=date),
+                                                    Q(num_events__isnull=False) |
+                                                    Q(num_weather__isnull=False)))
 
     # Use next_day and prev_day to add previous/next links
     prev_day = date - datetime.timedelta(days=1)
     next_day = date + datetime.timedelta(days=1)
 
     try:
-        previous = (Summary.objects.filter(Q(station__number=station_id),
+        previous = (Summary.objects.filter(Q(station=station),
                                            Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False))
-                                   .filter(date__lte=prev_day)
-                                   .filter(date__gte=datetime.date(2002, 1, 1))
+                                           Q(num_weather__isnull=False),
+                                           date__gte=datetime.date(2002, 1, 1),
+                                           date__lte=prev_day)
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
 
     try:
-        next = (Summary.objects.filter(Q(station__number=station_id),
+        next = (Summary.objects.filter(Q(station=station),
                                        Q(num_events__isnull=False) |
-                                       Q(num_weather__isnull=False))
-                               .filter(date__gte=next_day)
-                               .filter(date__lt=tomorrow)
+                                       Q(num_weather__isnull=False),
+                                       date__gte=next_day,
+                                       date__lte=datetime.date.today())
                                .order_by('date'))[0].date
     except IndexError:
         next = None
@@ -205,20 +199,16 @@ def station_data(request, station_id, year, month, day):
             has_slave = False
         else:
             has_slave = True
+        has_config = True
     except Configuration.DoesNotExist:
         config = None
         has_slave = False
+        has_config = False
 
     try:
         is_active = Pc.objects.filter(station=station)[0].is_active
     except IndexError:
         is_active = False
-
-    try:
-        Configuration.objects.filter(source__station=station)[0]
-        has_config = True
-    except IndexError:
-        has_config = False
 
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
@@ -264,11 +254,7 @@ def station_status(request, station_id):
     station = get_object_or_404(Station, number=station_id)
     pc = get_object_or_404(Pc, station=station, is_active=True)
 
-    try:
-        Summary.objects.filter(station=station)[0]
-        has_data = True
-    except IndexError:
-        has_data = False
+    has_data = station_has_data(station)
 
     try:
         Configuration.objects.filter(source__station=station)[0]
@@ -288,20 +274,15 @@ def station_status(request, station_id):
 def station_config(request, station_id):
     """Show configuration history for a particular station"""
 
-    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     station_id = int(station_id)
 
     station = get_object_or_404(Station, number=station_id)
     configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
                               source__station=station,
                               timestamp__gte=datetime.date(2002, 1, 1),
-                              timestamp__lt=tomorrow)
+                              timestamp__lte=datetime.date.today())
 
-    try:
-        Summary.objects.filter(station=station)[0]
-        has_data = True
-    except IndexError:
-        has_data = False
+    has_data = station_has_data(station)
 
     try:
         is_active = Pc.objects.filter(station=station)[0].is_active
@@ -336,10 +317,12 @@ def station(request, station_id):
 
     summary = (Summary.objects.filter(Q(station__number=station_id),
                                       Q(num_events__isnull=False) |
-                                      Q(num_weather__isnull=False))
-                              .filter(date__lt=datetime.date.today())
+                                      Q(num_weather__isnull=False),
+                                      date__gte=datetime.date(2002, 1, 1),
+                                      date__lte=datetime.date.today())
                               .latest('date'))
-    return redirect(station_data, station_id=str(station_id),
+    return redirect(station_data,
+                    station_id=str(station_id),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
@@ -442,8 +425,9 @@ def get_dataset_source(station_id, year, month, day, type):
 
 
 def get_config_source(station_id, type):
-    configs = (Configuration.objects.filter(source__station__number=station_id)
-                                    .filter(timestamp__gte=datetime.date(2002, 1, 1))
+    configs = (Configuration.objects.filter(source__station__number=station_id,
+                                            timestamp__gte=datetime.date(2002, 1, 1),
+                                            timestamp__lte=datetime.date.today())
                                     .order_by('timestamp'))
     if type == 'voltage':
         data = configs.values_list('timestamp', 'mas_ch1_voltage', 'mas_ch2_voltage', 'slv_ch1_voltage', 'slv_ch2_voltage')
@@ -552,10 +536,9 @@ def nav_calendar(station, theyear, themonth):
                                            Q(date=day),
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False)))
+                    link = (station.number, theyear, themonth, day.day)
                 except Summary.DoesNotExist:
                     link = None
-                else:
-                    link = (station.number, theyear, themonth, day.day)
                 days.append({'day': day.day, 'link': link})
             else:
                 days.append('')
@@ -588,21 +571,40 @@ def nav_months(station, theyear):
 def nav_years(station):
     """Create list of previous years"""
 
-    date_list = (Summary.objects.filter(Q(station=station),
-                                        Q(num_events__isnull=False) |
-                                        Q(num_weather__isnull=False))
-                        .dates('date', 'year'))
+    valid_years = (Summary.objects.filter(Q(station=station),
+                                          Q(num_events__isnull=False) |
+                                          Q(num_weather__isnull=False),
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                          .dates('date', 'year'))
+    valid_years = [date.year for date in valid_years]
 
-    valid_years = [date.year for date in date_list
-                   if 2002 <= date.year <= datetime.datetime.now().year]
     year_list = []
     for year in range(valid_years[0], valid_years[-1] + 1):
         if year in valid_years:
-            first_day = (Summary.objects.filter(station=station,
-                                                date__year=year)
+            first_day = (Summary.objects.filter(Q(station=station),
+                                                Q(date__year=year),
+                                                Q(num_events__isnull=False) |
+                                                Q(num_weather__isnull=False))
                                 .dates('date', 'day')[0])
             link = (station.number, year, first_day.month, first_day.day)
             year_list.append({'year': year, 'link': link})
         else:
             year_list.append({'year': year, 'link': None})
     return year_list
+
+
+def station_has_data(station):
+    """Check if there is valis event or weather data for the given station"""
+
+    try:
+        Summary.objects.filter(Q(station=station),
+                               Q(num_events__isnull=False) |
+                               Q(num_weather__isnull=False),
+                               date__gte=datetime.date(2002, 1, 1),
+                               date__lte=datetime.date.today())[0]
+        has_data = True
+    except IndexError:
+        has_data = False
+
+    return has_data
