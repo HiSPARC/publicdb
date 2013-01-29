@@ -68,6 +68,7 @@ def get_coincidence(request):
 
 
 def get_events(coincidence):
+    """Get events that belong to this coincidence"""
     events = []
     for e in coincidence.coincidence.events.all():
         s = e.station
@@ -92,12 +93,14 @@ def get_events(coincidence):
 
 
 def data_json(coincidence, events):
+    """Construct json with data for jSparc to display"""
     data = dict(pk=coincidence.pk,
-            timestamp=calendar.timegm(datetime.datetime
-                    .combine(coincidence.coincidence.date,
-                             coincidence.coincidence.time).utctimetuple()),
-            nanoseconds=coincidence.coincidence.nanoseconds,
-            events=events)
+                timestamp=calendar.timegm(datetime.datetime
+                                  .combine(coincidence.coincidence.date,
+                                           coincidence.coincidence.time)
+                                  .utctimetuple()),
+                nanoseconds=coincidence.coincidence.nanoseconds,
+                events=events)
     response = HttpResponse(json.dumps(data), mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -126,15 +129,24 @@ def top_lijst(slug):
 
 
 def result(request):
+    """Process results from jSparc sessions"""
     session_title = request.GET['session_title']
+
+    # If session is example, do not save result.
+    if session_title.lower() == 'example':
+        return test_result()
+
     student_name = request.GET['student_name']
+
+    # If student is test student, do not save result.
+    if coincidence.student.name.lower() == 'test student':
+        return test_result()
+
     pk = request.GET['pk']
     lat = request.GET['lat']
     lon = request.GET['lon']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
-
-    # If session is example, do not save result.
     if session_title.lower() == 'example':
         return test_result()
 
@@ -142,16 +154,11 @@ def result(request):
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
-    # If student is test student, do not save result.
-    if coincidence.student.name.lower() == 'test student':
-        return test_result()
-
     coincidence.core_position_x = lon
     coincidence.core_position_y = lat
     coincidence.log_energy = log_energy
     coincidence.error_estimate = error_estimate
     coincidence.is_analyzed = True
-    #FIXME
     coincidence.theta = 0
     coincidence.phi = 0
     coincidence.save()
@@ -169,6 +176,7 @@ def result(request):
 
 
 def test_result():
+    """Generate random ranking for test sessions"""
     msg = "Test session, result not stored"
     rank = randint(1, 10)
     response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
