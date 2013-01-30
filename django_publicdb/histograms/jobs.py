@@ -202,6 +202,7 @@ def update_config(summary):
 
 
 def create_histogram(data, high, samples):
+    """Bin the given data, in bins from 0 to [high] in [samples] bins"""
     if data is None:
         return [], []
     else:
@@ -218,6 +219,7 @@ def create_histogram(data, high, samples):
 
 
 def save_histograms(summary, slug, bins, values):
+    """Store the binned data in database"""
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
     try:
@@ -231,6 +233,7 @@ def save_histograms(summary, slug, bins, values):
 
 
 def save_dataset(summary, slug, data):
+    """Store the data in database"""
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
     try:
