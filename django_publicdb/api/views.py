@@ -20,7 +20,7 @@ def json_dict(dict):
 
 
 def station_info(request, station_id=None):
-    """Get list of clusters"""
+    """Get station info, can be filtered by station"""
     station = Station.objects.get(number=station_id)
 
     station_info = {'number': station.number, 'name': station.name,
@@ -31,7 +31,7 @@ def station_info(request, station_id=None):
 
 
 def station(request, subcluster_name=None):
-    """Get list of clusters"""
+    """Get list of stations, can be filtered by subcluster"""
     cluster = Cluster.objects.filter(name=subcluster_name)
     station = get_station_dict(subcluster=cluster)
 
@@ -39,7 +39,7 @@ def station(request, subcluster_name=None):
 
 
 def subcluster(request, cluster_name=None):
-    """Get list of clusters"""
+    """Get list of subclusters, can be filtered by parent cluster"""
     cluster = Cluster.objects.filter(name=cluster_name, parent=None)
     clusters = get_subcluster_dict(cluster=cluster)
 
@@ -47,7 +47,7 @@ def subcluster(request, cluster_name=None):
 
 
 def cluster(request, country_name=None):
-    """Get list of clusters"""
+    """Get list of clusters, can be filtered by country"""
     country = Country.objects.filter(name=country_name)
     clusters = get_cluster_dict(country=country)
 
@@ -57,7 +57,7 @@ def cluster(request, country_name=None):
 def country(request):
     """Get list of countries"""
     countries = get_country_dict()
-    print countries
+
     return json_dict(countries)
 
 
@@ -152,7 +152,7 @@ def has_weather(request, station_id, year=None, month=None, day=None):
 
 
 def config(request, station_id, year=None, month=None, day=None):
-
+    """Get the latest configuration of the station for a given date"""
     station = Station.objects.get(number=station_id)
     try:
         if year and month and day:
