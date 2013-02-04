@@ -29,13 +29,19 @@ def station(request, station_id=None):
     except (Station.DoesNotExist, Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
+    try:
+        is_active = Pc.objects.filter(station=station)[0].is_active
+    except IndexError:
+        is_active = False
+
     station_info = {'number': station.number,
                     'name': station.name,
                     'cluster': station.cluster.name,
                     'country': station.cluster.country.name,
                     'latitude': config.gps_latitude,
                     'longitude': config.gps_longitude,
-                    'altitude': config.gps_altitude}
+                    'altitude': config.gps_altitude,
+                    'active': is_active}
 
     return json_dict(station_info)
 
@@ -98,8 +104,15 @@ def get_station_dict(subcluster=None):
     else:
         stations = Station.objects.all()
 
-    station_dict = [{'number': station.number, 'name': station.name}
-                    for station in stations]
+    station_dict = []
+    for station in stations:
+        try:
+            if Pc.objects.filter(station=station)[0].is_active:
+                station_dict.append({'number': station.number,
+                                     'name': station.name})
+        except IndexError:
+            pass
+
     return sorted(station_dict, key=itemgetter('number'))
 
 
@@ -125,6 +138,7 @@ def get_cluster_dict(country=None):
 
     cluster_dict = [{'number': cluster.number, 'name': cluster.name}
                     for cluster in clusters]
+
     return sorted(cluster_dict, key=itemgetter('number'))
 
 
