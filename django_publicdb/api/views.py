@@ -143,12 +143,15 @@ def has_data(request, station_id, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-
     try:
         if year and month and day:
+            date = datetime.date(int(year), int(month), int(day))
+            if not validate_date(date):
+                return HttpResponseNotFound()
+
             Summary.objects.filter(station=station,
                                    num_events__isnull=False,
-                                   date=datetime.date(int(year), int(month), int(day)))[0]
+                                   date=date)[0]
         else:
             Summary.objects.filter(station=station,
                                    num_events__isnull=False,
@@ -171,9 +174,12 @@ def has_weather(request, station_id, year=None, month=None, day=None):
 
     try:
         if year and month and day:
+            date = datetime.date(int(year), int(month), int(day))
+            if not validate_date(date):
+                return HttpResponseNotFound()
             Summary.objects.filter(station=station,
                                    num_weather__isnull=False,
-                                   date=datetime.date(int(year), int(month), int(day)))[0]
+                                   date=date)[0]
         else:
             Summary.objects.filter(station=station,
                                    num_weather__isnull=False,
@@ -196,8 +202,11 @@ def config(request, station_id, year=None, month=None, day=None):
 
     try:
         if year and month and day:
+            date = datetime.date(int(year), int(month), int(day))
+            if not validate_date(date):
+                return HttpResponseNotFound()
             c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=datetime.date(int(year), int(month), int(day)))
+                                              timestamp__lte=date)
                                       .latest('timestamp'))
         else:
             c = (Configuration.objects.filter(source__station=station,
