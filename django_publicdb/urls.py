@@ -13,6 +13,7 @@ urlpatterns = patterns('',
 
     (r'^$', RedirectView.as_view(url='show/stations', permanent=False)),
 
+    (r'^api/', include('django_publicdb.api.urls')),
     (r'^show/', include('django_publicdb.status_display.urls')),
     (r'^analysis-session/', include('django_publicdb.analysissessions.urls')),
     (r'^software-updates/', include('django_publicdb.updates.urls')),
@@ -22,7 +23,7 @@ urlpatterns = patterns('',
     (r'^config/datastore$', create_datastore_config),
 
     (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
-    # Uncomment the admin/doc line below and add 'django.contrib.admindocs' 
+    # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
 
