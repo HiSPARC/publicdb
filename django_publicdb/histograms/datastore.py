@@ -82,7 +82,7 @@ def get_stations(date):
     path = get_data_path(date)
 
     station_list = []
-    with tables.openFile(path) as file:
+    with tables.openFile(path, 'r') as file:
         for cluster in file.listNodes('/hisparc'):
             for station in file.listNodes(cluster):
                 m = re.match('station_(?P<station>[0-9]+)', station._v_name)
@@ -194,7 +194,7 @@ def get_data(cluster, station_id, date, table, quantity):
     """
     path = get_data_path(date)
 
-    with tables.openFile(path) as file:
+    with tables.openFile(path, 'r') as file:
         table = file.getNode('/hisparc/cluster_%s/station_%d' %
                              (cluster.lower(), station_id), table)
         try:
@@ -217,7 +217,7 @@ def get_time_series(cluster, station_id, date, table, quantity):
     """
     path = get_data_path(date)
 
-    with tables.openFile(path) as file:
+    with tables.openFile(path, 'r') as file:
         table = file.getNode('/hisparc/cluster_%s/station_%d' %
                              (cluster.lower(), station_id), table)
         try:
@@ -256,7 +256,7 @@ def get_config_messages(cluster, station_id, date):
     """
     path = get_data_path(date)
 
-    file = tables.openFile(path)
+    file = tables.openFile(path, 'r')
     parent = file.getNode('/hisparc/cluster_%s/station_%d' %
                           (cluster.lower(), station_id))
     config = file.getNode(parent, 'config')
