@@ -235,6 +235,48 @@ def config(request, station_id, year=None, month=None, day=None):
     return json_dict(config)
 
 
+def num_events(request, station_id):
+    """Get number of events in a certain year for the given station"""
+
+    try:
+        station = Station.objects.get(number=station_id)
+    except Station.DoesNotExist:
+        return HttpResponseNotFound()
+
+    start = datetime.date(2002, 1, 1)
+    end = datetime.date.today()
+    if not validate_date(start):
+        return HttpResponseNotFound()
+
+    summary = Summary.objects.filter(station=station,
+                                     date__gte=start, date__lt=end,
+                                     num_events__isnull=False)
+    num_events = sum([s.num_events for s in summary])
+
+    return json_dict(num_events)
+
+
+def num_events_year(request, station_id, year):
+    """Get number of events in a certain year for the given station"""
+
+    try:
+        station = Station.objects.get(number=station_id)
+    except Station.DoesNotExist:
+        return HttpResponseNotFound()
+
+    start = datetime.date(int(year), 1, 1)
+    end = datetime.date(int(year) + 1, 1, 1)
+    if not validate_date(start):
+        return HttpResponseNotFound()
+
+    summary = Summary.objects.filter(station=station,
+                                     date__gte=start, date__lt=end,
+                                     num_events__isnull=False)
+    num_events = sum([s.num_events for s in summary])
+
+    return json_dict(num_events)
+
+
 def num_events_month(request, station_id, year, month):
     """Get number of events in a certain month for the given station"""
 
@@ -303,4 +345,5 @@ def num_events_hour(request, station_id, year, month, day, hour):
 
 def validate_date(date):
     """Give 404 is date is outside HiSPARC project range"""
-    return datetime.date(2002, 1, 1) < date < datetime.date.today()
+    return datetime.date(2002, 1, 1) <= date <= datetime.date.today()
+
