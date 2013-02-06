@@ -135,6 +135,8 @@ INSTALLED_APPS = (
     'django_publicdb.analysissessions',
     'django_publicdb.updates',
     'django_publicdb.raw_data',
+    'django_publicdb.api',
+    'django_publicdb.jsparc',
     'django_publicdb.default',
     'south',
 )
