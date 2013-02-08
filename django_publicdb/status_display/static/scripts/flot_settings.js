@@ -63,7 +63,7 @@ var base_options = {
     legend: {show: false}
 };
 
-var _eh_options = {
+var _eventhist_options = {
     series: {
         lines: {
             lineWidth: 1.5}},
@@ -77,7 +77,7 @@ var _eh_options = {
         max: 24}
 };
 
-var _ph_options = {
+var _pulseheighthist_options = {
     yaxis: {
         axisLabel: 'Count',
         min: 0.7,
@@ -88,7 +88,7 @@ var _ph_options = {
         axisLabel: 'Pulseheight (mV)'}
 };
 
-var _pi_options = {
+var _pulseintegralhist_options = {
     yaxis: {
         axisLabel: 'Count',
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
@@ -99,7 +99,7 @@ var _pi_options = {
         axisLabel: 'Pulseintegral (mVns)'}
 };
 
-var _td_options = {
+var _temperaturedata_options = {
     series: {
         lines: {
             show: false},
@@ -118,7 +118,7 @@ var _td_options = {
         max: 24}
 };
 
-var _bd_options = {
+var _barometerdata_options = {
     series: {
         lines: {
             show: false},
@@ -137,7 +137,7 @@ var _bd_options = {
         max: 24}
 };
 
-var _vg_options = {
+var _voltagegraph_options = {
     xaxis: {
         axisLabel: 'Date',
         mode: "time",
@@ -145,9 +145,9 @@ var _vg_options = {
     yaxis: {
         axisLabel: 'PMT Voltage (V)',
         min: 300}
-    }
+};
 
-var _cg_options = {
+var _currentgraph_options = {
     xaxis: {
         axisLabel: 'Date',
         mode: "time",
@@ -155,12 +155,27 @@ var _cg_options = {
     yaxis: {
         axisLabel: 'PMT Current (mV)',
         min: 0}
-    }
+};
 
-var eh_options = $.extend(true, {}, base_options, _eh_options);
-var ph_options = $.extend(true, {}, base_options, _ph_options);
-var pi_options = $.extend(true, {}, base_options, _pi_options);
-var td_options = $.extend(true, {}, base_options, _td_options);
-var bd_options = $.extend(true, {}, base_options, _bd_options);
-var vg_options = $.extend(true, {}, base_options, _vg_options);
-var cg_options = $.extend(true, {}, base_options, _cg_options);
+var _tracegraph_options = {
+    series: {
+        lines: {
+            lineWidth: 1.5,
+            steps: false}},
+    xaxis: {
+        axisLabel: 'Time (ns)',
+        max: 200},
+    yaxis: {
+        axisLabel: 'Signal (mV)',
+        min: -1500,
+        max: 0}
+};
+
+var eh_options = $.extend(true, {}, base_options, _eventhist_options);
+var ph_options = $.extend(true, {}, base_options, _pulseheighthist_options);
+var pi_options = $.extend(true, {}, base_options, _pulseintegralhist_options);
+var td_options = $.extend(true, {}, base_options, _temperaturedata_options);
+var bd_options = $.extend(true, {}, base_options, _barometerdata_options);
+var vg_options = $.extend(true, {}, base_options, _voltagegraph_options);
+var cg_options = $.extend(true, {}, base_options, _currentgraph_options);
+var tr_options = $.extend(true, {}, base_options, _tracegraph_options);
