@@ -1,4 +1,5 @@
 from django.conf.urls.defaults import *
+from django.views.generic import TemplateView
 
 urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^stations/$', 'stations'),
@@ -19,4 +20,5 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/voltage/(?P<station_id>\d+)/$', 'get_voltage_config_source'),
     (r'^source/current/(?P<station_id>\d+)/$', 'get_current_config_source'),
     (r'^source/gps/(?P<station_id>\d+)/$', 'get_gps_config_source'),
+    (r'^help/$', TemplateView.as_view(template_name="help.html")),
 )

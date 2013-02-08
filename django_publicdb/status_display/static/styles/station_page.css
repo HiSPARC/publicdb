@@ -30,13 +30,20 @@
 #eh_histogram,
 #bd_histogram,
 #td_histogram,
-#vg_histogram ,
+#vg_histogram,
 #cg_histogram {
     height: 200px;}
 
 #ph_histogram,
 #pi_histogram {
     height: 300px;}
+
+#tr_graph_ph,
+#tr_graph_pi {
+    height: 170px;}
+
+#ph_histogram_mip {
+    height: 225px;}
 
 .histogram,
 #gpsPositions {
@@ -53,14 +60,16 @@
     display: none;}
 
 h3 {
-    display: inline-block;}
+    display: block;
+    clear: both;
+    margin-bottom: 0.5em;}
 
 .sourceLink {
     float: right;
     position: relative;
     right: 15px;
     font-size: 8pt;
-    margin: 27px 0 0 0;
+    margin: 0;
     padding: 0;}
 
 .sourceLink a {
@@ -206,3 +215,13 @@ a.currentPage {
 
 .curr {background-color: #2A7AE2;}
 .old {background-color: #B85C32;}
+
+
+/* Help */
+
+.term {
+    font-size: 18px;}
+
+.meaning {
+    margin-left: 10px;
+    font-size: 13px;}
