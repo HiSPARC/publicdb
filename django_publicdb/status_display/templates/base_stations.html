@@ -66,4 +66,12 @@
       {% block sidebar %}{% endblock %}    
     </div>
 
+    <div id="help">
+      {% block help %}
+        <div class="keyvalue">
+            <span class="value"><a href="{% url 'status_display.views.help' %}" target="_blank">Help</a></span>
+        </div>
+      {% endblock %}    
+    </div>
+
 {% endblock %}

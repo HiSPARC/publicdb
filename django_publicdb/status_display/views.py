@@ -608,3 +608,8 @@ def station_has_data(station):
         has_data = False
 
     return has_data
+
+
+def help(request):
+    return render_to_response('help.html',
+                              context_instance=RequestContext(request))
