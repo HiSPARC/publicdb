@@ -1,0 +1,38 @@
+{% extends 'base_live.html' %}
+
+{% load url from future %}
+
+{% block title %}{{ block.super }}{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_live.js"></script>
+    <script type="text/javascript">
+        function downloadGraph(target) {
+            var dataurl = $(target + ' .flot-base')[0].toDataURL();
+            window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
+        }
+    </script>
+{% endblock %}
+
+{% block data %}
+    <div id="graphs">
+
+      {% if traces %}
+        <div id="traceGraph" class="graph">
+            <h3>Signal</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#tr_graph')">Image</a>
+            </div>
+            <div class="plot" id="tr_graph"></div>
+            <script type="text/javascript">
+                $.plot($("#tr_graph"), [
+                  {% for data in traces.data %}
+                    {data: {{ data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2}],
+                    tr_options);
+            </script>
+        </div>
+      {% endif %}
+    </div>
+{% endblock %}
