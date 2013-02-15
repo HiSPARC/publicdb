@@ -22,7 +22,7 @@ def station(request, station_id):
         cluster_name = station.cluster.name
     event, traces = get_trace(cluster_name, station.number)
     traces = subtract_baseline(event, traces)
-    traces = create_plot_object(traces, 'Time [sample]', 'Signal [ADC]')
+    traces = create_plot_object(traces, 'Time (ns)', 'Signal (ADC)')
     return render_to_response('live_display.html',
         {'station': station,
          'event': event,
@@ -39,7 +39,7 @@ def get_new_event(request, station_id, iterator):
         cluster_name = station.cluster.name
     event, traces = get_trace(cluster_name, station.number, iterator)
     traces = subtract_baseline(event, traces)
-    traces = create_plot_object(traces, 'Time [sample]', 'Signal [ADC]')
+    traces = create_plot_object(traces, 'Time (ns)', 'Signal (ADC)')
 
     return json_dict(traces)
 
@@ -52,7 +52,7 @@ def subtract_baseline(event, traces):
 def create_plot_object(y_series, x_label, y_label):
     if type(y_series[0]) != list and type(y_series[0]) != tuple:
             y_series = [y_series]
-    data = [[[xv, -yv] for xv, yv in enumerate(y_values)] for
+    data = [[[xv * 2.5, -yv] for xv, yv in enumerate(y_values)] for
             y_values in y_series]
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
