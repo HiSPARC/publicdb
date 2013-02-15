@@ -35,7 +35,8 @@ def retrieve_event(node, iterator):
     """
     event = node.events[-iterator];
     trace_idx = event['traces'];
-    trace_str = [zlib.decompress(node.blobs[idx]).split(',') for idx in trace_idx]
+    trace_str = [zlib.decompress(node.blobs[idx]).split(',')
+                 for idx in trace_idx if idx != -1]
     traces = [[int(val) for val in plate if val != ''] for plate in trace_str]
     return event, traces
 
