@@ -9,7 +9,7 @@ import tables
 from django.conf import settings
 
 
-def get_trace(cluster, station_id, iterator=2):
+def get_trace(cluster, station_id, iterator=1):
     """
 
     :param cluster: string containing the cluster name (slugged)

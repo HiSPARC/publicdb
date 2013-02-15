@@ -11,6 +11,32 @@
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
             window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
         }
+
+        $(document).ready(function() {
+            var data = [];
+            var iterator = 1;
+            var baseurl = "{% url 'live.views.get_new_event' station.number %}"
+
+            function fetchData() {
+                function onDataReceived(traces) {
+                    if (iterator < 40) {
+                        ++iterator}
+                    else {
+                        iterator = 1}
+                    data = [];
+                    for (var i = 0; i < traces.data.length; i++) {
+                        data.push({data: traces.data[i], yaxis: 1});}
+                    $.plot("#tr_graph", data, tr_options);}
+
+                $.ajax({url: baseurl + iterator,
+                        type: "GET",
+                        dataType: "json",
+                        success: onDataReceived});
+                setTimeout(fetchData, 5000);
+            }
+            setTimeout(fetchData, 5000);
+        });
+
     </script>
 {% endblock %}
 

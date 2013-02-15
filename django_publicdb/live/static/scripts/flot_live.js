@@ -14,10 +14,10 @@ var base_options = {
         color: "#000",
         tickColor: "#000",
         font: {
-            size: 12},
+            size: 15},
         tickLength: 4,
         tickDecimals: 0,
-        labelWidth: 33,
+        labelWidth: 40,
         axisLabelUseCanvas: true,
         axisLabelFontSizePixels: 16},
     xaxis: {
@@ -26,10 +26,10 @@ var base_options = {
         color: "#000",
         tickColor: "#000",
         font: {
-            size: 12},
+            size: 15},
         tickLength: 4,
         tickDecimals: 0,
-        labelHeight: 23,
+        labelHeight: 33,
         axisLabelUseCanvas: true,
         axisLabelFontSizePixels: 16},
     y2axis: {
@@ -71,7 +71,8 @@ var _tracegraph_options = {
     xaxis: {
         axisLabel: 'Time (ns)'},
     yaxis: {
-        axisLabel: 'Signal (ADC)'}
+        axisLabel: 'Signal (ADC)',
+        max: 20}
 };
 
 var tr_options = $.extend(true, {}, base_options, _tracegraph_options);

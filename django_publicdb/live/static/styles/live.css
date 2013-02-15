@@ -1,5 +1,19 @@
 /* Header */
 
+#container {
+    margin: auto;
+    width: 1880px;}
+
+#pageHeader {
+    background: url(../header.png) top right no-repeat;
+    height: 63px;
+    width: 200px;
+    margin: 0;
+    padding: 0;
+    left: 1630px;
+    display: inline-block;
+    position: relative;}
+
 #header * {
     margin: 0;
     padding: 0;}
@@ -16,10 +30,10 @@
 
 #graphs {
     float: left;
-    width: 609px;}
+    width: 800px;}
 
 #tr_graph {
-    height: 170px;}
+    height: 400px;}
 
 .plot {
     display: block;
@@ -172,13 +186,13 @@ a.currentPage {
     font-weight: bold;
     margin-right: 10px;}
 
-.ch1 {color:#222;}
-.ch2 {color:#D22;}
-.ch3 {color:#1C2;}
-.ch4 {color:#1CC;}
+.ch1 {color: #222;}
+.ch2 {color: #D22;}
+.ch3 {color: #1C2;}
+.ch4 {color: #1CC;}
 
-.good {color:#091;}
-.bad {color:#F11;}
+.good {color: #091;}
+.bad {color: #F11;}
 
 .gpsBall {
     width: 8px;

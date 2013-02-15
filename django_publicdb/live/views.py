@@ -1,10 +1,12 @@
+from django.http import HttpResponse
 from django.shortcuts import (render_to_response, get_object_or_404,
                               get_list_or_404, redirect)
 from django.template import RequestContext
 from django.conf import settings
-from django.db.models import Q
 
+import json
 import datetime
+import random
 
 from django_publicdb.inforecords.models import *
 from datastore import *
@@ -14,7 +16,11 @@ def station(request, station_id):
 
     station_id = int(station_id)
     station = get_object_or_404(Station, number=station_id)
-    event, traces = get_trace(station.cluster.parent.name, station.number)
+    try:
+        cluster_name = station.cluster.parent.name
+    except:
+        cluster_name = station.cluster.name
+    event, traces = get_trace(cluster_name, station.number)
     traces = subtract_baseline(event, traces)
     traces = create_plot_object(traces, 'Time [sample]', 'Signal [ADC]')
     return render_to_response('live_display.html',
@@ -22,6 +28,21 @@ def station(request, station_id):
          'event': event,
          'traces': traces},
         context_instance=RequestContext(request))
+
+
+def get_new_event(request, station_id, iterator):
+    iterator = int(iterator)
+    station = get_object_or_404(Station, number=station_id)
+    try:
+        cluster_name = station.cluster.parent.name
+    except:
+        cluster_name = station.cluster.name
+    event, traces = get_trace(cluster_name, station.number, iterator)
+    traces = subtract_baseline(event, traces)
+    traces = create_plot_object(traces, 'Time [sample]', 'Signal [ADC]')
+
+    return json_dict(traces)
+
 
 def subtract_baseline(event, traces):
     traces = [[val - event['baseline'][i] for val in trace] for i, trace in enumerate(traces)]
@@ -45,3 +66,11 @@ def get_new_trace(request, station_id):
     tracedata = create_histogram('eventtime', station, date)
 
     return trace
+
+
+def json_dict(dict):
+    """Create a json HTTPResponse"""
+    response = HttpResponse(json.dumps(dict, sort_keys=True),
+                            content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
