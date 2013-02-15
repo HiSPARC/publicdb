@@ -9,7 +9,7 @@ import datetime
 import random
 
 from django_publicdb.inforecords.models import *
-from datastore import *
+from datastore import get_trace
 
 def station(request, station_id):
     """Show daily histograms for a particular station"""

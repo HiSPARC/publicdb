@@ -28,7 +28,7 @@
                         data.push({data: traces.data[i], yaxis: 1});}
                     $.plot("#tr_graph", data, tr_options);}
 
-                $.ajax({url: baseurl + iterator,
+                $.ajax({url: baseurl + iterator + '/',
                         type: "GET",
                         dataType: "json",
                         success: onDataReceived});
