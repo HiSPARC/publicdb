@@ -67,9 +67,9 @@ We will now populate this environment with all prerequisites.  To
 duplicate the environment used while writing this documentation, use the
 following instructions, including version numbers.  To install the latest
 versions of the software, drop the `==<version>` part.  For example, you
-can install ipython 0.12.1 using::
+can install ipython 0.13.1 using::
 
-    $ pip install ipython==0.12.1
+    $ pip install ipython==0.13.1
 
 Alternatively, install the latest version with::
 
@@ -77,17 +77,17 @@ Alternatively, install the latest version with::
 
 The complete requirements and installation instructions are::
 
-    $ pip install ipython==0.12.1
+    $ pip install ipython==0.13.1
 
-    $ pip install Cython==0.16
+    $ pip install Cython==0.17.1
     $ pip install numpy==1.6.2
 
     $ pip install numexpr==2.0.1
-    $ pip install tables==2.3.1
+    $ pip install tables==2.4.0
 
     $ pip install recaptcha-client==1.0.6
 
-    $ pip install Django==1.4.2
+    $ pip install Django==1.4.3
     $ pip install South==0.7.3
 
 You now have all the prerequisites for running the publicdb django app.
