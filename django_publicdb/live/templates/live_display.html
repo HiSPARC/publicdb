@@ -13,6 +13,15 @@
             window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
         }
 
+        function resizeToFit() {
+            w_scale = $(window).width() / 1940;
+            h_scale = $(window).height() / 1100;
+            scale = Math.min(w_scale, h_scale);
+            $('body').css({'zoom': scale,
+                         '-moz-transform': 'scale(' + scale + ')',
+                         '-moz-transform-origin': '0 0'})
+        }
+
         $(document).ready(function() {
             resizeToFit();
             $(window).resize(function() {
