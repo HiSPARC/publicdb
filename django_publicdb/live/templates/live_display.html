@@ -6,6 +6,7 @@
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_live.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/screenfull.min.js"></script>
     <script type="text/javascript">
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -13,6 +14,17 @@
         }
 
         $(document).ready(function() {
+            resizeToFit();
+            $(window).resize(function() {
+                resizeToFit();
+            });
+
+            if (screenfull.enabled) {
+                $('#fullscreen').css('visibility', 'visible').click(function() {
+                    screenfull.request();
+                });
+            }
+
             var data = [];
             var iterator = 1;
             var baseurl = "{% url 'live.views.get_new_event' station.number %}"
@@ -40,15 +52,16 @@
     </script>
 {% endblock %}
 
-{% block data %}
-    <div id="graphs">
+{% block content %}
+    <div id="fullscreen">
+        <a>Enter fullscreen</a>
+    </div>
+    {{ block.super }}
 
+    <div id="graphs">
       {% if traces %}
         <div id="traceGraph" class="graph">
-            <h3>Signal</h3>
-            <div class="sourceLink">
-                <a onclick="downloadGraph('#tr_graph')">Image</a>
-            </div>
+            <h3>Event signal</h3>
             <div class="plot" id="tr_graph"></div>
             <script type="text/javascript">
                 $.plot($("#tr_graph"), [

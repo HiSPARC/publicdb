@@ -1,8 +1,12 @@
 /* Header */
 
+html {
+    background: white;}
+
 #container {
     margin: auto;
-    width: 1880px;}
+    width: 1920px;
+    height: 1080px;}
 
 #pageHeader {
     background: url(../header.png) top right no-repeat;
@@ -10,7 +14,7 @@
     width: 200px;
     margin: 0;
     padding: 0;
-    left: 1630px;
+    left: 1700px;
     display: inline-block;
     position: relative;}
 
@@ -21,19 +25,29 @@
 #header {
     margin-bottom: 15px;}
 
+#header h2 {
+    text-align: center;
+    font-size: 2em;}
+
 #date {
     font-weight: normal;
     font-size: 11pt;
     margin-top: 5px;}
 
+#fullscreen {
+    visibility: hidden;
+    font-size: 12px;
+    left: 1760px;
+    position: relative;}
+
 /* Graphs */
 
 #graphs {
     float: left;
-    width: 800px;}
+    width: 1000px;}
 
 #tr_graph {
-    height: 400px;}
+    height: 500px;}
 
 .plot {
     display: block;
@@ -46,6 +60,7 @@
     display: none;}
 
 h3 {
+    text-align: center;
     display: block;
     clear: both;
     margin-bottom: 0.5em;}
