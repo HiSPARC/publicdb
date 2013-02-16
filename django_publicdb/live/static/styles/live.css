@@ -35,10 +35,10 @@ html {
     margin-top: 5px;}
 
 #fullscreen {
+    padding: 0px 15px;
     visibility: hidden;
     font-size: 12px;
-    left: 1760px;
-    position: relative;}
+    text-align: right;}
 
 /* Graphs */
 
