@@ -231,7 +231,7 @@ class SessionRequest(models.Model):
         subject = 'HiSPARC analysis session request'
         message = ('Hello %s,'
                    '\n\nPlease click on this link to confirm your request for an analysis session with jSparc:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/request/%s') % (self.name, self.url)
+                   '\nhttp://data.hisparc.nl/analysis-session/request/%s') % (self.name, self.url)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -248,7 +248,7 @@ class SessionRequest(models.Model):
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
+                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
                    (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
@@ -267,7 +267,7 @@ class SessionRequest(models.Model):
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
+                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
                    (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
