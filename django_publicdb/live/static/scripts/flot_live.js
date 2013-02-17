@@ -14,24 +14,24 @@ var base_options = {
         color: "#000",
         tickColor: "#000",
         font: {
-            size: 15},
+            size: 18},
         tickLength: 4,
         tickDecimals: 0,
         labelWidth: 40,
         axisLabelUseCanvas: true,
-        axisLabelFontSizePixels: 16},
+        axisLabelFontSizePixels: 22},
     xaxis: {
         show: true,
         position: "bottom",
         color: "#000",
         tickColor: "#000",
         font: {
-            size: 15},
+            size: 18},
         tickLength: 4,
         tickDecimals: 0,
         labelHeight: 33,
         axisLabelUseCanvas: true,
-        axisLabelFontSizePixels: 16},
+        axisLabelFontSizePixels: 22},
     y2axis: {
         show: true,
         position: "right",

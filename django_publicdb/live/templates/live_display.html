@@ -23,39 +23,46 @@
         }
 
         $(document).ready(function() {
+            // Automatically resize the content to fit in window
             resizeToFit();
             $(window).resize(function() {
                 resizeToFit();
             });
 
+            // Show a fullscreen button if browser support Fullscreen API
             if (screenfull.enabled) {
                 $('#fullscreen').css('visibility', 'visible').click(function() {
                     screenfull.request();
-                });
-            }
+                });}
 
+            // Get new traces on an interval
             var data = [];
-            var iterator = 1;
+            var refreshRate = 5000;
+            var iteratorStart = 40;
+            var iterator = iteratorStart;
             var baseurl = "{% url 'live.views.get_new_event' station.number %}"
 
             function fetchData() {
                 function onDataReceived(traces) {
-                    if (iterator < 40) {
-                        ++iterator}
+                    if (iterator > 1) {
+                        iterator--;}
                     else {
-                        iterator = 1}
+                        iterator = iteratorStart;}
                     data = [];
                     for (var i = 0; i < traces.data.length; i++) {
                         data.push({data: traces.data[i], yaxis: 1});}
-                    $.plot("#tr_graph", data, tr_options);}
+                    $.plot("#tr_graph", data, tr_options);
+                }
 
                 $.ajax({url: baseurl + iterator + '/',
                         type: "GET",
                         dataType: "json",
                         success: onDataReceived});
-                setTimeout(fetchData, 5000);
+                setTimeout(fetchData, refreshRate);
             }
-            setTimeout(fetchData, 5000);
+
+            setTimeout(fetchData, refreshRate);
+
         });
 
     </script>
@@ -67,7 +74,7 @@
     </div>
     {{ block.super }}
 
-    <div id="graphs">
+    <div id="traces">
       {% if traces %}
         <div id="traceGraph" class="graph">
             <h3>Event signal</h3>

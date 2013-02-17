@@ -42,7 +42,7 @@ html {
 
 /* Graphs */
 
-#graphs {
+#traces {
     float: left;
     width: 1000px;}
 
@@ -60,6 +60,7 @@ html {
     display: none;}
 
 h3 {
+    font-size: 28px;
     text-align: center;
     display: block;
     clear: both;
