@@ -8,25 +8,23 @@ import json
 import datetime
 import random
 
+import numpy as np
+
+from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
-from datastore import get_trace
+from datastore import get_event
 
 def station(request, station_id):
     """Show daily histograms for a particular station"""
 
     station_id = int(station_id)
     station = get_object_or_404(Station, number=station_id)
-    try:
-        cluster_name = station.cluster.parent.name
-    except:
-        cluster_name = station.cluster.name
-    event, traces = get_trace(cluster_name, station.number)
-    traces = subtract_baseline(event, traces)
-    traces = create_plot_object(traces, 'Time (ns)', 'Signal (ADC)')
+    config = (Configuration.objects.filter(source__station=station,
+                                           timestamp__lt=datetime.date.today())
+                                   .latest('timestamp'))
     return render_to_response('live_display.html',
         {'station': station,
-         'event': event,
-         'traces': traces},
+         'config': config},
         context_instance=RequestContext(request))
 
 
@@ -37,11 +35,10 @@ def get_new_event(request, station_id, iterator):
         cluster_name = station.cluster.parent.name
     except:
         cluster_name = station.cluster.name
-    event, traces = get_trace(cluster_name, station.number, iterator)
+    event, traces, event_count = get_event(cluster_name, station.number, iterator)
     traces = subtract_baseline(event, traces)
     traces = create_plot_object(traces, 'Time (ns)', 'Signal (ADC)')
-
-    return json_dict(traces)
+    return json_dict({"event": event, "traces": traces, "count": event_count})
 
 
 def subtract_baseline(event, traces):

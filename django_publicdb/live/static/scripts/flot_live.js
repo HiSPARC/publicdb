@@ -17,7 +17,7 @@ var base_options = {
             size: 18},
         tickLength: 4,
         tickDecimals: 0,
-        labelWidth: 40,
+        labelWidth: 55,
         axisLabelUseCanvas: true,
         axisLabelFontSizePixels: 22},
     xaxis: {
@@ -29,7 +29,7 @@ var base_options = {
             size: 18},
         tickLength: 4,
         tickDecimals: 0,
-        labelHeight: 33,
+        labelHeight: 40,
         axisLabelUseCanvas: true,
         axisLabelFontSizePixels: 22},
     y2axis: {
@@ -50,7 +50,7 @@ var base_options = {
         tickFormatter: HideTickLabels},
     grid: {
         show: true,
-        aboveData: 0,
+        aboveData: false,
         color: "#000",
         backgroundColor: "rgba(255, 255, 255, 0)",
         labelMargin: 7,
@@ -72,7 +72,17 @@ var _tracegraph_options = {
         axisLabel: 'Time (ns)'},
     yaxis: {
         axisLabel: 'Signal (ADC)',
-        max: 20}
+        max: 20},
+    grid: {
+        markings: [{yaxis: {from: -53, to: -53},
+                    color: "#ddd",
+                    lineWidth: .5},
+                   {yaxis: {from: -123, to: -123},
+                    color: "#ddd",
+                    lineWidth: .5},
+                   {yaxis: {from: -210, to: -210},
+                    color: "#ccc",
+                    lineWidth: 1}]}
 };
 
 var tr_options = $.extend(true, {}, base_options, _tracegraph_options);

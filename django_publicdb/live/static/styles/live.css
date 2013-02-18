@@ -3,10 +3,14 @@
 html {
     background: white;}
 
+body {
+    margin: 10px;
+    font-size: 100%;}
+
 #container {
     margin: auto;
-    width: 1920px;
-    height: 1080px;}
+    width: 1900px;
+    height: 1060px;}
 
 #pageHeader {
     background: url(../header.png) top right no-repeat;
@@ -27,59 +31,62 @@ html {
 
 #header h2 {
     text-align: center;
-    font-size: 2em;}
+    font-size: 200%;}
 
 #date {
     font-weight: normal;
-    font-size: 11pt;
+    font-size: 100%;
     margin-top: 5px;}
 
 #fullscreen {
     padding: 0px 15px;
     visibility: hidden;
-    font-size: 12px;
+    font-size: 80%;
     text-align: right;}
 
-/* Graphs */
+/* Areas */
+
+.clearer {
+    margin: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+    clear: both;}
 
 #traces {
     float: left;
     width: 1000px;}
 
-#tr_graph {
-    height: 500px;}
+#info {
+    float: left;
+    width: 800px;}
 
-.plot {
-    display: block;
-    clear: both;}
+#data {
+    float: right;
+    width: 800px;}
 
-.x2Axis .tickLabel {
-    display: none;}
+#reconstruction {
+    float: right;
+    width: 800px;}
 
-.y2Axis .tickLabel {
-    display: none;}
+#location {
+    float: right;
+    width: 800px;
+    height: 350px;}
+
+#map{
+    width: 750px;
+    height: 300px;}
+
+/* Text */
 
 h3 {
-    font-size: 28px;
+    font-size: 180%;
     text-align: center;
     display: block;
     clear: both;
-    margin-bottom: 0.5em;}
-
-.sourceLink {
-    float: right;
-    position: relative;
-    right: 15px;
-    font-size: 8pt;
-    margin: 0;
-    padding: 0;}
-
-.sourceLink a {
-    padding: 3px;
-    cursor: pointer;}
-
-
-/* Sidebar */
+    margin-top: 0.7em;
+    margin-bottom: 0.4em;}
 
 a:hover {
     color: #005;
@@ -91,7 +98,75 @@ a {
     color: #25B;
     text-decoration: none;}
 
+.sectionTitle {
+    margin-top: 0.75em;
+    font-size: 150%;
+    font-weight: bold;}
+
+.keyvalue {
+    font-size: 120%;
+    margin-top: 5px;
+    margin-bottom: 5px;}
+
+.key {
+    font-weight: bold;
+    margin-right: 10px;}
+
+.value {
+    margin-right: 2px;}
+
+
+/* Graphs */
+
+#tr_graph {
+    overflow: hidden;
+    height: 450px;}
+
+.plot {
+    display: block;
+    clear: both;}
+
+.x2Axis .tickLabel {
+    display: none;}
+
+.y2Axis .tickLabel {
+    display: none;}
+
+.sourceLink {
+    float: right;
+    position: relative;
+    right: 15px;
+    font-size: 80%;
+    margin: 0;
+    padding: 0;}
+
+.sourceLink a {
+    padding: 3px;
+    cursor: pointer;}
+
+/* Legend */
 .ch1 {color: #222;}
 .ch2 {color: #D22;}
 .ch3 {color: #1C2;}
 .ch4 {color: #1CC;}
+
+.olControlAttribution {
+    position: absolute !important;
+    font-size: 60% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 5 0 0 0 !important;}
+
+.olControlScaleLine {
+    position: absolute !important;
+    font-size: 60% !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 0 5px 0 0 !important;}
+
