@@ -3,10 +3,9 @@
 
 #stationList {
     float: left;
-    width: 609px;}
-
-#stationList {
+    width: 609px;
     font-size: 10pt;
+    margin-bottom: 30px;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;}
