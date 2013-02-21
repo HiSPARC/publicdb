@@ -13,11 +13,10 @@ urlpatterns = patterns('django_publicdb.api.views',
     (r'^station/(?P<station_id>\d+)/$', 'station'),
 
     (r'^station/(?P<station_id>\d+)/data/$', 'has_data'),
-    (r'^station/(?P<station_id>\d+)/weather/$', 'has_weather'),
-    (r'^station/(?P<station_id>\d+)/config/$', 'config'),
-
     (r'^station/(?P<station_id>\d+)/data/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'has_data'),
+    (r'^station/(?P<station_id>\d+)/weather/$', 'has_weather'),
     (r'^station/(?P<station_id>\d+)/weather/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'has_weather'),
+    (r'^station/(?P<station_id>\d+)/config/$', 'config'),
     (r'^station/(?P<station_id>\d+)/config/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'config'),
 
     (r'^station/(?P<station_id>\d+)/num_events/$', 'num_events'),
