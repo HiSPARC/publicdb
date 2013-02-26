@@ -61,6 +61,20 @@ def stations(request, subcluster_id=None):
     return json_dict(station)
 
 
+def stations_with_data(request, year, month, day):
+    """Check which stations have event data on the given date"""
+
+    date = datetime.date(int(year), int(month), int(day))
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = Summary.objects.filter(num_events__isnull=False, date=date)
+    stations = [{'number': summary.station.number, 'name': summary.station.name}
+                    for summary in summaries]
+
+    return json_dict(stations)
+
+
 def subclusters(request, cluster_id=None):
     """Get list of subclusters, can be filtered by parent cluster"""
     if cluster_id:
