@@ -19,6 +19,27 @@ def json_dict(dict):
     return response
 
 
+def man(request):
+    """Give overview of the possible urls"""
+
+    man = {
+        "stations": 'stations/',
+        "stations_in_subcluster": 'subclusters/<subcluster_id>/',
+        "subclusters": 'subclusters/',
+        "subclusters_in_cluster": 'clusters/<cluster_id>/',
+        "clusters": 'clusters/',
+        "clusters_in_country": 'countries/<country_id>/',
+        "countries": 'countries/',
+        "stations_with_data": 'stations/<year>/<month>/<day>/',
+        "station_info": 'station/<station_id>/',
+        "has_data": 'station/<station_id>/data/{<year>/<month>/<day>/}',
+        "has_weather": 'station/<station_id>/weather/{<year>/<month>/<day>/}',
+        "configuration": 'station/<station_id>/config/{<year>/<month>/<day>/}',
+        "number_of_events": 'station/<station_id>/num_events/{<year>/{<month>/{<day>/{<hour>/}}}}'}
+
+    return json_dict(man)
+
+
 def station(request, station_id=None):
     """Get station info, can be filtered by station"""
     try:

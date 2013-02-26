@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import *
 
 urlpatterns = patterns('django_publicdb.api.views',
+    (r'^$', 'man'),
+
     (r'^stations/$', 'stations'),
     (r'^subclusters/$', 'subclusters'),
     (r'^clusters/$', 'clusters'),
