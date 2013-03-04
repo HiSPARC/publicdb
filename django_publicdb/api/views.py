@@ -23,19 +23,20 @@ def man(request):
     """Give overview of the possible urls"""
 
     man = {
+        "base_url": 'http://data.hisparc.nl/api/',
         "stations": 'stations/',
-        "stations_in_subcluster": 'subclusters/<subcluster_id>/',
+        "stations_in_subcluster": 'subclusters/{subcluster_id}/',
         "subclusters": 'subclusters/',
-        "subclusters_in_cluster": 'clusters/<cluster_id>/',
+        "subclusters_in_cluster": 'clusters/{cluster_id}/',
         "clusters": 'clusters/',
-        "clusters_in_country": 'countries/<country_id>/',
+        "clusters_in_country": 'countries/{country_id}/',
         "countries": 'countries/',
-        "stations_with_data": 'stations/<year>/<month>/<day>/',
-        "station_info": 'station/<station_id>/',
-        "has_data": 'station/<station_id>/data/{<year>/<month>/<day>/}',
-        "has_weather": 'station/<station_id>/weather/{<year>/<month>/<day>/}',
-        "configuration": 'station/<station_id>/config/{<year>/<month>/<day>/}',
-        "number_of_events": 'station/<station_id>/num_events/{<year>/{<month>/{<day>/{<hour>/}}}}'}
+        "stations_with_data": 'stations/{year}/{month}/{day}/',
+        "station_info": 'station/{station_id}/',
+        "has_data": 'station/{station_id}/data/{year}/{month}/{day}/',
+        "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
+        "configuration": 'station/{station_id}/config/{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_id}/num_events/{year}/{month}/{day}/{hour}/'}
 
     return json_dict(man)
 
