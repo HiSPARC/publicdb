@@ -322,7 +322,10 @@ def num_events_month(request, station_id, year, month):
         return HttpResponseNotFound()
 
     start = datetime.date(int(year), int(month), 1)
-    end = datetime.date(int(year), int(month) + 1, 1)
+    if int(month) == 12:
+        end = datetime.date(int(year) + 1, 1, 1)
+    else:
+        end = datetime.date(int(year), int(month) + 1, 1)
     if not validate_date(start):
         return HttpResponseNotFound()
 
