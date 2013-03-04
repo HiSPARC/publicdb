@@ -1,6 +1,6 @@
 User-agent: *
 Disallow: /api/*
-Disallow: /show/stations/*/*/
+Disallow: /show/stations/*/*/*/
 Disallow: /show/source/
 Disallow: /analysis-session/
 Disallow: /software-updates/
