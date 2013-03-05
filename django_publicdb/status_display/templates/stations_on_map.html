@@ -8,18 +8,6 @@
 
 {% block head %}
     <script type="text/javascript">
-        var pointStyle = {
-            fillColor: '#1BAF16',
-            fillOpacity: 0.8,
-            strokeOpacity: 0.8,
-            strokeWidth: 1,
-            pointRadius: 3,
-            cursor: 'pointer'};
-        var pointStyle_down = $.extend(true, {}, pointStyle, {fillColor:'#F00'});
-        var pointStyle_problem = $.extend(true, {}, pointStyle, {fillColor:'#FFD700'});
-        var pointStyle_up = $.extend(true, {}, pointStyle, {fillColor:'#008000'});
-        var pointStyle_unknown = $.extend(true, {}, pointStyle, {fillColor:'#00F'});
-
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
             var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
@@ -32,87 +20,86 @@
             var map = new OpenLayers.Map("stationMap", options);
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
+            var colors = {"down": 'red',
+                          "problem": 'gold',
+                          "up": 'green',
+                          "unknown": 'blue'};
+            var context = {
+                getColor: function(feature) {
+                    return colors[feature.attributes["status"]];},
+                getLabel: function(feature) {
+                    if (map.getZoom() >= 14) {
+                        return feature.attributes["id"];}
+                    else {
+                        return ''}},
+                getSize: function(feature) {
+                    return .5 * map.getZoom();}};
+            var pointStyle = {
+                fillColor: "${getColor}", // using context.getColor(feature)
+                fillOpacity: 0.8,
+                strokeColor: "black",
+                strokeOpacity: 0.75,
+                strokeWidth: 1,
+                pointRadius: "${getSize}", // using context.getSize(feature)
+                cursor: 'pointer',
+                label: '${getLabel}', // using context.getLabel(feature)
+                labelYOffset: 16,
+                fontSize: 12,
+                fontFamily: 'sans-serif',
+                fontWeight: 'bold'};
+            var style = new OpenLayers.Style(pointStyle, {context: context});
 
             map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
-      {% for cluster in clusters %}
-            var {{ cluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ cluster.name }}");
-        {% for station in cluster.stations %}
-          {% if station.longitude and station.latitude %} 
-            var feature = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
-                                       .transform(fromProjection, toProjection),
-                {id: {{ station.number }},
-                 name: "{{ station.name }}",
-                 subcluster: "{{ station.cluster }}",
-                 cluster: "{{ station.cluster.parent }}",
-                 link: {{ station.link }},
-                 status: "{{ station.status }}"},
-                pointStyle_{{ station.status }});
-            {{ cluster.name|slugify|remove_hyphens }}.addFeatures(feature);
-          {% endif %}
-        {% endfor %}
-            map.addLayer({{ cluster.name|slugify|remove_hyphens }});
-      {% endfor %}
-            map.events.register('zoomend', this, function(event) {
-                var zLevel = map.getZoom();
-                if (zLevel <= 5) {
-                    setPointRadius(2);}
-                else if (zLevel <= 8) {
-                    setPointRadius(3);}
-                else if (zLevel <= 10) {
-                    setPointRadius(4);}
-                else if (zLevel <= 12) {
-                    setPointRadius(5);}
-                else if (zLevel <= 14) {
-                    setPointRadius(6);}
-                else if (zLevel <= 16) {
-                    setPointRadius(7);}
-                else if (zLevel <= 18) {
-                    setPointRadius(8);}
-            });
-            
-          {% if focus %}
-            var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
-            if (bounds) {map.zoomToExtent(bounds);}
-          {% endif %}
+            {% for cluster in clusters %}
+                var {{ cluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ cluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                    {% for station in cluster.stations %}
+                        {% if station.longitude and station.latitude %} 
+                            var feature = new OpenLayers.Feature.Vector(
+                                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
+                                                       .transform(fromProjection, toProjection),
+                                {id: {{ station.number }},
+                                 name: "{{ station.name }}",
+                                 subcluster: "{{ station.cluster }}",
+                                 cluster: "{{ station.cluster.parent }}",
+                                 link: {{ station.link }},
+                                 status: "{{ station.status }}"});
+                            {{ cluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                        {% endif %}
+                    {% endfor %}
+                map.addLayer({{ cluster.name|slugify|remove_hyphens }});
+            {% endfor %}
+            // Zoom to fit cluster
+            {% if focus %}
+                var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
+                if (bounds) {map.zoomToExtent(bounds);}
+            {% endif %}
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
-
             var selectControl = new OpenLayers.Control.SelectFeature(
-                [{% for cluster in clusters %}{{ cluster.name|slugify|remove_hyphens }}, {% endfor %}],
-                {clickout: true, toggle: false, multiple: false, hover: false,
-                 toggleKey: "ctrlKey", multipleKey: "shiftKey"});
+                [{% for cluster in clusters %}{{ cluster.name|slugify|remove_hyphens }},
+                 {% endfor %}],
+                {clickout: true, hover: false});
             map.addControl(selectControl);
             selectControl.activate();
             {% for cluster in clusters %}
-            {{ cluster.name|slugify|remove_hyphens }}.events.on({
-                "featureselected": function(e) {showStationInfo(e);}});
+                {{ cluster.name|slugify|remove_hyphens }}.events.on({
+                    "featureselected": function(e) {showStationInfo(e);}});
             {% endfor %}
         });
-
-        function setPointRadius(size) {
-            $('circle').attr('r', size.toString());
-            pointStyle.pointRadius = size;
-            pointStyle_down.pointRadius = size;
-            pointStyle_problem.pointRadius = size;
-            pointStyle_up.pointRadius = size;
-            pointStyle_unknown.pointRadius = size;
-        }
 
         function showStationInfo(e) {
             var attr = e.feature.attributes
             stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "/status'><span class='statusBall " + attr.status + "'></span></a>" +
                         "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name + " (" + attr.id + ")</a>");
+
             if (attr.cluster == "None") {cluster = ""}
             else {cluster = " (" + attr.cluster + ")"}
             clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.subcluster + "'> " + attr.subcluster + cluster + "</a>");}
 
         function stationLink(text) {
-            $('#stationLink').html(text);            
-        }
+            $('#stationLink').html(text);}
 
         function clusterLink(text) {
-            $('#clusterLink').html(text);            
-        }
+            $('#clusterLink').html(text);}
     </script>
 {% endblock %}
 
@@ -128,7 +115,7 @@
     <div class="sectionTitle">Selected Station</div>
     <div class="keyvalue">
         <span class="key">Station</span><br />
-        <span class="value" id="stationLink"><span class="statusBall"></span>None</span>
+        <span class="value" id="stationLink"><span class="statusBall"></span> None</span>
     </div>
     <div class="keyvalue">
         <span class="key">Cluster</span><br />
