@@ -186,7 +186,7 @@ a.currentPage {
     background: rgba(255,255,255,0.7);
     font-family: Arial !important;
     padding: 2px 4px !important;
-    border-radius: 5 0 0 0 !important;}
+    border-radius: 5px 0 0 0 !important;}
 
 .olControlScaleLine {
     position: absolute !important;
