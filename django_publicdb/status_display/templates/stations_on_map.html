@@ -83,7 +83,9 @@
             // Zoom to fit cluster
             {% if focus %}
                 var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
-                if (bounds) {map.zoomToExtent(bounds);}
+                if (bounds) {
+                    map.zoomToExtent(bounds);
+                    map.zoomTo(Math.floor(map.getZoom()));}
             {% endif %}
             var selectControl = new OpenLayers.Control.SelectFeature(
                 [{% for cluster in clusters %}
