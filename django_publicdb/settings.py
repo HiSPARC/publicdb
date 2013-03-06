@@ -11,19 +11,19 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
-        'NAME': 'publicdb',                      # Or path to database file if using sqlite3.
-        'USER': 'hisparc',                      # Not used with sqlite3.
-        'PASSWORD': 'hisphisp',                  # Not used with sqlite3.
-        'HOST': 'localhost',                      # Set to empty string for localhost. Not used with sqlite3.
+        'NAME': '../public.db',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
+        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
 
 # Path of the mounted HiSPARC datastore root folder
 # DEV_ONLY
-DATASTORE_PATH = '/Users/arne/Datastore/'
+DATASTORE_PATH = '../datastore'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -137,7 +137,6 @@ INSTALLED_APPS = (
     'django_publicdb.raw_data',
     'django_publicdb.api',
     'django_publicdb.maps',
-    'django_publicdb.live',
     'django_publicdb.jsparc',
     'django_publicdb.default',
     'south',
