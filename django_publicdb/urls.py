@@ -15,6 +15,7 @@ urlpatterns = patterns('',
 
     (r'^api/', include('django_publicdb.api.urls')),
     (r'^show/', include('django_publicdb.status_display.urls')),
+    (r'^maps/', include('django_publicdb.maps.urls')),
     (r'^analysis-session/', include('django_publicdb.analysissessions.urls')),
     (r'^software-updates/', include('django_publicdb.updates.urls')),
     (r'^raw_data/', include('django_publicdb.raw_data.urls')),
