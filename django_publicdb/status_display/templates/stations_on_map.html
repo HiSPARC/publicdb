@@ -75,7 +75,8 @@
             {% endif %}
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
             var selectControl = new OpenLayers.Control.SelectFeature(
-                [{% for cluster in clusters %}{{ cluster.name|slugify|remove_hyphens }},
+                [{% for cluster in clusters %}
+                    {{ cluster.name|slugify|remove_hyphens }}{% if not forloop.last %},{% endif %}
                  {% endfor %}],
                 {clickout: true, hover: false});
             map.addControl(selectControl);
