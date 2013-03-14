@@ -37,6 +37,7 @@ def main():
     test_for_datastore_directory()
     fill_datastore()
 
+
 def test_for_datastore_directory():
     print "Checking for datastore path at %s ..." % datastore_path,
     if not os.path.exists(datastore_path):
@@ -44,9 +45,11 @@ def test_for_datastore_directory():
     else:
         print "Found."
 
+
 def fill_datastore():
     for date in generate_date_range(START, END):
         download_and_store_data_for_date(date)
+
 
 def generate_date_range(start, end):
     date = start
@@ -54,25 +57,27 @@ def generate_date_range(start, end):
         yield date
         date += timedelta(days=1)
 
+
 def download_and_store_data_for_date(date):
     f = get_datastore_file_for_date(date)
     for station in Station.objects.all():
         download_and_store_station_data(f, station, date)
     f.close()
 
+
 def get_datastore_file_for_date(date):
     return open_or_create_file(datastore_path, date)
+
 
 def download_and_store_station_data(f, station, date):
     start = datetime.combine(date, time(0, 0, 0))
     end = start + timedelta(days=1)
 
     cluster = station.cluster.main_cluster()
-    station_group = get_or_create_station_group(f, cluster,
-                                                station.number)
+    station_group = get_or_create_station_group(f, cluster, station.number)
 
-    download_data(f, station_group, station.number, start, end,
-                  get_blobs=True)
+    download_data(f, station_group, station.number, start, end, get_blobs=True)
+
 
 def open_or_create_file(data_dir, date):
     """Open an existing file or create a new one
@@ -85,14 +90,14 @@ def open_or_create_file(data_dir, date):
 
     """
     dir = os.path.join(data_dir, '%d/%d' % (date.year, date.month))
-    file = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month,
-                                              date.day))
+    file = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month, date.day))
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x
         os.makedirs(dir, 0755)
 
     return tables.openFile(file, 'a')
+
 
 def get_or_create_cluster_group(file, cluster):
     """Get an existing cluster group or create a new one
@@ -117,6 +122,7 @@ def get_or_create_cluster_group(file, cluster):
 
     return cluster
 
+
 def get_or_create_station_group(file, cluster, station_id):
     """Get an existing station group or create a new one
 
@@ -137,7 +143,5 @@ def get_or_create_station_group(file, cluster, station_id):
     return station
 
 
-
 if __name__ == '__main__':
     main()
-
