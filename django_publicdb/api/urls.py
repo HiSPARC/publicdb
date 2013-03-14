@@ -12,7 +12,8 @@ urlpatterns = patterns('django_publicdb.api.views',
     (r'^clusters/(?P<cluster_id>\d+)/$', 'subclusters'),
     (r'^countries/(?P<country_id>\d+)/$', 'clusters'),
 
-    (r'^stations/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_data'),
+    (r'^stations/data/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_data'),
+    (r'^stations/weather/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_weather'),
 
     (r'^station/(?P<station_id>\d+)/$', 'station'),
 

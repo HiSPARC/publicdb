@@ -31,7 +31,8 @@ def man(request):
         "clusters": 'clusters/',
         "clusters_in_country": 'countries/{country_id}/',
         "countries": 'countries/',
-        "stations_with_data": 'stations/{year}/{month}/{day}/',
+        "stations_with_data": 'stations/data/{year}/{month}/{day}/',
+        "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
         "station_info": 'station/{station_id}/',
         "has_data": 'station/{station_id}/data/{year}/{month}/{day}/',
         "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
@@ -125,7 +126,21 @@ def stations_with_data(request, year, month, day):
 
     summaries = Summary.objects.filter(num_events__isnull=False, date=date)
     stations = [{'number': summary.station.number, 'name': summary.station.name}
-                    for summary in summaries]
+                for summary in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather(request, year, month, day):
+    """Check which stations have weather data on the given date"""
+
+    date = datetime.date(int(year), int(month), int(day))
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = Summary.objects.filter(num_weather__isnull=False, date=date)
+    stations = [{'number': summary.station.number, 'name': summary.station.name}
+                for summary in summaries]
 
     return json_dict(stations)
 
