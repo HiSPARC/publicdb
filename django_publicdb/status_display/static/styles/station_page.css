@@ -171,6 +171,7 @@ a.currentPage {
     margin-right: 2px;}
 
 #gpsMap {
+    clear: both;
     width: 585px;
     height: 250px;}
 
