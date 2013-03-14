@@ -45,6 +45,7 @@ def station(request, station_id=None):
     """Get station info, can be filtered by station"""
     try:
         station = Station.objects.get(number=station_id)
+        detector = DetectorHisparc.objects.get(station=station)
         config = (Configuration.objects.filter(source__station=station,
                                                timestamp__lte=datetime.date.today())
                                        .latest('timestamp'))
@@ -56,14 +57,46 @@ def station(request, station_id=None):
     except IndexError:
         is_active = False
 
-    station_info = {'number': station.number,
-                    'name': station.name,
-                    'cluster': station.cluster.name,
-                    'country': station.cluster.country.name,
-                    'latitude': config.gps_latitude,
-                    'longitude': config.gps_longitude,
-                    'altitude': config.gps_altitude,
-                    'active': is_active}
+    scintillator1 = {"perpendicular": detector.scintillator_1_perp,
+                     "longitudinal": detector.scintillator_1_long,
+                     "angle": detector.scintillator_1_angle}
+    scintillator2 = {"perpendicular": detector.scintillator_2_perp,
+                     "longitudinal": detector.scintillator_2_long,
+                     "angle": detector.scintillator_2_angle}
+
+    if config.slave() != "no slave":
+        scintillator3 = {"perpendicular": detector.scintillator_3_perp,
+                         "longitudinal": detector.scintillator_3_long,
+                         "angle": detector.scintillator_3_angle}
+        scintillator4 = {"perpendicular": detector.scintillator_4_perp,
+                         "longitudinal": detector.scintillator_4_long,
+                         "angle": detector.scintillator_4_angle}
+
+        station_info = {'number': station.number,
+                        'name': station.name,
+                        'cluster': station.cluster.name,
+                        'country': station.cluster.country.name,
+                        'latitude': config.gps_latitude,
+                        'longitude': config.gps_longitude,
+                        'altitude': config.gps_altitude,
+                        'active': is_active,
+                        'scintillators': 4,
+                        'scintillator1': scintillator1,
+                        'scintillator2': scintillator2,
+                        'scintillator3': scintillator3,
+                        'scintillator4': scintillator4}
+    else:
+        station_info = {'number': station.number,
+                        'name': station.name,
+                        'cluster': station.cluster.name,
+                        'country': station.cluster.country.name,
+                        'latitude': config.gps_latitude,
+                        'longitude': config.gps_longitude,
+                        'altitude': config.gps_altitude,
+                        'active': is_active,
+                        'scintillators': 2,
+                        'scintillator1': scintillator1,
+                        'scintillator2': scintillator2}
 
     return json_dict(station_info)
 
