@@ -34,6 +34,9 @@
 #cg_histogram {
     height: 200px;}
 
+#ag_histogram {
+    height: 130px;}
+
 #ph_histogram,
 #pi_histogram {
     height: 300px;}

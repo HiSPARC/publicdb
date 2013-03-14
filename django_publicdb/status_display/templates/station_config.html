@@ -141,6 +141,24 @@
                 <a href="{% url 'status_display.views.get_gps_config_source' station.number %}">Source</a>
             </div>
             <div id="gpsMap"></div>
+            {% if altitudegraph %}
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#ag_histogram')">Image</a>
+            </div>
+            <div class="plot" id="ag_histogram"></div>
+            <script type="text/javascript">
+                var ag_options = cg_options;
+                ag_labels = {yaxis: {axisLabel: "{{ altitudegraph.y_label }}"},
+                             xaxis: {axisLabel: "{{ altitudegraph.x_label }}"}}
+                $.extend(true, ag_options, ag_labels)
+                $.plot($("#ag_histogram"), [
+                  {% for data in altitudegraph.data %}
+                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ag_options);
+            </script>
+            {% endif %}
+
         </div>
     </div>
 {% endblock %}

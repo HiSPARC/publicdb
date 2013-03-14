@@ -313,6 +313,7 @@ def station_config(request, station_id):
 
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
+    altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
 
     return render_to_response('station_config.html',
@@ -320,6 +321,7 @@ def station_config(request, station_id):
          'config': config,
          'voltagegraph': voltagegraph,
          'currentgraph': currentgraph,
+         'altitudegraph': altitudegraph,
          'gpstrack': gpstrack,
          'has_slave': has_slave,
          'has_data': has_data,
@@ -512,6 +514,9 @@ def plot_config(type, configs):
                   for config in configs]
         values = zip(*values)
         y_label = 'PMT Current (mA)'
+    if type == 'altitude':
+        values = [config.gps_altitude for config in configs]
+        y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
 
