@@ -62,9 +62,9 @@
             var style = new OpenLayers.Style(pointStyle, {context: context});
 
             map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
-            {% for cluster in clusters %}
-                var {{ cluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ cluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
-                    {% for station in cluster.stations %}
+            {% for subcluster in subclusters %}
+                var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                    {% for station in subcluster.stations %}
                         {% if station.longitude and station.latitude %} 
                             var feature = new OpenLayers.Feature.Vector(
                                 new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
@@ -75,14 +75,20 @@
                                  cluster: "{{ station.cluster.parent }}",
                                  link: {{ station.link }},
                                  status: "{{ station.status }}"});
-                            {{ cluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                            {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
                         {% endif %}
                     {% endfor %}
-                map.addLayer({{ cluster.name|slugify|remove_hyphens }});
+                map.addLayer({{ subcluster.name|slugify|remove_hyphens }});
             {% endfor %}
             // Zoom to fit cluster
             {% if focus %}
-                var bounds = {{ focus|slugify|remove_hyphens }}.getDataExtent();
+                {% for layer in focus %}
+                    {% if forloop.first %}
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getDataExtent();
+                    {% else %}
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getDataExtent());
+                    {% endif %}
+                {% endfor %}
                 if (bounds) {
                     map.zoomToExtent(bounds);
                     map.zoomTo(Math.floor(map.getZoom()));}

@@ -17,9 +17,12 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     if country:
         get_object_or_404(Country, name=country)
         if cluster:
-            get_object_or_404(Cluster, name=cluster, parent=None)
+            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
             if subcluster:
-                get_object_or_404(Cluster, name=subcluster)
+                if cluster == subcluster:
+                    get_object_or_404(Cluster, name=subcluster, parent=None)
+                else:
+                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
                 focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
             else:
                 focus = [Cluster.objects.get(name=cluster, parent=None).name]

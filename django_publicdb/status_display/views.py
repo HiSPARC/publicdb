@@ -116,19 +116,35 @@ def stations_by_name(request):
                               context_instance=RequestContext(request))
 
 
-def stations_on_map(request, subcluster=None):
+def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    if subcluster:
-        get_object_or_404(Cluster, name=subcluster)
-    clusters = []
-    for cluster in Cluster.objects.all():
+    if country:
+        get_object_or_404(Country, name=country)
+        if cluster:
+            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
+            if subcluster:
+                if cluster == subcluster:
+                    get_object_or_404(Cluster, name=subcluster, parent=None)
+                else:
+                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
+                focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
+            else:
+                focus = [Cluster.objects.get(name=cluster, parent=None).name]
+                focus.extend(Cluster.objects.filter(parent__name=cluster).values_list('name', flat=True))
+        else:
+            focus = Cluster.objects.filter(country__name=country).values_list('name', flat=True)
+    else:
+        focus = Cluster.objects.all().values_list('name', flat=True)
+
+    subclusters = []
+    for subcluster in Cluster.objects.all():
         stations = []
         for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
-                                        .filter(station__cluster__name=cluster,
+                                        .filter(station__cluster__name=subcluster,
                                                 station__pc__is_active=True)):
             if station_has_data(detector.station):
                 link = detector.station.number
@@ -143,12 +159,12 @@ def stations_on_map(request, subcluster=None):
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
-        clusters.append({'name': cluster.name,
-                         'stations': stations})
+        subclusters.append({'name': subcluster.name,
+                            'stations': stations})
 
     return render_to_response('stations_on_map.html',
-        {'clusters': clusters,
-         'focus': subcluster},
+        {'subclusters': subclusters,
+         'focus': focus},
         context_instance=RequestContext(request))
 
 
