@@ -3,8 +3,7 @@
 {% load url from future %}
 {% load fix_strings %}
 
-{% block current_mapcluster %}{% if focus %}currentPage{% endif %}{% endblock %}
-{% block current_map %}{% if not focus %}currentPage{% endif %}{% endblock %}
+{% block current_map %}currentPage{% endblock %}
 
 {% block head %}
     <script type="text/javascript">

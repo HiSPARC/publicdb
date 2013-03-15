@@ -37,6 +37,7 @@
     font-size: 32px;}
 
 #stationList ul {
+    font-size: 10pt;
     margin: 0 0 15px 0;
     padding-left: 15px;
     list-style: none;}
@@ -50,7 +51,6 @@
 #stationList ul a,
 #stationLink a,
 #clusterLink a {
-    font-size: 10pt;
     color: #23B;
     text-decoration: none;}
 
@@ -61,6 +61,7 @@
 
 #stationLink,
 #clusterLink {
+    font-size: 10pt;
     display: block;
     text-overflow: ellipsis;
     white-space: nowrap;
