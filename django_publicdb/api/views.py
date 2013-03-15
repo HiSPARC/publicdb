@@ -57,21 +57,21 @@ def station(request, station_id=None):
     except IndexError:
         is_active = False
 
-    scintillator1 = {"alfa": detector.scintillator_1_alfa,
+    scintillator1 = {"alpha": detector.scintillator_1_alpha,
                      "beta": detector.scintillator_1_beta,
                      "radius": detector.scintillator_1_radius,
                      "height": detector.scintillator_1_height}
-    scintillator2 = {"alfa": detector.scintillator_2_alfa,
+    scintillator2 = {"alpha": detector.scintillator_2_alpha,
                      "beta": detector.scintillator_2_beta,
                      "radius": detector.scintillator_2_radius,
                      "height": detector.scintillator_2_height}
 
     if config.slave() != "no slave":
-        scintillator3 = {"alfa": detector.scintillator_3_alfa,
+        scintillator3 = {"alpha": detector.scintillator_3_alpha,
                          "beta": detector.scintillator_3_beta,
                          "radius": detector.scintillator_3_radius,
                          "height": detector.scintillator_3_height}
-        scintillator4 = {"alfa": detector.scintillator_4_alfa,
+        scintillator4 = {"alpha": detector.scintillator_4_alpha,
                          "beta": detector.scintillator_4_beta,
                          "radius": detector.scintillator_4_radius,
                          "height": detector.scintillator_4_height}

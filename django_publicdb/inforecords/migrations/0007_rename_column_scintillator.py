@@ -8,25 +8,25 @@ class Migration(DataMigration):
 
     def forwards(self, orm):
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_angle',
-                         'scintillator_1_alfa')
+                         'scintillator_1_alpha')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_perp',
                          'scintillator_1_beta')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_long',
                          'scintillator_1_radius')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_2_angle',
-                         'scintillator_2_alfa')
+                         'scintillator_2_alpha')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_2_perp',
                          'scintillator_2_beta')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_2_long',
                          'scintillator_2_radius')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_3_angle',
-                         'scintillator_3_alfa')
+                         'scintillator_3_alpha')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_3_perp',
                          'scintillator_3_beta')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_3_long',
                          'scintillator_3_radius')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_angle',
-                         'scintillator_4_alfa')
+                         'scintillator_4_alpha')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_perp',
                          'scintillator_4_beta')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_long',
@@ -37,25 +37,25 @@ class Migration(DataMigration):
         db.add_column('inforecords_detectorhisparc', 'scintillator_4_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
 
     def backwards(self, orm):
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_alfa',
+        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_alpha',
                          'scintillator_1_angle')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_beta',
                          'scintillator_1_perp')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_radius',
                          'scintillator_1_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_alfa',
+        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_alpha',
                          'scintillator_2_angle')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_2_beta',
                          'scintillator_2_perp')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_2_radius',
                          'scintillator_2_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_alfa',
+        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_alpha',
                          'scintillator_3_angle')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_3_beta',
                          'scintillator_3_perp')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_3_radius',
                          'scintillator_3_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_alfa',
+        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_alpha',
                          'scintillator_4_angle')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_beta',
                          'scintillator_4_perp')
