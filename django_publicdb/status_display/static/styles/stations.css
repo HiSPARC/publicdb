@@ -96,24 +96,6 @@ h1 a:hover {
     visibility: hidden;
     background-color: blue;}
 
-.olControlAttribution {
-    position: absolute !important;
-    font-size: 10px !important;
-    bottom: 0 !important;
-    right: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 5px 0 0 0 !important;}
-
-.olControlScaleLine {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 0 5px 0 0 !important;}
 
 /* Sidebar */
 
