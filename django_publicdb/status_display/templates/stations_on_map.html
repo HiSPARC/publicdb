@@ -73,6 +73,7 @@
                                  name: "{{ station.name }}",
                                  subcluster: "{{ station.cluster }}",
                                  cluster: "{{ station.cluster.parent }}",
+                                 country: "{{ station.cluster.country }}",
                                  link: {{ station.link }},
                                  status: "{{ station.status }}"});
                             {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
@@ -94,14 +95,14 @@
                     map.zoomTo(Math.floor(map.getZoom()));}
             {% endif %}
             var selectControl = new OpenLayers.Control.SelectFeature(
-                [{% for cluster in clusters %}
-                    {{ cluster.name|slugify|remove_hyphens }}{% if not forloop.last %},{% endif %}
+                [{% for subcluster in subclusters %}
+                    {{ subcluster.name|slugify|remove_hyphens }}{% if not forloop.last %},{% endif %}
                  {% endfor %}],
                 {clickout: true, hover: false});
             map.addControl(selectControl);
             selectControl.activate();
-            {% for cluster in clusters %}
-                {{ cluster.name|slugify|remove_hyphens }}.events.on({
+            {% for subcluster in subclusters %}
+                {{ subcluster.name|slugify|remove_hyphens }}.events.on({
                     "featureselected": function(e) {showStationInfo(e);}});
             {% endfor %}
         });
@@ -111,9 +112,9 @@
             stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "/status'><span class='statusBall " + attr.status + "'></span></a>" +
                         "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name + " (" + attr.id + ")</a>");
 
-            if (attr.cluster == "None") {cluster = ""}
-            else {cluster = " (" + attr.cluster + ")"}
-            clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.subcluster + "'> " + attr.subcluster + cluster + "</a>");}
+            if (attr.cluster == "None") {cluster = attr.subcluster}
+            else {cluster = attr.cluster}
+            clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.country + '/' + cluster + '/' + attr.subcluster + "'> " + attr.subcluster + " (" +  cluster + ")</a>");}
 
         function stationLink(text) {
             $('#stationLink').html(text);}
