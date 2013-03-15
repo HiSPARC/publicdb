@@ -88,12 +88,14 @@ h3 {
 
 /* Sidebar */
 
+#sidebar {
+    float: right;
+    font-size: 9pt;}
+
 #navigation,
 #config,
 #help {
-    float: right;
     width: 220px;
-    font-size: 9pt;
     border-left: 1px solid black;
     padding-left: 20px;}
 
