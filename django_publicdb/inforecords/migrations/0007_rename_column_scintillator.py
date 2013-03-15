@@ -31,6 +31,10 @@ class Migration(DataMigration):
                          'scintillator_4_beta')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_long',
                          'scintillator_4_radius')
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
 
     def backwards(self, orm):
         db.rename_column('inforecords_detectorhisparc', 'scintillator_1_alfa',
@@ -57,6 +61,10 @@ class Migration(DataMigration):
                          'scintillator_4_perp')
         db.rename_column('inforecords_detectorhisparc', 'scintillator_4_radius',
                          'scintillator_4_long')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_height')
 
 
     models = {
