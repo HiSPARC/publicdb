@@ -109,18 +109,20 @@ h1 a:hover {
 
 /* Sidebar */
 
+#sidebar {
+    float: right;
+    font-size: 9pt;}
+
 #legend,
-#sidebar,
+#extra,
 #help {
     margin-top: 20px;}
 
 #legend,
-#sidebar,
+#extra,
 #help,
 #navigation {
-    float: right;
     width: 220px;
-    font-size: 9pt;
     border-left: 1px solid black;
     padding-left: 20px;}
 
