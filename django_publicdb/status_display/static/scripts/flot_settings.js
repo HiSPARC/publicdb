@@ -1,7 +1,7 @@
 function HideTickLabels(v, axis) {
     return " ";}
 
-var base_options = {
+var _base = {
     colors: ["#222", "#D22", "#1C2", "#1CC"],
     series: {
         lines: {
@@ -63,7 +63,7 @@ var base_options = {
     legend: {show: false}
 };
 
-var _eventhist_options = {
+var _eventhistogram = {
     series: {
         lines: {
             lineWidth: 1.5}},
@@ -77,7 +77,7 @@ var _eventhist_options = {
         max: 24}
 };
 
-var _pulseheighthist_options = {
+var _pulseheighthistogram = {
     yaxis: {
         axisLabel: 'Count',
         min: 0.7,
@@ -88,7 +88,7 @@ var _pulseheighthist_options = {
         axisLabel: 'Pulseheight (mV)'}
 };
 
-var _pulseintegralhist_options = {
+var _pulseintegralhistogram = {
     yaxis: {
         axisLabel: 'Count',
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
@@ -99,7 +99,7 @@ var _pulseintegralhist_options = {
         axisLabel: 'Pulseintegral (mVns)'}
 };
 
-var _temperaturedata_options = {
+var _temperaturedata = {
     series: {
         lines: {
             show: false},
@@ -118,7 +118,7 @@ var _temperaturedata_options = {
         max: 24}
 };
 
-var _barometerdata_options = {
+var _barometerdata = {
     series: {
         lines: {
             show: false},
@@ -137,7 +137,7 @@ var _barometerdata_options = {
         max: 24}
 };
 
-var _voltagegraph_options = {
+var _voltagegraph = {
     xaxis: {
         axisLabel: 'Date',
         mode: "time",
@@ -147,7 +147,7 @@ var _voltagegraph_options = {
         min: 300}
 };
 
-var _currentgraph_options = {
+var _currentgraph = {
     xaxis: {
         axisLabel: 'Date',
         mode: "time",
@@ -157,7 +157,17 @@ var _currentgraph_options = {
         min: 0}
 };
 
-var _tracegraph_options = {
+var _altitudegraph = {
+    xaxis: {
+        axisLabel: 'Date',
+        mode: "time",
+        timeformat: "%m/%Y"},
+    yaxis: {
+        axisLabel: 'Altitude (m)',
+        min: 0}
+};
+
+var _tracegraph = {
     series: {
         lines: {
             lineWidth: 1.5,
@@ -171,11 +181,12 @@ var _tracegraph_options = {
         max: 0}
 };
 
-var eh_options = $.extend(true, {}, base_options, _eventhist_options);
-var ph_options = $.extend(true, {}, base_options, _pulseheighthist_options);
-var pi_options = $.extend(true, {}, base_options, _pulseintegralhist_options);
-var td_options = $.extend(true, {}, base_options, _temperaturedata_options);
-var bd_options = $.extend(true, {}, base_options, _barometerdata_options);
-var vg_options = $.extend(true, {}, base_options, _voltagegraph_options);
-var cg_options = $.extend(true, {}, base_options, _currentgraph_options);
-var tr_options = $.extend(true, {}, base_options, _tracegraph_options);
+var eh_options = $.extend(true, {}, _base, _eventhistogram);
+var ph_options = $.extend(true, {}, _base, _pulseheighthistogram);
+var pi_options = $.extend(true, {}, _base, _pulseintegralhistogram);
+var td_options = $.extend(true, {}, _base, _temperaturedata);
+var bd_options = $.extend(true, {}, _base, _barometerdata);
+var vg_options = $.extend(true, {}, _base, _voltagegraph);
+var cg_options = $.extend(true, {}, _base, _currentgraph);
+var ag_options = $.extend(true, {}, _base, _altitudegraph);
+var tr_options = $.extend(true, {}, _base, _tracegraph);
