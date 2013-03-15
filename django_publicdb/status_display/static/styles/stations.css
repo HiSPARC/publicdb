@@ -42,7 +42,10 @@
     list-style: none;}
 
 #stationList li {
-    line-height: 140%}
+    line-height: 140%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;}
 
 #stationList ul a,
 #stationLink a,
@@ -55,6 +58,13 @@
 #stationLink a:hover {
     color: #005;
     text-decoration: underline;}
+
+#stationLink,
+#clusterLink {
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;}
 
 h2 {
     font-size: 24px;
