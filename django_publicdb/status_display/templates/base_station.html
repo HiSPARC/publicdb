@@ -15,6 +15,9 @@
     <div id="header">
         <h2>{% block header %}Station: {{ station.number }} &mdash; {{ station.name }}{% endblock %}</h2>
         <div id="date">{% block date %}{% now "D, j N Y" %}{% endblock %}</div>
+        <div id="notice">Histogram creation is currently not working due to some bad data on the server.<br />
+                         Do not worry, data from all active stations is still being received and stored.<br />
+                         We are working on a fix, once implemented all missing graphs will be generated.</div>
     </div>
     
     {% block data %}

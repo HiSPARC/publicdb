@@ -12,6 +12,15 @@
     font-size: 11pt;
     margin-top: 5px;}
 
+/* Notice */
+#notice {
+    width: 75%;
+    color: #D22;
+    font-size: 13pt;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 5px;}
+
 /* Graphs */
 
 #graphs {
