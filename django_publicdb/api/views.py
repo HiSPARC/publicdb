@@ -42,8 +42,19 @@ def man(request):
     return json_dict(man)
 
 
-def station(request, station_id=None):
-    """Get station info, can be filtered by station"""
+def station(request, station_id):
+    """Get station info
+
+    Retrieve important information about a station.
+
+    :param station_id: a station number identifier
+
+    :return: station_info. This is a dictionary containing info about the
+        station. Most importantly, this contains information about the
+        position of the station, including the position of the individual
+        scintillators.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
         detector = DetectorHisparc.objects.get(station=station)
@@ -103,7 +114,17 @@ def station(request, station_id=None):
 
 
 def stations(request, subcluster_id=None):
-    """Get list of stations, can be filtered by subcluster"""
+    """Get station list
+
+    Retrieve a list of all stations or all stations in a subcluster.
+
+    :param subcluster_id: a subcluster number identifier. If given, only
+        stations belonging to that subcluster will be included in the list.
+
+    :return: stations. This is a list containing dictionaries which consist of
+        the name and number of each station (matching the subcluster).
+
+    """
     if subcluster_id:
         try:
             subcluster = Cluster.objects.get(number=subcluster_id)
@@ -112,14 +133,24 @@ def stations(request, subcluster_id=None):
     else:
         subcluster = None
 
-    station = get_station_dict(subcluster=subcluster)
+    stations = get_station_dict(subcluster=subcluster)
 
-    return json_dict(station)
+    return json_dict(stations)
 
 
 def stations_with_data(request, year, month, day):
-    """Check which stations have event data on the given date"""
+    """Get stations with data
 
+    Retrieve a list of all stations which have data on the given date.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: stations. A list containing the name and number of each station
+        that has measured events on the given date.
+
+    """
     date = datetime.date(int(year), int(month), int(day))
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -132,8 +163,18 @@ def stations_with_data(request, year, month, day):
 
 
 def stations_with_weather(request, year, month, day):
-    """Check which stations have weather data on the given date"""
+    """Get stations with weather data
 
+    Retrieve a list of all stations which have weather data on the given date.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: stations. A list containing the name and number of each station
+        that has measured weather data on the given date.
+
+    """
     date = datetime.date(int(year), int(month), int(day))
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -146,7 +187,18 @@ def stations_with_weather(request, year, month, day):
 
 
 def subclusters(request, cluster_id=None):
-    """Get list of subclusters, can be filtered by parent cluster"""
+    """Get subcluster list
+
+    Retrieve a list of all subclusters or all subclusters in a specific
+    cluster.
+
+    :param cluster_id: a cluster number identifier, give this to only get
+        subclusters from this cluster.
+
+    :return: subclusters. A list containing the name and number of all
+        subclusters that matched the given parameters.
+
+    """
     if cluster_id:
         try:
             cluster = Cluster.objects.get(number=cluster_id, parent=None)
@@ -155,13 +207,24 @@ def subclusters(request, cluster_id=None):
     else:
         cluster = None
 
-    clusters = get_subcluster_dict(cluster=cluster)
+    subclusters = get_subcluster_dict(cluster=cluster)
 
-    return json_dict(clusters)
+    return json_dict(subclusters)
 
 
 def clusters(request, country_id=None):
-    """Get list of clusters, can be filtered by country"""
+    """Get cluster list
+
+    Retrieve a list of all clusters or only the clusters in a specific country.
+    By cluster we here mean the main clusters, which contain subclusters.
+
+    :param country_id: a country number identifier, give this to only get
+        clusters from a specific country.
+
+    :return: clusters. A list containing the name and number of all
+        clusters that matched the given parameters.
+
+    """
     if country_id:
         try:
             country = Country.objects.get(number=country_id)
@@ -176,7 +239,14 @@ def clusters(request, country_id=None):
 
 
 def countries(request):
-    """Get list of countries"""
+    """Get country list
+
+    Retrieve a list of all countries with active stations.
+
+    :return: countries. A list containing the name and number of all
+        countries.
+
+    """
     countries = get_country_dict()
 
     return json_dict(countries)
