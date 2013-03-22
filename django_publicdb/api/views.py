@@ -304,8 +304,20 @@ def get_country_dict():
 
 
 def has_data(request, station_id, year=None, month=None, day=None):
-    """Check if there is valid event data for the given station and date"""
+    """Check for presence of cosmic ray data
 
+    Find out if the given station has measured shower data, either on a
+    specific date, or at all.
+
+    :param station_id: a stationn number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: has_data. A boolean, True if the given station has shower
+        data, False otherwise.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -333,8 +345,20 @@ def has_data(request, station_id, year=None, month=None, day=None):
 
 
 def has_weather(request, station_id, year=None, month=None, day=None):
-    """Check if there is valid weather data for the given station and date"""
+    """Check for presence of weather data
 
+    Find out if the given station has measured weather data, either on a
+    specific date, or at all.
+
+    :param station_id: a stationn number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: has_weather. A boolean, True if the given station has weather
+        data, False otherwise.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -361,8 +385,21 @@ def has_weather(request, station_id, year=None, month=None, day=None):
 
 
 def config(request, station_id, year=None, month=None, day=None):
-    """Get the latest configuration of the station for a given date"""
+    """Get station config settings
 
+    Retrieve the entire configuration of a station. If no date if given the
+    latest config will be sent, otherwise the latest on or before the given
+    date.
+
+    :param station_id: a stationn number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: config. A dictionary containing the entire configuration from
+        the HiSPARC DAQ.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -390,8 +427,18 @@ def config(request, station_id, year=None, month=None, day=None):
 
 
 def num_events(request, station_id):
-    """Get number of events in a certain year for the given station"""
+    """Get total number of events for a station
 
+    Retrieve the number of events that a station has measured during its
+    entire operation. The following functions each dig a little deeper,
+    going for a shorter time period.
+
+    :param station_id: a stationn number identifier.
+
+    :return: num_events. A number (long) containing the total number of
+        events ever recorded by the given station.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -411,8 +458,18 @@ def num_events(request, station_id):
 
 
 def num_events_year(request, station_id, year):
-    """Get number of events in a certain year for the given station"""
+    """Get total number of events for a station in the given year
 
+    Retrieve the total number of events that a station has measured during
+    the given year.
+
+    :param station_id: a station number identifier.
+    :param year: the year for which the number of events is to be given.
+
+    :return: num_events. A number (long) containing the total number of
+        events recorded by the given station in the given year.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -432,8 +489,20 @@ def num_events_year(request, station_id, year):
 
 
 def num_events_month(request, station_id, year, month):
-    """Get number of events in a certain month for the given station"""
+    """Get total number of events for a station in the given month of a year
 
+    Retrieve the total number of events that a station has measured during the given
+    month.
+
+    :param station_id: a station number identifier.
+    :param year: the year in which to look for the month.
+    :param month: the month for which the number of events is to be given.
+
+    :return: num_events. A number (long) containing the total number of
+        events recorded by the given station in the given month of the given
+        year.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -456,8 +525,19 @@ def num_events_month(request, station_id, year, month):
 
 
 def num_events_day(request, station_id, year, month, day):
-    """Get number of events for the given station and date"""
+    """Get total number of events for a station on a given date
 
+    Retrieve the total number of events that a station has measured on a date.
+
+    :param station_id: a station number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: num_events. A number (long) containing the number of events
+        recorded by the station on the given date.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
@@ -478,8 +558,21 @@ def num_events_day(request, station_id, year, month, day):
 
 
 def num_events_hour(request, station_id, year, month, day, hour):
-    """Get number of events for the given station in the hour of the date"""
+    """Get number of events for a station in an hour on the given date
 
+    Retrieve the total number of events that a station has measured in that
+    hour.
+
+    :param station_id: a station number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+    :param hour: the hour for which the number of events is to be retrieved.
+
+    :return: num_events. A number (long) containing the number of events
+        recorded by the station in hour on date.
+
+    """
     try:
         station = Station.objects.get(number=station_id)
     except Station.DoesNotExist:
