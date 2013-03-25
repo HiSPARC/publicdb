@@ -1,7 +1,7 @@
 API Reference
 =============
 
-.. automodule:: api
+.. automodule:: django_publicdb.api
    :members:
    :undoc-members:
 
@@ -10,4 +10,4 @@ Contents:
 
 .. toctree::
 
-   views
+   api_views
