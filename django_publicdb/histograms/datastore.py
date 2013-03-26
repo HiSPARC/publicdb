@@ -203,7 +203,7 @@ def get_data(cluster, station_id, date, table, quantity):
             data = table.col(quantity)
         except tables.NoSuchNodeError:
             logger.error('Cannot find data node for station %d in %s on %s' %
-                         (station_id, cluster.lower(), date)
+                         (station_id, cluster.lower(), date))
             data = None
 
     return data.tolist()
@@ -231,7 +231,7 @@ def get_time_series(cluster, station_id, date, table, quantity):
             data.sort(key=itemgetter(0))
         except tables.NoSuchNodeError:
             logger.error('Cannot find data node for station %d in %s on %s' %
-                         (station_id, cluster.lower(), date)
+                         (station_id, cluster.lower(), date))
             data = None
 
     return data
