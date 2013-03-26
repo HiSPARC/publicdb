@@ -1,8 +1,8 @@
-Welcome to Public Database documentation!
-=========================================
+Public Database documentation!
+==============================
 
 The HiSPARC Public Database is the interface through which everyone can access
-the data and the administration is done.
+the data and our station administration is done.
 
 Contents:
 

@@ -594,6 +594,9 @@ def num_events_hour(request, station_id, year, month, day, hour):
 
 
 def validate_date(date):
-    """Give 404 is date is outside HiSPARC project range"""
+    """Check if date is outside HiSPARC project range
+
+    If not valid, a 404 (Not Found) should probably be returned to the user.
+    """
     return datetime.date(2002, 1, 1) <= date <= datetime.date.today()
 
