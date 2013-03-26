@@ -1,11 +1,14 @@
 import os
 import re
 import datetime
+import logging
 from operator import itemgetter
 
 import tables
 
 from django.conf import settings
+
+logger = logging.getLogger('histograms.datastore')
 
 
 def check_for_new_events(last_check_time):
@@ -194,11 +197,13 @@ def get_data(cluster, station_id, date, table, quantity):
     path = get_data_path(date)
 
     with tables.openFile(path, 'r') as file:
-        table = file.getNode('/hisparc/cluster_%s/station_%d' %
-                             (cluster.lower(), station_id), table)
         try:
+            table = file.getNode('/hisparc/cluster_%s/station_%d' %
+                                 (cluster.lower(), station_id), table)
             data = table.col(quantity)
         except tables.NoSuchNodeError:
+            logger.error('Cannot find data node for station %d in %s on %s' %
+                         (station_id, cluster.lower(), date)
             data = None
 
     return data.tolist()
@@ -217,14 +222,16 @@ def get_time_series(cluster, station_id, date, table, quantity):
     path = get_data_path(date)
 
     with tables.openFile(path, 'r') as file:
-        table = file.getNode('/hisparc/cluster_%s/station_%d' %
-                             (cluster.lower(), station_id), table)
         try:
+            table = file.getNode('/hisparc/cluster_%s/station_%d' %
+                                 (cluster.lower(), station_id), table)
             col1 = table.col('timestamp')
             col2 = table.col(quantity)
             data = zip(col1, col2)
             data.sort(key=itemgetter(0))
         except tables.NoSuchNodeError:
+            logger.error('Cannot find data node for station %d in %s on %s' %
+                         (station_id, cluster.lower(), date)
             data = None
 
     return data
