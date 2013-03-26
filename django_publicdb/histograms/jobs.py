@@ -186,7 +186,7 @@ def update_config(summary):
     for config in configs[summary.num_config:]:
         new_config = Configuration(source=summary)
         for var in vars(new_config):
-            if var in ['source', 'id', 'source_id'] or var[0] == '_'):
+            if var in ['source', 'id', 'source_id'] or var[0] == '_':
                 pass
             elif var in ['mas_version', 'slv_version']:
                 vars(new_config)[var] = blobs[config[var]]
