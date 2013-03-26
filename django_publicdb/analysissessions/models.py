@@ -175,11 +175,11 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = [x * .57 if x not in [-999, -1] else x for x in
-                            event['pulseheights']]
-            integrals = [x * .57 * 2.5 if x not in [-999, -1] else x for x in
-                         event['integrals']]
-
+            pulseheights = [round(x * .57, 2) if x not in [-999, -1] else x
+                            for x in event['pulseheights']]
+            integrals = [round(x * .57 * 2.5, 2) if x not in [-999, -1] else x
+                         for x in event['integrals']]
+            traces = [[round(sample, 2) for sample in trace] for trace in traces]
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
