@@ -200,13 +200,14 @@ def get_data(cluster, station_id, date, table, quantity):
         try:
             table = file.getNode('/hisparc/cluster_%s/station_%d' %
                                  (cluster.lower(), station_id), table)
-            data = table.col(quantity)
+            col = table.col(quantity)
+            data = col.tolist()
         except tables.NoSuchNodeError:
             logger.error('Cannot find data node for station %d in %s on %s' %
                          (station_id, cluster.lower(), date))
             data = None
 
-    return data.tolist()
+    return data
 
 
 def get_time_series(cluster, station_id, date, table, quantity):
