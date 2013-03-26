@@ -35,15 +35,17 @@ def check_for_updates():
             summary = datastore.check_for_new_events(last_check_time)
 
             for date, station_list in summary.iteritems():
+                logger.debug('Now processing %s' % date)
                 for station, table_list in station_list.iteritems():
-                    station = (inforecords.Station.objects
-                                          .get(number=station))
+                    try:
+                        station = inforecords.Station.objects.get(number=station)
+                    except DoesNotExist:
+                        logger.error('Unknown station: %s' % station)
+                        continue
                     s, created = Summary.objects.get_or_create(
                                         station=station, date=date)
                     for table, num_events in table_list.iteritems():
-                        if (table == 'events' or table == 'config' or
-                            table == 'errors' or table == 'weather'):
-
+                        if table in ['events', 'config', 'errors', 'weather']:
                             number_of = 'num_%s' % table
                             update_type = 'needs_update_%s' % table
                             if vars(s)[number_of] != num_events:
@@ -53,7 +55,7 @@ def check_for_updates():
                                               station.number))
                                 s.needs_update = True
                                 vars(s)[update_type] = True
-                                if table == 'events' or table == 'weather':
+                                if table in ['events', 'weather']:
                                     vars(s)[number_of] = num_events
                                 s.save()
             state.check_last_run = check_last_run
@@ -184,10 +186,9 @@ def update_config(summary):
     for config in configs[summary.num_config:]:
         new_config = Configuration(source=summary)
         for var in vars(new_config):
-            if (var == 'source' or var == 'id' or var == 'source_id' or
-                var[0] == '_'):
+            if var in ['source', 'id', 'source_id'] or var[0] == '_'):
                 pass
-            elif var == 'mas_version' or var == 'slv_version':
+            elif var in ['mas_version', 'slv_version']:
                 vars(new_config)[var] = blobs[config[var]]
             elif var == 'timestamp':
                 ts = datetime.datetime.fromtimestamp(config[var])

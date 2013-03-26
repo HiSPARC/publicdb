@@ -57,8 +57,7 @@ def get_event_summary(file_list):
         with tables.openFile(file, 'r') as data:
             for cluster in data.listNodes('/hisparc'):
                 for station in data.listNodes(cluster):
-                    num = int(re.search('([0-9]+)$',
-                              station._v_name).group())
+                    num = int(re.search('([0-9]+)$', station._v_name).group())
                     event_tables = {}
                     for table in data.listNodes(station):
                         event_tables[table.name] = len(table)
