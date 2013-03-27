@@ -47,12 +47,11 @@ def station(request, station_id):
 
     Retrieve important information about a station.
 
-    :param station_id: a station number identifier
+    :param station_id: a station number identifier.
 
-    :return: station_info. This is a dictionary containing info about the
-        station. Most importantly, this contains information about the
-        position of the station, including the position of the individual
-        scintillators.
+    :return: dictionary containing info about the station. Most importantly,
+             this contains information about the position of the station,
+             including the position of the individual scintillators.
 
     """
     try:
@@ -121,8 +120,8 @@ def stations(request, subcluster_id=None):
     :param subcluster_id: a subcluster number identifier. If given, only
         stations belonging to that subcluster will be included in the list.
 
-    :return: stations. This is a list containing dictionaries which consist of
-        the name and number of each station (matching the subcluster).
+    :return: list containing dictionaries which consist of the name and number
+             of each station (matching the subcluster).
 
     """
     if subcluster_id:
@@ -147,8 +146,8 @@ def stations_with_data(request, year, month, day):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: stations. A list containing the name and number of each station
-        that has measured events on the given date.
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events on the given date.
 
     """
     date = datetime.date(int(year), int(month), int(day))
@@ -171,8 +170,8 @@ def stations_with_weather(request, year, month, day):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: stations. A list containing the name and number of each station
-        that has measured weather data on the given date.
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data on the given date.
 
     """
     date = datetime.date(int(year), int(month), int(day))
@@ -195,8 +194,8 @@ def subclusters(request, cluster_id=None):
     :param cluster_id: a cluster number identifier, give this to only get
         subclusters from this cluster.
 
-    :return: subclusters. A list containing the name and number of all
-        subclusters that matched the given parameters.
+    :return: list of dictionaries containing the name and number of all
+             subclusters that matched the given parameters.
 
     """
     if cluster_id:
@@ -221,8 +220,8 @@ def clusters(request, country_id=None):
     :param country_id: a country number identifier, give this to only get
         clusters from a specific country.
 
-    :return: clusters. A list containing the name and number of all
-        clusters that matched the given parameters.
+    :return: list of dictionaries containing the name and number of all
+             clusters that matched the given parameters.
 
     """
     if country_id:
@@ -243,8 +242,7 @@ def countries(request):
 
     Retrieve a list of all countries with active stations.
 
-    :return: countries. A list containing the name and number of all
-        countries.
+    :return: list of dictionaries containing the name and number of all countries.
 
     """
     countries = get_country_dict()
@@ -314,8 +312,7 @@ def has_data(request, station_id, year=None, month=None, day=None):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: has_data. A boolean, True if the given station has shower
-        data, False otherwise.
+    :return: boolean, True if the given station has shower data, False otherwise.
 
     """
     try:
@@ -355,8 +352,7 @@ def has_weather(request, station_id, year=None, month=None, day=None):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: has_weather. A boolean, True if the given station has weather
-        data, False otherwise.
+    :return: boolean, True if the given station has weather data, False otherwise.
 
     """
     try:
@@ -396,8 +392,8 @@ def config(request, station_id, year=None, month=None, day=None):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: config. A dictionary containing the entire configuration from
-        the HiSPARC DAQ.
+    :return: dictionary containing the entire configuration from
+             the HiSPARC DAQ.
 
     """
     try:
@@ -435,8 +431,8 @@ def num_events(request, station_id):
 
     :param station_id: a stationn number identifier.
 
-    :return: num_events. A number (long) containing the total number of
-        events ever recorded by the given station.
+    :return: integer containing the total number of events ever recorded by
+             the given station.
 
     """
     try:
@@ -466,8 +462,8 @@ def num_events_year(request, station_id, year):
     :param station_id: a station number identifier.
     :param year: the year for which the number of events is to be given.
 
-    :return: num_events. A number (long) containing the total number of
-        events recorded by the given station in the given year.
+    :return: integer containing the total number of events recorded by the
+             given station in the given year.
 
     """
     try:
@@ -498,9 +494,8 @@ def num_events_month(request, station_id, year, month):
     :param year: the year in which to look for the month.
     :param month: the month for which the number of events is to be given.
 
-    :return: num_events. A number (long) containing the total number of
-        events recorded by the given station in the given month of the given
-        year.
+    :return: integer containing the total number of events recorded by the
+             given station in the given month of the given year.
 
     """
     try:
@@ -534,8 +529,8 @@ def num_events_day(request, station_id, year, month, day):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: num_events. A number (long) containing the number of events
-        recorded by the station on the given date.
+    :return: integer denoting the number of events recorded by the station
+             on the given date.
 
     """
     try:
@@ -569,8 +564,8 @@ def num_events_hour(request, station_id, year, month, day, hour):
     :param day: the day part of the date.
     :param hour: the hour for which the number of events is to be retrieved.
 
-    :return: num_events. A number (long) containing the number of events
-        recorded by the station in hour on date.
+    :return: integer giving the number of events recorded by the station
+             in hour on date.
 
     """
     try:
@@ -594,6 +589,12 @@ def num_events_hour(request, station_id, year, month, day, hour):
 
 
 def validate_date(date):
-    """Give 404 is date is outside HiSPARC project range"""
+    """Check if date is outside HiSPARC project range
+
+    If not valid, a 404 (Not Found) should be returned to the user.
+
+    :return: boolean, True if the date is in the range, False otherwise.
+
+    """
     return datetime.date(2002, 1, 1) <= date <= datetime.date.today()
 
