@@ -616,7 +616,7 @@ def nav_years(station):
 
 
 def station_has_data(station):
-    """Check if there is valis event or weather data for the given station"""
+    """Check if there is valid event or weather data for the given station"""
 
     try:
         Summary.objects.filter(Q(station=station),
@@ -632,5 +632,6 @@ def station_has_data(station):
 
 
 def help(request):
+    """Show the static help page"""
     return render_to_response('help.html',
                               context_instance=RequestContext(request))

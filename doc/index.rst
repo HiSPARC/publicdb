@@ -10,7 +10,9 @@ Contents:
    :maxdepth: 3
    :numbered:
 
+   api_tutorial
    api
+   status_display
 
 
 Indices and tables

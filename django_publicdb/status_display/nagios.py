@@ -7,8 +7,8 @@ from django_publicdb.inforecords.models import *
 def status_lists():
     """Get various station status lists from Nagios
 
-    :return: down, problem, up. Each of these is a list containing
-        station short names that have the status their name implies.
+    :return: down, problem, up. lists containing station short names that have
+             the status the variable name implies.
 
     """
     down = down_list()
@@ -19,50 +19,71 @@ def status_lists():
 
 
 def down_list():
-    """Get Nagios page which lists DOWN hosts"""
+    """Get Nagios page which lists DOWN hosts
 
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=4'
-    down_list = retrieve_station_status(url)
+    :return: list of station short names of stations that are DOWN.
 
-    return down_list
+    """
+    query = 'hostgroup=all&style=hostdetail&hoststatustypes=4'
+    down = retrieve_station_status(query)
+
+    return down
 
 
 def problem_list():
-    """Get Nagios page which lists hosts with a problem"""
+    """Get Nagios page which lists hosts with a problem
 
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
-    problem_list = retrieve_station_status(url)
+    :return: list containing station short names of stations for which
+             the host has status OK, but some services are CRITICAL.
 
-    return problem_list
+    """
+    query = 'hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
+    problem = retrieve_station_status(query)
+
+    return problem
 
 
 def up_list():
-    """Get Nagios page which lists UP hosts"""
+    """Get Nagios page which lists UP hosts
 
-    url = 'http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?hostgroup=all&style=hostdetail&hoststatustypes=2'
-    up_list = retrieve_station_status(url)
+    :return: list of station short names of stations that are OK.
 
-    return up_list
+    """
+    query = 'hostgroup=all&style=hostdetail&hoststatustypes=2'
+    up = retrieve_station_status(query)
+
+    return up
 
 
 def retrieve_station_status(url):
-    """Get station list from Nagios page which lists hosts of certain level"""
+    """Get station list from Nagios page which lists hosts of certain level
+
+    :param query: query to filter stations on Nagios.
+
+    :return: list of station short names on the given page.
+
+    """
+    nagios_base = "http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?"
 
     try:
-        req = urllib2.urlopen(url, timeout=2)
+        req = urllib2.urlopen(nagios_base + query, timeout=2)
         res = req.read()
-        station_list = re.findall("host=([a-z0-9]+)\' title", res)
+        station = re.findall("host=([a-z0-9]+)\' title", res)
     except urllib2.URLError:
-        station_list = []
+        stations = []
 
-    return station_list
+    return stations
 
 
 def get_station_status(station, down, problem, up):
     """Check if station is in down, problem or up list.
 
-    :return: A string denoting the current status of requested station,
-        if the station occurs in multiple lists, the worst case is returned.
+    :param station: station_id for which you want the status.
+    :param down: list of stations that are DOWN.
+    :param problem: list of stations that have a service CRITICAL (but are UP).
+    :param up: list of stations that are UP.
+    :return: string denoting the current status of requested station, if the
+             station occurs in multiple lists, the worst case is returned.
 
     """
     try:

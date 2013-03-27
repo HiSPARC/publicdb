@@ -47,12 +47,22 @@ Easy deployment
 ---------------
 
 The commands from the previous section are added to the Makefile as the
-gh-pages target.
+gh-pages target. This way you only need to run `make gh-pages` command to 
+generate and commit the gh-pages.
+
+
+Django required!
+----------------
+
+To build these docs Django has to be installed in your current environment.
+Many modules import functions from Django, therefore they will need to be
+accessible when building the docs. If you setup a dev environment for publicdb
+you may need to do `workon publicdb` before running the make.
 
 
 Sources
 -------
 
-https://github.com/matthew-brett/gh-sphinx-template
-http://blog.nikhilism.com/2012/08/automatic-github-pages-generation-from.html
-https://help.github.com/articles/creating-project-pages-manually
+[gh-sphinx-template](https://github.com/matthew-brett/gh-sphinx-template)  
+[automatic-github-pages-generation](http://blog.nikhilism.com/2012/08/automatic-github-pages-generation-from.html)  
+[creating-project-pages-manually](https://help.github.com/articles/creating-project-pages-manually)
