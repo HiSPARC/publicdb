@@ -39,7 +39,7 @@ def check_for_updates():
                 for station, table_list in station_list.iteritems():
                     try:
                         station = inforecords.Station.objects.get(number=station)
-                    except inforecords.DoesNotExist:
+                    except inforecords.Station.DoesNotExist:
                         logger.error('Unknown station: %s' % station)
                         continue
                     s, created = Summary.objects.get_or_create(
