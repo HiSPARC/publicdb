@@ -54,7 +54,8 @@ generate and commit the gh-pages.
 Django required!
 ----------------
 
-To build these docs Django has to be installed in your current environment.
+The Python package Django needs to be installed in your working environment
+for the building of these docs to work.
 Many modules import functions from Django, therefore they will need to be
 accessible when building the docs. If you setup a dev environment for publicdb
 you may need to do `workon publicdb` before running the make.
