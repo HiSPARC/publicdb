@@ -146,10 +146,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
                                         .filter(station__cluster__name=subcluster,
                                                 station__pc__is_active=True)):
-            if station_has_data(detector.station):
-                link = detector.station.number
-            else:
-                link = None
+            link = station_has_data(detector.station)
             status = get_station_status(detector.station, down, problem, up)
             stations.append({'number': detector.station.number,
                              'name': detector.station.name,

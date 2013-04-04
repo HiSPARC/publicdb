@@ -55,7 +55,7 @@ def up_list():
     return up
 
 
-def retrieve_station_status(url):
+def retrieve_station_status(query):
     """Get station list from Nagios page which lists hosts of certain level
 
     :param query: query to filter stations on Nagios.
@@ -68,7 +68,7 @@ def retrieve_station_status(url):
     try:
         req = urllib2.urlopen(nagios_base + query, timeout=2)
         res = req.read()
-        station = re.findall("host=([a-z0-9]+)\' title", res)
+        stations = re.findall("host=([a-z0-9]+)\' title", res)
     except urllib2.URLError:
         stations = []
 

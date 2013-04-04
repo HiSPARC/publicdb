@@ -7,7 +7,11 @@
 
 {% block head %}
     <script type="text/javascript">
+        var stationlink;
+        var clusterlink;
         $(document).ready(function() {
+            stationlink = $('#stationLink');
+            clusterlink = $('#clusterLink');
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
             var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
             var options = {
@@ -73,7 +77,7 @@
                                  subcluster: "{{ station.cluster }}",
                                  cluster: "{{ station.cluster.parent }}",
                                  country: "{{ station.cluster.country }}",
-                                 link: {{ station.link }},
+                                 link: {{ station.link|lower }},
                                  status: "{{ station.status }}"});
                             {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
                         {% endif %}
@@ -108,18 +112,22 @@
 
         function showStationInfo(e) {
             var attr = e.feature.attributes
-            stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.link + "/status'><span class='statusBall " + attr.status + "'></span></a>" +
-                        "<a href='{% url 'status_display.views.stations' %}" + attr.link + "'> " + attr.name + " (" + attr.id + ")</a>");
+            // Do not link to data if attr.link is false
+            if(attr.link) {
+                stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
+                            "<a href='{% url 'status_display.views.stations' %}" + attr.id + "'>" + attr.name + " (" + attr.id + ")</a>");}
+            else {stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
+                              attr.name + " (" + attr.id + ")");}
 
             if (attr.cluster == "None") {cluster = attr.subcluster}
             else {cluster = attr.cluster}
             clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.country + '/' + cluster + '/' + attr.subcluster + "'> " + attr.subcluster + " (" +  cluster + ")</a>");}
 
         function stationLink(text) {
-            $('#stationLink').html(text);}
+            stationlink.html(text);}
 
         function clusterLink(text) {
-            $('#clusterLink').html(text);}
+            clusterlink.html(text);}
     </script>
 {% endblock %}
 
