@@ -12,6 +12,16 @@
     font-size: 11pt;
     margin-top: 5px;}
 
+/* Notice */
+#notice {
+    line-height: 1.3em;
+    width: 100%;
+    color: #D22;
+    font-size: 12pt;
+    border: 1px solid black;
+    padding: 10px;
+    margin: 5px;}
+
 /* Graphs */
 
 #graphs {
