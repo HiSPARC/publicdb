@@ -1,7 +1,7 @@
 import os
 import sys
 
-sys.path.append('/user/admhispa/http/pique')
+sys.path.append('/var/www')
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import django.core.handlers.wsgi
