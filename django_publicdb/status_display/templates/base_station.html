@@ -15,10 +15,6 @@
     <div id="header">
         <h2>{% block header %}Station: {{ station.number }} &mdash; {{ station.name }}{% endblock %}</h2>
         <div id="date">{% block date %}{% now "D, j N Y" %}{% endblock %}</div>
-        <div id="notice">Data processing on our storage server is not working correctly, we are working on a fix.<br />
-                         The effect of this is that you'll see only partial data for the last few days.<br />
-                         Do not worry, all data for all active stations is still being received and stored, but not processed.<br />
-                         Once fixed, all currently missing data will be visible again, and this should not happen again.</div>
     </div>
     
     {% block data %}
