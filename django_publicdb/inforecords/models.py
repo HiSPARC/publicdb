@@ -47,10 +47,10 @@ class Contact(models.Model):
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
-    postalcode = models.CharField(max_length=6)
+    postalcode = models.CharField(max_length=12)
     city = models.CharField(max_length=40)
-    pobox = models.CharField(max_length=9, null=True, blank=True)
-    pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
+    pobox = models.CharField(max_length=12, null=True, blank=True)
+    pobox_postalcode = models.CharField(max_length=12, null=True, blank=True)
     pobox_city = models.CharField(max_length=40, null=True, blank=True)
     phone_work = models.CharField(max_length=20)
     phone_home = models.CharField(max_length=20, null=True, blank=True)
