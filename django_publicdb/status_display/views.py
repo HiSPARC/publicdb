@@ -613,8 +613,14 @@ def nav_years(station):
 
 
 def station_has_data(station):
-    """Check if there is valid event or weather data for the given station"""
+    """Check if there is valid event or weather data for the given station
 
+    :param station: Station object for which to check.
+
+    :return: boolean indicating if the station has recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
     try:
         Summary.objects.filter(Q(station=station),
                                Q(num_events__isnull=False) |
