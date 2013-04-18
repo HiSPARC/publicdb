@@ -52,7 +52,7 @@ class python {
   package { "numexpr":
     ensure => "2.0.1",
     provider => pip,
-    require => Package["numpy"],
+    require => Package["numpy"]
   }
   
   package { "recaptcha-client":
@@ -73,5 +73,31 @@ class python {
     provider => pip,
     require => Package["python-pip"]
   }
+    exec { "create_static":
+     command => "mkdir -p /var/www/static",
+      }
+   file { '/var/www/static':
+     ensure  => 'present',
+     mode   => '0777',
+     owner   => "vagrant",
+     group   => "vagrant",
+     require => Exec["create_static"]    
+  }
+  
+  exec { "syncdb":
+    command => "python /var/www/manage.py syncdb --noinput --migrate",
+    user => "vagrant",
+    require => Package["pytables"],
+    logoutput => on_failure
+    }
+    
+  exec { "collectstatic":
+    command => "python /var/www/manage.py collectstatic --noinput",
+    user => "vagrant",
+    require => exec["syncdb"],
+    logoutput => on_failure
+    }
+    
+    
 
 }

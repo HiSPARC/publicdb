@@ -3,6 +3,7 @@ HiSPARC_coincidences.db
 public.db
 *.h5
 datastore/
+hisparc/
 _build/
 
 # Python
