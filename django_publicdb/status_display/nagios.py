@@ -63,7 +63,7 @@ def retrieve_station_status(query):
     :return: list of station short names on the given page.
 
     """
-    nagios_base = "http://vpn.hisparc.nl/nagios/cgi-bin/status.cgi?"
+    nagios_base = "http://vpn.hisparc.nl/cgi-bin/status.cgi?"
 
     try:
         req = urllib2.urlopen(nagios_base + query, timeout=2)
