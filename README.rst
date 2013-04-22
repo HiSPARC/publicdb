@@ -90,6 +90,8 @@ The complete requirements and installation instructions are::
     $ pip install Django==1.4.3
     $ pip install South==0.7.3
 
+    $ pip install https://github.com/hisparc/sapphire/zipball/master
+
 You now have all the prerequisites for running the publicdb django app.
 For reference, the results from `pip freeze`::
 
@@ -98,17 +100,28 @@ For reference, the results from `pip freeze`::
     Django==1.4.2
     South==0.7.3
     ipython==0.12.1
+    matplotlib==1.2.1
+    mock==1.0.1
     numexpr==2.0.1
     numpy==1.6.2
+    progressbar==2.3
     recaptcha-client==1.0.6
+    sapphire==0.9.1b
+    scipy==0.12.0
     tables==2.3.1
     wsgiref==0.1.2
+
+Note for Mac OS X users: python has trouble detecting the default locale.
+Before continuing, it's best to type this into your terminal::
+
+    $ export LC_ALL=en_US.UTF-8
 
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
 database with::
 
     $ ./manage.py syncdb
     $ ./manage.py migrate
+
 
 
 Hints for running a development publicdb server

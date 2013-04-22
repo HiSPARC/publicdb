@@ -2,8 +2,8 @@ from django.db import models
 from django_publicdb.coincidences.models import *
 from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
-from hisparc.analysis import coincidences
-from hisparc import publicdb
+from sapphire.analysis import coincidences
+from sapphire import publicdb
 from random import choice, randint
 from django.template.defaultfilters import slugify
 from datetime import timedelta
