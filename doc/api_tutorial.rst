@@ -118,5 +118,5 @@ Start Python and type (copy/paste) the following lines of code:
     ...     dates.append(datum)
     ...     datum += timedelta(days=1)
     ...
-    >>> plot(dates, events)
+    >>> step(dates, events)
     >>> show()
