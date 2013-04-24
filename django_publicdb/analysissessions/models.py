@@ -130,7 +130,9 @@ class SessionRequest(models.Model):
             print "Error:", msg
             data.close()
             return nvalid
-        c_list, timestamps = coincidences.search_coincidences(data, stations)
+
+        coinc = coincidences.Coincidences(data, None, stations)
+        c_list, timestamps = coinc._search_coincidences()
         for coincidence in c_list:
             if len(coincidence) >= 3:
                 event_list = coincidences.get_events(data, stations,
