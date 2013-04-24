@@ -21,7 +21,7 @@ os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 import tables
 from datetime import date, datetime, time, timedelta
 
-from hisparc.publicdb import download_data
+from sapphire.publicdb import download_data
 
 from django.conf import settings
 from django_publicdb.inforecords.models import *
