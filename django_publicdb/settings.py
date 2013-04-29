@@ -160,7 +160,10 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'null_handler': {
+            'class': 'django.utils.log.NullHandler',
+        },
     },
     'loggers': {
         'django.request': {
@@ -168,5 +171,9 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-    }
+        'django.db.backends': {
+            'handlers': ['null_handler'],
+            'propagate': False,
+        }
+    },
 }
