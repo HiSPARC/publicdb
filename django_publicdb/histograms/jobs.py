@@ -144,8 +144,7 @@ def perform_events_tasks(summary):
 
 
 def perform_config_tasks(summary):
-    num_config = update_config(summary)
-    summary.num_config = num_config
+    update_config(summary)
     summary.needs_update_config = False
 
 
@@ -247,9 +246,7 @@ def update_config(summary):
                 vars(new_config)[var] = config[var]
         new_config.save()
 
-    num_config = len(configs)
     file.close()
-    return num_config
 
 
 def create_histogram(data, high, samples):
