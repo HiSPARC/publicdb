@@ -30,7 +30,7 @@ from django_publicdb.inforecords.models import *
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
 START = date(2012, 12, 28)
-END = date(2013, 1, 4)
+END = date(2013, 1, 5)
 
 
 def main():
