@@ -9,7 +9,7 @@ import logging
 import numpy
 
 from models import *
-from django_publicdb.inforecords.models import DetectorHisparc
+from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 
 logger = logging.getLogger('histograms.jobs')
@@ -19,51 +19,85 @@ BIN_PH_NUM = 200
 MAX_IN = 50000
 BIN_IN_NUM = 200
 
+SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+IGNORE_TABLES = ['blobs']
 
 def check_for_updates():
+    """Run a check for updates to the event tables"""
+
     state = GeneratorState.objects.get()
 
     if state.check_is_running:
-        return False
+        check_has_run = False
     else:
-        last_check_time = time.mktime(state.check_last_run.timetuple())
-        check_last_run = datetime.datetime.now()
-        state.check_is_running = True
+        check_for_new_events_and_update_flags(state)
+        check_has_run = True
+
+    return check_has_run
+
+
+def check_for_new_events_and_update_flags(state):
+    """Check the datastore for new events and update flags"""
+
+    # bookkeeping
+    last_check_time = time.mktime(state.check_last_run.timetuple())
+    check_last_run = datetime.datetime.now()
+    state.check_is_running = True
+    state.save()
+
+    try:
+        # perform a check for updated files
+        possibly_new = datastore.check_for_new_events(last_check_time)
+
+        # perform a thorough check for each possible date
+        for date, station_list in possibly_new.iteritems():
+            process_possible_stations_for_date(date, station_list)
+        state.check_last_run = check_last_run
+    finally:
+        # bookkeeping
+        state.check_is_running = False
         state.save()
 
-        try:
-            summary = datastore.check_for_new_events(last_check_time)
 
-            for date, station_list in summary.iteritems():
-                logger.debug('Now processing %s' % date)
-                for station, table_list in station_list.iteritems():
-                    try:
-                        station = inforecords.Station.objects.get(number=station)
-                    except inforecords.Station.DoesNotExist:
-                        logger.error('Unknown station: %s' % station)
-                        continue
-                    s, created = Summary.objects.get_or_create(
-                                        station=station, date=date)
-                    for table, num_events in table_list.iteritems():
-                        if table in ['events', 'config', 'errors', 'weather']:
-                            number_of = 'num_%s' % table
-                            update_type = 'needs_update_%s' % table
-                            if vars(s)[number_of] != num_events:
-                                logger.debug("New data (%s) on %s for station %d" %
-                                             (table,
-                                              date.strftime("%a %b %d %Y"),
-                                              station.number))
-                                s.needs_update = True
-                                vars(s)[update_type] = True
-                                if table in ['events', 'weather']:
-                                    vars(s)[number_of] = num_events
-                                s.save()
-            state.check_last_run = check_last_run
-        finally:
-            state.check_is_running = False
-            state.save()
+def process_possible_stations_for_date(date, station_list):
+    """Check stations for possible new data"""
 
-    return True
+    logger.debug('Now processing %s' % date)
+    for station, table_list in station_list.iteritems():
+        process_possible_tables_for_station(station, table_list, date)
+
+
+def process_possible_tables_for_station(station, table_list, date):
+    """Check all tables and store summary for single station"""
+
+    try:
+        station = inforecords.Station.objects.get(number=station)
+    except Station.DoesNotExist:
+        logger.error('Unknown station: %s' % station)
+    else:
+        summary, created = Summary.objects.get_or_create(station=station,
+                                                         date=date)
+        for table, num_events in table_list.iteritems():
+            check_table_and_update_flags(table, num_events, summary)
+
+
+def check_table_and_update_flags(table_name, num_events, summary):
+    """Check a single table and update flags if new data"""
+
+    if table_name in SUPPORTED_TABLES:
+        number_of_events_attr = 'num_%s' % table_name
+        update_flag_attr = 'needs_update_%s' % table_name
+
+        if getattr(summary, number_of_events_attr) != num_events:
+            logger.debug("New data (%s) on %s for station %d", table_name,
+                         summary.date.strftime("%a %b %d %Y"),
+                         summary.station.number)
+            setattr(summary, update_flag_attr, True)
+            setattr(summary, number_of_events_attr, num_events)
+            summary.needs_update = True
+            summary.save()
+    elif table_name not in IGNORE_TABLES:
+        logger.warning('Unsupported table type: %s', table_name)
 
 
 def update_all_histograms():
