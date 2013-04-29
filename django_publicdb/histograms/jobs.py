@@ -21,6 +21,11 @@ BIN_IN_NUM = 200
 
 SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
 IGNORE_TABLES = ['blobs']
+# For some event tables, we can safely update the num_events during the
+# check.  For configs, this is not possible.  The previous number of
+# configs is used to select only new ones during the update.
+RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
+
 
 def check_for_updates():
     """Run a check for updates to the event tables"""
@@ -92,8 +97,10 @@ def check_table_and_update_flags(table_name, num_events, summary):
             logger.debug("New data (%s) on %s for station %d", table_name,
                          summary.date.strftime("%a %b %d %Y"),
                          summary.station.number)
+            # only record number of events for *some* tables at this time
+            if table_name in RECORD_EARLY_NUM_EVENTS:
+                setattr(summary, number_of_events_attr, num_events)
             setattr(summary, update_flag_attr, True)
-            setattr(summary, number_of_events_attr, num_events)
             summary.needs_update = True
             summary.save()
     elif table_name not in IGNORE_TABLES:
