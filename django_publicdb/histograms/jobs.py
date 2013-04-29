@@ -111,32 +111,48 @@ def update_all_histograms():
         state.save()
 
         try:
-            for summary in (Summary.objects.filter(needs_update=True)
-                                   .reverse()):
-                if summary.needs_update_events:
-                    update_eventtime_histogram(summary)
-                    update_pulseheight_histogram(summary)
-                    update_pulseintegral_histogram(summary)
-                    summary.needs_update_events = False
-
-                if summary.needs_update_config:
-                    num_config = update_config(summary)
-                    summary.num_config = num_config
-                    summary.needs_update_config = False
-
-                if summary.needs_update_weather:
-                    update_temperature_dataset(summary)
-                    update_barometer_dataset(summary)
-                    summary.needs_update_weather = False
-
-                summary.needs_update = False
-                summary.save()
+            perform_update_tasks()
             state.update_last_run = update_last_run
         finally:
             state.update_is_running = False
             state.save()
 
     return True
+
+
+def perform_update_tasks():
+    for summary in (Summary.objects.filter(needs_update=True)
+                           .reverse()):
+        if summary.needs_update_events:
+            perform_events_tasks(summary)
+
+        if summary.needs_update_config:
+            perform_config_tasks(summary)
+
+        if summary.needs_update_weather:
+            perform_weather_tasks(summary)
+
+        summary.needs_update = False
+        summary.save()
+
+
+def perform_events_tasks(summary):
+    update_eventtime_histogram(summary)
+    update_pulseheight_histogram(summary)
+    update_pulseintegral_histogram(summary)
+    summary.needs_update_events = False
+
+
+def perform_config_tasks(summary):
+    num_config = update_config(summary)
+    summary.num_config = num_config
+    summary.needs_update_config = False
+
+
+def perform_weather_tasks(summary):
+    update_temperature_dataset(summary)
+    update_barometer_dataset(summary)
+    summary.needs_update_weather = False
 
 
 def update_gps_coordinates():
