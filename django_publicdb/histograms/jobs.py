@@ -14,16 +14,21 @@ import datastore
 
 logger = logging.getLogger('histograms.jobs')
 
+# Parameters for the histograms
 MAX_PH = 2000
 BIN_PH_NUM = 200
 MAX_IN = 50000
 BIN_IN_NUM = 200
 
+# Tables supported by this code
 SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+# Tables ignored by this code (unsupported tables not listed here will
+# generate a warning).
 IGNORE_TABLES = ['blobs']
 # For some event tables, we can safely update the num_events during the
-# check.  For configs, this is not possible.  The previous number of
-# configs is used to select only new ones during the update.
+# check.  For events, for example, the histograms are recreated.  For
+# configs, this is not possible.  The previous number of configs is used
+# to select only new ones during the update.
 RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
 
 
