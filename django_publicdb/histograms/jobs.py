@@ -11,6 +11,7 @@ import numpy
 from models import *
 from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
+import esd
 
 logger = logging.getLogger('histograms.jobs')
 
@@ -152,6 +153,7 @@ def perform_events_tasks(summary):
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseintegral_histogram(summary)
+    process_events_and_store_esd(summary)
     summary.needs_update_events = False
 
 
@@ -222,6 +224,9 @@ def update_pulseintegral_histogram(summary):
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
+def process_events_and_store_esd(summary):
+    logger.debug("Processing events and storing ESD for %s" % summary)
+    esd.process_events_and_store_esd(summary)
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
