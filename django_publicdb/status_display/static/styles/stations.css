@@ -3,9 +3,9 @@
 
 #stationList {
     float: left;
+    margin-bottom: 30px;
     width: 609px;
     font-size: 10pt;
-    margin-bottom: 30px;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;}
@@ -25,28 +25,28 @@
 
 .subcluster {
     display: block;
+    break-inside: avoid-column;
     -webkit-column-break-inside: avoid;
     -moz-column-break-inside: avoid;
-    column-break-inside: avoid;
-    break-inside: avoid-column;}
+    column-break-inside: avoid;}
 
 .country h1 {
-    -moz-column-span: all;
+    font-size: 32px;
     -webkit-column-span: all;
-    column-span: all;
-    font-size: 32px;}
+    -moz-column-span: all;
+    column-span: all;}
 
 #stationList ul {
-    font-size: 10pt;
     margin: 0 0 15px 0;
     padding-left: 15px;
-    list-style: none;}
+    list-style: none;
+    font-size: 10pt;}
 
 #stationList li {
-    line-height: 140%;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;}
+    line-height: 140%;}
 
 #stationList ul a,
 #stationLink a,
@@ -61,15 +61,15 @@
 
 #stationLink,
 #clusterLink {
-    font-size: 10pt;
     display: block;
+    overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    overflow: hidden;}
+    font-size: 10pt;}
 
 h2 {
-    font-size: 24px;
-    margin-top: 0;}
+    margin-top: 0;
+    font-size: 24px;}
 
 h3 a,
 h2 a,
@@ -84,11 +84,11 @@ h1 a:hover {
     text-decoration: underline;}
 
 .statusBall {
-    background-color: grey;
+    display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    display: inline-block;
+    background-color: grey;
     opacity: 0.3;}
 
 .statusBall:hover {
@@ -123,17 +123,17 @@ h1 a:hover {
 #extra,
 #help,
 #navigation {
+    padding-left: 20px;
     width: 220px;
-    border-left: 1px solid black;
-    padding-left: 20px;}
+    border-left: 1px solid black;}
 
 #navigation .nolink {
-    font-weight: normal;
-    color: black;}
+    color: black;
+    font-weight: normal;}
     
 #navigation .nolink:hover {
-    text-decoration: none;
-    color: black;}
+    color: black;
+    text-decoration: none;}
     
 #navigation a,
 #navigation .nolink {
@@ -145,17 +145,17 @@ h1 a:hover {
 
 #help a,
 #navigation a {
-    font-weight: bold;
     border-radius: 3px;
     color: #25B;
-    text-decoration: none;}
+    text-decoration: none;
+    font-weight: bold;}
 
 #navigation a.currentDate:hover,
 #navigation a.currentPage:hover,
 #navigation a.currentDate,
 #navigation a.currentPage {
-    color: white;
-    background: #075EBB;}
+    background: #075EBB;
+    color: white;}
 
 #navigation > div,
 #config > div {
@@ -164,18 +164,18 @@ h1 a:hover {
 
 .sectionTitle {
     margin-top: 5px;
-    font-size: 130%;
-    font-weight: bold;
     padding-top: 5px;
-    padding-bottom: 5px;}
+    padding-bottom: 5px;
+    font-weight: bold;
+    font-size: 130%;}
 
 .keyvalue {
     margin-top: 5px;
     margin-bottom: 5px;}
 
 .key {
-    font-weight: bold;
-    margin-right: 10px;}
+    margin-right: 10px;
+    font-weight: bold;}
 
 .thin {
     font-weight: normal;}
