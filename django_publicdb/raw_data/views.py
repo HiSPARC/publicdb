@@ -11,6 +11,7 @@ import tempfile
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
+
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
     if request.method == 'POST':
@@ -30,6 +31,7 @@ def call_xmlrpc(request):
         c = Context({'methods': methods})
         response.write(t.render(c))
         return response
+
 
 def xmlrpc(uri):
     """A decorator for XML-RPC functions."""
@@ -68,11 +70,12 @@ def get_data_url(station_id, date, get_blobs=False):
 
     url = urlparse.urljoin(settings.MEDIA_URL, 'raw_data/')
     url = urlparse.urljoin(url, os.path.basename(target.filename))
-    
+
     datafile.close()
     target.close()
 
     return url
+
 
 def get_raw_datafile(date):
     """Return a reference to the raw data file on a specified date"""
@@ -88,16 +91,18 @@ def get_raw_datafile(date):
 
     return datafile
 
+
 def get_station_node(datafile, station_id):
     """Return the requested station's node"""
 
     station = 'station_%d' % station_id
 
     for cluster in datafile.listNodes('/hisparc'):
-        if station in cluster: 
+        if station in cluster:
             return datafile.getNode(cluster, station)
 
     raise Exception("No data available for this station on that date")
+
 
 def get_target():
     """Return a reference to a download target file"""
