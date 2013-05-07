@@ -23,7 +23,7 @@ def process_events_and_store_esd(summary):
     filepath = datastore.get_data_path(date)
     with tables.openFile(filepath, 'r') as data:
         source_node = get_station_node(data, station)
-        copy_node_to_esd_file_for_summary(summary, source_node)
+        copy_node_to_esd_file_for_summary(summary, source_node.events)
 
     #copy to tmp?
     #... process_events(date, cluster, station_id)
@@ -72,7 +72,7 @@ def copy_node_to_esd_file_for_summary(summary, source_node):
 
     with tables.openFile(esd_path, 'a') as esd_data:
         esd_group = get_or_create_station_node(esd_data, summary.station)
-        source_node.events.copy(esd_group, createparents=True)
+        source_node.copy(esd_group, createparents=True, overwrite=True)
 
 
 def get_tmp_file(date, station_id):
