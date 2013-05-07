@@ -72,8 +72,7 @@ def copy_node_to_esd_file_for_summary(summary, source_node):
 
     with tables.openFile(esd_path, 'a') as esd_data:
         esd_group = get_or_create_station_node(esd_data, summary.station)
-        print esd_group
-        #source_node.events.copy(esd_group, createparents=True)
+        source_node.events.copy(esd_group, createparents=True)
 
 
 def get_tmp_file(date, station_id):
