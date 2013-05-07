@@ -1,4 +1,6 @@
 """Process events from datastore and save Event Summary Data (ESD)"""
+
+import os.path
 import tempfile
 
 import tables
@@ -20,7 +22,7 @@ def process_events_and_store_esd(summary):
 
     filepath = datastore.get_data_path(date)
     with tables.openFile(filepath, 'r') as data:
-        source_node = get_station_node_from_datastore_file(data, station)
+        source_node = get_station_node(data, station)
         copy_node_to_esd_file_for_summary(summary, source_node)
 
     #copy to tmp?
@@ -29,7 +31,17 @@ def process_events_and_store_esd(summary):
     #copy_node_from_tmp_to_esd(date, cluster, station_id)
 
 
-def get_station_node_from_datastore_file(data, station):
+def get_or_create_station_node(data, station):
+    node_path = get_station_node_path(station)
+    head, tail = os.path.split(node_path)
+
+    if node_path in data:
+        return data.getNode(head, tail)
+    else:
+        return data.createGroup(head, tail, createparents=True)
+
+
+def get_station_node(data, station):
     """Return station node in datastore file
 
     :param data: datastore file
@@ -51,15 +63,15 @@ def get_station_node_path(station):
     """
     cluster = station.cluster.main_cluster()
     station_id = station.number
-    return '/hisparc/cluster_%s/station_%d/' % (cluster.lower(),
-                                                station_id)
+    return '/hisparc/cluster_%s/station_%d' % (cluster.lower(),
+                                               station_id)
 
 
 def copy_node_to_esd_file_for_summary(summary, source_node):
     esd_path = esd_storage.get_or_create_esd_data_path(summary.date)
 
     with tables.openFile(esd_path, 'a') as esd_data:
-        esd_group = get_station_node_path(summary.station)
+        esd_group = get_or_create_station_node(esd_data, summary.station)
         print esd_group
         #source_node.events.copy(esd_group, createparents=True)
 
