@@ -36,17 +36,32 @@ def get_station_node_from_datastore_file(data, station):
     :param station: inforecords.models.Station object
 
     """
+    node_path = get_station_node_path(station)
+    group = data.getNode(node_path)
+    return group
+
+
+def get_station_node_path(station):
+    """Return station node path as used in data files
+
+    :param station: inforecords.Station instance
+
+    :returns: path to station group as used in datastore / ESD files
+
+    """
     cluster = station.cluster.main_cluster()
     station_id = station.number
-
-    group = data.getNode('/hisparc/cluster_%s/station_%d/' %
-                         (cluster.lower(), station_id))
-    return group
+    return '/hisparc/cluster_%s/station_%d/' % (cluster.lower(),
+                                                station_id)
 
 
 def copy_node_to_esd_file_for_summary(summary, source_node):
     esd_path = esd_storage.get_or_create_esd_data_path(summary.date)
-    print esd_path
+
+    with tables.openFile(esd_path, 'a') as esd_data:
+        esd_group = get_station_node_path(summary.station)
+        print esd_group
+        #source_node.events.copy(esd_group, createparents=True)
 
 
 def get_tmp_file(date, station_id):
