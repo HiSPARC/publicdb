@@ -47,6 +47,24 @@ def get_esd_data_path(date):
     return os.path.join(rootdir, filepath)
 
 
+def get_or_create_esd_data_path(date):
+    """Return path to ESD file, creating directories if necessary
+
+    :param date: datetime.date object
+
+    :returns: path to ESD file
+
+    """
+    filepath = get_esd_data_path(date)
+    dirpath, filename = os.path.split(filepath)
+
+    if not os.path.exists(dirpath):
+        # create dir and parent dirs with mode rwxr-xr-x
+        os.makedirs(dirpath, 0755)
+
+    return filepath
+
+
 def open_or_create_file(data_dir, date):
     """Open an existing file or create a new one
 

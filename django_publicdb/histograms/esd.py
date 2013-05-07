@@ -21,7 +21,7 @@ def process_events_and_store_esd(summary):
     filepath = datastore.get_data_path(date)
     with tables.openFile(filepath, 'r') as data:
         source_node = get_station_node_from_datastore_file(data, station)
-        print source_node
+        copy_node_to_esd_file_for_summary(summary, source_node)
 
     #copy to tmp?
     #... process_events(date, cluster, station_id)
@@ -42,6 +42,11 @@ def get_station_node_from_datastore_file(data, station):
     group = data.getNode('/hisparc/cluster_%s/station_%d/' %
                          (cluster.lower(), station_id))
     return group
+
+
+def copy_node_to_esd_file_for_summary(summary, source_node):
+    esd_path = esd_storage.get_or_create_esd_data_path(summary.date)
+    print esd_path
 
 
 def get_tmp_file(date, station_id):
