@@ -30,9 +30,6 @@ DATASTORE_PATH = '../datastore'
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = '../esd'
 
-# Path of the mounted HiSPARC event summary datastore (ESD) root folder
-TMP_PATH = '../tmp'
-
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
