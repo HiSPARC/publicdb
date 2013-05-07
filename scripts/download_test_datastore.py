@@ -89,8 +89,8 @@ def open_or_create_file(data_dir, date):
     :param date: the event date
 
     """
-    dir = os.path.join(data_dir, '%d/%d' % (date.year, date.month))
-    file = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month, date.day))
+    dir = os.path.join(data_dir, date.strftime('%Y/%-m'))
+    file = os.path.join(dir, date.strftime('%Y_%-m_%-d.h5'))
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x

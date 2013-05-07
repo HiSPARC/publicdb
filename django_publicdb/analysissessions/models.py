@@ -117,9 +117,9 @@ class SessionRequest(models.Model):
         return [self.sid, self.pin]
 
     def find_coincidence(self, date, session):
-        file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
-        datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
-                                      str(date.month), file)
+        file = date.strftime('%Y_%-m_%-d.h5')
+        datastore_path = os.path.join(settings.DATASTORE_PATH,
+                                      date.strftime('%Y/%-m'), file)
         data = tables.openFile(datastore_path, 'r')
         ndups = 0
         nvalid = 0

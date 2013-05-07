@@ -92,6 +92,7 @@ def get_stations(date):
 
     return station_list
 
+
 def get_event_timestamps(cluster, station_id, date):
     """Get event timestamps
 
@@ -243,14 +244,14 @@ def get_data_path(date):
 
     Return path to the data file of a particular date
 
-    :param date: the date
+    :param date: the date as a datetime.date object
 
     :return: path to the data file
 
     """
     rootdir = settings.DATASTORE_PATH
-    file = '%d_%d_%d.h5' % (date.year, date.month, date.day)
-    return os.path.join(rootdir, str(date.year), str(date.month), file)
+    filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(rootdir, filepath)
 
 
 def get_config_messages(cluster, station_id, date):
