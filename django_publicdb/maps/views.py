@@ -41,7 +41,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
-            link = station_has_data(station)
             status = get_station_status(station, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
