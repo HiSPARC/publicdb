@@ -153,9 +153,16 @@ def create_temporary_file():
     return f.name
 
 
-def copy_node_to_esd_file_for_summary(summary, source_node):
+def copy_node_to_esd_file_for_summary(summary, node):
+    """Copy a PyTables node to ESD file
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param node: the node to be copied
+
+    """
     esd_path = esd_storage.get_or_create_esd_data_path(summary.date)
 
     with tables.openFile(esd_path, 'a') as esd_data:
         esd_group = get_or_create_station_node(esd_data, summary.station)
-        source_node.copy(esd_group, createparents=True, overwrite=True)
+        node.copy(esd_group, createparents=True, overwrite=True)
