@@ -99,7 +99,7 @@ def process_events_and_store_esd(summary):
         with tables.openFile(tmp_filename, 'w') as f:
             process_events = ProcessEventsFromSource(data, f, source_node,
                                                      '/')
-            process_events.process_and_store_results(limit=100)
+            process_events.process_and_store_results()
             copy_node_to_esd_file_for_summary(summary,
                                               process_events.destination)
     os.remove(tmp_filename)
