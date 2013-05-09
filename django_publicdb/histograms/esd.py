@@ -2,6 +2,7 @@
 
 import os.path
 import tempfile
+import logging
 
 import tables
 from sapphire.analysis import process_events
@@ -9,6 +10,9 @@ from sapphire.storage import ProcessedHisparcEvent
 
 import datastore
 import esd_storage
+
+
+logger = logging.getLogger('histograms.esd')
 
 
 class ProcessEventsFromSource(process_events.ProcessEvents):
