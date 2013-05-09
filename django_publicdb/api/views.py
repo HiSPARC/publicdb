@@ -54,11 +54,14 @@ def station(request, station_id):
              including the position of the individual scintillators.
 
     """
+    today = datetime.date.today()
     try:
         station = Station.objects.get(number=station_id)
-        detector = DetectorHisparc.objects.get(station=station)
+        detector = (DetectorHisparc.objects.filter(station=station,
+                                                   startdate__lte=today)
+                                           .latest('startdate'))
         config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lte=datetime.date.today())
+                                               timestamp__lte=today)
                                        .latest('timestamp'))
     except (Station.DoesNotExist, Configuration.DoesNotExist):
         return HttpResponseNotFound()

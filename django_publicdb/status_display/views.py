@@ -143,14 +143,16 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
-                                        .filter(station__cluster__name=subcluster,
-                                                station__pc__is_active=True)):
-            link = station_has_data(detector.station)
-            status = get_station_status(detector.station, down, problem, up)
-            stations.append({'number': detector.station.number,
-                             'name': detector.station.name,
-                             'cluster': detector.station.cluster,
+        for station in Station.objects.filter(cluster=subcluster,
+                                              pc__is_active=True):
+            detector = (DetectorHisparc.objects.filter(station=station,
+                                                       startdate__lte=today)
+                                               .latest('startdate'))
+            link = station_has_data(station)
+            status = get_station_status(station, down, problem, up)
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'cluster': station.cluster,
                              'link': link,
                              'status': status,
                              'longitude': detector.longitude,
@@ -421,10 +423,11 @@ def get_gps_config_source(request, station_id):
 
 
 def get_histogram_source(station_id, year, month, day, type):
-    histogram = DailyHistogram.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    histogram = get_object_or_404(DailyHistogram,
+                                  source__station__number=int(station_id),
+                                  source__date=date,
+                                  type__slug=type)
     if type == 'eventtime':
         return zip(histogram.bins, histogram.values)
     else:
@@ -432,10 +435,11 @@ def get_histogram_source(station_id, year, month, day, type):
 
 
 def get_dataset_source(station_id, year, month, day, type):
-    dataset = DailyDataset.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    dataset = get_object_or_404(DailyDataset,
+                                source__station__number=int(station_id),
+                                source__date=date,
+                                type__slug=type)
     return zip(dataset.x, dataset.y)
 
 

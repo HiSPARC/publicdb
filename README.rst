@@ -25,7 +25,6 @@ the source::
     
 Then apply this patch::
 
-    ===================================================================
     --- CMakeLists.txt (revision 22471)
     +++ CMakeLists.txt (working copy)
     @@ -884,7 +884,7 @@
@@ -77,38 +76,44 @@ Alternatively, install the latest version with::
 
 The complete requirements and installation instructions are::
 
-    $ pip install ipython==0.13.1
+    $ pip install ipython==0.13.2
 
-    $ pip install Cython==0.17.1
-    $ pip install numpy==1.6.2
+    $ pip install Cython==0.19
+    $ pip install numpy==1.7.1
 
-    $ pip install numexpr==2.0.1
+    $ pip install numexpr==2.1
     $ pip install tables==2.4.0
 
     $ pip install recaptcha-client==1.0.6
 
     $ pip install Django==1.4.3
-    $ pip install South==0.7.3
+    $ pip install South==0.7.6
+    $ pip install docutils==0.10
 
+    $ pip install progressbar==2.3
+    $ pip install mock==1.0.1
+    $ pip install scipy==0.12.0
+    $ pip install matplotlib==1.2.1
     $ pip install https://github.com/hisparc/sapphire/zipball/master
 
 You now have all the prerequisites for running the publicdb django app.
 For reference, the results from `pip freeze`::
 
     $ pip freeze
-    Cython==0.16
-    Django==1.4.2
-    South==0.7.3
-    ipython==0.12.1
+    Cython==0.19
+    Django==1.4.3
+    South==0.7.6
+    docutils==0.10
+    ipython==0.13.2
     matplotlib==1.2.1
     mock==1.0.1
-    numexpr==2.0.1
-    numpy==1.6.2
+    numexpr==2.1
+    numpy==1.7.1
     progressbar==2.3
     recaptcha-client==1.0.6
     sapphire==0.9.1b
     scipy==0.12.0
-    tables==2.3.1
+    tables==2.4.0
     wsgiref==0.1.2
 
 Note for Mac OS X users: python has trouble detecting the default locale.
@@ -121,7 +126,6 @@ database with::
 
     $ ./manage.py syncdb
     $ ./manage.py migrate
-
 
 
 Hints for running a development publicdb server

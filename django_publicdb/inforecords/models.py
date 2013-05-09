@@ -36,8 +36,7 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         super(Contact, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     class Meta:
         unique_together = [('first_name', 'prefix_surname', 'surname')]
@@ -95,8 +94,7 @@ class ContactInformation(models.Model):
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     class Meta:
         ordering = ['city', 'street_1', 'email_work']
@@ -386,7 +384,9 @@ class Pc(models.Model):
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.register_hosts_ip([(x.name, x.ip) for x in Pc.objects.all()])
+        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
+        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
+        proxy.register_hosts_ip(aliases)
         proxy.reload_nagios()
 
     def install_default_services(self):
@@ -443,13 +443,22 @@ class EnabledService(models.Model):
 
     def save(self, *args, **kwargs):
         super(EnabledService, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     def delete(self, *args, **kwargs):
         super(EnabledService, self).delete(*args, **kwargs)
+        reload_nagios()
+
+
+def reload_nagios():
+    """Reload the nagios configuration"""
+
+    try:
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
+    except:
+        #FIXME logging!
+        pass
 
 
 def reload_datastore():
