@@ -436,7 +436,7 @@ def get_histogram_source(station_id, year, month, day, type):
 
 def get_dataset_source(station_id, year, month, day, type):
     date = datetime.date(int(year), int(month), int(day))
-    dataset = get_object_or_404(DailyDataset
+    dataset = get_object_or_404(DailyDataset,
                                 source__station__number=int(station_id),
                                 source__date=date,
                                 type__slug=type)
