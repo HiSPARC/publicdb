@@ -226,3 +226,55 @@ def get_or_create_esd_data_path(date):
         os.makedirs(dirpath, 0755)
 
     return filepath
+
+
+def get_event_timestamps(summary):
+    """Get event timestamps
+
+    Read data from file and return a list of timestamps for all events on
+    date `date' from station `station_id', specified by the summary.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    return get_event_data(summary, 'timestamp')
+
+
+def get_event_data(summary, quantity):
+    """Get event data of a specific quantity
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    return get_data(summary, 'events', quantity)
+
+
+def get_data(summary, tablename, quantity):
+    """Get data from the datastore from a table of a specific quantity
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param tablename: table name (e.g. 'events', 'weather', ...)
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    date = summary.date
+    station = summary.station
+
+    path = get_esd_data_path(date)
+    with tables.openFile(path, 'r') as datafile:
+        try:
+            station_node = get_station_node(datafile, station)
+            table = datafile.getNode(station_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error('Cannot find data node for station %d in %s on %s' %
+                         (station_id, cluster.lower(), date))
+            data = None
+        else:
+            col = table.col(quantity)
+            data = col.tolist()
+
+    return data

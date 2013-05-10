@@ -194,8 +194,7 @@ def update_gps_coordinates():
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    timestamps = datastore.get_event_timestamps(cluster, station_id,
-                                                summary.date)
+    timestamps = esd.get_event_timestamps(summary)
 
     # creating a histogram with bins consisting of timestamps instead of
     # hours saves us from having to convert all timestamps to hours of day.
