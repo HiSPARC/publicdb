@@ -103,12 +103,13 @@ def process_events_and_store_esd(summary):
     station = summary.station
 
     filepath = datastore.get_data_path(date)
-    with tables.openFile(filepath, 'r') as data:
-        source_node = get_station_node(data, station)
+    with tables.openFile(filepath, 'r') as source_file:
+        source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
-        with tables.openFile(tmp_filename, 'w') as f:
-            process_events = ProcessEventsFromSource(data, f, source_node,
-                                                     '/')
+        with tables.openFile(tmp_filename, 'w') as tmp_file:
+            process_events = ProcessEventsFromSource(source_file,
+                                                     tmp_file,
+                                                     source_node, '/')
             process_events.process_and_store_results()
             copy_node_to_esd_file_for_summary(summary,
                                               process_events.destination)
