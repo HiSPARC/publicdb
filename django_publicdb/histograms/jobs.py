@@ -151,7 +151,6 @@ def perform_update_tasks():
 
 def perform_events_tasks(summary):
     process_events_and_store_esd(summary)
-    # FIXME: make use of ESD for histograms!
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseintegral_histogram(summary)
@@ -166,7 +165,6 @@ def perform_config_tasks(summary):
 
 def perform_weather_tasks(summary):
     process_weather_and_store_esd(summary)
-    # FIXME: make use of ESD for histograms!
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
     summary.needs_update_weather = False
