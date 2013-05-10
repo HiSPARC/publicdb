@@ -86,6 +86,11 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
 
         return self.source_group.blobs
 
+    def _create_progressbar_from_iterable(self, iterable, length=None):
+        """Override method, do not show a progressbar"""
+
+        return lambda x: x
+
 
 def process_events_and_store_esd(summary):
     """Process events from datastore and save Event Summary Data
