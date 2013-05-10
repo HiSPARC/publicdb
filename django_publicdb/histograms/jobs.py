@@ -165,6 +165,8 @@ def perform_config_tasks(summary):
 
 
 def perform_weather_tasks(summary):
+    process_weather_and_store_esd(summary)
+    # FIXME: make use of ESD for histograms!
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
     summary.needs_update_weather = False
@@ -229,6 +231,13 @@ def process_events_and_store_esd(summary):
     logger.debug("Processing events and storing ESD for %s", summary)
     t0 = time.time()
     esd.process_events_and_store_esd(summary)
+    t1 = time.time()
+    logger.debug("Processing took %.1f s.", t1 - t0)
+
+def process_weather_and_store_esd(summary):
+    logger.debug("Processing weather events and storing ESD for %s", summary)
+    t0 = time.time()
+    esd.process_weather_and_store_esd(summary)
     t1 = time.time()
     logger.debug("Processing took %.1f s.", t1 - t0)
 

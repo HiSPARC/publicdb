@@ -115,6 +115,22 @@ def process_events_and_store_esd(summary):
     os.remove(tmp_filename)
 
 
+def process_weather_and_store_esd(summary):
+    """Process weather events from datastore and save Event Summary Data
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+    station = summary.station
+
+    filepath = datastore.get_data_path(date)
+    with tables.openFile(filepath, 'r') as data:
+        source_node = get_station_node(data, station)
+        copy_node_to_esd_file_for_summary(summary, source_node.weather)
+
+
 def get_or_create_station_node(data, station):
     node_path = get_station_node_path(station)
     head, tail = os.path.split(node_path)
