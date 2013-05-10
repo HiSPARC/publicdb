@@ -262,6 +262,27 @@ def get_pulseheights(summary):
         return pulseheights.T
 
 
+def get_integrals(summary):
+    """Get all event integrals
+
+    Read data from file and return a list of integrals.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    integrals = get_event_data(summary, 'integrals')
+    if integrals is None:
+        return None
+    else:
+        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
+        #FIXME need configurations for this
+        integrals *= .57 * 2.5
+
+        # transpose, so we have '4 arrays of many integrals'
+        return integrals.T
+
+
 def get_event_data(summary, quantity):
     """Get event data of a specific quantity
 

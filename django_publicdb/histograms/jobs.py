@@ -221,7 +221,7 @@ def update_pulseheight_histogram(summary):
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    integrals = datastore.get_integrals(cluster, station_id, summary.date)
+    integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
