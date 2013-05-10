@@ -9,7 +9,8 @@ from sapphire.analysis import process_events
 from sapphire.storage import ProcessedHisparcEvent
 
 import datastore
-import esd_storage
+
+from django.conf import settings
 
 
 logger = logging.getLogger('histograms.esd')
@@ -165,8 +166,41 @@ def copy_node_to_esd_file_for_summary(summary, node):
     :param node: the node to be copied
 
     """
-    esd_path = esd_storage.get_or_create_esd_data_path(summary.date)
+    esd_path = get_or_create_esd_data_path(summary.date)
 
     with tables.openFile(esd_path, 'a') as esd_data:
         esd_group = get_or_create_station_node(esd_data, summary.station)
         node.copy(esd_group, createparents=True, overwrite=True)
+
+
+def get_esd_data_path(date):
+    """Return path to ESD file
+
+    Return path to the ESD file of a particular date
+
+    :param date: the date as a datetime.date object
+
+    :return: path to the ESD file
+
+    """
+    rootdir = settings.ESD_PATH
+    filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(rootdir, filepath)
+
+
+def get_or_create_esd_data_path(date):
+    """Return path to ESD file, creating directories if necessary
+
+    :param date: datetime.date object
+
+    :returns: path to ESD file
+
+    """
+    filepath = get_esd_data_path(date)
+    dirpath, filename = os.path.split(filepath)
+
+    if not os.path.exists(dirpath):
+        # create dir and parent dirs with mode rwxr-xr-x
+        os.makedirs(dirpath, 0755)
+
+    return filepath
