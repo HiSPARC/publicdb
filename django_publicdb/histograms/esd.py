@@ -3,6 +3,7 @@
 import os.path
 import tempfile
 import logging
+from operator import itemgetter
 
 import tables
 from sapphire.analysis import process_events
@@ -283,6 +284,26 @@ def get_integrals(summary):
         return integrals.T
 
 
+def get_temperature(summary):
+    """Get temperature data
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    return get_time_series(summary, 'weather', 'temp_outside')
+
+
+def get_barometer(summary):
+    """Get barometer data
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    return get_time_series(summary, 'weather', 'barometer')
+
+
 def get_event_data(summary, quantity):
     """Get event data of a specific quantity
 
@@ -312,10 +333,40 @@ def get_data(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.getNode(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error('Cannot find data node for station %d in %s on %s' %
-                         (station_id, cluster.lower(), date))
+            logger.error("Cannot find table %s for %s", tablename,
+                         summary)
             data = None
         else:
             data = table.col(quantity)
+
+    return data
+
+
+def get_time_series(summary, tablename, quantity):
+    """Get time series data from a table of a specific quantity
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param tablename: table name (e.g. 'events', 'weather', ...)
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    date = summary.date
+    station = summary.station
+
+    path = get_esd_data_path(date)
+    with tables.openFile(path, 'r') as datafile:
+        try:
+            station_node = get_station_node(datafile, station)
+            table = datafile.getNode(station_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename,
+                         summary)
+            data = None
+        else:
+            col1 = table.col('timestamp')
+            col2 = table.col(quantity)
+            data = zip(col1, col2)
+            data.sort(key=itemgetter(0))
 
     return data

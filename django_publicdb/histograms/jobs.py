@@ -242,7 +242,7 @@ def process_weather_and_store_esd(summary):
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    temperature = datastore.get_temperature(cluster, station_id, summary.date)
+    temperature = esd.get_temperature(summary)
     ERR = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
@@ -252,7 +252,7 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    barometer = datastore.get_barometer(cluster, station_id, summary.date)
+    barometer = esd.get_barometer(summary)
     save_dataset(summary, 'barometer', barometer)
 
 
