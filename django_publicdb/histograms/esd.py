@@ -256,10 +256,10 @@ def get_pulseheights(summary):
     else:
         #FIXME
         # need configurations for this
-        pulseheights = [[x * .57 for x in y] for y in pulseheights]
+        pulseheights *= .57
 
-        # transpose, so we have 4 arrays of many pulseheights
-        return zip(*pulseheights)
+        # transpose, so we have '4 arrays of many pulseheights'
+        return pulseheights.T
 
 
 def get_event_data(summary, quantity):
@@ -295,7 +295,6 @@ def get_data(summary, tablename, quantity):
                          (station_id, cluster.lower(), date))
             data = None
         else:
-            col = table.col(quantity)
-            data = col.tolist()
+            data = table.col(quantity)
 
     return data
