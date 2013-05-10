@@ -226,8 +226,11 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 def process_events_and_store_esd(summary):
-    logger.debug("Processing events and storing ESD for %s" % summary)
+    logger.debug("Processing events and storing ESD for %s", summary)
+    t0 = time.time()
     esd.process_events_and_store_esd(summary)
+    t1 = time.time()
+    logger.debug("Processing took %.1f s.", t1 - t0)
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
