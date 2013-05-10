@@ -241,6 +241,27 @@ def get_event_timestamps(summary):
     return get_event_data(summary, 'timestamp')
 
 
+def get_pulseheights(summary):
+    """Get all event pulse heights
+
+    Read data from file and return a list of pulseheights.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    pulseheights = get_event_data(summary, 'pulseheights')
+    if pulseheights is None:
+        return None
+    else:
+        #FIXME
+        # need configurations for this
+        pulseheights = [[x * .57 for x in y] for y in pulseheights]
+
+        # transpose, so we have 4 arrays of many pulseheights
+        return zip(*pulseheights)
+
+
 def get_event_data(summary, quantity):
     """Get event data of a specific quantity
 

@@ -213,8 +213,7 @@ def update_eventtime_histogram(summary):
 def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    pulseheights = datastore.get_pulseheights(cluster, station_id,
-                                              summary.date)
+    pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
 
