@@ -127,22 +127,22 @@ def process_weather_and_store_esd(summary):
     station = summary.station
 
     filepath = datastore.get_data_path(date)
-    with tables.openFile(filepath, 'r') as data:
-        source_node = get_station_node(data, station)
+    with tables.openFile(filepath, 'r') as source_file:
+        source_node = get_station_node(source_file, station)
         copy_node_to_esd_file_for_summary(summary, source_node.weather)
 
 
-def get_or_create_station_node(data, station):
+def get_or_create_station_node(datafile, station):
     node_path = get_station_node_path(station)
     head, tail = os.path.split(node_path)
 
-    if node_path in data:
-        return data.getNode(head, tail)
+    if node_path in datafile:
+        return datafile.getNode(head, tail)
     else:
-        return data.createGroup(head, tail, createparents=True)
+        return datafile.createGroup(head, tail, createparents=True)
 
 
-def get_station_node(data, station):
+def get_station_node(datafile, station):
     """Return station node in datastore file
 
     :param data: datastore file
@@ -150,7 +150,7 @@ def get_station_node(data, station):
 
     """
     node_path = get_station_node_path(station)
-    group = data.getNode(node_path)
+    group = datafile.getNode(node_path)
     return group
 
 
