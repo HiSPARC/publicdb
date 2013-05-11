@@ -60,6 +60,21 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         """Override method, the destination is empty"""
         pass
 
+    def _replace_table_with_selected_rows(self, table, row_ids):
+        """Replace events table with selected rows.
+
+        :param table: original table to be replaced.
+        :param row_ids: row ids of the selected rows which should go in
+            the destination table.
+
+        """
+        new_events = self.dest_file.createTable(self.dest_group, '_events',
+            description=table.description)
+        selected_rows = table.readCoordinates(row_ids)
+        new_events.append(selected_rows)
+        new_events.flush()
+        return new_events
+
     def _create_empty_results_table(self):
         """Create empty results table with correct length."""
 
