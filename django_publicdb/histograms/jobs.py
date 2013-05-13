@@ -167,17 +167,19 @@ def process_and_store_temporary_esd_for_summary(summary):
 
 
 def update_histograms():
-    for summary in (Summary.objects.filter(needs_update_events=True)
-                           .reverse()):
-        perform_events_tasks(summary)
+    worker_pool = multiprocessing.Pool()
 
-    for summary in (Summary.objects.filter(needs_update_config=True)
-                           .reverse()):
-        perform_config_tasks(summary)
+    summaries = Summary.objects.filter(needs_update_events=True).reverse()
+    worker_pool.map_async(perform_events_tasks, summaries)
 
-    for summary in (Summary.objects.filter(needs_update_weather=True)
-                           .reverse()):
-        perform_weather_tasks(summary)
+    summaries = Summary.objects.filter(needs_update_weather=True).reverse()
+    worker_pool.map_async(perform_weather_tasks, summaries)
+
+    summaries = Summary.objects.filter(needs_update_config=True).reverse()
+    worker_pool.map_async(perform_config_tasks, summaries)
+
+    worker_pool.close()
+    worker_pool.join()
 
 
 def perform_events_tasks(summary):
