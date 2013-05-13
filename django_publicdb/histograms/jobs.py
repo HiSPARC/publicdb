@@ -141,10 +141,22 @@ def perform_update_tasks():
 def update_esd():
     for summary in (Summary.objects.filter(needs_update=True)
                            .reverse()):
-        process_events_and_store_esd(summary)
-        process_weather_and_store_esd(summary)
+        summary, tmp_locations = \
+            process_and_store_temporary_esd_for_summary(summary)
+        for tmpfile_path, node_path in tmp_locations:
+            esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                               node_path)
         summary.needs_update = False
         summary.save()
+
+
+def process_and_store_temporary_esd_for_summary(summary):
+    tmp_locations = []
+    if summary.needs_update_events:
+        tmp_locations.append(process_events_and_store_esd(summary))
+    if summary.needs_update_weather:
+        tmp_locations.append(process_weather_and_store_esd(summary))
+    return summary, tmp_locations
 
 
 def update_histograms():
@@ -241,18 +253,18 @@ def process_events_and_store_esd(summary):
     t0 = time.time()
     tmpfile_path, node_path = \
         esd.process_events_and_store_temporary_esd(summary)
-    esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
     t1 = time.time()
     logger.debug("Processing took %.1f s.", t1 - t0)
+    return tmpfile_path, node_path
 
 def process_weather_and_store_esd(summary):
     logger.debug("Processing weather events and storing ESD for %s", summary)
     t0 = time.time()
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
-    esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
     t1 = time.time()
     logger.debug("Processing took %.1f s.", t1 - t0)
+    return tmpfile_path, node_path
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
