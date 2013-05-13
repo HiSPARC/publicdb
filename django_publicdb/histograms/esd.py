@@ -108,8 +108,11 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         return lambda x: x
 
 
-def process_events_and_store_esd(summary):
-    """Process events from datastore and save Event Summary Data
+def process_events_and_store_temporary_esd(summary):
+    """Process events from datastore and save temporary Event Summary Data
+
+    Events from the datastore are processed and stored in a temporary
+    file.  The temporary file path and node path are returned.
 
     :param summary: summary of data source (station and date)
     :type summary: histograms.models.Summary instance
@@ -127,9 +130,8 @@ def process_events_and_store_esd(summary):
                                                      tmp_file,
                                                      source_node, '/')
             process_events.process_and_store_results()
-            copy_node_to_esd_file_for_summary(summary,
-                                              process_events.destination)
-    os.remove(tmp_filename)
+            node_path = process_events.destination._v_pathname
+    return tmp_filename, node_path
 
 
 def process_weather_and_store_esd(summary):
@@ -194,6 +196,22 @@ def create_temporary_file():
     f = tempfile.NamedTemporaryFile(delete=False)
     f.close()
     return f.name
+
+
+def copy_temporary_esd_node_to_esd(summary, file_path, node_path):
+    """Copy temporary ESD node into the Event Summary Data
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param file_path: the path to the file containing the temporary ESD
+        node.
+    :param node_path: the path to the node to be copied
+
+    """
+    with tables.openFile(file_path, 'r') as tmp_file:
+        node = tmp_file.getNode(node_path)
+        copy_node_to_esd_file_for_summary(summary, node)
+    os.remove(file_path)
 
 
 def copy_node_to_esd_file_for_summary(summary, node):
