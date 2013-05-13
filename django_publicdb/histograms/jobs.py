@@ -6,6 +6,8 @@ import datetime
 import time
 import calendar
 import logging
+import multiprocessing
+
 import numpy
 
 from models import *
@@ -139,15 +141,20 @@ def perform_update_tasks():
 
 
 def update_esd():
-    for summary in (Summary.objects.filter(needs_update=True)
-                           .reverse()):
-        summary, tmp_locations = \
-            process_and_store_temporary_esd_for_summary(summary)
+    worker_pool = multiprocessing.Pool()
+    summaries = Summary.objects.filter(needs_update=True).reverse()
+    results = worker_pool.imap_unordered(
+        process_and_store_temporary_esd_for_summary, summaries)
+    worker_pool.close()
+
+    for summary, tmp_locations in results:
         for tmpfile_path, node_path in tmp_locations:
             esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                node_path)
         summary.needs_update = False
         summary.save()
+
+    worker_pool.join()
 
 
 def process_and_store_temporary_esd_for_summary(summary):
