@@ -134,40 +134,53 @@ def update_all_histograms():
 
 
 def perform_update_tasks():
+    update_esd()
+    update_histograms()
+
+
+def update_esd():
     for summary in (Summary.objects.filter(needs_update=True)
                            .reverse()):
-        if summary.needs_update_events:
-            perform_events_tasks(summary)
-
-        if summary.needs_update_config:
-            perform_config_tasks(summary)
-
-        if summary.needs_update_weather:
-            perform_weather_tasks(summary)
-
+        process_events_and_store_esd(summary)
+        process_weather_and_store_esd(summary)
         summary.needs_update = False
         summary.save()
 
 
+def update_histograms():
+    for summary in (Summary.objects.filter(needs_update_events=True)
+                           .reverse()):
+        perform_events_tasks(summary)
+
+    for summary in (Summary.objects.filter(needs_update_config=True)
+                           .reverse()):
+        perform_config_tasks(summary)
+
+    for summary in (Summary.objects.filter(needs_update_weather=True)
+                           .reverse()):
+        perform_weather_tasks(summary)
+
+
 def perform_events_tasks(summary):
-    process_events_and_store_esd(summary)
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseintegral_histogram(summary)
     summary.needs_update_events = False
+    summary.save()
 
 
 def perform_config_tasks(summary):
     num_config = update_config(summary)
     summary.num_config = num_config
     summary.needs_update_config = False
+    summary.save()
 
 
 def perform_weather_tasks(summary):
-    process_weather_and_store_esd(summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
     summary.needs_update_weather = False
+    summary.save()
 
 
 def update_gps_coordinates():
