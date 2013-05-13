@@ -134,8 +134,10 @@ def process_events_and_store_temporary_esd(summary):
     return tmp_filename, node_path
 
 
-def process_weather_and_store_esd(summary):
-    """Process weather events from datastore and save Event Summary Data
+def process_weather_and_store_temporary_esd(summary):
+    """Process weather events from datastore and save temporary ESD
+
+    Currently, this is basically a no-op.
 
     :param summary: summary of data source (station and date)
     :type summary: histograms.models.Summary instance
@@ -147,7 +149,11 @@ def process_weather_and_store_esd(summary):
     filepath = datastore.get_data_path(date)
     with tables.openFile(filepath, 'r') as source_file:
         source_node = get_station_node(source_file, station)
-        copy_node_to_esd_file_for_summary(summary, source_node.weather)
+        tmp_filename = create_temporary_file()
+        with tables.openFile(tmp_filename, 'w') as tmp_file:
+            new_node = source_node.weather.copy(tmp_file.root)
+            node_path = new_node._v_pathname
+    return tmp_filename, node_path
 
 
 def get_or_create_station_node(datafile, station):

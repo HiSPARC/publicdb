@@ -239,16 +239,18 @@ def update_pulseintegral_histogram(summary):
 def process_events_and_store_esd(summary):
     logger.debug("Processing events and storing ESD for %s", summary)
     t0 = time.time()
-    tmpfile, node_path = \
+    tmpfile_path, node_path = \
         esd.process_events_and_store_temporary_esd(summary)
-    esd.copy_temporary_esd_node_to_esd(summary, tmpfile, node_path)
+    esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
     t1 = time.time()
     logger.debug("Processing took %.1f s.", t1 - t0)
 
 def process_weather_and_store_esd(summary):
     logger.debug("Processing weather events and storing ESD for %s", summary)
     t0 = time.time()
-    esd.process_weather_and_store_esd(summary)
+    tmpfile_path, node_path = \
+        esd.process_weather_and_store_temporary_esd(summary)
+    esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
     t1 = time.time()
     logger.debug("Processing took %.1f s.", t1 - t0)
 
