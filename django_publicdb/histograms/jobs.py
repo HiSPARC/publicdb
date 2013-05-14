@@ -10,6 +10,7 @@ import multiprocessing
 
 import numpy
 
+import django.db
 from models import *
 from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
@@ -145,7 +146,6 @@ def update_esd():
     summaries = Summary.objects.filter(needs_update=True).reverse()
     results = worker_pool.imap_unordered(
         process_and_store_temporary_esd_for_summary, summaries)
-    worker_pool.close()
 
     for summary, tmp_locations in results:
         for tmpfile_path, node_path in tmp_locations:
@@ -154,10 +154,12 @@ def update_esd():
         summary.needs_update = False
         summary.save()
 
+    worker_pool.close()
     worker_pool.join()
 
 
 def process_and_store_temporary_esd_for_summary(summary):
+    django.db.close_connection()
     tmp_locations = []
     if summary.needs_update_events:
         tmp_locations.append(process_events_and_store_esd(summary))
@@ -167,41 +169,61 @@ def process_and_store_temporary_esd_for_summary(summary):
 
 
 def update_histograms():
+    """Update all histograms"""
+
+    # Use a worker pool
     worker_pool = multiprocessing.Pool()
-
     summaries = Summary.objects.filter(needs_update_events=True).reverse()
-    worker_pool.map_async(perform_events_tasks, summaries)
+    results = worker_pool.imap_unordered(perform_events_tasks, summaries)
+    for summary in results:
+        summary.needs_update_events=False
+        summary.save()
+    worker_pool.close()
+    worker_pool.join()
 
+    # Use a new worker pool (or you'll be sorry).
+    # You could reuse the worker pool, but then you need to force querying
+    # the database to prefetch all summaries.
+    worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_weather=True).reverse()
-    worker_pool.map_async(perform_weather_tasks, summaries)
+    results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
+    for summary in results:
+        summary.needs_update_weather=False
+        summary.save()
+    worker_pool.close()
+    worker_pool.join()
 
+    # Use a new worker pool (or you'll be sorry).
+    worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_config=True).reverse()
-    worker_pool.map_async(perform_config_tasks, summaries)
-
+    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
+    for summary in results:
+        summary.needs_update_config=False
+        summary.save()
     worker_pool.close()
     worker_pool.join()
 
 
 def perform_events_tasks(summary):
+    django.db.close_connection()
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseintegral_histogram(summary)
-    summary.needs_update_events = False
-    summary.save()
+    return summary
 
 
 def perform_config_tasks(summary):
+    django.db.close_connection()
     num_config = update_config(summary)
     summary.num_config = num_config
-    summary.needs_update_config = False
-    summary.save()
+    return summary
 
 
 def perform_weather_tasks(summary):
+    django.db.close_connection()
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
-    summary.needs_update_weather = False
-    summary.save()
+    return summary
 
 
 def update_gps_coordinates():
@@ -268,11 +290,8 @@ def process_events_and_store_esd(summary):
 
 def process_weather_and_store_esd(summary):
     logger.debug("Processing weather events and storing ESD for %s", summary)
-    t0 = time.time()
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
-    t1 = time.time()
-    logger.debug("Processing took %.1f s.", t1 - t0)
     return tmpfile_path, node_path
 
 def update_temperature_dataset(summary):
