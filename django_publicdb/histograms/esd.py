@@ -296,7 +296,8 @@ def get_pulseheights(summary):
     else:
         #FIXME
         # need configurations for this
-        pulseheights *= .57
+        # DO NOT shorten this line or you risk losing precision.
+        pulseheights = pulseheights * .57
 
         # transpose, so we have '4 arrays of many pulseheights'
         return pulseheights.T
