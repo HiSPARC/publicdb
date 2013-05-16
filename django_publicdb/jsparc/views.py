@@ -87,7 +87,7 @@ def get_events(coincidence):
                      traces=e.traces.tolist(),
                      pulseheights=e.pulseheights.tolist(),
                      integrals=e.integrals.tolist(),
-                     mips=(e.pulseheights / 200.).tolist()
+                     mips=(e.pulseheights / 200.).tolist())
         events.append(event)
     return events
 
