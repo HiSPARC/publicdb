@@ -318,7 +318,8 @@ def get_integrals(summary):
     else:
         # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
         #FIXME need configurations for this
-        integrals *= .57 * 2.5
+        # DO NOT shorten this line or you risk losing precision.
+        integrals = integrals * .57 * 2.5
 
         # transpose, so we have '4 arrays of many integrals'
         return integrals.T
