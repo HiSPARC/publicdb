@@ -2,12 +2,9 @@ from django.db import models
 from django_publicdb.coincidences.models import *
 from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
-from sapphire.analysis import coincidences
-from sapphire import publicdb
-from random import choice, randint
 from django.template.defaultfilters import slugify
-from datetime import timedelta
 
+from random import choice, randint
 import string
 import datetime
 import hashlib
@@ -15,6 +12,11 @@ import tables
 import sys
 import os
 import re
+
+import numpy
+
+from sapphire.analysis import coincidences
+from sapphire import publicdb
 
 
 class AnalysisSession(models.Model):
@@ -91,7 +93,7 @@ class SessionRequest(models.Model):
         self.session_pending = False
         self.save()
         starts = datetime.datetime.now()
-        session_length = timedelta(weeks=4)
+        session_length = datetime.timedelta(weeks=4)
         ends = starts + session_length
         session = AnalysisSession(starts=starts,
                                   ends=ends,
@@ -100,11 +102,11 @@ class SessionRequest(models.Model):
                                   title=self.sid)
         session.save()
         date = self.start_date
-        search_length = timedelta(weeks=3)
+        search_length = datetime.timedelta(weeks=3)
         enddate = self.start_date + search_length
         while (self.events_created < self.events_to_create and date < enddate):
             self.events_created += self.find_coincidence(date, session)
-            date += timedelta(days=1)
+            date += datetime.timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
         elif self.events_created <= self.events_to_create:
@@ -177,11 +179,9 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = [round(x * .57, 2) if x not in [-999, -1] else x
-                            for x in event['pulseheights']]
-            integrals = [round(x * .57 * 2.5, 2) if x not in [-999, -1] else x
-                         for x in event['integrals']]
-            traces = [[round(sample, 2) for sample in trace] for trace in traces]
+            pulseheights = numpy.around(event['pulseheights'] * .57, 2)
+            integrals = numpy.around(event['integrals'] * .57 * 2.5, 2)
+            traces = numpy.around(traces, 2)
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
@@ -209,8 +209,8 @@ class SessionRequest(models.Model):
         t = []
         for trace in traces:
             m = min(trace)
-            # No significant pulse (not lower than -20 mV)
             if not m < -20:
+                # No significant pulse (not lower than -20 mV)
                 continue
             for i, v in enumerate(trace):
                 if v < .2 * m:

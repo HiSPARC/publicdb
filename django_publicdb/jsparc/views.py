@@ -84,10 +84,10 @@ def get_events(coincidence):
                      alt=d.height,
                      status='on',
                      detectors=len(e.traces),
-                     traces=e.traces,
-                     pulseheights=[np.asscalar(u) for u in e.pulseheights],
-                     integrals=[np.asscalar(u) for u in e.integrals],
-                     mips=[x / 200. for x in e.pulseheights])
+                     traces=e.traces.tolist(),
+                     pulseheights=e.pulseheights.tolist(),
+                     integrals=e.integrals.tolist(),
+                     mips=(e.pulseheights / 200.).tolist())
         events.append(event)
     return events
 
