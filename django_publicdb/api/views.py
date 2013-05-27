@@ -10,6 +10,10 @@ from django_publicdb.analysissessions.models import *
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 
+import os
+import numpy
+import scipy
+from scipy import optimize
 
 def json_dict(dict):
     """Create a json HTTPResponse"""
@@ -296,12 +300,260 @@ def get_cluster_dict(country=None):
 
     return sorted(cluster_dict, key=itemgetter('number'))
 
-
 def get_country_dict():
     countries = Country.objects.all()
     country_dict = [{'number': country.number, 'name': country.name}
                     for country in countries]
     return sorted(country_dict, key=itemgetter('number'))
+
+def get_pulseheight_drift(request, station_id, plate_number,
+                          year, month, day, number_of_days):
+
+    requested_date = datetime.date(int(year), int(month), int(day))
+
+    station_id   = int(station_id)
+    plate_number = int(plate_number)
+
+    if (plate_number < 1) or (plate_number > 4):
+        return json_dict({
+            'error' : "Platenumber (value = %s) is out of range, should be between 1 and 4" % plate_number
+        })
+
+    #---------------------------------------------------------------------------
+    # Read in all data into these two dictionaries: t, mpv
+
+    t   = []
+    mpv = []
+
+    for days in range(int(number_of_days)):
+
+        fit_date = requested_date - datetime.timedelta(days=days)
+
+        # Check path
+
+        filepath = os.path.join(
+            "/home/cblam/Projects/hisparc/data-quality/analysis",
+            "%s_%s_%s.%s.pulseheights.dat" % (
+                fit_date.year, fit_date.month, fit_date.day, station_id
+            )
+        )
+
+        if not os.path.exists(filepath):
+            print "Unable to get fit values. Path doesn't exist: %s" % filepath
+            continue
+
+        # Transform file format to dictionary
+
+        with open(filepath, "r") as f:
+            for line in f.readlines():
+                # The stripping is primarily for removing the newline character
+                # at the end
+                line = line.strip()
+
+                try:
+
+                    # Assign values to readable variables
+
+                    t0, station, numberOfPlate, entries = line.split(" ")[0:4]
+                    fitCenter, fitRange                 = line.split(" ")[4:6]
+                    peakFit, peakFitError               = line.split(" ")[6:8]
+                    widthFit, widthFitError             = line.split(" ")[8:10]
+                    chiSquare                           = line.split(" ")[10]
+
+                    if int(numberOfPlate) + 1 != int(plate_number):
+                        continue
+
+                    # Make cuts
+
+                    if chiSquare < 1.5:
+                        continue
+
+                    if fitRange < 45.0:
+                        continue
+
+                    print "%s %s %s" %( peakFit, fitRange, chiSquare)
+
+                    #
+
+                    t.append(float(t0))
+                    mpv.append(float(peakFit))
+
+                except:
+                    raise
+                    pass
+
+            f.close()
+
+    #return json_dict([t, mpv])
+
+    #---------------------------------------------------------------------------
+    # Preparing results
+
+    t_array   = numpy.float_(t)
+    mpv_array = numpy.float_(mpv)
+
+    linear_fit = lambda p, t: p[0] + p[1]*t # Target function
+
+    # Determine the drift by a linear fit
+
+    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+
+    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+
+    drift = p1[1] * 86400.0
+
+    # Calculate the relative fluctuation
+
+    relative_mpv = []
+
+    for i in range(len(t)):
+        relative_mpv.append( mpv[i] / linear_fit(p1, t[i]) )
+
+    # Fit the relative fluctation with a gauss
+
+    bins = numpy.arange(0.0, 2.0, 0.005)
+    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+
+    frequency, bins = numpy.histogram(relative_mpv, bins=bins)
+    x = (bins[:-1] + bins[1:]) / 2
+
+    initial_N = 16
+    initial_mean = 1
+    initial_width = 0.03
+
+    popt, pcov = scipy.optimize.curve_fit(gauss, x, frequency,
+                           p0=(initial_N, initial_mean, initial_width))
+
+    #---------------------------------------------------------------------------
+    # Insert values into dictionary
+
+    dict = {
+        'station'        : station_id,
+        'plate_number'   : plate_number,
+
+        'year'           : requested_date.year,
+        'month'          : requested_date.month,
+        'day'            : requested_date.day,
+
+        'number_of_selected_days'  : len(t),
+        'number_of_requested_days' : number_of_days,
+
+        'fit_offset'     : p1[0],
+        'fit_slope'      : p1[1],
+
+        'drift_per_day'  : drift,
+
+        'timestamp'      : t,
+        'mpv'            : mpv,
+
+        'relative_mean'  : popt[1],
+        'relative_width' : popt[2],
+
+        # Debug
+        #'relative_mpv'   : relative_mpv,
+        #'frequency'      : frequency.tolist(),
+        #'x'              : x.tolist()
+    }
+
+    #---------------------------------------------------------------------------
+    # Return
+
+    return json_dict(dict)
+
+def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 14)
+
+def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 30)
+
+def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None, day=None):
+    """Get fit values of the pulseheight distribution for a station on a given day
+
+    Retrieve fit values of the pulseheight distribution. The fitting has to be
+    done before and stored somewhere. This function retrieves the fit values from
+    storage and returns to the client. Returns an error meesage if the values
+    are not found on storage.
+
+    :param station_id: a station number identifier.
+    :param plate_number: plate number in the range 1..4
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: dictionary containing fit results of the specified station, plate
+             and date
+
+    """
+
+    if year == None and month == None and day == None:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=6)
+
+        year  = yesterday.year
+        month = yesterday.month
+        day   = yesterday.day
+
+    # Check path
+
+    filepath = os.path.join(
+        "/home/cblam/Projects/hisparc/data-quality/analysis",
+        "%s_%s_%s.%s.pulseheights.dat" % (
+            year, month, day, station_id
+        )
+    )
+
+    if not os.path.exists(filepath):
+        return json_dict({"error": "Unable to get fit values. Please make sure the following path does exist: %s" % filepath})
+
+    # Transform file format to dictionary
+
+    with open(filepath, "r") as f:
+        for line in f.readlines():
+            # The stripping is primarily for removing the newline character
+            # at the end
+            line = line.strip()
+
+            try:
+                t0, station, numberOfPlate, entries = line.split(" ")[0:4]
+                peak, width                         = line.split(" ")[4:6]
+                peakFit, peakFitError               = line.split(" ")[6:8]
+                widthFit, widthFitError             = line.split(" ")[8:10]
+                chiSquare                           = line.split(" ")[10]
+
+                if int(numberOfPlate)+1 != int(plate_number):
+                    continue
+
+                return json_dict({
+                    'station'      : station_id,
+                    'plate_number' : plate_number,
+                    'year'         : year,
+                    'month'        : month,
+                    'day'          : day,
+
+                    "timestamp"       : int(t0),
+                    "entries"         : int(float(entries)),
+
+                    "initial_mpv"     : float(peak),
+                    "initial_width"   : float(width),
+
+                    "fit_mpv"         : float(peakFit),
+                    "fit_mpv_error"   : float(peakFitError),
+                    "fit_width"       : float(widthFit),
+                    "fit_width_error" : float(widthFitError),
+                    "chi_square"      : chiSquare
+                })
+            except:
+                raise
+                pass
+
+        f.close()
 
 
 def has_data(request, station_id, year=None, month=None, day=None):
