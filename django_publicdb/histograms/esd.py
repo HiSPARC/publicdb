@@ -5,6 +5,7 @@ import tempfile
 import logging
 from operator import itemgetter
 
+import numpy as np
 import tables
 from sapphire.analysis import process_events
 from sapphire.storage import ProcessedHisparcEvent
@@ -294,10 +295,9 @@ def get_pulseheights(summary):
     if pulseheights is None:
         return None
     else:
-        #FIXME
-        # need configurations for this
-        # DO NOT shorten this line or you risk losing precision.
-        pulseheights = pulseheights * .57
+        #FIXME: do we need configurations for this?
+        pulseheights = np.where(pulseheights >= 0, pulseheights * .57,
+                                pulseheights)
 
         # transpose, so we have '4 arrays of many pulseheights'
         return pulseheights.T
@@ -317,9 +317,9 @@ def get_integrals(summary):
         return None
     else:
         # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
-        #FIXME need configurations for this
-        # DO NOT shorten this line or you risk losing precision.
-        integrals = integrals * .57 * 2.5
+        #FIXME: do we need configurations for this?
+        integrals = np.where(integrals >= 0, integrals * .57 * 2.5,
+                             integrals)
 
         # transpose, so we have '4 arrays of many integrals'
         return integrals.T
