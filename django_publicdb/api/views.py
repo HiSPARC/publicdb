@@ -140,7 +140,74 @@ def stations(request, subcluster_id=None):
     return json_dict(stations)
 
 
-def stations_with_data(request, year, month, day):
+def stations_with_data(request):
+    """Get stations with data
+
+    Retrieve a list of all stations which have recorded data.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events.
+
+    """
+    summaries = (Station.objects.filter(summary__num_events__isnull=False)
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_year(request, year):
+    """Get stations with data
+
+    Retrieve a list of all stations which have data in the given year.
+
+    :param year: the year part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events in the given year.
+
+    """
+    date = datetime.date(int(year), 1, 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__year=int(year))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_month(request, year, month):
+    """Get stations with data
+
+    Retrieve a list of all stations which have data in the given month.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events in the given month.
+
+    """
+    date = datetime.date(int(year), int(month), 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__year=int(year),
+                                        summary__date__month=int(month))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_day(request, year, month, day):
     """Get stations with data
 
     Retrieve a list of all stations which have data on the given date.
@@ -164,7 +231,74 @@ def stations_with_data(request, year, month, day):
     return json_dict(stations)
 
 
-def stations_with_weather(request, year, month, day):
+def stations_with_weather(request):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data.
+
+    """
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False)
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_year(request, year):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data in the given year.
+
+    :param year: the year part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data in the given year.
+
+    """
+    date = datetime.date(int(year), 1, 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__year=int(year))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_month(request, year, month):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data in the given month.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data in the given month.
+
+    """
+    date = datetime.date(int(year), int(month), 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__year=int(year),
+                                        summary__date__month=int(month))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_day(request, year, month, day):
     """Get stations with weather data
 
     Retrieve a list of all stations which have weather data on the given date.
