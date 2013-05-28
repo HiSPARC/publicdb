@@ -1,4 +1,5 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseBadRequest
+from django.shortcuts import get_object_or_404
 from django.template import loader, Context
 from django.conf import settings
 
@@ -7,6 +8,13 @@ import tables
 import datetime
 import urlparse
 import tempfile
+
+import dateutil.parser
+
+from django_publicdb.inforecords.models import Station
+from django_publicdb.histograms.models import Summary
+from django_publicdb.histograms import esd
+
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
@@ -114,3 +122,46 @@ def get_target():
     #FIXME (for debugging only, sets extra permissions)
     #os.chmod(file.name, 0644)
     return tables.openFile(file.name, 'w')
+
+
+def download_events(request, station_id):
+    """Download events.
+
+    :param station_id: station id
+    :param start: (optional, GET) start of data range
+    :param end: (optional, GET) end of data range
+
+    """
+    station_id = int(station_id)
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+
+    try:
+        if 'start' in request.GET:
+            start = dateutil.parser.parse(request.GET['start'])
+        else:
+            start = yesterday
+
+        if 'end' in request.GET:
+            end = dateutil.parser.parse(request.GET['end'])
+        else:
+            end = start + datetime.timedelta(days=1)
+    except ValueError:
+        msg = ("Incorrect optional parameters (start [datetime], "
+               "end [datetime])")
+        return HttpResponseBadRequest(msg, content_type="text/plain")
+
+    events = get_events_from_esd_in_range(station_id, start, end)
+
+    return HttpResponse(events, content_type='text/plain')
+
+
+def get_events_from_esd_in_range(station_id, start, end):
+    station = Station.objects.get(number=station_id)
+
+    get_object_or_404(Summary, station=station, date=start)
+    filepath = esd.get_esd_data_path(start)
+    with tables.openFile(filepath) as f:
+        station_node = esd.get_station_node(f, station)
+        events = station_node.events.read()
+
+    return events
