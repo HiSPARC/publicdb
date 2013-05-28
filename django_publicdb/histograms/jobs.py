@@ -8,7 +8,7 @@ import calendar
 import logging
 import multiprocessing
 
-import numpy
+import numpy as np
 
 import django.db
 from models import *
@@ -257,7 +257,7 @@ def update_eventtime_histogram(summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = numpy.histogram(timestamps, bins=bins)
+    hist = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
     hist = hist[0].tolist()
@@ -342,8 +342,8 @@ def create_histogram(data, high, samples):
     else:
         values = []
         for array in data:
-            bins = numpy.linspace(0, high, samples + 1)
-            hist, bins = numpy.histogram(array, bins=bins)
+            bins = np.linspace(0, high, samples + 1)
+            hist, bins = np.histogram(array, bins=bins)
             values.append(hist)
 
         bins = bins.tolist()
