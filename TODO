@@ -1,0 +1,2 @@
+[ ] If there are only two detectors, pulseheights are -1, but nx and tx
+are -0.00something and -999.0.
