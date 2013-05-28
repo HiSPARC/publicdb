@@ -8,6 +8,7 @@ import tables
 import datetime
 import urlparse
 import tempfile
+import csv
 
 import dateutil.parser
 
@@ -133,6 +134,8 @@ def download_events(request, station_id):
 
     """
     station_id = int(station_id)
+    station = get_object_or_404(Station, number=station_id)
+
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
 
     try:
@@ -150,18 +153,44 @@ def download_events(request, station_id):
                "end [datetime])")
         return HttpResponseBadRequest(msg, content_type="text/plain")
 
-    events = get_events_from_esd_in_range(station_id, start, end)
+    events = get_events_from_esd_in_range(station, start, end)
 
-    return HttpResponse(events, content_type='text/plain')
+    t = loader.get_template('event_data.csv')
+    c = Context({'station': station})
+    
+    response = HttpResponse(content_type='text/csv')
+    response.write(t.render(c))
+
+    writer = csv.writer(response, delimiter=',')
+    for event in events:
+        row = [event['timestamp'],
+               event['nanoseconds'],
+               event['pulseheights'][0],
+               event['pulseheights'][1],
+               event['pulseheights'][2],
+               event['pulseheights'][3],
+               event['integrals'][0],
+               event['integrals'][1],
+               event['integrals'][2],
+               event['integrals'][3],
+               round(event['n1'], 4),
+               round(event['n2'], 4),
+               round(event['n3'], 4),
+               round(event['n4'], 4),
+               round(event['t1'], 4),
+               round(event['t2'], 4),
+               round(event['t3'], 4),
+               round(event['t4'], 4),
+              ]
+        writer.writerow(row)
+
+    return response
 
 
-def get_events_from_esd_in_range(station_id, start, end):
-    station = Station.objects.get(number=station_id)
-
+def get_events_from_esd_in_range(station, start, end):
     get_object_or_404(Summary, station=station, date=start)
     filepath = esd.get_esd_data_path(start)
     with tables.openFile(filepath) as f:
         station_node = esd.get_station_node(f, station)
-        events = station_node.events.read()
-
-    return events
+        for event in station_node.events:
+            yield event
