@@ -156,14 +156,16 @@ def download_events(request, station_id):
     events = get_events_from_esd_in_range(station, start, end)
 
     t = loader.get_template('event_data.csv')
-    c = Context({'station': station})
+    c = Context({'station': station, 'start': start, 'end': end})
     
     response = HttpResponse(content_type='text/csv')
     response.write(t.render(c))
 
     writer = csv.writer(response, delimiter='\t')
     for event in events:
-        row = [event['timestamp'],
+        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
+        row = [dt.date(), dt.time(),
+               event['timestamp'],
                event['nanoseconds'],
                event['pulseheights'][0],
                event['pulseheights'][1],
