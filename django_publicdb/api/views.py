@@ -608,7 +608,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
 
     # Based on chi2 of the fit
 
-    if chiSquare < 1.5:
+    if dict["chi_square"] < 1.5:
         dict.update({
             "nagios" : nagios.critical,
             "quality": "Chi2 of the fit is smaller than 1.5: %.1" % dict["chi_square"]
@@ -617,7 +617,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
 
     # Based on the fit range (= initialWidth)
 
-    if initialWidth < 45:
+    if dict["initial_width"] < 45:
         dict.update({
             "nagios" : nagios.critical,
             "quality": "Fit range is smaller than 45 ADC: %.1f ADC" % dict["initial_width"]
@@ -632,7 +632,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     lower_bound = threshold.mpv_mean * (1 - 4*threshold.mpv_sigma)
     upper_bound = threshold.mpv_mean * (1 + 4*threshold.mpv_sigma)
 
-    if peakFit < lower_bound or peakFit > upper_bound:
+    if dict["fit_mpv"] < lower_bound or dict["fit_mpv"] > upper_bound:
         dict.update({
             "nagios" : nagios.critical,
             "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" % (
