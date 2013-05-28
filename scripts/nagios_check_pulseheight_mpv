@@ -14,11 +14,16 @@
 # Required packages
 #-------------------------------------------------------------------------------
 
-import urllib2
-import simplejson
-import signal
 import sys
 import datetime
+
+try:
+    import urllib2
+    import simplejson
+    import signal
+except Exception as e:
+    print e
+    sys.exit(3)
 
 #-------------------------------------------------------------------------------
 # Nagios helpers
@@ -116,4 +121,4 @@ if "error" in j:
 
     exit(nagios.unknown, j["error"])
 
-exit(j["nagios"], j["message"])
+exit(j["nagios"], j["quality"])
