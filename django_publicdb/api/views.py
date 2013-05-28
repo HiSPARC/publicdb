@@ -611,11 +611,11 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     if dict["chi_square"] < 1.5:
         dict.update({
             "nagios" : nagios.critical,
-            "quality": "Chi2 of the fit is smaller than 1.5: %.1" % dict["chi_square"]
+            "quality": "Chi2 of the fit is smaller than 1.5: %.1f" % dict["chi_square"]
         })
         return json_dict(dict)
 
-    # Based on the fit range (= initialWidth)
+    # Based on the fit range (= initial_width)
 
     if dict["initial_width"] < 45:
         dict.update({
