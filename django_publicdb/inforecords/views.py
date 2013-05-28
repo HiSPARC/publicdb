@@ -10,6 +10,8 @@ from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 from django_publicdb.status_display.views import station_has_data
 
+import os
+
 @login_required
 def keys(request, host):
     """Return a zip-file containing the hosts OpenVPN keys"""
@@ -47,6 +49,11 @@ def create_nagios_config(request):
         for service in host.enabledservice_set.all():
             check_command = service.monitor_service.nagios_command
 
+            # Skip pulseheight monitoring here, we will do it somewhere below
+            # because it requires its own custom check interval
+            if check_command.count('check_pulseheight'):
+                continue
+
             # Let's see if we need to pass parameters to this service
             if check_command.count('check_nrpe'):
 
@@ -75,13 +82,15 @@ def create_nagios_config(request):
 
         has_data = station_has_data(host.station)
 
-        #print host.station
+        # Add the pulseheight monitoring service here
+        pulseheight_thresholds = []
+        for service in host.enabledservice_set.all():
+            check_command = service.monitor_service.nagios_command
 
-        pulseheight_thresholds = MonitorPulseheightThresholds.objects.filter(station=host.station)
+            if not check_command.count('check_pulseheight_mpv'):
+                continue
 
-        print host.station.number
-        print pulseheight_thresholds[0].station.number
-        print pulseheight_thresholds[0].mpv_mean
+            pulseheight_thresholds = MonitorPulseheightThresholds.objects.filter(station=host.station)
 
         # Append this host to the hosts list
         hosts.append({
@@ -91,11 +100,16 @@ def create_nagios_config(request):
             'has_data'              : has_data
         })
 
+    # Add the publicdb/scripts path
+    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
+                                                "..", "..", "scripts"))
+
     # Render the template
     return render_to_response('nagios.cfg',
                               {'contacts': Contact.objects.all(),
                                'clusters': Cluster.objects.all(),
-                               'hosts': hosts},
+                               'hosts': hosts,
+                               'scripts_path': scripts_path},
                               mimetype='text/plain')
 
 
