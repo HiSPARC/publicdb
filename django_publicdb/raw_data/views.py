@@ -161,7 +161,7 @@ def download_events(request, station_id):
     response = HttpResponse(content_type='text/csv')
     response.write(t.render(c))
 
-    writer = csv.writer(response, delimiter=',')
+    writer = csv.writer(response, delimiter='\t')
     for event in events:
         row = [event['timestamp'],
                event['nanoseconds'],
