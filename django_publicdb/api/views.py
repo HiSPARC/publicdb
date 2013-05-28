@@ -149,7 +149,9 @@ def stations_with_data(request):
              station that has measured events.
 
     """
-    summaries = (Station.objects.filter(summary__num_events__isnull=False)
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__gte=datetime.date(2002, 1, 1),
+                                        summary__date__lte=datetime.date.today())
                                 .distinct())
     stations = [{'number': station.number, 'name': station.name}
                 for station in summaries]
@@ -240,7 +242,9 @@ def stations_with_weather(request):
              station that has measured weather data.
 
     """
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False)
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__gte=datetime.date(2002, 1, 1),
+                                        summary__date__lte=datetime.date.today())
                                 .distinct())
     stations = [{'number': station.number, 'name': station.name}
                 for station in summaries]
