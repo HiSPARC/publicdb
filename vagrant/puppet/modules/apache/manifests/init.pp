@@ -12,8 +12,11 @@ class apache {
     ensure => running,
     require => Package["libapache2-mod-wsgi"]
   }
-
-  file { "/var/www":
+    exec { "create_django_publicdb":
+     command => "mkdir -p /var/www/django_publicdb",
+      }
+ 
+  file { "/var/www/django_publicdb":
     ensure => link,
     owner  => "vagrant",
     group  => "vagrant",
