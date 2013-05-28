@@ -157,7 +157,7 @@ class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True,blank=True)
     contactinformation = models.ForeignKey('ContactInformation',
-                                            related_name='stations')
+                                           related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     contact = models.ForeignKey(Contact, related_name='stations_contact',
                                 null=True)

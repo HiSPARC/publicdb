@@ -7,69 +7,68 @@ from django.db import models
 class Migration(DataMigration):
 
     def forwards(self, orm):
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_angle',
-                         'scintillator_1_alpha')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_perp',
-                         'scintillator_1_beta')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_long',
-                         'scintillator_1_radius')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_angle',
-                         'scintillator_2_alpha')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_perp',
-                         'scintillator_2_beta')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_long',
-                         'scintillator_2_radius')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_angle',
-                         'scintillator_3_alpha')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_perp',
-                         'scintillator_3_beta')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_long',
-                         'scintillator_3_radius')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_angle',
-                         'scintillator_4_alpha')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_perp',
-                         'scintillator_4_beta')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_long',
-                         'scintillator_4_radius')
-        db.add_column('inforecords_detectorhisparc', 'scintillator_1_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
-        db.add_column('inforecords_detectorhisparc', 'scintillator_2_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
-        db.add_column('inforecords_detectorhisparc', 'scintillator_3_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
-        db.add_column('inforecords_detectorhisparc', 'scintillator_4_height', self.gf('django.db.models.fields.FloatField')(default=0, blank=True), keep_default=False)
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_angle')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_long')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_perp')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_angle')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_perp')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_angle')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_long')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_long')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_angle')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_long')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_perp')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_perp')
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_alpha', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_beta', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_radius', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_height', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_alpha', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_beta', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_radius', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_height', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_alpha', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_beta', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_radius', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_height', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_alpha', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_beta', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_radius', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_height', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
 
     def backwards(self, orm):
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_alpha',
-                         'scintillator_1_angle')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_beta',
-                         'scintillator_1_perp')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_1_radius',
-                         'scintillator_1_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_alpha',
-                         'scintillator_2_angle')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_beta',
-                         'scintillator_2_perp')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_2_radius',
-                         'scintillator_2_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_alpha',
-                         'scintillator_3_angle')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_beta',
-                         'scintillator_3_perp')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_3_radius',
-                         'scintillator_3_long')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_alpha',
-                         'scintillator_4_angle')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_beta',
-                         'scintillator_4_perp')
-        db.rename_column('inforecords_detectorhisparc', 'scintillator_4_radius',
-                         'scintillator_4_long')
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_angle', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_long', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_perp', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_angle', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_perp', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_angle', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_4_long', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_long', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_angle', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_1_long', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_2_perp', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'scintillator_3_perp', self.gf('django.db.models.fields.FloatField')(null=True, blank=True), keep_default=False)
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_alpha')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_beta')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_1_radius')
         db.delete_column('inforecords_detectorhisparc', 'scintillator_1_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_alpha')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_beta')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_2_radius')
         db.delete_column('inforecords_detectorhisparc', 'scintillator_2_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_alpha')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_beta')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_3_radius')
         db.delete_column('inforecords_detectorhisparc', 'scintillator_3_height')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_alpha')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_beta')
+        db.delete_column('inforecords_detectorhisparc', 'scintillator_4_radius')
         db.delete_column('inforecords_detectorhisparc', 'scintillator_4_height')
-
 
     models = {
         'inforecords.cluster': {
-            'Meta': {'object_name': 'Cluster'},
+            'Meta': {'ordering': "('name',)", 'object_name': 'Cluster'},
             'country': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'clusters'", 'to': "orm['inforecords.Country']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '70'}),
@@ -78,7 +77,7 @@ class Migration(DataMigration):
             'url': ('django.db.models.fields.URLField', [], {'max_length': '200', 'null': 'True', 'blank': 'True'})
         },
         'inforecords.contact': {
-            'Meta': {'unique_together': "[('first_name', 'prefix_surname', 'surname')]", 'object_name': 'Contact'},
+            'Meta': {'ordering': "('surname', 'first_name')", 'unique_together': "[('first_name', 'prefix_surname', 'surname')]", 'object_name': 'Contact'},
             'contactinformation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'contacts'", 'to': "orm['inforecords.ContactInformation']"}),
             'first_name': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -88,7 +87,7 @@ class Migration(DataMigration):
             'title': ('django.db.models.fields.CharField', [], {'max_length': '20', 'null': 'True', 'blank': 'True'})
         },
         'inforecords.contactinformation': {
-            'Meta': {'object_name': 'ContactInformation'},
+            'Meta': {'ordering': "['city', 'street_1', 'email_work']", 'object_name': 'ContactInformation'},
             'city': ('django.db.models.fields.CharField', [], {'max_length': '40'}),
             'email_private': ('django.db.models.fields.EmailField', [], {'max_length': '75', 'null': 'True', 'blank': 'True'}),
             'email_work': ('django.db.models.fields.EmailField', [], {'max_length': '75'}),
@@ -108,10 +107,10 @@ class Migration(DataMigration):
             'Meta': {'object_name': 'Country'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40'}),
-            'number': ('django.db.models.fields.IntegerField', [], {'unique': 'True'})
+            'number': ('django.db.models.fields.IntegerField', [], {'unique': 'True', 'blank': 'True'})
         },
         'inforecords.detectorhisparc': {
-            'Meta': {'object_name': 'DetectorHisparc'},
+            'Meta': {'ordering': "('station__number',)", 'object_name': 'DetectorHisparc'},
             'direction': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'enddate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
             'height': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -120,32 +119,32 @@ class Migration(DataMigration):
             'longitude': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_1_alpha': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_1_beta': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'scintillator_1_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_1_height': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'scintillator_1_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_2_alpha': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_2_beta': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'scintillator_2_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_2_height': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'scintillator_2_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_3_alpha': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_3_beta': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'scintillator_3_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_3_height': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'scintillator_3_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_4_alpha': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_4_beta': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
-            'scintillator_4_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'scintillator_4_height': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
+            'scintillator_4_radius': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'startdate': ('django.db.models.fields.DateField', [], {}),
             'station': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Station']"}),
             'translation_long': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'translation_perp': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'})
         },
         'inforecords.electronics': {
-            'Meta': {'object_name': 'Electronics'},
+            'Meta': {'ordering': "('batch', 'serial')", 'object_name': 'Electronics'},
             'batch': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.ElectronicsBatch']"}),
             'enddate': ('django.db.models.fields.DateField', [], {'null': 'True', 'blank': 'True'}),
-            'has_gps': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'has_gps': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_master': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'is_master': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'serial': ('django.db.models.fields.IntegerField', [], {}),
             'startdate': ('django.db.models.fields.DateField', [], {}),
@@ -154,7 +153,7 @@ class Migration(DataMigration):
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.ElectronicsType']"})
         },
         'inforecords.electronicsbatch': {
-            'Meta': {'object_name': 'ElectronicsBatch'},
+            'Meta': {'ordering': "('type', 'number')", 'object_name': 'ElectronicsBatch'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'notes': ('django.db.models.fields.TextField', [], {}),
             'number': ('django.db.models.fields.IntegerField', [], {'unique': 'True'}),
@@ -166,12 +165,12 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'inforecords.electronicstype': {
-            'Meta': {'object_name': 'ElectronicsType'},
+            'Meta': {'ordering': "('description',)", 'object_name': 'ElectronicsType'},
             'description': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'inforecords.enabledservice': {
-            'Meta': {'object_name': 'EnabledService'},
+            'Meta': {'ordering': "('pc', 'monitor_service')", 'object_name': 'EnabledService'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'max_critical': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'max_warning': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -181,11 +180,11 @@ class Migration(DataMigration):
             'pc': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Pc']"})
         },
         'inforecords.monitorservice': {
-            'Meta': {'object_name': 'MonitorService'},
+            'Meta': {'ordering': "('description',)", 'object_name': 'MonitorService'},
             'description': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40'}),
-            'enable_active_checks': ('django.db.models.fields.BooleanField', [], {'default': 'True', 'blank': 'True'}),
+            'enable_active_checks': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_default_service': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'is_default_service': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'max_critical': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'max_warning': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
             'min_critical': ('django.db.models.fields.FloatField', [], {'null': 'True', 'blank': 'True'}),
@@ -193,13 +192,13 @@ class Migration(DataMigration):
             'nagios_command': ('django.db.models.fields.CharField', [], {'max_length': '70'})
         },
         'inforecords.pc': {
-            'Meta': {'object_name': 'Pc'},
+            'Meta': {'ordering': "('name',)", 'object_name': 'Pc'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'ip': ('django.db.models.fields.IPAddressField', [], {'unique': 'True', 'max_length': '15', 'blank': 'True'}),
-            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False', 'blank': 'True'}),
+            'is_active': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '40'}),
             'notes': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
-            'services': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['inforecords.MonitorService']", 'through': "'EnabledService'"}),
+            'services': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['inforecords.MonitorService']", 'through': "orm['inforecords.EnabledService']", 'symmetrical': 'False'}),
             'station': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.Station']"}),
             'type': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['inforecords.PcType']"})
         },
@@ -215,10 +214,10 @@ class Migration(DataMigration):
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'})
         },
         'inforecords.station': {
-            'Meta': {'object_name': 'Station'},
+            'Meta': {'ordering': "('number',)", 'object_name': 'Station'},
             'cluster': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.Cluster']"}),
             'contact': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations_contact'", 'null': 'True', 'to': "orm['inforecords.Contact']"}),
-            'contact_information': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.ContactInformation']"}),
+            'contactinformation': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations'", 'to': "orm['inforecords.ContactInformation']"}),
             'ict_contact': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'stations_ict_contact'", 'null': 'True', 'to': "orm['inforecords.Contact']"}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'info_page': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
