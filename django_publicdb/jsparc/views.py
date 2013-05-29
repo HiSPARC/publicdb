@@ -137,21 +137,19 @@ def result(request):
     if session_title.lower() == 'example':
         return test_result()
 
-    student_name = request.GET['student_name']
+    pk = request.GET['pk']
+    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
 
     # If student is test student, do not save result.
     if coincidence.student.name.lower() == 'test student':
         return test_result()
 
-    pk = request.GET['pk']
+    student_name = request.GET['student_name']
     lat = request.GET['lat']
     lon = request.GET['lon']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
-    if session_title.lower() == 'example':
-        return test_result()
 
-    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
