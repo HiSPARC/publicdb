@@ -88,7 +88,7 @@ def get_events(coincidence):
                      pulseheights=e.pulseheights,
                      integrals=e.integrals,
                      mips=[ph / 200. if ph > 0 else ph
-                           for ph in e.pulseheights]))
+                           for ph in e.pulseheights])
         events.append(event)
     return events
 
