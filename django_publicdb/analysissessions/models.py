@@ -13,7 +13,7 @@ import sys
 import os
 import re
 
-import numpy
+import numpy as np
 
 from sapphire.analysis import coincidences
 from sapphire import publicdb
@@ -179,9 +179,13 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = numpy.around(event['pulseheights'] * .57, 2)
-            integrals = numpy.around(event['integrals'] * .57 * 2.5, 2)
-            traces = numpy.around(traces, 2)
+            pulseheights = np.where(event['pulseheights'] > 0,
+                                    np.around(event['pulseheights'] * .57, 2),
+                                    event['pulseheights']).tolist()
+            integrals = np.where(event['integrals'] > 0,
+                                 np.around(event['integrals'] * .57 * 2.5, 2),
+                                 event['integrals']).tolist()
+            traces = np.around(traces, 2).tolist()
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
