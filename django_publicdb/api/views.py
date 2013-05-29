@@ -71,20 +71,24 @@ def station(request, station_id):
     except IndexError:
         is_active = False
 
-    scintillator1 = {"perpendicular": detector.scintillator_1_perp,
-                     "longitudinal": detector.scintillator_1_long,
-                     "angle": detector.scintillator_1_angle}
-    scintillator2 = {"perpendicular": detector.scintillator_2_perp,
-                     "longitudinal": detector.scintillator_2_long,
-                     "angle": detector.scintillator_2_angle}
+    scintillator1 = {"alpha": detector.scintillator_1_alpha,
+                     "beta": detector.scintillator_1_beta,
+                     "radius": detector.scintillator_1_radius,
+                     "height": detector.scintillator_1_height}
+    scintillator2 = {"alpha": detector.scintillator_2_alpha,
+                     "beta": detector.scintillator_2_beta,
+                     "radius": detector.scintillator_2_radius,
+                     "height": detector.scintillator_2_height}
 
     if config.slave() != "no slave":
-        scintillator3 = {"perpendicular": detector.scintillator_3_perp,
-                         "longitudinal": detector.scintillator_3_long,
-                         "angle": detector.scintillator_3_angle}
-        scintillator4 = {"perpendicular": detector.scintillator_4_perp,
-                         "longitudinal": detector.scintillator_4_long,
-                         "angle": detector.scintillator_4_angle}
+        scintillator3 = {"alpha": detector.scintillator_3_alpha,
+                         "beta": detector.scintillator_3_beta,
+                         "radius": detector.scintillator_3_radius,
+                         "height": detector.scintillator_3_height}
+        scintillator4 = {"alpha": detector.scintillator_4_alpha,
+                         "beta": detector.scintillator_4_beta,
+                         "radius": detector.scintillator_4_radius,
+                         "height": detector.scintillator_4_height}
 
         station_info = {'number': station.number,
                         'name': station.name,

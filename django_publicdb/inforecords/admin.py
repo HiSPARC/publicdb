@@ -97,6 +97,12 @@ class PcAdmin(admin.ModelAdmin):
     list_per_page = 200
 
 
+class DetectorHisparcAdmin(admin.ModelAdmin):
+    list_display = ('station', 'startdate')
+    list_filter = ('station',)
+    list_per_page = 200
+
+
 class ElectronicsAdmin(admin.ModelAdmin):
     list_filter = ('batch',)
 
@@ -113,7 +119,7 @@ admin.site.register(ContactInformation, ContactInformationAdmin)
 admin.site.register(Cluster, ClusterAdmin)
 admin.site.register(Station, StationAdmin)
 admin.site.register(Country, CountryAdmin)
-admin.site.register(DetectorHisparc)
+admin.site.register(DetectorHisparc, DetectorHisparcAdmin)
 admin.site.register(ElectronicsType)
 admin.site.register(ElectronicsStatus)
 admin.site.register(ElectronicsBatch)
