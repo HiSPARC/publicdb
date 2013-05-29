@@ -236,8 +236,10 @@ class SessionRequest(models.Model):
     def SendMail(self):
         subject = 'HiSPARC analysis session request'
         message = ('Hello %s,'
-                   '\n\nPlease click on this link to confirm your request for an analysis session with jSparc:'
-                   '\nhttp://data.hisparc.nl/analysis-session/request/%s') % (self.name, self.url)
+                   '\n\nPlease click on this link to confirm your request for'
+                   ' an analysis session with jSparc:'
+                   '\nhttp://data.hisparc.nl/analysis-session/request/%s' %
+                   (self.name, self.url))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -255,7 +257,8 @@ class SessionRequest(models.Model):
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
                    '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+                   (self.name, self.sid, self.pin, self.events_created,
+                    slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -268,13 +271,15 @@ class SessionRequest(models.Model):
                    '\n\nYour analysis session for jSparc has been created.'
                    '\nTitle = %s'
                    '\nPin = %d'
-                   '\nHowever, we were unable to find the amount of events you requested.'
+                   '\nHowever, we were unable to find the amount of events you'
+                   ' requested.'
                    '\nEvents created = %d'
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
                    '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+                   (self.name, self.sid, self.pin, self.events_created,
+                    slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -285,8 +290,10 @@ class SessionRequest(models.Model):
         subject = 'HiSPARC analysis session creation failed'
         message = ('Hello %s,'
                    '\n\nYour analysis session for jSparc could not be created.'
-                   '\nPerhaps there was no data for the date and/or stations you selected.'
-                   '\nPlease try selecting a different cluster or date.') % self.name
+                   '\nPerhaps there was no data for the date and/or stations'
+                   ' you selected.'
+                   '\nPlease try selecting a different cluster or date.' %
+                   self.name)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
