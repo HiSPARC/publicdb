@@ -9,6 +9,7 @@ import datetime
 import urlparse
 import tempfile
 import csv
+import calendar
 
 import dateutil.parser
 
@@ -193,15 +194,27 @@ def download_events(request, station_id):
 
 
 def get_events_from_esd_in_range(station, start, end):
+    """Get events from ESD in time range.
+
+    :param station: Station object
+    :param start: start of datetime range
+    :param end: end of datetime range
+
+    """
     get_object_or_404(Summary, station=station, date=start)
     filepath = esd.get_esd_data_path(start)
     with tables.openFile(filepath) as f:
         station_node = esd.get_station_node(f, station)
-        for event in station_node.events:
+        ts0 = calendar.timegm(start.utctimetuple())
+        ts1 = calendar.timegm(end.utctimetuple())
+        for event in station_node.events.where(
+            '(ts0 <= timestamp) & (timestamp < ts1)'):
             yield event
 
 
 def clean_floats(number, precision=4):
+    """Format floating point numbers for data download."""
+
     if int(number) in [-1, -999]:
         return int(number)
     else:
