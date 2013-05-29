@@ -175,14 +175,14 @@ def download_events(request, station_id):
                event['integrals'][1],
                event['integrals'][2],
                event['integrals'][3],
-               round(event['n1'], 4),
-               round(event['n2'], 4),
-               round(event['n3'], 4),
-               round(event['n4'], 4),
-               round(event['t1'], 4),
-               round(event['t2'], 4),
-               round(event['t3'], 4),
-               round(event['t4'], 4),
+               clean_floats(event['n1']),
+               clean_floats(event['n2']),
+               clean_floats(event['n3']),
+               clean_floats(event['n4']),
+               clean_floats(event['t1']),
+               clean_floats(event['t2']),
+               clean_floats(event['t3']),
+               clean_floats(event['t4']),
               ]
         writer.writerow(row)
 
@@ -196,3 +196,10 @@ def get_events_from_esd_in_range(station, start, end):
         station_node = esd.get_station_node(f, station)
         for event in station_node.events:
             yield event
+
+
+def clean_floats(number, precision=4):
+    if int(number) in [-1, -999]:
+        return int(number)
+    else:
+        return round(number, precision)
