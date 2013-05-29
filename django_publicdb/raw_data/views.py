@@ -159,6 +159,9 @@ def download_events(request, station_id):
     c = Context({'station': station, 'start': start, 'end': end})
     
     response = HttpResponse(content_type='text/csv')
+    timerange_string = prettyprint_timerange(start, end)
+    filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
+    response['Content-Disposition'] = 'filename="%s"' % filename
     response.write(t.render(c))
 
     writer = csv.writer(response, delimiter='\t')
@@ -203,3 +206,20 @@ def clean_floats(number, precision=4):
         return int(number)
     else:
         return round(number, precision)
+
+
+def prettyprint_timerange(t0, t1):
+    """Pretty print a time range."""
+
+    duration = t1 - t0
+    if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or
+        t0.hour > 0):
+        timerange = '%s %s' % (t0, t1)
+    elif duration.days == 1:
+        timerange = str(t0.date())
+    else:
+        timerange = '%s %s' % (t0.date(), t1.date())
+
+    timerange = (timerange.replace('-', '').replace(' ', '_')
+                          .replace(':', ''))
+    return timerange
