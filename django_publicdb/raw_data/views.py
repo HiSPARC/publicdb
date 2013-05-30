@@ -201,15 +201,16 @@ def get_events_from_esd_in_range(station, start, end):
     :param end: end of datetime range
 
     """
-    get_object_or_404(Summary, station=station, date=start)
-    filepath = esd.get_esd_data_path(start)
-    with tables.openFile(filepath) as f:
-        station_node = esd.get_station_node(f, station)
-        ts0 = calendar.timegm(start.utctimetuple())
-        ts1 = calendar.timegm(end.utctimetuple())
-        for event in station_node.events.where(
-            '(ts0 <= timestamp) & (timestamp < ts1)'):
-            yield event
+    for t0, t1 in single_day_ranges(start, end):
+        get_object_or_404(Summary, station=station, date=t0)
+        filepath = esd.get_esd_data_path(t0)
+        with tables.openFile(filepath) as f:
+            station_node = esd.get_station_node(f, station)
+            ts0 = calendar.timegm(t0.utctimetuple())
+            ts1 = calendar.timegm(t1.utctimetuple())
+            for event in station_node.events.where(
+                '(ts0 <= timestamp) & (timestamp < ts1)'):
+                yield event
 
 
 def clean_floats(number, precision=4):
@@ -236,3 +237,26 @@ def prettyprint_timerange(t0, t1):
     timerange = (timerange.replace('-', '').replace(' ', '_')
                           .replace(':', ''))
     return timerange
+
+
+def single_day_ranges(start, end):
+    """Generate datetime ranges consisting of a single day.
+
+    Generate datetime ranges, a single day at a time.  The generator keeps
+    returning two datetime values, making up a range of a full day.
+    However, the first and last days may be shorter, if a specific
+    time-of-day was specified.
+
+    :param start: start of range
+    :param end: end of range
+
+    """
+    cur = start
+    next_day = (cur.replace(hour=0, minute=0, second=0, microsecond=0) +
+                datetime.timedelta(days=1))
+
+    while next_day < end:
+        yield cur, next_day
+        cur = next_day
+        next_day = cur + datetime.timedelta(days=1)
+    yield cur, end
