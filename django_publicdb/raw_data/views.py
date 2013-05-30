@@ -202,7 +202,10 @@ def get_events_from_esd_in_range(station, start, end):
 
     """
     for t0, t1 in single_day_ranges(start, end):
-        get_object_or_404(Summary, station=station, date=t0)
+        try:
+            Summary.objects.get(station=station, date=t0)
+        except Summary.DoesNotExist:
+            continue
         filepath = esd.get_esd_data_path(t0)
         with tables.openFile(filepath) as f:
             station_node = esd.get_station_node(f, station)
