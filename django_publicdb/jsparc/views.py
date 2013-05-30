@@ -4,6 +4,7 @@ import calendar
 import datetime
 import json
 from random import randrange
+
 import numpy as np
 import operator
 
@@ -20,9 +21,12 @@ def get_coincidence(request):
     student_name = request.GET.get('student_name', None)
 
     if session_title.lower() == 'example':
-        count = AnalyzedCoincidence.objects.count()
+        today = datetime.date.today()
+        coincidences = AnalyzedCoincidence.objects.filter(
+                                                session__ends__gt=today)
+        count = coincidences.count()
         random_index = randint(0, count - 1)
-        coincidence = AnalyzedCoincidence.objects.all()[random_index]
+        coincidence = coincidences[random_index]
         events = get_events(coincidence)
         response = data_json(coincidence, events)
         return response
