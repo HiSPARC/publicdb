@@ -146,6 +146,7 @@ def download_events(request, station_id):
     station = get_object_or_404(Station, number=station_id)
 
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    yesterday = datetime.datetime.combine(yesterday, datetime.time())
 
     try:
         if 'start' in request.GET:
