@@ -80,6 +80,18 @@ def station(request, station_id):
                      "radius": detector.scintillator_2_radius,
                      "height": detector.scintillator_2_height}
 
+    station_info = {'number': station.number,
+                    'name': station.name,
+                    'cluster': station.cluster.name,
+                    'country': station.cluster.country.name,
+                    'latitude': config.gps_latitude,
+                    'longitude': config.gps_longitude,
+                    'altitude': config.gps_altitude,
+                    'active': is_active,
+                    'scintillators': 2,
+                    'scintillator1': scintillator1,
+                    'scintillator2': scintillator2}
+
     if config.slave() != "no slave":
         scintillator3 = {"alpha": detector.scintillator_3_alpha,
                          "beta": detector.scintillator_3_beta,
@@ -89,32 +101,9 @@ def station(request, station_id):
                          "beta": detector.scintillator_4_beta,
                          "radius": detector.scintillator_4_radius,
                          "height": detector.scintillator_4_height}
-
-        station_info = {'number': station.number,
-                        'name': station.name,
-                        'cluster': station.cluster.name,
-                        'country': station.cluster.country.name,
-                        'latitude': config.gps_latitude,
-                        'longitude': config.gps_longitude,
-                        'altitude': config.gps_altitude,
-                        'active': is_active,
-                        'scintillators': 4,
-                        'scintillator1': scintillator1,
-                        'scintillator2': scintillator2,
-                        'scintillator3': scintillator3,
-                        'scintillator4': scintillator4}
-    else:
-        station_info = {'number': station.number,
-                        'name': station.name,
-                        'cluster': station.cluster.name,
-                        'country': station.cluster.country.name,
-                        'latitude': config.gps_latitude,
-                        'longitude': config.gps_longitude,
-                        'altitude': config.gps_altitude,
-                        'active': is_active,
-                        'scintillators': 2,
-                        'scintillator1': scintillator1,
-                        'scintillator2': scintillator2}
+        station_info.update({'scintillator3': scintillator3,
+                             'scintillator4': scintillator4})
+        station_info['scintillators'] = 4
 
     return json_dict(station_info)
 
