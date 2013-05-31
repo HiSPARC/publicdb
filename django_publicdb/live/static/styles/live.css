@@ -150,21 +150,22 @@ a {
     margin-left: -10px;}
 
 .scintillator {
-    width: 25px;
-    height: 50px;
-    margin-top: -25px; 
-    margin-left: -12.5px; 
-    background-color: #DDD;}
+    width: 50px;
+    height: 100px;
+    margin-top: -50px; 
+    margin-left: -25px;
+    border-radius: 1px 1px 0 0;
+    background-color: #CCD;}
 
 .scintillator:after {
     content: "";
     width: 0;
     height: 0;
     position: absolute;
-    margin: -25px 0 0 0;
-    border-bottom: 27px solid #EEE;
-    border-right: 13px solid rgba(0, 0, 0, 0);
-    border-left: 13px solid rgba(0, 0, 0, 0);
+    margin: -60px 0 0 0;
+    border-bottom: 61px solid #CDD;
+    border-right: 26px solid rgba(0, 0, 0, 0);
+    border-left: 26px solid rgba(0, 0, 0, 0);
     z-index: -1;}
 
 

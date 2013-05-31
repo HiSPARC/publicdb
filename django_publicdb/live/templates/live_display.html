@@ -66,21 +66,21 @@
 
             // Default layout
             if (scintillators.number == 2) {
-                $('#detector1').css({'transform': 'translate(125px, 0)'})
-                $('#detector2').css({'transform': 'translate(-125px, 0)'})
+                $('#detector1').css({'transform': 'translate(-250px, 0)'})
+                $('#detector2').css({'transform': 'translate(250px, 0)'})
                 $('#detector3').hide()
                 $('#detector4').hide()
-                bounds.right = 125;
-                bounds.left = 125;}
-            if (scintillators.number == 4) {
-                $('#detector1').css({'transform': 'translate(0, -433px) rotate(180deg)'})
-                $('#detector2').css({'transform': 'translate(0, -144px) rotate(180deg)'})
-                $('#detector3').css({'transform': 'translate(250px, 0) rotate(-90deg)'})
-                $('#detector4').css({'transform': 'translate(-250px, 0) rotate(90deg)'})
-                bounds.top = 433;
                 bounds.right = 250;
-                bounds.bottom = 0;
                 bounds.left = 250;}
+            if (scintillators.number == 4) {
+                $('#detector1').css({'transform': 'translate(0, -866px) rotate(180deg)'})
+                $('#detector2').css({'transform': 'translate(0, -289px) rotate(180deg)'})
+                $('#detector3').css({'transform': 'translate(-500px, 0) rotate(-90deg)'})
+                $('#detector4').css({'transform': 'translate(500px, 0) rotate(90deg)'})
+                bounds.top = 866;
+                bounds.right = 500;
+                bounds.bottom = 0;
+                bounds.left = 500;}
 
             for (var i = 0; i < scintillators.number; i++) {
                 x = scintillators.positions[i].radius * Math.sin(scintillators.positions[i].alfa * toRad)
