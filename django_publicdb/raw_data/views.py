@@ -158,17 +158,28 @@ def download_events(request, station_id):
             end = dateutil.parser.parse(request.GET['end'])
         else:
             end = start + datetime.timedelta(days=1)
+
     except ValueError:
         msg = ("Incorrect optional parameters (start [datetime], "
                "end [datetime])")
         return HttpResponseBadRequest(msg, content_type="text/plain")
+
+    download = request.GET.get('download', False)
+    if download in ['true', 'True']:
+        download = True
+    else:
+        download = False
 
     csv_output = generate_events_as_csv(station, start, end)
     response = HttpResponse(csv_output, content_type='text/csv')
 
     timerange_string = prettyprint_timerange(start, end)
     filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
-    response['Content-Disposition'] = 'filename="%s"' % filename
+    if download:
+        content_disposition = 'Attachment; filename="%s"' % filename
+    else:
+        content_disposition = 'filename="%s"' % filename
+    response['Content-Disposition'] = content_disposition
 
     return response
 
