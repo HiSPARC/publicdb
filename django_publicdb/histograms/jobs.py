@@ -12,6 +12,8 @@ from models import *
 from django_publicdb.inforecords.models import DetectorHisparc
 import datastore
 
+import fit_pulseheight_peak
+
 logger = logging.getLogger('histograms.jobs')
 
 MAX_PH = 2000
@@ -76,12 +78,18 @@ def update_all_histograms():
         state.update_is_running = True
         state.save()
 
+        print "Bla"
+
         try:
             for summary in (Summary.objects.filter(needs_update=True)
                                    .reverse()):
+
+                print summary
+
                 if summary.needs_update_events:
                     update_eventtime_histogram(summary)
                     update_pulseheight_histogram(summary)
+                    update_pulseheight_fit(summary)
                     update_pulseintegral_histogram(summary)
                     summary.needs_update_events = False
 
@@ -151,6 +159,23 @@ def update_pulseheight_histogram(summary):
                                               summary.date)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
+
+
+def update_pulseheight_fit(summary):
+    logger.debug("Updating pulseheight fit for %s" % summary)
+
+    # Variables
+
+    stationNumber = summary.station.number
+
+    # Fit
+
+    print "Going to fit station %s" % stationNumber
+
+    fit_pulseheight_peak.analysePulseheightsForStation(
+        datastore.get_data_path(summary.date),
+        stationNumber
+    )
 
 
 def update_pulseintegral_histogram(summary):

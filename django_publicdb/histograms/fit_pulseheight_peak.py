@@ -369,7 +369,7 @@ def analysePulseheightsForStation( file, station ):
 
     basename = os.path.basename(file)
     rootname, extension = os.path.splitext(basename)
-    outputRootname = "fits/%s.%s.pulseheights" %( rootname, station )
+    outputRootname = "pulseheight_fits/%s.%s.pulseheights" %( rootname, station )
 
     output = open( "%s.dat" % outputRootname, "w" )
 
