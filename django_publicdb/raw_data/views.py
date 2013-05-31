@@ -22,6 +22,14 @@ from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
 
+class SingleLineStringIO:
+
+    """Very limited file-like object buffering a single line."""
+
+    def write(self, line):
+        self.line = line
+
+
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
     if request.method == 'POST':
@@ -154,18 +162,27 @@ def download_events(request, station_id):
                "end [datetime])")
         return HttpResponseBadRequest(msg, content_type="text/plain")
 
-    events = get_events_from_esd_in_range(station, start, end)
+    csv_output = generate_events_as_csv(station, start, end)
+    response = HttpResponse(csv_output, content_type='text/csv')
 
-    t = loader.get_template('event_data.csv')
-    c = Context({'station': station, 'start': start, 'end': end})
-    
-    response = HttpResponse(content_type='text/csv')
     timerange_string = prettyprint_timerange(start, end)
     filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
     response['Content-Disposition'] = 'filename="%s"' % filename
-    response.write(t.render(c))
 
-    writer = csv.writer(response, delimiter='\t')
+    return response
+
+
+def generate_events_as_csv(station, start, end):
+    """Render CSV output as an iterator."""
+
+    t = loader.get_template('event_data.csv')
+    c = Context({'station': station, 'start': start, 'end': end})
+
+    yield t.render(c)
+
+    line_buffer = SingleLineStringIO()
+    writer = csv.writer(line_buffer, delimiter='\t')
+    events = get_events_from_esd_in_range(station, start, end)
     for event in events:
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
         row = [dt.date(), dt.time(),
@@ -189,8 +206,7 @@ def download_events(request, station_id):
                clean_floats(event['t4']),
               ]
         writer.writerow(row)
-
-    return response
+        yield line_buffer.line
 
 
 def get_events_from_esd_in_range(station, start, end):
