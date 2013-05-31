@@ -24,7 +24,7 @@ import subprocess
 FLAG = '/tmp/flag_nagios_reload'
 HASH = '/tmp/hash_nagios'
 NAGIOS_CFG = '/usr/local/nagios/etc/objects/hisparc.cfg'
-CFG_URL = 'http://data.hisparc.nl/django/config/nagios'
+CFG_URL = 'http://data.hisparc.nl/config/nagios'
 
 
 def reload_nagios():

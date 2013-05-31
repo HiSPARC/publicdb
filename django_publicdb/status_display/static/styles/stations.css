@@ -3,9 +3,8 @@
 
 #stationList {
     float: left;
-    width: 609px;}
-
-#stationList {
+    margin-bottom: 30px;
+    width: 609px;
     font-size: 10pt;
     -webkit-column-count: 2;
     -moz-column-count: 2;
@@ -26,29 +25,32 @@
 
 .subcluster {
     display: block;
+    break-inside: avoid-column;
     -webkit-column-break-inside: avoid;
     -moz-column-break-inside: avoid;
-    column-break-inside: avoid;
-    break-inside: avoid-column;}
+    column-break-inside: avoid;}
 
 .country h1 {
-    -moz-column-span: all;
+    font-size: 32px;
     -webkit-column-span: all;
-    column-span: all;
-    font-size: 32px;}
+    -moz-column-span: all;
+    column-span: all;}
 
 #stationList ul {
     margin: 0 0 15px 0;
     padding-left: 15px;
-    list-style: none;}
+    list-style: none;
+    font-size: 10pt;}
 
 #stationList li {
-    line-height: 140%}
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 140%;}
 
 #stationList ul a,
 #stationLink a,
 #clusterLink a {
-    font-size: 10pt;
     color: #23B;
     text-decoration: none;}
 
@@ -57,9 +59,17 @@
     color: #005;
     text-decoration: underline;}
 
+#stationLink,
+#clusterLink {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10pt;}
+
 h2 {
-    font-size: 24px;
-    margin-top: 0;}
+    margin-top: 0;
+    font-size: 24px;}
 
 h3 a,
 h2 a,
@@ -74,11 +84,11 @@ h1 a:hover {
     text-decoration: underline;}
 
 .statusBall {
-    background-color: grey;
+    display: inline-block;
     width: 8px;
     height: 8px;
-    border-radius: 4px;
-    display: inline-block;
+    border-radius: 50%;
+    background-color: grey;
     opacity: 0.3;}
 
 .statusBall:hover {
@@ -97,49 +107,33 @@ h1 a:hover {
     visibility: hidden;
     background-color: blue;}
 
-.olControlAttribution {
-    position: absolute !important;
-    font-size: 10px !important;
-    bottom: 0 !important;
-    right: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 5px 0 0 0 !important;}
-
-.olControlScaleLine {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 0 5px 0 0 !important;}
 
 /* Sidebar */
 
+#sidebar {
+    float: right;
+    font-size: 9pt;}
+
 #legend,
-#sidebar,
+#extra,
 #help {
     margin-top: 20px;}
 
 #legend,
-#sidebar,
+#extra,
 #help,
 #navigation {
-    float: right;
+    padding-left: 20px;
     width: 220px;
-    font-size: 9pt;
-    border-left: 1px solid black;
-    padding-left: 20px;}
+    border-left: 1px solid black;}
 
 #navigation .nolink {
-    font-weight: normal;
-    color: black;}
+    color: black;
+    font-weight: normal;}
     
 #navigation .nolink:hover {
-    text-decoration: none;
-    color: black;}
+    color: black;
+    text-decoration: none;}
     
 #navigation a,
 #navigation .nolink {
@@ -151,17 +145,17 @@ h1 a:hover {
 
 #help a,
 #navigation a {
-    font-weight: bold;
     border-radius: 3px;
     color: #25B;
-    text-decoration: none;}
+    text-decoration: none;
+    font-weight: bold;}
 
 #navigation a.currentDate:hover,
 #navigation a.currentPage:hover,
 #navigation a.currentDate,
 #navigation a.currentPage {
-    color: white;
-    background: #075EBB;}
+    background: #075EBB;
+    color: white;}
 
 #navigation > div,
 #config > div {
@@ -170,18 +164,18 @@ h1 a:hover {
 
 .sectionTitle {
     margin-top: 5px;
-    font-size: 130%;
-    font-weight: bold;
     padding-top: 5px;
-    padding-bottom: 5px;}
+    padding-bottom: 5px;
+    font-weight: bold;
+    font-size: 130%;}
 
 .keyvalue {
     margin-top: 5px;
     margin-bottom: 5px;}
 
 .key {
-    font-weight: bold;
-    margin-right: 10px;}
+    margin-right: 10px;
+    font-weight: bold;}
 
 .thin {
     font-weight: normal;}

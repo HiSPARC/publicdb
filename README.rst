@@ -25,7 +25,6 @@ the source::
     
 Then apply this patch::
 
-    ===================================================================
     --- CMakeLists.txt (revision 22471)
     +++ CMakeLists.txt (working copy)
     @@ -884,7 +884,7 @@
@@ -67,9 +66,9 @@ We will now populate this environment with all prerequisites.  To
 duplicate the environment used while writing this documentation, use the
 following instructions, including version numbers.  To install the latest
 versions of the software, drop the `==<version>` part.  For example, you
-can install ipython 0.12.1 using::
+can install ipython 0.13.1 using::
 
-    $ pip install ipython==0.12.1
+    $ pip install ipython==0.13.1
 
 Alternatively, install the latest version with::
 
@@ -77,32 +76,50 @@ Alternatively, install the latest version with::
 
 The complete requirements and installation instructions are::
 
-    $ pip install ipython==0.12.1
+    $ pip install ipython==0.13.2
 
-    $ pip install Cython==0.16
-    $ pip install numpy==1.6.2
+    $ pip install Cython==0.19
+    $ pip install numpy==1.7.1
 
-    $ pip install numexpr==2.0.1
-    $ pip install tables==2.3.1
+    $ pip install numexpr==2.1
+    $ pip install tables==2.4.0
 
     $ pip install recaptcha-client==1.0.6
 
-    $ pip install Django==1.4.2
-    $ pip install South==0.7.3
+    $ pip install Django==1.4.3
+    $ pip install South==0.7.6
+    $ pip install docutils==0.10
+
+    $ pip install progressbar==2.3
+    $ pip install mock==1.0.1
+    $ pip install scipy==0.12.0
+    $ pip install matplotlib==1.2.1
+    $ pip install https://github.com/hisparc/sapphire/zipball/master
 
 You now have all the prerequisites for running the publicdb django app.
 For reference, the results from `pip freeze`::
 
     $ pip freeze
-    Cython==0.16
-    Django==1.4.2
-    South==0.7.3
-    ipython==0.12.1
-    numexpr==2.0.1
-    numpy==1.6.2
+    Cython==0.19
+    Django==1.4.3
+    South==0.7.6
+    docutils==0.10
+    ipython==0.13.2
+    matplotlib==1.2.1
+    mock==1.0.1
+    numexpr==2.1
+    numpy==1.7.1
+    progressbar==2.3
     recaptcha-client==1.0.6
-    tables==2.3.1
+    sapphire==0.9.1b
+    scipy==0.12.0
+    tables==2.4.0
     wsgiref==0.1.2
+
+Note for Mac OS X users: python has trouble detecting the default locale.
+Before continuing, it's best to type this into your terminal::
+
+    $ export LC_ALL=en_US.UTF-8
 
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
 database with::

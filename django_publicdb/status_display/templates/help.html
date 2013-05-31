@@ -243,19 +243,21 @@
 
 </div>
 
-<div id="navigation">
-  {% block navigation_sidebar %}
-    <div class="keyvalue">
-        <span id="value"><a class="nolink currentPage">Help</a></span>
-    </div>
+<div id="sidebar">
+    <div id="navigation">
+      {% block navigation_sidebar %}
+        <div class="keyvalue">
+            <span id="value"><a class="nolink currentPage">Help</a></span>
+        </div>
 
-    <div class="keyvalue">
-        <span class="key">Stations</span>
-        <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
-        <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
-    </div>
+        <div class="keyvalue">
+            <span class="key">Stations</span>
+            <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
+            <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+        </div>
 
-  {% endblock %}
+      {% endblock %}
+    </div>
 </div>
     
 {% endblock %}

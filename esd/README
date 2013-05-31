@@ -1,0 +1,2 @@
+This directory contains the Event Summary Data (ESD).  It is filled by the
+Django histograms.jobs code.

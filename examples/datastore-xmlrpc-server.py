@@ -17,7 +17,7 @@ import subprocess
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
-CFG_URL = 'http://data.hisparc.nl/django/config/datastore'
+CFG_URL = 'http://data.hisparc.nl/config/datastore'
 
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""

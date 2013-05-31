@@ -2,12 +2,9 @@ from django.db import models
 from django_publicdb.coincidences.models import *
 from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
-from hisparc.analysis import coincidences
-from hisparc import publicdb
-from random import choice, randint
 from django.template.defaultfilters import slugify
-from datetime import timedelta
 
+from random import choice, randint
 import string
 import datetime
 import hashlib
@@ -15,6 +12,11 @@ import tables
 import sys
 import os
 import re
+
+import numpy as np
+
+from sapphire.analysis import coincidences
+from sapphire import publicdb
 
 
 class AnalysisSession(models.Model):
@@ -91,7 +93,7 @@ class SessionRequest(models.Model):
         self.session_pending = False
         self.save()
         starts = datetime.datetime.now()
-        session_length = timedelta(weeks=4)
+        session_length = datetime.timedelta(weeks=4)
         ends = starts + session_length
         session = AnalysisSession(starts=starts,
                                   ends=ends,
@@ -100,11 +102,11 @@ class SessionRequest(models.Model):
                                   title=self.sid)
         session.save()
         date = self.start_date
-        search_length = timedelta(weeks=3)
+        search_length = datetime.timedelta(weeks=3)
         enddate = self.start_date + search_length
         while (self.events_created < self.events_to_create and date < enddate):
             self.events_created += self.find_coincidence(date, session)
-            date += timedelta(days=1)
+            date += datetime.timedelta(days=1)
         if self.events_created <= 0:
             self.sendmail_zero()
         elif self.events_created <= self.events_to_create:
@@ -117,9 +119,9 @@ class SessionRequest(models.Model):
         return [self.sid, self.pin]
 
     def find_coincidence(self, date, session):
-        file = '%s_%s_%s.h5' % (str(date.year), str(date.month), str(date.day))
-        datastore_path = os.path.join(settings.DATASTORE_PATH, str(date.year),
-                                      str(date.month), file)
+        file = date.strftime('%Y_%-m_%-d.h5')
+        datastore_path = os.path.join(settings.DATASTORE_PATH,
+                                      date.strftime('%Y/%-m'), file)
         data = tables.openFile(datastore_path, 'r')
         ndups = 0
         nvalid = 0
@@ -130,7 +132,9 @@ class SessionRequest(models.Model):
             print "Error:", msg
             data.close()
             return nvalid
-        c_list, timestamps = coincidences.search_coincidences(data, stations)
+
+        coinc = coincidences.Coincidences(data, None, stations)
+        c_list, timestamps = coinc._search_coincidences()
         for coincidence in c_list:
             if len(coincidence) >= 3:
                 event_list = coincidences.get_events(data, stations,
@@ -175,11 +179,13 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = [x * .57 if x not in [-999, -1] else x for x in
-                            event['pulseheights']]
-            integrals = [x * .57 * 2.5 if x not in [-999, -1] else x for x in
-                         event['integrals']]
-
+            pulseheights = np.where(event['pulseheights'] > 0,
+                                    np.around(event['pulseheights'] * .57, 2),
+                                    event['pulseheights']).tolist()
+            integrals = np.where(event['integrals'] > 0,
+                                 np.around(event['integrals'] * .57 * 2.5, 2),
+                                 event['integrals']).tolist()
+            traces = np.around(traces, 2).tolist()
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
@@ -207,8 +213,8 @@ class SessionRequest(models.Model):
         t = []
         for trace in traces:
             m = min(trace)
-            # No significant pulse (not lower than -20 mV)
             if not m < -20:
+                # No significant pulse (not lower than -20 mV)
                 continue
             for i, v in enumerate(trace):
                 if v < .2 * m:
@@ -230,8 +236,10 @@ class SessionRequest(models.Model):
     def SendMail(self):
         subject = 'HiSPARC analysis session request'
         message = ('Hello %s,'
-                   '\n\nPlease click on this link to confirm your request for an analysis session with jSparc:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/request/%s') % (self.name, self.url)
+                   '\n\nPlease click on this link to confirm your request for'
+                   ' an analysis session with jSparc:'
+                   '\nhttp://data.hisparc.nl/analysis-session/request/%s' %
+                   (self.name, self.url))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -248,8 +256,9 @@ class SessionRequest(models.Model):
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
+                   (self.name, self.sid, self.pin, self.events_created,
+                    slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -262,13 +271,15 @@ class SessionRequest(models.Model):
                    '\n\nYour analysis session for jSparc has been created.'
                    '\nTitle = %s'
                    '\nPin = %d'
-                   '\nHowever, we were unable to find the amount of events you requested.'
+                   '\nHowever, we were unable to find the amount of events you'
+                   ' requested.'
                    '\nEvents created = %d'
                    '\n\nGo here to start analysing events:'
                    '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
                    '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/django/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
+                   (self.name, self.sid, self.pin, self.events_created,
+                    slugify(self.sid)))
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)
@@ -279,8 +290,10 @@ class SessionRequest(models.Model):
         subject = 'HiSPARC analysis session creation failed'
         message = ('Hello %s,'
                    '\n\nYour analysis session for jSparc could not be created.'
-                   '\nPerhaps there was no data for the date and/or stations you selected.'
-                   '\nPlease try selecting a different cluster or date.') % self.name
+                   '\nPerhaps there was no data for the date and/or stations'
+                   ' you selected.'
+                   '\nPlease try selecting a different cluster or date.' %
+                   self.name)
         sender = 'info@hisparc.nl'
         mail = self.email
         send_mail(subject, message, sender, [self.email,], fail_silently=False)

@@ -116,39 +116,54 @@ def stations_by_name(request):
                               context_instance=RequestContext(request))
 
 
-def stations_on_map(request, subcluster=None):
+def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    if subcluster:
-        get_object_or_404(Cluster, name=subcluster)
-    clusters = []
-    for cluster in Cluster.objects.all():
-        stations = []
-        for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
-                                        .filter(station__cluster__name=cluster,
-                                                station__pc__is_active=True)):
-            if station_has_data(detector.station):
-                link = detector.station.number
+    if country:
+        get_object_or_404(Country, name=country)
+        if cluster:
+            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
+            if subcluster:
+                if cluster == subcluster:
+                    get_object_or_404(Cluster, name=subcluster, parent=None)
+                else:
+                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
+                focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
             else:
-                link = None
-            status = get_station_status(detector.station, down, problem, up)
-            stations.append({'number': detector.station.number,
-                             'name': detector.station.name,
-                             'cluster': detector.station.cluster,
+                focus = [Cluster.objects.get(name=cluster, parent=None).name]
+                focus.extend(Cluster.objects.filter(parent__name=cluster).values_list('name', flat=True))
+        else:
+            focus = Cluster.objects.filter(country__name=country).values_list('name', flat=True)
+    else:
+        focus = Cluster.objects.all().values_list('name', flat=True)
+
+    subclusters = []
+    for subcluster in Cluster.objects.all():
+        stations = []
+        for station in Station.objects.filter(cluster=subcluster,
+                                              pc__is_active=True):
+            detector = (DetectorHisparc.objects.filter(station=station,
+                                                       startdate__lte=today)
+                                               .latest('startdate'))
+            link = station_has_data(station)
+            status = get_station_status(station, down, problem, up)
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'cluster': station.cluster,
                              'link': link,
                              'status': status,
                              'longitude': detector.longitude,
                              'latitude': detector.latitude,
                              'altitude': detector.height})
-        clusters.append({'name': cluster.name,
-                         'stations': stations})
+        subclusters.append({'name': subcluster.name,
+                            'stations': stations})
 
     return render_to_response('stations_on_map.html',
-        {'clusters': clusters,
-         'focus': subcluster},
+        {'subclusters': subclusters,
+         'focus': focus},
         context_instance=RequestContext(request))
 
 
@@ -297,6 +312,7 @@ def station_config(request, station_id):
 
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
+    altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
 
     return render_to_response('station_config.html',
@@ -304,6 +320,7 @@ def station_config(request, station_id):
          'config': config,
          'voltagegraph': voltagegraph,
          'currentgraph': currentgraph,
+         'altitudegraph': altitudegraph,
          'gpstrack': gpstrack,
          'has_slave': has_slave,
          'has_data': has_data,
@@ -406,10 +423,11 @@ def get_gps_config_source(request, station_id):
 
 
 def get_histogram_source(station_id, year, month, day, type):
-    histogram = DailyHistogram.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    histogram = get_object_or_404(DailyHistogram,
+                                  source__station__number=int(station_id),
+                                  source__date=date,
+                                  type__slug=type)
     if type == 'eventtime':
         return zip(histogram.bins, histogram.values)
     else:
@@ -417,10 +435,11 @@ def get_histogram_source(station_id, year, month, day, type):
 
 
 def get_dataset_source(station_id, year, month, day, type):
-    dataset = DailyDataset.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    dataset = get_object_or_404(DailyDataset,
+                                source__station__number=int(station_id),
+                                source__date=date,
+                                type__slug=type)
     return zip(dataset.x, dataset.y)
 
 
@@ -496,6 +515,9 @@ def plot_config(type, configs):
                   for config in configs]
         values = zip(*values)
         y_label = 'PMT Current (mA)'
+    if type == 'altitude':
+        values = [config.gps_altitude for config in configs]
+        y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
 
@@ -558,9 +580,11 @@ def nav_months(station, theyear):
 
     month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year,
-                                            date__month=date.month)
+        first_day = (Summary.objects.filter(Q(station=station),
+                                            Q(date__year=date.year),
+                                            Q(date__month=date.month),
+                                            Q(num_events__isnull=False) |
+                                            Q(num_weather__isnull=False))
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
         month_list[date.month - 1]['link'] = link
@@ -595,8 +619,14 @@ def nav_years(station):
 
 
 def station_has_data(station):
-    """Check if there is valis event or weather data for the given station"""
+    """Check if there is valid event or weather data for the given station
 
+    :param station: Station object for which to check.
+
+    :return: boolean indicating if the station has recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
     try:
         Summary.objects.filter(Q(station=station),
                                Q(num_events__isnull=False) |
@@ -611,5 +641,6 @@ def station_has_data(station):
 
 
 def help(request):
+    """Show the static help page"""
     return render_to_response('help.html',
                               context_instance=RequestContext(request))
