@@ -14,17 +14,43 @@ from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
 from datastore import get_event
 
+
 def station(request, station_id):
     """Show daily histograms for a particular station"""
-
+    today = datetime.date.today()
     station_id = int(station_id)
     station = get_object_or_404(Station, number=station_id)
     config = (Configuration.objects.filter(source__station=station,
                                            timestamp__lt=datetime.date.today())
                                    .latest('timestamp'))
+    detectorhisparc = (DetectorHisparc.objects.filter(station=station,
+                                                      startdate__lte=today)
+                                              .latest('startdate'))
+
+    positions = [{"alpha": detectorhisparc.scintillator_1_alpha,
+                  "beta": detectorhisparc.scintillator_1_beta,
+                  "radius": detectorhisparc.scintillator_1_radius,
+                  "height": detectorhisparc.scintillator_1_height},
+                 {"alpha": detectorhisparc.scintillator_2_alpha,
+                  "beta": detectorhisparc.scintillator_2_beta,
+                  "radius": detectorhisparc.scintillator_2_radius,
+                  "height": detectorhisparc.scintillator_2_height}]
+    if config.slave() != "no slave":
+        positions.extend([{"alpha": detectorhisparc.scintillator_3_alpha,
+                           "beta": detectorhisparc.scintillator_3_beta,
+                           "radius": detectorhisparc.scintillator_3_radius,
+                           "height": detectorhisparc.scintillator_3_height},
+                          {"alpha": detectorhisparc.scintillator_4_alpha,
+                           "beta": detectorhisparc.scintillator_4_beta,
+                           "radius": detectorhisparc.scintillator_4_radius,
+                           "height": detectorhisparc.scintillator_4_height}])
+    scintillators = {'number': len(positions),
+                     'positions': positions}
+
     return render_to_response('live_display.html',
         {'station': station,
-         'config': config},
+         'config': config,
+         'scintillators': json.dumps(scintillators)},
         context_instance=RequestContext(request))
 
 
@@ -54,15 +80,6 @@ def create_plot_object(y_series, x_label, y_label):
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
-
-
-def get_new_trace(request, station_id):
-
-    today = datetime.date.today()
-
-    tracedata = create_histogram('eventtime', station, date)
-
-    return trace
 
 
 def json_dict(dict):

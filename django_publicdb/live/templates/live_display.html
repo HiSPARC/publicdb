@@ -4,10 +4,29 @@
 
 {% block title %}{{ block.super }}{% endblock %}
 
+{% block head_styles %}
+    {{ block.super }}
+    <style type="text/css">
+        @-webkit-keyframes trigger1 {50% {background-color: #222;}}
+        @-webkit-keyframes trigger2 {50% {background-color: #D22;}}
+        @-webkit-keyframes trigger3 {50% {background-color: #1C2;}}
+        @-webkit-keyframes trigger4 {50% {background-color: #1CC;}}
+    </style>
+{% endblock %}
+
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_live.js"></script>
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/screenfull.min.js"></script>
     <script type="text/javascript">
+        var toRad = Math.atan(1)/45;
+        var bounds = {"top": 0, "right": 0, "bottom": 0, "left": 0};
+
+        function padZero(number, length) {
+            var str = '' + number;
+            while (str.length < length) {
+                str = '0' + str;}
+            return str;
+        }
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -19,8 +38,20 @@
             h_scale = $(window).height() / 1080;
             scale = Math.min(w_scale, h_scale);
             $('body').css({'zoom': scale,
-                         '-moz-transform': 'scale(' + scale + ')',
-                         '-moz-transform-origin': '0 0'})
+                           '-moz-transform': 'scale(' + scale + ')',
+                           '-moz-transform-origin': '0 0'})
+        }
+
+        function resizeLayoutToFit() {
+            w_scale = $('#station-layout').width() / (bounds.left + bounds.right);
+            h_scale = $('#station-layout').height() / (bounds.top + bounds.bottom);
+            scale = Math.min(w_scale, h_scale);
+            if (scale < 1) {
+                $('#station-scale').css({'zoom': scale,
+                                         '-moz-transform': 'scale(' + scale + ')',
+                                         '-moz-transform-origin': '0 0'})}
+            $('.center').css({'top': ((( -(bounds.top + bounds.bottom) / 2 + bounds.top) * scale / $('#station-layout').height()) * 100 + 50) + '%',
+                              'left': ((( - (bounds.left + bounds.right) / 2 + bounds.left) * scale / $('#station-layout').width()) * 100 + 50) + '%'})
         }
 
         $(document).ready(function() {
@@ -30,6 +61,36 @@
                 resizeToFit();
             });
 
+            // Make station
+            var scintillators = {% autoescape off %}{{ scintillators }}{% endautoescape %}
+
+            // Default layout
+            if (scintillators.number == 2) {
+                $('#detector1').css({'transform': 'translate(125px, 0)'})
+                $('#detector2').css({'transform': 'translate(-125px, 0)'})
+                $('#detector3').hide()
+                $('#detector4').hide()
+                bounds.right = 125;
+                bounds.left = 125;}
+            if (scintillators.number == 4) {
+                $('#detector1').css({'transform': 'translate(0, -433px) rotate(180deg)'})
+                $('#detector2').css({'transform': 'translate(0, -144px) rotate(180deg)'})
+                $('#detector3').css({'transform': 'translate(250px, 0) rotate(-90deg)'})
+                $('#detector4').css({'transform': 'translate(-250px, 0) rotate(90deg)'})
+                bounds.top = 433;
+                bounds.right = 250;
+                bounds.bottom = 0;
+                bounds.left = 250;}
+
+            for (var i = 0; i < scintillators.number; i++) {
+                x = scintillators.positions[i].radius * Math.sin(scintillators.positions[i].alfa * toRad)
+                y = scintillators.positions[i].radius * Math.cos(scintillators.positions[i].alfa * toRad)
+                b = scintillators.positions[i].beta
+                $('#detector' + i + 1).css({'transform': 'translate(' + x + 'px, ' + y + 'px) rotate(' + b + 'deg)'})}
+
+            // Resize the layout to fit in the div
+            resizeLayoutToFit()
+
             // Show a fullscreen button if browser support Fullscreen API
             if (screenfull.enabled) {
                 $('#fullscreen').css('visibility', 'visible').click(function() {
@@ -37,8 +98,8 @@
                 });}
 
             // Set constants
-            var refreshRate = 5000;
-            var iteratorStart = 40;
+            var refreshRate = 10000;
+            var iteratorStart = 26;
             var iterator = iteratorStart;
             var baseurl = "{% url 'live.views.get_new_event' station.number %}"
             var tr_graph = $("#tr_graph");
@@ -54,7 +115,15 @@
                         data.push({data: event.traces.data[i], yaxis: 1});}
                     data.push({data: [1, 1], lines: {show: false}, xaxis: 2, yaxis: 2});
                     var plot = $.plot(tr_graph, data, tr_options);
-                     // add labels
+                    // add labels
+                    for (var i = 0; i < scintillators.number; i++) {
+        	            $('#detector' + (i + 1)).css({'animation': 'none'})}
+                    for (var i = 0; i < scintillators.number; i++) {
+                        if (event.event.pulseheights[i] > 123) {
+        	                $('#detector' + (i + 1)).css({'animation': 'trigger' + (i + 1) + ' 3s infinite alternate'})}
+        	            else if (event.event.pulseheights[i] > 53) {
+        	                $('#detector' + (i + 1)).css({'animation': 'trigger' + (i + 1) + ' 3s infinite alternate'})}
+        	            }
                     h = plot.getPlotOffset();
                     o = plot.pointOffset({ x: 0, y: -53});
                     tr_graph.append('<div style="position:absolute;right:' + (h.right + 4) + 'px;top:' + o.top + 'px;color:#666;font-size:smaller">low</div>');
@@ -64,8 +133,9 @@
                     tr_graph.append('<div style="position:absolute;right:' + (h.right + 4) + 'px;top:' + o.top + 'px;color:#666;font-size:smaller">MIP</div>');
                     $('#n_events').html(event.count)
                     $('#nth_event').html(event.count - iterator)
-                    $('#timestamp').html(event.event.timestamp + '.' + event.event.nanoseconds)
-                    $('#date').html(new Date(event.event.timestamp * 1000).toUTCString())
+                    $('#e_timestamp').html(event.event.timestamp + '.' + padZero(event.event.nanoseconds, 9))
+                    $('#e_date').html(new Date(event.event.timestamp * 1000).toUTCString())
+                    $('#e_trigger').html()
                 }
     
                 $.ajax({url: baseurl + iterator + '/',
@@ -78,6 +148,7 @@
             // Show first trace and initiate auto refresh
             fetchData();
 
+            // Show location map
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
             var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
             var options = {
@@ -88,21 +159,18 @@
             var mapLayer = new OpenLayers.Layer.OSM();
             map.addLayer(mapLayer);
             map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
-                                        .transform(fromProjection, toProjection), 16);
-
+                                        .transform(fromProjection, toProjection), 17);
             var stationLayer = new OpenLayers.Layer.Vector("station");
             var feature = new OpenLayers.Feature.Vector(
                 new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }}).transform(fromProjection, toProjection), {},
-                    {pointRadius: 6,
+                    {pointRadius: 8,
                      fillColor: '#2A7AE2',
                      fillOpacity: 1,
                      stroke: true,
-                     strokeWidth: 0.5});
+                     strokeWidth: 1});
             stationLayer.addFeatures(feature);
             map.addLayer(stationLayer);
 
-            var bounds = stationLayer.getDataExtent();
-            map.zoomToExtent(bounds);
         });
 
     </script>
@@ -116,8 +184,8 @@
     {{ block.super }}
 
     <div id="traces">
+        <h3>Event signal</h3>
         <div id="traceGraph" class="graph">
-            <h3>Event signal</h3>
             <div class="plot" id="tr_graph"></div>
         </div>
     </div>
@@ -126,14 +194,18 @@
         <h3>Event data</h3>
         <div class="sectionTitle">Time</div>
         <div class="keyvalue"><span class="key">Event</span><span class="value" id="nth_event"></span> (<span class="value" id="n_events"></span>)</div>
-        <div class="keyvalue"><span class="key">Timestamp</span><span class="value" id="timestamp"></span> s</div>
-        <div class="keyvalue"><span class="key">Date</span><span class="value" id="date"></span></div>
-        <div class="keyvalue"><span class="key">Density</span><span class="value" id="density">mips</span></div>
+        <div class="keyvalue"><span class="key">Timestamp</span><span class="value" id="e_timestamp"></span> s</div>
+        <div class="keyvalue"><span class="key">Date</span><span class="value" id="e_date"></span></div>
+        <div class="sectionTitle">Trigger</div>
+        <div class="keyvalue"><span class="key">PMT channels</span><span class="value ch1">ch1</span> <span class="value ch2">ch2</span>{% if config.slave != 'no slave' %} <span class="value ch3">ch3</span> <span class="value ch4">ch4</span>{% endif %}</div>
+        <div class="keyvalue"><span class="key">Trigger conditions</span><span class="value">{{ config.trig_low_signals }} low {% if config.trig_and_or %}or{% else %}and{% endif %} {{ config.trig_high_signals }} high</span></div>
+
     </div>
 
     <div id="reconstruction">
-        <h3>Reconstruction</h3>
+        <h3>Event reconstruction</h3>
         <div class="sectionTitle">Origin and energy</div>
+        <div class="keyvalue"><span class="key">Density</span><span class="value">reconstruction.mips</span></div>
         <div class="keyvalue"><span class="key">Primary energy</span><span class="value">reconstruction.energy</span></div>
         <div class="keyvalue"><span class="key">Core distance</span><span class="value">reconstruction.distance</span></div>
         <div class="keyvalue"><span class="key">Zenith angle</span><span class="value">reconstruction.zenith</span></div>
@@ -143,21 +215,25 @@
     <div class="clearer"></div>
 
     <div id="info">
-        <h3>Station Info</h3>
-        <div class="sectionTitle">Station info</div>
-        <div class="keyvalue"><span class="key">PMT channels</span><span class="value ch1">ch1</span> <span class="value ch2">ch2</span>{% if config.slave != 'no slave' %} <span class="value ch3">ch3</span> <span class="value ch4">ch4</span>{% endif %}</div>
-        <div class="keyvalue"><span class="key">Trigger conditions</span><span class="value">{{ config.trig_low_signals }} low {% if config.trig_and_or %}or{% else %}and{% endif %} {{ config.trig_high_signals }} high</span></div>
-        <div class="sectionTitle">GPS location</div>
-        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude }} &deg;</span></div>
-        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude }} &deg;</span></div>
-        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude }} m</span></div>
-        <div class="sectionTitle">Layout</div>
-        <div class="keyvalue"><span class="key">Shape</span><span class="value">triangle</span></div>
+        <h3>Station layout</h3>
+        <div id="station-layout">
+            <div id="station-scale">
+                <div class="center" id="gps"></div>
+                <div class="scintillator center" id="detector1"></div>
+                <div class="scintillator center" id="detector2"></div>
+                <div class="scintillator center" id="detector3"></div>
+                <div class="scintillator center" id="detector4"></div>
+            </div>
+        </div>
     </div>
 
     <div id="location">
         <h3>Location</h3>
         <div id="map"></div>
+        <div class="location"><span class="key">GPS: </span></div>
+        <div class="location"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude|floatformat:"4" }} &deg;</span></div>
+        <div class="location"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude|floatformat:"4" }} &deg;</span></div>
+        <div class="location"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude|floatformat:"4" }} m</span></div>
     </div>
     
 {% endblock %}

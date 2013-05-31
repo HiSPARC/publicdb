@@ -1,13 +1,19 @@
+* {
+    margin: 0;
+    padding: 0;}
+
 /* Header */
 
 html {
+    border: 1px solid black;
     background: white;}
 
 body {
-    margin: 10px;
+    margin: 9px;
     font-size: 100%;}
 
 #container {
+    overflow: hidden;
     margin: auto;
     width: 1900px;
     height: 1060px;}
@@ -59,7 +65,7 @@ body {
 
 #info {
     float: left;
-    width: 800px;}
+    width: 1000px;}
 
 #data {
     float: right;
@@ -108,12 +114,58 @@ a {
     margin-top: 5px;
     margin-bottom: 5px;}
 
+.location {
+    font-size: 120%;
+    margin-top: 5px;
+    margin-left: 25px;
+    display: inline-block;}
+
 .key {
     font-weight: bold;
     margin-right: 10px;}
 
 .value {
     margin-right: 2px;}
+
+
+/* Layout */
+
+#station-layout {
+    overflow: hidden;
+    width: 100%;
+    height: 300px;
+    position: relative;}
+
+.center {
+    top: 50%;
+    left: 50%;
+    position: absolute;}
+    
+#gps {
+    background-color: black;
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    margin-top: -10px; 
+    margin-left: -10px;}
+
+.scintillator {
+    width: 25px;
+    height: 50px;
+    margin-top: -25px; 
+    margin-left: -12.5px; 
+    background-color: #DDD;}
+
+.scintillator:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    margin: -25px 0 0 0;
+    border-bottom: 27px solid #EEE;
+    border-right: 13px solid rgba(0, 0, 0, 0);
+    border-left: 13px solid rgba(0, 0, 0, 0);
+    z-index: -1;}
 
 
 /* Graphs */
