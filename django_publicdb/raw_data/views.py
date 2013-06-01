@@ -11,6 +11,7 @@ import urlparse
 import tempfile
 import csv
 import calendar
+import urllib
 
 import dateutil.parser
 
@@ -140,8 +141,13 @@ def download_form(request):
         form = DataDownloadForm(request.POST)
         if form.is_valid():
             station = form.cleaned_data['station']
-            return HttpResponseRedirect('/data/%d/events' %
-                                        station.number)
+            start = form.cleaned_data['start']
+            end = form.cleaned_data['end']
+            download = form.cleaned_data['download']
+            query_string = urllib.urlencode({'start': start, 'end': end,
+                                             'download': download})
+            return HttpResponseRedirect('/data/%d/events?%s' %
+                                        (station.number, query_string))
     else:
         form = DataDownloadForm()
 
