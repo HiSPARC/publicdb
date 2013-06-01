@@ -1,5 +1,6 @@
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseRedirect)
+from django.shortcuts import get_object_or_404, render
 from django.template import loader, Context
 from django.conf import settings
 
@@ -16,7 +17,7 @@ import dateutil.parser
 from django_publicdb.inforecords.models import Station
 from django_publicdb.histograms.models import Summary
 from django_publicdb.histograms import esd
-
+from django_publicdb.raw_data.forms import DataDownloadForm
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
@@ -132,6 +133,19 @@ def get_target():
     #FIXME (for debugging only, sets extra permissions)
     #os.chmod(file.name, 0644)
     return tables.openFile(file.name, 'w')
+
+
+def download_form(request):
+    if request.method == 'POST':
+        form = DataDownloadForm(request.POST)
+        if form.is_valid():
+            station = form.cleaned_data['station']
+            return HttpResponseRedirect('/data/%d/events' %
+                                        station.number)
+    else:
+        form = DataDownloadForm()
+
+    return render(request, 'data_download.html', {'form': form})
 
 
 def download_events(request, station_id):

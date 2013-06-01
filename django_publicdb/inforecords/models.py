@@ -166,7 +166,7 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '%s' % (self.number)
+        return '%5d: %s' % (self.number, self.name)
 
     def save(self, *args, **kwargs):
         if self.number==None:
