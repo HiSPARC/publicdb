@@ -196,9 +196,9 @@ def download_events(request, station_id):
     timerange_string = prettyprint_timerange(start, end)
     filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
     if download:
-        content_disposition = 'Attachment; filename="%s"' % filename
+        content_disposition = 'attachment; filename="%s"' % filename
     else:
-        content_disposition = 'filename="%s"' % filename
+        content_disposition = 'inline; filename="%s"' % filename
     response['Content-Disposition'] = content_disposition
 
     return response
