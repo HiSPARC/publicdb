@@ -1,5 +1,5 @@
 Exec {
-    path => "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:usr/local/src/:usr/local/src/hisparc:/vagrant"
+    path => "/usr/local/bin:/usr/local/sbin:/bin:/sbin:/usr/bin:/usr/sbin:/vagrant"
     }
     
 exec { 'get_python':
@@ -45,7 +45,7 @@ file { "/var/www/django_publicdb":
   force  => true
 }
 
-file { "/etc/httpd/httpd.conf":
+file { "/etc/httpd/conf.d/hisparc.conf":
   target => "/vagrant/vagrant/puppet/modules/apache/manifests/hisparc.conf",
   owner  => vagrant,
   group  => vagrant,

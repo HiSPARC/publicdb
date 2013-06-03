@@ -24,3 +24,6 @@ Thumbs.db
 
 # Vim
 *.swp
+
+# Vagrant
+.vagrant
