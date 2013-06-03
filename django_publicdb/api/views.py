@@ -529,12 +529,14 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     # Check path
     #---------------------------------------------------------------------------
 
-    filepath = os.path.join(
-        "/home/cblam/Projects/hisparc/data-quality/analysis",
+    filepath = os.path.abspath(os.path.join(
+        #"/home/cblam/Projects/hisparc/data-quality/analysis",
+        os.path.dirname(__file__),
+        "../histograms/pulseheight_fits",
         "%s_%s_%s.%s.pulseheights.dat" % (
             year, month, day, station_id
         )
-    )
+    ))
 
     if not os.path.exists(filepath):
         dict.update({
