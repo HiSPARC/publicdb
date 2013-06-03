@@ -1,0 +1,1 @@
+python /var/www/django_publicdb/manage.py syncdb --noinput --migrate

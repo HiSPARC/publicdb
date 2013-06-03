@@ -1,7 +1,6 @@
 Exec {
-    path => "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:usr/local/src/:usr/local/src/hisparc"
+    path => "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin:usr/local/src/:usr/local/src/hisparc:/vagrant"
     }
-    
     
 exec { 'get_python':
     command => "bash python.sh",
@@ -51,4 +50,48 @@ file { "/etc/httpd/httpd.conf":
   owner  => vagrant,
   group  => vagrant,
   force  => true
+}
+  
+exec { 'get_mysql':
+    command => "bash mysql.sh",
+    user => "vagrant",
+    logoutput => on_failure
+}
+exec { "create_static":
+ command => "sudo mkdir -p /var/www/static",
+}
+
+exec { "adjust_static":
+ command => "bash adjustments.sh",
+ user => "vagrant",
+ require => Exec['create_static']
   }
+  
+exec { "sqlite_devel":
+ command => "bash sqlite_devel.sh",
+ user => "vagrant",
+ require => Exec['get_mysql'] 
+}
+
+exec { "recompile_python":
+ command => "bash recompile_python.sh",
+ user => "vagrant",
+ require => Exec['sqlite_devel'],
+ logoutput => on_failure
+}
+
+
+exec { "syncdb":
+command => "bash syncdb.sh",
+user => "vagrant",
+require => Exec['recompile_python'],
+logoutput => on_failure
+}
+
+exec { "collectstatic":
+command => "bash migrate.sh",
+user => "vagrant",
+require => Exec["syncdb"],
+logoutput => on_failure
+}
+

@@ -1,5 +1,7 @@
 class git {
-    package { "git":
-        ensure => present,
+    exec { 'get_git':
+    command => "bash git.sh",
+    user => "vagrant",
+    logoutput => on_failure
     }
 }

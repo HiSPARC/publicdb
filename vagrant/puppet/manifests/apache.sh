@@ -13,8 +13,8 @@ sudo yum -y install httpd-devel
 # +User www
 # +Group www
 
- ### Section 2: 'Main' server configuration
- #
+ # Section 2: 'Main' server configuration
+ 
 # EOF
 
 sudo /sbin/chkconfig --add httpd
@@ -41,7 +41,7 @@ sudo make install
  # LoadModule version_module modules/mod_version.so
 # +LoadModule wsgi_module modules/mod_wsgi.so
 
- #
+ 
  # The following modules are not loaded by default:
 # EOF
 
