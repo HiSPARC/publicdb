@@ -501,7 +501,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
 
     if year == None and month == None and day == None:
         today = datetime.date.today()
-        yesterday = today - datetime.timedelta(days=6)
+        yesterday = today - datetime.timedelta(days=1)
 
         year  = yesterday.year
         month = yesterday.month
