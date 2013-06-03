@@ -136,7 +136,7 @@ def get_target():
     return tables.openFile(file.name, 'w')
 
 
-def download_form(request):
+def download_form(request, station_id=None, start=None, end=None):
     if request.method == 'POST':
         form = DataDownloadForm(request.POST)
         if form.is_valid():
@@ -149,7 +149,13 @@ def download_form(request):
             return HttpResponseRedirect('/data/%d/events?%s' %
                                         (station.number, query_string))
     else:
-        form = DataDownloadForm()
+        if station_id:
+            station = get_object_or_404(Station, number=station_id)
+        else:
+            station = None
+        form = DataDownloadForm(initial={'station': station,
+                                         'start': start,
+                                         'end': end})
 
     return render(request, 'data_download.html', {'form': form})
 

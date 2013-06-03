@@ -160,6 +160,15 @@ a.currentPage {
     padding-top: 10px;
     padding-bottom: 10px;}
 
+#download {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+#download a{
+    padding: 0px;
+}
+
 #prev {
     float: left;
     margin-right: -1em;}
