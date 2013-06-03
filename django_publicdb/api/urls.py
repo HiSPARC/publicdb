@@ -12,8 +12,14 @@ urlpatterns = patterns('django_publicdb.api.views',
     (r'^clusters/(?P<cluster_id>\d+)/$', 'subclusters'),
     (r'^countries/(?P<country_id>\d+)/$', 'clusters'),
 
-    (r'^stations/data/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_data'),
-    (r'^stations/weather/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_weather'),
+    (r'^stations/data/$', 'stations_with_data'),
+    (r'^stations/data/(?P<year>\d{4})/$', 'stations_with_data_year'),
+    (r'^stations/data/(?P<year>\d{4})/(?P<month>\d+)/$', 'stations_with_data_month'),
+    (r'^stations/data/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_data_day'),
+    (r'^stations/weather/$', 'stations_with_weather'),
+    (r'^stations/weather/(?P<year>\d{4})/$', 'stations_with_weather_year'),
+    (r'^stations/weather/(?P<year>\d{4})/(?P<month>\d+)/$', 'stations_with_weather_month'),
+    (r'^stations/weather/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'stations_with_weather_day'),
 
     (r'^station/(?P<station_id>\d+)/$', 'station'),
 

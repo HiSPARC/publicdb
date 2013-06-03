@@ -21,9 +21,14 @@ DATABASES = {
     }
 }
 
-# Path of the mounted HiSPARC datastore root folder
+# Path settings
 # DEV_ONLY
+
+# Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = '../datastore'
+
+# Path of the mounted HiSPARC event summary datastore (ESD) root folder
+ESD_PATH = '../esd'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -160,7 +165,10 @@ LOGGING = {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler'
-        }
+        },
+        'null_handler': {
+            'class': 'django.utils.log.NullHandler',
+        },
     },
     'loggers': {
         'django.request': {
@@ -168,5 +176,9 @@ LOGGING = {
             'level': 'ERROR',
             'propagate': True,
         },
-    }
+        'django.db.backends': {
+            'handlers': ['null_handler'],
+            'propagate': False,
+        }
+    },
 }

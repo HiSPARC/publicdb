@@ -423,10 +423,11 @@ def get_gps_config_source(request, station_id):
 
 
 def get_histogram_source(station_id, year, month, day, type):
-    histogram = DailyHistogram.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    histogram = get_object_or_404(DailyHistogram,
+                                  source__station__number=int(station_id),
+                                  source__date=date,
+                                  type__slug=type)
     if type == 'eventtime':
         return zip(histogram.bins, histogram.values)
     else:
@@ -434,10 +435,11 @@ def get_histogram_source(station_id, year, month, day, type):
 
 
 def get_dataset_source(station_id, year, month, day, type):
-    dataset = DailyDataset.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    dataset = get_object_or_404(DailyDataset,
+                                source__station__number=int(station_id),
+                                source__date=date,
+                                type__slug=type)
     return zip(dataset.x, dataset.y)
 
 
@@ -578,9 +580,11 @@ def nav_months(station, theyear):
 
     month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year,
-                                            date__month=date.month)
+        first_day = (Summary.objects.filter(Q(station=station),
+                                            Q(date__year=date.year),
+                                            Q(date__month=date.month),
+                                            Q(num_events__isnull=False) |
+                                            Q(num_weather__isnull=False))
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
         month_list[date.month - 1]['link'] = link

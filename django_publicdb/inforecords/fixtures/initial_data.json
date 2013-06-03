@@ -19,28 +19,6 @@
         }
     }, 
     {
-        "pk": 1, 
-        "model": "inforecords.cluster", 
-        "fields": {
-            "url": "", 
-            "country": 1, 
-            "name": "Amsterdam", 
-            "parent": null, 
-            "number": 0
-        }
-    }, 
-    {
-        "pk": 2, 
-        "model": "inforecords.cluster", 
-        "fields": {
-            "url": "", 
-            "country": 1, 
-            "name": "Science Park", 
-            "parent": 1, 
-            "number": 500
-        }
-    }, 
-    {
         "pk": 2, 
         "model": "inforecords.contactinformation", 
         "fields": {
@@ -76,6 +54,61 @@
             "street_1": "Science Park 105", 
             "street_2": "", 
             "pobox_city": ""
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "inforecords.contactinformation", 
+        "fields": {
+            "city": "Hoofddorp", 
+            "fax": "", 
+            "pobox_postalcode": "", 
+            "phone_work": "023-5616198", 
+            "url": "", 
+            "email_private": "", 
+            "email_work": "info@kajmunk.nl", 
+            "pobox": "", 
+            "phone_home": "", 
+            "postalcode": "2131RV", 
+            "street_1": "Kaj Munkweg 3", 
+            "street_2": "", 
+            "pobox_city": ""
+        }
+    }, 
+    {
+        "pk": 1, 
+        "model": "inforecords.cluster", 
+        "fields": {
+            "url": "", 
+            "country": 1, 
+            "name": "Amsterdam", 
+            "parent": null, 
+            "number": 0
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "inforecords.cluster", 
+        "fields": {
+            "url": "", 
+            "country": 1, 
+            "name": "Science Park", 
+            "parent": 1, 
+            "number": 500
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "inforecords.station", 
+        "fields": {
+            "name": "Kaj Munk College", 
+            "contactinformation": 3, 
+            "number": 202, 
+            "cluster": 1, 
+            "contact": 1, 
+            "ict_contact": 1, 
+            "info_page": "", 
+            "password": "Foobar"
         }
     }, 
     {

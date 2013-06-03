@@ -75,46 +75,39 @@ def station(request, station_id):
     except IndexError:
         is_active = False
 
-    scintillator1 = {"perpendicular": detector.scintillator_1_perp,
-                     "longitudinal": detector.scintillator_1_long,
-                     "angle": detector.scintillator_1_angle}
-    scintillator2 = {"perpendicular": detector.scintillator_2_perp,
-                     "longitudinal": detector.scintillator_2_long,
-                     "angle": detector.scintillator_2_angle}
+    scintillator1 = {"alpha": detector.scintillator_1_alpha,
+                     "beta": detector.scintillator_1_beta,
+                     "radius": detector.scintillator_1_radius,
+                     "height": detector.scintillator_1_height}
+    scintillator2 = {"alpha": detector.scintillator_2_alpha,
+                     "beta": detector.scintillator_2_beta,
+                     "radius": detector.scintillator_2_radius,
+                     "height": detector.scintillator_2_height}
+
+    station_info = {'number': station.number,
+                    'name': station.name,
+                    'cluster': station.cluster.name,
+                    'country': station.cluster.country.name,
+                    'latitude': config.gps_latitude,
+                    'longitude': config.gps_longitude,
+                    'altitude': config.gps_altitude,
+                    'active': is_active,
+                    'scintillators': 2,
+                    'scintillator1': scintillator1,
+                    'scintillator2': scintillator2}
 
     if config.slave() != "no slave":
-        scintillator3 = {"perpendicular": detector.scintillator_3_perp,
-                         "longitudinal": detector.scintillator_3_long,
-                         "angle": detector.scintillator_3_angle}
-        scintillator4 = {"perpendicular": detector.scintillator_4_perp,
-                         "longitudinal": detector.scintillator_4_long,
-                         "angle": detector.scintillator_4_angle}
-
-        station_info = {'number': station.number,
-                        'name': station.name,
-                        'cluster': station.cluster.name,
-                        'country': station.cluster.country.name,
-                        'latitude': config.gps_latitude,
-                        'longitude': config.gps_longitude,
-                        'altitude': config.gps_altitude,
-                        'active': is_active,
-                        'scintillators': 4,
-                        'scintillator1': scintillator1,
-                        'scintillator2': scintillator2,
-                        'scintillator3': scintillator3,
-                        'scintillator4': scintillator4}
-    else:
-        station_info = {'number': station.number,
-                        'name': station.name,
-                        'cluster': station.cluster.name,
-                        'country': station.cluster.country.name,
-                        'latitude': config.gps_latitude,
-                        'longitude': config.gps_longitude,
-                        'altitude': config.gps_altitude,
-                        'active': is_active,
-                        'scintillators': 2,
-                        'scintillator1': scintillator1,
-                        'scintillator2': scintillator2}
+        scintillator3 = {"alpha": detector.scintillator_3_alpha,
+                         "beta": detector.scintillator_3_beta,
+                         "radius": detector.scintillator_3_radius,
+                         "height": detector.scintillator_3_height}
+        scintillator4 = {"alpha": detector.scintillator_4_alpha,
+                         "beta": detector.scintillator_4_beta,
+                         "radius": detector.scintillator_4_radius,
+                         "height": detector.scintillator_4_height}
+        station_info.update({'scintillator3': scintillator3,
+                             'scintillator4': scintillator4})
+        station_info['scintillators'] = 4
 
     return json_dict(station_info)
 
@@ -144,7 +137,76 @@ def stations(request, subcluster_id=None):
     return json_dict(stations)
 
 
-def stations_with_data(request, year, month, day):
+def stations_with_data(request):
+    """Get stations with data
+
+    Retrieve a list of all stations which have recorded data.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events.
+
+    """
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__gte=datetime.date(2002, 1, 1),
+                                        summary__date__lte=datetime.date.today())
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_year(request, year):
+    """Get stations with data
+
+    Retrieve a list of all stations which have data in the given year.
+
+    :param year: the year part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events in the given year.
+
+    """
+    date = datetime.date(int(year), 1, 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__year=int(year))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_month(request, year, month):
+    """Get stations with data
+
+    Retrieve a list of all stations which have data in the given month.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured events in the given month.
+
+    """
+    date = datetime.date(int(year), int(month), 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_events__isnull=False,
+                                        summary__date__year=int(year),
+                                        summary__date__month=int(month))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_data_day(request, year, month, day):
     """Get stations with data
 
     Retrieve a list of all stations which have data on the given date.
@@ -168,7 +230,76 @@ def stations_with_data(request, year, month, day):
     return json_dict(stations)
 
 
-def stations_with_weather(request, year, month, day):
+def stations_with_weather(request):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data.
+
+    """
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__gte=datetime.date(2002, 1, 1),
+                                        summary__date__lte=datetime.date.today())
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_year(request, year):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data in the given year.
+
+    :param year: the year part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data in the given year.
+
+    """
+    date = datetime.date(int(year), 1, 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__year=int(year))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_month(request, year, month):
+    """Get stations with weather data
+
+    Retrieve a list of all stations which have weather data in the given month.
+
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+
+    :return: list of dictionaries containing the name and number of each
+             station that has measured weather data in the given month.
+
+    """
+    date = datetime.date(int(year), int(month), 1)
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
+                                        summary__date__year=int(year),
+                                        summary__date__month=int(month))
+                                .distinct())
+    stations = [{'number': station.number, 'name': station.name}
+                for station in summaries]
+
+    return json_dict(stations)
+
+
+def stations_with_weather_day(request, year, month, day):
     """Get stations with weather data
 
     Retrieve a list of all stations which have weather data on the given date.
