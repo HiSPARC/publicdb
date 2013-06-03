@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}
+HiSPARC Data Download Form
+{% endblock %}
+
+{% block content %}
+
+<div id="header"><h2>Data Download Form</h2></div>
+
+<form action='/data/download' method="post">
+{{ form.as_p }}
+<input type="submit" value="Submit" />
+</form>
+
+{% endblock %}

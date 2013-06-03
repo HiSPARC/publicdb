@@ -241,6 +241,7 @@ def station_data(request, station_id, year, month, day):
     return render_to_response('station_data.html',
         {'station': station,
          'date': date,
+         'tomorrow': date + datetime.timedelta(days=1),
          'config': config,
          'has_slave': has_slave,
          'eventhistogram': eventhistogram,
