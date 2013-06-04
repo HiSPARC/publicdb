@@ -10,6 +10,10 @@ from django_publicdb.analysissessions.models import *
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 
+import os
+import numpy
+import scipy
+from scipy import optimize
 
 def json_dict(dict):
     """Create a json HTTPResponse"""
@@ -433,6 +437,367 @@ def get_country_dict():
     country_dict = [{'number': country.number, 'name': country.name}
                     for country in countries]
     return sorted(country_dict, key=itemgetter('number'))
+
+
+def get_pulseheight_drift(request, station_id, plate_number,
+                          year, month, day, number_of_days):
+
+    requested_date = datetime.date(int(year), int(month), int(day))
+
+    station_id   = int(station_id)
+    plate_number = int(plate_number)
+
+    if (plate_number < 1) or (plate_number > 4):
+        return json_dict({
+            'error' : "Platenumber (value = %s) is out of range, should be between 1 and 4" % plate_number
+        })
+
+    #---------------------------------------------------------------------------
+    # Read in all data into these two dictionaries: t, mpv
+
+    t   = []
+    mpv = []
+
+    for days in range(int(number_of_days)):
+
+        fit_date = requested_date - datetime.timedelta(days=days)
+
+        # Check path
+
+        filepath = os.path.join(
+            "/home/cblam/Projects/hisparc/data-quality/analysis",
+            "%s_%s_%s.%s.pulseheights.dat" % (
+                fit_date.year, fit_date.month, fit_date.day, station_id
+            )
+        )
+
+        if not os.path.exists(filepath):
+            print "Unable to get fit values. Path doesn't exist: %s" % filepath
+            continue
+
+        # Transform file format to dictionary
+
+        with open(filepath, "r") as f:
+            for line in f.readlines():
+                # The stripping is primarily for removing the newline character
+                # at the end
+                line = line.strip()
+
+                try:
+
+                    # Assign values to readable variables
+
+                    t0, station, numberOfPlate, entries = line.split(" ")[0:4]
+                    fitCenter, fitRange                 = line.split(" ")[4:6]
+                    peakFit, peakFitError               = line.split(" ")[6:8]
+                    widthFit, widthFitError             = line.split(" ")[8:10]
+                    chiSquare                           = line.split(" ")[10]
+
+                    if int(numberOfPlate) + 1 != int(plate_number):
+                        continue
+
+                    # Make cuts
+
+                    if chiSquare < 1.5:
+                        continue
+
+                    if fitRange < 45.0:
+                        continue
+
+                    print "%s %s %s" %( peakFit, fitRange, chiSquare)
+
+                    #
+
+                    t.append(float(t0))
+                    mpv.append(float(peakFit))
+
+                except:
+                    raise
+                    pass
+
+            f.close()
+
+    #return json_dict([t, mpv])
+
+    #---------------------------------------------------------------------------
+    # Preparing results
+
+    t_array   = numpy.float_(t)
+    mpv_array = numpy.float_(mpv)
+
+    linear_fit = lambda p, t: p[0] + p[1]*t # Target function
+
+    # Determine the drift by a linear fit
+
+    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+
+    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+
+    drift = p1[1] * 86400.0
+
+    # Calculate the relative fluctuation
+
+    relative_mpv = []
+
+    for i in range(len(t)):
+        relative_mpv.append( mpv[i] / linear_fit(p1, t[i]) )
+
+    # Fit the relative fluctation with a gauss
+
+    bins = numpy.arange(0.0, 2.0, 0.005)
+    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+
+    frequency, bins = numpy.histogram(relative_mpv, bins=bins)
+    x = (bins[:-1] + bins[1:]) / 2
+
+    initial_N = 16
+    initial_mean = 1
+    initial_width = 0.03
+
+    popt, pcov = scipy.optimize.curve_fit(gauss, x, frequency,
+                           p0=(initial_N, initial_mean, initial_width))
+
+    #---------------------------------------------------------------------------
+    # Insert values into dictionary
+
+    dict = {
+        'station'        : station_id,
+        'plate_number'   : plate_number,
+
+        'year'           : requested_date.year,
+        'month'          : requested_date.month,
+        'day'            : requested_date.day,
+
+        'number_of_selected_days'  : len(t),
+        'number_of_requested_days' : number_of_days,
+
+        'fit_offset'     : p1[0],
+        'fit_slope'      : p1[1],
+
+        'drift_per_day'  : drift,
+
+        'timestamp'      : t,
+        'mpv'            : mpv,
+
+        'relative_mean'  : popt[1],
+        'relative_width' : popt[2],
+
+        # Debug
+        #'relative_mpv'   : relative_mpv,
+        #'frequency'      : frequency.tolist(),
+        #'x'              : x.tolist()
+    }
+
+    #---------------------------------------------------------------------------
+    # Return
+
+    return json_dict(dict)
+
+
+def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 14)
+
+
+def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 30)
+
+
+def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None, day=None):
+    """Get fit values of the pulseheight distribution for a station on a given day
+
+    Retrieve fit values of the pulseheight distribution. The fitting has to be
+    done before and stored somewhere. This function retrieves the fit values from
+    storage and returns to the client. Returns an error meesage if the values
+    are not found on storage.
+
+    :param station_id: a station number identifier.
+    :param plate_number: plate number in the range 1..4
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: HTTPResonse with JSON containing fit results of the specified
+             station, plate and date
+
+    """
+
+    #---------------------------------------------------------------------------
+    # Contents
+    # 1. Initialize
+    # 2. Check path
+    # 3. Extract data to dictionary
+    # 4. Check data quality
+    #---------------------------------------------------------------------------
+
+    #---------------------------------------------------------------------------
+    # 1. Initialize
+    #---------------------------------------------------------------------------
+
+    station_id   = int(station_id)
+    plate_number = int(plate_number)
+
+    if year == None and month == None and day == None:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+
+        year  = yesterday.year
+        month = yesterday.month
+        day   = yesterday.day
+
+    year  = int(year)
+    month = int(month)
+    day   = int(day)
+
+    dict = {
+        'station'      : station_id,
+        'plate_number' : plate_number,
+        'year'         : year,
+        'month'        : month,
+        'day'          : day
+    }
+
+    class nagios:
+        ok = (0, 'OK')
+        warning = (1, 'WARNING')
+        critical = (2, 'CRITICAL')
+        unknown = (3, 'UNKNOWN')
+
+    #---------------------------------------------------------------------------
+    # 2. Check path
+    #---------------------------------------------------------------------------
+
+    filepath = os.path.abspath(os.path.join(
+        #"/home/cblam/Projects/hisparc/data-quality/analysis",
+        os.path.dirname(__file__),
+        "../histograms/pulseheight_fits",
+        "%s_%s_%s.%s.pulseheights.dat" % (
+            year, month, day, station_id
+        )
+    ))
+
+    if not os.path.exists(filepath):
+        dict.update({
+            "nagios": nagios.unknown,
+            "error" : "Unable to get fit values due to missing data file. Please make sure the following path does exist: %s" % filepath
+        })
+
+        return json_dict(dict)
+
+    #---------------------------------------------------------------------------
+    # 3. Extract data to dictionary
+    #---------------------------------------------------------------------------
+
+    with open(filepath, "r") as f:
+        for line in f.readlines():
+            # The stripping is primarily for removing the newline character
+            # at the end
+            line = line.strip()
+
+            try:
+                t0, station, numberOfPlate, entries = line.split(" ")[0:4]
+                initialPeak, initialWidth           = line.split(" ")[4:6]
+                peakFit, peakFitError               = line.split(" ")[6:8]
+                widthFit, widthFitError             = line.split(" ")[8:10]
+                chiSquare                           = line.split(" ")[10]
+            except:
+                dict.update({
+                    "nagios": nagios.unknown,
+                    "error" : "Data file has been opened, but error in extracting values from line"
+                })
+                return json_dict(dict)
+
+            if int(numberOfPlate)+1 != int(plate_number):
+                continue
+
+            try:
+                dict.update({
+                    "timestamp"       : int(t0),
+                    "entries"         : int(float(entries)),
+
+                    "initial_mpv"     : float(initialPeak),
+                    "initial_width"   : float(initialWidth),
+
+                    "fit_mpv"         : float(peakFit),
+                    "fit_mpv_error"   : float(peakFitError),
+                    "fit_width"       : float(widthFit),
+                    "fit_width_error" : float(widthFitError),
+                    "chi_square"      : float(chiSquare)
+                })
+            except:
+                dict.update({
+                    "nagios": nagios.unknown,
+                    "error" : "Data file has been found, but error in converting data to numbers"
+                })
+                return json_dict(dict)
+
+            break
+
+        f.close()
+
+    if "fit_mpv" not in dict:
+        dict.update({
+            "nagios": nagios.unknown,
+            'error' : "Data file exists but no fit found for plate. Probably the station doesn't have this plate."
+        })
+        return json_dict(dict)
+
+    #---------------------------------------------------------------------------
+    # 4. Check data quality
+    #---------------------------------------------------------------------------
+
+    # Based on chi2 of the fit
+    # TODO: Value of 0.1 has to be verified
+
+    if dict["chi_square"] < 0.1:
+        dict.update({
+            "nagios" : nagios.critical,
+            "quality": "Chi2 of the fit is smaller than 1.5: %.1f" % dict["chi_square"]
+        })
+        return json_dict(dict)
+
+    # Based on the fit range (= initial_width)
+
+    if dict["initial_width"] < 45:
+        dict.update({
+            "nagios" : nagios.critical,
+            "quality": "Fit range is smaller than 45 ADC: %.1f ADC" % dict["initial_width"]
+        })
+        return json_dict(dict)
+
+    # Based on MPV and 4*sigma
+
+    station   = Station.objects.get(number=station_id)
+    threshold = MonitorPulseheightThresholds.objects.get(station=station, plate=plate_number)
+
+    lower_bound = threshold.mpv_mean * (1 - 4*threshold.mpv_sigma)
+    upper_bound = threshold.mpv_mean * (1 + 4*threshold.mpv_sigma)
+
+    if dict["fit_mpv"] < lower_bound or dict["fit_mpv"] > upper_bound:
+        dict.update({
+            "nagios" : nagios.critical,
+            "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" % (
+                lower_bound, upper_bound, dict["fit_mpv"]
+            )
+        })
+        return json_dict(dict)
+
+    # Everything seems to be a-ok
+
+    dict.update({
+        "nagios" : nagios.ok,
+        "quality": "Fitted MPV is within bounds (%.1f;%.1f): %.1f" % (
+            lower_bound, upper_bound, dict["fit_mpv"]
+        )
+    })
+
+    return json_dict(dict)
 
 
 def has_data(request, station_id, year=None, month=None, day=None):
