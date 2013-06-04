@@ -45,11 +45,11 @@ file { "/var/www/django_publicdb":
   force  => true
 }
 
-file { "/etc/httpd/conf.d/hisparc.conf":
-  target => "/vagrant/vagrant/puppet/modules/apache/manifests/hisparc.conf",
-  owner  => vagrant,
-  group  => vagrant,
-  force  => true
+exec { 'hisparc_conf':
+  command => "bash hispconf.sh",
+  user => "vagrant",
+  require => Exec['sqlite_devel'], 
+  logoutput => on_failure
 }
   
 exec { 'get_mysql':
@@ -57,23 +57,25 @@ exec { 'get_mysql':
     user => "vagrant",
     logoutput => on_failure
 }
-exec { "create_static":
+
+
+exec { 'create_static':
  command => "sudo mkdir -p /var/www/static",
 }
 
-exec { "adjust_static":
+exec { 'adjust_static':
  command => "bash adjustments.sh",
  user => "vagrant",
  require => Exec['create_static']
   }
   
-exec { "sqlite_devel":
+exec { 'sqlite_devel':
  command => "bash sqlite_devel.sh",
  user => "vagrant",
  require => Exec['get_mysql'] 
 }
 
-exec { "recompile_python":
+exec { 'recompile_python':
  command => "bash recompile_python.sh",
  user => "vagrant",
  require => Exec['sqlite_devel'],
@@ -81,14 +83,14 @@ exec { "recompile_python":
 }
 
 
-exec { "syncdb":
+exec { 'syncdb':
 command => "bash syncdb.sh",
 user => "vagrant",
 require => Exec['recompile_python'],
 logoutput => on_failure
 }
 
-exec { "collectstatic":
+exec { 'collectstatic':
 command => "bash migrate.sh",
 user => "vagrant",
 require => Exec["syncdb"],
