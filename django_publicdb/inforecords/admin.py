@@ -83,6 +83,12 @@ class EnabledServiceInline(admin.TabularInline):
     extra = 10
 
 
+class MonitorPulseheightThresholdsAdmin(admin.ModelAdmin):
+    list_display = ('station', 'plate', 'mpv_mean', 'mpv_sigma')
+    list_filter = ('station',)
+    list_per_page = 200
+
+
 class MonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('description', 'is_default_service', 'nagios_command')
     inlines = (EnabledServiceInline,)
@@ -126,5 +132,7 @@ admin.site.register(ElectronicsBatch)
 admin.site.register(Electronics, ElectronicsAdmin)
 admin.site.register(PcType)
 admin.site.register(Pc, PcAdmin)
+admin.site.register(MonitorPulseheightThresholds,
+                    MonitorPulseheightThresholdsAdmin)
 admin.site.register(MonitorService, MonitorServiceAdmin)
 admin.site.register(EnabledService, EnabledServiceAdmin)
