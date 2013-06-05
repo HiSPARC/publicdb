@@ -462,8 +462,8 @@ def get_pulseheight_drift(request, station_id, plate_number,
 
         # Check path
 
-        filepath = "/localstore/mpv_fits/%s_%s_%s.%s.pulseheights.dat" %
-                    (fit_date.year, fit_date.month, fit_date.day, station_id)
+        filepath = ("/localstore/mpv_fits/%s_%s_%s.%s.pulseheights.dat" %
+                    (fit_date.year, fit_date.month, fit_date.day, station_id))
 
         if not os.path.exists(filepath):
             print "Unable to get fit values. Path doesn't exist: %s" % filepath
@@ -647,8 +647,8 @@ def get_pulseheight_fit(request, station_id, plate_number,
 
     # 2. Check path
 
-    filepath = "/localstore/mpv_fits/%s_%s_%s.%s.pulseheights.dat" %
-               (year, month, day, station_id)
+    filepath = ("/localstore/mpv_fits/%s_%s_%s.%s.pulseheights.dat" %
+                (year, month, day, station_id))
 
     if not os.path.exists(filepath):
         dict.update({
