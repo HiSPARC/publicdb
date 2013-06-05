@@ -151,3 +151,33 @@ You can start the Django development server from inside the Django app
 directory (the one containing your settings.py) with::
 
     $ ./manage.py runserver
+
+
+Deployment
+----------
+
+Initial draft.
+
+Op Pique::
+
+    /srv bestaat al.
+
+    # cd /srv
+    # mkdir publicdb
+    # chown hisparc.hisparc publicdb
+    # chmod g+rwx publicdb
+    # setfacl -m d:g::rwx publicdb
+
+    ---> als user davidf?
+
+    $ cd publicdb
+    $ git clone https://github.com/HiSPARC/publicdb.git www
+    $ chmod g+w www
+    $ mkdir static
+    $ virtualenv --distribute publicdb_env
+
+    $ source /srv/publicdb/publicdb_env/bin/activate
+    (publicdb env install instructies gevolgd)
+
+    $ pip install uwsgi uwsgitop
+    $ pip install mysql-python
