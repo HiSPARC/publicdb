@@ -78,9 +78,9 @@ The complete requirements and installation instructions are::
 
     $ pip install ipython==0.13.2
 
-    $ pip install Cython==0.19
     $ pip install numpy==1.7.1
 
+    $ pip install Cython==0.19
     $ pip install numexpr==2.1
     $ pip install tables==2.4.0
 

@@ -315,6 +315,7 @@ class Pc(models.Model):
     type = models.ForeignKey(PcType)
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
+    is_test = models.BooleanField(default=False)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
@@ -401,17 +402,17 @@ class Pc(models.Model):
 
 
 class MonitorPulseheightThresholds(models.Model):
-
     station = models.ForeignKey('Station')
-    plate   = models.IntegerField()
+    plate = models.IntegerField()
 
-    mpv_mean      = models.FloatField()
-    mpv_sigma     = models.FloatField()
+    mpv_mean = models.FloatField()
+    mpv_sigma = models.FloatField()
     mpv_max_allowed_drift = models.FloatField()
     mpv_min_allowed_drift = models.FloatField()
 
     class Meta:
         verbose_name_plural = "Pulseheight thresholds for Nagios monitoring"
+
 
 class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)

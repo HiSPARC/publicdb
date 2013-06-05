@@ -144,7 +144,8 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     for subcluster in Cluster.objects.all():
         stations = []
         for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True):
+                                              pc__is_active=True,
+                                              pc__is_test=False):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
