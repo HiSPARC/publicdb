@@ -86,7 +86,8 @@ def station(request, station_id):
 
     station_info = {'number': station.number,
                     'name': station.name,
-                    'cluster': station.cluster.name,
+                    'subcluster': station.cluster.name,
+                    'cluster': station.cluster.main_cluster(),
                     'country': station.cluster.country.name,
                     'latitude': config.gps_latitude,
                     'longitude': config.gps_longitude,
