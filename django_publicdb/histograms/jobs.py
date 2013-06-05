@@ -16,6 +16,8 @@ from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
+import fit_pulseheight_peak
+
 logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
@@ -208,6 +210,7 @@ def perform_events_tasks(summary):
     django.db.close_connection()
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
+    update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     return summary
 
@@ -270,6 +273,23 @@ def update_pulseheight_histogram(summary):
     pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
+
+
+def update_pulseheight_fit(summary):
+    logger.debug("Updating pulseheight fit for %s" % summary)
+
+    # Variables
+
+    stationNumber = summary.station.number
+
+    # Fit
+
+    print "Going to fit station %s" % stationNumber
+
+    fit_pulseheight_peak.analysePulseheightsForStation(
+        datastore.get_data_path(summary.date),
+        stationNumber
+    )
 
 
 def update_pulseintegral_histogram(summary):
