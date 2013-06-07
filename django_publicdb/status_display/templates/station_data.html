@@ -17,47 +17,38 @@
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
     <!--[if lte IE 8]><script type="text/javascript">
         var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
     </script><![endif]-->
     <script type="text/javascript">
       {% if config %}
-        var pointStyle = {
-            fillColor: '#00F',
-            fillOpacity: 0.8,
-            pointRadius: 7,
-            stroke: false};
-
         $(document).ready(function() {
             var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
             var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-            var options = {
-                controls: [
-                    new OpenLayers.Control.Navigation(
-                        {dragPanOptions: {enableKinetic: true}}),
-                    new OpenLayers.Control.Attribution(),
-                    new OpenLayers.Control.ScaleLine()]};
-            var map = new OpenLayers.Map("stationMap", options);
-            var mapLayer = new OpenLayers.Layer.OSM();
-            map.addLayer(mapLayer);
+
+            var map = createMap("stationMap");
+            var style = createStyle(map);
 
             map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
                                         .transform(fromProjection, toProjection), 16);
 
-            var stationLayer = new OpenLayers.Layer.Vector("stations");
-            var feature = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
-                                       .transform(fromProjection, toProjection),
-                {id: {{ station.number }},
-                 name: "{{ station.name }}"},
-                pointStyle);
+            var stationLayer = new OpenLayers.Layer.Vector("stations", {styleMap: new OpenLayers.StyleMap(style)});
 
+            var feature = new OpenLayers.Feature.Vector(
+                                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                                       .transform(fromProjection, toProjection),
+                               {id: "", // no label, normally {id: {{ station.number }},
+                                name: "{{ station.name }}",
+                                status: "unknown"}); // blue
             stationLayer.addFeatures(feature);
+
             map.addLayer(stationLayer);
-            
+
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
+            /*
             map.events.register('zoomend', this, function(event) {
                 var zLevel = map.getZoom();
                 if (zLevel <= 5) {
@@ -73,14 +64,18 @@
                 else if (zLevel <= 18) {
                     setPointRadius(9);}
             });
+            */
+
         });
 
       {% endif %}
 
+        /*
         function setPointRadius(size) {
             $('circle').attr('r', size.toString());
-            pointStyle.pointRadius = size;
+            //pointStyle.pointRadius = size;
         }
+        */
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -93,7 +88,7 @@
 
 {% block data %}
     <div id="graphs">
-    
+
       {% if eventhistogram %}
         <div id="eventHistogram" class="histogram">
             <h3>Event histogram (number of events per hour)</h3>
@@ -114,7 +109,7 @@
             </script>
         </div>
       {% endif %}
-    
+
       {% if pulseheighthistogram %}
         <div id="pulseheightHistogram" class="histogram">
             <h3>Pulseheight histogram</h3>
@@ -135,7 +130,7 @@
             </script>
         </div>
       {% endif %}
-    
+
       {% if pulseintegralhistogram %}
         <div id="pulseintegralHistogram" class="histogram">
             <h3>Pulseintegral histogram</h3>
@@ -156,7 +151,7 @@
             </script>
         </div>
       {% endif %}
-    
+
       {% if barometerdata %}
         <div id="barometerData" class="histogram">
             <h3>Barometer data</h3>
@@ -177,7 +172,7 @@
             </script>
         </div>
       {% endif %}
-    
+
       {% if temperaturedata %}
         <div id="temperatureData" class="histogram">
             <h3>Temperature data</h3>
