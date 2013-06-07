@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('django_publicdb.updates',
     (r'^(?P<queue>\w+)/check$', 'views.update_check_querystring'),

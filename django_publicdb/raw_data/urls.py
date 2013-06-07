@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 from django.views.generic import RedirectView
 
 urlpatterns = patterns('django_publicdb.raw_data',
