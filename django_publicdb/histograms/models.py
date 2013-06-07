@@ -229,3 +229,26 @@ class GeneratorState(models.Model):
     check_is_running = models.BooleanField()
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField()
+
+
+class PulseheightFit(models.Model):
+    source = models.ForeignKey('Summary')
+    plate = models.IntegerField()
+
+    initial_mpv = models.FloatField()
+    initial_width = models.FloatField()
+
+    fitted_mpv = models.FloatField()
+    fitted_mpv_error = models.FloatField()
+    fitted_width = models.FloatField()
+    fitted_width_error = models.FloatField()
+
+    chi_square_reduced = models.FloatField()
+
+    def station(self):
+        return self.source.station.number
+
+    class Meta:
+        verbose_name_plural = 'Pulseheight fit'
+        unique_together = ('source', 'plate')
+
