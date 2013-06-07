@@ -447,7 +447,7 @@ def get_country_dict():
     return sorted(country_dict, key=itemgetter('number'))
 
 
-def get_pulseheight_drift(request, station_id, plate_number,
+def get_pulseheight_drift(request, station_number, plate_number,
                           year, month, day, number_of_days):
 
     #---------------------------------------------------------------------------
@@ -456,17 +456,17 @@ def get_pulseheight_drift(request, station_id, plate_number,
 
     requested_date = datetime.date(int(year), int(month), int(day))
 
-    station_id   = int(station_id)
+    station_number = int(station_number)
     plate_number = int(plate_number)
 
-    year  = int(year)
+    year = int(year)
     month = int(month)
-    day   = int(day)
+    day = int(day)
 
     number_of_days = int(number_of_days)
 
     dict = {
-        'station': station_id,
+        'station': station_number,
         'plate_number': plate_number,
         'year': year,
         'month': month,
@@ -486,7 +486,7 @@ def get_pulseheight_drift(request, station_id, plate_number,
     #---------------------------------------------------------------------------
 
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
 
         date_range = (requested_date - datetime.timedelta(days=number_of_days-1),
                       requested_date)
@@ -592,7 +592,7 @@ def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
                                  today.year, today.month, today.day, 30)
 
 
-def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None, day=None):
+def get_pulseheight_fit(request, station_number, plate_number, year=None, month=None, day=None):
     """Get fit values of the pulseheight distribution for a station on a given day
 
     Retrieve fit values of the pulseheight distribution. The fitting has to be
@@ -600,7 +600,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     storage and returns to the client. Returns an error meesage if the values
     are not found on storage.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param plate_number: plate number in the range 1..4
     :param year: the year part of the date.
     :param month: the month part of the date.
@@ -615,27 +615,27 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     # Initialize
     #---------------------------------------------------------------------------
 
-    station_id   = int(station_id)
+    station_number = int(station_number)
     plate_number = int(plate_number)
 
     if year == None and month == None and day == None:
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
 
-        year  = yesterday.year
+        year = yesterday.year
         month = yesterday.month
-        day   = yesterday.day
+        day = yesterday.day
 
-    year  = int(year)
+    year = int(year)
     month = int(month)
-    day   = int(day)
+    day = int(day)
 
     dict = {
-        'station'      : station_id,
-        'plate_number' : plate_number,
-        'year'         : year,
-        'month'        : month,
-        'day'          : day
+        'station': station_number,
+        'plate_number': plate_number,
+        'year': year,
+        'month': month,
+        'day': day
     }
 
     #---------------------------------------------------------------------------
@@ -643,11 +643,8 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
     #---------------------------------------------------------------------------
 
     try:
-        station = Station.objects.get(number=station_id)
-        summary = Summary.objects.get(station=station,
-                                      date=datetime.date(year, month, day))
-
-        fit = PulseheightFit.objects.get(source=summary,
+        fit = PulseheightFit.objects.get(source__station__number=station_number,
+                                         source__date=datetime.date(year,month,day),
                                          plate=plate_number)
     except Exception, e:
         dict.update({
@@ -658,7 +655,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
         return json_dict(dict)
 
     try:
-        dict.update({"entries": summary.num_events,
+        dict.update({"entries": fit.source.num_events,
                      "initial_mpv": fit.initial_mpv,
                      "initial_width": fit.initial_width,
                      "fitted_mpv": fit.fitted_mpv,
@@ -705,7 +702,7 @@ def get_pulseheight_fit(request, station_id, plate_number, year=None, month=None
 
     # Based on MPV and 4*sigma
 
-    threshold = MonitorPulseheightThresholds.objects.get(station=station,
+    threshold = MonitorPulseheightThresholds.objects.get(station__number=station_number,
                                                          plate=plate_number)
 
     lower_bound = threshold.mpv_mean * (1 - 4*threshold.mpv_sigma)
