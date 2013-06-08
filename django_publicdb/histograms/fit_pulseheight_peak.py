@@ -19,8 +19,8 @@ import scipy.stats
 
 from pylab import *
 
-uid = 0
-hists = []
+import datastore
+from django_publicdb.histograms.models import *
 
 def findBinNextMinimum(y, startBin):
 
@@ -38,6 +38,7 @@ def findBinNextMinimum(y, startBin):
         if currentY > minY:
             return i-1
 
+
 def findBinNextMaximum(y, startBin):
 
     maxY = y[startBin]
@@ -54,6 +55,7 @@ def findBinNextMaximum(y, startBin):
         if currentY < maxY:
             return i-1
 
+
 def smooth_forward(y, n=5):
     y_smoothed = []
     for i in range(0, len(y)-n):
@@ -62,6 +64,7 @@ def smooth_forward(y, n=5):
         y_smoothed.append(avg)
 
     return y_smoothed
+
 
 def getFitParameters(x, y, stationNumber, plateNumber):
 
@@ -143,6 +146,7 @@ def getFitParameters(x, y, stationNumber, plateNumber):
 
     return (maxX + minX)/2 + bias, maxX+bias, minX+bias
 
+
 def fitPulseheightPeak(events, stationNumber, plateNumber):
     """
         events        : table
@@ -155,11 +159,6 @@ def fitPulseheightPeak(events, stationNumber, plateNumber):
 
     if plateNumber > 3 or plateNumber < 0:
         return
-
-    global hists
-    global uid
-
-    uid += 1
 
     if len(events) == 0:
         return
@@ -349,113 +348,81 @@ def getEventsFromStation( h5File, station ):
 
     return
 
-def analysePulseheightsForStation( file, station ):
+def getPulseheightFits( summary ):
     """
         file: string
         station : int
     """
 
-    # Input data
+    #---------------------------------------------------------------------------
+    # Checks
+    #---------------------------------------------------------------------------
 
+    if not isinstance(summary, Summary):
+        raise Exception
+
+    #---------------------------------------------------------------------------
+    # Input data
+    #---------------------------------------------------------------------------
+
+    file = datastore.get_data_path(summary.date)
     data = tables.openFile(file, 'r')
 
+    station = summary.station.number
     events = getEventsFromStation( data, station )
 
     if isinstance(events, types.NoneType) or len(events) == 0:
         print "Error: no events found for station %s" % station
         return
 
-    # Output file
+    #---------------------------------------------------------------------------
+    # Fit
+    #---------------------------------------------------------------------------
 
-    basename = os.path.basename(file)
-    rootname, extension = os.path.splitext(basename)
-    outputRootname = "pulseheight_fits/%s.%s.pulseheights" %( rootname, station )
+    fits = []
 
-    output = open( "%s.dat" % outputRootname, "w" )
+    for numberOfPlate in range(4):
 
-    # Determine the bounds of the timestamp of a single day
+        # Initial values
 
-    t0 = events[0]['timestamp'] - (events[0]['timestamp'] % 86400)
-    t1 = t0
+        fit = PulseheightFit(
+            source = summary,
+            plate = int(numberOfPlate),
 
-    tStart = t0
-    tEnd   = t0 + 3600*24
+            initial_mpv = 0,
+            initial_width = 0,
 
-    canvases = []
+            fitted_mpv = 0,
+            fitted_mpv_error = 0,
+            fitted_width = 0,
+            fitted_width_error = 0,
 
-    while t0 < tEnd:
-        t1 += 3600*24
+            chi_square_reduced = -1
+        )
 
-        rows = events.readWhere('(timestamp >= t0) & (timestamp < t1)')
+        # Fit
 
-        if len(rows) == 0:
-            t0 = t1
-            continue;
+        try:
+            subplot(220 + numberOfPlate + 1)
+            title("Station %s plate %s" % (station, (numberOfPlate + 1)))
 
-        for numberOfPlate in range(4):
+            entries, initial_peak, initial_width, fit_result, chi_square_reduced = fitPulseheightPeak(events,
+                                                                               station,
+                                                                               numberOfPlate)
 
-            # Initial values
+            fit.initial_mpv = initial_peak
+            fit.initial_width = initial_width
 
-            entries = len(rows)
-            peak = 0
-            width = 0
-            peakFit = 0
-            peakFitError = 0
-            widthFit = 0
-            widthFitError = 0
-            chiSquare = -1
+            fit.fitted_mpv = fit_result[0][1]
+            fit.fitted_mpv_error = sqrt(fit_result[1][1,1])
+            fit.fitted_width = fit_result[0][2]
+            fit.fitted_width_error = sqrt(fit_result[1][2,2])
 
-            # Fit
+            fit.chi_square_reduced = chi_square_reduced
 
-            try:
-                subplot(220 + numberOfPlate + 1)
-                title("Station %s plate %s" % (station, (numberOfPlate + 1)))
+        except ValueError:
+            pass
 
-                entries, peak, width, fit, chiSquare = fitPulseheightPeak(rows,
-                                                                          station,
-                                                                          numberOfPlate )
+        fits.append(fit)
 
-                xlim([0, 1550])
-
-                entries = len(rows)
-
-                #peakFit  = fit.floatParsFinal().find("mg")
-                #widthFit = fit.floatParsFinal().find("wg")
-
-                peakFit       = fit[0][1]
-                peakFitError  = sqrt(fit[1][1,1])
-                widthFit      = fit[0][2]
-                widthFitError = sqrt(fit[1][2,2])
-
-            except ValueError:
-                pass
-
-            output.write( "%s %s %s %s %s %s %s %s %s %s %s\n" % (
-                t0, station, numberOfPlate, entries,
-                peak, width,
-                peakFit, peakFitError,
-                widthFit, widthFitError,
-                chiSquare)
-            )
-
-        t0 = t1
-
-    #show()
-
-    # Finalize
-
-    output.close()
-
-    #data.close()
-
-    #code.interact(local=locals())
-
-#-------------------------------------------------------------------------------
-# Main
-#-------------------------------------------------------------------------------
-
-if __name__ == "__main__":
-    if len(sys.argv) == 3:
-        analysePulseheightsForStation( sys.argv[1], sys.argv[2] )
-    else:
-        print "Usage: %s <h5 file> [<station number>]" % sys.argv[0]
+    return fits
