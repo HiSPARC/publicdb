@@ -122,6 +122,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'django_publicdb.urls'
 
+ALLOWED_HOSTS = [
+    'data.hisparc.nl', # Allow subdomain
+    'data.hisparc.nl.', # Also allow FQDN and subdomains
+]
+
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
