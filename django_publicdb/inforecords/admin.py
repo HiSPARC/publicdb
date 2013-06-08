@@ -1,4 +1,3 @@
-from django.conf.urls.defaults import url, patterns
 from django.contrib import admin
 from models import *
 from django.utils.encoding import force_unicode

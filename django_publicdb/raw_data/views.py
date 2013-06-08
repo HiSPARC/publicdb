@@ -1,5 +1,5 @@
 from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseRedirect)
+                         HttpResponseRedirect, StreamingHttpResponse)
 from django.shortcuts import get_object_or_404, render
 from django.template import loader, Context
 from django.conf import settings
@@ -197,7 +197,7 @@ def download_events(request, station_id):
         download = False
 
     csv_output = generate_events_as_csv(station, start, end)
-    response = HttpResponse(csv_output, content_type='text/csv')
+    response = StreamingHttpResponse(csv_output, content_type='text/csv')
 
     timerange_string = prettyprint_timerange(start, end)
     filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
