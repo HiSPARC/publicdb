@@ -123,8 +123,8 @@ MIDDLEWARE_CLASSES = (
 ROOT_URLCONF = 'django_publicdb.urls'
 
 ALLOWED_HOSTS = [
-    'data.hisparc.nl', # Allow subdomain
-    'data.hisparc.nl.', # Also allow FQDN and subdomains
+    'data.hisparc.nl',
+    'data.hisparc.nl.', # Also allow FQDN
 ]
 
 TEMPLATE_DIRS = (
