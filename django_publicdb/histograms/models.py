@@ -6,12 +6,14 @@ import base64
 import re
 
 from django_publicdb.inforecords import models as inforecords
+from south.modelsinspector import add_introspection_rules
 
 
 class SerializedDataField(models.Field):
     # This makes sure that to_python() will be called when objects are
     # initialized
     __metaclass__ = models.SubfieldBase
+    add_introspection_rules([], ["^django_publicdb\.histograms\.models\.SerializedDataField"])
 
     def db_type(self, connection):
         return 'LONGBLOB'
@@ -227,3 +229,26 @@ class GeneratorState(models.Model):
     check_is_running = models.BooleanField()
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField()
+
+
+class PulseheightFit(models.Model):
+    source = models.ForeignKey('Summary')
+    plate = models.IntegerField()
+
+    initial_mpv = models.FloatField()
+    initial_width = models.FloatField()
+
+    fitted_mpv = models.FloatField()
+    fitted_mpv_error = models.FloatField()
+    fitted_width = models.FloatField()
+    fitted_width_error = models.FloatField()
+
+    chi_square_reduced = models.FloatField()
+
+    def station(self):
+        return self.source.station.number
+
+    class Meta:
+        verbose_name_plural = 'Pulseheight fit'
+        unique_together = ('source', 'plate')
+
