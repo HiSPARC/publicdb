@@ -15,6 +15,7 @@ import numpy
 import scipy
 from scipy import optimize
 
+
 class Nagios:
     ok = (0, 'OK')
     warning = (1, 'WARNING')
@@ -470,8 +471,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
         'plate_number': plate_number,
         'year': year,
         'month': month,
-        'day': day
-    }
+        'day': day}
 
     if (plate_number < 1) or (plate_number > 4):
         dict.update({
@@ -503,8 +503,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
         dict.update({
             "nagios": Nagios.unknown,
             "error": "Error retrieving fits",
-            "exception": e
-        })
+            "exception": str(e)})
         return json_dict(dict)
 
     #---------------------------------------------------------------------------
@@ -650,7 +649,7 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
         dict.update({
             "nagios": Nagios.unknown,
             "error": "Fit has not been found",
-            "exception": e
+            "exception": str(e)
         })
         return json_dict(dict)
 
@@ -668,7 +667,7 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
             "nagios": Nagios.unknown,
             "error": "Data has been found, "
                      "but error in converting data to numbers",
-            "exception": e})
+            "exception": str(e)})
         return json_dict(dict)
 
     #---------------------------------------------------------------------------
