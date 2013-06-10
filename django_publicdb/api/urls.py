@@ -1,4 +1,4 @@
-from django.conf.urls import patterns
+from django.conf.urls.defaults import *
 
 urlpatterns = patterns('django_publicdb.api.views',
     (r'^$', 'man'),
@@ -37,9 +37,9 @@ urlpatterns = patterns('django_publicdb.api.views',
     (r'^station/(?P<station_id>\d+)/num_events/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/(?P<hour>\d+)/$', 'num_events_hour'),
 
 
-    (r'^station/(?P<station_id>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/?$', 'get_pulseheight_fit'),
-    (r'^station/(?P<station_id>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)$', 'get_pulseheight_fit'),
-    (r'^station/(?P<station_id>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/(?P<number_of_days>\d+)$', 'get_pulseheight_drift'),
-    (r'^station/(?P<station_id>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_14_days', 'get_pulseheight_drift_last_14_days'),
-    (r'^station/(?P<station_id>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_30_days', 'get_pulseheight_drift_last_30_days'),
+    (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/?$', 'get_pulseheight_fit'),
+    (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)$', 'get_pulseheight_fit'),
+    (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/(?P<number_of_days>\d+)$', 'get_pulseheight_drift'),
+    (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_14_days', 'get_pulseheight_drift_last_14_days'),
+    (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_30_days', 'get_pulseheight_drift_last_30_days'),
 )
