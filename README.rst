@@ -14,10 +14,10 @@ analysis sessions.
 Setting up a personal development environment
 ---------------------------------------------
 
-Besides all the Python packages that will need to be installed next
-you also need the HDF5 libraries.  These are required to work with
-the h5 data files and to install the python tables package.  So download
-the source::
+Besides all the Python packages that will need to be installed next you
+also need the HDF5 libraries.  These are required to work with the h5 data
+files and to install the python tables package.  If your system does not
+provide a recent versions of these libraries, download the source::
 
     $ wget http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8.9/src/hdf5-1.8.9.tar.gz
     $ tar xvzf hdf5-1.8.9.tar.gz
@@ -144,13 +144,11 @@ previously::
 In order to create a tiny copy of the datastore for development purposes,
 do::
 
-    $ cd scripts/
-    $ python download_test_datastore.py
+    $ python scripts/download_test_datastore.py
 
-Run the django-cron.py in the examples folder to generate the histograms
-for the downloaded data::
+To generate the histograms for the downloaded data::
 
-    $ python django-cron.py
+    $ python scripts/hisparc-update.py
 
 You can start the Django development server from inside the Django app
 directory (the one containing your settings.py) with::
