@@ -5,9 +5,8 @@ import os
 import re
 import code
 import string
-import datetime
-import math
-import random
+import logging
+from math import sqrt
 
 import types
 
@@ -17,7 +16,16 @@ import scipy
 import scipy.optimize
 import scipy.stats
 
-from pylab import *
+from models import *
+import datastore
+
+from django_publicdb.inforecords.models import Station
+
+
+logger = logging.getLogger('histograms.fit_pulseheight_peak')
+
+uid = 0
+hists = []
 
 import datastore
 from django_publicdb.histograms.models import *
@@ -286,31 +294,13 @@ def fitPulseheightPeak(events, stationNumber, plateNumber):
                           fit_window_occurence)**2 / fit_window_occurence).sum()
     reducedChiSquare = chiSquare / (len(fit_window_occurence) - len(fitParameters))
 
-    # Print results
-
-    print fitCovariance
-
-    print "Fit result: peak %.1f +- %.1f, width %.1f +- %.1f" %(
-        fitParameters[1], sqrt(fitCovariance[1,1]),
-        fitParameters[2], sqrt(fitCovariance[2,2]),
-    )
-
-    print "Chi square: %.3f" % chiSquare
-    print "DOF: %d" % (len(fit_window_occurence) - len(fitParameters))
-    print "Reduced chi square: %.1f" % reducedChiSquare
-
-    plot(fit_window_pulseheight,
-         gauss(fit_window_pulseheight,
-               fitParameters[0], fitParameters[1], fitParameters[2]),
-         "r")
-
-    plot(pulseheight,
-         gauss(pulseheight, fitParameters[0], fitParameters[1], fitParameters[2]),
-         "r--")
-
-    #show()
-
-    # Return result
+    logger.debug("Fit result: peak %.1f +- %.1f, width %.1f +- %.1f" %
+                 (fitParameters[1], sqrt(fitCovariance[1,1]),
+                  fitParameters[2], sqrt(fitCovariance[2,2])))
+    logger.debug("Chi square: %.3f" % chiSquare)
+    logger.debug("Degrees of freedom: %d" %
+                 (len(fit_window_occurence) - len(fitParameters)))
+    logger.debug("Reduced chi square: %.1f" % reducedChiSquare)
 
     return len(data), peak, width, fitResult, reducedChiSquare
 
@@ -346,8 +336,6 @@ def getEventsFromStation( h5File, station ):
     except:
         pass
 
-    return
-
 def getPulseheightFits( summary ):
     """
         file: string
@@ -372,7 +360,7 @@ def getPulseheightFits( summary ):
     events = getEventsFromStation( data, station )
 
     if isinstance(events, types.NoneType) or len(events) == 0:
-        print "Error: no events found for station %s" % station
+        logger.error("Error: no events found for station %s" % station)
         return
 
     #---------------------------------------------------------------------------
@@ -403,12 +391,9 @@ def getPulseheightFits( summary ):
         # Fit
 
         try:
-            subplot(220 + numberOfPlate + 1)
-            title("Station %s plate %s" % (station, (numberOfPlate + 1)))
-
             entries, initial_peak, initial_width, fit_result, chi_square_reduced = fitPulseheightPeak(events,
-                                                                               station,
-                                                                               numberOfPlate)
+                                                                                                      station,
+                                                                                                      numberOfPlate)
 
             fit.initial_mpv = initial_peak
             fit.initial_width = initial_width

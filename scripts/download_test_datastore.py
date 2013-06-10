@@ -15,7 +15,10 @@
 import os
 import sys
 
-sys.path.append('../')
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+sys.path.append(publicdb_path)
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
