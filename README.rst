@@ -129,6 +129,7 @@ Before continuing, it's best to type this into your terminal::
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
 database with::
 
+    $ cp settings-develop.py settings.py
     $ ./manage.py syncdb
     $ ./manage.py migrate
 
