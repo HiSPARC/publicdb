@@ -823,20 +823,23 @@ def config(request, station_id, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
+    if year and month and day:
+        date = datetime.date(int(year), int(month), int(day))
+        if not validate_date(date):
+            return HttpResponseNotFound()
+    else:
+        date = datetime.date.today()
+
     try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=date)
-                                      .latest('timestamp'))
-        else:
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=datetime.date.today())
-                                      .latest('timestamp'))
-        config = serializers.serialize("json", [c])
-        config = json.loads(config)
+        c = (Configuration.objects.filter(source__station=station,
+                                          timestamp__lte=date)
+                                  .latest('timestamp'))
+    except Configuration.DoesNotExist:
+        return HttpResponseNotFound()
+
+    config = serializers.serialize("json", [c])
+    config = json.loads(config)
+    try:
         config = config[0]['fields']
     except IndexError:
         config = False

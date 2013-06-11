@@ -83,6 +83,7 @@ def download_and_store_station_data(f, station, date, get_blobs=True):
                   start, end,
                   get_blobs=get_blobs)
 
+
 def open_or_create_file(data_dir, date):
     """Open an existing file or create a new one
 

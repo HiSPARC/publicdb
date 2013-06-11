@@ -122,10 +122,6 @@ class SessionRequest(models.Model):
         file = date.strftime('%Y_%-m_%-d.h5')
         datastore_path = os.path.join(settings.DATASTORE_PATH,
                                       date.strftime('%Y/%-m'), file)
-
-        print settings.DATASTORE_PATH
-        print datastore_path
-
         data = tables.openFile(datastore_path, 'r')
         ndups = 0
         nvalid = 0
