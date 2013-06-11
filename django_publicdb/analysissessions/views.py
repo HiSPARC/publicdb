@@ -1,17 +1,8 @@
-<<<<<<< HEAD
-from django.shortcuts               import render_to_response, get_object_or_404, redirect
-from django.template                import RequestContext
-from django.core.context_processors import csrf
-from django.conf                    import settings
-from django.core.mail               import send_mail
-from django.http                    import HttpResponseRedirect, HttpResponse
-=======
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
 from django.http import HttpResponseRedirect, HttpResponse
-from django.views.decorators.csrf import csrf_protect
->>>>>>> master
+#from django.views.decorators.csrf import csrf_protect
 
 import numpy as np
 from numpy import pi, arccos, arcsin, arctan2, sin, cos
@@ -301,7 +292,7 @@ def confirm_request(request, url):
             context_instance=RequestContext(request))
 
 
-def create_request(request):
+def create_session(request):
     sessionlist = (SessionRequest.objects.filter(session_confirmed=True)
                                          .filter(session_pending=True))
     for sessionrequest in sessionlist:
