@@ -14,10 +14,7 @@ import calendar
 
 from models import *
 from forms import *
-from django_publicdb.status_display.views import create_histogram_plot, \
-                                                 render_and_save_plot
 from recaptcha.client import captcha
-import chaco.api as chaco
 
 
 def data_display(request, slug):
@@ -27,21 +24,24 @@ def data_display(request, slug):
     coincidences = AnalyzedCoincidence.objects.filter(session=session,
                                                       is_analyzed=True)
     energy_histogram = create_energy_histogram(slug, coincidences)
-    core_plot = create_core_plot(slug, coincidences)
-    star_map = create_star_map(slug, coincidences)
+    core_plot = None # create_core_plot(slug, coincidences)
+    star_map = None # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
     title = session.title
+    pin = session.pin
 
-    return render_to_response('symposium-data.html',
-        {'energy_histogram': energy_histogram, 'core_plot': core_plot,
-         'star_map': star_map, 'scores': scores, 'slug': slug, 'title':title},
+    return render_to_response('results.html',
+        {'energy_histogram': energy_histogram,
+         'core_plot': core_plot,
+         'star_map': star_map,
+         'scores': scores,
+         'slug': slug,
+         'session': session},
         context_instance=RequestContext(request))
 
 
 def create_energy_histogram(slug, coincidences):
     """Create an energy histogram"""
-
-    name = 'symposium-energy-%s.png' % slug
 
     energies = [x.log_energy for x in coincidences]
     good_energies = [x.log_energy for x in
@@ -51,17 +51,13 @@ def create_energy_histogram(slug, coincidences):
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
     values = [v1.tolist(), v2.tolist()]
 
-    plot = create_histogram_plot(bins, values, True, 'Log energy (eV)',
-                                 'Count', log=False)
-    render_and_save_plot(plot, name, 300, 200)
-
-    return settings.MEDIA_URL + name
+    plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
+                                     'Count')
+    return plot_object
 
 
 def create_core_plot(slug, coincidences):
     """Create a plot showing analyzed shower cores"""
-
-    name = 'symposium-cores-%s.png' % slug
 
     if 'middelharnis' in slug:
         xbounds = (4.15268, 4.16838)
@@ -71,9 +67,6 @@ def create_core_plot(slug, coincidences):
         xbounds = (4.93772, 4.96952)
         ybounds = (52.34542, 52.36592)
         filename = 'map-flipped.png'
-
-    data = chaco.ArrayPlotData()
-    plot = chaco.Plot(data)
 
     x, y, logenergy = get_core_positions(coincidences)
     data.set_data('x', x)
@@ -94,7 +87,7 @@ def create_core_plot(slug, coincidences):
     v.low_setting, v.high_setting = ybounds
 
     render_and_save_plot(plot, name, 300, 326)
-    return settings.MEDIA_URL + name
+    return plot_object
 
 
 def create_star_map(slug, coincidences):
@@ -154,6 +147,17 @@ def create_star_map(slug, coincidences):
 
     render_and_save_plot(plot, name, 300, 300)
     return settings.MEDIA_URL + name
+
+
+def create_plot_object(x_values, y_series, x_label, y_label):
+    if type(y_series[0]) != list:
+        y_series = [y_series]
+
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
+            y_values in y_series]
+
+    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
+    return plot_object
 
 
 def top_lijst(slug):
@@ -281,36 +285,30 @@ def validate_request_form( request ):
 
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
-
-    if sessionrequest.session_confirmed==False:
-
+    if sessionrequest.session_confirmed == False:
        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
-       sessionrequest.pin = randint(1000,9999)
-       starts             = datetime.datetime.now()
-       ends               = datetime.datetime.now()
+       sessionrequest.pin = randint(1000, 9999)
+       starts = datetime.datetime.now()
+       ends = datetime.datetime.now()
+       session = AnalysisSession(starts=starts,
+                                 ends=ends,
+                                 pin=str(sessionrequest.id),
+                                 title=sessionrequest.sid)
 
-       session = AnalysisSession(starts = starts, ends = ends,
-                                 pin = str(sessionrequest.id),
-                                 title = sessionrequest.sid)
-
-       sessionrequest.session_confirmed=True
+       sessionrequest.session_confirmed = True
        sessionrequest.save()
-
-    return render_to_response(
-        'confirm.html',
-        {
-            'id' : sessionrequest.sid,
-            'pin': sessionrequest.pin
-        }
-    )
+    return render_to_response('confirm.html',
+            {'id': sessionrequest.sid, 'pin': sessionrequest.pin},
+            context_instance=RequestContext(request))
 
 
 def create_request(request):
-    sessionlist = SessionRequest.objects.filter(session_confirmed=True).filter(session_pending=True)
+    sessionlist = (SessionRequest.objects.filter(session_confirmed=True)
+                                         .filter(session_pending=True))
     for sessionrequest in sessionlist:
-       sessionrequest.session_confirmed=False
-       sessionrequest.save()
+        sessionrequest.session_confirmed=False
+        sessionrequest.save()
 
     for sessionrequest in sessionlist:
-       sessionrequest.create_session()
+        sessionrequest.create_session()
     return HttpResponse('')

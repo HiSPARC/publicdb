@@ -29,6 +29,10 @@ def is_json(response):
 
 class Client:
 
+    def __init__(self, testcase):
+        self.testcase = testcase
+
+
     def receive_coincidence(
         self,
         session_title,
@@ -100,6 +104,17 @@ class MyJsparcTests(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def setUp( self ):
+        # Change start date and end date, otherwise it will complain the
+        # session is not in progress anymore.
+
+        session = AnalysisSession.objects.all()[0]
+       
+        session.starts = datetime.datetime.now() - datetime.timedelta(days=1)
+        session.ends = datetime.datetime.now() + datetime.timedelta(days=365)
+        session.save()
+
+        #
+
         super( MyJsparcTests, self ).setUp()
 
     def tearDown( self ):
@@ -110,7 +125,7 @@ class MyJsparcTests(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def test_everythingCorrect( self ):
-        client = Client()
+        client = Client(self)
 
         session = AnalysisSession.objects.all()[0]
 
@@ -139,7 +154,7 @@ class MyJsparcTests(LiveServerTestCase):
         self.assertEqual( data[ 'msg' ], "OK [result stored]" )
 
     def test_wrongPin( self ):
-        client = Client()
+        client = Client(self)
 
         session = AnalysisSession.objects.all()[0]
 
@@ -152,7 +167,7 @@ class MyJsparcTests(LiveServerTestCase):
         assert(not is_json(response))
 
     def test_wrongTitle( self ):
-        client = Client()
+        client = Client(self)
 
         session = AnalysisSession.objects.all()[0]
 
@@ -165,7 +180,7 @@ class MyJsparcTests(LiveServerTestCase):
         assert(not is_json(response))
 
     def test_wrongStudentName( self ):
-        client = Client()
+        client = Client(self)
 
         session = AnalysisSession.objects.all()[0]
 

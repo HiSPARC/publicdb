@@ -1,9 +1,14 @@
 import os
 import re
 import datetime
+import logging
+from operator import itemgetter
+
 import tables
 
 from django.conf import settings
+
+logger = logging.getLogger('histograms.datastore')
 
 
 def check_for_new_events(last_check_time):
@@ -55,8 +60,7 @@ def get_event_summary(file_list):
         with tables.openFile(file, 'r') as data:
             for cluster in data.listNodes('/hisparc'):
                 for station in data.listNodes(cluster):
-                    num = int(re.search('([0-9]+)$',
-                              station._v_name).group())
+                    num = int(re.search('([0-9]+)$', station._v_name).group())
                     event_tables = {}
                     for table in data.listNodes(station):
                         event_tables[table.name] = len(table)
@@ -80,7 +84,7 @@ def get_stations(date):
     path = get_data_path(date)
 
     station_list = []
-    with tables.openFile(path) as file:
+    with tables.openFile(path, 'r') as file:
         for cluster in file.listNodes('/hisparc'):
             for station in file.listNodes(cluster):
                 m = re.match('station_(?P<station>[0-9]+)', station._v_name)
@@ -88,158 +92,20 @@ def get_stations(date):
 
     return station_list
 
-def get_event_timestamps(cluster, station_id, date):
-    """Get event timestamps
-
-    Read data from file and return a list of timestamps for all events on
-    date `date' from station `station_id'.
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-
-    """
-    return get_event_data(cluster, station_id, date, 'timestamp')
-
-
-def get_pulseheights(cluster, station_id, date):
-    """Get all event pulse heights
-
-    Read data from file and return a list of pulseheights.
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-
-    """
-    pulseheights = get_event_data(cluster, station_id, date, 'pulseheights')
-    if pulseheights is None:
-        return None
-    else:
-        #FIXME
-        # need configurations for this
-        pulseheights = [[x * .57 for x in y] for y in pulseheights]
-
-        # transpose, so we have 4 arrays of many pulseheights
-        return zip(*pulseheights)
-
-
-def get_integrals(cluster, station_id, date):
-    """Get all event integrals
-
-    Read data from file and return a list of integrals.
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-
-    """
-    integrals = get_event_data(cluster, station_id, date, 'integrals')
-    if integrals is None:
-        return None
-    else:
-        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
-        # need configurations for this
-        integrals = [[x * .57 * 2.5 for x in y] for y in integrals]
-
-        # transpose, so we have 4 arrays of many integrals
-        return zip(*integrals)
-
-
-def get_temperature(cluster, station_id, date):
-    """Get temperature data
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-
-    """
-    return get_time_series(cluster, station_id, date, 'weather', 'temp_outside')
-
-
-def get_barometer(cluster, station_id, date):
-    """Get barometer data
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-
-    """
-    return get_time_series(cluster, station_id, date, 'weather', 'barometer')
-
-
-def get_event_data(cluster, station_id, date, quantity):
-    """Get event data of a specific quantity
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-    :param quantity: the specific event data type (e.g., 'pulseheights')
-
-    """
-    return get_data(cluster, station_id, date, 'events', quantity)
-
-
-def get_data(cluster, station_id, date, table, quantity):
-    """Get data from the datastore from a table of a specific quantity
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-    :param table: table name (e.g. 'events', 'weather', ...)
-    :param quantity: the specific event data type (e.g., 'pulseheights')
-
-    """
-    path = get_data_path(date)
-
-    with tables.openFile(path) as file:
-        table = file.getNode('/hisparc/cluster_%s/station_%d' %
-                             (cluster.lower(), station_id), table)
-        try:
-            data = [x[quantity] for x in table]
-        except tables.NoSuchNodeError:
-            data = None
-
-    return data
-
-
-def get_time_series(cluster, station_id, date, table, quantity):
-    """Get time series data from a table of a specific quantity
-
-    :param cluster: string containing the cluster name
-    :param station_id: station number
-    :param date: date
-    :param table: table name (e.g. 'events', 'weather', ...)
-    :param quantity: the specific event data type (e.g., 'pulseheights')
-
-    """
-    path = get_data_path(date)
-
-    with tables.openFile(path) as file:
-        table = file.getNode('/hisparc/cluster_%s/station_%d' %
-                             (cluster.lower(), station_id), table)
-        try:
-            data = [(x['timestamp'], x[quantity]) for x in table]
-            data.sort()
-        except tables.NoSuchNodeError:
-            data = None
-
-    return data
-
 
 def get_data_path(date):
     """Return path to data file
 
     Return path to the data file of a particular date
 
-    :param date: the date
+    :param date: the date as a datetime.date object
 
     :return: path to the data file
 
     """
     rootdir = settings.DATASTORE_PATH
-    file = '%d_%d_%d.h5' % (date.year, date.month, date.day)
-    return os.path.join(rootdir, str(date.year), str(date.month), file)
+    filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(rootdir, filepath)
 
 
 def get_config_messages(cluster, station_id, date):
@@ -252,7 +118,7 @@ def get_config_messages(cluster, station_id, date):
     """
     path = get_data_path(date)
 
-    file = tables.openFile(path)
+    file = tables.openFile(path, 'r')
     parent = file.getNode('/hisparc/cluster_%s/station_%d' %
                           (cluster.lower(), station_id))
     config = file.getNode(parent, 'config')

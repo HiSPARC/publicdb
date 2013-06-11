@@ -7,6 +7,16 @@ class GeneratorStateAdmin(admin.ModelAdmin):
                     'update_is_running')
 
 
+class DailyHistogramAdmin(admin.ModelAdmin):
+    list_filter = ('type',)
+    raw_id_fields = ('source',)
+
+
+class DailyDatasetAdmin(admin.ModelAdmin):
+    list_filter = ('type',)
+    raw_id_fields = ('source',)
+
+
 class DailyHistogramInline(admin.StackedInline):
     model = DailyHistogram
     extra = 0
@@ -23,14 +33,15 @@ class SummaryAdmin(admin.ModelAdmin):
 
 
 class ConfigurationAdmin(admin.ModelAdmin):
-    list_display = ('station', 'timestamp')
-    list_filter = ('timestamp',)
+    list_display = ('station', 'master', 'slave', 'timestamp')
+    list_filter = ('timestamp', 'source__station__number')
+    raw_id_fields = ('source',)
 
 
 admin.site.register(GeneratorState, GeneratorStateAdmin)
 admin.site.register(Summary, SummaryAdmin)
-admin.site.register(DailyHistogram)
+admin.site.register(DailyHistogram, DailyHistogramAdmin)
 admin.site.register(HistogramType)
-admin.site.register(DailyDataset)
+admin.site.register(DailyDataset, DailyDatasetAdmin)
 admin.site.register(DatasetType)
 admin.site.register(Configuration, ConfigurationAdmin)

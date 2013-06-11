@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('django_publicdb.jsparc.views',
     (r'^get_coincidence/$', 'get_coincidence'),

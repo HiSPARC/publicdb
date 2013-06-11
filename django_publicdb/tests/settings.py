@@ -31,6 +31,7 @@ DATABASES = {
 # DEV_ONLY
 DATASTORE_PATH = '/var/www/publicdb_datastore'
 TEST_DATASTORE_PATH = '/var/www/publicdb_datastore/test'
+ESD_PATH = '/var/www/publicdb_datastore/esd'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -137,7 +138,8 @@ INSTALLED_APPS = (
     'django_publicdb.analysissessions',
     'django_publicdb.updates',
     'django_publicdb.raw_data',
-    #'south',
+    'django_publicdb.default',
+    'south',
 )
 
 # A sample logging configuration. The only tangible logging

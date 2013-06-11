@@ -35,8 +35,6 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        self.driver = webdriver.Firefox()
-
         # The tests require a data file. We will download some data and put it
         # in a test directory. It needs to be writable by the user who initiates
         # the tests.
@@ -66,6 +64,10 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         super(MyAnalysisSessionsTests, self).setUp()
 
+        # Start Selenium
+
+        self.driver = webdriver.Firefox()
+
     def tearDown(self):
         super(MyAnalysisSessionsTests, self).tearDown()
 
@@ -80,7 +82,7 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
     def changeUrlToLocal(self, url):
         return string.replace(
             url,
-            'http://data.hisparc.nl/django',
+            'http://data.hisparc.nl',
             self.live_server_url
         )
 
@@ -126,7 +128,7 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
             ("id_cluster",          "Middelharnis"),
             ("id_start_date_year",  "2011"),
             ("id_start_date_month", "March"),
-            ("id_start_date_day",   "20"),
+            ("id_start_date_day",   "25"),
             ("id_number_of_events", "10")
         ]:
 

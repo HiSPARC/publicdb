@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Deleting model 'DetectorStatus'
         db.delete_table('inforecords_detectorstatus')
 
@@ -79,7 +79,7 @@ class Migration(SchemaMigration):
 
 
     def backwards(self, orm):
-        
+
         # Adding model 'DetectorStatus'
         db.create_table('inforecords_detectorstatus', (
             ('description', self.gf('django.db.models.fields.CharField')(max_length=40, unique=True)),
@@ -130,7 +130,7 @@ class Migration(SchemaMigration):
         db.send_create_signal('inforecords', ['Contactposition'])
 
         # Adding field 'DetectorHisparc.status'
-        db.add_column('inforecords_detectorhisparc', 'status', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['inforecords.DetectorStatus']), keep_default=False)
+        db.add_column('inforecords_detectorhisparc', 'status', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.DetectorStatus']), keep_default=False)
 
         # Adding field 'Cluster.country'
         db.add_column('inforecords_cluster', 'country', self.gf('django.db.models.fields.CharField')(default='', max_length=40), keep_default=False)
@@ -154,7 +154,7 @@ class Migration(SchemaMigration):
         db.add_column('inforecords_contact', 'url', self.gf('django.db.models.fields.URLField')(max_length=200, null=True, blank=True), keep_default=False)
 
         # Adding field 'Contact.contactposition'
-        db.add_column('inforecords_contact', 'contactposition', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['inforecords.Contactposition']), keep_default=False)
+        db.add_column('inforecords_contact', 'contactposition', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Contactposition']), keep_default=False)
 
         # Adding field 'Contact.phone_home'
         db.add_column('inforecords_contact', 'phone_home', self.gf('django.db.models.fields.CharField')(max_length=20, null=True, blank=True), keep_default=False)
@@ -175,7 +175,7 @@ class Migration(SchemaMigration):
         db.delete_unique('inforecords_contact', ['prefix_surname', 'first_name', 'surname'])
 
         # Adding field 'Station.location'
-        db.add_column('inforecords_station', 'location', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['inforecords.Location']), keep_default=False)
+        db.add_column('inforecords_station', 'location', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Location']), keep_default=False)
 
         # Changing field 'Station.contact'
         db.alter_column('inforecords_station', 'contact_id', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Contact'], null=True, blank=True))

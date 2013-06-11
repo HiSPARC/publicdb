@@ -1,0 +1,19 @@
+html {
+    font-family: sans-serif;}
+
+#container {
+    margin: auto;
+    width: 850px;}
+
+#pageHeader {
+    position: relative;
+    left: 630px;
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    height: 63px;
+    background: url(../header.png) top right no-repeat;}
+
+#pageHeader span {
+    display: none;}

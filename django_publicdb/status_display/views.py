@@ -1,112 +1,248 @@
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.shortcuts import (render_to_response, get_object_or_404,
+                              get_list_or_404, redirect)
 from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from operator import itemgetter
 import calendar
-import os
 from numpy import arange, pi, sin
 import datetime
 import time
 
-from traits.etsconfig.api import ETSConfig
-ETSConfig.toolkit = 'null'
-import chaco.api as chaco
-from chaco.scales.api import CalendarScaleSystem
-from chaco.scales_tick_generator import ScalesTickGenerator
-
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
+from nagios import *
 
 
 def stations(request):
-    """Show a list of stations, ordered by cluster"""
+    """Show the default station list"""
 
-    clusters = []
-    for cluster in Cluster.objects.all():
-        stations = []
-        for station in Station.objects.filter(cluster=cluster):
-            try:
-                Summary.objects.filter(station=station)[0]
-                link = station.number
-            except IndexError:
-                link = None
+    return redirect(stations_by_country)
 
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'link': link})
-        clusters.append({'name': cluster.name, 'stations': stations})
 
-    # Add option to station page for list of stations sorted by number
-    #allstations = sorted([station
-    #                      for cluster in clusters
-    #                      for station in cluster.stations],
-    #                     key=itemgetter('number'))
+def stations_by_country(request):
+    """Show a list of stations, ordered by country, cluster and subcluster"""
 
-    return render_to_response('stations.html', {'clusters': clusters},
+    down, problem, up = status_lists()
+    countries = []
+    for country in Country.objects.all():
+        clusters = []
+        for cluster in Cluster.objects.filter(country=country, parent=None):
+            subclusters = []
+            for subcluster in Cluster.objects.filter(parent=cluster):
+                stations = []
+                for station in Station.objects.filter(cluster=subcluster):
+                    if station_has_data(station):
+                        link = station.number
+                    else:
+                        link = None
+                    status = get_station_status(station, down, problem, up)
+
+                    stations.append({'number': station.number,
+                                     'name': station.name,
+                                     'link': link,
+                                     'status': status})
+                subclusters.append({'name': subcluster.name,
+                                    'stations': stations})
+            stations = []
+            for station in Station.objects.filter(cluster=cluster):
+                if station_has_data(station):
+                    link = station.number
+                else:
+                    link = None
+                status = get_station_status(station, down, problem, up)
+
+                stations.append({'number': station.number,
+                                 'name': station.name,
+                                 'link': link,
+                                 'status': status})
+            clusters.append({'name': cluster.name,
+                             'subclusters': subclusters,
+                             'stations': stations})
+        countries.append({'number': country.number,
+                          'name': country.name,
+                          'clusters': clusters})
+
+    countries = sorted(countries, key=itemgetter('number'))
+
+    return render_to_response('stations_by_country.html',
+                              {'countries': countries},
                               context_instance=RequestContext(request))
 
 
-def station_page(request, station_id, year, month, day):
+def stations_by_number(request):
+    """Show a list of stations, ordered by number"""
+
+    down, problem, up = status_lists()
+    stations = []
+    for station in Station.objects.all():
+        if station_has_data(station):
+            link = station.number
+        else:
+            link = None
+        status = get_station_status(station, down, problem, up)
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link,
+                         'status': status})
+
+    return render_to_response('stations_by_number.html',
+                              {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
+def stations_by_name(request):
+    """Show a list of stations, ordered by station name"""
+
+    down, problem, up = status_lists()
+    stations = []
+    for station in Station.objects.all():
+        if station_has_data(station):
+            link = station.number
+        else:
+            link = None
+        status = get_station_status(station, down, problem, up)
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link,
+                         'status': status})
+
+    stations = sorted(stations, key=itemgetter('name'))
+
+    return render_to_response('stations_by_name.html', {'stations': stations},
+                              context_instance=RequestContext(request))
+
+
+def stations_on_map(request, country=None, cluster=None, subcluster=None):
+    """Show all stations from a subcluster on a map"""
+
+    down, problem, up = status_lists()
+    today = datetime.datetime.utcnow()
+
+    if country:
+        get_object_or_404(Country, name=country)
+        if cluster:
+            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
+            if subcluster:
+                if cluster == subcluster:
+                    get_object_or_404(Cluster, name=subcluster, parent=None)
+                else:
+                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
+                focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
+            else:
+                focus = [Cluster.objects.get(name=cluster, parent=None).name]
+                focus.extend(Cluster.objects.filter(parent__name=cluster).values_list('name', flat=True))
+        else:
+            focus = Cluster.objects.filter(country__name=country).values_list('name', flat=True)
+    else:
+        focus = Cluster.objects.all().values_list('name', flat=True)
+
+    subclusters = []
+    for subcluster in Cluster.objects.all():
+        stations = []
+        for station in Station.objects.filter(cluster=subcluster,
+                                              pc__is_active=True,
+                                              pc__is_test=False):
+            detector = (DetectorHisparc.objects.filter(station=station,
+                                                       startdate__lte=today)
+                                               .latest('startdate'))
+            link = station_has_data(station)
+            status = get_station_status(station, down, problem, up)
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'cluster': station.cluster,
+                             'link': link,
+                             'status': status,
+                             'longitude': detector.longitude,
+                             'latitude': detector.latitude,
+                             'altitude': detector.height})
+        subclusters.append({'name': subcluster.name,
+                            'stations': stations})
+
+    return render_to_response('stations_on_map.html',
+        {'subclusters': subclusters,
+         'focus': focus},
+        context_instance=RequestContext(request))
+
+
+def station_data(request, station_id, year, month, day):
     """Show daily histograms for a particular station"""
 
     station_id = int(station_id)
     year = int(year)
     month = int(month)
     day = int(day)
+    date = datetime.date(year, month, day)
 
     station = get_object_or_404(Station, number=station_id)
+    data = get_object_or_404(Summary.objects.filter(Q(station=station),
+                                                    Q(date=date),
+                                                    Q(num_events__isnull=False) |
+                                                    Q(num_weather__isnull=False)))
 
-    # Use yesterday and tomorrow to add previous/next links
-    yesterday = (datetime.date(year, month, day) - datetime.timedelta(days=1))
-    tomorrow = (datetime.date(year, month, day) + datetime.timedelta(days=1))
+    # Use next_day and prev_day to add previous/next links
+    prev_day = date - datetime.timedelta(days=1)
+    next_day = date + datetime.timedelta(days=1)
 
     try:
-        previous = (Summary.objects.filter(Q(station__number=station_id),
+        previous = (Summary.objects.filter(Q(station=station),
                                            Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False))
-                                   .filter(date__lte=yesterday)
+                                           Q(num_weather__isnull=False),
+                                           date__gte=datetime.date(2002, 1, 1),
+                                           date__lte=prev_day)
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
 
     try:
-        next = (Summary.objects.filter(Q(station__number=station_id),
+        next = (Summary.objects.filter(Q(station=station),
                                        Q(num_events__isnull=False) |
-                                       Q(num_weather__isnull=False))
-                               .filter(date__gte=tomorrow)
+                                       Q(num_weather__isnull=False),
+                                       date__gte=next_day,
+                                       date__lte=datetime.date.today())
                                .order_by('date'))[0].date
     except IndexError:
         next = None
 
     try:
         config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=tomorrow)
+                                               timestamp__lt=next_day)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
         else:
             has_slave = True
+        has_config = True
     except Configuration.DoesNotExist:
         config = None
         has_slave = False
+        has_config = False
+
+    try:
+        is_active = Pc.objects.filter(station=station)[0].is_active
+    except IndexError:
+        is_active = False
 
     thismonth = nav_calendar(station, year, month)
     month_list = nav_months(station, year)
     year_list = nav_years(station)
-    current_date = {'year': year, 'month': calendar.month_name[month][:3], 'day': day}
+    current_date = {'year': year,
+                    'month': calendar.month_name[month][:3],
+                    'day': day}
 
-    eventhistogram = create_histogram('eventtime', station, year, month, day)
-    pulseheighthistogram = create_histogram('pulseheight', station,
-                                            year, month, day, log=True)
-    pulseintegralhistogram = create_histogram('pulseintegral', station,
-                                              year, month, day, log=True)
-    barometerdata = plot_dataset('barometer', station, year, month, day)
-    temperaturedata = plot_dataset('temperature', station, year, month, day)
+    eventhistogram = create_histogram('eventtime', station, date)
+    pulseheighthistogram = create_histogram('pulseheight', station, date)
+    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
+    barometerdata = plot_dataset('barometer', station, date)
+    temperaturedata = plot_dataset('temperature', station, date)
 
-    return render_to_response('station_page.html',
+    return render_to_response('station_data.html',
         {'station': station,
-         'date': datetime.date(year, month, day),
+         'date': date,
+         'tomorrow': date + datetime.timedelta(days=1),
          'config': config,
          'has_slave': has_slave,
          'eventhistogram': eventhistogram,
@@ -120,7 +256,78 @@ def station_page(request, station_id, year, month, day):
          'current_date': current_date,
          'prev': previous,
          'next': next,
-         'link': (station_id, year, month, day)},
+         'link': (station_id, year, month, day),
+         'has_data': True,
+         'is_active': is_active,
+         'has_config': has_config},
+        context_instance=RequestContext(request))
+
+
+def station_status(request, station_id):
+    """Show daily histograms for a particular station"""
+
+    station_id = int(station_id)
+
+    station = get_object_or_404(Station, number=station_id)
+    pc = get_object_or_404(Pc, station=station, is_active=True)
+
+    has_data = station_has_data(station)
+
+    try:
+        Configuration.objects.filter(source__station=station)[0]
+        has_config = True
+    except IndexError:
+        has_config = False
+
+    return render_to_response('station_status.html',
+        {'station': station,
+         'pc': pc,
+         'has_data': has_data,
+         'is_active': True,
+         'has_config': has_config},
+        context_instance=RequestContext(request))
+
+
+def station_config(request, station_id):
+    """Show configuration history for a particular station"""
+
+    station_id = int(station_id)
+
+    station = get_object_or_404(Station, number=station_id)
+    configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
+                              source__station=station,
+                              timestamp__gte=datetime.date(2002, 1, 1),
+                              timestamp__lte=datetime.date.today())
+
+    has_data = station_has_data(station)
+
+    try:
+        is_active = Pc.objects.filter(station=station)[0].is_active
+    except IndexError:
+        is_active = False
+
+    config = configs[-1]
+    if config.slv_version.count('0') == 2:
+        has_slave = False
+    else:
+        has_slave = True
+
+    voltagegraph = plot_config('voltage', configs)
+    currentgraph = plot_config('current', configs)
+    altitudegraph = plot_config('altitude', configs)
+    gpstrack = get_gpspositions(configs)
+
+    return render_to_response('station_config.html',
+        {'station': station,
+         'config': config,
+         'voltagegraph': voltagegraph,
+         'currentgraph': currentgraph,
+         'altitudegraph': altitudegraph,
+         'gpstrack': gpstrack,
+         'has_slave': has_slave,
+         'has_data': has_data,
+         'is_active': is_active,
+         'has_config': True},
         context_instance=RequestContext(request))
 
 
@@ -129,10 +336,12 @@ def station(request, station_id):
 
     summary = (Summary.objects.filter(Q(station__number=station_id),
                                       Q(num_events__isnull=False) |
-                                      Q(num_weather__isnull=False))
-                              .filter(date__lt=datetime.date.today())
+                                      Q(num_weather__isnull=False),
+                                      date__gte=datetime.date(2002, 1, 1),
+                                      date__lte=datetime.date.today())
                               .latest('date'))
-    return redirect(station_page, station_id=str(station_id),
+    return redirect(station_data,
+                    station_id=str(station_id),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
@@ -188,11 +397,39 @@ def get_temperature_dataset_source(request, station_id, year, month, day):
     return response
 
 
+def get_voltage_config_source(request, station_id):
+    data = get_config_source(station_id, 'voltage')
+    response = render_to_response('source_voltage_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=voltage-%s.csv' % station_id)
+    return response
+
+
+def get_current_config_source(request, station_id):
+    data = get_config_source(station_id, 'current')
+    response = render_to_response('source_current_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=current-%s.csv' % station_id)
+    return response
+
+
+def get_gps_config_source(request, station_id):
+    data = get_config_source(station_id, 'gps')
+    response = render_to_response('source_gps_config.csv',
+                                  {'data': data}, mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=gps-%s.csv' % station_id)
+    return response
+
+
 def get_histogram_source(station_id, year, month, day, type):
-    histogram = DailyHistogram.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    histogram = get_object_or_404(DailyHistogram,
+                                  source__station__number=int(station_id),
+                                  source__date=date,
+                                  type__slug=type)
     if type == 'eventtime':
         return zip(histogram.bins, histogram.values)
     else:
@@ -200,19 +437,37 @@ def get_histogram_source(station_id, year, month, day, type):
 
 
 def get_dataset_source(station_id, year, month, day, type):
-    dataset = DailyDataset.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    dataset = get_object_or_404(DailyDataset,
+                                source__station__number=int(station_id),
+                                source__date=date,
+                                type__slug=type)
     return zip(dataset.x, dataset.y)
 
 
-def create_histogram(type, station, year, month, day, log=False):
-    """Create a histogram and save it to disk"""
+def get_config_source(station_id, type):
+    configs = (Configuration.objects.filter(source__station__number=station_id,
+                                            timestamp__gte=datetime.date(2002, 1, 1),
+                                            timestamp__lte=datetime.date.today())
+                                    .order_by('timestamp'))
+    if type == 'voltage':
+        data = configs.values_list('timestamp', 'mas_ch1_voltage', 'mas_ch2_voltage', 'slv_ch1_voltage', 'slv_ch2_voltage')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+    elif type == 'current':
+        data = configs.values_list('timestamp', 'mas_ch1_current', 'mas_ch2_current', 'slv_ch1_current', 'slv_ch2_current')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+    elif type == 'gps':
+        data = configs.values_list('timestamp', 'gps_latitude', 'gps_longitude', 'gps_altitude')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3]] for row in data]
+    else:
+        data = None
 
-    name = 'histogram-%s-%d-%d-%02d-%02d.png' % (type, station.number,
-                                                 year, month, day)
-    date = datetime.date(year, month, day)
+    return data
+
+
+def create_histogram(type, station, date):
+    """Create a histogram object"""
+
     source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug__exact=type)
 
@@ -221,88 +476,15 @@ def create_histogram(type, station, year, month, day, log=False):
     except DailyHistogram.DoesNotExist:
         return None
 
-    plot = create_histogram_plot(histogram.bins, histogram.values,
-                                 type.has_multiple_datasets,
-                                 type.bin_axis_title,
-                                 type.value_axis_title,
-                                 log)
-
-    width, height = 500, 333
-    if type.slug == 'eventtime':
-        height = 150
-    render_and_save_plot(plot, name, width, height)
-
-    return settings.MEDIA_URL + name
+    plot_object = create_plot_object(histogram.bins[:-1], histogram.values,
+                                     type.bin_axis_title,
+                                     type.value_axis_title)
+    return plot_object
 
 
-def create_histogram_plot(bins, values, has_multiple_datasets,
-                          bin_axis_title, value_axis_title, log):
-    """Convenience function for creating histogram plots"""
+def plot_dataset(type, station, date, log=False):
+    """Create a dataset plot object"""
 
-    if has_multiple_datasets:
-        datasets = values
-        color = colors()
-    else:
-        # simulate multiple datasets
-        datasets = [values]
-        color = monochrome()
-
-    view = chaco.DataView()
-    index = chaco.ArrayDataSource(bins)
-    view.index_range.add(index)
-    index_mapper = chaco.LinearMapper(range=view.index_range)
-
-    for values in datasets:
-        values.append(values[-1])
-
-        value = chaco.ArrayDataSource(values)
-        view.value_range.add(value)
-
-        if log:
-            value_mapper = chaco.LogMapper(range=view.value_range)
-        else:
-            value_mapper = chaco.LinearMapper(range=view.value_range)
-
-        plot = chaco.LinePlot(index=index, value=value,
-                              index_mapper=index_mapper,
-                              value_mapper=value_mapper,
-                              render_style='connectedhold',
-                              color=color.next(),
-                              line_width=1.5)
-        view.add(plot)
-
-    if log:
-        view.value_mapper = chaco.LogMapper()
-        view.value_range.low_setting = 1
-    else:
-        view.value_range.low_setting = 0
-
-    #FIXME
-    if datasets:
-        m = max([max(x) for x in datasets])
-        if m != 0:
-            view.value_range.high_setting = m * 1.1
-
-#    if has_multiple_datasets:
-#        legend = chaco.Legend(labels=['scint1', 'scint2', 'scint3', 'scint4'],
-#                              component=view.plots, align="ur", padding=10)
-#        view.overlays.append(legend)
-
-    view.x_axis.title = bin_axis_title
-    view.y_axis.title = value_axis_title
-    view.x_axis.title_font = 'modern bold 16'
-    view.y_axis.title_font = 'modern bold 16'
-    view.x_axis.title_spacing = 20
-
-    return view
-
-
-def plot_dataset(type, station, year, month, day, log=False):
-    """Create a dataset plot and save it to disk"""
-
-    name = 'dataset-%s-%d-%d-%02d-%02d.png' % (type, station.number,
-                                               year, month, day)
-    date = datetime.date(year, month, day)
     source = get_object_or_404(Summary, station=station, date=date)
     type = DatasetType.objects.get(slug__exact=type)
 
@@ -311,71 +493,53 @@ def plot_dataset(type, station, year, month, day, log=False):
     except DailyDataset.DoesNotExist:
         return None
 
-    plot = create_dataset_plot(dataset.x, dataset.y, type.x_axis_title,
-                               type.y_axis_title, log)
-
-    width, height = 500, 150
-    render_and_save_plot(plot, name, width, height)
-
-    return settings.MEDIA_URL + name
+    plot_object = create_plot_object(dataset.x, dataset.y, type.x_axis_title,
+                                     type.y_axis_title)
+    return plot_object
 
 
-def create_dataset_plot(x, y, x_axis_title, y_axis_title, log):
-    """Convenience function for creating histogram plots"""
+def plot_config(type, configs):
+    """Create a plot object from station configs"""
 
-    color = monochrome()
+    timestamps = [calendar.timegm(config.timestamp.utctimetuple())
+                  for config in configs]
+    x_label = 'Date (month/year)'
 
-    #FIXME calendarscalesystem only uses local time, so adjust
-    x = [u + time.altzone for u in x]
-
-    data = chaco.ArrayPlotData(x=x, y=y)
-    plot = chaco.Plot(data=data)
-    #plot.plot(('x', 'y'), color=color.next(), line_width=1.5)
-    plot.plot(('x', 'y'), color=color.next(), type='scatter',
-              marker='circle', marker_size=0.5)
-
-    tick_generator = ScalesTickGenerator(scale=CalendarScaleSystem())
-    bottom_axis = chaco.PlotAxis(plot, orientation="bottom",
-                                 tick_generator=tick_generator)
-    plot.index_axis = bottom_axis
-
-    plot.x_axis.title = x_axis_title
-    plot.y_axis.title = y_axis_title
-    plot.x_axis.title_font = 'modern bold 16'
-    plot.y_axis.title_font = 'modern bold 16'
-    plot.x_axis.title_spacing = 20
-
-    return plot
+    if type == 'voltage':
+        values = [[config.mas_ch1_voltage, config.mas_ch2_voltage,
+                   config.slv_ch1_voltage, config.slv_ch2_voltage]
+                  for config in configs]
+        values = zip(*values)
+        y_label = 'PMT Voltage (V)'
+    elif type == 'current':
+        values = [[config.mas_ch1_current, config.mas_ch2_current,
+                   config.slv_ch1_current, config.slv_ch2_current]
+                  for config in configs]
+        values = zip(*values)
+        y_label = 'PMT Current (mA)'
+    if type == 'altitude':
+        values = [config.gps_altitude for config in configs]
+        y_label = 'Altitude (m)'
+    plot_object = create_plot_object(timestamps, values, x_label, y_label)
+    return plot_object
 
 
-def render_and_save_plot(plot, name, width, height):
-    plot.bounds = [width, height]
-    plot.padding = (80, 10, 10, 50)
-    gc = chaco.PlotGraphicsContext(plot.outer_bounds)
-    gc.render_component(plot)
-    path = os.path.join(settings.MEDIA_ROOT, name)
-    gc.save(path)
+def get_gpspositions(configs):
+    """Get all unique gps positions from the configs"""
+
+    gps = [(config.gps_longitude, config.gps_latitude) for config in configs
+           if config.gps_longitude != 0.0 and config.gps_latitude != 0.0]
+    return set(gps)
 
 
-def colors():
-    """Generator function which returns color names"""
+def create_plot_object(x_values, y_series, x_label, y_label):
+    if type(y_series[0]) != list and type(y_series[0]) != tuple:
+            y_series = [y_series]
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
+            y_values in y_series]
 
-    colors = [[0., 0., 0., .7],
-              [1., 0., 0., .7],
-              [0., 1., 0., .7],
-              [0., 1., 1., .7]]
-
-    for color in colors:
-        yield color
-
-
-def monochrome():
-    """Generator function which returns monochrome color names"""
-
-    color = 'black'
-
-    while True:
-        yield color
+    plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
+    return plot_object
 
 
 def nav_calendar(station, theyear, themonth):
@@ -392,13 +556,13 @@ def nav_calendar(station, theyear, themonth):
             if day.month == themonth:
                 try:
                     summary = (Summary.objects
-                                      .get(Q(station=station), Q(date=day),
+                                      .get(Q(station=station),
+                                           Q(date=day),
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False)))
+                    link = (station.number, theyear, themonth, day.day)
                 except Summary.DoesNotExist:
                     link = None
-                else:
-                    link = (station.number, theyear, themonth, day.day)
                 days.append({'day': day.day, 'link': link})
             else:
                 days.append('')
@@ -416,15 +580,16 @@ def nav_months(station, theyear):
                                         Q(num_weather__isnull=False))
                         .dates('date', 'month'))
 
-    month_list = []
+    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
-        name = calendar.month_name[date.month][:3]
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year,
-                                            date__month=date.month)
+        first_day = (Summary.objects.filter(Q(station=station),
+                                            Q(date__year=date.year),
+                                            Q(date__month=date.month),
+                                            Q(num_events__isnull=False) |
+                                            Q(num_weather__isnull=False))
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
-        month_list.append({'month': name, 'link': link})
+        month_list[date.month - 1]['link'] = link
 
     return month_list
 
@@ -432,17 +597,52 @@ def nav_months(station, theyear):
 def nav_years(station):
     """Create list of previous years"""
 
-    date_list = (Summary.objects.filter(Q(station=station),
-                                        Q(num_events__isnull=False) |
-                                        Q(num_weather__isnull=False))
-                        .dates('date', 'year'))
+    valid_years = (Summary.objects.filter(Q(station=station),
+                                          Q(num_events__isnull=False) |
+                                          Q(num_weather__isnull=False),
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                          .dates('date', 'year'))
+    valid_years = [date.year for date in valid_years]
 
     year_list = []
-    for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year)
-                            .dates('date', 'day')[0])
-        link = (station.number, date.year, first_day.month, first_day.day)
-        year_list.append({'year': date.year, 'link': link})
-
+    for year in range(valid_years[0], valid_years[-1] + 1):
+        if year in valid_years:
+            first_day = (Summary.objects.filter(Q(station=station),
+                                                Q(date__year=year),
+                                                Q(num_events__isnull=False) |
+                                                Q(num_weather__isnull=False))
+                                .dates('date', 'day')[0])
+            link = (station.number, year, first_day.month, first_day.day)
+            year_list.append({'year': year, 'link': link})
+        else:
+            year_list.append({'year': year, 'link': None})
     return year_list
+
+
+def station_has_data(station):
+    """Check if there is valid event or weather data for the given station
+
+    :param station: Station object for which to check.
+
+    :return: boolean indicating if the station has recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
+    try:
+        Summary.objects.filter(Q(station=station),
+                               Q(num_events__isnull=False) |
+                               Q(num_weather__isnull=False),
+                               date__gte=datetime.date(2002, 1, 1),
+                               date__lte=datetime.date.today())[0]
+        has_data = True
+    except IndexError:
+        has_data = False
+
+    return has_data
+
+
+def help(request):
+    """Show the static help page"""
+    return render_to_response('help.html',
+                              context_instance=RequestContext(request))

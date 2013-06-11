@@ -15,13 +15,16 @@
 import os
 import sys
 
-sys.path.append('../')
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+sys.path.append(publicdb_path)
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
 from datetime import date, datetime, time, timedelta
 
-from hisparc.publicdb import download_data
+from sapphire.publicdb import download_data
 
 from django.conf import settings
 from django_publicdb.inforecords.models import *
@@ -29,13 +32,14 @@ from django_publicdb.inforecords.models import *
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
-START = date(2010, 12, 28)
-END = date(2011, 1, 4)
+START = date(2013, 1, 5)
+END = date(2013, 1, 7)
 
 
 def main():
     test_for_datastore_directory()
     fill_datastore()
+
 
 def test_for_datastore_directory():
     print "Checking for datastore path at %s ..." % datastore_path,
@@ -44,9 +48,11 @@ def test_for_datastore_directory():
     else:
         print "Found."
 
+
 def fill_datastore():
     for date in generate_date_range(START, END):
         download_and_store_data_for_date(date)
+
 
 def generate_date_range(start, end):
     date = start
@@ -54,24 +60,27 @@ def generate_date_range(start, end):
         yield date
         date += timedelta(days=1)
 
+
 def download_and_store_data_for_date(date):
     f = get_datastore_file_for_date(date)
     for station in Station.objects.all():
         download_and_store_station_data(f, station, date)
     f.close()
 
+
 def get_datastore_file_for_date(date):
     return open_or_create_file(datastore_path, date)
+
 
 def download_and_store_station_data(f, station, date, get_blobs=True):
     start = datetime.combine(date, time(0, 0, 0))
     end = start + timedelta(days=1)
 
     cluster = station.cluster.main_cluster()
-    station_group = get_or_create_station_group(f, cluster,
-                                                station.number)
+    station_group = get_or_create_station_group(f, cluster, station.number)
 
-    download_data(f, station_group, station.number, start, end,
+    download_data(f, station_group, station.number,
+                  start, end,
                   get_blobs=get_blobs)
 
 def open_or_create_file(data_dir, date):
@@ -84,15 +93,15 @@ def open_or_create_file(data_dir, date):
     :param date: the event date
 
     """
-    dir = os.path.join(data_dir, '%d/%d' % (date.year, date.month))
-    file = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month,
-                                              date.day))
+    dir = os.path.join(data_dir, date.strftime('%Y/%-m'))
+    file = os.path.join(dir, date.strftime('%Y_%-m_%-d.h5'))
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x
         os.makedirs(dir, 0755)
 
     return tables.openFile(file, 'a')
+
 
 def get_or_create_cluster_group(file, cluster):
     """Get an existing cluster group or create a new one
@@ -117,6 +126,7 @@ def get_or_create_cluster_group(file, cluster):
 
     return cluster
 
+
 def get_or_create_station_group(file, cluster, station_id):
     """Get an existing station group or create a new one
 
@@ -137,7 +147,5 @@ def get_or_create_station_group(file, cluster, station_id):
     return station
 
 
-
 if __name__ == '__main__':
     main()
-

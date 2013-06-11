@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/stations.css" />
+{% endblock %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>{% block header %}List of HiSPARC stations{% endblock %}</h2>
+    </div>
+    
+    <div id="stationList">
+      {% block list %}{% endblock %}
+    </div>
+    
+    {% block map %}{% endblock %}
+    
+    <div id="sidebar">
+        <div id="navigation">
+          {% block navigation_sidebar %}
+            <div class="sectionTitle">Stations</div>
+            <div class="keyvalue">
+                <span class="key">List by</span>
+                <span class="value"><a class="{% block current_location %}{% endblock %}" href="{% url 'status_display.views.stations_by_country' %}">Location</a></span>
+                <span class="value"><a class="{% block current_name %}{% endblock %}" href="{% url 'status_display.views.stations_by_name' %}">Name</a></span>
+                <span class="value"><a class="{% block current_number %}{% endblock %}" href="{% url 'status_display.views.stations_by_number' %}">Number</a></span>
+            </div>
+            <div class="keyvalue">
+                <span class="key">Map</span>
+                <span class="value"><a class="{% block current_map %}{% endblock %}" href="{% url 'status_display.views.stations_on_map' %}">Overview</a></span>
+            </div>
+          {% endblock %}
+        </div>
+    
+        <div id="legend">
+          {% block legend %}
+            <div class="sectionTitle">Data Availability</div>
+            <div class="keyvalue">
+                <span class="key thin" style='color: #23B;'>Station</span><span class="value">Link to data</span><br />
+            </div>
+            <div class="keyvalue">
+                <span class="key thin">Station</span><span class="value">No data received</span>
+            </div>
+    
+            <div class="sectionTitle">Current Status</div>
+            <div class="keyvalue">
+                <span class='key statusBall up'></span><span class="value">Up</span><br />
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall problem'></span><span class="value">Problem</span><br />
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall down'></span><span class="value">Down</span><br />
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall'></span><span class="value">&larr; Link to status</span>
+            </div>
+          {% endblock %}
+        </div>
+    
+        <div id="extra">
+          {% block extra %}{% endblock %}    
+        </div>
+
+        <div id="help">
+          {% block help %}
+            <div class="keyvalue">
+                <span class="value"><a href="{% url 'status_display.views.help' %}" target="_blank">Help</a></span>
+            </div>
+          {% endblock %}    
+        </div>
+    </div>
+
+{% endblock %}

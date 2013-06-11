@@ -1,6 +1,20 @@
+{% extends "base.html" %}
+{% block title %}jSparc | Session requested{% endblock %}
+
 {% block content %}
 
-<p>Thank you for your request.</br>
-An email has been send to you with a link to confirm your request.</p>
+<h3>jSparc request</h3>
+
+<p>
+    {{ data.first_name }} {{ data.sur_name }}, thank you for your request.</br>
+    An email has been send to you ({{ data.email }}) with a link to confirm your request.
+</p>
+
+<p>
+    <strong>Request overview</strong><br />
+    Cluster: {{ data.cluster }}<br />
+    Start date: {{ data.start_date }}<br />
+    Number of coincidences: {{ data.number_of_events }}
+</p>
 
 {% endblock %}
