@@ -203,32 +203,20 @@ def get_core_positions(coincidences):
 
 def request_form( request ):
 
-<<<<<<< HEAD
     if request.method == 'POST':
         form = SessionRequestForm( request.POST )
     else:
         form = SessionRequestForm()
 
-    #----------
-    # reCaptcha
-    #----------
-
-    html_captcha = captcha.displayhtml(
-        settings.RECAPTCHA_PUB_KEY
-    )
-
     #----------------
     # Render response
     #----------------
 
-    return render_to_response(
-        'request.html',
-        {
-            'form'         : form,
-            'html_captcha' : html_captcha
-        },
-        context_instance = RequestContext( request )
-    )
+    html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
+
+    return render_to_response('request.html',
+                              {'form': form, 'html_captcha': html_captcha},
+                              context_instance = RequestContext(request))
 
 def validate_request_form( request ):
 
@@ -241,70 +229,13 @@ def validate_request_form( request ):
 
     if not settings.RECAPTCHA_DISABLE_CHECK:
 
-        check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'],
-            request.POST['recaptcha_response_field'],
-            settings.RECAPTCHA_PRIVATE_KEY,
-            request.META['REMOTE_ADDR']
-        )
+        check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
+                                       request.POST['recaptcha_response_field'],
+                                       settings.RECAPTCHA_PRIVATE_KEY,
+                                       request.META['REMOTE_ADDR'])
 
         if not check_captcha.is_valid:
-            return request_form( request )
-=======
-@csrf_protect
-def get_request(request):
-    if request.method == 'POST':
-        if settings.RECAPTCHA_ENABLED:
-            check_captcha = captcha.submit(
-                request.POST['recaptcha_challenge_field'],
-                request.POST['recaptcha_response_field'],
-                settings.RECAPTCHA_PRIVATE_KEY,
-                request.META['REMOTE_ADDR'])
-            if check_captcha.is_valid is False:
-                pass_captcha = False
-                html_captcha = captcha.displayhtml(
-                    settings.RECAPTCHA_PUB_KEY,
-                    error=check_captcha.error_code)
-            else:
-                pass_captcha = True
-        else:
-            pass_captcha = True
-
-        form = SessionRequestForm(request.POST)
-        if pass_captcha:
-            if form.is_valid():
-                data = {}
-                data.update(form.cleaned_data)
-                new_request = SessionRequest(
-                        first_name=data['first_name'],
-                        sur_name=data['sur_name'],
-                        email=data['email'],
-                        school=data['school'],
-                        cluster=data['cluster'],
-                        start_date=data['start_date'],
-                        mail_send=False,
-                        session_created=False,
-                        session_pending=True,
-                        events_to_create=data['number_of_events'],
-                        events_created=0)
-                new_request.GenerateUrl()
-                new_request.save()
-                new_request.SendMail()
-                return render_to_response('thankyou.html', {'data': data},
-                        context_instance=RequestContext(request))
-            else:
-                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-    else:
-        form = SessionRequestForm()
-        if settings.RECAPTCHA_ENABLED:
-            html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-        else:
-            html_captcha = "reCAPTCHA disabled"
-
-    return render_to_response('request.html',
-            {'form': form, 'html_captcha': html_captcha},
-            RequestContext(request, {}))
->>>>>>> master
+            return request_form(request)
 
         #html_captcha = captcha.displayhtml(
         #    settings.RECAPTCHA_PUB_KEY,
@@ -315,10 +246,10 @@ def get_request(request):
     # Check form input
     #-----------------
 
-    form = SessionRequestForm( request.POST )
+    form = SessionRequestForm(request.POST)
 
     if not form.is_valid():
-        return request_form( request )
+        return request_form(request)
 
     #-----------
     # Send email
@@ -328,22 +259,26 @@ def get_request(request):
     data.update(form.cleaned_data)
 
     new_request=SessionRequest(
-        first_name       = data['first_name'],
-        sur_name         = data['sur_name'],
-        email            = data['email'],
-        school           = data['school'],
-        cluster          = data['cluster'],
-        start_date       = data['start_date'],
-        mail_send        = False,
-        session_created  = False,
-        session_pending  = True,
+        first_name = data['first_name'],
+        sur_name = data['sur_name'],
+        email = data['email'],
+        school = data['school'],
+        cluster = data['cluster'],
+        start_date = data['start_date'],
+        mail_send = False,
+        session_created = False,
+        session_pending = True,
         events_to_create = data['number_of_events'],
-        events_created   = 0
+        events_created = 0
     )
 
     new_request.GenerateUrl()
     new_request.save()
     new_request.SendMail()
+
+    #----------------
+    # Return response
+    #----------------
 
     return render_to_response('thankyou.html')
 
