@@ -277,8 +277,12 @@ def update_pulseheight_histogram(summary):
 
 def update_pulseheight_fit(summary):
     logger.debug("Updating pulseheight fit for %s" % summary)
-
-    fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExists:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
     save_pulseheight_fits(summary, fits)
 
 

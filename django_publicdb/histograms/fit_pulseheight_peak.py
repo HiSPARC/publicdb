@@ -5,7 +5,7 @@ import os
 import string
 import logging
 from math import sqrt
-
+import datetime
 import types
 
 import tables
@@ -15,15 +15,10 @@ import scipy.optimize
 import scipy.stats
 
 from models import *
-import datastore
-
-from django_publicdb.inforecords.models import Station
+import esd
 
 
 logger = logging.getLogger('histograms.fit_pulseheight_peak')
-
-uid = 0
-hists = []
 
 
 def findBinNextMinimum(y, startBin):
@@ -53,7 +48,9 @@ def findBinNextMaximum(y, startBin):
 
 
 def smooth_forward(y, n=5):
+
     y_smoothed = []
+
     for i in range(0, len(y) - n):
         sum = numpy.sum(y[i:i + n])
         avg = sum / n
@@ -62,9 +59,9 @@ def smooth_forward(y, n=5):
     return y_smoothed
 
 
-def getFitParameters(x, y, stationNumber, plateNumber):
+def getFitParameters(x, y):
 
-    bias = (x[1]-x[0])*2
+    bias = (x[1] - x[0]) * 2
 
     # Rebin x
 
@@ -72,7 +69,7 @@ def getFitParameters(x, y, stationNumber, plateNumber):
     if len(x_rebinned) % 2 == 1:
         x_rebinned.append(x_rebinned[-1] + x_rebinned[1] - x_rebinned[0])
     x_rebinned = numpy.float_(x_rebinned)
-    x_rebinned = x_rebinned.reshape(len(x_rebinned)/2, 2).mean(axis=1)
+    x_rebinned = x_rebinned.reshape(len(x_rebinned) / 2, 2).mean(axis=1)
 
     # Smooth y by averaging while keeping sharp cut at 120 ADC
 
@@ -123,47 +120,22 @@ def getFitParameters(x, y, stationNumber, plateNumber):
 
     # Return fit peak, fit range minimum = maxX, fit range maximum = minX
 
-    return (maxX + minX)/2 + bias, maxX+bias, minX+bias
+    return (maxX + minX) / 2 + bias, maxX + bias, minX + bias
 
 
-def fitPulseheightPeak(events, stationNumber, plateNumber):
+def fitPulseheightPeak(pulseheights):
     """
-        events        : table
-        plateNumber   : int 0..3
-        stationNumber : int
+        pulseheights  : nparray
     """
-
-    if len(events) == 0:
-        return
-
-    if plateNumber > 3 or plateNumber < 0:
-        return
-
-    global hists
-    global uid
-
-    uid += 1
 
     phMin = 50  # ADC
     phMax = 1550  # ADC
 
-    data = []
-
-    for event in events:
-        ph = event['pulseheights'][plateNumber]
-
-        if not phMin < ph < phMax:
-            continue
-
-        data.append(ph)
-
-    # Determine fit range
-
     # Make histogram: occurence of dPulseheight vs pulseheight
 
-    bins = numpy.arange(0, 5000, 10)
+    bins = numpy.arange(phMin, phMax, 10)
 
-    occurence, bins = numpy.histogram(numpy.float_(data), bins=bins)
+    occurence, bins = numpy.histogram(pulseheights, bins=bins)
     pulseheight = (bins[:-1] + bins[1:]) / 2
 
     # Get fit parameters
@@ -173,8 +145,7 @@ def fitPulseheightPeak(events, stationNumber, plateNumber):
     if average_pulseheight < 100:
         raise ValueError("Average pulseheight is less than 100")
 
-    peak, minRange, maxRange = getFitParameters(pulseheight, occurence,
-                                                stationNumber, plateNumber)
+    peak, minRange, maxRange = getFitParameters(pulseheight, occurence)
     logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
                  (peak, minRange, maxRange))
 
@@ -191,7 +162,7 @@ def fitPulseheightPeak(events, stationNumber, plateNumber):
         fitResult = [fitParameters, fitCovariance]
         chiSquare = -1
 
-        return len(data), peak, width, fitResult, chiSquare
+        return len(pulseheights), peak, width, fitResult, chiSquare
 
     # Fit function
 
@@ -250,69 +221,29 @@ def fitPulseheightPeak(events, stationNumber, plateNumber):
                  (len(fit_window_occurence) - len(fitParameters)))
     logger.debug("Reduced chi square: %.1f" % reducedChiSquare)
 
-    return len(data), peak, width, fitResult, reducedChiSquare
+    return len(pulseheights), peak, width, fitResult, reducedChiSquare
 
 
-def getEventsFromStation(h5File, station_number):
+def getPulseheightFits(summary):
     """
-        h5File:  tables.File
-        station: int
-
-        return: tables.Table
+        summary: Summary
     """
 
-    # Files in the datastore have the following structure
-    # /hisparc/cluster_[main cluster]/station_[station_id]/events
+    pulseheights = esd.get_event_data(summary, 'pulseheights')
+    today = datetime.datetime.utcnow()
 
-    station = Station.objects.get(number=station_number)
-    cluster = station.cluster.main_cluster()
-    path = '/hisparc/cluster_%s/station_%d' % (cluster.lower(), station_number)
-
-    try:
-        events_table = h5File.getNode(path, "events")
-    except tables.NoSuchNodeError:
-        events_table = None
-
-    return events_table
-
-
-def getPulseheightFits( summary ):
-    """
-        file: string
-        station : int
-    """
-
-    #---------------------------------------------------------------------------
-    # Checks
-    #---------------------------------------------------------------------------
-
-    if not isinstance(summary, Summary):
-        raise Exception
-
-    #---------------------------------------------------------------------------
-    # Input data
-    #---------------------------------------------------------------------------
-
-    file = datastore.get_data_path(summary.date)
-    data = tables.openFile(file, 'r')
-
-    station = summary.station.number
-    events = getEventsFromStation( data, station )
-
-    if isinstance(events, types.NoneType) or len(events) == 0:
-        logger.error("Error: no events found for station %s" % station)
-        return
-
-    #---------------------------------------------------------------------------
-    # Fit
-    #---------------------------------------------------------------------------
+    config = (Configuration.objects.filter(source__station=summary.station,
+                                           timestamp__lte=today)
+                                   .latest('timestamp'))
+    if config.slave() == 'no slave':
+        n_plates = 2
+    else:
+        n_plates = 4
 
     fits = []
 
-    for numberOfPlate in range(4):
-
+    for numberOfPlate in range(1, n_plates + 1):
         # Initial values
-
         fit = PulseheightFit(
             source = summary,
             plate = int(numberOfPlate),
@@ -325,15 +256,13 @@ def getPulseheightFits( summary ):
             fitted_width = 0,
             fitted_width_error = 0,
 
-            chi_square_reduced = -1
-        )
+            chi_square_reduced = -1)
 
         # Fit
 
         try:
-            entries, initial_peak, initial_width, fit_result, chi_square_reduced = fitPulseheightPeak(events,
-                                                                                                      station,
-                                                                                                      numberOfPlate)
+            entries, initial_peak, initial_width, fit_result, \
+            chi_square_reduced = fitPulseheightPeak(pulseheights[:, numberOfPlate - 1])
 
             fit.initial_mpv = initial_peak
             fit.initial_width = initial_width
