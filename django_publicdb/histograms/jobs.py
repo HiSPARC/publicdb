@@ -175,6 +175,18 @@ def update_histograms():
 
     # Use a worker pool
     worker_pool = multiprocessing.Pool()
+    summaries = Summary.objects.filter(needs_update_config=True).reverse()
+    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
+    for summary in results:
+        summary.needs_update_config=False
+        summary.save()
+    worker_pool.close()
+    worker_pool.join()
+
+    # Use a new worker pool (or you'll be sorry).
+    # You could reuse the worker pool, but then you need to force querying
+    # the database to prefetch all summaries.
+    worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_events=True).reverse()
     results = worker_pool.imap_unordered(perform_events_tasks, summaries)
     for summary in results:
@@ -184,23 +196,11 @@ def update_histograms():
     worker_pool.join()
 
     # Use a new worker pool (or you'll be sorry).
-    # You could reuse the worker pool, but then you need to force querying
-    # the database to prefetch all summaries.
     worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_weather=True).reverse()
     results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
     for summary in results:
         summary.needs_update_weather=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
-
-    # Use a new worker pool (or you'll be sorry).
-    worker_pool = multiprocessing.Pool()
-    summaries = Summary.objects.filter(needs_update_config=True).reverse()
-    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
-    for summary in results:
-        summary.needs_update_config=False
         summary.save()
     worker_pool.close()
     worker_pool.join()
@@ -277,8 +277,12 @@ def update_pulseheight_histogram(summary):
 
 def update_pulseheight_fit(summary):
     logger.debug("Updating pulseheight fit for %s" % summary)
-
-    fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExists:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
     save_pulseheight_fits(summary, fits)
 
 
