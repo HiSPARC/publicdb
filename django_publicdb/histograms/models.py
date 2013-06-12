@@ -247,6 +247,11 @@ class PulseheightFit(models.Model):
 
     def station(self):
         return self.source.station.number
+    station.admin_order_field = 'source__station__number'
+
+    def date(self):
+        return self.source.date
+    date.admin_order_field = 'source__date'
 
     class Meta:
         verbose_name_plural = 'Pulseheight fit'
