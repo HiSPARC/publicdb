@@ -279,7 +279,7 @@ def update_pulseheight_fit(summary):
     logger.debug("Updating pulseheight fit for %s" % summary)
     try:
         fits = fit_pulseheight_peak.getPulseheightFits(summary)
-    except Configuration.DoesNotExists:
+    except Configuration.DoesNotExist:
         logger.debug("No Configuration for station: %d." %
                      summary.station.number)
         return
