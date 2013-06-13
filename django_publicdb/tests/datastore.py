@@ -9,6 +9,9 @@ from scripts import download_test_datastore
 from django_publicdb import inforecords
 
 def setup_test_datastore_directory(datastore_path):
+
+    # Data store path
+
     if not os.path.exists(datastore_path):
         os.makedirs(datastore_path)
     else:
@@ -24,6 +27,13 @@ def setup_test_datastore_directory(datastore_path):
         os.remove(os.path.join(datastore_path, "testfile"))
 
     settings.DATASTORE_PATH = datastore_path
+
+    # ESD path
+
+    settings.ESD_PATH = os.path.join(datastore_path, "esd")
+
+    if not os.path.exists(settings.ESD_PATH):
+        os.makedirs(settings.ESD_PATH)
 
 def get_datafile_path(date):
     return os.path.join(settings.DATASTORE_PATH,
