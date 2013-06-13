@@ -15,7 +15,7 @@ from django.test import TestCase
 from django_publicdb.tests import datastore as tests_datastore
 from django_publicdb.histograms import models, datastore, jobs
 
-class BaseHistogramsTests(TestCase):
+class BaseHistogramsTestCase(TestCase):
 
     fixtures = [
         'tests_inforecords'
@@ -62,10 +62,10 @@ class BaseHistogramsTests(TestCase):
 
         #
 
-        super(BaseHistogramsTests, self).setUp()
+        super(BaseHistogramsTestCase, self).setUp()
 
     def tearDown(self):
-        super(BaseHistogramsTests, self).tearDown()
+        super(BaseHistogramsTestCase, self).tearDown()
 
         settings.DATASTORE_PATH = self.original_datastore_path
 
@@ -77,17 +77,17 @@ class BaseHistogramsTests(TestCase):
     #    code.interact(local=dict(globals(), **locals()))
 
 
-class DatastoreTests(BaseHistogramsTests):
+class DatastoreTestCase(BaseHistogramsTestCase):
 
     #---------------------------------------------------------------------------
     # Setup and teardown
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        super(DatastoreTests, self).setUp()
+        super(DatastoreTestCase, self).setUp()
 
     def tearDown(self):
-        super(DatastoreTests, self).tearDown()
+        super(DatastoreTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests
@@ -117,17 +117,17 @@ class DatastoreTests(BaseHistogramsTests):
         self.assertEqual(len(event_summary), 0)
 
 
-class CheckForUpdatesTests(BaseHistogramsTests):
+class CheckForUpdatesTestCase(BaseHistogramsTestCase):
 
     #---------------------------------------------------------------------------
     # Setup and teardown
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        super(CheckForUpdatesTests, self).setUp()
+        super(CheckForUpdatesTestCase, self).setUp()
 
     def tearDown(self):
-        super(CheckForUpdatesTests, self).tearDown()
+        super(CheckForUpdatesTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests
@@ -188,7 +188,7 @@ class CheckForUpdatesTests(BaseHistogramsTests):
         self.assertEqual(len(s), 0)
 
 
-class UpdateAllHistogramsTests(BaseHistogramsTests):
+class PulseheightFitTestCase(BaseHistogramsTestCase):
 
     fixtures = [
         'tests_inforecords',
@@ -200,14 +200,165 @@ class UpdateAllHistogramsTests(BaseHistogramsTests):
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        super(UpdateAllHistogramsTests, self).setUp()
+        super(PulseheightFitTestCase, self).setUp()
+
+        models.PulseheightFit.objects.all().delete()
+
+        jobs.check_for_updates()
+
+        jobs.update_esd()
+
+    def tearDown(self):
+        super(PulseheightFitTestCase, self).tearDown()
+
+    #---------------------------------------------------------------------------
+    # Tests
+    #---------------------------------------------------------------------------
+
+    def test_jobs_update_pulseheight_fit_normal(self, ):
+        """ When everything is ok, in the end there should be 4 fits in the database
+        """
+
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        jobs.update_pulseheight_fit(summary)
+
+        # Four fits are expected
+
+        fits = models.PulseheightFit.objects.all()
+
+        self.assertEqual(len(fits), 4)
+
+    def test_jobs_update_pulseheight_fit_no_config(self):
+        """ When there is no config, no fit should have been made
+        """
+
+        models.Configuration.objects.all().delete()
+
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        jobs.update_pulseheight_fit(summary)
+
+        # No fits are expected
+
+        fits = models.PulseheightFit.objects.all()
+
+        self.assertEqual(len(fits), 0)
+
+    def test_jobs_safe_pulseheight_fit_normal(self):
+        """ Saving a PulseheightFit in normal conditions
+        """
+
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        # Create and save fits into the database
+
+        fits = []
+        for numberOfPlate in range(1, 5):
+            fits.append(
+                models.PulseheightFit(
+                    source = summary,
+                    plate = int(numberOfPlate),
+
+                    initial_mpv = 1,
+                    initial_width = 2,
+
+                    fitted_mpv = 3,
+                    fitted_mpv_error = 4,
+                    fitted_width = 5,
+                    fitted_width_error = 6,
+
+                    chi_square_reduced = 7))
+
+        jobs.save_pulseheight_fits(summary, fits)
+
+        # Updated value is expected
+
+        fits = models.PulseheightFit.objects.filter(source = summary)
+        self.assertEqual(len(fits), 4)
+        self.assertEqual(fits[0].initial_mpv, 1.0)
+
+    def test_jobs_safe_pulseheight_fit_no_fits(self):
+        """ Saving no fits should do nothing
+        """
+
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        jobs.save_pulseheight_fits(summary, [])
+
+        # No fits expected
+
+        fits = models.PulseheightFit.objects.all()
+        self.assertEqual(len(fits), 0)
+
+    def test_jobs_safe_pulseheight_fit_update(self):
+        """ Updating a PulseheightFit should be reflected in the database
+        """
+
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        numberOfPlate = 1
+
+        # Create and save a fit into the database
+
+        fit = models.PulseheightFit(
+            source = summary,
+            plate = int(numberOfPlate),
+
+            initial_mpv = 1,
+            initial_width = 2,
+
+            fitted_mpv = 3,
+            fitted_mpv_error = 4,
+            fitted_width = 5,
+            fitted_width_error = 6,
+
+            chi_square_reduced = 7)
+
+        fit.save()
+
+        # Try to update an existing fit. What matters is that the source and
+        # plate are the same, as the pair is defined to be unique in the table.
+
+        fits = models.PulseheightFit.objects.filter(source = summary)
+        self.assertEqual(len(fits), 1)
+
+        fits[0].initial_mpv = 10
+
+        jobs.save_pulseheight_fits(summary, fits)
+
+        # Updated value is expected
+
+        fits = models.PulseheightFit.objects.filter(source = summary)
+        self.assertEqual(len(fits), 1)
+        self.assertEqual(fits[0].initial_mpv, 10.0)
+
+
+class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
+
+    fixtures = [
+        'tests_inforecords',
+        'tests_histograms'
+    ]
+
+    #---------------------------------------------------------------------------
+    # Setup and teardown
+    #---------------------------------------------------------------------------
+
+    def setUp(self):
+        super(UpdateAllHistogramsTestCase, self).setUp()
 
         models.DailyHistogram.objects.all().delete()
         models.DailyDataset.objects.all().delete()
         models.PulseheightFit.objects.all().delete()
 
     def tearDown(self):
-        super(UpdateAllHistogramsTests, self).tearDown()
+        super(UpdateAllHistogramsTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests
