@@ -232,13 +232,10 @@ def getPulseheightFits(summary):
     pulseheights = esd.get_event_data(summary, 'pulseheights')
     today = datetime.datetime.utcnow()
 
-    config = (Configuration.objects.filter(source__station=summary.station,
-                                           timestamp__lte=today)
-                                   .latest('timestamp'))
-    if config.slave() == 'no slave':
-        n_plates = 2
-    else:
-        n_plates = 4
+    try:
+        n_plates = summary.station.number_of_plates()
+    except Configuration.DoesNotExist:
+        raise
 
     fits = []
 

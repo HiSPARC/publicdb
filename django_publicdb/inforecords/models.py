@@ -5,6 +5,8 @@ import xmlrpclib
 
 from django.conf import settings
 
+import datetime
+
 
 class Profession(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -177,6 +179,23 @@ class Station(models.Model):
     def delete(self, *args, **kwargs):
         super(Station, self).delete(*args, **kwargs)
         reload_datastore()
+
+    def number_of_plates(self):
+        from django_publicdb.histograms.models import Configuration
+
+        n_plates = 0
+        today = datetime.datetime.utcnow()
+
+        config = (Configuration.objects.filter(source__station=self,
+                                               timestamp__lte=today)
+                                       .latest('timestamp'))
+
+        if config.slave() == 'no slave':
+            n_plates = 2
+        else:
+            n_plates = 4
+
+        return n_plates
 
     class Meta:
         ordering = ('number',)
