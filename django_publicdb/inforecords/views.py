@@ -11,6 +11,7 @@ from django_publicdb.histograms.models import *
 from django_publicdb.status_display.views import station_has_data
 
 import os
+import datetime
 
 @login_required
 def keys(request, host):
@@ -83,14 +84,29 @@ def create_nagios_config(request):
         has_data = station_has_data(host.station)
 
         # Add the pulseheight monitoring service here
+        # For every plate it retrieves the thresholds values. These are then
+        # passed to the template via the "hosts" variable
+
         pulseheight_thresholds = []
-        for service in host.enabledservice_set.all():
-            check_command = service.monitor_service.nagios_command
+       
+        try:
+            number_of_plates = host.station.number_of_plates()
 
-            if not check_command.count('check_pulseheight_mpv'):
-                continue
+            for service in host.enabledservice_set.all():
+                check_command = service.monitor_service.nagios_command
 
-            pulseheight_thresholds = MonitorPulseheightThresholds.objects.filter(station=host.station)
+                if not check_command.count('check_pulseheight_mpv'):
+                    continue
+
+                pulseheight_thresholds = \
+                    MonitorPulseheightThresholds.objects \
+                                                .filter(station=host.station,
+                                                        plate__lte=number_of_plates)
+
+                break
+
+        except Configuration.DoesNotExist:
+            pass
 
         # Append this host to the hosts list
         hosts.append({
