@@ -7,6 +7,8 @@ import os
 import code
 import logging
 
+import tables
+
 # Django
 from django.conf import settings
 from django.test import TestCase, TransactionTestCase
@@ -49,6 +51,14 @@ class BaseHistogramsTestCase(TransactionTestCase):
 
         self.assertTrue(os.path.exists(file))
 
+        try:
+            data = tables.openFile(file, "r")
+        except Exception:
+            self.assertTrue(False)
+
+        self.assertEqual(len(data.root.hisparc.cluster_amsterdam.station_501.events), 6843)
+        data.close()
+
         # Download real data of station 505 on 20 January 2010, which has
         # data where we can fit the pulseheight MPV.
 
@@ -59,6 +69,14 @@ class BaseHistogramsTestCase(TransactionTestCase):
             tests_datastore.download_data_station(501, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
+
+        try:
+            data = tables.openFile(file, "r")
+        except Exception:
+            self.assertTrue(False)
+
+        self.assertEqual(len(data.root.hisparc.cluster_amsterdam.station_501.events), 63322)
+        data.close()
 
         #
 
@@ -204,8 +222,10 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
 
         models.PulseheightFit.objects.all().delete()
 
-        jobs.check_for_updates()
+        print "Checking for updates"
+        self.assertTrue(jobs.check_for_updates())
 
+        print "Updating ESD"
         jobs.update_esd()
 
     def tearDown(self):
@@ -247,7 +267,7 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
 
         self.assertEqual(len(fits), 0)
 
-    def test_jobs_safe_pulseheight_fit_normal(self):
+    def test_jobs_save_pulseheight_fit_normal(self):
         """ Saving a PulseheightFit in normal conditions
         """
 
@@ -281,7 +301,7 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
         self.assertEqual(len(fits), 4)
         self.assertEqual(fits[0].initial_mpv, 1.0)
 
-    def test_jobs_safe_pulseheight_fit_no_fits(self):
+    def test_jobs_save_pulseheight_fit_no_fits(self):
         """ Saving no fits should do nothing
         """
 
@@ -295,7 +315,7 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
         fits = models.PulseheightFit.objects.all()
         self.assertEqual(len(fits), 0)
 
-    def test_jobs_safe_pulseheight_fit_update(self):
+    def test_jobs_save_pulseheight_fit_update(self):
         """ Updating a PulseheightFit should be reflected in the database
         """
 

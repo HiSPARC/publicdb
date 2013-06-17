@@ -8,6 +8,7 @@ import os
 
 import json
 import urllib
+import tables
 
 # Selenium
 from selenium    import webdriver
@@ -59,6 +60,16 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
             tests_datastore.download_data_station(3203, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
+
+        try:
+            data = tables.openFile(file, "r")
+        except Exception:
+            self.assertTrue(False)
+
+        self.assertEqual(len(data.root.hisparc.cluster_leiden.station_3201.events), 50547)
+        self.assertEqual(len(data.root.hisparc.cluster_leiden.station_3202.events), 43176)
+        self.assertEqual(len(data.root.hisparc.cluster_leiden.station_3203.events), 18268)
+        data.close()
 
         #
 
