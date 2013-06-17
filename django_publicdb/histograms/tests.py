@@ -78,7 +78,13 @@ class BaseHistogramsTestCase(TransactionTestCase):
         self.assertEqual(len(data.root.hisparc.cluster_amsterdam.station_501.events), 63322)
         data.close()
 
-        #
+        # Reset generator state such that it will always update when new files
+        # are found
+
+        state = models.GeneratorState.objects.get()
+        state.update_last_run = datetime.datetime.fromtimestamp(0)
+        state.check_last_run = datetime.datetime.fromtimestamp(0)
+        state.save()
 
         super(BaseHistogramsTestCase, self).setUp()
 
