@@ -108,7 +108,7 @@ class MyJsparcTests(LiveServerTestCase):
         # session is not in progress anymore.
 
         session = AnalysisSession.objects.all()[0]
-       
+
         session.starts = datetime.datetime.now() - datetime.timedelta(days=1)
         session.ends = datetime.datetime.now() + datetime.timedelta(days=365)
         session.save()
@@ -158,13 +158,17 @@ class MyJsparcTests(LiveServerTestCase):
 
         session = AnalysisSession.objects.all()[0]
 
-        response = client.receive_coincidence(
-            session.title,
-            0000,
-            "Student 1"
-        )
-
-        assert(not is_json(response))
+        try:
+            response = client.receive_coincidence(
+                session.title,
+                0000,
+                "Student 1"
+            )
+        except IOError, e:
+            #raise IOError, ('http error', errcode, errmsg, headers)
+            self.assertEqual(e[1], 401)
+        else:
+            self.assertTrue(False)
 
     def test_wrongTitle( self ):
         client = Client(self)
