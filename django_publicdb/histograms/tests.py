@@ -15,7 +15,7 @@ from django.test import TestCase, TransactionTestCase
 
 # Publicdb
 from django_publicdb.tests import datastore as tests_datastore
-from django_publicdb.histograms import models, datastore, jobs
+from django_publicdb.histograms import models, datastore, jobs, esd
 
 class BaseHistogramsTestCase(TransactionTestCase):
 
@@ -226,12 +226,26 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
     def setUp(self):
         super(PulseheightFitTestCase, self).setUp()
 
+        # Prepare tables
+
         models.PulseheightFit.objects.all().delete()
 
-        print "Checking for updates"
+        # Don't generate ESD file when it already exists
+
+        if os.path.exists(esd.get_esd_data_path(datetime.date(2011, 7, 7))):
+            return
+
+        # Generate ESD file
+
+        models.Summary.objects.filter(date__gte=datetime.date(2011, 7, 7)).delete()
+
         self.assertTrue(jobs.check_for_updates())
 
-        print "Updating ESD"
+        summary = models.Summary.objects.get(station__number=501,
+                                             date = datetime.date(2011, 7, 7))
+
+        self.assertTrue(summary.needs_update)
+
         jobs.update_esd()
 
     def tearDown(self):
