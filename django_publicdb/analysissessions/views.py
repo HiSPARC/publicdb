@@ -203,7 +203,10 @@ def request_form( request ):
     # Render response
     #----------------
 
-    html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
+    html_captcha = "reCAPTCHA disabled"
+
+    if settings.RECAPTCHA_ENABLED:
+        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
 
     return render_to_response('request.html',
                               {'form': form, 'html_captcha': html_captcha},
@@ -218,7 +221,7 @@ def validate_request_form( request ):
     # Check reCaptcha input
     #----------------------
 
-    if not settings.RECAPTCHA_DISABLE_CHECK:
+    if settings.RECAPTCHA_ENABLED:
 
         check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
                                        request.POST['recaptcha_response_field'],
