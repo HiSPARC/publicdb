@@ -9,13 +9,13 @@ import logging
 
 # Django
 from django.conf import settings
-from django.test import TestCase
+from django.test import TestCase, TransactionTestCase
 
 # Publicdb
 from django_publicdb.tests import datastore as tests_datastore
 from django_publicdb.histograms import models, datastore, jobs
 
-class BaseHistogramsTestCase(TestCase):
+class BaseHistogramsTestCase(TransactionTestCase):
 
     fixtures = [
         'tests_inforecords'

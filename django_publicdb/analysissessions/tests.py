@@ -73,7 +73,7 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         settings.DATASTORE_PATH = self.original_datastore_path
 
-        #self.driver.quit()
+        self.driver.quit()
 
     #---------------------------------------------------------------------------
     # Helper functions
