@@ -14,7 +14,7 @@ from django.conf import settings
 from django.test import TestCase, TransactionTestCase
 
 # Publicdb
-from django_publicdb.tests import datastore as tests_datastore
+from lib.test import datastore as test_datastore
 from django_publicdb.histograms import models, datastore, jobs, esd
 
 class BaseHistogramsTestCase(TransactionTestCase):
@@ -35,7 +35,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
 
         self.original_datastore_path = settings.DATASTORE_PATH
 
-        tests_datastore.setup_test_datastore_directory(os.path.join(
+        test_datastore.setup_test_datastore_directory(os.path.join(
             settings.TEST_DATASTORE_PATH,
             "histograms"
         ))
@@ -44,10 +44,10 @@ class BaseHistogramsTestCase(TransactionTestCase):
         # include weather data and configuration update.
 
         date = datetime.date(2012, 5, 16)
-        file = tests_datastore.get_datafile_path(date)
+        file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            tests_datastore.download_data_station(501, date, get_blobs=True)
+            test_datastore.download_data_station(501, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 
@@ -63,10 +63,10 @@ class BaseHistogramsTestCase(TransactionTestCase):
         # data where we can fit the pulseheight MPV.
 
         date = datetime.date(2011, 7, 7)
-        file = tests_datastore.get_datafile_path(date)
+        file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            tests_datastore.download_data_station(501, date, get_blobs=True)
+            test_datastore.download_data_station(501, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 

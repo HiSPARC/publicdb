@@ -26,7 +26,7 @@ from django.conf import settings
 from django.test import LiveServerTestCase
 
 # Publicdb
-from django_publicdb.tests import datastore as tests_datastore
+from lib.test import datastore as test_datastore
 
 class MyAnalysisSessionsTests(LiveServerTestCase):
     fixtures = ['tests_inforecords']
@@ -42,7 +42,7 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         self.original_datastore_path = settings.DATASTORE_PATH
 
-        tests_datastore.setup_test_datastore_directory(os.path.join(
+        test_datastore.setup_test_datastore_directory(os.path.join(
             settings.TEST_DATASTORE_PATH,
             "analysissessions"
         ))
@@ -52,12 +52,12 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         date = datetime.date(2011, 3, 25)
 
-        file = tests_datastore.get_datafile_path(date)
+        file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            tests_datastore.download_data_station(3201, date, get_blobs=True)
-            tests_datastore.download_data_station(3202, date, get_blobs=True)
-            tests_datastore.download_data_station(3203, date, get_blobs=True)
+            test_datastore.download_data_station(3201, date, get_blobs=True)
+            test_datastore.download_data_station(3202, date, get_blobs=True)
+            test_datastore.download_data_station(3203, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 

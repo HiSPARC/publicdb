@@ -9,7 +9,7 @@ from django.conf import settings
 from django.test import LiveServerTestCase
 
 # Publicdb
-from django_publicdb.tests import datastore as tests_datastore
+from lib.test import datastore as test_datastore
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 
