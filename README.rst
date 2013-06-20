@@ -230,6 +230,10 @@ For example::
     $ ./manage.py test analysissessions
     $ ./manage.py test jsparc
 
+or in one line::
+
+    $ ./manage.py test histograms api analysissessions jsparc
+
 Tests can also be run by executing the next line::
 
     $ ./manage.py test
