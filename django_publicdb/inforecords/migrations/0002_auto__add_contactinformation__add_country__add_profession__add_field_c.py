@@ -7,7 +7,7 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        
+
         # Adding model 'ContactInformation'
         db.create_table('inforecords_contactinformation', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
@@ -46,10 +46,10 @@ class Migration(SchemaMigration):
         db.add_column('inforecords_cluster', 'number', self.gf('django.db.models.fields.IntegerField')(default=0, blank=True), keep_default=False)
 
         # Adding field 'Cluster.new_country'
-        db.add_column('inforecords_cluster', 'new_country', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='clusters', to=orm['inforecords.Country']), keep_default=False)
+        db.add_column('inforecords_cluster', 'new_country', self.gf('django.db.models.fields.related.ForeignKey')(related_name='clusters', to=orm['inforecords.Country'], null=True), keep_default=False)
 
         # Adding field 'Contact.profession'
-        db.add_column('inforecords_contact', 'profession', self.gf('django.db.models.fields.related.ForeignKey')(default=0, to=orm['inforecords.Profession'], blank=True), keep_default=False)
+        db.add_column('inforecords_contact', 'profession', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['inforecords.Profession'], blank=True, null=True), keep_default=False)
 
         # Adding field 'Contact.prefix_surname'
         db.add_column('inforecords_contact', 'prefix_surname', self.gf('django.db.models.fields.CharField')(default='', max_length=10, blank=True), keep_default=False)
@@ -58,26 +58,26 @@ class Migration(SchemaMigration):
         db.add_column('inforecords_contact', 'surname', self.gf('django.db.models.fields.CharField')(default='', max_length=40), keep_default=False)
 
         # Adding field 'Contact.contactinformation'
-        db.add_column('inforecords_contact', 'contactinformation', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='contacts', to=orm['inforecords.ContactInformation']), keep_default=False)
+        db.add_column('inforecords_contact', 'contactinformation', self.gf('django.db.models.fields.related.ForeignKey')(related_name='contacts', to=orm['inforecords.ContactInformation'], null=True), keep_default=False)
 
         # Adding field 'Station.name'
         db.add_column('inforecords_station', 'name', self.gf('django.db.models.fields.CharField')(default='', max_length=70), keep_default=False)
 
         # Adding field 'Station.contact_information'
-        db.add_column('inforecords_station', 'contact_information', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations', to=orm['inforecords.ContactInformation']), keep_default=False)
+        db.add_column('inforecords_station', 'contact_information', self.gf('django.db.models.fields.related.ForeignKey')(related_name='stations', to=orm['inforecords.ContactInformation'], null=True), keep_default=False)
 
         # Adding field 'Station.cluster'
-        db.add_column('inforecords_station', 'cluster', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations', to=orm['inforecords.Cluster']), keep_default=False)
+        db.add_column('inforecords_station', 'cluster', self.gf('django.db.models.fields.related.ForeignKey')(related_name='stations', to=orm['inforecords.Cluster'], null=True), keep_default=False)
 
         # Adding field 'Station.ict_contact'
-        db.add_column('inforecords_station', 'ict_contact', self.gf('django.db.models.fields.related.ForeignKey')(default=0, related_name='stations_ict_contact', to=orm['inforecords.Contact']), keep_default=False)
+        db.add_column('inforecords_station', 'ict_contact', self.gf('django.db.models.fields.related.ForeignKey')(related_name='stations_ict_contact', to=orm['inforecords.Contact'], null=True), keep_default=False)
 
         # Changing field 'Station.number'
         db.alter_column('inforecords_station', 'number', self.gf('django.db.models.fields.IntegerField')(unique=True, blank=True))
 
 
     def backwards(self, orm):
-        
+
         # Deleting model 'ContactInformation'
         db.delete_table('inforecords_contactinformation')
 

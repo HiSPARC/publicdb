@@ -19,6 +19,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
         'NAME': os.path.join(publicdb_path, 'public.db'), # Or path to database file if using sqlite3.
+        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -31,6 +32,7 @@ DATABASES = {
 
 # Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = os.path.join(publicdb_path, 'datastore')
+TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = os.path.join(publicdb_path, 'esd')
