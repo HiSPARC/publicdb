@@ -28,7 +28,7 @@ from django.test import LiveServerTestCase
 # Publicdb
 from lib.test import datastore as test_datastore
 
-class MyAnalysisSessionsTests(LiveServerTestCase):
+class LiveSessionTestCase(LiveServerTestCase):
     fixtures = ['tests_inforecords']
 
     #---------------------------------------------------------------------------
@@ -73,14 +73,14 @@ class MyAnalysisSessionsTests(LiveServerTestCase):
 
         #
 
-        super(MyAnalysisSessionsTests, self).setUp()
+        super(LiveSessionTestCase, self).setUp()
 
         # Start Selenium
 
         self.driver = webdriver.Firefox()
 
     def tearDown(self):
-        super(MyAnalysisSessionsTests, self).tearDown()
+        super(LiveSessionTestCase, self).tearDown()
 
         settings.DATASTORE_PATH = self.original_datastore_path
 

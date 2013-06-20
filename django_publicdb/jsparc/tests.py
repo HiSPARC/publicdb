@@ -91,7 +91,7 @@ class Client:
         return response
 
 
-class MyJsparcTests(LiveServerTestCase):
+class LiveSessionTestCase(LiveServerTestCase):
 
     fixtures = [
         'tests_inforecords',
@@ -115,10 +115,10 @@ class MyJsparcTests(LiveServerTestCase):
 
         #
 
-        super( MyJsparcTests, self ).setUp()
+        super( LiveSessionTestCase, self ).setUp()
 
     def tearDown( self ):
-        super( MyJsparcTests, self ).tearDown()
+        super( LiveSessionTestCase, self ).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests

@@ -4,7 +4,7 @@ from django.core import serializers
 from django_publicdb.coincidences.models import *
 from django_publicdb.inforecords.models import *
 
-class MyCoincidencesTests(TestCase):
+class SerializationTestCase(TestCase):
 
     fixtures = [
         'tests_inforecords'
@@ -15,10 +15,10 @@ class MyCoincidencesTests(TestCase):
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        super(MyCoincidencesTests, self).setUp()
+        super(SerializationTestCase, self).setUp()
 
     def tearDown(self):
-        super(MyCoincidencesTests, self).tearDown()
+        super(SerializationTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests

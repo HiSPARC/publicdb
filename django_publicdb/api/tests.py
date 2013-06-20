@@ -26,7 +26,7 @@ def is_json(response):
     return True
 
 
-class MyAPItests(LiveServerTestCase):
+class ViewsTestCase(LiveServerTestCase):
     fixtures = [
         'tests_inforecords',
         'tests_histograms'
@@ -37,11 +37,11 @@ class MyAPItests(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def setUp(self):
-        super(MyAPItests, self).setUp()
+        super(ViewsTestCase, self).setUp()
 
 
     def tearDown(self):
-        super(MyAPItests, self).tearDown()
+        super(ViewsTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Helper functions
