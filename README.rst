@@ -174,25 +174,25 @@ approach lies somewhere in the middle.
 
 When tests are written, please consider the following thoughts:
 
-    - Write tests for a specific functionality in an isolated situation
-      (`unit testing <https://en.wikipedia.org/wiki/Unit_testing>`_).
-    - Write tests for a specific functionality in a context interacting with
-      other pieces of code (`integration testing <http://en.wikipedia.org/wiki/Integration_testing>`_).
-    - Give a certain input and check for the expected output or behaviour
-      (functional testing). The output does not necessarily have to be the
-      returned result of a function, but can be any measurable quantity such as
-      the execution time.
-    - Write tests that explicitly tries to break the functionality. This can be
-      done by giving wrong input. Good code has proper input checks and error
-      handling.
+- Write tests for a specific functionality in an isolated situation
+  (`unit testing <https://en.wikipedia.org/wiki/Unit_testing>`_).
+- Write tests for a specific functionality in a context interacting with
+  other pieces of code (`integration testing <http://en.wikipedia.org/wiki/Integration_testing>`_).
+- Give a certain input and check for the expected output or behaviour
+  (functional testing). The output does not necessarily have to be the
+  returned result of a function, but can be any measurable quantity such as
+  the execution time.
+- Write tests that explicitly tries to break the functionality. This can be
+  done by giving wrong input. Good code has proper input checks and error
+  handling.
 
 There are also non-functional tests and they include among other things:
 
-    - Compatibility testing
-    - Performance testing
-    - Recovery testing
-    - Security testing
-    - Stress testing
+- Compatibility testing
+- Performance testing
+- Recovery testing
+- Security testing
+- Stress testing
 
 Running tests
 ^^^^^^^^^^^^^
@@ -287,13 +287,13 @@ A starting point for writing your own tests would be the existing test suites of
 each application of this project. They are located in the file "tests.py" in
 each application directory. Each shows different concepts:
 
-    - histograms/tests.py: multiple TestCases inherited from a single
-      superclass. Includes both unit and integration test cases.
-    - api/tests.py and jsparc/tests.py: running LiveServerTestCase with urllib2
-      as the http client.
-    - analysissessions/tests.py: running LiveServerTestCase with Firefox as the
-      web client. Firefox is automated using Selenium, which provides an API for
-      scripting Firefox using python.
+- histograms/tests.py: multiple TestCases inherited from a single
+  superclass. Includes both unit and integration test cases.
+- api/tests.py and jsparc/tests.py: running LiveServerTestCase with urllib2
+  as the http client.
+- analysissessions/tests.py: running LiveServerTestCase with Firefox as the
+  web client. Firefox is automated using Selenium, which provides an API for
+  scripting Firefox using python.
 
 A `LiveServerTestCase <https://docs.djangoproject.com/en/1.5/topics/testing/overview/#liveservertestcase>`_
 is like executing tests while the publicdb is running from a live http server
@@ -332,8 +332,8 @@ To use fixture files in a test case they need to be placed in the "fixtures"
 directory of an application. Hence the two fixtures in the example correspond
 to the following files:
 
-    - histograms/fixtures/tests_histograms.json.gz
-    - inforecords/fixtures/tests_inforecords.json.gz
+- histograms/fixtures/tests_histograms.json.gz
+- inforecords/fixtures/tests_inforecords.json.gz
 
 Event data
 ##########
