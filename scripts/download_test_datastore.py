@@ -15,7 +15,10 @@
 import os
 import sys
 
-sys.path.append('../')
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+sys.path.append(publicdb_path)
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
@@ -30,7 +33,7 @@ from django_publicdb.inforecords.models import *
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
 START = date(2013, 1, 5)
-END = date(2013, 1, 6)
+END = date(2013, 1, 7)
 
 
 def main():

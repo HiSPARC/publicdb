@@ -1,5 +1,10 @@
 # Django settings for django_publicdb project.
 
+import os.path
+
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
@@ -13,7 +18,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
-        'NAME': '../public.db',                      # Or path to database file if using sqlite3.
+        'NAME': os.path.join(publicdb_path, 'public.db'), # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -25,10 +30,10 @@ DATABASES = {
 # DEV_ONLY
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '../datastore'
+DATASTORE_PATH = os.path.join(publicdb_path, 'datastore')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
-ESD_PATH = '../esd'
+ESD_PATH = os.path.join(publicdb_path, 'esd')
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
@@ -62,7 +67,7 @@ USE_I18N = True
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # DEV_ONLY
-MEDIA_ROOT = '../mediaroot/'
+MEDIA_ROOT = os.path.join(publicdb_path, '/mediaroot/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -73,7 +78,7 @@ MEDIA_URL = 'http://localhost:8008/mediaroot/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = '/srv/publicdb/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -105,7 +110,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    'django.middleware.gzip.GZipMiddleware',
+    #'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -116,6 +121,11 @@ MIDDLEWARE_CLASSES = (
 )
 
 ROOT_URLCONF = 'django_publicdb.urls'
+
+ALLOWED_HOSTS = [
+    'data.hisparc.nl',
+    'data.hisparc.nl.', # Also allow FQDN
+]
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

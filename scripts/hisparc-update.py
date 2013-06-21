@@ -5,7 +5,10 @@ import logging
 import traceback
 import time
 
-sys.path.append('..')
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+sys.path.append(publicdb_path)
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import django_publicdb.histograms as hg

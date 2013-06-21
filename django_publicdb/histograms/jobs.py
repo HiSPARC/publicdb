@@ -16,6 +16,8 @@ from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
+import fit_pulseheight_peak
+
 logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
@@ -173,6 +175,18 @@ def update_histograms():
 
     # Use a worker pool
     worker_pool = multiprocessing.Pool()
+    summaries = Summary.objects.filter(needs_update_config=True).reverse()
+    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
+    for summary in results:
+        summary.needs_update_config=False
+        summary.save()
+    worker_pool.close()
+    worker_pool.join()
+
+    # Use a new worker pool (or you'll be sorry).
+    # You could reuse the worker pool, but then you need to force querying
+    # the database to prefetch all summaries.
+    worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_events=True).reverse()
     results = worker_pool.imap_unordered(perform_events_tasks, summaries)
     for summary in results:
@@ -182,8 +196,6 @@ def update_histograms():
     worker_pool.join()
 
     # Use a new worker pool (or you'll be sorry).
-    # You could reuse the worker pool, but then you need to force querying
-    # the database to prefetch all summaries.
     worker_pool = multiprocessing.Pool()
     summaries = Summary.objects.filter(needs_update_weather=True).reverse()
     results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
@@ -193,21 +205,12 @@ def update_histograms():
     worker_pool.close()
     worker_pool.join()
 
-    # Use a new worker pool (or you'll be sorry).
-    worker_pool = multiprocessing.Pool()
-    summaries = Summary.objects.filter(needs_update_config=True).reverse()
-    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
-    for summary in results:
-        summary.needs_update_config=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
-
 
 def perform_events_tasks(summary):
     django.db.close_connection()
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
+    update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     return summary
 
@@ -272,12 +275,24 @@ def update_pulseheight_histogram(summary):
     save_histograms(summary, 'pulseheight', bins, histograms)
 
 
+def update_pulseheight_fit(summary):
+    logger.debug("Updating pulseheight fit for %s" % summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExist:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
+    save_pulseheight_fits(summary, fits)
+
+
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
     integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
+
 
 def process_events_and_store_esd(summary):
     logger.debug("Processing events and storing ESD for %s", summary)
@@ -288,11 +303,13 @@ def process_events_and_store_esd(summary):
     logger.debug("Processing took %.1f s.", t1 - t0)
     return tmpfile_path, node_path
 
+
 def process_weather_and_store_esd(summary):
     logger.debug("Processing weather events and storing ESD for %s", summary)
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
+
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
@@ -379,6 +396,27 @@ def save_dataset(summary, slug, data):
     d.y = y
     d.save()
     logger.debug("Saved succesfully")
+
+
+def save_pulseheight_fits(summary, fits):
+
+    if len(fits) == 0:
+        logger.debug("Empty pulseheight fit results. Nothing to save.")
+        return
+
+    logger.debug("Saving pulseheight fits for %s" % summary)
+
+    for fit in fits:
+        try:
+            fit.save()
+        except django.db.IntegrityError:
+            existing_fit = PulseheightFit.objects.get(source=summary,
+                                                      plate=fit.plate)
+
+            fit.id = existing_fit.id
+            fit.save()
+
+    logger.debug("Saved successfully")
 
 
 def get_station_cluster_id(station):

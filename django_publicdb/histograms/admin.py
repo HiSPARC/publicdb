@@ -38,6 +38,12 @@ class ConfigurationAdmin(admin.ModelAdmin):
     raw_id_fields = ('source',)
 
 
+class PulseheightFitAdmin(admin.ModelAdmin):
+    list_display = ('station', 'date', 'plate', 'fitted_mpv')
+    list_filter = ('source__station__number', 'plate', 'source__date')
+    raw_id_fields = ('source',)
+
+
 admin.site.register(GeneratorState, GeneratorStateAdmin)
 admin.site.register(Summary, SummaryAdmin)
 admin.site.register(DailyHistogram, DailyHistogramAdmin)
@@ -45,3 +51,4 @@ admin.site.register(HistogramType)
 admin.site.register(DailyDataset, DailyDatasetAdmin)
 admin.site.register(DatasetType)
 admin.site.register(Configuration, ConfigurationAdmin)
+admin.site.register(PulseheightFit, PulseheightFitAdmin)

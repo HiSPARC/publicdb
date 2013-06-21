@@ -34,15 +34,15 @@ def get_coincidence(request):
     try:
         session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
-            raise ValueError('Wrong pin for this session')
+            return error_json(401, 'Wrong pin for this session.')
     except AnalysisSession.DoesNotExist:
-        raise Exception('No such analysis session!')
+        return error_json(404, 'No session with that title.')
     except ValueError:
         raise
     else:
         if not session.in_progress():
-            raise Exception("Analysis session hasn't started yet or "
-                            "is already closed!")
+            return error_json(404, "The requested session has not started yet "
+                                   "or is already expired.")
 
     if not student_name:
         student = Student.objects.get(session=session,
@@ -107,6 +107,16 @@ def data_json(coincidence, events):
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
     response = HttpResponse(json.dumps(data), mimetype='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def error_json(error_code, message):
+    """Construct error response json for jSparc requests"""
+    data = dict(message=message,
+                code=error_code)
+    response = HttpResponse(json.dumps(data), status=error_code,
+                            mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 

@@ -166,7 +166,7 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '%s' % (self.number)
+        return '%5d: %s' % (self.number, self.name)
 
     def save(self, *args, **kwargs):
         if self.number==None:
@@ -315,6 +315,7 @@ class Pc(models.Model):
     type = models.ForeignKey(PcType)
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
+    is_test = models.BooleanField(default=False)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
@@ -398,6 +399,19 @@ class Pc(models.Model):
             for service in MonitorService.objects. \
                             filter(is_default_service=True):
                 EnabledService(pc=self, monitor_service=service).save()
+
+
+class MonitorPulseheightThresholds(models.Model):
+    station = models.ForeignKey('Station')
+    plate = models.IntegerField()
+
+    mpv_mean = models.FloatField()
+    mpv_sigma = models.FloatField()
+    mpv_max_allowed_drift = models.FloatField()
+    mpv_min_allowed_drift = models.FloatField()
+
+    class Meta:
+        verbose_name_plural = "Pulseheight thresholds for Nagios monitoring"
 
 
 class MonitorService(models.Model):

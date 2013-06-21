@@ -10,6 +10,18 @@ from django_publicdb.analysissessions.models import *
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 
+import os
+import numpy
+import scipy
+from scipy import optimize
+
+
+class Nagios:
+    ok = (0, 'OK')
+    warning = (1, 'WARNING')
+    critical = (2, 'CRITICAL')
+    unknown = (3, 'UNKNOWN')
+
 
 def json_dict(dict):
     """Create a json HTTPResponse"""
@@ -82,7 +94,8 @@ def station(request, station_id):
 
     station_info = {'number': station.number,
                     'name': station.name,
-                    'cluster': station.cluster.name,
+                    'subcluster': station.cluster.name,
+                    'cluster': station.cluster.main_cluster(),
                     'country': station.cluster.country.name,
                     'latitude': config.gps_latitude,
                     'longitude': config.gps_longitude,
@@ -435,6 +448,281 @@ def get_country_dict():
     return sorted(country_dict, key=itemgetter('number'))
 
 
+def get_pulseheight_drift(request, station_number, plate_number,
+                          year, month, day, number_of_days):
+
+    #---------------------------------------------------------------------------
+    # Initialize
+    #---------------------------------------------------------------------------
+
+    requested_date = datetime.date(int(year), int(month), int(day))
+
+    station_number = int(station_number)
+    plate_number = int(plate_number)
+
+    year = int(year)
+    month = int(month)
+    day = int(day)
+
+    number_of_days = int(number_of_days)
+
+    dict = {
+        'station': station_number,
+        'plate_number': plate_number,
+        'year': year,
+        'month': month,
+        'day': day}
+
+    if (plate_number < 1) or (plate_number > 4):
+        dict.update({
+            "nagios": Nagios.unknown,
+            "error": "Platenumber (value = %s) is out of range, should be between 1 and 4" %
+                     plate_number
+        })
+        return json_dict(dict)
+
+    #---------------------------------------------------------------------------
+    # Get fits
+    #---------------------------------------------------------------------------
+
+    try:
+        station = Station.objects.get(number=station_number)
+
+        date_range = (requested_date - datetime.timedelta(days=number_of_days-1),
+                      requested_date)
+
+        summaries = Summary.objects.filter(station=station,
+                                           date__range=date_range)
+
+        fits = PulseheightFit.objects.filter(source__in=summaries,
+                                             plate=plate_number,
+                                             chi_square_reduced__gt=0.01,
+                                             chi_square_reduced__lt=8.0,
+                                             initial_width__gt=45.0)
+    except Exception, e:
+        dict.update({
+            "nagios": Nagios.unknown,
+            "error": "Error retrieving fits",
+            "exception": str(e)})
+        return json_dict(dict)
+
+    #---------------------------------------------------------------------------
+    # Fit drift
+    #---------------------------------------------------------------------------
+
+    t_array   = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+    mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
+
+    linear_fit = lambda p, t: p[0] + p[1]*t # Target function
+
+    # Determine the drift by a linear fit
+
+    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+
+    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+
+    drift = p1[1] * 86400.0
+
+    # Calculate the relative fluctuation
+
+    relative_mpv = []
+
+    for t, mpv in zip(t_array, mpv_array):
+        relative_mpv.append(mpv / linear_fit(p1, t))
+
+    # Fit the relative fluctation with a gauss
+
+    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+
+    # x = ADC, y = number of events per dPulseheight
+
+    bins = numpy.arange(0.0, 2.0, 0.005)
+    y, bins = numpy.histogram(relative_mpv, bins=bins)
+    x = (bins[:-1] + bins[1:]) / 2
+
+    initial_N = 16
+    initial_mean = 1
+    initial_width = 0.03
+
+    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
+                                                           initial_mean,
+                                                           initial_width))
+
+    #---------------------------------------------------------------------------
+    # Return
+    #---------------------------------------------------------------------------
+
+    dict.update({
+        'number_of_selected_days'  : len(t_array),
+        'number_of_requested_days' : number_of_days,
+
+        'fit_offset'     : p1[0],
+        'fit_slope'      : p1[1],
+
+        'drift_per_day'  : drift,
+
+        'timestamp'      : t_array.tolist(),
+        'mpv'            : mpv_array.tolist(),
+
+        'relative_mean'  : popt[1],
+        'relative_width' : popt[2],
+
+        # Debug
+        #'relative_mpv'   : relative_mpv,
+        #'frequency'      : frequency.tolist(),
+        #'x'              : x.tolist()
+    })
+
+    return json_dict(dict)
+
+
+def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 14)
+
+
+def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+    today = datetime.date.today()
+
+    return get_pulseheight_drift(request, station_id, plate_number,
+                                 today.year, today.month, today.day, 30)
+
+
+def get_pulseheight_fit(request, station_number, plate_number, year=None, month=None, day=None):
+    """Get fit values of the pulseheight distribution for a station on a given day
+
+    Retrieve fit values of the pulseheight distribution. The fitting has to be
+    done before and stored somewhere. This function retrieves the fit values from
+    storage and returns to the client. Returns an error meesage if the values
+    are not found on storage.
+
+    :param station_number: a station number identifier.
+    :param plate_number: plate number in the range 1..4
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
+
+    :return: dictionary containing fit results of the specified station, plate
+             and date
+
+    """
+
+    #---------------------------------------------------------------------------
+    # Initialize
+    #---------------------------------------------------------------------------
+
+    station_number = int(station_number)
+    plate_number = int(plate_number)
+
+    if year == None and month == None and day == None:
+        today = datetime.date.today()
+        yesterday = today - datetime.timedelta(days=1)
+
+        year = yesterday.year
+        month = yesterday.month
+        day = yesterday.day
+
+    year = int(year)
+    month = int(month)
+    day = int(day)
+
+    dict = {
+        'station': station_number,
+        'plate_number': plate_number,
+        'year': year,
+        'month': month,
+        'day': day
+    }
+
+    #---------------------------------------------------------------------------
+    # Get fit
+    #---------------------------------------------------------------------------
+
+    try:
+        fit = PulseheightFit.objects.get(source__station__number=station_number,
+                                         source__date=datetime.date(year,month,day),
+                                         plate=plate_number)
+    except Exception, e:
+        dict.update({
+            "nagios": Nagios.unknown,
+            "error": "Fit has not been found",
+            "exception": str(e)
+        })
+        return json_dict(dict)
+
+    try:
+        dict.update({"entries": fit.source.num_events,
+                     "initial_mpv": fit.initial_mpv,
+                     "initial_width": fit.initial_width,
+                     "fitted_mpv": fit.fitted_mpv,
+                     "fitted_mpv_error": fit.fitted_mpv_error,
+                     "fitted_width": fit.fitted_width,
+                     "fitted_width_error": fit.fitted_width_error,
+                     "chi_square_reduced": fit.chi_square_reduced})
+    except Exception, e:
+        dict.update({
+            "nagios": Nagios.unknown,
+            "error": "Data has been found, "
+                     "but error in converting data to numbers",
+            "exception": str(e)})
+        return json_dict(dict)
+
+    #---------------------------------------------------------------------------
+    # Data quality
+    #---------------------------------------------------------------------------
+
+    # Based on chi2 of the fit
+
+    if fit.chi_square_reduced < 0.01:
+        dict.update({
+            "nagios" : Nagios.critical,
+            "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
+                       fit.chi_square_reduced})
+        return json_dict(dict)
+
+    if fit.chi_square_reduced > 8.0:
+        dict.update({
+            "nagios" : Nagios.critical,
+            "quality": "Chi2 of the fit is greater than 8.0: %.1f"
+                       % fit.chi_square_reduced})
+        return json_dict(dict)
+
+    # Based on the fit range (= initial_width)
+
+    if fit.initial_width < 45:
+        dict.update({
+            "nagios": Nagios.critical,
+            "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
+                       fit.initial_width})
+        return json_dict(dict)
+
+    # Based on MPV and 4*sigma
+
+    threshold = MonitorPulseheightThresholds.objects.get(station__number=station_number,
+                                                         plate=plate_number)
+
+    lower_bound = threshold.mpv_mean * (1 - 4*threshold.mpv_sigma)
+    upper_bound = threshold.mpv_mean * (1 + 4*threshold.mpv_sigma)
+
+    if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
+        dict.update({
+            "nagios": Nagios.critical,
+            "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                       (lower_bound, upper_bound, fit.fitted_mpv)})
+        return json_dict(dict)
+
+    # Everything seems to be a-ok
+
+    dict.update({
+        "nagios": Nagios.ok,
+        "quality": "Fitted MPV is within bounds (%.1f;%.1f): %.1f" %
+                   (lower_bound, upper_bound, fit.fitted_mpv)})
+    return json_dict(dict)
+
+
 def has_data(request, station_id, year=None, month=None, day=None):
     """Check for presence of cosmic ray data
 
@@ -535,20 +823,23 @@ def config(request, station_id, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
+    if year and month and day:
+        date = datetime.date(int(year), int(month), int(day))
+        if not validate_date(date):
+            return HttpResponseNotFound()
+    else:
+        date = datetime.date.today()
+
     try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=date)
-                                      .latest('timestamp'))
-        else:
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=datetime.date.today())
-                                      .latest('timestamp'))
-        config = serializers.serialize("json", [c])
-        config = json.loads(config)
+        c = (Configuration.objects.filter(source__station=station,
+                                          timestamp__lte=date)
+                                  .latest('timestamp'))
+    except Configuration.DoesNotExist:
+        return HttpResponseNotFound()
+
+    config = serializers.serialize("json", [c])
+    config = json.loads(config)
+    try:
         config = config[0]['fields']
     except IndexError:
         config = False

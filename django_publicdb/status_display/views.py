@@ -1,5 +1,6 @@
 from django.shortcuts import (render_to_response, get_object_or_404,
                               get_list_or_404, redirect)
+from django.http import Http404
 from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
@@ -144,7 +145,8 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     for subcluster in Cluster.objects.all():
         stations = []
         for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True):
+                                              pc__is_active=True,
+                                              pc__is_test=False):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
@@ -177,10 +179,11 @@ def station_data(request, station_id, year, month, day):
     date = datetime.date(year, month, day)
 
     station = get_object_or_404(Station, number=station_id)
-    data = get_object_or_404(Summary.objects.filter(Q(station=station),
-                                                    Q(date=date),
-                                                    Q(num_events__isnull=False) |
-                                                    Q(num_weather__isnull=False)))
+    data = get_object_or_404(Summary,
+                             Q(num_events__isnull=False) |
+                             Q(num_weather__isnull=False),
+                             station=station,
+                             date=date)
 
     # Use next_day and prev_day to add previous/next links
     prev_day = date - datetime.timedelta(days=1)
@@ -241,6 +244,7 @@ def station_data(request, station_id, year, month, day):
     return render_to_response('station_data.html',
         {'station': station,
          'date': date,
+         'tomorrow': date + datetime.timedelta(days=1),
          'config': config,
          'has_slave': has_slave,
          'eventhistogram': eventhistogram,
@@ -332,12 +336,16 @@ def station_config(request, station_id):
 def station(request, station_id):
     """Show most recent histograms for a particular station"""
 
-    summary = (Summary.objects.filter(Q(station__number=station_id),
-                                      Q(num_events__isnull=False) |
-                                      Q(num_weather__isnull=False),
-                                      date__gte=datetime.date(2002, 1, 1),
-                                      date__lte=datetime.date.today())
-                              .latest('date'))
+    try:
+        summary = (Summary.objects.filter(Q(num_events__isnull=False) |
+                                          Q(num_weather__isnull=False),
+                                          station__number=station_id,
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                                    .latest('date'))
+    except Summary.DoesNotExist:
+        raise Http404
+
     return redirect(station_data,
                     station_id=str(station_id),
                     year=str(summary.date.year),
