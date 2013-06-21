@@ -1,3 +1,6 @@
+var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
+var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
+
 function createMap(name) {
     var options = {
         fractionalZoom: true,
