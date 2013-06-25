@@ -339,6 +339,34 @@ to the following files:
 - histograms/fixtures/tests_histograms.json.gz
 - inforecords/fixtures/tests_inforecords.json.gz
 
+Existing fixtures content
+#########################
+
+The repository contains fixtures that are based on a snapshot of the hisparc
+publicdb database on 26 July 2012.
+
+analysissessions/fixtures/tests_analysissessions.json.gz:
+
+- Contains a session based on coincidences for the Science park cluster on 1 May
+  2010.
+
+coincidences/fixtures/tests_coincidences.json.gz:
+
+- Includes coincidences for the Science park cluster on 1 May 2010.
+
+histograms/fixtures/tests_histograms.json.gz:
+
+- Summary objects are removed for all but station 501. All objects with a
+  reference to those summaries are also removed (DailyDataset, DailyHistogram,
+  Configuration and PulseheightFit). Only the summaries of the year
+  2011 are kept.
+- All PulseheightFit objects are removed except for those between 16 June 2011
+  and 9 August 2011.
+
+inforecords/fixtures/tests_inforecords.json.gz:
+
+- Sensitive information has been replaced with placeholders.
+
 Event data
 ##########
 
