@@ -9,48 +9,35 @@
 
 {% block head %}
     <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
     <script type="text/javascript">
       {% if config %}
-        var pointStyle = {
-            pointRadius: 6,
-            fillColor: '#B85C32',
-            fillOpacity: 0.8,
-            stroke: true,
-            strokeWidth: 0.5};
-        var nowPointStyle = {
-            pointRadius: 6,
-            fillColor: '#2A7AE2',
-            fillOpacity: 1,
-            stroke: true,
-            strokeWidth: 0.5};
 
         $(document).ready(function() {
-            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
-            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-            var options = {
-                controls: [
-                    new OpenLayers.Control.Navigation(
-                        {dragPanOptions: {enableKinetic: true}}),
-                    new OpenLayers.Control.Attribution(),
-                    new OpenLayers.Control.ScaleLine()]};
-            var map = new OpenLayers.Map("gpsMap", options);
-            var mapLayer = new OpenLayers.Layer.OSM();
-            map.addLayer(mapLayer);
+            var map = createMap("gpsMap");
+            var style = createStyle(map);
 
             map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
                                         .transform(fromProjection, toProjection), 16);
 
-            var gpsLayer = new OpenLayers.Layer.Vector("gps");
+            var gpsLayer = new OpenLayers.Layer.Vector("gps", {styleMap: new OpenLayers.StyleMap(style)});
+
             {% for gps in gpstrack %}
-            var feature = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point{{ gps }}.transform(fromProjection, toProjection), {},
-                pointStyle);
-            gpsLayer.addFeatures(feature);
+                var feature = new OpenLayers.Feature.Vector(
+                                    new OpenLayers.Geometry.Point{{ gps }}.transform(fromProjection, toProjection),
+                                   {id: "", // no label, normally {id: {{ station.number }},
+                                    name: "{{ station.name }}",
+                                    status: "gpsold"});
+                gpsLayer.addFeatures(feature);
             {% endfor %}
 
+
             var feature = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }}).transform(fromProjection, toProjection), {},
-                nowPointStyle);
+                                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                                       .transform(fromProjection, toProjection),
+                               {id: "", // no label, normally {id: {{ station.number }},
+                                name: "{{ station.name }}",
+                                status: "gpsnew"});
             gpsLayer.addFeatures(feature);
 
             map.addLayer(gpsLayer);
@@ -60,29 +47,10 @@
 
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
 
-            map.events.register('zoomend', this, function(event) {
-                var zLevel = map.getZoom();
-                if (zLevel <= 5) {
-                    setPointRadius(2);}
-                else if (zLevel <= 8) {
-                    setPointRadius(3);}
-                else if (zLevel <= 11) {
-                    setPointRadius(4);}
-                else if (zLevel <= 14) {
-                    setPointRadius(4);}
-                else if (zLevel <= 16) {
-                    setPointRadius(5);}
-                else if (zLevel <= 18) {
-                    setPointRadius(6);}
-            });
         });
 
       {% endif %}
 
-        function setPointRadius(size) {
-            $('circle').attr('r', size.toString());
-            pointStyle.pointRadius = size;
-        }
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -113,7 +81,7 @@
             </script>
         </div>
       {% endif %}
-    
+
       {% if currentgraph %}
         <div id="currentGraph" class="histogram">
             <h3>PMT Current</h3>
@@ -134,7 +102,7 @@
             </script>
         </div>
       {% endif %}
-    
+
         <div id="gpsPositions">
             <h3>GPS Positions</h3>
             <div class="sourceLink">
@@ -219,7 +187,7 @@
             <span class="key">Start DAQ mode</span>
             <span class="value {% if config.startmode %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span>
         </div>
-        
+
     </div>
     <div id="stationPosition">
         <div class="sectionTitle">Position</div>
