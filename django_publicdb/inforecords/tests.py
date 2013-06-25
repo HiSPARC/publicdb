@@ -89,6 +89,16 @@ class NagiosConfigTestCase(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def test_config_nagios_501(self):
+        """ Tests the generated nagios config file for station 501.
+
+            It checks the following things:
+            - Number of services for checking the plates. This should correspond
+              to the number of plates of the station.
+            - Definition of the command referenced by the service.
+            - The existence of the file referenced by the command.
+            - Return status of the file when executed. This should return exit
+              status 3 (UNKNOWN in terms of nagios).
+        """
 
         # Initialize work space
 
@@ -174,6 +184,9 @@ class NagiosPluginTestCase(LiveServerTestCase):
     #---------------------------------------------------------------------------
 
     def test_plugin_no_fit(self):
+        """ Tests the check_pulseheight_mpv plugin in case of no fit found.
+            Should return exit code 3 (UNKNOWN).
+        """
 
         # Initialize work space
 
@@ -190,6 +203,9 @@ class NagiosPluginTestCase(LiveServerTestCase):
         self.assertEqual(status[0], 3)
 
     def test_plugin_fit_within_thresholds(self):
+        """ Tests the check_pulseheight_mpv plugin in case of a fit within thresholds.
+            Should return exit code 0 (OK).
+        """
 
         # Initialize work space
         # Delete all fits. Then insert one fit that is within thresholds.
@@ -229,6 +245,9 @@ class NagiosPluginTestCase(LiveServerTestCase):
         self.assertEqual(status[0], 0)
 
     def test_plugin_fit_below_thresholds(self):
+        """ Tests the check_pulseheight_mpv plugin in case of a fit below thresholds.
+            Should return exit code 2 (CRITICAL).
+        """
 
         # Initialize work space
         # Delete all fits. Then insert one fit that is below thresholds.
@@ -268,6 +287,9 @@ class NagiosPluginTestCase(LiveServerTestCase):
         self.assertEqual(status[0], 2)
 
     def test_plugin_fit_above_thresholds(self):
+        """ Tests the check_pulseheight_mpv plugin in case of a fit above thresholds.
+            Should return exit code 2 (CRITICAL).
+        """
 
         # Initialize work space
         # Delete all fits. Then insert one fit that is above thresholds.
