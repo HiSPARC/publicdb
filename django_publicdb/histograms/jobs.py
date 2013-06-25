@@ -210,7 +210,7 @@ def perform_events_tasks(summary):
     django.db.close_connection()
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
-    update_pulseheight_fit(summary)
+    #update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     return summary
 
