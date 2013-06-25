@@ -54,6 +54,9 @@ signal.signal(signal.SIGALRM, raise_timeout)
 #-------------------------------------------------------------------------------
 
 def check_pulseheight_mpv(publicdb_host, stationNumber, plateNumber, date):
+
+    publicdb_host = publicdb_host.replace("http://", "")
+
     try:
         uri = "http://%s/api/station/%s/plate/%s/pulseheight/fit/%s/%s/%s" % (
             publicdb_host,
@@ -127,4 +130,4 @@ if __name__ == '__main__':
                                                     yesterday)
 
     exit(exit_code, exit_message)
-   
+
