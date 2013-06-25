@@ -450,11 +450,18 @@ This has to be repeated whenever a commit introduces new or changed static
 files.
 
 We've installed `supervisor <http://supervisord.org>`_ to manage the uWSGI
-process.  We've added the following program entry::
+process.  Unfortunately, Scientific Linux contains an archaic version
+which uses up 100 % CPU when child process redirects the output for
+logging purposes.  Now, we let supervisord do the logging.
+
+We've added the following program entry::
 
     [program:uwsgi]
     command=/srv/publicdb/publicdb_env/bin/uwsgi --ini /srv/publicdb/www/uwsgi.ini
     stopsignal=INT
+    logfile=/var/log/uwsgi.log
+    log_stdout=true
+    log_stderr=true
 
 The uWSGI config file currently in production::
 
@@ -466,6 +473,7 @@ The uWSGI config file currently in production::
 
     processes = 9
     threads = 4
+    http-timeout = 300
 
     http = 0.0.0.0:80
     stats = 127.0.0.1:9191
@@ -476,17 +484,18 @@ The uWSGI config file currently in production::
     env = DJANGO_SETTINGS_MODULE=django_publicdb.settings
     module = django.core.handlers.wsgi:WSGIHandler()
     static-map = /media/static=/srv/publicdb/static
-    static-map = /media/raw_data=/var/www/html/media/raw_data
+    static-map = /media/raw_data=/localstore/media/raw_data
     static-map = /media/jsparc=/srv/publicdb/jsparc
+    static-map = /media/uploads=/srv/publicdb/uploads
 
     auto-procname = True
     pidfile = /var/run/uwsgi.pid
-    logto = /var/log/uwsgi.log
-    logfile-chown = True
+    #logto = /var/log/uwsgi.log
+    #logfile-chown = True
     touch-reload = /tmp/uwsgi-reload.me
 
     route-uri = ^/django/(.*)$ redirect-permanent:/$1
 
 And the cron job to do a nightly run of data processing::
 
-    0 4 * * * hisparc /srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py
+    0 4 * * * hisparc /srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1

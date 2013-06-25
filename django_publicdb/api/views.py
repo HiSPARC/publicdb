@@ -543,7 +543,8 @@ def get_pulseheight_drift(request, station_number, plate_number,
                  # Debug
                  #'relative_mpv': relative_mpv,
                  #'frequency': frequency.tolist(),
-                 #'x': x.tolist()})
+                 #'x': x.tolist()
+                 })
 
     return json_dict(dict)
 
