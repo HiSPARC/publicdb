@@ -67,7 +67,7 @@ def retrieve_station_status(query):
     nagios_base = "http://vpn.hisparc.nl/cgi-bin/status.cgi?"
 
     try:
-        req = urllib2.urlopen(nagios_base + query, timeout=2)
+        req = urllib2.urlopen(nagios_base + query, timeout=1)
         res = req.read()
         stations = re.findall("host=([a-z0-9]+)\' title", res)
     except (urllib2.URLError, socket.timeout):
