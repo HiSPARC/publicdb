@@ -126,28 +126,72 @@ def getFitParameters(x, y):
 def fitPulseheightPeak(pulseheights):
     """
         pulseheights  : nparray
+
+        returned chi_square:
+        >0: Chi square of the fit.
+        -1: Initial fit range is smaller than or equal to 40 ADC.
+        -2: Maximum calls reached for determining the optimum.
+        -3: Unable to find initial fit parameters
+        -4: There is an empty bin in the fit range. This is probably because
+            the fit occurs somewhere in the tail of the histogram.
     """
+
+    # Contents
+    #
+    # 1. Initialize work space
+    # 2. Make histogram: occurence of dPulseheight vs pulseheight
+    # 3. Get initial fit parameters for gauss: mean and width
+    # 4. Fit with gauss
+    # 5. Calculate the Chi2
+    # 6. Return
+
+    #---------------------------------------------------------------------------
+    # 1. Initialize work space
 
     phMin = 50  # ADC
     phMax = 1550  # ADC
 
-    # Make histogram: occurence of dPulseheight vs pulseheight
+    # Initial return values
+
+    peak = 0
+    width = 0
+
+    fitParameters = numpy.zeros(3)
+    fitCovariance = numpy.zeros((3, 3))
+    fitResult = [fitParameters, fitCovariance]
+
+    chiSquare = 0
+
+    #---------------------------------------------------------------------------
+    # 2. Make histogram: occurence of dPulseheight vs pulseheight
 
     bins = numpy.arange(phMin, phMax, 10)
 
     occurence, bins = numpy.histogram(pulseheights, bins=bins)
     pulseheight = (bins[:-1] + bins[1:]) / 2
 
-    # Get fit parameters
+    # Do initial checks
+
+    sum = occurence.sum()
+
+    if sum < 100:
+        raise ValueError("Sum is less than 100 ADC. Dataset is probably empty")
 
     average_pulseheight = (pulseheight * occurence).sum() / occurence.sum()
 
     if average_pulseheight < 100:
-        raise ValueError("Average pulseheight is less than 100")
+        raise ValueError("Average pulseheight is less than 100 ADC")
 
-    peak, minRange, maxRange = getFitParameters(pulseheight, occurence)
-    logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
-                 (peak, minRange, maxRange))
+    #---------------------------------------------------------------------------
+    # 3. Get initial fit parameters for gauss: mean and width
+
+    try:
+        peak, minRange, maxRange = getFitParameters(pulseheight, occurence)
+        logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
+	                 (peak, minRange, maxRange))
+    except Exception, e:
+        chiSquare = -3
+        return len(pulseheights), peak, width, fitResult, chiSquare
 
     width = peak - minRange
     peakOrig = peak
@@ -156,13 +200,11 @@ def fitPulseheightPeak(pulseheights):
     # at all.
 
     if width <= 40:
-        fitParameters = numpy.zeros(3)
-        fitCovariance = numpy.zeros((3, 3))
-
-        fitResult = [fitParameters, fitCovariance]
         chiSquare = -1
-
         return len(pulseheights), peak, width, fitResult, chiSquare
+
+    #---------------------------------------------------------------------------
+    # 4. Fit with gauss
 
     # Fit function
 
@@ -188,21 +230,31 @@ def fitPulseheightPeak(pulseheights):
             fit_window_pulseheight.append(pulseheight[i])
             fit_window_occurence.append(occurence[i])
 
+    if 0 in fit_window_occurence:
+        chiSquare = -4
+        return len(pulseheights), peak, width, fitResult, chiSquare
+
     # Initial parameter values
 
     initial_N = 16
     initial_mean = peak
     initial_width = width
 
-    fitResult = scipy.optimize.curve_fit(gauss,
-                                         fit_window_pulseheight,
-                                         fit_window_occurence,
-                                         [initial_N, initial_mean, initial_width])
+    try:
+        fitResult = scipy.optimize.curve_fit(gauss,
+                                             fit_window_pulseheight,
+                                             fit_window_occurence,
+                                             [initial_N, initial_mean, initial_width])
+    except RuntimeError, exception:
+        chiSquare = -2
+        return len(pulseheights), peak, width, fitResult, chiSquare
 
     fitParameters = fitResult[0]
     fitCovariance = fitResult[1]
 
-    # Calculate the Chi2
+    #---------------------------------------------------------------------------
+    # 5. Calculate the Chi2
+
     # Chi2 = Sum((y_data - y_fitted)^2 / sigma^2)
     # It is assumed that the events per bin are poisson distributed.
     # Sigma^2 for a poisson process is the same as the number of events in the bin
@@ -212,6 +264,9 @@ def fitPulseheightPeak(pulseheights):
                           fit_window_pulseheight,
                           fit_window_occurence)**2 / fit_window_occurence).sum()
     reducedChiSquare = chiSquare / (len(fit_window_occurence) - len(fitParameters))
+
+    #---------------------------------------------------------------------------
+    # 6. Return
 
     logger.debug("Fit result: peak %.1f +- %.1f, width %.1f +- %.1f" %
                  (fitParameters[1], sqrt(fitCovariance[1,1]),
@@ -229,7 +284,15 @@ def getPulseheightFits(summary):
         summary: Summary
     """
 
+    # Get pulseheight data from ESD
+
     pulseheights = esd.get_event_data(summary, 'pulseheights')
+
+    if pulseheights == None:
+        return []
+
+    # Get number of plates from the config data
+
     today = datetime.datetime.utcnow()
 
     config = (Configuration.objects.filter(source__station=summary.station,
@@ -239,6 +302,8 @@ def getPulseheightFits(summary):
         n_plates = 2
     else:
         n_plates = 4
+
+    # Get fits
 
     fits = []
 
@@ -274,8 +339,15 @@ def getPulseheightFits(summary):
 
             fit.chi_square_reduced = chi_square_reduced
 
-        except ValueError:
-            pass
+        except ValueError, exception:
+            logger.warning("[%s plate %s] %s" %
+                           (summary, numberOfPlate, exception))
+            chi_square_reduced = -1
+
+        except Exception, exception:
+            logger.error("[%s plate %s] %s" %
+                         (summary, numberOfPlate, exception))
+            chi_square_reduced = -99
 
         fits.append(fit)
 
