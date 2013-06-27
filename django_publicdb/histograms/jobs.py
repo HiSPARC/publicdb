@@ -37,6 +37,14 @@ IGNORE_TABLES = ['blobs']
 # to select only new ones during the update.
 RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
 
+# Process data with multiple threads. Default is enabled.
+# Disable multiprocessing for debugging purposes. When multithreaded
+# processing is enabled the traceback doesn't go to the exact location.
+# Also, sqlite3 is single threaded. So when multi processing is used
+# together with sqlite3, you might get the message "database is locked".
+
+USE_MULTIPROCESSING = True
+
 
 def check_for_updates():
     """Run a check for updates to the event tables"""
@@ -174,36 +182,69 @@ def update_histograms():
     """Update all histograms"""
 
     # Use a worker pool
-    worker_pool = multiprocessing.Pool()
+
     summaries = Summary.objects.filter(needs_update_config=True).reverse()
-    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
-    for summary in results:
-        summary.needs_update_config=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
+
+    if USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(perform_config_tasks, summaries)
+        for summary in results:
+            summary.needs_update_config=False
+            summary.save()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            if not summary.needs_update_events:
+                continue
+
+            perform_config_tasks(summary)
+            summary.needs_update_config=False
+            summary.save()
 
     # Use a new worker pool (or you'll be sorry).
     # You could reuse the worker pool, but then you need to force querying
     # the database to prefetch all summaries.
-    worker_pool = multiprocessing.Pool()
+
     summaries = Summary.objects.filter(needs_update_events=True).reverse()
-    results = worker_pool.imap_unordered(perform_events_tasks, summaries)
-    for summary in results:
-        summary.needs_update_events=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
+
+    if USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(perform_events_tasks, summaries)
+        for summary in results:
+            summary.needs_update_events=False
+            summary.save()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            if not summary.needs_update_events:
+                continue
+
+            perform_events_tasks(summary)
+            summary.needs_update_events=False
+            summary.save()
 
     # Use a new worker pool (or you'll be sorry).
-    worker_pool = multiprocessing.Pool()
+
     summaries = Summary.objects.filter(needs_update_weather=True).reverse()
-    results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
-    for summary in results:
-        summary.needs_update_weather=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
+
+    if USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
+        for summary in results:
+            summary.needs_update_weather=False
+            summary.save()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            if not summary.needs_update_weather:
+                continue
+
+            perform_weather_tasks(summary)
+            summary.needs_update_weather=False
+            summary.save()
 
 
 def perform_events_tasks(summary):

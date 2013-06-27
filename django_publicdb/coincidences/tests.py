@@ -4,15 +4,15 @@ from django.core import serializers
 from django_publicdb.coincidences.models import *
 from django_publicdb.inforecords.models import *
 
+
 class SerializationTestCase(TestCase):
 
     fixtures = [
-        'tests_inforecords'
-    ]
+        'tests_inforecords']
 
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     # Setup and teardown
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
 
     def setUp(self):
         super(SerializationTestCase, self).setUp()
@@ -20,9 +20,9 @@ class SerializationTestCase(TestCase):
     def tearDown(self):
         super(SerializationTestCase, self).tearDown()
 
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
     # Tests
-    #---------------------------------------------------------------------------
+    #--------------------------------------------------------------------------
 
     def test_Event_Serialization_JSON(self):
 
@@ -30,15 +30,13 @@ class SerializationTestCase(TestCase):
 
         station = Station.objects.all()[0]
 
-        event = Event(
-            date = "2010-05-01",
-            time = "00:09:15",
-            nanoseconds = 665162853,
-            station = station,
-            pulseheights = [1, 2, 3, 4],
-            integrals = [1, 2, 3, 4],
-            traces = [[1, 2, 3, 4]]
-        )
+        event = Event(date = "2010-05-01",
+                      time = "00:09:15",
+                      nanoseconds = 665162853,
+                      station = station,
+                      pulseheights = [1, 2, 3, 4],
+                      integrals = [1, 2, 3, 4],
+                      traces = [[1, 2, 3, 4]])
 
         event.save()
 
@@ -64,15 +62,13 @@ class SerializationTestCase(TestCase):
 
         station = Station.objects.all()[0]
 
-        event = Event(
-            date = "2010-05-01",
-            time = "00:09:15",
-            nanoseconds = 665162853,
-            station = station,
-            pulseheights = [1, 2, 3, 4],
-            integrals = [1, 2, 3, 4],
-            traces = [[1, 2, 3, 4]]
-        )
+        event = Event(date = "2010-05-01",
+                      time = "00:09:15",
+                      nanoseconds = 665162853,
+                      station = station,
+                      pulseheights = [1, 2, 3, 4],
+                      integrals = [1, 2, 3, 4],
+                      traces = [[1, 2, 3, 4]])
 
         event.save()
 
