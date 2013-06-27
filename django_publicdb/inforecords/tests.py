@@ -153,15 +153,6 @@ class NagiosConfigTestCase(LiveServerTestCase):
         script = search_result.group(1)
         self.assertTrue(os.path.exists(script))
 
-        # Try to execute command
-        # Should return exit code 3, which stands for UNKNOWN to nagios.
-        # Should return exit code 3 because no fit has been found. All fits has
-        # been deleted at the initialization stage of this test.
-
-        args = check_command.split("!")
-        args[0] = script
-        self.assertEqual(subprocess.call(args), 3)
-
 
 class NagiosPluginTestCase(LiveServerTestCase):
     fixtures = [
