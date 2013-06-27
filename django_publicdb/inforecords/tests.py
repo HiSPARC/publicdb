@@ -36,7 +36,7 @@ def check_and_get_response(testcase, url):
                               "",
                               url))
 
-    self.assertTrue(is_plaintext(response))
+    testcase.assertTrue(is_plaintext(response))
 
     return response
 
