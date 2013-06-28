@@ -12,6 +12,7 @@ import tables
 # Django
 from django.conf import settings
 from django.test import TestCase, TransactionTestCase
+from django.test.utils import override_settings
 
 # Publicdb
 from lib.test import datastore as test_datastore
@@ -544,7 +545,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertFalse(jobs.update_all_histograms())
 
-    def test_jobs_update_all_histograms_501_2011_7_7(self):
+    def base_test_jobs_update_all_histograms_501_2011_7_7(self):
         """ Tests jobs.update_all_histograms() by processing a single Summary.
             It then checks for the output in the database. The data of station
             501 on 2011/7/7 contains events data that is suitable for fitting
@@ -645,7 +646,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         for d in datasets:
             self.assertEqual(d.source, test_summary)
 
-    def test_jobs_update_all_histograms_501_2012_5_16(self):
+    def base_test_jobs_update_all_histograms_501_2012_5_16(self):
         """ Tests jobs.update_all_histograms() by processing a single Summary.
             It then checks for the output in the database. The data of station
             501 on 2012/5/16 contains events, configuration and weather data,
@@ -753,3 +754,20 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         for d in datasets:
             self.assertEqual(d.source, test_summary)
+
+    @override_settings(USE_MULTIPROCESSING=False)
+    def test_jobs_update_all_histograms_501_2011_7_7_single_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_2011_7_7()
+
+    @override_settings(USE_MULTIPROCESSING=True)
+    def test_jobs_update_all_histograms_501_2011_7_7_multi_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_2011_7_7()
+
+    @override_settings(USE_MULTIPROCESSING=False)
+    def test_jobs_update_all_histograms_501_2012_5_16_single_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_2012_5_16()
+
+    @override_settings(USE_MULTIPROCESSING=True)
+    def test_jobs_update_all_histograms_501_2012_5_16_multi_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_2012_5_16()
+
