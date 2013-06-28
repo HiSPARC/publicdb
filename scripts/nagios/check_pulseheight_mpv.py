@@ -21,6 +21,7 @@ try:
     import urllib2
     import simplejson
     import signal
+    from django.conf import settings
 except Exception as e:
     print e
     sys.exit(3)
@@ -125,9 +126,10 @@ if __name__ == '__main__':
     #today = datetime.date(2011, 5, 1)
     yesterday = today - datetime.timedelta(days=1)
 
-    exit_code, exit_message = check_pulseheight_mpv("localhost:8000",
-                                                    stationNumber, plateNumber,
-                                                    yesterday)
+    exit_code, exit_message = check_pulseheight_mpv(
+            settings.PUBLICDB_HOST_FOR_NAGIOS,
+            stationNumber, plateNumber,
+            yesterday)
 
     exit(exit_code, exit_message)
 

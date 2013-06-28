@@ -4,12 +4,13 @@ import re
 import code
 import os
 import subprocess
-
 import urllib
+import inspect
 
 # Django
 from django.conf import settings
 from django.test import LiveServerTestCase
+from django.test.utils import override_settings
 
 # Publicdb
 from django_publicdb.inforecords.models import *
@@ -167,6 +168,8 @@ class NagiosPluginTestCase(LiveServerTestCase):
     def setUp(self):
         super(NagiosPluginTestCase, self).setUp()
 
+        settings.PUBLICDB_HOST_FOR_NAGIOS = self.live_server_url
+
     def tearDown(self):
         super(NagiosPluginTestCase, self).tearDown()
 
@@ -174,24 +177,51 @@ class NagiosPluginTestCase(LiveServerTestCase):
     # Tests
     #---------------------------------------------------------------------------
 
+    def test_plugin_wrong_arguments(self):
+        """ Tests the check_pulseheight_mpv plugin in case of wrong arguments
+            Should return exit code 3 (UNKNOWN).
+            Executes the plugin via subprocess.
+        """
+
+
+        # Should return exit code 3, which stands for UNKNOWN to nagios.
+        # Should return exit code 3 because no fit has been found.
+
+        with open(os.devnull,"w") as devnull:
+            returncode = subprocess.call(
+              [inspect.getsourcefile(check_pulseheight_mpv), ""],
+              stdout=devnull)
+            self.assertEqual(returncode, 3)
+
+            returncode = subprocess.call(
+              [inspect.getsourcefile(check_pulseheight_mpv), "501"],
+              stdout=devnull)
+            self.assertEqual(returncode, 3)
+
+            returncode = subprocess.call(
+              [inspect.getsourcefile(check_pulseheight_mpv), "blala lalaa"],
+              stdout=devnull)
+            self.assertEqual(returncode, 3)
+
     def test_plugin_no_fit(self):
         """ Tests the check_pulseheight_mpv plugin in case of no fit found.
             Should return exit code 3 (UNKNOWN).
+            Executes the plugin via subprocess.
         """
 
         # Initialize work space
 
         PulseheightFit.objects.all().delete()
 
-        date = datetime.date.today()
-
         # Should return exit code 3, which stands for UNKNOWN to nagios.
         # Should return exit code 3 because no fit has been found.
 
-        status, message = check_pulseheight_mpv(self.live_server_url,
-                                                501, 1, date)
+        with open(os.devnull,"w") as devnull:
+            returncode = subprocess.call(
+              [inspect.getsourcefile(check_pulseheight_mpv), "501 1"],
+              stdout=devnull)
+            self.assertEqual(returncode, 3)
 
-        self.assertEqual(status[0], 3)
 
     def test_plugin_fit_within_thresholds(self):
         """ Tests the check_pulseheight_mpv plugin in case of a fit within thresholds.
@@ -318,3 +348,4 @@ class NagiosPluginTestCase(LiveServerTestCase):
                                                 threshold.plate,
                                                 summary.date)
         self.assertEqual(status[0], 2)
+
