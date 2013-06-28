@@ -16,7 +16,7 @@ from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
-from django_publicdb.settings import USE_MULTIPROCESSING
+from django.conf import settings
 
 import fit_pulseheight_peak
 
@@ -189,11 +189,9 @@ def perform_tasks_manager(needs_update_item, perform_certain_tasks):
     summaries = eval("Summary.objects.filter(%s=True).reverse()" %
                      needs_update_item)
 
-    if USE_MULTIPROCESSING:
+    if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
-
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
-
         for summary in results:
             exec "summary.%s=False" % needs_update_item
             summary.save()
