@@ -16,6 +16,8 @@ from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
+from django.conf import settings
+
 import fit_pulseheight_peak
 
 logger = logging.getLogger('histograms.jobs')
@@ -36,14 +38,6 @@ IGNORE_TABLES = ['blobs']
 # configs, this is not possible.  The previous number of configs is used
 # to select only new ones during the update.
 RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
-
-# Process data with multiple threads. Default is enabled.
-# Disable multiprocessing for debugging purposes. When multithreaded
-# processing is enabled the traceback doesn't go to the exact location.
-# Also, sqlite3 is single threaded. So when multi processing is used
-# together with sqlite3, you might get the message "database is locked".
-
-USE_MULTIPROCESSING = True
 
 
 def check_for_updates():
@@ -181,69 +175,35 @@ def process_and_store_temporary_esd_for_summary(summary):
 def update_histograms():
     """Update all histograms"""
 
-    # Use a worker pool
+    perform_tasks_manager("needs_update_config", perform_config_tasks)
+    perform_tasks_manager("needs_update_events", perform_events_tasks)
+    perform_tasks_manager("needs_update_weather", perform_weather_tasks)
 
-    summaries = Summary.objects.filter(needs_update_config=True).reverse()
 
-    if USE_MULTIPROCESSING:
+def perform_tasks_manager(needs_update_item, perform_certain_tasks):
+    """ Front office for doing tasks
+        Depending on the USE_MULTIPROCESSING flag, the manager either does the
+        tasks himself or he grabs some workers and let them do it.
+    """
+
+    summaries = eval("Summary.objects.filter(%s=True).reverse()" %
+                     needs_update_item)
+
+    if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(perform_config_tasks, summaries)
+        results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
-            summary.needs_update_config=False
+            exec "summary.%s=False" % needs_update_item
             summary.save()
         worker_pool.close()
         worker_pool.join()
     else:
         for summary in summaries:
-            if not summary.needs_update_events:
+            if not eval("summary.%s" % needs_update_item):
                 continue
 
-            perform_config_tasks(summary)
-            summary.needs_update_config=False
-            summary.save()
-
-    # Use a new worker pool (or you'll be sorry).
-    # You could reuse the worker pool, but then you need to force querying
-    # the database to prefetch all summaries.
-
-    summaries = Summary.objects.filter(needs_update_events=True).reverse()
-
-    if USE_MULTIPROCESSING:
-        worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(perform_events_tasks, summaries)
-        for summary in results:
-            summary.needs_update_events=False
-            summary.save()
-        worker_pool.close()
-        worker_pool.join()
-    else:
-        for summary in summaries:
-            if not summary.needs_update_events:
-                continue
-
-            perform_events_tasks(summary)
-            summary.needs_update_events=False
-            summary.save()
-
-    # Use a new worker pool (or you'll be sorry).
-
-    summaries = Summary.objects.filter(needs_update_weather=True).reverse()
-
-    if USE_MULTIPROCESSING:
-        worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
-        for summary in results:
-            summary.needs_update_weather=False
-            summary.save()
-        worker_pool.close()
-        worker_pool.join()
-    else:
-        for summary in summaries:
-            if not summary.needs_update_weather:
-                continue
-
-            perform_weather_tasks(summary)
-            summary.needs_update_weather=False
+            perform_certain_tasks(summary)
+            exec "summary.%s=False" % needs_update_item
             summary.save()
 
 

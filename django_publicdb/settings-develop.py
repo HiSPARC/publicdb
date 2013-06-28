@@ -46,6 +46,14 @@ RECAPTCHA_ENABLED = False
 RECAPTCHA_PUB_KEY = 'foobar'
 RECAPTCHA_PRIVATE_KEY = 'foobaz'
 
+# Process data with multiple threads. Default is disabled (False).
+# Disable multiprocessing for debugging purposes. When multithreaded
+# processing is enabled the traceback doesn't go to the exact location.
+# Also, sqlite3 is single threaded. So when multi processing is used
+# together with sqlite3, you might get the message "database is locked".
+
+USE_MULTIPROCESSING = False
+
 # E-mail settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
