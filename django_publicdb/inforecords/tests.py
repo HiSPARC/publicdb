@@ -190,17 +190,17 @@ class NagiosPluginTestCase(LiveServerTestCase):
         with open(os.devnull,"w") as devnull:
             returncode = subprocess.call(
               [inspect.getsourcefile(check_pulseheight_mpv), ""],
-              stdout=devnull)
+              stdout=devnull, shell=True)
             self.assertEqual(returncode, 3)
 
             returncode = subprocess.call(
               [inspect.getsourcefile(check_pulseheight_mpv), "501"],
-              stdout=devnull)
+              stdout=devnull, shell=True)
             self.assertEqual(returncode, 3)
 
             returncode = subprocess.call(
               [inspect.getsourcefile(check_pulseheight_mpv), "blala lalaa"],
-              stdout=devnull)
+              stdout=devnull, shell=True)
             self.assertEqual(returncode, 3)
 
     def test_plugin_no_fit(self):
@@ -219,7 +219,7 @@ class NagiosPluginTestCase(LiveServerTestCase):
         with open(os.devnull,"w") as devnull:
             returncode = subprocess.call(
               [inspect.getsourcefile(check_pulseheight_mpv), "501 1"],
-              stdout=devnull)
+              stdout=devnull, shell=True)
             self.assertEqual(returncode, 3)
 
 

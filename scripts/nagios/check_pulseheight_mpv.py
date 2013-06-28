@@ -16,15 +16,25 @@
 
 import sys
 import datetime
+import os
 
 try:
     import urllib2
     import simplejson
     import signal
-    from django.conf import settings
 except Exception as e:
     print e
     sys.exit(3)
+
+# Django imports
+
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '../..')
+sys.path.append(publicdb_path)
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+
+from django.conf import settings
 
 #-------------------------------------------------------------------------------
 # Helpers
