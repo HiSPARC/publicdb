@@ -16,6 +16,8 @@ from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
+from django.conf import settings
+
 import fit_pulseheight_peak
 
 logger = logging.getLogger('histograms.jobs')
@@ -173,37 +175,36 @@ def process_and_store_temporary_esd_for_summary(summary):
 def update_histograms():
     """Update all histograms"""
 
-    # Use a worker pool
-    worker_pool = multiprocessing.Pool()
-    summaries = Summary.objects.filter(needs_update_events=True).reverse()
-    results = worker_pool.imap_unordered(perform_events_tasks, summaries)
-    for summary in results:
-        summary.needs_update_events=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
+    perform_tasks_manager("needs_update_config", perform_config_tasks)
+    perform_tasks_manager("needs_update_events", perform_events_tasks)
+    perform_tasks_manager("needs_update_weather", perform_weather_tasks)
 
-    # Use a new worker pool (or you'll be sorry).
-    # You could reuse the worker pool, but then you need to force querying
-    # the database to prefetch all summaries.
-    worker_pool = multiprocessing.Pool()
-    summaries = Summary.objects.filter(needs_update_weather=True).reverse()
-    results = worker_pool.imap_unordered(perform_weather_tasks, summaries)
-    for summary in results:
-        summary.needs_update_weather=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
 
-    # Use a new worker pool (or you'll be sorry).
-    worker_pool = multiprocessing.Pool()
-    summaries = Summary.objects.filter(needs_update_config=True).reverse()
-    results = worker_pool.imap_unordered(perform_config_tasks, summaries)
-    for summary in results:
-        summary.needs_update_config=False
-        summary.save()
-    worker_pool.close()
-    worker_pool.join()
+def perform_tasks_manager(needs_update_item, perform_certain_tasks):
+    """ Front office for doing tasks
+        Depending on the USE_MULTIPROCESSING flag, the manager either does the
+        tasks himself or he grabs some workers and let them do it.
+    """
+
+    summaries = eval("Summary.objects.filter(%s=True).reverse()" %
+                     needs_update_item)
+
+    if settings.USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
+        for summary in results:
+            exec "summary.%s=False" % needs_update_item
+            summary.save()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            if not eval("summary.%s" % needs_update_item):
+                continue
+
+            perform_certain_tasks(summary)
+            exec "summary.%s=False" % needs_update_item
+            summary.save()
 
 
 def perform_events_tasks(summary):
@@ -277,8 +278,12 @@ def update_pulseheight_histogram(summary):
 
 def update_pulseheight_fit(summary):
     logger.debug("Updating pulseheight fit for %s" % summary)
-
-    fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExist:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
     save_pulseheight_fits(summary, fits)
 
 

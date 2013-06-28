@@ -232,8 +232,14 @@ class GeneratorState(models.Model):
 
 
 class PulseheightFit(models.Model):
+    DETECTOR_CHOICES = (
+        (1, 'Scintillator 1'),
+        (2, 'Scintillator 2'),
+        (3, 'Scintillator 3'),
+        (4, 'Scintillator 4'))
+
     source = models.ForeignKey('Summary')
-    plate = models.IntegerField()
+    plate = models.IntegerField(choices=DETECTOR_CHOICES)
 
     initial_mpv = models.FloatField()
     initial_width = models.FloatField()
@@ -247,6 +253,11 @@ class PulseheightFit(models.Model):
 
     def station(self):
         return self.source.station.number
+    station.admin_order_field = 'source__station__number'
+
+    def date(self):
+        return self.source.date
+    date.admin_order_field = 'source__date'
 
     class Meta:
         verbose_name_plural = 'Pulseheight fit'

@@ -450,73 +450,55 @@ def get_country_dict():
 
 def get_pulseheight_drift(request, station_number, plate_number,
                           year, month, day, number_of_days):
+    """Get pulseheight drift
 
-    #---------------------------------------------------------------------------
-    # Initialize
-    #---------------------------------------------------------------------------
-
-    requested_date = datetime.date(int(year), int(month), int(day))
-
+    :param station_number: station number
+    :param plate_number: detector number, either 1, 2, 3 or 4.
+    :param year, month, day: date for which to check
+    :param number_of_days: number of days over which to determine drift
+    """
     station_number = int(station_number)
     plate_number = int(plate_number)
-
-    year = int(year)
-    month = int(month)
-    day = int(day)
-
+    requested_date = datetime.date(int(year), int(month), int(day))
     number_of_days = int(number_of_days)
 
-    dict = {
-        'station': station_number,
-        'plate_number': plate_number,
-        'year': year,
-        'month': month,
-        'day': day}
+    dict = {'station': station_number,
+            'plate_number': plate_number,
+            'year': requested_date.year,
+            'month': requested_date.month,
+            'day': requested_date.day}
 
     if (plate_number < 1) or (plate_number > 4):
-        dict.update({
-            "nagios": Nagios.unknown,
-            "error": "Platenumber (value = %s) is out of range, should be between 1 and 4" %
-                     plate_number
-        })
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Platenumber (value = %s) is out of range, "
+                              "should be between 1 and 4" % plate_number})
         return json_dict(dict)
-
-    #---------------------------------------------------------------------------
-    # Get fits
-    #---------------------------------------------------------------------------
 
     try:
         station = Station.objects.get(number=station_number)
-
-        date_range = (requested_date - datetime.timedelta(days=number_of_days-1),
+        date_range = (requested_date - datetime.timedelta(days=number_of_days - 1),
                       requested_date)
-
         summaries = Summary.objects.filter(station=station,
                                            date__range=date_range)
-
         fits = PulseheightFit.objects.filter(source__in=summaries,
                                              plate=plate_number,
                                              chi_square_reduced__gt=0.01,
                                              chi_square_reduced__lt=8.0,
                                              initial_width__gt=45.0)
     except Exception, e:
-        dict.update({
-            "nagios": Nagios.unknown,
-            "error": "Error retrieving fits",
-            "exception": str(e)})
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Error retrieving fits",
+                     "exception": str(e)})
         return json_dict(dict)
 
-    #---------------------------------------------------------------------------
     # Fit drift
-    #---------------------------------------------------------------------------
 
-    t_array   = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+    t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
     mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-    linear_fit = lambda p, t: p[0] + p[1]*t # Target function
+    linear_fit = lambda p, t: p[0] + p[1] * t # Target function
 
     # Determine the drift by a linear fit
-
     errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
 
     p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
@@ -532,7 +514,6 @@ def get_pulseheight_drift(request, station_number, plate_number,
         relative_mpv.append(mpv / linear_fit(p1, t))
 
     # Fit the relative fluctation with a gauss
-
     gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
 
     # x = ADC, y = number of events per dPulseheight
@@ -549,30 +530,21 @@ def get_pulseheight_drift(request, station_number, plate_number,
                                                            initial_mean,
                                                            initial_width))
 
-    #---------------------------------------------------------------------------
-    # Return
-    #---------------------------------------------------------------------------
+    dict.update({'number_of_selected_days': len(t_array),
+                 'number_of_requested_days': number_of_days,
+                 'fit_offset': p1[0],
+                 'fit_slope': p1[1],
+                 'drift_per_day': drift,
+                 'timestamp': t_array.tolist(),
+                 'mpv': mpv_array.tolist(),
+                 'relative_mean': popt[1],
+                 'relative_width': popt[2],
 
-    dict.update({
-        'number_of_selected_days'  : len(t_array),
-        'number_of_requested_days' : number_of_days,
-
-        'fit_offset'     : p1[0],
-        'fit_slope'      : p1[1],
-
-        'drift_per_day'  : drift,
-
-        'timestamp'      : t_array.tolist(),
-        'mpv'            : mpv_array.tolist(),
-
-        'relative_mean'  : popt[1],
-        'relative_width' : popt[2],
-
-        # Debug
-        #'relative_mpv'   : relative_mpv,
-        #'frequency'      : frequency.tolist(),
-        #'x'              : x.tolist()
-    })
+                 # Debug
+                 #'relative_mpv': relative_mpv,
+                 #'frequency': frequency.tolist(),
+                 #'x': x.tolist()
+                 })
 
     return json_dict(dict)
 
@@ -591,7 +563,8 @@ def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
                                  today.year, today.month, today.day, 30)
 
 
-def get_pulseheight_fit(request, station_number, plate_number, year=None, month=None, day=None):
+def get_pulseheight_fit(request, station_number, plate_number,
+                        year=None, month=None, day=None):
     """Get fit values of the pulseheight distribution for a station on a given day
 
     Retrieve fit values of the pulseheight distribution. The fitting has to be
@@ -610,47 +583,30 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
 
     """
 
-    #---------------------------------------------------------------------------
-    # Initialize
-    #---------------------------------------------------------------------------
-
     station_number = int(station_number)
     plate_number = int(plate_number)
 
     if year == None and month == None and day == None:
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
+        requested_date = yesterday
+    else:
+        requested_date = datetime.date(int(year), int(month), int(day))
 
-        year = yesterday.year
-        month = yesterday.month
-        day = yesterday.day
-
-    year = int(year)
-    month = int(month)
-    day = int(day)
-
-    dict = {
-        'station': station_number,
-        'plate_number': plate_number,
-        'year': year,
-        'month': month,
-        'day': day
-    }
-
-    #---------------------------------------------------------------------------
-    # Get fit
-    #---------------------------------------------------------------------------
+    dict = {'station': station_number,
+            'plate_number': plate_number,
+            'year': requested_date.year,
+            'month': requested_date.month,
+            'day': requested_date.day}
 
     try:
         fit = PulseheightFit.objects.get(source__station__number=station_number,
-                                         source__date=datetime.date(year,month,day),
+                                         source__date=requested_date,
                                          plate=plate_number)
     except Exception, e:
-        dict.update({
-            "nagios": Nagios.unknown,
-            "error": "Fit has not been found",
-            "exception": str(e)
-        })
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Fit has not been found",
+                     "exception": str(e)})
         return json_dict(dict)
 
     try:
@@ -663,40 +619,34 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
                      "fitted_width_error": fit.fitted_width_error,
                      "chi_square_reduced": fit.chi_square_reduced})
     except Exception, e:
-        dict.update({
-            "nagios": Nagios.unknown,
-            "error": "Data has been found, "
-                     "but error in converting data to numbers",
-            "exception": str(e)})
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Data has been found, "
+                              "but error in converting data to numbers",
+                     "exception": str(e)})
         return json_dict(dict)
 
-    #---------------------------------------------------------------------------
     # Data quality
-    #---------------------------------------------------------------------------
 
     # Based on chi2 of the fit
 
     if fit.chi_square_reduced < 0.01:
-        dict.update({
-            "nagios" : Nagios.critical,
-            "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
-                       fit.chi_square_reduced})
+        dict.update({"nagios" : Nagios.critical,
+                     "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
+                                fit.chi_square_reduced})
         return json_dict(dict)
 
     if fit.chi_square_reduced > 8.0:
-        dict.update({
-            "nagios" : Nagios.critical,
-            "quality": "Chi2 of the fit is greater than 8.0: %.1f"
-                       % fit.chi_square_reduced})
+        dict.update({"nagios" : Nagios.critical,
+                     "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
+                                fit.chi_square_reduced})
         return json_dict(dict)
 
     # Based on the fit range (= initial_width)
 
     if fit.initial_width < 45:
-        dict.update({
-            "nagios": Nagios.critical,
-            "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
-                       fit.initial_width})
+        dict.update({"nagios": Nagios.critical,
+                     "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
+                                fit.initial_width})
         return json_dict(dict)
 
     # Based on MPV and 4*sigma
@@ -704,22 +654,18 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
     threshold = MonitorPulseheightThresholds.objects.get(station__number=station_number,
                                                          plate=plate_number)
 
-    lower_bound = threshold.mpv_mean * (1 - 4*threshold.mpv_sigma)
-    upper_bound = threshold.mpv_mean * (1 + 4*threshold.mpv_sigma)
+    lower_bound = threshold.mpv_mean * (1 - 4 * threshold.mpv_sigma)
+    upper_bound = threshold.mpv_mean * (1 + 4 * threshold.mpv_sigma)
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
-        dict.update({
-            "nagios": Nagios.critical,
-            "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
-                       (lower_bound, upper_bound, fit.fitted_mpv)})
+        dict.update({"nagios": Nagios.critical,
+                "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                           (lower_bound, upper_bound, fit.fitted_mpv)})
         return json_dict(dict)
 
-    # Everything seems to be a-ok
-
-    dict.update({
-        "nagios": Nagios.ok,
-        "quality": "Fitted MPV is within bounds (%.1f;%.1f): %.1f" %
-                   (lower_bound, upper_bound, fit.fitted_mpv)})
+    dict.update({"nagios": Nagios.ok,
+                 "quality": "Fitted MPV is within bounds (%.1f;%.1f): %.1f" %
+                            (lower_bound, upper_bound, fit.fitted_mpv)})
     return json_dict(dict)
 
 
@@ -774,7 +720,8 @@ def has_weather(request, station_id, year=None, month=None, day=None):
     :param month: the month part of the date.
     :param day: the day part of the date.
 
-    :return: boolean, True if the given station has weather data, False otherwise.
+    :return: boolean, True if the given station has weather data,
+        False otherwise.
 
     """
     try:
@@ -823,20 +770,23 @@ def config(request, station_id, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
+    if year and month and day:
+        date = datetime.date(int(year), int(month), int(day))
+        if not validate_date(date):
+            return HttpResponseNotFound()
+    else:
+        date = datetime.date.today()
+
     try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=date)
-                                      .latest('timestamp'))
-        else:
-            c = (Configuration.objects.filter(source__station=station,
-                                              timestamp__lte=datetime.date.today())
-                                      .latest('timestamp'))
-        config = serializers.serialize("json", [c])
-        config = json.loads(config)
+        c = (Configuration.objects.filter(source__station=station,
+                                          timestamp__lte=date)
+                                  .latest('timestamp'))
+    except Configuration.DoesNotExist:
+        return HttpResponseNotFound()
+
+    config = serializers.serialize("json", [c])
+    config = json.loads(config)
+    try:
         config = config[0]['fields']
     except IndexError:
         config = False
@@ -909,8 +859,8 @@ def num_events_year(request, station_id, year):
 def num_events_month(request, station_id, year, month):
     """Get total number of events for a station in the given month of a year
 
-    Retrieve the total number of events that a station has measured during the given
-    month.
+    Retrieve the total number of events that a station has measured during
+    the given month.
 
     :param station_id: a station number identifier.
     :param year: the year in which to look for the month.
