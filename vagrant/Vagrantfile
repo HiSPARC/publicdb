@@ -1,5 +1,7 @@
-Vagrant::Config.run do |config|
+Vagrant.configure("1") do |config|
     config.vm.box = 'centOS 5.9'
+    # veewee source code for this box:
+    # https://github.com/puppetlabs/puppet-vagrant-boxes/tree/master/definitions/centos-59-x64-vbox4210
     config.vm.box_url = 'http://puppet-vagrant-boxes.puppetlabs.com/centos-59-x64-vbox4210.box'
     
     config.vm.network :hostonly, "192.168.100.12"
