@@ -12,5 +12,3 @@ cd /srv/publicdb
 git clone https://github.com/HiSPARC/publicdb.git www
 sudo chmod g+w www
 sudo mkdir static
-
-
