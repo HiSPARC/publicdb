@@ -192,7 +192,8 @@ def get_core_positions(coincidences):
         logenergy.append(c.log_energy)
     return x, y, logenergy
 
-def request_form( request ):
+
+def request_form(request):
 
     if request.method == 'POST':
         form = SessionRequestForm( request.POST )
@@ -212,22 +213,21 @@ def request_form( request ):
                               {'form': form, 'html_captcha': html_captcha},
                               context_instance = RequestContext(request))
 
-def validate_request_form( request ):
+
+def validate_request_form(request):
 
     if request.method != 'POST':
-        return redirect( request_form )
+        return redirect(request_form)
 
     #----------------------
     # Check reCaptcha input
     #----------------------
 
     if settings.RECAPTCHA_ENABLED:
-
         check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
                                        request.POST['recaptcha_response_field'],
                                        settings.RECAPTCHA_PRIVATE_KEY,
                                        request.META['REMOTE_ADDR'])
-
         if not check_captcha.is_valid:
             return request_form(request)
 
@@ -275,6 +275,7 @@ def validate_request_form( request ):
     #----------------
 
     return render_to_response('thankyou.html')
+
 
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)

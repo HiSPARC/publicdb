@@ -103,7 +103,7 @@ class SessionRequest(models.Model):
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
-        enddate = self.start_date + search_length
+        enddate = min([self.start_date + search_length, datetime.date.today()])
         while (self.events_created < self.events_to_create and date < enddate):
             self.events_created += self.find_coincidence(date, session)
             date += datetime.timedelta(days=1)
