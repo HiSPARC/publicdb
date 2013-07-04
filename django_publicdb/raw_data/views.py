@@ -144,10 +144,12 @@ def download_form(request, station_id=None, start=None, end=None):
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
+            data_type = form.cleaned_data['data_type']
             query_string = urllib.urlencode({'start': start, 'end': end,
                                              'download': download})
-            return HttpResponseRedirect('/data/%d/events?%s' %
-                                        (station.number, query_string))
+            return HttpResponseRedirect('/data/%d/%s?%s' %
+                                        (station.number, data_type,
+                                         query_string))
     else:
         if station_id:
             station = get_object_or_404(Station, number=station_id)
@@ -155,17 +157,20 @@ def download_form(request, station_id=None, start=None, end=None):
             station = None
         form = DataDownloadForm(initial={'station': station,
                                          'start': start,
-                                         'end': end})
+                                         'end': end,
+                                         'data_type': 'events'})
 
     return render(request, 'data_download.html', {'form': form})
 
 
-def download_events(request, station_id):
-    """Download events.
+def download_data(request, station_id, data_type='events'):
+    """Download data.
 
     :param station_id: station id
+    :param data_type: (optional) choose between event and weather data
     :param start: (optional, GET) start of data range
     :param end: (optional, GET) end of data range
+    :param download: (optional, GET) download the csv
 
     """
     station_id = int(station_id)
@@ -184,7 +189,6 @@ def download_events(request, station_id):
             end = dateutil.parser.parse(request.GET['end'])
         else:
             end = start + datetime.timedelta(days=1)
-
     except ValueError:
         msg = ("Incorrect optional parameters (start [datetime], "
                "end [datetime])")
@@ -196,11 +200,16 @@ def download_events(request, station_id):
     else:
         download = False
 
-    csv_output = generate_events_as_csv(station, start, end)
+    timerange_string = prettyprint_timerange(start, end)
+    if data_type == 'weather':
+        csv_output = generate_weather_as_csv(station, start, end)
+        filename = 'weather-s%d-%s.csv' % (station_id, timerange_string)
+    elif data_type == 'events':
+        csv_output = generate_events_as_csv(station, start, end)
+        filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
+
     response = StreamingHttpResponse(csv_output, content_type='text/csv')
 
-    timerange_string = prettyprint_timerange(start, end)
-    filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
     if download:
         content_disposition = 'attachment; filename="%s"' % filename
     else:
@@ -266,6 +275,64 @@ def get_events_from_esd_in_range(station, start, end):
             ts0 = calendar.timegm(t0.utctimetuple())
             ts1 = calendar.timegm(t1.utctimetuple())
             for event in station_node.events.where(
+                '(ts0 <= timestamp) & (timestamp < ts1)'):
+                yield event
+
+
+def generate_weather_as_csv(station, start, end):
+    """Render CSV output as an iterator."""
+
+    t = loader.get_template('weather_data.csv')
+    c = Context({'station': station, 'start': start, 'end': end})
+
+    yield t.render(c)
+
+    line_buffer = SingleLineStringIO()
+    writer = csv.writer(line_buffer, delimiter='\t')
+    events = get_weather_from_esd_in_range(station, start, end)
+    for event in events:
+        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
+        row = [dt.date(), dt.time(),
+               event['timestamp'],
+               clean_floats(event['temp_inside'], precision=2),
+               clean_floats(event['temp_outside'], precision=2),
+               event['humidity_inside'],
+               event['humidity_outside'],
+               clean_floats(event['barometer'], precision=2),
+               event['wind_dir'],
+               event['wind_speed'],
+               event['solar_rad'],
+               event['uv'],
+               clean_floats(event['evapotranspiration'], precision=3),
+               clean_floats(event['rain_rate'], precision=2),
+               event['heat_index'],
+               clean_floats(event['dew_point'], precision=2),
+               clean_floats(event['wind_chill'], precision=2),
+              ]
+        writer.writerow(row)
+        yield line_buffer.line
+
+
+def get_weather_from_esd_in_range(station, start, end):
+    """Get weather from ESD in time range.
+
+    :param station: Station object
+    :param start: start of datetime range
+    :param end: end of datetime range
+
+    """
+    for t0, t1 in single_day_ranges(start, end):
+        try:
+            Summary.objects.get(station=station, date=t0,
+                                num_weather__isnull=False)
+        except Summary.DoesNotExist:
+            continue
+        filepath = esd.get_esd_data_path(t0)
+        with tables.openFile(filepath) as f:
+            station_node = esd.get_station_node(f, station)
+            ts0 = calendar.timegm(t0.utctimetuple())
+            ts1 = calendar.timegm(t1.utctimetuple())
+            for event in station_node.weather.where(
                 '(ts0 <= timestamp) & (timestamp < ts1)'):
                 yield event
 
