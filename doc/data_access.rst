@@ -47,10 +47,9 @@ First load the required libraries (requires the numpy package).
 
 .. code-block:: python
 
-    >>> from urllib2 import urlopen
-    >>> from urllib import urlencode
     >>> from datetime import datetime
-    >>> from csv import reader
+    >>> from urllib import urlencode
+    >>> from urllib2 import urlopen
     >>> from StringIO import StringIO
     >>> from numpy import genfromtxt
 
