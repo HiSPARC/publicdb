@@ -11,6 +11,8 @@ detector data from the datastore, as well as an API to participate in
 analysis sessions.
 
 .. contents:: Table of Contents
+   :backlinks: none
+
 
 Setting up a personal development environment
 ---------------------------------------------
