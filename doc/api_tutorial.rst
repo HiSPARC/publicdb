@@ -89,7 +89,7 @@ The following code example will generate a webpage which will use the
 drop-down menu from which a station can be selected, once you have
 chosen a station you can click the :code:`Get info` button to make
 Javascript get the station information. To try this you can either use
-this example page: `jsFiddle <http://jsfiddle.net/NCWXq/1/>`_ or create
+this example page: `jsFiddle <http://jsfiddle.net/NCWXq/2/>`_ or create
 your own HTML file with this code:
 
 .. code-block:: html
@@ -99,9 +99,11 @@ your own HTML file with this code:
     <script src="http://data.hisparc.nl/media/static/scripts/jquery-1.8.2.min.js"></script>
     <script>
         $(function() {
+            // Get an up-to-date list of HiSPARC stations
             $.getJSON(
                 'http://data.hisparc.nl/api/stations/',
                 function(data) {
+                    // Create the drop-down menu
                     var select = $('<select>');
                     var id, name;
                     for (var i in data) {
@@ -110,8 +112,10 @@ your own HTML file with this code:
                         select.append($('<option>').attr('value', id).text(id + ' - ' + name));}
                     $('#station_list').append(select);});
 
+            // Attach a function to the Get info button
             $('#get_station').on('click', function() {
                 var id = $('#station_list').find('select').val();
+                // Get info for selected station and display it in a nice way
                 $.getJSON('http://data.hisparc.nl/api/station/' + id + '/',
                           function(data) {
                               $('#station_info').text(JSON.stringify(data, undefined, 4));
@@ -133,13 +137,13 @@ Python example
 --------------
 
 In this example we will use several standard Python libraries and the
-popular plotting library matplotlib (pylab). We start by importing the
-required libraries, one to get data from the urls, one to make working
-with dates easy and the plotting library. Then define the start values
-and perpare two empty lists in which the data can be placed. Then a
-while loop is used to loop over all days between datum and end_datum,
-reading each corresponding url. Finally a plot is made, setting the
-dates against their values.
+popular plotting library `matplotlib <http://matplotlib.org>`_ (pylab).
+We start by importing the required libraries, one to get data from the
+urls, one to make working with dates easy and the plotting library. Then
+define the start values and perpare two empty lists in which the data
+can be placed. Then a while loop is used to loop over all days between
+datum and end_datum, reading each corresponding url. Finally a plot is
+made, setting the dates against their values.
 
 Start Python and type (copy/paste) the following lines of code:
 
