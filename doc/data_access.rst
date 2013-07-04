@@ -24,7 +24,8 @@ event summary data' link on the right. When this link is clicked you
 will be taken to the `Data Download Form
 <http://data.hisparc.nl/data/download>`_. On this page you can select
 the station, the start and end date for which you want to download the
-data.
+data. There is also an option to download weather data instead of events,
+however, not all stations gather weather data.
 
 When you click the Submit button without checking the checkbox to
 Download, the data should (Firefox always download the data) show up in
@@ -54,6 +55,8 @@ First load the required libraries (requires the numpy package).
     >>> from numpy import genfromtxt
 
 Then define the url and place the start and end datetime in the query.
+To download weather data instead, replace 'events' by 'weather' in
+the url (and choose a station that has weather data, e.g. 3 or 501).
 
 .. note::
 
