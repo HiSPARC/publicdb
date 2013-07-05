@@ -194,15 +194,10 @@ def get_core_positions(coincidences):
 
 
 def request_form(request):
-
     if request.method == 'POST':
-        form = SessionRequestForm( request.POST )
+        form = SessionRequestForm(request.POST)
     else:
         form = SessionRequestForm()
-
-    #----------------
-    # Render response
-    #----------------
 
     html_captcha = "reCAPTCHA disabled"
 
@@ -215,14 +210,10 @@ def request_form(request):
 
 
 def validate_request_form(request):
-
     if request.method != 'POST':
         return redirect(request_form)
 
-    #----------------------
     # Check reCaptcha input
-    #----------------------
-
     if settings.RECAPTCHA_ENABLED:
         check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
                                        request.POST['recaptcha_response_field'],
@@ -236,45 +227,34 @@ def validate_request_form(request):
         #    error=check_captcha.error_code
         #)
 
-    #-----------------
     # Check form input
-    #-----------------
-
     form = SessionRequestForm(request.POST)
 
     if not form.is_valid():
         return request_form(request)
 
-    #-----------
-    # Send email
-    #-----------
-
+    # Send email and show overview
     data = {}
     data.update(form.cleaned_data)
 
-    new_request=SessionRequest(
-        first_name = data['first_name'],
-        sur_name = data['sur_name'],
-        email = data['email'],
-        school = data['school'],
-        cluster = data['cluster'],
-        start_date = data['start_date'],
-        mail_send = False,
-        session_created = False,
-        session_pending = True,
-        events_to_create = data['number_of_events'],
-        events_created = 0
-    )
+    new_request = SessionRequest(first_name = data['first_name'],
+                                 sur_name = data['sur_name'],
+                                 email = data['email'],
+                                 school = data['school'],
+                                 cluster = data['cluster'],
+                                 start_date = data['start_date'],
+                                 mail_send = False,
+                                 session_created = False,
+                                 session_pending = True,
+                                 events_to_create = data['number_of_events'],
+                                 events_created = 0)
 
-    new_request.GenerateUrl()
+    new_request.generate_url()
     new_request.save()
-    new_request.SendMail()
+    new_request.sendmail_request()
 
-    #----------------
-    # Return response
-    #----------------
-
-    return render_to_response('thankyou.html')
+    return render_to_response('thankyou.html', {'data': data},
+                              context_instance=RequestContext(request))
 
 
 def confirm_request(request, url):
