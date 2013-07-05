@@ -12,6 +12,7 @@ Contents:
 
    data_access
    api_tutorial
+   hisparc_maps
    api
    status_display
 
