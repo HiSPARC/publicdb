@@ -1,5 +1,5 @@
 Veewee::Session.declare({
-  :cpu_count => '1', :memory_size=> '384',
+  :cpu_count => '4', :memory_size=> '512',
   :disk_size => '81920', :disk_format => 'VDI', :hostiocache => 'off', :ioapic => 'on', :pae => 'on',
   :os_type_id => 'RedHat_64',
   :iso_file => "SL.59.020213.CD.x86_64.disc1.iso",
