@@ -1,0 +1,5 @@
+---
+- hosts: publicdb
+  tasks:
+    - name: ensure ansible playbook is executed
+      shell: echo "Yes, ansible works correctly!"
