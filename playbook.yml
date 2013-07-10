@@ -8,3 +8,46 @@
     - name: ensure vagrant user is part of hisparc group
       user: name=vagrant groups=hisparc append=yes
       sudo: yes
+
+    - name: ensure /usr/local/lib is in ld.so.conf
+      lineinfile: dest=/etc/ld.so.conf regexp=''
+                  state=present line='/usr/local/lib' backrefs=yes
+      sudo: yes
+
+    - name: ensure local source directory exists
+      file: path=/usr/local/src/hisparc state=directory
+            owner=hisparc group=hisparc mode=775
+      sudo: yes
+
+    - name: download python 2.7 source
+      get_url: url=http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2
+               dest=/usr/local/src/hisparc/
+
+    - name: unpack python 2.7
+      shell: chdir=/usr/local/src/hisparc
+             creates=/usr/local/src/hisparc/Python-2.7.5
+             tar xjf Python-2.7.5.tar.bz2
+
+    - name: build and install python 2.7
+      shell: chdir=/usr/local/src/hisparc/Python-2.7.5
+             creates=/usr/local/bin/python2.7
+             ./configure --enable-shared && make && sudo make install &&
+             sudo /sbin/ldconfig
+
+    - name: download setuptools
+      get_url: url=https://bitbucket.org/pypa/setuptools/raw/0.8/ez_setup.py
+               dest=/usr/local/src/hisparc/
+
+    - name: install setuptools
+      shell: chdir=/usr/local/src/hisparc
+             creates=/usr/local/bin/easy_install python ez_setup.py
+      sudo: yes
+
+    - name: download pip install script
+      get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+               dest=/usr/local/src/hisparc/
+
+    - name: install pip
+      shell: chdir=/usr/local/src/hisparc creates=/usr/local/bin/pip
+             python get-pip.py
+      sudo: yes
