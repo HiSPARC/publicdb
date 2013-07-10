@@ -1,5 +1,10 @@
 ---
 - hosts: publicdb
   tasks:
-    - name: ensure ansible playbook is executed
-      shell: echo "Yes, ansible works correctly!"
+    - name: ensure hisparc user is present
+      user: name=hisparc state=present
+      sudo: yes
+
+    - name: ensure vagrant user is part of hisparc group
+      user: name=vagrant groups=hisparc append=yes
+      sudo: yes
