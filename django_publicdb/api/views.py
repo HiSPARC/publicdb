@@ -387,9 +387,10 @@ def clusters(request, country_id=None):
 def countries(request):
     """Get country list
 
-    Retrieve a list of all countries with active stations.
+    Retrieve a list of all countries.
 
-    :return: list of dictionaries containing the name and number of all countries.
+    :return: list of dictionaries containing the name and number of
+             all countries.
 
     """
     countries = get_country_dict()
@@ -406,7 +407,8 @@ def get_station_dict(subcluster=None):
     station_dict = []
     for station in stations:
         try:
-            if Pc.objects.filter(station=station)[0].is_active:
+            pc = Pc.objects.filter(station=station)[0]
+            if not pc.is_test:
                 station_dict.append({'number': station.number,
                                      'name': station.name})
         except IndexError:
