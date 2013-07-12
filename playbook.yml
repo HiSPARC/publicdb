@@ -9,6 +9,10 @@
       user: name=vagrant groups=hisparc append=yes
       sudo: yes
 
+    - name: kill active ssh connection
+      script: kill_active_sshd.sh
+      ignore_errors: true
+
     - name: ensure /usr/local/lib is in ld.so.conf
       lineinfile: dest=/etc/ld.so.conf regexp=''
                   state=present line='/usr/local/lib' backrefs=yes
