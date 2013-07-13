@@ -1,0 +1,9 @@
+Cython==0.19.1
+Django==1.5.1
+South==0.8.1
+docutils==0.10
+ipython==0.13.2
+mock==1.0.1
+numpy==1.7.1
+progressbar==2.3
+recaptcha-client==1.0.6
