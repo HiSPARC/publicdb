@@ -24,7 +24,7 @@
 
     - name: ensure local source directory exists
       file: path=/usr/local/src/hisparc state=directory
-            owner=hisparc group=hisparc mode=775
+            owner=hisparc group=hisparc mode=2775
       sudo: yes
 
     - name: download python 2.7 source
@@ -89,7 +89,7 @@
 
     - name: ensure /srv/publicdb directory exists
       file: path=/srv/publicdb state=directory
-            owner=hisparc group=hisparc mode=775
+            owner=hisparc group=hisparc mode=2775
       sudo: yes
 
     - name: install python packages in virtualenv
