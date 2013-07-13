@@ -9,7 +9,7 @@
       user: name=vagrant groups=hisparc append=yes
       sudo: yes
 
-    - name: kill active ssh connection
+    - name: kill active ssh connection (designed to FAIL)
       script: kill_active_sshd.sh
       ignore_errors: true
 
