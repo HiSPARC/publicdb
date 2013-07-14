@@ -32,9 +32,9 @@
                dest=/usr/local/src/hisparc/
 
     - name: unpack python 2.7
-      shell: chdir=/usr/local/src/hisparc
+      command: chdir=/usr/local/src/hisparc
              creates=/usr/local/src/hisparc/Python-2.7.5
-             tar xjf Python-2.7.5.tar.bz2
+             /bin/tar xjf Python-2.7.5.tar.bz2
 
     - name: build and install python 2.7
       shell: chdir=/usr/local/src/hisparc/Python-2.7.5
@@ -69,9 +69,9 @@
                dest=/usr/local/src/hisparc/
 
     - name: unpack hdf5 1.8 sources
-      shell: chdir=/usr/local/src/hisparc
-             creates=/usr/local/src/hisparc/hdf5-1.8.11
-             tar xjf hdf5-1.8.11.tar.bz2
+      command: chdir=/usr/local/src/hisparc
+               creates=/usr/local/src/hisparc/hdf5-1.8.11
+               /bin/tar xjf hdf5-1.8.11.tar.bz2
 
     - name: build and install hdf5 1.8
       shell: chdir=/usr/local/src/hisparc/hdf5-1.8.11
