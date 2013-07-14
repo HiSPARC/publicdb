@@ -17,6 +17,10 @@
       command: /bin/rpm -U --force http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
       sudo: yes
 
+    - name: install MySQL server
+      yum: name=mysql-server,mysql-devel
+      sudo: yes
+
     - name: install ACL utilities
       yum: name=acl
       sudo: yes
