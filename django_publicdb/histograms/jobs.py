@@ -6,64 +6,118 @@ import datetime
 import time
 import calendar
 import logging
-import numpy
+import multiprocessing
 
+import numpy as np
+
+import django.db
 from models import *
-from django_publicdb.inforecords.models import DetectorHisparc
+from django_publicdb.inforecords.models import Station, DetectorHisparc
 import datastore
+import esd
+
+from django.conf import settings
+
+import fit_pulseheight_peak
 
 logger = logging.getLogger('histograms.jobs')
 
+# Parameters for the histograms
 MAX_PH = 2000
 BIN_PH_NUM = 200
 MAX_IN = 50000
 BIN_IN_NUM = 200
 
+# Tables supported by this code
+SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+# Tables ignored by this code (unsupported tables not listed here will
+# generate a warning).
+IGNORE_TABLES = ['blobs']
+# For some event tables, we can safely update the num_events during the
+# check.  For events, for example, the histograms are recreated.  For
+# configs, this is not possible.  The previous number of configs is used
+# to select only new ones during the update.
+RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
+
 
 def check_for_updates():
+    """Run a check for updates to the event tables"""
+
     state = GeneratorState.objects.get()
 
     if state.check_is_running:
-        return False
+        check_has_run = False
     else:
-        last_check_time = time.mktime(state.check_last_run.timetuple())
-        check_last_run = datetime.datetime.now()
-        state.check_is_running = True
+        check_for_new_events_and_update_flags(state)
+        check_has_run = True
+
+    return check_has_run
+
+
+def check_for_new_events_and_update_flags(state):
+    """Check the datastore for new events and update flags"""
+
+    # bookkeeping
+    last_check_time = time.mktime(state.check_last_run.timetuple())
+    check_last_run = datetime.datetime.now()
+    state.check_is_running = True
+    state.save()
+
+    try:
+        # perform a check for updated files
+        possibly_new = datastore.check_for_new_events(last_check_time)
+
+        # perform a thorough check for each possible date
+        for date, station_list in possibly_new.iteritems():
+            process_possible_stations_for_date(date, station_list)
+        state.check_last_run = check_last_run
+    finally:
+        # bookkeeping
+        state.check_is_running = False
         state.save()
 
-        try:
-            summary = datastore.check_for_new_events(last_check_time)
 
-            for date, station_list in summary.iteritems():
-                logger.debug('Now processing %s' % date)
-                for station, table_list in station_list.iteritems():
-                    try:
-                        station = inforecords.Station.objects.get(number=station)
-                    except inforecords.Station.DoesNotExist:
-                        logger.error('Unknown station: %s' % station)
-                        continue
-                    s, created = Summary.objects.get_or_create(
-                                        station=station, date=date)
-                    for table, num_events in table_list.iteritems():
-                        if table in ['events', 'config', 'errors', 'weather']:
-                            number_of = 'num_%s' % table
-                            update_type = 'needs_update_%s' % table
-                            if vars(s)[number_of] != num_events:
-                                logger.debug("New data (%s) on %s for station %d" %
-                                             (table,
-                                              date.strftime("%a %b %d %Y"),
-                                              station.number))
-                                s.needs_update = True
-                                vars(s)[update_type] = True
-                                if table in ['events', 'weather']:
-                                    vars(s)[number_of] = num_events
-                                s.save()
-            state.check_last_run = check_last_run
-        finally:
-            state.check_is_running = False
-            state.save()
+def process_possible_stations_for_date(date, station_list):
+    """Check stations for possible new data"""
 
-    return True
+    logger.debug('Now processing %s' % date)
+    for station, table_list in station_list.iteritems():
+        process_possible_tables_for_station(station, table_list, date)
+
+
+def process_possible_tables_for_station(station, table_list, date):
+    """Check all tables and store summary for single station"""
+
+    try:
+        station = inforecords.Station.objects.get(number=station)
+    except Station.DoesNotExist:
+        logger.error('Unknown station: %s' % station)
+    else:
+        summary, created = Summary.objects.get_or_create(station=station,
+                                                         date=date)
+        for table, num_events in table_list.iteritems():
+            check_table_and_update_flags(table, num_events, summary)
+
+
+def check_table_and_update_flags(table_name, num_events, summary):
+    """Check a single table and update flags if new data"""
+
+    if table_name in SUPPORTED_TABLES:
+        number_of_events_attr = 'num_%s' % table_name
+        update_flag_attr = 'needs_update_%s' % table_name
+
+        if getattr(summary, number_of_events_attr) != num_events:
+            logger.debug("New data (%s) on %s for station %d", table_name,
+                         summary.date.strftime("%a %b %d %Y"),
+                         summary.station.number)
+            # only record number of events for *some* tables at this time
+            if table_name in RECORD_EARLY_NUM_EVENTS:
+                setattr(summary, number_of_events_attr, num_events)
+            setattr(summary, update_flag_attr, True)
+            summary.needs_update = True
+            summary.save()
+    elif table_name not in IGNORE_TABLES:
+        logger.warning('Unsupported table type: %s', table_name)
 
 
 def update_all_histograms():
@@ -77,32 +131,103 @@ def update_all_histograms():
         state.save()
 
         try:
-            for summary in (Summary.objects.filter(needs_update=True)
-                                   .reverse()):
-                if summary.needs_update_events:
-                    update_eventtime_histogram(summary)
-                    update_pulseheight_histogram(summary)
-                    update_pulseintegral_histogram(summary)
-                    summary.needs_update_events = False
-
-                if summary.needs_update_config:
-                    num_config = update_config(summary)
-                    summary.num_config = num_config
-                    summary.needs_update_config = False
-
-                if summary.needs_update_weather:
-                    update_temperature_dataset(summary)
-                    update_barometer_dataset(summary)
-                    summary.needs_update_weather = False
-
-                summary.needs_update = False
-                summary.save()
+            perform_update_tasks()
             state.update_last_run = update_last_run
         finally:
             state.update_is_running = False
             state.save()
 
     return True
+
+
+def perform_update_tasks():
+    update_esd()
+    update_histograms()
+
+
+def update_esd():
+    worker_pool = multiprocessing.Pool()
+    summaries = Summary.objects.filter(needs_update=True).reverse()
+    results = worker_pool.imap_unordered(
+        process_and_store_temporary_esd_for_summary, summaries)
+
+    for summary, tmp_locations in results:
+        for tmpfile_path, node_path in tmp_locations:
+            esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                               node_path)
+        summary.needs_update = False
+        summary.save()
+
+    worker_pool.close()
+    worker_pool.join()
+
+
+def process_and_store_temporary_esd_for_summary(summary):
+    django.db.close_connection()
+    tmp_locations = []
+    if summary.needs_update_events:
+        tmp_locations.append(process_events_and_store_esd(summary))
+    if summary.needs_update_weather:
+        tmp_locations.append(process_weather_and_store_esd(summary))
+    return summary, tmp_locations
+
+
+def update_histograms():
+    """Update all histograms"""
+
+    perform_tasks_manager("needs_update_config", perform_config_tasks)
+    perform_tasks_manager("needs_update_events", perform_events_tasks)
+    perform_tasks_manager("needs_update_weather", perform_weather_tasks)
+
+
+def perform_tasks_manager(needs_update_item, perform_certain_tasks):
+    """ Front office for doing tasks
+        Depending on the USE_MULTIPROCESSING flag, the manager either does the
+        tasks himself or he grabs some workers and let them do it.
+    """
+
+    summaries = eval("Summary.objects.filter(%s=True).reverse()" %
+                     needs_update_item)
+
+    if settings.USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
+        for summary in results:
+            exec "summary.%s=False" % needs_update_item
+            summary.save()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            if not eval("summary.%s" % needs_update_item):
+                continue
+
+            perform_certain_tasks(summary)
+            exec "summary.%s=False" % needs_update_item
+            summary.save()
+
+
+def perform_events_tasks(summary):
+    django.db.close_connection()
+    update_eventtime_histogram(summary)
+    update_pulseheight_histogram(summary)
+    update_pulseheight_fit(summary)
+    update_pulseintegral_histogram(summary)
+    return summary
+
+
+def perform_config_tasks(summary):
+    django.db.close_connection()
+    num_config = update_config(summary)
+    summary.num_config = num_config
+    return summary
+
+
+def perform_weather_tasks(summary):
+    django.db.close_connection()
+    update_temperature_dataset(summary)
+    update_barometer_dataset(summary)
+    return summary
 
 
 def update_gps_coordinates():
@@ -127,8 +252,7 @@ def update_gps_coordinates():
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    timestamps = datastore.get_event_timestamps(cluster, station_id,
-                                                summary.date)
+    timestamps = esd.get_event_timestamps(summary)
 
     # creating a histogram with bins consisting of timestamps instead of
     # hours saves us from having to convert all timestamps to hours of day.
@@ -137,7 +261,7 @@ def update_eventtime_histogram(summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = numpy.histogram(timestamps, bins=bins)
+    hist = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
     hist = hist[0].tolist()
@@ -147,25 +271,52 @@ def update_eventtime_histogram(summary):
 def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    pulseheights = datastore.get_pulseheights(cluster, station_id,
-                                              summary.date)
+    pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
+
+
+def update_pulseheight_fit(summary):
+    logger.debug("Updating pulseheight fit for %s" % summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExist:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
+    save_pulseheight_fits(summary, fits)
 
 
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    integrals = datastore.get_integrals(cluster, station_id, summary.date)
+    integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
+
+
+def process_events_and_store_esd(summary):
+    logger.debug("Processing events and storing ESD for %s", summary)
+    t0 = time.time()
+    tmpfile_path, node_path = \
+        esd.process_events_and_store_temporary_esd(summary)
+    t1 = time.time()
+    logger.debug("Processing took %.1f s.", t1 - t0)
+    return tmpfile_path, node_path
+
+
+def process_weather_and_store_esd(summary):
+    logger.debug("Processing weather events and storing ESD for %s", summary)
+    tmpfile_path, node_path = \
+        esd.process_weather_and_store_temporary_esd(summary)
+    return tmpfile_path, node_path
 
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    temperature = datastore.get_temperature(cluster, station_id, summary.date)
-    ERR = [-999, -2**15]
+    temperature = esd.get_temperature(summary)
+    ERR = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         save_dataset(summary, 'temperature', temperature)
@@ -174,7 +325,7 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
     cluster, station_id = get_station_cluster_id(summary.station)
-    barometer = datastore.get_barometer(cluster, station_id, summary.date)
+    barometer = esd.get_barometer(summary)
     save_dataset(summary, 'barometer', barometer)
 
 
@@ -209,8 +360,8 @@ def create_histogram(data, high, samples):
     else:
         values = []
         for array in data:
-            bins = numpy.linspace(0, high, samples + 1)
-            hist, bins = numpy.histogram(array, bins=bins)
+            bins = np.linspace(0, high, samples + 1)
+            hist, bins = np.histogram(array, bins=bins)
             values.append(hist)
 
         bins = bins.tolist()
@@ -246,6 +397,27 @@ def save_dataset(summary, slug, data):
     d.y = y
     d.save()
     logger.debug("Saved succesfully")
+
+
+def save_pulseheight_fits(summary, fits):
+
+    if len(fits) == 0:
+        logger.debug("Empty pulseheight fit results. Nothing to save.")
+        return
+
+    logger.debug("Saving pulseheight fits for %s" % summary)
+
+    for fit in fits:
+        try:
+            fit.save()
+        except django.db.IntegrityError:
+            existing_fit = PulseheightFit.objects.get(source=summary,
+                                                      plate=fit.plate)
+
+            fit.id = existing_fit.id
+            fit.save()
+
+    logger.debug("Saved successfully")
 
 
 def get_station_cluster_id(station):

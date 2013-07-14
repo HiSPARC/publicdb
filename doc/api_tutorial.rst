@@ -6,7 +6,7 @@ API Tutorial
 The |hisparc| |api| (Application Programming Interface) simplifies data access from other applications. In this tutorial, we'll give some examples of how data can be accessed and used with Javascript (`jQuery <http://www.jquery.com/>`_) and `Python <http://www.python.org>`_. We'll show you how to do some neat things. How can you get a list of all |hisparc| stations in Denmark? What is the position of station 201? Which stations had data on 20 October 2010? How does the number of measured events change during a few weeks? This tutorial will give you an overview of some of possibilities with the |hisparc| |api|. For details on all available classes and methods, please see the :doc:`api`.
 
 .. note::
-    We'll require you to know some basic programming, i.e. to understand what an :code:`if` statement is and :code:`for` loop does. If you are new to coding you can try a tutorial online, for instance `Codeacademy <http://www.codecademy.com/>`_.
+    We'll require you to know some basic programming, i.e. to understand what an :code:`if` statement is and :code:`for` loop does. If you are new to coding you can try a tutorial online, for instance `Codeacademy <http://www.codecademy.com/>`_, we recommend learning Python or jQuery.
 
 
 First look
@@ -118,5 +118,5 @@ Start Python and type (copy/paste) the following lines of code:
     ...     dates.append(datum)
     ...     datum += timedelta(days=1)
     ...
-    >>> plot(dates, events)
+    >>> step(dates, events)
     >>> show()

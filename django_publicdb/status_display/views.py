@@ -1,5 +1,6 @@
 from django.shortcuts import (render_to_response, get_object_or_404,
                               get_list_or_404, redirect)
+from django.http import Http404
 from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
@@ -143,14 +144,17 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for detector in (DetectorHisparc.objects.exclude(enddate__lt=today)
-                                        .filter(station__cluster__name=subcluster,
-                                                station__pc__is_active=True)):
-            link = station_has_data(detector.station)
-            status = get_station_status(detector.station, down, problem, up)
-            stations.append({'number': detector.station.number,
-                             'name': detector.station.name,
-                             'cluster': detector.station.cluster,
+        for station in Station.objects.filter(cluster=subcluster,
+                                              pc__is_active=True,
+                                              pc__is_test=False):
+            detector = (DetectorHisparc.objects.filter(station=station,
+                                                       startdate__lte=today)
+                                               .latest('startdate'))
+            link = station_has_data(station)
+            status = get_station_status(station, down, problem, up)
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'cluster': station.cluster,
                              'link': link,
                              'status': status,
                              'longitude': detector.longitude,
@@ -175,10 +179,11 @@ def station_data(request, station_id, year, month, day):
     date = datetime.date(year, month, day)
 
     station = get_object_or_404(Station, number=station_id)
-    data = get_object_or_404(Summary.objects.filter(Q(station=station),
-                                                    Q(date=date),
-                                                    Q(num_events__isnull=False) |
-                                                    Q(num_weather__isnull=False)))
+    data = get_object_or_404(Summary,
+                             Q(num_events__isnull=False) |
+                             Q(num_weather__isnull=False),
+                             station=station,
+                             date=date)
 
     # Use next_day and prev_day to add previous/next links
     prev_day = date - datetime.timedelta(days=1)
@@ -239,6 +244,7 @@ def station_data(request, station_id, year, month, day):
     return render_to_response('station_data.html',
         {'station': station,
          'date': date,
+         'tomorrow': date + datetime.timedelta(days=1),
          'config': config,
          'has_slave': has_slave,
          'eventhistogram': eventhistogram,
@@ -330,12 +336,16 @@ def station_config(request, station_id):
 def station(request, station_id):
     """Show most recent histograms for a particular station"""
 
-    summary = (Summary.objects.filter(Q(station__number=station_id),
-                                      Q(num_events__isnull=False) |
-                                      Q(num_weather__isnull=False),
-                                      date__gte=datetime.date(2002, 1, 1),
-                                      date__lte=datetime.date.today())
-                              .latest('date'))
+    try:
+        summary = (Summary.objects.filter(Q(num_events__isnull=False) |
+                                          Q(num_weather__isnull=False),
+                                          station__number=station_id,
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                                    .latest('date'))
+    except Summary.DoesNotExist:
+        raise Http404
+
     return redirect(station_data,
                     station_id=str(station_id),
                     year=str(summary.date.year),
@@ -421,10 +431,11 @@ def get_gps_config_source(request, station_id):
 
 
 def get_histogram_source(station_id, year, month, day, type):
-    histogram = DailyHistogram.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    histogram = get_object_or_404(DailyHistogram,
+                                  source__station__number=int(station_id),
+                                  source__date=date,
+                                  type__slug=type)
     if type == 'eventtime':
         return zip(histogram.bins, histogram.values)
     else:
@@ -432,10 +443,11 @@ def get_histogram_source(station_id, year, month, day, type):
 
 
 def get_dataset_source(station_id, year, month, day, type):
-    dataset = DailyDataset.objects.get(
-            source__station__number=int(station_id),
-            source__date=datetime.date(int(year), int(month), int(day)),
-            type__slug=type)
+    date = datetime.date(int(year), int(month), int(day))
+    dataset = get_object_or_404(DailyDataset,
+                                source__station__number=int(station_id),
+                                source__date=date,
+                                type__slug=type)
     return zip(dataset.x, dataset.y)
 
 
@@ -576,9 +588,11 @@ def nav_months(station, theyear):
 
     month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
     for date in date_list:
-        first_day = (Summary.objects.filter(station=station,
-                                            date__year=date.year,
-                                            date__month=date.month)
+        first_day = (Summary.objects.filter(Q(station=station),
+                                            Q(date__year=date.year),
+                                            Q(date__month=date.month),
+                                            Q(num_events__isnull=False) |
+                                            Q(num_weather__isnull=False))
                             .dates('date', 'day')[0])
         link = (station.number, date.year, date.month, first_day.day)
         month_list[date.month - 1]['link'] = link
@@ -613,8 +627,14 @@ def nav_years(station):
 
 
 def station_has_data(station):
-    """Check if there is valid event or weather data for the given station"""
+    """Check if there is valid event or weather data for the given station
 
+    :param station: Station object for which to check.
+
+    :return: boolean indicating if the station has recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
     try:
         Summary.objects.filter(Q(station=station),
                                Q(num_events__isnull=False) |

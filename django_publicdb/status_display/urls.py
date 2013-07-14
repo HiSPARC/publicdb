@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import *
+from django.conf.urls import patterns
 
 urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^stations/$', 'stations'),

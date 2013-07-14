@@ -36,8 +36,7 @@ class Contact(models.Model):
 
     def save(self, *args, **kwargs):
         super(Contact, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     class Meta:
         unique_together = [('first_name', 'prefix_surname', 'surname')]
@@ -47,10 +46,10 @@ class Contact(models.Model):
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
-    postalcode = models.CharField(max_length=6)
+    postalcode = models.CharField(max_length=12)
     city = models.CharField(max_length=40)
-    pobox = models.CharField(max_length=9, null=True, blank=True)
-    pobox_postalcode = models.CharField(max_length=6, null=True, blank=True)
+    pobox = models.CharField(max_length=12, null=True, blank=True)
+    pobox_postalcode = models.CharField(max_length=12, null=True, blank=True)
     pobox_city = models.CharField(max_length=40, null=True, blank=True)
     phone_work = models.CharField(max_length=20)
     phone_home = models.CharField(max_length=20, null=True, blank=True)
@@ -95,8 +94,7 @@ class ContactInformation(models.Model):
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     class Meta:
         ordering = ['city', 'street_1', 'email_work']
@@ -157,7 +155,7 @@ class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True,blank=True)
     contactinformation = models.ForeignKey('ContactInformation',
-                                            related_name='stations')
+                                           related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
     contact = models.ForeignKey(Contact, related_name='stations_contact',
                                 null=True)
@@ -168,7 +166,7 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 
     def __unicode__(self):
-        return '%s' % (self.number)
+        return '%5d: %s' % (self.number, self.name)
 
     def save(self, *args, **kwargs):
         if self.number==None:
@@ -222,18 +220,22 @@ class DetectorHisparc(models.Model):
     direction = models.FloatField(null=True, blank=True)
     translation_perp = models.FloatField(null=True, blank=True)
     translation_long = models.FloatField(null=True, blank=True)
-    scintillator_1_perp = models.FloatField(null=True, blank=True)
-    scintillator_1_long = models.FloatField(null=True, blank=True)
-    scintillator_1_angle = models.FloatField(null=True, blank=True)
-    scintillator_2_perp = models.FloatField(null=True, blank=True)
-    scintillator_2_long = models.FloatField(null=True, blank=True)
-    scintillator_2_angle = models.FloatField(null=True, blank=True)
-    scintillator_3_perp = models.FloatField(null=True, blank=True)
-    scintillator_3_long = models.FloatField(null=True, blank=True)
-    scintillator_3_angle = models.FloatField(null=True, blank=True)
-    scintillator_4_perp = models.FloatField(null=True, blank=True)
-    scintillator_4_long = models.FloatField(null=True, blank=True)
-    scintillator_4_angle = models.FloatField(null=True, blank=True)
+    scintillator_1_alpha = models.FloatField(null=True, blank=True)
+    scintillator_1_beta = models.FloatField(null=True, blank=True)
+    scintillator_1_radius = models.FloatField(null=True, blank=True)
+    scintillator_1_height = models.FloatField(null=True, blank=True)
+    scintillator_2_alpha = models.FloatField(null=True, blank=True)
+    scintillator_2_beta = models.FloatField(null=True, blank=True)
+    scintillator_2_radius = models.FloatField(null=True, blank=True)
+    scintillator_2_height = models.FloatField(null=True, blank=True)
+    scintillator_3_alpha = models.FloatField(null=True, blank=True)
+    scintillator_3_beta = models.FloatField(null=True, blank=True)
+    scintillator_3_radius = models.FloatField(null=True, blank=True)
+    scintillator_3_height = models.FloatField(null=True, blank=True)
+    scintillator_4_alpha = models.FloatField(null=True, blank=True)
+    scintillator_4_beta = models.FloatField(null=True, blank=True)
+    scintillator_4_radius = models.FloatField(null=True, blank=True)
+    scintillator_4_height = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
         return unicode(self.station)
@@ -313,6 +315,7 @@ class Pc(models.Model):
     type = models.ForeignKey(PcType)
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
+    is_test = models.BooleanField(default=False)
     ip = models.IPAddressField(unique=True, blank=True)
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
@@ -386,7 +389,9 @@ class Pc(models.Model):
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.register_hosts_ip([(x.name, x.ip) for x in Pc.objects.all()])
+        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
+        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
+        proxy.register_hosts_ip(aliases)
         proxy.reload_nagios()
 
     def install_default_services(self):
@@ -394,6 +399,19 @@ class Pc(models.Model):
             for service in MonitorService.objects. \
                             filter(is_default_service=True):
                 EnabledService(pc=self, monitor_service=service).save()
+
+
+class MonitorPulseheightThresholds(models.Model):
+    station = models.ForeignKey('Station')
+    plate = models.IntegerField()
+
+    mpv_mean = models.FloatField()
+    mpv_sigma = models.FloatField()
+    mpv_max_allowed_drift = models.FloatField()
+    mpv_min_allowed_drift = models.FloatField()
+
+    class Meta:
+        verbose_name_plural = "Pulseheight thresholds for Nagios monitoring"
 
 
 class MonitorService(models.Model):
@@ -443,13 +461,22 @@ class EnabledService(models.Model):
 
     def save(self, *args, **kwargs):
         super(EnabledService, self).save(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        reload_nagios()
 
     def delete(self, *args, **kwargs):
         super(EnabledService, self).delete(*args, **kwargs)
+        reload_nagios()
+
+
+def reload_nagios():
+    """Reload the nagios configuration"""
+
+    try:
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
+    except:
+        #FIXME logging!
+        pass
 
 
 def reload_datastore():

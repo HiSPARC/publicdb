@@ -1,13 +1,14 @@
-from django_publicdb.inforecords.models import *
 from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse
+from django.conf import settings
+from django.contrib.auth.decorators import login_required
 
 import xmlrpclib
 import base64
 
-from django.conf import settings
-from django.contrib.auth.decorators import login_required
-
+from django_publicdb.inforecords.models import *
+from django_publicdb.histograms.models import *
+from django_publicdb.status_display.views import station_has_data
 
 @login_required
 def keys(request, host):
@@ -66,8 +67,9 @@ def create_nagios_config(request):
                 {'description': service.monitor_service.description,
                  'check_command': check_command,
                  'active_checks': service.monitor_service.enable_active_checks})
+        has_data = station_has_data(host.station)
         # Append this host to the hosts list
-        hosts.append({'pc': host, 'services': services})
+        hosts.append({'pc': host, 'services': services, 'has_data': has_data})
 
     # Render the template
     return render_to_response('nagios.cfg',

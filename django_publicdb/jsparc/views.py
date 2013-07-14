@@ -4,6 +4,7 @@ import calendar
 import datetime
 import json
 from random import randrange
+
 import numpy as np
 import operator
 
@@ -20,9 +21,12 @@ def get_coincidence(request):
     student_name = request.GET.get('student_name', None)
 
     if session_title.lower() == 'example':
-        count = AnalyzedCoincidence.objects.count()
+        today = datetime.date.today()
+        coincidences = AnalyzedCoincidence.objects.filter(
+                                                session__ends__gt=today)
+        count = coincidences.count()
         random_index = randint(0, count - 1)
-        coincidence = AnalyzedCoincidence.objects.all()[random_index]
+        coincidence = coincidences[random_index]
         events = get_events(coincidence)
         response = data_json(coincidence, events)
         return response
@@ -30,15 +34,15 @@ def get_coincidence(request):
     try:
         session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
-            raise ValueError('Wrong pin for this session')
+            return error_json(401, 'Wrong pin for this session.')
     except AnalysisSession.DoesNotExist:
-        raise Exception('No such analysis session!')
+        return error_json(404, 'No session with that title.')
     except ValueError:
         raise
     else:
         if not session.in_progress():
-            raise Exception("Analysis session hasn't started yet or "
-                            "is already closed!")
+            return error_json(404, "The requested session has not started yet "
+                                   "or is already expired.")
 
     if not student_name:
         student = Student.objects.get(session=session,
@@ -85,9 +89,10 @@ def get_events(coincidence):
                      status='on',
                      detectors=len(e.traces),
                      traces=e.traces,
-                     pulseheights=[np.asscalar(u) for u in e.pulseheights],
-                     integrals=[np.asscalar(u) for u in e.integrals],
-                     mips=[x / 200. for x in e.pulseheights])
+                     pulseheights=e.pulseheights,
+                     integrals=e.integrals,
+                     mips=[ph / 200. if ph > 0 else ph
+                           for ph in e.pulseheights])
         events.append(event)
     return events
 
@@ -102,6 +107,16 @@ def data_json(coincidence, events):
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
     response = HttpResponse(json.dumps(data), mimetype='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
+
+def error_json(error_code, message):
+    """Construct error response json for jSparc requests"""
+    data = dict(message=message,
+                code=error_code)
+    response = HttpResponse(json.dumps(data), status=error_code,
+                            mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -136,21 +151,19 @@ def result(request):
     if session_title.lower() == 'example':
         return test_result()
 
-    student_name = request.GET['student_name']
+    pk = request.GET['pk']
+    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
 
     # If student is test student, do not save result.
     if coincidence.student.name.lower() == 'test student':
         return test_result()
 
-    pk = request.GET['pk']
+    student_name = request.GET['student_name']
     lat = request.GET['lat']
     lon = request.GET['lon']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
-    if session_title.lower() == 'example':
-        return test_result()
 
-    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 

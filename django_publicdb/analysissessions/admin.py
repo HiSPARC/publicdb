@@ -12,7 +12,7 @@ class AnalyzedCoincidenceAdmin(admin.ModelAdmin):
     exclude = ('coincidence',)
     list_display = ('session', 'coincidence', 'student', 'is_analyzed')
     list_display_links = ('session', 'coincidence')
-    list_filter = ('session', 'is_analyzed', 'student')
+    list_filter = ('session', 'is_analyzed')
 
 
 class StudentAdmin(admin.ModelAdmin):

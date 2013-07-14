@@ -1,4 +1,3 @@
-from django.conf.urls.defaults import url, patterns
 from django.contrib import admin
 from models import *
 from django.utils.encoding import force_unicode
@@ -83,6 +82,12 @@ class EnabledServiceInline(admin.TabularInline):
     extra = 10
 
 
+class MonitorPulseheightThresholdsAdmin(admin.ModelAdmin):
+    list_display = ('station', 'plate', 'mpv_mean', 'mpv_sigma')
+    list_filter = ('station',)
+    list_per_page = 200
+
+
 class MonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('description', 'is_default_service', 'nagios_command')
     inlines = (EnabledServiceInline,)
@@ -94,6 +99,12 @@ class PcAdmin(admin.ModelAdmin):
     list_filter = ('is_active',)
     ordering = ('station',)
     inlines = (EnabledServiceInline,)
+    list_per_page = 200
+
+
+class DetectorHisparcAdmin(admin.ModelAdmin):
+    list_display = ('station', 'startdate')
+    list_filter = ('station',)
     list_per_page = 200
 
 
@@ -113,12 +124,14 @@ admin.site.register(ContactInformation, ContactInformationAdmin)
 admin.site.register(Cluster, ClusterAdmin)
 admin.site.register(Station, StationAdmin)
 admin.site.register(Country, CountryAdmin)
-admin.site.register(DetectorHisparc)
+admin.site.register(DetectorHisparc, DetectorHisparcAdmin)
 admin.site.register(ElectronicsType)
 admin.site.register(ElectronicsStatus)
 admin.site.register(ElectronicsBatch)
 admin.site.register(Electronics, ElectronicsAdmin)
 admin.site.register(PcType)
 admin.site.register(Pc, PcAdmin)
+admin.site.register(MonitorPulseheightThresholds,
+                    MonitorPulseheightThresholdsAdmin)
 admin.site.register(MonitorService, MonitorServiceAdmin)
 admin.site.register(EnabledService, EnabledServiceAdmin)

@@ -15,13 +15,16 @@
 import os
 import sys
 
-sys.path.append('../')
+dirname = os.path.dirname(__file__)
+publicdb_path = os.path.join(dirname, '..')
+sys.path.append(publicdb_path)
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
 from datetime import date, datetime, time, timedelta
 
-from hisparc.publicdb import download_data
+from sapphire.publicdb import download_data
 
 from django.conf import settings
 from django_publicdb.inforecords.models import *
@@ -29,8 +32,8 @@ from django_publicdb.inforecords.models import *
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
-START = date(2010, 12, 28)
-END = date(2011, 1, 4)
+START = date(2013, 1, 5)
+END = date(2013, 1, 7)
 
 
 def main():
@@ -69,14 +72,16 @@ def get_datastore_file_for_date(date):
     return open_or_create_file(datastore_path, date)
 
 
-def download_and_store_station_data(f, station, date):
+def download_and_store_station_data(f, station, date, get_blobs=True):
     start = datetime.combine(date, time(0, 0, 0))
     end = start + timedelta(days=1)
 
     cluster = station.cluster.main_cluster()
     station_group = get_or_create_station_group(f, cluster, station.number)
 
-    download_data(f, station_group, station.number, start, end, get_blobs=True)
+    download_data(f, station_group, station.number,
+                  start, end,
+                  get_blobs=get_blobs)
 
 
 def open_or_create_file(data_dir, date):
@@ -89,8 +94,8 @@ def open_or_create_file(data_dir, date):
     :param date: the event date
 
     """
-    dir = os.path.join(data_dir, '%d/%d' % (date.year, date.month))
-    file = os.path.join(dir, '%d_%d_%d.h5' % (date.year, date.month, date.day))
+    dir = os.path.join(data_dir, date.strftime('%Y/%-m'))
+    file = os.path.join(dir, date.strftime('%Y_%-m_%-d.h5'))
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x
