@@ -106,12 +106,12 @@
 
     - name: install python packages in virtualenv -- stage 1
       pip: virtualenv=/srv/publicdb/publicdb_env
-           requirements=/vagrant/pip-stage1.txt
+           requirements=/vagrant/provisioning/pip-stage1.txt
 
     - name: install python packages in virtualenv -- stage 2
       pip: virtualenv=/srv/publicdb/publicdb_env
-           requirements=/vagrant/pip-stage2.txt
+           requirements=/vagrant/provisioning/pip-stage2.txt
 
     - name: install python packages in virtualenv -- stage 3
       pip: virtualenv=/srv/publicdb/publicdb_env
-           requirements=/vagrant/pip-stage3.txt
+           requirements=/vagrant/provisioning/pip-stage3.txt
