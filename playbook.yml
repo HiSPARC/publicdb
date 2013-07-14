@@ -17,6 +17,10 @@
       command: /bin/rpm -U --force http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
       sudo: yes
 
+    - name: install ACL utilities
+      yum: name=acl
+      sudo: yes
+
     - name: ensure /usr/local/lib is in ld.so.conf
       lineinfile: dest=/etc/ld.so.conf regexp=''
                   state=present line='/usr/local/lib' backrefs=yes
@@ -25,6 +29,10 @@
     - name: ensure local source directory exists
       file: path=/usr/local/src/hisparc state=directory
             owner=hisparc group=hisparc mode=2775
+      sudo: yes
+
+    - name: set default group write ACLs on /usr/local/src
+      command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
       sudo: yes
 
     - name: download python 2.7 source
@@ -90,6 +98,10 @@
     - name: ensure /srv/publicdb directory exists
       file: path=/srv/publicdb state=directory
             owner=hisparc group=hisparc mode=2775
+      sudo: yes
+
+    - name: set default group write ACLs on /srv/publicdb
+      command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
       sudo: yes
 
     - name: install python packages in virtualenv
