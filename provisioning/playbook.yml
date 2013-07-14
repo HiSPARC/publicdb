@@ -108,6 +108,9 @@
       command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
       sudo: yes
 
+    - name: link publicdb sources to /srv/publicdb
+      command: /bin/ln -s /vagrant/django_publicdb /srv/publicdb/www
+
     - name: install python packages in virtualenv -- stage 1
       pip: virtualenv=/srv/publicdb/publicdb_env
            requirements=/vagrant/provisioning/pip-stage1.txt
