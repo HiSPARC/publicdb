@@ -1,0 +1,86 @@
+- name: download python 2.7 source
+  get_url: url=http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2
+           dest=/usr/local/src/hisparc/
+
+- name: unpack python 2.7
+  command: chdir=/usr/local/src/hisparc
+         creates=/usr/local/src/hisparc/Python-2.7.5
+         /bin/tar xjf Python-2.7.5.tar.bz2
+
+- name: build and install python 2.7
+  shell: chdir=/usr/local/src/hisparc/Python-2.7.5
+         creates=/usr/local/bin/python2.7
+         ./configure --enable-shared && make && sudo make install &&
+         sudo /sbin/ldconfig
+
+- name: download setuptools
+  get_url: url=https://bitbucket.org/pypa/setuptools/raw/0.8/ez_setup.py
+           dest=/usr/local/src/hisparc/
+
+- name: install setuptools
+  shell: chdir=/usr/local/src/hisparc
+         creates=/usr/local/bin/easy_install python ez_setup.py
+  sudo: yes
+
+- name: download pip install script
+  get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py
+           dest=/usr/local/src/hisparc/
+
+- name: install pip
+  shell: chdir=/usr/local/src/hisparc creates=/usr/local/bin/pip
+         python get-pip.py
+  sudo: yes
+
+- name: install virtualenv
+  pip: name=virtualenv
+  sudo: yes
+
+- name: download hdf5 1.8 sources
+  get_url: url=http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.11.tar.bz2
+           dest=/usr/local/src/hisparc/
+
+- name: unpack hdf5 1.8 sources
+  command: chdir=/usr/local/src/hisparc
+           creates=/usr/local/src/hisparc/hdf5-1.8.11
+           /bin/tar xjf hdf5-1.8.11.tar.bz2
+
+- name: build and install hdf5 1.8
+  shell: chdir=/usr/local/src/hisparc/hdf5-1.8.11
+         creates=/usr/local/lib/libhdf5.so.8.0.0
+         ./configure --prefix=/usr/local && make && sudo make install
+         && sudo /sbin/ldconfig
+
+- name: install libraries
+  yum: name=gcc-gfortran,pkgconfig,lapack-devel,blas-devel,freetype-devel,libpng-devel
+  sudo: yes
+
+- name: ensure /srv directory exists
+  file: path=/srv state=directory
+  sudo: yes
+
+- name: ensure /srv/publicdb directory exists
+  file: path=/srv/publicdb state=directory
+        owner=hisparc group=hisparc mode=2775
+  sudo: yes
+
+- name: set default group write ACLs on /srv/publicdb
+  command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
+  sudo: yes
+
+- name: link publicdb sources to /srv/publicdb
+  file: path=/srv/publicdb/www src=/vagrant/django_publicdb state=link
+
+- name: create django static folder
+  file: path=/srv/publicdb/static state=directory
+
+- name: install python packages in virtualenv -- stage 1
+  pip: virtualenv=/srv/publicdb/publicdb_env
+       requirements=/vagrant/provisioning/pip-stage1.txt
+
+- name: install python packages in virtualenv -- stage 2
+  pip: virtualenv=/srv/publicdb/publicdb_env
+       requirements=/vagrant/provisioning/pip-stage2.txt
+
+- name: install python packages in virtualenv -- stage 3
+  pip: virtualenv=/srv/publicdb/publicdb_env
+       requirements=/vagrant/provisioning/pip-stage3.txt

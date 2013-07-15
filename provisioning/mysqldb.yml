@@ -1,0 +1,32 @@
+---
+- name: install MySQL server and development libraries
+  yum: name={{ item }} state=present
+  sudo: yes
+  with_items:
+    - mysql-server
+    - mysql-devel
+    - MySQL-python
+
+- name: start MySQL server
+  service: name=mysqld state=started
+  sudo: yes
+
+- name: update MySQL root password for all accounts
+  mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
+  with_items:
+    - $ansible_fqdn
+    - 127.0.0.1
+    - localhost
+
+- name: copy .my.cnf file with root password credentials
+  template: src=my.cnf.j2 dest=/home/{{ ansible_user_id }}/.my.cnf
+
+- name: delete anonymous accounts
+  mysql_user: user='' host={{ item }} state=absent
+  with_items:
+    - $ansible_fqdn
+    - 127.0.0.1
+    - localhost
+
+- name: remove the MySQL test database
+  mysql_db: db=test state=absent

@@ -1,0 +1,35 @@
+---
+- name: ensure hisparc user is present
+  user: name=hisparc state=present
+  sudo: yes
+
+- name: ensure vagrant user is part of hisparc group
+  user: name=vagrant groups=hisparc append=yes
+  sudo: yes
+
+- name: kill active ssh connection (designed to FAIL)
+  script: kill_active_sshd.sh
+  ignore_errors: true
+
+- name: enable EPEL repositories
+  command: /bin/rpm -U --force http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+  sudo: yes
+
+- name: install ACL utilities
+  yum: name=acl
+  sudo: yes
+
+- name: ensure /usr/local/lib is in ld.so.conf
+  lineinfile: dest=/etc/ld.so.conf
+              regexp='/usr/local/lib'
+              line='/usr/local/lib' state=present
+  sudo: yes
+
+- name: ensure local source directory exists
+  file: path=/usr/local/src/hisparc state=directory
+        owner=hisparc group=hisparc mode=2775
+  sudo: yes
+
+- name: set default group write ACLs on /usr/local/src
+  command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
+  sudo: yes
