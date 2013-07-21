@@ -103,7 +103,7 @@ class SessionRequest(models.Model):
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
-        enddate = self.start_date + search_length
+        enddate = min([self.start_date + search_length, datetime.date.today()])
         while (self.events_created < self.events_to_create and date < enddate):
             self.events_created += self.find_coincidence(date, session)
             date += datetime.timedelta(days=1)
@@ -227,14 +227,14 @@ class SessionRequest(models.Model):
             trace_timing = -999
         return trace_timing
 
-    def GenerateUrl(self):
+    def generate_url(self):
         chars = string.letters + string.digits
         newurl = ''.join([choice(chars) for i in range(20)])
         if SessionRequest.objects.filter(url=newurl):
             newurl = ''.join([choice(chars) for i in range(20)])
         self.url = newurl
 
-    def SendMail(self):
+    def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
         message = ('Hello %s,'
                    '\n\nPlease click on this link to confirm your request for'

@@ -8,7 +8,7 @@ function createMap(name) {
             new OpenLayers.Control.Navigation(
                 {dragPanOptions: {enableKinetic: true}}),
             new OpenLayers.Control.Attribution(),
-            new OpenLayers.Control.ScaleLine()]};
+            new OpenLayers.Control.ScaleLine({geodesic: true})]};
 
     var map = new OpenLayers.Map(name, options);
 

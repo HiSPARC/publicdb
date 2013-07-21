@@ -1,3 +1,8 @@
+body {
+    background: #fff;
+    max-width: 960px;
+    margin: 0 auto;}
+
 div.sphinxsidebar ul {
     margin: 10px 10px;}
 

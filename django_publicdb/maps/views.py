@@ -9,6 +9,42 @@ from django_publicdb.inforecords.models import *
 from django_publicdb.status_display.nagios import *
 
 
+def station_on_map(request, station_id):
+    """Zoom in on a specific station on a map"""
+
+    down, problem, up = status_lists()
+    today = datetime.datetime.utcnow()
+
+    center = (DetectorHisparc.objects.filter(station__number=int(station_id),
+                                             startdate__lte=today)
+                                     .latest('startdate'))
+
+    subclusters = []
+    for subcluster in Cluster.objects.all():
+        stations = []
+        for station in Station.objects.filter(cluster=subcluster,
+                                              pc__is_active=True,
+                                              pc__is_test=False):
+            detector = (DetectorHisparc.objects.filter(station=station,
+                                                       startdate__lte=today)
+                                               .latest('startdate'))
+            status = get_station_status(station, down, problem, up)
+            stations.append({'number': station.number,
+                             'name': station.name,
+                             'cluster': station.cluster,
+                             'status': status,
+                             'longitude': detector.longitude,
+                             'latitude': detector.latitude,
+                             'altitude': detector.height})
+        subclusters.append({'name': subcluster.name,
+                            'stations': stations})
+
+    return render_to_response('map.html',
+        {'subclusters': subclusters,
+         'center': center},
+        context_instance=RequestContext(request))
+
+
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
