@@ -10,8 +10,42 @@ data and displays it for public use.  It exposes an API to download raw
 detector data from the datastore, as well as an API to participate in
 analysis sessions.
 
+To run and test the code, you can either set up a personal development
+environment containing all necessary libraries, or you can use Vagrant and
+Virtualbox to run everything in a virtual machine.
+
+
 .. contents:: Table of Contents
    :backlinks: none
+
+
+Using Vagrant to run inside a virtual machine
+---------------------------------------------
+
+We use `Vagrant <http://www.vagrantup.com>`_ to set up a virtual machine
+nearly identical to our production server *Pique*.  You can download
+Vagrant binaries for all major platforms.
+
+To correctly provision the VM, you need to have Python installed, with the
+`Ansible <http://www.ansibleworks.com>`_ package::
+
+    $ pip install ansible
+
+Then, navigate to the publicdb repository root and::
+
+    $ vagrant up
+
+You can ssh into you box by issuing::
+
+    $ vagrant ssh
+
+or you can reach it at 192.168.10.10.  To halt the VM, issue::
+
+    $ vagrant halt
+
+Please consult the `Vagrant documentation
+<http://docs.vagrantup.com/v2/>`_ for further instructions on using
+Vagrant.
 
 
 Setting up a personal development environment
