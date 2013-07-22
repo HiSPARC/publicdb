@@ -39,3 +39,14 @@
 - name: set up MySQL user
   mysql_user: name=hisparc password={{ mysql_password }}
               priv=publicdb.*:ALL state=present
+
+- name: copy Django settings file
+  copy: src=settings.py dest=/srv/publicdb/www/settings.py backup=yes
+
+- name: synchronize Django database
+  shell: chdir=/srv/publicdb/www
+         yes 'no' | /srv/publicdb/publicdb_env/bin/python manage.py syncdb
+
+- name: migrate Django apps
+  command: chdir=/srv/publicdb/www
+           /srv/publicdb/publicdb_env/bin/python manage.py migrate
