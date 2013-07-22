@@ -50,3 +50,8 @@
 - name: migrate Django apps
   command: chdir=/srv/publicdb/www
            /srv/publicdb/publicdb_env/bin/python manage.py migrate
+
+- name: collect static files of Django apps
+  shell: chdir=/srv/publicdb/www
+         yes 'yes' |
+         /srv/publicdb/publicdb_env/bin/python manage.py collectstatic
