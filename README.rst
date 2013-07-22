@@ -136,41 +136,6 @@ database with::
     $ ./manage.py syncdb
     $ ./manage.py migrate
 
-You can also use vagrant to set up a personal development environment in a virtualbox
--------------------------------------------------------------------------------------
-
-Centos will be downloaded on the virtualbox. On this box all the required
-programms, will be downloaded. Also their will be a shared folder created.
-This folder is called vagrant in the box and it contains the folder publicdb.
-
-First, `Vagrant <http://vagrantup.com/>`_ has to be installed.
-
-Second, open a terminal. Go to the place where the Vagrantfile is located,
-this file is located at [PATHO]/publicdb/vagrant/. 
-
-To run vagrant and download the needed programms,  
-do ::
-    $ vagrant up
-
-To start the box after everything is downloaded,
-do ::
-    $ vagrant ssh
-
-To activate the virtual environment in the box,
-do ::
-    $ source /srv/publicdb/publicdb_env/bin/activate
-    
-After that you need to start supervisor with ::
-    $ sudo /sbin/service supervisord start
-    
-At last, to start the testserver ::
-    $ cd /srv/publicdb/www
-    $ sudo uwsgi --ini uwsgi.ini
-    
-Every file that is beeing changed in [PATHO]/publicdb, will automaticcaly be 
-changed in the virtalbox. This is the same, for everything that you change
-in the virtualbox. 
-
 
 Hints for running a development publicdb server
 -----------------------------------------------
