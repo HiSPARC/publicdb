@@ -4,4 +4,4 @@
     - include: common.yml
     - include: mysqldb.yml mysql_root_password=Data4admin!
     - include: development.yml
-    - include: publicdb.yml
+    - include: publicdb.yml mysql_password=Data4user!

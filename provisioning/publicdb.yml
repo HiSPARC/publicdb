@@ -28,3 +28,10 @@
 - name: install python packages in virtualenv -- stage 3
   pip: virtualenv=/srv/publicdb/publicdb_env
        requirements=/vagrant/provisioning/pip-stage3.txt
+
+- name: set up MySQL database
+  mysql_db: name=publicdb state=present
+
+- name: set up MySQL user
+  mysql_user: name=hisparc password={{ mysql_password }}
+              priv=publicdb.*:ALL state=present
