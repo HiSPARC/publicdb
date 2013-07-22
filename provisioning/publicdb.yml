@@ -29,6 +29,10 @@
   pip: virtualenv=/srv/publicdb/publicdb_env
        requirements=/vagrant/provisioning/pip-stage3.txt
 
+- name: install latest version of SAPPHiRE
+  pip: virtualenv=/srv/publicdb/publicdb_env state=latest
+       name=https://github.com/HiSPARC/sapphire/archive/master.zip
+
 - name: set up MySQL database
   mysql_db: name=publicdb state=present
 
