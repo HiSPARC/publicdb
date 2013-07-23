@@ -41,7 +41,8 @@
               priv=publicdb.*:ALL state=present
 
 - name: copy Django settings file
-  copy: src=settings.py dest=/srv/publicdb/www/settings.py backup=yes
+  copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
+        backup=yes
 
 - name: synchronize Django database
   shell: chdir=/srv/publicdb/www
@@ -55,3 +56,6 @@
   shell: chdir=/srv/publicdb/www
          yes 'yes' |
          /srv/publicdb/publicdb_env/bin/python manage.py collectstatic
+
+- name: copy uwsgi.ini
+  copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
