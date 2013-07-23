@@ -61,3 +61,7 @@
     - blas-devel
     - freetype-devel
     - libpng-devel
+
+- name: install git
+  yum: name=git state=present
+  sudo: yes

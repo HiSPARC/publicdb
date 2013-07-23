@@ -11,8 +11,9 @@
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
   sudo: yes
 
-- name: link publicdb sources to /srv/publicdb
-  file: path=/srv/publicdb/www src=/vagrant/django_publicdb state=link
+- name: checkout publicdb in /srv/publicdb/www
+  git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
+       update=yes force=no
 
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
@@ -45,15 +46,15 @@
         backup=yes
 
 - name: synchronize Django database
-  shell: chdir=/srv/publicdb/www
+  shell: chdir=/srv/publicdb/www/django_publicdb
          yes 'no' | /srv/publicdb/publicdb_env/bin/python manage.py syncdb
 
 - name: migrate Django apps
-  command: chdir=/srv/publicdb/www
+  command: chdir=/srv/publicdb/www/django_publicdb
            /srv/publicdb/publicdb_env/bin/python manage.py migrate
 
 - name: collect static files of Django apps
-  shell: chdir=/srv/publicdb/www
+  shell: chdir=/srv/publicdb/www/django_publicdb
          yes 'yes' |
          /srv/publicdb/publicdb_env/bin/python manage.py collectstatic
 
