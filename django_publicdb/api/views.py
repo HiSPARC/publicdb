@@ -551,17 +551,17 @@ def get_pulseheight_drift(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 14)
 
 
-def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 30)
 
 
