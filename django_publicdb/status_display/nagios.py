@@ -100,3 +100,14 @@ def get_station_status(station, down, problem, up):
         return 'up'
     else:
         return 'unknown'
+
+def get_status_counts(down, problem, up):
+    """
+    :param down: list of stations that are DOWN.
+    :param problem: list of stations that have a service CRITICAL (but are UP).
+    :param up: list of stations that are UP.
+    :return: dictionary containing the counts of stations with a status.
+
+    """
+    statuscount = {'up': len(up), 'problem': len(problem), 'down': len(down)}
+    return statuscount

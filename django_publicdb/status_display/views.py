@@ -26,6 +26,7 @@ def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     countries = []
     for country in Country.objects.all():
         clusters = []
@@ -68,7 +69,8 @@ def stations_by_country(request):
     countries = sorted(countries, key=itemgetter('number'))
 
     return render_to_response('stations_by_country.html',
-                              {'countries': countries},
+                              {'countries': countries,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
@@ -76,6 +78,7 @@ def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.all():
         if station_has_data(station):
@@ -90,7 +93,8 @@ def stations_by_number(request):
                          'status': status})
 
     return render_to_response('stations_by_number.html',
-                              {'stations': stations},
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
@@ -98,6 +102,7 @@ def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.all():
         if station_has_data(station):
@@ -113,7 +118,9 @@ def stations_by_name(request):
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render_to_response('stations_by_name.html', {'stations': stations},
+    return render_to_response('stations_by_name.html',
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
@@ -121,6 +128,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     today = datetime.datetime.utcnow()
 
     if country:
@@ -164,9 +172,10 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                             'stations': stations})
 
     return render_to_response('stations_on_map.html',
-        {'subclusters': subclusters,
-         'focus': focus},
-        context_instance=RequestContext(request))
+                              {'subclusters': subclusters,
+                               'focus': focus,
+                               'statuscount': statuscount},
+                              context_instance=RequestContext(request))
 
 
 def station_data(request, station_id, year, month, day):
