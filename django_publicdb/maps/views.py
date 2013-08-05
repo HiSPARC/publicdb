@@ -28,7 +28,7 @@ def station_on_map(request, station_id):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
-            status = get_station_status(station, down, problem, up)
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
@@ -78,7 +78,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
-            status = get_station_status(station, down, problem, up)
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,

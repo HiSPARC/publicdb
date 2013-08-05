@@ -27,8 +27,9 @@ def down_list():
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=4'
     down = retrieve_station_status(query)
+    down_ids = pc_name_to_station_ids(down)
 
-    return down
+    return down_ids
 
 
 def problem_list():
@@ -40,20 +41,22 @@ def problem_list():
     """
     query = 'hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
     problem = retrieve_station_status(query)
+    problem_ids = pc_name_to_station_ids(problem)
 
-    return problem
+    return problem_ids
 
 
 def up_list():
     """Get Nagios page which lists UP hosts
 
-    :return: list of station short names of stations that are OK.
+    :return: list of station ids of stations that are OK.
 
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=2'
     up = retrieve_station_status(query)
+    up_ids = pc_name_to_station_ids(up)
 
-    return up
+    return up_ids
 
 
 def retrieve_station_status(query):
@@ -76,10 +79,23 @@ def retrieve_station_status(query):
     return stations
 
 
-def get_station_status(station, down, problem, up):
+def pc_name_to_station_ids(shortnames):
+    """Convert list of pc names to station ids
+
+    :param shortnames: list of pc names.
+
+    :return: station ids that have a pc with name in the shortnames.
+
+    """
+    stations = list(Station.objects.filter(pc__name__in=shortnames)
+                                   .values_list('number', flat=True))
+    return stations
+
+
+def get_station_status(station_number, down, problem, up):
     """Check if station is in down, problem or up list.
 
-    :param station: station_id for which you want the status.
+    :param station_number: station for which you want the status.
     :param down: list of stations that are DOWN.
     :param problem: list of stations that have a service CRITICAL (but are UP).
     :param up: list of stations that are UP.
@@ -87,19 +103,15 @@ def get_station_status(station, down, problem, up):
              station occurs in multiple lists, the worst case is returned.
 
     """
-    try:
-        name = Pc.objects.filter(station=station)[0].name
-    except IndexError:
-        return 'unknown'
-
-    if name in down:
+    if station_number in down:
         return 'down'
-    elif name in problem:
+    elif station_number in problem:
         return 'problem'
-    elif name in up:
+    elif station_number in up:
         return 'up'
     else:
         return 'unknown'
+
 
 def get_status_counts(down, problem, up):
     """

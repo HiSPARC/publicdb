@@ -39,7 +39,7 @@ def stations_by_country(request):
                         link = station.number
                     else:
                         link = None
-                    status = get_station_status(station, down, problem, up)
+                    status = get_station_status(station.number, down, problem, up)
 
                     stations.append({'number': station.number,
                                      'name': station.name,
@@ -53,7 +53,7 @@ def stations_by_country(request):
                     link = station.number
                 else:
                     link = None
-                status = get_station_status(station, down, problem, up)
+                status = get_station_status(station.number, down, problem, up)
 
                 stations.append({'number': station.number,
                                  'name': station.name,
@@ -85,7 +85,7 @@ def stations_by_number(request):
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -109,7 +109,7 @@ def stations_by_name(request):
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -159,7 +159,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                                        startdate__lte=today)
                                                .latest('startdate'))
             link = station_has_data(station)
-            status = get_station_status(station, down, problem, up)
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
