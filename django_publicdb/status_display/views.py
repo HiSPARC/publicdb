@@ -25,8 +25,10 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
+
     countries = []
     for country in Country.objects.all():
         clusters = []
@@ -35,7 +37,7 @@ def stations_by_country(request):
             for subcluster in Cluster.objects.filter(parent=cluster):
                 stations = []
                 for station in Station.objects.filter(cluster=subcluster):
-                    if station_has_data(station):
+                    if station.number in data_stations:
                         link = station.number
                     else:
                         link = None
@@ -49,7 +51,7 @@ def stations_by_country(request):
                                     'stations': stations})
             stations = []
             for station in Station.objects.filter(cluster=cluster):
-                if station_has_data(station):
+                if station.number in data_stations:
                     link = station.number
                 else:
                     link = None
@@ -77,11 +79,12 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.all():
-        if station_has_data(station):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
@@ -101,11 +104,12 @@ def stations_by_number(request):
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.all():
-        if station_has_data(station):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
@@ -127,6 +131,7 @@ def stations_by_name(request):
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     today = datetime.datetime.utcnow()
@@ -158,7 +163,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
-            link = station_has_data(station)
+            link = station.number in data_stations
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
@@ -633,6 +638,23 @@ def nav_years(station):
         else:
             year_list.append({'year': year, 'link': None})
     return year_list
+
+
+def stations_with_data():
+    """Get list of station ids with valid event or weather data
+
+    :return: list with station ids for stations that recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
+    stations = (Station.objects.filter(Q(summary__num_events__isnull=False) |
+                                       Q(summary__num_weather__isnull=False),
+                                       summary__date__gte=datetime.date(2002, 1, 1),
+                                       summary__date__lte=datetime.date.today())
+                               .distinct()
+                               .values_list('number', flat=True))
+
+    return stations
 
 
 def station_has_data(station):
