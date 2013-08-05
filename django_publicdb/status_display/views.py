@@ -569,19 +569,21 @@ def nav_calendar(station, theyear, themonth):
     month_name = '%s %d' % (calendar.month_name[themonth], theyear)
     days_names = calendar.weekheader(3).split(' ')
 
+    days_with_data = (Summary.objects.filter(Q(num_events__isnull=False) |
+                                             Q(num_weather__isnull=False),
+                                             station=station,
+                                             date__year=theyear,
+                                             date__month=themonth)
+                                     .values_list('date', flat=True))
+
     weeks = []
     for week in month:
         days = []
         for day in week:
             if day.month == themonth:
-                try:
-                    summary = (Summary.objects
-                                      .get(Q(station=station),
-                                           Q(date=day),
-                                           Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False)))
+                if day in days_with_data:
                     link = (station.number, theyear, themonth, day.day)
-                except Summary.DoesNotExist:
+                else:
                     link = None
                 days.append({'day': day.day, 'link': link})
             else:
