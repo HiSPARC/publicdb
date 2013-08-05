@@ -201,16 +201,13 @@ def station_data(request, station_id, year, month, day):
                              station=station,
                              date=date)
 
-    # Use next_day and prev_day to add previous/next links
-    prev_day = date - datetime.timedelta(days=1)
-    next_day = date + datetime.timedelta(days=1)
-
+    # Find previous/next dates with data
     try:
         previous = (Summary.objects.filter(Q(station=station),
                                            Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False),
                                            date__gte=datetime.date(2002, 1, 1),
-                                           date__lte=prev_day)
+                                           date__lt=date)
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
@@ -219,7 +216,7 @@ def station_data(request, station_id, year, month, day):
         next = (Summary.objects.filter(Q(station=station),
                                        Q(num_events__isnull=False) |
                                        Q(num_weather__isnull=False),
-                                       date__gte=next_day,
+                                       date__gt=date,
                                        date__lte=datetime.date.today())
                                .order_by('date'))[0].date
     except IndexError:
@@ -227,7 +224,7 @@ def station_data(request, station_id, year, month, day):
 
     try:
         config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=next_day)
+                                               timestamp__lte=date)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
