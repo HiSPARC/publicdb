@@ -225,15 +225,18 @@ def station_data(request, station_id, year, month, day):
         next = None
 
     try:
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lte=date)
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=date)
+                                 .latest('date'))
+        config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
         else:
             has_slave = True
         has_config = True
-    except Configuration.DoesNotExist:
+    except (Summary.DoesNotExist, Configuration.DoesNotExist):
         config = None
         has_slave = False
         has_config = False
@@ -357,7 +360,7 @@ def station(request, station_id):
                                           station__number=station_id,
                                           date__gte=datetime.date(2002, 1, 1),
                                           date__lte=datetime.date.today())
-                                    .latest('date'))
+                                  .latest('date'))
     except Summary.DoesNotExist:
         raise Http404
 
