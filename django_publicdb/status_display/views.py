@@ -160,11 +160,13 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_active=True,
                                                pc__is_test=False)):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
+            try:
+                detector = (DetectorHisparc.objects.filter(station=station,
+                                                           startdate__lte=today)
+                                                   .latest('startdate'))
+            except DetectorHisparc.DoesNotExist:
+                continue
             link = station.number in data_stations
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
@@ -203,9 +205,9 @@ def station_data(request, station_id, year, month, day):
 
     # Find previous/next dates with data
     try:
-        previous = (Summary.objects.filter(Q(station=station),
-                                           Q(num_events__isnull=False) |
+        previous = (Summary.objects.filter(Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False),
+                                           station=station,
                                            date__gte=datetime.date(2002, 1, 1),
                                            date__lt=date)
                                    .latest('date')).date
@@ -213,9 +215,9 @@ def station_data(request, station_id, year, month, day):
         previous = None
 
     try:
-        next = (Summary.objects.filter(Q(station=station),
-                                       Q(num_events__isnull=False) |
+        next = (Summary.objects.filter(Q(num_events__isnull=False) |
                                        Q(num_weather__isnull=False),
+                                       station=station,
                                        date__gt=date,
                                        date__lte=datetime.date.today())
                                .order_by('date'))[0].date

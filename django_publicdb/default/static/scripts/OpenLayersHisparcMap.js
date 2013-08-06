@@ -37,7 +37,7 @@ function createStyle(map) {
                 "down": 'red',
                 "problem": 'gold',
                 "up": 'green',
-                "unknown": 'blue',
+                "unknown": 'grey',
                 "gpsold": '#B85C32',
                 "gpsnew": '#2A7AE2'};
             return colors[feature.attributes["status"]];},

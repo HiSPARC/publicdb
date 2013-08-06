@@ -77,11 +77,13 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_active=True,
                                                pc__is_test=False)):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
+            try:
+                detector = (DetectorHisparc.objects.filter(station=station,
+                                                           startdate__lte=today)
+                                                   .latest('startdate'))
+            except DetectorHisparc.DoesNotExist:
+                continue
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
