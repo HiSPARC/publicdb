@@ -36,7 +36,8 @@ def stations_by_country(request):
             subclusters = []
             for subcluster in Cluster.objects.filter(parent=cluster):
                 stations = []
-                for station in Station.objects.filter(cluster=subcluster):
+                for station in (Station.objects.filter(cluster=subcluster)
+                                       .exclude(pc__type__slug='admin')):
                     if station.number in data_stations:
                         link = station.number
                     else:
@@ -50,7 +51,8 @@ def stations_by_country(request):
                 subclusters.append({'name': subcluster.name,
                                     'stations': stations})
             stations = []
-            for station in Station.objects.filter(cluster=cluster):
+            for station in (Station.objects.filter(cluster=cluster)
+                                   .exclude(pc__type__slug='admin')):
                 if station.number in data_stations:
                     link = station.number
                 else:
@@ -83,7 +85,7 @@ def stations_by_number(request):
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
+    for station in Station.objects.exclude(pc__type__slug='admin'):
         if station.number in data_stations:
             link = station.number
         else:
@@ -108,7 +110,7 @@ def stations_by_name(request):
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
+    for station in Station.objects.exclude(pc__type__slug='admin'):
         if station.number in data_stations:
             link = station.number
         else:
@@ -289,7 +291,7 @@ def station_status(request, station_id):
     station_id = int(station_id)
 
     station = get_object_or_404(Station, number=station_id)
-    pc = get_object_or_404(Pc, station=station, is_active=True)
+    pc = get_object_or_404(Pc, ~Q(type__slug='admin'), station=station)
 
     has_data = station_has_data(station)
 
@@ -303,7 +305,6 @@ def station_status(request, station_id):
         {'station': station,
          'pc': pc,
          'has_data': has_data,
-         'is_active': True,
          'has_config': has_config},
         context_instance=RequestContext(request))
 
