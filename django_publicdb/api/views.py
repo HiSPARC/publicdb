@@ -497,62 +497,73 @@ def get_pulseheight_drift(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Fit drift
+    if len(fits) < 14:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "There are less than 14 fits in the requested date range, no drift rate will be calculated."})
+        return json_dict(dict)
 
-    t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
-    mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
+    try:
+        # Fit drift
 
-    linear_fit = lambda p, t: p[0] + p[1] * t # Target function
+        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+        mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-    # Determine the drift by a linear fit
-    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+        linear_fit = lambda p, t: p[0] + p[1] * t # Target function
 
-    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
-    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+        # Determine the drift by a linear fit
+        errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
 
-    drift = p1[1] * 86400.0
+        p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+        p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
 
-    # Calculate the relative fluctuation
+        drift = p1[1] * 86400.0
 
-    relative_mpv = []
+        # Calculate the relative fluctuation
 
-    for t, mpv in zip(t_array, mpv_array):
-        relative_mpv.append(mpv / linear_fit(p1, t))
+        relative_mpv = []
 
-    # Fit the relative fluctation with a gauss
-    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+        for t, mpv in zip(t_array, mpv_array):
+            relative_mpv.append(mpv / linear_fit(p1, t))
 
-    # x = ADC, y = number of events per dPulseheight
+        # Fit the relative fluctation with a gauss
+        gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
 
-    bins = numpy.arange(0.0, 2.0, 0.005)
-    y, bins = numpy.histogram(relative_mpv, bins=bins)
-    x = (bins[:-1] + bins[1:]) / 2
+        # x = ADC, y = number of events per dPulseheight
 
-    initial_N = 16
-    initial_mean = 1
-    initial_width = 0.03
+        bins = numpy.arange(0.0, 2.0, 0.005)
+        y, bins = numpy.histogram(relative_mpv, bins=bins)
+        x = (bins[:-1] + bins[1:]) / 2
 
-    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
-                                                           initial_mean,
-                                                           initial_width))
+        initial_N = 16
+        initial_mean = 1
+        initial_width = 0.03
 
-    dict.update({'number_of_selected_days': len(t_array),
-                 'number_of_requested_days': number_of_days,
-                 'fit_offset': p1[0],
-                 'fit_slope': p1[1],
-                 'drift_per_day': drift,
-                 'timestamp': t_array.tolist(),
-                 'mpv': mpv_array.tolist(),
-                 'relative_mean': popt[1],
-                 'relative_width': popt[2],
+        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
+                                                               initial_mean,
+                                                               initial_width))
 
-                 # Debug
-                 #'relative_mpv': relative_mpv,
-                 #'frequency': frequency.tolist(),
-                 #'x': x.tolist()
-                 })
+        dict.update({'number_of_selected_days': len(t_array),
+                     'number_of_requested_days': number_of_days,
+                     'fit_offset': p1[0],
+                     'fit_slope': p1[1],
+                     'drift_per_day': drift,
+                     'timestamp': t_array.tolist(),
+                     'mpv': mpv_array.tolist(),
+                     'relative_mean': popt[1],
+                     'relative_width': popt[2],
 
-    return json_dict(dict)
+                     # Debug
+                     #'relative_mpv': relative_mpv,
+                     #'frequency': frequency.tolist(),
+                     #'x': x.tolist()
+                     })
+
+        return json_dict(dict)
+    except Exception, e:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Error in calculating the drift",
+                     "exception": str(e)})
+        return json_dict(dict)
 
 
 def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
