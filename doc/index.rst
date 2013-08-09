@@ -10,7 +10,9 @@ Contents:
    :maxdepth: 3
    :numbered:
 
+   data_access
    api_tutorial
+   hisparc_maps
    api
    status_display
 

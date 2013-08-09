@@ -76,6 +76,8 @@ class ViewsTestCase(LiveServerTestCase):
                json_data["fitted_mpv"] == 222.101846139)
 
         self.check_and_get_response("/station/501/plate/1/pulseheight/drift/2011/9/1/30")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_14_days")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_30_days")
 
     def test_stations(self):
         self.check_and_get_response("/stations/")

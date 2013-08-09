@@ -25,7 +25,12 @@
             var map = createMap("map");
             var style = createStyle(map);
 
-            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+            {% if center %}
+                map.setCenter(new OpenLayers.LonLat({{ center.longitude }}, {{center.latitude }}).transform(fromProjection, toProjection), 17);
+            {% else %}
+                map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+            {% endif %}
+
             {% for subcluster in subclusters %}
                 var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
                     {% for station in subcluster.stations %}

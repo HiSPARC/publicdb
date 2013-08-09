@@ -37,26 +37,43 @@
     
         <div id="legend">
           {% block legend %}
-            <div class="sectionTitle">Data Availability</div>
+            <div class="sectionTitle">Data availability</div>
             <div class="keyvalue">
-                <span class="key thin" style='color: #23B;'>Station</span><span class="value">Link to data</span><br />
+                <span class="key thin" style='color: #23B;'>Station</span>
+                <span class="value">&larr; Link to data</span><br />
             </div>
             <div class="keyvalue">
-                <span class="key thin">Station</span><span class="value">No data received</span>
+                <span class="key thin">Station</span>
+                <span class="value">No data received</span>
             </div>
+
     
-            <div class="sectionTitle">Current Status</div>
+            <div class="sectionTitle">Current status</div>
             <div class="keyvalue">
-                <span class='key statusBall up'></span><span class="value">Up</span><br />
+                <span class='key statusBall up'></span>
+                <span class="value">Up {% if statuscount %}({{ statuscount.up }}){% endif %}</span><br />
             </div>
             <div class="keyvalue">
-                <span class='key statusBall problem'></span><span class="value">Problem</span><br />
+                <span class='key statusBall problem'></span>
+                <span class="value">Problem {% if statuscount %}({{ statuscount.problem }}){% endif %}</span><br />
             </div>
             <div class="keyvalue">
-                <span class='key statusBall down'></span><span class="value">Down</span><br />
+                <span class='key statusBall down'></span>
+                <span class="value">Down {% if statuscount %}({{ statuscount.down }}){% endif %}</span><br />
             </div>
             <div class="keyvalue">
-                <span class='key statusBall'></span><span class="value">&larr; Link to status</span>
+                <span class='key statusBall unknown'></span>
+                <span class="value">Unknown</span><br />
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall'></span>
+                <span class="value">&larr; Link to status</span>
+            </div>
+
+            <div class="sectionTitle">Region map</div>
+            <div class="keyvalue">
+                <span class="key">Cluster</span>
+                <span class="value">&larr; Link to map</span><br />
             </div>
           {% endblock %}
         </div>
