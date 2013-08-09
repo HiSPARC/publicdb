@@ -623,7 +623,10 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "fitted_mpv_error": fit.fitted_mpv_error,
                      "fitted_width": fit.fitted_width,
                      "fitted_width_error": fit.fitted_width_error,
-                     "chi_square_reduced": fit.chi_square_reduced})
+                     "degrees_of_freedom": fit.degrees_of_freedom,
+                     "chi_square_reduced": fit.chi_square_reduced,
+                     "error_type": fit.error_type,
+                     "error_message": fit.error_message})
     except Exception, e:
         dict.update({"nagios": Nagios.unknown,
                      "error": "Data has been found, "
@@ -631,7 +634,12 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Data quality
+    # Fit failures
+
+    if len(fit.error_message) > 0:
+        dict.update({"nagios" : Nagios.critical,
+                     "quality": error_message})
+        return json_dict(dict)
 
     # Based on chi2 of the fit
 
@@ -665,8 +673,8 @@ def get_pulseheight_fit(request, station_number, plate_number,
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
         dict.update({"nagios": Nagios.critical,
-                "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
-                           (lower_bound, upper_bound, fit.fitted_mpv)})
+                     "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                                (lower_bound, upper_bound, fit.fitted_mpv)})
         return json_dict(dict)
 
     dict.update({"nagios": Nagios.ok,
