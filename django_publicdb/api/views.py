@@ -78,7 +78,8 @@ def station(request, station_id):
                                  .latest('date'))
         config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
-    except (Station.DoesNotExist, Configuration.DoesNotExist):
+    except (Station.DoesNotExist, Summary.DoesNotExist,
+            Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
