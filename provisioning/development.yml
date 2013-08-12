@@ -1,4 +1,16 @@
 ---
+- name: install libraries
+  yum: name={{ item }} state=present
+  sudo: yes
+  with_items:
+    - pkgconfig
+    - gcc-gfortran
+    - lapack-devel
+    - blas-devel
+    - freetype-devel
+    - libpng-devel
+    - bzip2-devel
+
 - name: download python 2.7 source
   get_url: url=http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2
            dest=/usr/local/src/hisparc/
@@ -50,17 +62,6 @@
          creates=/usr/local/lib/libhdf5.so.8.0.0
          ./configure --prefix=/usr/local && make && sudo make install
          && sudo /sbin/ldconfig
-
-- name: install libraries
-  yum: name={{ item }} state=present
-  sudo: yes
-  with_items:
-    - pkgconfig
-    - gcc-gfortran
-    - lapack-devel
-    - blas-devel
-    - freetype-devel
-    - libpng-devel
 
 - name: install git
   yum: name=git state=present
