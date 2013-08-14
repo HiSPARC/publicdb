@@ -72,10 +72,14 @@ def station(request, station_id):
         detector = (DetectorHisparc.objects.filter(station=station,
                                                    startdate__lte=today)
                                            .latest('startdate'))
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lte=today)
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=today)
+                                 .latest('date'))
+        config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
-    except (Station.DoesNotExist, Configuration.DoesNotExist):
+    except (Station.DoesNotExist, Summary.DoesNotExist,
+            Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
@@ -551,17 +555,17 @@ def get_pulseheight_drift(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 14)
 
 
-def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 30)
 
 
@@ -758,7 +762,7 @@ def config(request, station_id, year=None, month=None, day=None):
     latest config will be sent, otherwise the latest on or before the given
     date.
 
-    :param station_id: a stationn number identifier.
+    :param station_id: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -780,9 +784,11 @@ def config(request, station_id, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        c = (Configuration.objects.filter(source__station=station,
-                                          timestamp__lte=date)
-                                  .latest('timestamp'))
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=date)
+                                 .latest('date'))
+        c = Configuration.objects.filter(source=source).latest('timestamp')
     except Configuration.DoesNotExist:
         return HttpResponseNotFound()
 

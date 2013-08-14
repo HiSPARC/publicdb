@@ -215,6 +215,7 @@ def download_data(request, station_id, data_type='events'):
     else:
         content_disposition = 'inline; filename="%s"' % filename
     response['Content-Disposition'] = content_disposition
+    response['Access-Control-Allow-Origin'] = '*'
 
     return response
 

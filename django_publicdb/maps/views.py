@@ -22,13 +22,15 @@ def station_on_map(request, station_id):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True,
-                                              pc__is_test=False):
+        for station in (Station.objects.select_related('cluster__parent',
+                                                       'cluster__country')
+                                       .filter(cluster=subcluster,
+                                               pc__is_active=True,
+                                               pc__is_test=False)):
             detector = (DetectorHisparc.objects.filter(station=station,
                                                        startdate__lte=today)
                                                .latest('startdate'))
-            status = get_station_status(station, down, problem, up)
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
@@ -72,13 +74,17 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True,
-                                              pc__is_test=False):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
-            status = get_station_status(station, down, problem, up)
+        for station in (Station.objects.select_related('cluster__parent',
+                                                       'cluster__country')
+                                       .filter(cluster=subcluster,
+                                               pc__is_test=False)):
+            try:
+                detector = (DetectorHisparc.objects.filter(station=station,
+                                                           startdate__lte=today)
+                                                   .latest('startdate'))
+            except DetectorHisparc.DoesNotExist:
+                continue
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
