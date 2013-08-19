@@ -32,6 +32,7 @@
 
 - name: install latest version of SAPPHiRE
   pip: virtualenv=/srv/publicdb/publicdb_env state=latest
+       extra_args=--no-deps
        name=https://github.com/HiSPARC/sapphire/archive/master.zip
 
 - name: set up MySQL database
