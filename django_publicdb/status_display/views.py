@@ -32,9 +32,10 @@ def stations_by_country(request):
 
     countries = OrderedDict()
 
-    for station in (Station.objects.all().order_by('number')
-                                         .select_related('cluster__country',
-                                                         'cluster__parent')):
+    for station in (Station.objects.exclude(pc__type__slug='admin')
+                                   .order_by('number')
+                                   .select_related('cluster__country',
+                                                   'cluster__parent')):
         if station.number in data_stations:
             link = station.number
         else:
