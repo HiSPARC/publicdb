@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from collections import OrderedDict
 from operator import itemgetter
 import calendar
 from numpy import arange, pi, sin
@@ -29,50 +30,37 @@ def stations_by_country(request):
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
 
-    countries = []
-    for country in Country.objects.all():
-        clusters = []
-        for cluster in Cluster.objects.filter(country=country, parent=None):
-            subclusters = []
-            for subcluster in Cluster.objects.filter(parent=cluster):
-                stations = []
-                for station in (Station.objects.filter(cluster=subcluster)
-                                       .exclude(pc__type__slug='admin')):
-                    if station.number in data_stations:
-                        link = station.number
-                    else:
-                        link = None
-                    status = get_station_status(station.number, down, problem, up)
+    countries = OrderedDict()
 
-                    stations.append({'number': station.number,
-                                     'name': station.name,
-                                     'link': link,
-                                     'status': status})
-                subclusters.append({'name': subcluster.name,
-                                    'stations': stations})
-            stations = []
-            for station in (Station.objects.filter(cluster=cluster)
-                                   .exclude(pc__type__slug='admin')):
-                if station.number in data_stations:
-                    link = station.number
-                else:
-                    link = None
-                status = get_station_status(station.number, down, problem, up)
+    for station in (Station.objects.all().order_by('number')
+                                         .select_related('cluster__country',
+                                                         'cluster__parent')):
+        if station.number in data_stations:
+            link = station.number
+        else:
+            link = None
+        status = get_station_status(station.number, down, problem, up)
+        station_info = {'number': station.number,
+                        'name': station.name,
+                        'link': link,
+                        'status': status}
 
-                stations.append({'number': station.number,
-                                 'name': station.name,
-                                 'link': link,
-                                 'status': status})
-            clusters.append({'name': cluster.name,
-                             'subclusters': subclusters,
-                             'stations': stations})
-        countries.append({'number': country.number,
-                          'name': country.name,
-                          'clusters': clusters})
+        country = station.cluster.country.name
+        if station.cluster.parent:
+            cluster = station.cluster.parent.name
+        else:
+            cluster = station.cluster.name
+        subcluster = station.cluster.name
 
-    countries = sorted(countries, key=itemgetter('number'))
+        if not country in countries:
+            countries[country] = OrderedDict()
+        if not cluster in countries[country]:
+            countries[country][cluster] = OrderedDict()
+        if not subcluster in countries[country][cluster]:
+            countries[country][cluster][subcluster] = []
+        countries[country][cluster][subcluster].append(station_info)
 
-    return render_to_response('stations_by_country.html',
+    return render_to_response('stations_by_country_related.html',
                               {'countries': countries,
                                'statuscount': statuscount},
                               context_instance=RequestContext(request))
