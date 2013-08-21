@@ -60,7 +60,7 @@ def stations_by_country(request):
             countries[country][cluster][subcluster] = []
         countries[country][cluster][subcluster].append(station_info)
 
-    return render_to_response('stations_by_country_related.html',
+    return render_to_response('stations_by_country.html',
                               {'countries': countries,
                                'statuscount': statuscount},
                               context_instance=RequestContext(request))
