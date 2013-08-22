@@ -276,7 +276,7 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         #-----------------------------------------------------------------------
 
         # Download data files and setup the test datastore
-        super(PulseheightFitTestCase, self).setUp()
+        super(JobsPulseheightFitTestCase, self).setUp()
 
         # Empty all fits
         models.PulseheightFit.objects.all().delete()
@@ -311,7 +311,7 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         jobs.update_esd()
 
     def tearDown(self):
-        super(PulseheightFitTestCase, self).tearDown()
+        super(JobsPulseheightFitTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests
