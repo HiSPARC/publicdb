@@ -26,15 +26,22 @@ except Exception as e:
     print e
     sys.exit(3)
 
-# Django imports
+# Publicdb setting
 
-dirname = os.path.dirname(__file__)
-publicdb_path = os.path.join(dirname, '../..')
-sys.path.append(publicdb_path)
+PUBLICDB_HOST_FOR_NAGIOS = "http://data.hisparc.nl"
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+try:
+    dirname = os.path.dirname(__file__)
+    publicdb_path = os.path.join(dirname, '../..')
+    sys.path.append(publicdb_path)
 
-from django.conf import settings
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+
+    from django.conf import settings
+
+    PUBLICDB_HOST_FOR_NAGIOS = settings.PUBLICDB_HOST_FOR_NAGIOS
+except:
+    pass
 
 #-------------------------------------------------------------------------------
 # Helpers
@@ -137,7 +144,7 @@ if __name__ == '__main__':
     yesterday = today - datetime.timedelta(days=1)
 
     exit_code, exit_message = check_pulseheight_mpv(
-            settings.PUBLICDB_HOST_FOR_NAGIOS,
+            PUBLICDB_HOST_FOR_NAGIOS,
             stationNumber, plateNumber,
             yesterday)
 
