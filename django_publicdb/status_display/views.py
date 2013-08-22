@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from collections import OrderedDict
 from operator import itemgetter
 import calendar
 from numpy import arange, pi, sin
@@ -25,64 +26,60 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
-    countries = []
-    for country in Country.objects.all():
-        clusters = []
-        for cluster in Cluster.objects.filter(country=country, parent=None):
-            subclusters = []
-            for subcluster in Cluster.objects.filter(parent=cluster):
-                stations = []
-                for station in Station.objects.filter(cluster=subcluster):
-                    if station_has_data(station):
-                        link = station.number
-                    else:
-                        link = None
-                    status = get_station_status(station, down, problem, up)
+    statuscount = get_status_counts(down, problem, up)
 
-                    stations.append({'number': station.number,
-                                     'name': station.name,
-                                     'link': link,
-                                     'status': status})
-                subclusters.append({'name': subcluster.name,
-                                    'stations': stations})
-            stations = []
-            for station in Station.objects.filter(cluster=cluster):
-                if station_has_data(station):
-                    link = station.number
-                else:
-                    link = None
-                status = get_station_status(station, down, problem, up)
+    countries = OrderedDict()
 
-                stations.append({'number': station.number,
-                                 'name': station.name,
-                                 'link': link,
-                                 'status': status})
-            clusters.append({'name': cluster.name,
-                             'subclusters': subclusters,
-                             'stations': stations})
-        countries.append({'number': country.number,
-                          'name': country.name,
-                          'clusters': clusters})
+    for station in (Station.objects.exclude(pc__type__slug='admin')
+                                   .order_by('number')
+                                   .select_related('cluster__country',
+                                                   'cluster__parent')):
+        if station.number in data_stations:
+            link = station.number
+        else:
+            link = None
+        status = get_station_status(station.number, down, problem, up)
+        station_info = {'number': station.number,
+                        'name': station.name,
+                        'link': link,
+                        'status': status}
 
-    countries = sorted(countries, key=itemgetter('number'))
+        country = station.cluster.country.name
+        if station.cluster.parent:
+            cluster = station.cluster.parent.name
+        else:
+            cluster = station.cluster.name
+        subcluster = station.cluster.name
+
+        if not country in countries:
+            countries[country] = OrderedDict()
+        if not cluster in countries[country]:
+            countries[country][cluster] = OrderedDict()
+        if not subcluster in countries[country][cluster]:
+            countries[country][cluster][subcluster] = []
+        countries[country][cluster][subcluster].append(station_info)
 
     return render_to_response('stations_by_country.html',
-                              {'countries': countries},
+                              {'countries': countries,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
-        if station_has_data(station):
+    for station in Station.objects.exclude(pc__type__slug='admin'):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -90,21 +87,24 @@ def stations_by_number(request):
                          'status': status})
 
     return render_to_response('stations_by_number.html',
-                              {'stations': stations},
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
-        if station_has_data(station):
+    for station in Station.objects.exclude(pc__type__slug='admin'):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -113,14 +113,18 @@ def stations_by_name(request):
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render_to_response('stations_by_name.html', {'stations': stations},
+    return render_to_response('stations_by_name.html',
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     today = datetime.datetime.utcnow()
 
     if country:
@@ -144,14 +148,18 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True,
-                                              pc__is_test=False):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
-            link = station_has_data(station)
-            status = get_station_status(station, down, problem, up)
+        for station in (Station.objects.select_related('cluster__parent',
+                                                       'cluster__country')
+                                       .filter(cluster=subcluster,
+                                               pc__is_test=False)):
+            try:
+                detector = (DetectorHisparc.objects.filter(station=station,
+                                                           startdate__lte=today)
+                                                   .latest('startdate'))
+            except DetectorHisparc.DoesNotExist:
+                continue
+            link = station.number in data_stations
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
@@ -164,9 +172,10 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                             'stations': stations})
 
     return render_to_response('stations_on_map.html',
-        {'subclusters': subclusters,
-         'focus': focus},
-        context_instance=RequestContext(request))
+                              {'subclusters': subclusters,
+                               'focus': focus,
+                               'statuscount': statuscount},
+                              context_instance=RequestContext(request))
 
 
 def station_data(request, station_id, year, month, day):
@@ -185,40 +194,40 @@ def station_data(request, station_id, year, month, day):
                              station=station,
                              date=date)
 
-    # Use next_day and prev_day to add previous/next links
-    prev_day = date - datetime.timedelta(days=1)
-    next_day = date + datetime.timedelta(days=1)
-
+    # Find previous/next dates with data
     try:
-        previous = (Summary.objects.filter(Q(station=station),
-                                           Q(num_events__isnull=False) |
+        previous = (Summary.objects.filter(Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False),
+                                           station=station,
                                            date__gte=datetime.date(2002, 1, 1),
-                                           date__lte=prev_day)
+                                           date__lt=date)
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
 
     try:
-        next = (Summary.objects.filter(Q(station=station),
-                                       Q(num_events__isnull=False) |
+        next = (Summary.objects.filter(Q(num_events__isnull=False) |
                                        Q(num_weather__isnull=False),
-                                       date__gte=next_day,
+                                       station=station,
+                                       date__gt=date,
                                        date__lte=datetime.date.today())
                                .order_by('date'))[0].date
     except IndexError:
         next = None
 
     try:
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=next_day)
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=date)
+                                 .latest('date'))
+        config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
         else:
             has_slave = True
         has_config = True
-    except Configuration.DoesNotExist:
+    except (Summary.DoesNotExist, Configuration.DoesNotExist):
         config = None
         has_slave = False
         has_config = False
@@ -271,7 +280,7 @@ def station_status(request, station_id):
     station_id = int(station_id)
 
     station = get_object_or_404(Station, number=station_id)
-    pc = get_object_or_404(Pc, station=station, is_active=True)
+    pc = get_object_or_404(Pc, ~Q(type__slug='admin'), station=station)
 
     has_data = station_has_data(station)
 
@@ -285,7 +294,6 @@ def station_status(request, station_id):
         {'station': station,
          'pc': pc,
          'has_data': has_data,
-         'is_active': True,
          'has_config': has_config},
         context_instance=RequestContext(request))
 
@@ -342,7 +350,7 @@ def station(request, station_id):
                                           station__number=station_id,
                                           date__gte=datetime.date(2002, 1, 1),
                                           date__lte=datetime.date.today())
-                                    .latest('date'))
+                                  .latest('date'))
     except Summary.DoesNotExist:
         raise Http404
 
@@ -555,19 +563,21 @@ def nav_calendar(station, theyear, themonth):
     month_name = '%s %d' % (calendar.month_name[themonth], theyear)
     days_names = calendar.weekheader(3).split(' ')
 
+    days_with_data = (Summary.objects.filter(Q(num_events__isnull=False) |
+                                             Q(num_weather__isnull=False),
+                                             station=station,
+                                             date__year=theyear,
+                                             date__month=themonth)
+                                     .values_list('date', flat=True))
+
     weeks = []
     for week in month:
         days = []
         for day in week:
             if day.month == themonth:
-                try:
-                    summary = (Summary.objects
-                                      .get(Q(station=station),
-                                           Q(date=day),
-                                           Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False)))
+                if day in days_with_data:
                     link = (station.number, theyear, themonth, day.day)
-                except Summary.DoesNotExist:
+                else:
                     link = None
                 days.append({'day': day.day, 'link': link})
             else:
@@ -624,6 +634,23 @@ def nav_years(station):
         else:
             year_list.append({'year': year, 'link': None})
     return year_list
+
+
+def stations_with_data():
+    """Get list of station ids with valid event or weather data
+
+    :return: list with station ids for stations that recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
+    stations = (Station.objects.filter(Q(summary__num_events__isnull=False) |
+                                       Q(summary__num_weather__isnull=False),
+                                       summary__date__gte=datetime.date(2002, 1, 1),
+                                       summary__date__lte=datetime.date.today())
+                               .distinct()
+                               .values_list('number', flat=True))
+
+    return stations
 
 
 def station_has_data(station):

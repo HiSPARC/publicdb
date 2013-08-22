@@ -72,10 +72,14 @@ def station(request, station_id):
         detector = (DetectorHisparc.objects.filter(station=station,
                                                    startdate__lte=today)
                                            .latest('startdate'))
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lte=today)
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=today)
+                                 .latest('date'))
+        config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
-    except (Station.DoesNotExist, Configuration.DoesNotExist):
+    except (Station.DoesNotExist, Summary.DoesNotExist,
+            Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
@@ -387,9 +391,10 @@ def clusters(request, country_id=None):
 def countries(request):
     """Get country list
 
-    Retrieve a list of all countries with active stations.
+    Retrieve a list of all countries.
 
-    :return: list of dictionaries containing the name and number of all countries.
+    :return: list of dictionaries containing the name and number of
+             all countries.
 
     """
     countries = get_country_dict()
@@ -406,7 +411,8 @@ def get_station_dict(subcluster=None):
     station_dict = []
     for station in stations:
         try:
-            if Pc.objects.filter(station=station)[0].is_active:
+            pc = Pc.objects.filter(station=station)[0]
+            if not pc.is_test:
                 station_dict.append({'number': station.number,
                                      'name': station.name})
         except IndexError:
@@ -491,75 +497,86 @@ def get_pulseheight_drift(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Fit drift
+    if len(fits) < 14:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "There are less than 14 fits in the requested date range, no drift rate will be calculated."})
+        return json_dict(dict)
 
-    t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
-    mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
+    try:
+        # Fit drift
 
-    linear_fit = lambda p, t: p[0] + p[1] * t # Target function
+        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+        mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-    # Determine the drift by a linear fit
-    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+        linear_fit = lambda p, t: p[0] + p[1] * t # Target function
 
-    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
-    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+        # Determine the drift by a linear fit
+        errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
 
-    drift = p1[1] * 86400.0
+        p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+        p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
 
-    # Calculate the relative fluctuation
+        drift = p1[1] * 86400.0
 
-    relative_mpv = []
+        # Calculate the relative fluctuation
 
-    for t, mpv in zip(t_array, mpv_array):
-        relative_mpv.append(mpv / linear_fit(p1, t))
+        relative_mpv = []
 
-    # Fit the relative fluctation with a gauss
-    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+        for t, mpv in zip(t_array, mpv_array):
+            relative_mpv.append(mpv / linear_fit(p1, t))
 
-    # x = ADC, y = number of events per dPulseheight
+        # Fit the relative fluctation with a gauss
+        gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
 
-    bins = numpy.arange(0.0, 2.0, 0.005)
-    y, bins = numpy.histogram(relative_mpv, bins=bins)
-    x = (bins[:-1] + bins[1:]) / 2
+        # x = ADC, y = number of events per dPulseheight
 
-    initial_N = 16
-    initial_mean = 1
-    initial_width = 0.03
+        bins = numpy.arange(0.0, 2.0, 0.005)
+        y, bins = numpy.histogram(relative_mpv, bins=bins)
+        x = (bins[:-1] + bins[1:]) / 2
 
-    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
-                                                           initial_mean,
-                                                           initial_width))
+        initial_N = 16
+        initial_mean = 1
+        initial_width = 0.03
 
-    dict.update({'number_of_selected_days': len(t_array),
-                 'number_of_requested_days': number_of_days,
-                 'fit_offset': p1[0],
-                 'fit_slope': p1[1],
-                 'drift_per_day': drift,
-                 'timestamp': t_array.tolist(),
-                 'mpv': mpv_array.tolist(),
-                 'relative_mean': popt[1],
-                 'relative_width': popt[2],
+        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
+                                                               initial_mean,
+                                                               initial_width))
 
-                 # Debug
-                 #'relative_mpv': relative_mpv,
-                 #'frequency': frequency.tolist(),
-                 #'x': x.tolist()
-                 })
+        dict.update({'number_of_selected_days': len(t_array),
+                     'number_of_requested_days': number_of_days,
+                     'fit_offset': p1[0],
+                     'fit_slope': p1[1],
+                     'drift_per_day': drift,
+                     'timestamp': t_array.tolist(),
+                     'mpv': mpv_array.tolist(),
+                     'relative_mean': popt[1],
+                     'relative_width': popt[2],
 
-    return json_dict(dict)
+                     # Debug
+                     #'relative_mpv': relative_mpv,
+                     #'frequency': frequency.tolist(),
+                     #'x': x.tolist()
+                     })
+
+        return json_dict(dict)
+    except Exception, e:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Error in calculating the drift",
+                     "exception": str(e)})
+        return json_dict(dict)
 
 
-def get_pulseheight_drift_last_14_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 14)
 
 
-def get_pulseheight_drift_last_30_days(request, station_id, plate_number):
+def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
     today = datetime.date.today()
 
-    return get_pulseheight_drift(request, station_id, plate_number,
+    return get_pulseheight_drift(request, station_number, plate_number,
                                  today.year, today.month, today.day, 30)
 
 
@@ -617,7 +634,10 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "fitted_mpv_error": fit.fitted_mpv_error,
                      "fitted_width": fit.fitted_width,
                      "fitted_width_error": fit.fitted_width_error,
-                     "chi_square_reduced": fit.chi_square_reduced})
+                     "degrees_of_freedom": fit.degrees_of_freedom,
+                     "chi_square_reduced": fit.chi_square_reduced,
+                     "error_type": fit.error_type,
+                     "error_message": fit.error_message})
     except Exception, e:
         dict.update({"nagios": Nagios.unknown,
                      "error": "Data has been found, "
@@ -625,7 +645,12 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Data quality
+    # Fit failures
+
+    if len(fit.error_message) > 0:
+        dict.update({"nagios" : Nagios.critical,
+                     "quality": error_message})
+        return json_dict(dict)
 
     # Based on chi2 of the fit
 
@@ -659,8 +684,8 @@ def get_pulseheight_fit(request, station_number, plate_number,
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
         dict.update({"nagios": Nagios.critical,
-                "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
-                           (lower_bound, upper_bound, fit.fitted_mpv)})
+                     "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                                (lower_bound, upper_bound, fit.fitted_mpv)})
         return json_dict(dict)
 
     dict.update({"nagios": Nagios.ok,
@@ -756,7 +781,7 @@ def config(request, station_id, year=None, month=None, day=None):
     latest config will be sent, otherwise the latest on or before the given
     date.
 
-    :param station_id: a stationn number identifier.
+    :param station_id: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -778,9 +803,11 @@ def config(request, station_id, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        c = (Configuration.objects.filter(source__station=station,
-                                          timestamp__lte=date)
-                                  .latest('timestamp'))
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=date)
+                                 .latest('date'))
+        c = Configuration.objects.filter(source=source).latest('timestamp')
     except Configuration.DoesNotExist:
         return HttpResponseNotFound()
 

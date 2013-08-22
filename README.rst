@@ -11,6 +11,8 @@ detector data from the datastore, as well as an API to participate in
 analysis sessions.
 
 .. contents:: Table of Contents
+   :backlinks: none
+
 
 Setting up a personal development environment
 ---------------------------------------------
@@ -130,7 +132,7 @@ Before continuing, it's best to type this into your terminal::
 Navigate to the `django_publicdb` folder and populate (and migrate) a test
 database with::
 
-    $ cp settings-develop.py settings.py
+    $ cp settings_develop.py settings.py
     $ ./manage.py syncdb
     $ ./manage.py migrate
 
@@ -438,7 +440,7 @@ database::
     $ pip install mysql-python
 
 At this point it is necessary to modify Django's ``settings.py`` for
-production.  We've used ``settings-develop.py`` as a starting point.  The
+production.  We've used ``settings_develop.py`` as a starting point.  The
 ``settings.py`` file is added to ``.gitignore``, so you don't have to
 worry about accidentally committing sensitive information.  To deploy the
 static files::

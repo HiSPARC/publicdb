@@ -8,7 +8,7 @@ function createMap(name) {
             new OpenLayers.Control.Navigation(
                 {dragPanOptions: {enableKinetic: true}}),
             new OpenLayers.Control.Attribution(),
-            new OpenLayers.Control.ScaleLine()]};
+            new OpenLayers.Control.ScaleLine({geodesic: true})]};
 
     var map = new OpenLayers.Map(name, options);
 
@@ -37,7 +37,7 @@ function createStyle(map) {
                 "down": 'red',
                 "problem": 'gold',
                 "up": 'green',
-                "unknown": 'blue',
+                "unknown": 'grey',
                 "gpsold": '#B85C32',
                 "gpsnew": '#2A7AE2'};
             return colors[feature.attributes["status"]];},
