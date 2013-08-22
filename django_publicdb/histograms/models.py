@@ -30,6 +30,19 @@ class SerializedDataField(models.Field):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
+class NetworkSummary(models.Model):
+    date = models.DateField(unique=True)
+    num_coincidences = models.IntegerField(blank=True, null=True)
+    needs_update = models.BooleanField()
+    needs_update_coincidences = models.BooleanField()
+
+    def __unicode__(self):
+        return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
+
+    class Meta:
+        ordering = ('date',)
+
+
 class Summary(models.Model):
     station = models.ForeignKey(inforecords.Station)
     date = models.DateField()
@@ -169,6 +182,20 @@ class Configuration(models.Model):
         slave_fpga = re.findall(r'\d+', self.slv_version)[1]
 
         return slave_fpga
+
+
+class NetworkHistogram(models.Model):
+    source = models.ForeignKey('NetworkSummary')
+    type = models.ForeignKey('HistogramType')
+    bins = SerializedDataField()
+    values = SerializedDataField()
+
+    def __unicode__(self):
+        return "%s - %s" % (self.source.date.strftime('%c'), self.type)
+
+    class Meta:
+        unique_together = (('source', 'type'),)
+        ordering = ('source', 'type')
 
 
 class DailyHistogram(models.Model):
