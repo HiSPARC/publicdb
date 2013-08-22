@@ -30,6 +30,8 @@ BIN_IN_NUM = 200
 
 # Tables supported by this code
 SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+# Tables that initiate network updates
+NETWORK_TABLES = {'events': 'coincidences'}
 # Tables ignored by this code (unsupported tables not listed here will
 # generate a warning).
 IGNORE_TABLES = ['blobs']
@@ -81,8 +83,26 @@ def process_possible_stations_for_date(date, station_list):
     """Check stations for possible new data"""
 
     logger.debug('Now processing %s' % date)
+    unique_table_list = set([table_name for table_list in station_list.values()
+                                        for table_name in table_list.keys()])
+    for table_name in unique_table_list:
+        process_possible_tables_for_network(date, table_name)
     for station, table_list in station_list.iteritems():
         process_possible_tables_for_station(station, table_list, date)
+
+
+def process_possible_tables_for_network(date, table_name):
+    """Check table and store summary for the network"""
+    try:
+        update_flag_attr = 'needs_update_%s' % NETWORK_TABLES[table_name]
+        logger.debug("New %s data on %s.", table_name,
+                                           date.strftime("%a %b %d %Y"))
+        networksummary, created = NetworkSummary.objects.get_or_create(date=date)
+        setattr(networksummary, update_flag_attr, True)
+        networksummary.needs_update = True
+        networksummary.save()
+    except KeyError:
+        logger.debug('Unsupported table type for network: %s', table_name)
 
 
 def process_possible_tables_for_station(station, table_list, date):
