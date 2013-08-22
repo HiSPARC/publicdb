@@ -109,6 +109,24 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         return lambda x: x
 
 
+def process_coincidences_and_store_in_esd(summary):
+    """Determine coincidences for events from Event Summary Data
+
+    Events from all non-test stations in the ESD are processed
+    for coincidences, the results of which are stored in the
+    coincidences group.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+
+    filepath = get_esd_data_path(date)
+    with tables.openFile(filepath, 'r') as data:
+        pass
+
+
 def process_events_and_store_temporary_esd(summary):
     """Process events from datastore and save temporary Event Summary Data
 

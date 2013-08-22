@@ -162,6 +162,7 @@ def update_all_histograms():
 
 def perform_update_tasks():
     update_esd()
+    update_coincidences()
     update_histograms()
 
 
@@ -182,14 +183,39 @@ def update_esd():
     worker_pool.join()
 
 
+def update_coincidences():
+    worker_pool = multiprocessing.Pool()
+    summaries = NetworkSummary.objects.filter(needs_update=True).reverse()
+    results = worker_pool.imap_unordered(
+        process_and_store_coincidences_for_network_summary, summaries)
+
+    for summary in results:
+        summary.needs_update = False
+        summary.save()
+
+    worker_pool.close()
+    worker_pool.join()
+
+
 def process_and_store_temporary_esd_for_summary(summary):
     django.db.close_connection()
+        for tmpfile_path, node_path in tmp_locations:
+            esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                               node_path)
+
     tmp_locations = []
     if summary.needs_update_events:
         tmp_locations.append(process_events_and_store_esd(summary))
     if summary.needs_update_weather:
         tmp_locations.append(process_weather_and_store_esd(summary))
     return summary, tmp_locations
+
+
+def process_and_store_coincidences_for_network_summary(summary):
+    django.db.close_connection()
+    if summary.needs_update_coincidences:
+        process_coincidences_and_store_esd(summary)
+    return summary
 
 
 def update_histograms():
@@ -313,6 +339,14 @@ def update_pulseintegral_histogram(summary):
     integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
+
+
+def process_coincidences_and_store_esd(summary):
+    logger.debug("Processing coincidences and storing ESD for %s", summary)
+    t0 = time.time()
+    esd.process_coincidences_and_store_in_esd(summary)
+    t1 = time.time()
+    logger.debug("Processing took %.1f s.", t1 - t0)
 
 
 def process_events_and_store_esd(summary):
