@@ -8,8 +8,10 @@ from operator import itemgetter
 import numpy as np
 import tables
 from sapphire.analysis import process_events
+from sapphire.analysis import coincidences
 from sapphire.storage import ProcessedHisparcEvent
 
+from django_publicdb.inforecords.models import Station
 import datastore
 
 from django.conf import settings
@@ -207,6 +209,17 @@ def get_station_node(datafile, station):
     return group
 
 
+def get_coincidences_node(datafile):
+    """Return coincidences node in datastore file
+
+    :param data: datastore file
+
+    """
+    node_path = '/hisparc/coincidences'
+    group = datafile.getNode(node_path)
+    return group
+
+
 def get_station_node_path(station):
     """Return station node path as used in data files
 
@@ -310,6 +323,19 @@ def get_event_timestamps(summary):
     return get_event_data(summary, 'timestamp')
 
 
+def get_coincidence_timestamps(summary):
+    """Get coincidence timestamps
+
+    Read data from file and return a list of timestamps for all coincidences
+    on the date specified by the summary.
+
+    :param summary: summary of data source (date)
+    :type summary: histograms.models.NetworkSummary instance
+
+    """
+    return get_coincidence_data(summary, 'timestamp')
+
+
 def get_pulseheights(summary):
     """Get all event pulse heights
 
@@ -384,6 +410,17 @@ def get_event_data(summary, quantity):
     return get_data(summary, 'events', quantity)
 
 
+def get_coincidence_data(summary, quantity):
+    """Get event data of a specific quantity
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    return get_coincidences(summary, 'coincidences', quantity)
+
+
 def get_data(summary, tablename, quantity):
     """Get data from the datastore from a table of a specific quantity
 
@@ -402,8 +439,32 @@ def get_data(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.getNode(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename,
-                         summary)
+            logger.error("Cannot find table %s for %s", tablename, summary)
+            data = None
+        else:
+            data = table.col(quantity)
+
+    return data
+
+
+def get_coincidences(summary, tablename, quantity):
+    """Get data from the datastore from a table of a specific quantity
+
+    :param summary: summary of data source (date)
+    :type summary: histograms.models.NetworkSummary instance
+    :param tablename: table name (e.g. 'coincidences', 'observables', ...)
+    :param quantity: the specific event data type (e.g., 'shower_size')
+
+    """
+    date = summary.date
+
+    path = get_esd_data_path(date)
+    with tables.openFile(path, 'r') as datafile:
+        try:
+            coincidences_node = get_coincidences_node(datafile)
+            table = datafile.getNode(coincidences_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename, summary)
             data = None
         else:
             data = table.col(quantity)

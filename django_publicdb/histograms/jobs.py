@@ -221,19 +221,25 @@ def process_and_store_coincidences_for_network_summary(summary):
 def update_histograms():
     """Update all histograms"""
 
-    perform_tasks_manager("needs_update_config", perform_config_tasks)
-    perform_tasks_manager("needs_update_events", perform_events_tasks)
-    perform_tasks_manager("needs_update_weather", perform_weather_tasks)
+    perform_tasks_manager("Summary", "needs_update_config",
+                          perform_config_tasks)
+    perform_tasks_manager("Summary", "needs_update_events",
+                          perform_events_tasks)
+    perform_tasks_manager("Summary", "needs_update_weather",
+                          perform_weather_tasks)
+    perform_tasks_manager("NetworkSummary", "needs_update_coincidences",
+                          perform_coincidences_tasks)
 
 
-def perform_tasks_manager(needs_update_item, perform_certain_tasks):
+def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     """ Front office for doing tasks
-        Depending on the USE_MULTIPROCESSING flag, the manager either does the
-        tasks himself or he grabs some workers and let them do it.
-    """
 
-    summaries = eval("Summary.objects.filter(%s=True).reverse()" %
-                     needs_update_item)
+    Depending on the USE_MULTIPROCESSING flag, the manager either does the
+    tasks himself or he grabs some workers and let them do it.
+
+    """
+    summaries = eval("%s.objects.filter(%s=True).reverse()" %
+                     (model, needs_update_item))
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
@@ -276,6 +282,13 @@ def perform_weather_tasks(summary):
     return summary
 
 
+def perform_coincidences_tasks(summary):
+    django.db.close_connection()
+    update_coincidencetime_histogram(summary)
+    update_coincidencenumber_histogram(summary)
+    return summary
+
+
 def update_gps_coordinates():
     """Update GPS coordinates for all stations"""
 
@@ -312,6 +325,36 @@ def update_eventtime_histogram(summary):
     bins = range(25)
     hist = hist[0].tolist()
     save_histograms(summary, 'eventtime', bins, hist)
+
+
+def update_coincidencetime_histogram(summary):
+    logger.debug("Updating coincidencetime histogram for %s" % summary)
+    timestamps = esd.get_coincidence_timestamps(summary)
+
+    # creating a histogram with bins consisting of timestamps instead of
+    # hours saves us from having to convert all timestamps to hours of day.
+    # timestamp at midnight (start of day) of date
+    start = calendar.timegm(summary.date.timetuple())
+    # create bins, don't forget right-most edge
+    bins = [start + hour * 3600 for hour in range(25)]
+
+    hist = np.histogram(timestamps, bins=bins)
+    # redefine bins and histogram, don't forget right-most edge
+    bins = range(25)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'coincidencetime', bins, hist)
+
+
+def update_coincidencenumber_histogram(summary):
+    logger.debug("Updating coincidencenumber histogram for %s" % summary)
+    n_stations = esd.get_coincidence_data(summary, 'N')
+
+    # create bins, don't forget right-most edge
+    bins = range(2, 101)
+
+    hist = np.histogram(n_stations, bins=bins)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'coincidencenumber', bins, hist)
 
 
 def update_pulseheight_histogram(summary):
@@ -432,6 +475,20 @@ def save_histograms(summary, slug, bins, values):
         h = DailyHistogram.objects.get(source=summary, type=type)
     except DailyHistogram.DoesNotExist:
         h = DailyHistogram(source=summary, type=type)
+    h.bins = bins
+    h.values = values
+    h.save()
+    logger.debug("Saved succesfully")
+
+
+def save_network_histograms(summary, slug, bins, values):
+    """Store the binned data in database"""
+    logger.debug("Saving histogram %s for %s" % (slug, summary))
+    type = HistogramType.objects.get(slug=slug)
+    try:
+        h = NetworkHistogram.objects.get(source=summary, type=type)
+    except NetworkHistogram.DoesNotExist:
+        h = NetworkHistogram(source=summary, type=type)
     h.bins = bins
     h.values = values
     h.save()
