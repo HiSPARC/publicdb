@@ -123,8 +123,18 @@ def process_coincidences_and_store_in_esd(summary):
     date = summary.date
 
     filepath = get_esd_data_path(date)
-    with tables.openFile(filepath, 'r') as data:
-        pass
+    data = tables.openFile(filepath, 'r')
+    test_stations = ['station_%d' % station.number
+                     for station in Station.objects.filter(pc__is_test=True)]
+    station_groups = [table._v_parent
+                      for table in data.walkNodes('/hisparc', 'Table')
+                      if table.name == 'events'
+                      and table._v_parent._v_name not in test_stations]
+    coinc = coincidences.Coincidences(data, '/coincidences', station_groups,
+                                      overwrite=True)
+    coinc.search_coincidences()
+    coinc.store_coincidences(cluster)
+    data.close()
 
 
 def process_events_and_store_temporary_esd(summary):
