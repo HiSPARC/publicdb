@@ -109,7 +109,7 @@ def process_possible_tables_for_station(station, table_list, date):
     """Check all tables and store summary for single station"""
 
     try:
-        station = inforecords.Station.objects.get(number=station)
+        station = Station.objects.get(number=station)
     except Station.DoesNotExist:
         logger.error('Unknown station: %s' % station)
     else:
