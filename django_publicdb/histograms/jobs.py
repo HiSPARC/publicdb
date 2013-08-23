@@ -199,10 +199,6 @@ def update_coincidences():
 
 def process_and_store_temporary_esd_for_summary(summary):
     django.db.close_connection()
-        for tmpfile_path, node_path in tmp_locations:
-            esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                               node_path)
-
     tmp_locations = []
     if summary.needs_update_events:
         tmp_locations.append(process_events_and_store_esd(summary))
