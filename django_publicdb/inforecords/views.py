@@ -88,7 +88,7 @@ def create_nagios_config(request):
         # passed to the template via the "hosts" variable
 
         pulseheight_thresholds = []
-       
+
         try:
             number_of_plates = host.station.number_of_plates()
 
@@ -109,23 +109,16 @@ def create_nagios_config(request):
             pass
 
         # Append this host to the hosts list
-        hosts.append({
-            'pc'                    : host,
-            'services'              : services,
-            'pulseheight_thresholds': pulseheight_thresholds,
-            'has_data'              : has_data
-        })
-
-    # Add the publicdb/scripts path
-    scripts_path = os.path.abspath(os.path.join(os.path.dirname(__file__),
-                                                "..", "..", "scripts"))
+        hosts.append({'pc': host,
+                      'services': services,
+                      'pulseheight_thresholds': pulseheight_thresholds,
+                      'has_data': has_data})
 
     # Render the template
     return render_to_response('nagios.cfg',
                               {'contacts': Contact.objects.all(),
                                'clusters': Cluster.objects.all(),
-                               'hosts': hosts,
-                               'scripts_path': scripts_path},
+                               'hosts': hosts},
                               mimetype='text/plain')
 
 
