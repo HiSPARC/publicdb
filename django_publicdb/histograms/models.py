@@ -40,6 +40,7 @@ class NetworkSummary(models.Model):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
 
     class Meta:
+        verbose_name_plural = 'network summaries'
         ordering = ('date',)
 
 

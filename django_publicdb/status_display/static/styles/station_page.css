@@ -27,6 +27,10 @@
 #gpsPositions {
     margin-bottom: 20px;}
 
+#ct_histogram,
+#cn_histogram {
+    height: 250px;}
+
 #eh_histogram,
 #bd_histogram,
 #td_histogram,

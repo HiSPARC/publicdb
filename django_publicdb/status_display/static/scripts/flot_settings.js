@@ -63,6 +63,37 @@ var _base = {
     legend: {show: false}
 };
 
+var _coincidencetimehistogram = {
+    series: {
+        lines: {
+            lineWidth: 1.5}},
+    yaxis: {
+        axisLabel: 'Number of coincidences',
+        min: 0},
+    xaxis: {
+        axisLabel: 'Hour of day (UTC)',
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
+        max: 24}
+};
+
+var _coincidencenumberhistogram = {
+    series: {
+        lines: {
+            lineWidth: 1.5}},
+    yaxis: {
+        axisLabel: 'Number of coincidences',
+        min: 0.7,
+        ticks: [1, 10, 100, 1000, 10000, 100000],
+        transform: function (N) {return Math.log(N);},
+        inverseTransform: function (N) {return Math.exp(N);}},
+    xaxis: {
+        axisLabel: 'Number of stations in coincidence',
+        ticks: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        min: 2,
+        max: 20}
+};
+
 var _eventhistogram = {
     series: {
         lines: {
@@ -181,6 +212,8 @@ var _tracegraph = {
         max: 0}
 };
 
+var ct_options = $.extend(true, {}, _base, _coincidencetimehistogram);
+var cn_options = $.extend(true, {}, _base, _coincidencenumberhistogram);
 var eh_options = $.extend(true, {}, _base, _eventhistogram);
 var ph_options = $.extend(true, {}, _base, _pulseheighthistogram);
 var pi_options = $.extend(true, {}, _base, _pulseintegralhistogram);
