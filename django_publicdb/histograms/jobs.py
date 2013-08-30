@@ -338,7 +338,7 @@ def update_coincidencetime_histogram(summary):
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
     hist = hist[0].tolist()
-    save_histograms(summary, 'coincidencetime', bins, hist)
+    save_network_histograms(summary, 'coincidencetime', bins, hist)
 
 
 def update_coincidencenumber_histogram(summary):
@@ -350,7 +350,7 @@ def update_coincidencenumber_histogram(summary):
 
     hist = np.histogram(n_stations, bins=bins)
     hist = hist[0].tolist()
-    save_histograms(summary, 'coincidencenumber', bins, hist)
+    save_network_histograms(summary, 'coincidencenumber', bins, hist)
 
 
 def update_pulseheight_histogram(summary):
