@@ -215,7 +215,7 @@ def get_coincidences_node(datafile):
     :param data: datastore file
 
     """
-    node_path = '/hisparc/coincidences'
+    node_path = '/coincidences'
     group = datafile.getNode(node_path)
     return group
 
