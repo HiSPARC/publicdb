@@ -135,8 +135,10 @@ def process_coincidences_and_store_in_esd(summary):
     coinc = coincidences.Coincidences(data, '/coincidences', station_groups,
                                       overwrite=True)
     coinc.search_coincidences()
-    coinc.store_coincidences(cluster)
+    coinc.store_coincidences()
+    num_coincidences = len(coinc.coincidences)
     data.close()
+    return num_coincidences
 
 
 def process_events_and_store_temporary_esd(summary):

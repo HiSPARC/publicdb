@@ -383,8 +383,9 @@ def update_pulseintegral_histogram(summary):
 def process_coincidences_and_store_esd(summary):
     logger.debug("Processing coincidences and storing ESD for %s", summary)
     t0 = time.time()
-    esd.process_coincidences_and_store_in_esd(summary)
+    num_coincidences = esd.process_coincidences_and_store_in_esd(summary)
     t1 = time.time()
+    set_attr(summary, 'num_coincidences', num_coincidences)
     logger.debug("Processing took %.1f s.", t1 - t0)
 
 
