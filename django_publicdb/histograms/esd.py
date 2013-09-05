@@ -132,8 +132,8 @@ def process_coincidences_and_store_in_esd(summary):
                       for table in data.walkNodes('/hisparc', 'Table')
                       if table.name == 'events'
                       and table._v_parent._v_name not in test_stations]
-    coinc = coincidences.Coincidences(data, '/coincidences', station_groups,
-                                      overwrite=True)
+    coinc = coincidences.CoincidencesESD(data, '/coincidences', station_groups,
+                                         overwrite=True)
     coinc.search_coincidences()
     coinc.store_coincidences()
     num_coincidences = len(coinc.coincidences)
