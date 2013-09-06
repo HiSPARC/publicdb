@@ -111,7 +111,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         return lambda x: x
 
 
-def process_coincidences_and_store_in_esd(summary):
+def search_coincidences_and_store_in_esd(summary):
     """Determine coincidences for events from Event Summary Data
 
     Events from all non-test stations in the ESD are processed
@@ -125,7 +125,7 @@ def process_coincidences_and_store_in_esd(summary):
     date = summary.date
 
     filepath = get_esd_data_path(date)
-    data = tables.openFile(filepath, 'r')
+    data = tables.openFile(filepath, 'a')
     test_stations = ['station_%d' % station.number
                      for station in Station.objects.filter(pc__is_test=True)]
     station_groups = [table._v_parent
@@ -134,7 +134,8 @@ def process_coincidences_and_store_in_esd(summary):
                       and table._v_parent._v_name not in test_stations]
     coinc = coincidences.CoincidencesESD(data, '/coincidences', station_groups,
                                          overwrite=True)
-    coinc.search_and_store_coincidences()
+    coinc.search_coincidences()
+    coinc.store_coincidences()
     num_coincidences = len(coinc.coincidences)
     data.close()
     return num_coincidences

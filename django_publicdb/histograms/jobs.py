@@ -187,7 +187,7 @@ def update_coincidences():
     worker_pool = multiprocessing.Pool()
     summaries = NetworkSummary.objects.filter(needs_update=True).reverse()
     results = worker_pool.imap_unordered(
-        process_and_store_coincidences_for_network_summary, summaries)
+        search_and_store_coincidences_for_network_summary, summaries)
 
     for summary in results:
         summary.needs_update = False
@@ -207,10 +207,10 @@ def process_and_store_temporary_esd_for_summary(summary):
     return summary, tmp_locations
 
 
-def process_and_store_coincidences_for_network_summary(summary):
+def search_and_store_coincidences_for_network_summary(summary):
     django.db.close_connection()
     if summary.needs_update_coincidences:
-        process_coincidences_and_store_esd(summary)
+        search_coincidences_and_store_esd(summary)
     return summary
 
 
@@ -380,12 +380,12 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 
-def process_coincidences_and_store_esd(summary):
+def search_coincidences_and_store_esd(summary):
     logger.debug("Processing coincidences and storing ESD for %s", summary)
     t0 = time.time()
-    num_coincidences = esd.process_coincidences_and_store_in_esd(summary)
+    num_coincidences = esd.search_coincidences_and_store_in_esd(summary)
     t1 = time.time()
-    set_attr(summary, 'num_coincidences', num_coincidences)
+    summary.num_coincidences = num_coincidences
     logger.debug("Processing took %.1f s.", t1 - t0)
 
 
