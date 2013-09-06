@@ -5,7 +5,7 @@ var _base = {
     colors: ["#222", "#D22", "#1C2", "#1CC"],
     series: {
         lines: {
-            lineWidth: 1,
+            lineWidth: 1.5,
             steps: true},
         shadowSize: 0},
     yaxis: {
@@ -64,9 +64,6 @@ var _base = {
 };
 
 var _coincidencetimehistogram = {
-    series: {
-        lines: {
-            lineWidth: 1.5}},
     yaxis: {
         axisLabel: 'Number of coincidences',
         min: 0},
@@ -78,9 +75,6 @@ var _coincidencetimehistogram = {
 };
 
 var _coincidencenumberhistogram = {
-    series: {
-        lines: {
-            lineWidth: 1.5}},
     yaxis: {
         axisLabel: 'Number of coincidences',
         min: 0.7,
@@ -95,9 +89,6 @@ var _coincidencenumberhistogram = {
 };
 
 var _eventhistogram = {
-    series: {
-        lines: {
-            lineWidth: 1.5}},
     yaxis: {
         axisLabel: 'Number of events',
         min: 0},
@@ -201,7 +192,6 @@ var _altitudegraph = {
 var _tracegraph = {
     series: {
         lines: {
-            lineWidth: 1.5,
             steps: false}},
     xaxis: {
         axisLabel: 'Time (ns)',
