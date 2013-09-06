@@ -223,9 +223,10 @@ def network_coincidences(request, year=None, month=None, day=None):
     except IndexError:
         next = None
 
-    status = {'station_count': Summary.objects.filter(date=date,
-                                                      num_events__isnull=False)
-                                              .count()}
+    station_summaries = Summary.objects.filter(date=date,
+                                               num_events__isnull=False)
+    status = {'station_count': station_summaries.count(),
+              'n_events': sum([s.num_events for s in station_summaries])}
 
     thismonth = nav_calendar(year, month)
     month_list = nav_months_network(year)
@@ -242,6 +243,7 @@ def network_coincidences(request, year=None, month=None, day=None):
          'tomorrow': date + datetime.timedelta(days=1),
          'coincidencetimehistogram': coincidencetimehistogram,
          'coincidencenumberhistogram': coincidencenumberhistogram,
+         'status': status,
          'thismonth': thismonth,
          'month_list': month_list,
          'year_list': year_list,

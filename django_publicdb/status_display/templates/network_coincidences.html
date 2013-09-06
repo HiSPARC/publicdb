@@ -140,8 +140,9 @@
 {% block status %}
   {% if status %}
     <div id="stations">
-        <div class="sectionTitle">Stations</div>
+        <div class="sectionTitle">Source</div>
         <div class="keyvalue"><span class="key">Stations with data</span><span class="value">{{ status.station_count }}</span></div>
+        <div class="keyvalue"><span class="key">Total number of events</span><span class="value">{{ status.n_events }}</span></div>
     </div>
   {% endif %}
 {% endblock %}

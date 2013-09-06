@@ -98,12 +98,14 @@ h3 {
 
 #navigation,
 #config,
+#status,
 #help {
     padding-left: 20px;
     width: 220px;
     border-left: 1px solid black;}
 
 #config,
+#status,
 #help {
     margin-top: 30px;}
 
@@ -160,7 +162,8 @@ a.currentPage {
     font-size: 8pt;}
 
 #navigation > div,
-#config > div {
+#config > div,
+#status > div {
     padding-top: 10px;
     padding-bottom: 10px;}
 
