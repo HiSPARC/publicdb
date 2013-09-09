@@ -54,32 +54,43 @@ def man(request):
     return json_dict(man)
 
 
-def station(request, station_id):
+def station(request, station_id, year=None, month=None, day=None):
     """Get station info
 
-    Retrieve important information about a station.
+    Retrieve important information about a station. If no date if given
+    the latest valid info will be sent, otherwise the latest on or
+    before the given date.
 
     :param station_id: a station number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
 
     :return: dictionary containing info about the station. Most importantly,
              this contains information about the position of the station,
              including the position of the individual scintillators.
 
     """
-    today = datetime.date.today()
+    if year and month and day:
+        date = datetime.date(int(year), int(month), int(day))
+        if not validate_date(date):
+            return HttpResponseNotFound()
+    else:
+        date = datetime.date.today()
+
     try:
         station = Station.objects.get(number=station_id)
         detector = (DetectorHisparc.objects.filter(station=station,
-                                                   startdate__lte=today)
+                                                   startdate__lte=date)
                                            .latest('startdate'))
         source = (Summary.objects.filter(station=station,
                                          num_config__isnull=False,
-                                         date__lte=today)
+                                         date__lte=date)
                                  .latest('date'))
         config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
-    except (Station.DoesNotExist, Summary.DoesNotExist,
-            Configuration.DoesNotExist):
+    except (Station.DoesNotExist, DetectorHisparc.DoesNotExist,
+            Summary.DoesNotExist, Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
