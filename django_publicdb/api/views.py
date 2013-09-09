@@ -45,7 +45,7 @@ def man(request):
         "countries": 'countries/',
         "stations_with_data": 'stations/data/{year}/{month}/{day}/',
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
-        "station_info": 'station/{station_id}/',
+        "station_info": 'station/{station_id}/{year}/{month}/{day}/',
         "has_data": 'station/{station_id}/data/{year}/{month}/{day}/',
         "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
         "configuration": 'station/{station_id}/config/{year}/{month}/{day}/',
