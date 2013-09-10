@@ -83,11 +83,13 @@ def station(request, station_id, year=None, month=None, day=None):
         detector = (DetectorHisparc.objects.filter(station=station,
                                                    startdate__lte=date)
                                            .latest('startdate'))
-        source = (Summary.objects.filter(station=station,
-                                         num_config__isnull=False,
-                                         date__lte=date)
-                                 .latest('date'))
-        config = (Configuration.objects.filter(source=source)
+        source_events = (Summary.objects.filter(station=station,
+                                                num_events__isnull=False,
+                                                date__lte=date).latest('date'))
+        source_config = (Summary.objects.filter(station=station,
+                                                num_config__isnull=False,
+                                                date__lte=date).latest('date'))
+        config = (Configuration.objects.filter(source=source_config)
                                        .latest('timestamp'))
     except (Station.DoesNotExist, DetectorHisparc.DoesNotExist,
             Summary.DoesNotExist, Configuration.DoesNotExist):
@@ -102,7 +104,8 @@ def station(request, station_id, year=None, month=None, day=None):
 
     for i in range(1, 5):
         try:
-            mpv = PulseheightFit.objects.get(source=source, plate=i).fitted_mpv
+            mpv = (PulseheightFit.objects.get(source=source_events, plate=i)
+                                         .fitted_mpv)
             if mpv == 0:
                 mpv_fits.append(None)
             else:
