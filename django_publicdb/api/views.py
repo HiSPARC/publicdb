@@ -674,7 +674,7 @@ def get_pulseheight_fit(request, station_number, plate_number,
 
     if len(fit.error_message) > 0:
         dict.update({"nagios" : Nagios.critical,
-                     "quality": error_message})
+                     "quality": fit.error_message})
         return json_dict(dict)
 
     # Based on chi2 of the fit
