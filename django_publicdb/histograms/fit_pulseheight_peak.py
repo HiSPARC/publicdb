@@ -7,6 +7,7 @@ import logging
 from math import sqrt
 import datetime
 import types
+import traceback
 
 import tables
 import numpy
@@ -311,9 +312,19 @@ def getPulseheightFits(summary):
         except Exception, exception:
             logger.error("[%s plate %s] %s" %
                          (summary, numberOfPlate, exception))
-            fit = PulseheightFit()
+
+            fit = PulseheightFit(initial_mpv = 0,
+                                 initial_width = 0,
+                                 fitted_mpv = 0,
+                                 fitted_mpv_error = 0,
+                                 fitted_width = 0,
+                                 fitted_width_error = 0,
+                                 degrees_of_freedom = 0,
+                                 chi_square_reduced = 0,
+                                 error_type = "",
+                                 error_message = "")
             fit.error_type = "Exception"
-            fit.error_message = exception
+            fit.error_message = traceback.format_exc()
 
         fit.source = summary
         fit.plate = numberOfPlate
