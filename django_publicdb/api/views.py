@@ -9,6 +9,7 @@ from django_publicdb.coincidences.models import *
 from django_publicdb.analysissessions.models import *
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
+import datastore
 
 import os
 import numpy
@@ -50,6 +51,9 @@ def man(request):
         "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
         "configuration": 'station/{station_id}/config/{year}/{month}/{day}/',
         "number_of_events": 'station/{station_id}/num_events/{year}/{month}/{day}/{hour}/'}
+        "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
+        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
+        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/{year}/{month}/{day}/{number_of_days}/'}
 
     return json_dict(man)
 
@@ -1010,6 +1014,35 @@ def num_events_hour(request, station_id, year, month, day, hour):
         num_events = 0
 
     return json_dict(num_events)
+
+
+def get_event_traces(request, station_number, ext_timestamp):
+    """Get the traces for an event
+
+    :param station_number: a station number identifier.
+    :param ext_timestamp: the extended timestamp (nanoseconds since UNIX epoch).
+
+    :return: two or four traces.
+
+    """
+    ext_timestamp = int(ext_timestamp)
+
+    date = datetime.datetime.utcfromtimestamp(ext_timestamp / 1e9).date()
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    try:
+        station = Station.objects.get(number=station_number)
+        Summary.objects.get(station=station, date=date, num_events__isnull=False)
+    except Station.DoesNotExist:
+        return HttpResponseNotFound()
+
+    try:
+        traces = datastore.get_event_traces(station, ext_timestamp)
+    except IndexError:
+        return HttpResponseNotFound()
+
+    return json_dict(traces)
 
 
 def validate_date(date):

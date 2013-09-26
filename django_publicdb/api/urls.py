@@ -43,4 +43,7 @@ urlpatterns = patterns('django_publicdb.api.views',
     (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/(?P<number_of_days>\d+)$', 'get_pulseheight_drift'),
     (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_14_days', 'get_pulseheight_drift_last_14_days'),
     (r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_30_days', 'get_pulseheight_drift_last_30_days'),
+
+    (r'^station/(?P<station_number>\d+)/trace/(?P<ext_timestamp>\d+)/$', 'get_event_traces'),
+
 )
