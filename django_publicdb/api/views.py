@@ -38,19 +38,19 @@ def man(request):
     man = {
         "base_url": 'http://data.hisparc.nl/api/',
         "stations": 'stations/',
-        "stations_in_subcluster": 'subclusters/{subcluster_id}/',
+        "stations_in_subcluster": 'subclusters/{subcluster_number}/',
         "subclusters": 'subclusters/',
-        "subclusters_in_cluster": 'clusters/{cluster_id}/',
+        "subclusters_in_cluster": 'clusters/{cluster_number}/',
         "clusters": 'clusters/',
-        "clusters_in_country": 'countries/{country_id}/',
+        "clusters_in_country": 'countries/{country_number}/',
         "countries": 'countries/',
         "stations_with_data": 'stations/data/{year}/{month}/{day}/',
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
-        "station_info": 'station/{station_id}/{year}/{month}/{day}/',
-        "has_data": 'station/{station_id}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
-        "configuration": 'station/{station_id}/config/{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_id}/num_events/{year}/{month}/{day}/{hour}/'}
+        "station_info": 'station/{station_number}/{year}/{month}/{day}/',
+        "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
+        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
+        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
         "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
         "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
         "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/{year}/{month}/{day}/{number_of_days}/'}
@@ -58,14 +58,14 @@ def man(request):
     return json_dict(man)
 
 
-def station(request, station_id, year=None, month=None, day=None):
+def station(request, station_number, year=None, month=None, day=None):
     """Get station info
 
     Retrieve important information about a station. If no date if given
     the latest valid info will be sent, otherwise the latest on or
     before the given date.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -83,7 +83,7 @@ def station(request, station_id, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
         detector = (DetectorHisparc.objects.filter(station=station,
                                                    startdate__lte=date)
                                            .latest('startdate'))
@@ -154,21 +154,21 @@ def station(request, station_id, year=None, month=None, day=None):
     return json_dict(station_info)
 
 
-def stations(request, subcluster_id=None):
+def stations(request, subcluster_number=None):
     """Get station list
 
     Retrieve a list of all stations or all stations in a subcluster.
 
-    :param subcluster_id: a subcluster number identifier. If given, only
+    :param subcluster_number: a subcluster number identifier. If given, only
         stations belonging to that subcluster will be included in the list.
 
     :return: list containing dictionaries which consist of the name and number
              of each station (matching the subcluster).
 
     """
-    if subcluster_id:
+    if subcluster_number:
         try:
-            subcluster = Cluster.objects.get(number=subcluster_id)
+            subcluster = Cluster.objects.get(number=subcluster_number)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -365,22 +365,22 @@ def stations_with_weather_day(request, year, month, day):
     return json_dict(stations)
 
 
-def subclusters(request, cluster_id=None):
+def subclusters(request, cluster_number=None):
     """Get subcluster list
 
     Retrieve a list of all subclusters or all subclusters in a specific
     cluster.
 
-    :param cluster_id: a cluster number identifier, give this to only get
+    :param cluster_number: a cluster number identifier, give this to only get
         subclusters from this cluster.
 
     :return: list of dictionaries containing the name and number of all
              subclusters that matched the given parameters.
 
     """
-    if cluster_id:
+    if cluster_number:
         try:
-            cluster = Cluster.objects.get(number=cluster_id, parent=None)
+            cluster = Cluster.objects.get(number=cluster_number, parent=None)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -391,22 +391,22 @@ def subclusters(request, cluster_id=None):
     return json_dict(subclusters)
 
 
-def clusters(request, country_id=None):
+def clusters(request, country_number=None):
     """Get cluster list
 
     Retrieve a list of all clusters or only the clusters in a specific country.
     By cluster we here mean the main clusters, which contain subclusters.
 
-    :param country_id: a country number identifier, give this to only get
+    :param country_number: a country number identifier, give this to only get
         clusters from a specific country.
 
     :return: list of dictionaries containing the name and number of all
              clusters that matched the given parameters.
 
     """
-    if country_id:
+    if country_number:
         try:
-            country = Country.objects.get(number=country_id)
+            country = Country.objects.get(number=country_number)
         except Country.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -723,13 +723,13 @@ def get_pulseheight_fit(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def has_data(request, station_id, year=None, month=None, day=None):
+def has_data(request, station_number, year=None, month=None, day=None):
     """Check for presence of cosmic ray data
 
     Find out if the given station has measured shower data, either on a
     specific date, or at all.
 
-    :param station_id: a stationn number identifier.
+    :param station_number: a stationn number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -738,7 +738,7 @@ def has_data(request, station_id, year=None, month=None, day=None):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -763,13 +763,13 @@ def has_data(request, station_id, year=None, month=None, day=None):
     return json_dict(has_data)
 
 
-def has_weather(request, station_id, year=None, month=None, day=None):
+def has_weather(request, station_number, year=None, month=None, day=None):
     """Check for presence of weather data
 
     Find out if the given station has measured weather data, either on a
     specific date, or at all.
 
-    :param station_id: a stationn number identifier.
+    :param station_number: a stationn number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -779,7 +779,7 @@ def has_weather(request, station_id, year=None, month=None, day=None):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -803,14 +803,14 @@ def has_weather(request, station_id, year=None, month=None, day=None):
     return json_dict(has_weather)
 
 
-def config(request, station_id, year=None, month=None, day=None):
+def config(request, station_number, year=None, month=None, day=None):
     """Get station config settings
 
     Retrieve the entire configuration of a station. If no date if given the
     latest config will be sent, otherwise the latest on or before the given
     date.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -820,7 +820,7 @@ def config(request, station_id, year=None, month=None, day=None):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -850,21 +850,21 @@ def config(request, station_id, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_id):
+def num_events(request, station_number):
     """Get total number of events for a station
 
     Retrieve the number of events that a station has measured during its
     entire operation. The following functions each dig a little deeper,
     going for a shorter time period.
 
-    :param station_id: a stationn number identifier.
+    :param station_number: a stationn number identifier.
 
     :return: integer containing the total number of events ever recorded by
              the given station.
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -881,13 +881,13 @@ def num_events(request, station_id):
     return json_dict(num_events)
 
 
-def num_events_year(request, station_id, year):
+def num_events_year(request, station_number, year):
     """Get total number of events for a station in the given year
 
     Retrieve the total number of events that a station has measured during
     the given year.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year for which the number of events is to be given.
 
     :return: integer containing the total number of events recorded by the
@@ -895,7 +895,7 @@ def num_events_year(request, station_id, year):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -912,13 +912,13 @@ def num_events_year(request, station_id, year):
     return json_dict(num_events)
 
 
-def num_events_month(request, station_id, year, month):
+def num_events_month(request, station_number, year, month):
     """Get total number of events for a station in the given month of a year
 
     Retrieve the total number of events that a station has measured during
     the given month.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year in which to look for the month.
     :param month: the month for which the number of events is to be given.
 
@@ -927,7 +927,7 @@ def num_events_month(request, station_id, year, month):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -947,12 +947,12 @@ def num_events_month(request, station_id, year, month):
     return json_dict(num_events)
 
 
-def num_events_day(request, station_id, year, month, day):
+def num_events_day(request, station_number, year, month, day):
     """Get total number of events for a station on a given date
 
     Retrieve the total number of events that a station has measured on a date.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -962,7 +962,7 @@ def num_events_day(request, station_id, year, month, day):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -980,13 +980,13 @@ def num_events_day(request, station_id, year, month, day):
     return json_dict(num_events)
 
 
-def num_events_hour(request, station_id, year, month, day, hour):
+def num_events_hour(request, station_number, year, month, day, hour):
     """Get number of events for a station in an hour on the given date
 
     Retrieve the total number of events that a station has measured in that
     hour.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -997,7 +997,7 @@ def num_events_hour(request, station_id, year, month, day, hour):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
