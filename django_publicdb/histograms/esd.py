@@ -188,9 +188,8 @@ def get_station_node_path(station):
 
     """
     cluster = station.cluster.main_cluster()
-    station_id = station.number
     return '/hisparc/cluster_%s/station_%d' % (cluster.lower(),
-                                               station_id)
+                                               station.number)
 
 
 def create_temporary_file():
@@ -273,7 +272,7 @@ def get_event_timestamps(summary):
     """Get event timestamps
 
     Read data from file and return a list of timestamps for all events on
-    date `date' from station `station_id', specified by the summary.
+    date `date' from station `station_number', specified by the summary.
 
     :param summary: summary of data source (station and date)
     :type summary: histograms.models.Summary instance

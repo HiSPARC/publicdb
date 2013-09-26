@@ -108,11 +108,11 @@ def get_data_path(date):
     return os.path.join(rootdir, filepath)
 
 
-def get_config_messages(cluster, station_id, date):
+def get_config_messages(cluster, station_number, date):
     """Get configuration messages
 
     :param cluster: string containing the cluster name
-    :param station_id: station number
+    :param station_number: station number
     :param date: date
 
     """
@@ -120,7 +120,7 @@ def get_config_messages(cluster, station_id, date):
 
     file = tables.openFile(path, 'r')
     parent = file.getNode('/hisparc/cluster_%s/station_%d' %
-                          (cluster.lower(), station_id))
+                          (cluster.lower(), station_number))
     config = file.getNode(parent, 'config')
     blobs = file.getNode(parent, 'blobs')
     return file, config, blobs

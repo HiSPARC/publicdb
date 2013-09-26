@@ -251,7 +251,6 @@ def update_gps_coordinates():
 
 def update_eventtime_histogram(summary):
     logger.debug("Updating eventtime histogram for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
     timestamps = esd.get_event_timestamps(summary)
 
     # creating a histogram with bins consisting of timestamps instead of
@@ -270,7 +269,6 @@ def update_eventtime_histogram(summary):
 
 def update_pulseheight_histogram(summary):
     logger.debug("Updating pulseheight histogram for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
     pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
@@ -289,7 +287,6 @@ def update_pulseheight_fit(summary):
 
 def update_pulseintegral_histogram(summary):
     logger.debug("Updating pulseintegral histogram for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
     integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
@@ -314,7 +311,6 @@ def process_weather_and_store_esd(summary):
 
 def update_temperature_dataset(summary):
     logger.debug("Updating temperature dataset for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
     temperature = esd.get_temperature(summary)
     ERR = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in ERR]
@@ -324,15 +320,15 @@ def update_temperature_dataset(summary):
 
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
     barometer = esd.get_barometer(summary)
     save_dataset(summary, 'barometer', barometer)
 
 
 def update_config(summary):
     logger.debug("Updating configuration messages for %s" % summary)
-    cluster, station_id = get_station_cluster_id(summary.station)
-    file, configs, blobs = datastore.get_config_messages(cluster, station_id,
+    cluster, station_number = get_station_cluster_number(summary.station)
+    file, configs, blobs = datastore.get_config_messages(cluster,
+                                                         station_number,
                                                          summary.date)
     for config in configs[summary.num_config:]:
         new_config = Configuration(source=summary)
@@ -420,5 +416,5 @@ def save_pulseheight_fits(summary, fits):
     logger.debug("Saved successfully")
 
 
-def get_station_cluster_id(station):
+def get_station_cluster_number(station):
     return station.cluster.main_cluster(), station.number
