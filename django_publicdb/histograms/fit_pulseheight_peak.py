@@ -249,7 +249,7 @@ def fitPulseheightPeak(pulseheights):
     fitParameters = fitResult[0]
     fitCovariance = fitResult[1]
 
-    if numpy.isinf(fitCovariance):
+    if numpy.isinf(fitCovariance).any():
         pulseheightFit.error_message = "Unable to calculate the covariance matrix."
         fitCovariance = numpy.zeros((3,3))
 
