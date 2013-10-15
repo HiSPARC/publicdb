@@ -96,7 +96,7 @@ def create_nagios_config(request):
         pulseheight_thresholds = []
 
         try:
-            number_of_plates = host.station.number_of_plates()
+            number_of_detectors = host.station.number_of_detectors()
 
             for service in host.enabledservice_set.all():
                 check_command = service.monitor_service.nagios_command
@@ -107,7 +107,7 @@ def create_nagios_config(request):
                 pulseheight_thresholds = \
                     MonitorPulseheightThresholds.objects \
                                                 .filter(station=host.station,
-                                                        plate__lte=number_of_plates)
+                                                        plate__lte=number_of_detectors)
 
                 break
 

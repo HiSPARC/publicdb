@@ -302,7 +302,7 @@ def getPulseheightFits(summary):
     today = datetime.datetime.utcnow()
 
     try:
-        n_plates = summary.station.number_of_plates()
+        n_plates = summary.station.number_of_detectors()
     except Configuration.DoesNotExist:
         raise
 
