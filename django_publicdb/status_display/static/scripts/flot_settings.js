@@ -104,8 +104,8 @@ var _pulseheighthistogram = {
         axisLabel: 'Count',
         min: 0.7,
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
-        transform: function (N) {return Math.log(N);},
-        inverseTransform: function (N) {return Math.exp(N);}},
+        transform: function (N) {return Math.log(N) / Math.LN10;},
+        inverseTransform: function (N) {return Math.pow(10, N);}},
     xaxis: {
         axisLabel: 'Pulseheight (mV)'}
 };
@@ -115,8 +115,8 @@ var _pulseintegralhistogram = {
         axisLabel: 'Count',
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         min: 0.7,
-        transform: function (N) {return Math.log(N);},
-        inverseTransform: function (N) {return Math.exp(N);}},
+        transform: function (N) {return Math.log(N) / Math.log(10);},
+        inverseTransform: function (N) {return Math.pow(10, N);}},
     xaxis: {
         axisLabel: 'Pulseintegral (mVns)'}
 };

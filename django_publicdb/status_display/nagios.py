@@ -22,41 +22,41 @@ def status_lists():
 def down_list():
     """Get Nagios page which lists DOWN hosts
 
-    :return: list of station short names of stations that are DOWN.
+    :return: list of station number of stations that are DOWN.
 
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=4'
     down = retrieve_station_status(query)
-    down_ids = pc_name_to_station_ids(down)
+    down_numbers = pc_name_to_station_number(down)
 
-    return down_ids
+    return down_numbers
 
 
 def problem_list():
     """Get Nagios page which lists hosts with a problem
 
-    :return: list containing station short names of stations for which
+    :return: list containing station number of stations for which
              the host has status OK, but some services are CRITICAL.
 
     """
     query = 'hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
     problem = retrieve_station_status(query)
-    problem_ids = pc_name_to_station_ids(problem)
+    problem_numbers = pc_name_to_station_number(problem)
 
-    return problem_ids
+    return problem_numbers
 
 
 def up_list():
     """Get Nagios page which lists UP hosts
 
-    :return: list of station ids of stations that are OK.
+    :return: list of station numbers of stations that are OK.
 
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=2'
     up = retrieve_station_status(query)
-    up_ids = pc_name_to_station_ids(up)
+    up_numbers = pc_name_to_station_number(up)
 
-    return up_ids
+    return up_numbers
 
 
 def retrieve_station_status(query):
@@ -79,12 +79,12 @@ def retrieve_station_status(query):
     return stations
 
 
-def pc_name_to_station_ids(shortnames):
-    """Convert list of pc names to station ids
+def pc_name_to_station_number(shortnames):
+    """Convert list of pc names to station numbers
 
     :param shortnames: list of pc names.
 
-    :return: station ids that have a pc with name in the shortnames.
+    :return: station numbers that have a pc with name in the shortnames.
 
     """
     stations = list(Station.objects.filter(pc__name__in=shortnames)

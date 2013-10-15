@@ -128,21 +128,21 @@ def get_or_create_cluster_group(file, cluster):
     return cluster
 
 
-def get_or_create_station_group(file, cluster, station_id):
+def get_or_create_station_group(file, cluster, station_number):
     """Get an existing station group or create a new one
 
     :param file: the PyTables data file
     :param cluster: the name of the cluster
-    :param station_id: the station number
+    :param station_number: the station number
 
     """
     cluster = get_or_create_cluster_group(file, cluster)
-    node_name = 'station_%d' % station_id
+    node_name = 'station_%d' % station_number
     try:
         station = file.getNode(cluster, node_name)
     except tables.NoSuchNodeError:
         station = file.createGroup(cluster, node_name,
-                                   'HiSPARC station %d data' % station_id)
+                                   'HiSPARC station %d data' % station_number)
         file.flush()
 
     return station

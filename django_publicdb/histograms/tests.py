@@ -8,6 +8,7 @@ import code
 import logging
 
 import tables
+import numpy
 
 # Django
 from django.conf import settings
@@ -17,6 +18,7 @@ from django.test.utils import override_settings
 # Publicdb
 from lib.test import datastore as test_datastore
 from django_publicdb.histograms import models, datastore, jobs, esd
+import fit_pulseheight_peak
 
 class BaseHistogramsTestCase(TransactionTestCase):
 
@@ -248,7 +250,7 @@ class CheckForUpdatesTestCase(BaseHistogramsTestCase):
         self.assertEqual(len(s), 0)
 
 
-class PulseheightFitTestCase(BaseHistogramsTestCase):
+class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
     fixtures = [
         'tests_inforecords',
@@ -274,7 +276,7 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
         #-----------------------------------------------------------------------
 
         # Download data files and setup the test datastore
-        super(PulseheightFitTestCase, self).setUp()
+        super(JobsPulseheightFitTestCase, self).setUp()
 
         # Empty all fits
         models.PulseheightFit.objects.all().delete()
@@ -309,7 +311,7 @@ class PulseheightFitTestCase(BaseHistogramsTestCase):
         jobs.update_esd()
 
     def tearDown(self):
-        super(PulseheightFitTestCase, self).tearDown()
+        super(JobsPulseheightFitTestCase, self).tearDown()
 
     #---------------------------------------------------------------------------
     # Tests
@@ -771,3 +773,24 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
     def test_jobs_update_all_histograms_501_2012_5_16_multi_threaded(self):
         self.base_test_jobs_update_all_histograms_501_2012_5_16()
 
+
+class PulseheightFitErrorsTestCase(TestCase):
+    def test_empty_data(self):
+        fit = models.PulseheightFit()
+
+        fit.error_message = ""
+        self.assertFalse(len(fit.error_message))
+
+        data = numpy.zeros(100)
+        fit = fit_pulseheight_peak.fitPulseheightPeak(data)
+        self.assertTrue(fit.error_message.count("Sum"))
+
+    def test_data_low_average(self):
+        fit = models.PulseheightFit()
+
+        fit.error_message = ""
+        self.assertFalse(len(fit.error_message))
+
+        data = numpy.random.normal(50, 5, 500)
+        fit = fit_pulseheight_peak.fitPulseheightPeak(data)
+        self.assertTrue(fit.error_message.count("Average"))
