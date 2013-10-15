@@ -137,5 +137,6 @@ def create_datastore_config(request):
         raise PermissionDenied
 
     return render_to_response('datastore.cfg',
-                              {'stations': Station.objects.all()},
+                              {'stations': Station.objects.all()
+                                           .select_related('cluster__parent')},
                               mimetype='text/plain')
