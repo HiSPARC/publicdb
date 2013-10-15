@@ -7,8 +7,6 @@ from django.conf import settings
 
 import datetime
 
-from django_publicdb.histograms.models import Configuration
-
 
 class Profession(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -183,6 +181,8 @@ class Station(models.Model):
         reload_datastore()
 
     def number_of_detectors(self):
+        from django_publicdb.histograms.models import Configuration
+
         n_detectors = 0
         today = datetime.datetime.utcnow()
 
