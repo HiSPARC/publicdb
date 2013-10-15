@@ -2,7 +2,9 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 
+import socket
 import xmlrpclib
 import base64
 
@@ -41,6 +43,10 @@ def create_nagios_config(request):
     EnabledService model.
 
     """
+    # Limit access to only allow access from VPN server
+    if request.META["REMOTE_ADDR"] != socket.gethostbyname(settings.VPN_HOST):
+        raise PermissionDenied
+
     # Start building the host list
     hosts = []
     for host in (Pc.objects.exclude(type__description='Admin PC')
@@ -124,6 +130,11 @@ def create_nagios_config(request):
 
 def create_datastore_config(request):
     """Create the datastore configuration"""
+
+    # Limit access to only allow access from the Datastore server
+    if (request.META["REMOTE_ADDR"] !=
+        socket.gethostbyname(settings.DATASTORE_HOST)):
+        raise PermissionDenied
 
     return render_to_response('datastore.cfg',
                               {'stations': Station.objects.all()},
