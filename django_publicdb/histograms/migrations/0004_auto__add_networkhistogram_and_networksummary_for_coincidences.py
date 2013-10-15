@@ -197,6 +197,9 @@ class Migration(SchemaMigration):
         u'histograms.pulseheightfit': {
             'Meta': {'unique_together': "(('source', 'plate'),)", 'object_name': 'PulseheightFit'},
             'chi_square_reduced': ('django.db.models.fields.FloatField', [], {}),
+            'degrees_of_freedom': ('django.db.models.fields.IntegerField', [], {'default': '0'}),
+            'error_message': ('django.db.models.fields.TextField', [], {'default': "''"}),
+            'error_type': ('django.db.models.fields.CharField', [], {'default': "''", 'max_length': '64'}),
             'fitted_mpv': ('django.db.models.fields.FloatField', [], {}),
             'fitted_mpv_error': ('django.db.models.fields.FloatField', [], {}),
             'fitted_width': ('django.db.models.fields.FloatField', [], {}),

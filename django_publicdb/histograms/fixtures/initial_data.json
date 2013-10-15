@@ -36,6 +36,30 @@
         }
     }, 
     {
+        "pk": 4, 
+        "model": "histograms.histogramtype", 
+        "fields": {
+            "value_axis_title": "Number of coincidences", 
+            "description": "This histogram will show you the number of stations per coincidence for a given day.", 
+            "bin_axis_title": "Number of stations in coincidence", 
+            "has_multiple_datasets": false, 
+            "slug": "coincidencenumber", 
+            "name": "Coincidence number histogram"
+        }
+    }, 
+    {
+        "pk": 5, 
+        "model": "histograms.histogramtype", 
+        "fields": {
+            "value_axis_title": "Number of coincidences", 
+            "description": "This histogram will show you the number of coincidences each hour for a given day.", 
+            "bin_axis_title": "Hour of day (UTC)", 
+            "has_multiple_datasets": false, 
+            "slug": "coincidencetime", 
+            "name": "Coincidence time histogram"
+        }
+    }, 
+    {
         "pk": 1, 
         "model": "histograms.datasettype", 
         "fields": {
