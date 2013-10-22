@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}HiSPARC | Station layout review form{% endblock %}
+{% block head_styles %}<style type="text/css" media="all">#pageHeader {position: absolute;}</style>{% endblock %}
+{% block content %}
+
+<div id="header">
+    <h2>HiSPARC station layout review form</h2>
+</div>
+
+<p>
+    This is a new station layout for station {{ station.number }} - {{ station.name }}.<br>
+    These measurements where submitted by {{ data.first_name }} {{ data.sur_name }}.<br>
+    The submitter can be reached via: {{ data.email }}.<br>
+    Please review the new layout and either approve or dismiss it.
+</p>
+
+<div id='reviewform'>
+    <form action="{% url 'django_publicdb.inforecords.views.station_layout_review_form' %}" method="post">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit" />
+    </form>
+</div>
+
+<div id='preview'>
+    [show preview of new layout]
+</div>
+
+{% endblock %}
