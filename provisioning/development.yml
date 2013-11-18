@@ -49,7 +49,7 @@
   sudo: yes
 
 - name: download hdf5 1.8 sources
-  get_url: url=http://www.hdfgroup.org/ftp/HDF5/current/src/hdf5-1.8.11.tar.bz2
+  get_url: url=http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.11/src/hdf5-1.8.11.tar.bz2
            dest=/usr/local/src/hisparc/
 
 - name: unpack hdf5 1.8 sources

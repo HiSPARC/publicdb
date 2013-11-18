@@ -1,5 +1,5 @@
 ---
-- hosts: publicdb
+- hosts: all
   tasks:
     - include: common.yml
     - include: mysqldb.yml mysql_root_password=Data4admin!
