@@ -26,19 +26,11 @@ class ViewsTestCase(LiveServerTestCase):
         'tests_inforecords',
         'tests_histograms']
 
-    #--------------------------------------------------------------------------
-    # Setup and teardown
-    #--------------------------------------------------------------------------
-
     def setUp(self):
         super(ViewsTestCase, self).setUp()
 
     def tearDown(self):
         super(ViewsTestCase, self).tearDown()
-
-    #--------------------------------------------------------------------------
-    # Helper functions
-    #--------------------------------------------------------------------------
 
     def check_and_get_response(self, url):
         response = urllib.urlopen("%s/api%s" % (self.live_server_url, url))
@@ -46,10 +38,6 @@ class ViewsTestCase(LiveServerTestCase):
         assert(is_json(response))
 
         return response
-
-    #--------------------------------------------------------------------------
-    # Tests
-    #--------------------------------------------------------------------------
 
     def test_station_501(self, ):
         self.check_and_get_response("/station/501")
@@ -81,10 +69,12 @@ class ViewsTestCase(LiveServerTestCase):
 
     def test_stations(self):
         self.check_and_get_response("/stations/")
+
         self.check_and_get_response("/stations/data/")
         self.check_and_get_response("/stations/data/2011")
         self.check_and_get_response("/stations/data/2011/9")
         self.check_and_get_response("/stations/data/2011/9/9")
+
         self.check_and_get_response("/stations/weather/")
         self.check_and_get_response("/stations/weather/2011/")
         self.check_and_get_response("/stations/weather/2011/9")
