@@ -179,8 +179,7 @@ def stations(request, subcluster_number=None):
     return json_dict(stations)
 
 
-def stations_with_data(request, type='events', year=None, month=None,
-                          day=None):
+def stations_with_data(request, type=None, year=None, month=None, day=None):
     """Get stations with event or weather data
 
     Retrieve a list of all stations which have recorded events or
@@ -586,18 +585,20 @@ def get_pulseheight_fit(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def has_data(request, station_number, year=None, month=None, day=None):
+def has_data(request, station_number, type=None, year=None, month=None,
+             day=None):
     """Check for presence of cosmic ray data
 
     Find out if the given station has measured shower data, either on a
     specific date, or at all.
 
     :param station_number: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
+    :param type: the data type, either events or weather.
+    :param year, month, day: the date, this has to be within the time
+            HiSPARC has been operational and can be as specific as
+            you desire.
 
-    :return: boolean, True if the given station has shower data, False otherwise.
+    :return: boolean, True if the given station has data, False otherwise.
 
     """
     try:
@@ -605,65 +606,38 @@ def has_data(request, station_number, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
+    summaries = Summary.objects.filter(station=station)
 
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
+    if type=='events':
+        summaries = summaries.filter(num_events__isnull=False)
+    elif type=='weather':
+        summaries = summaries.filter(num_weather__isnull=False)
+
+    if day:
+        date = datetime.date(int(year), int(month), int(day))
+        summaries = summaries.filter(date=date)
+    elif month:
+        date = datetime.date(int(year), int(month), 1)
+        summaries = summaries.filter(date__year=date.year,
+                                     date__month=date.month)
+    elif year:
+        date = datetime.date(int(year), 1, 1)
+        summaries = summaries.filter(date__year=date.year)
+    else:
+        date = datetime.date.today()
+        summaries = summaries.filter(date__gte=datetime.date(2002, 1, 1),
+                                     date__lte=date)
+
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    try:
+        a_summary_exists = summaries[0]
         has_data = True
     except IndexError:
         has_data = False
 
     return json_dict(has_data)
-
-
-def has_weather(request, station_number, year=None, month=None, day=None):
-    """Check for presence of weather data
-
-    Find out if the given station has measured weather data, either on a
-    specific date, or at all.
-
-    :param station_number: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: boolean, True if the given station has weather data,
-        False otherwise.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
-        has_weather = True
-    except IndexError:
-        has_weather = False
-
-    return json_dict(has_weather)
 
 
 def config(request, station_number, year=None, month=None, day=None):
