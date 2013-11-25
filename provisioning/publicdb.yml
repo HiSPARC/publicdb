@@ -18,21 +18,33 @@
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
 
+- name: Copy pip requirements files
+  copy: src=pip-stage1.txt dest=/home/{{ ansible_user_id }}/
+
+- name: Copy pip requirements files
+  copy: src=pip-stage2.txt dest=/home/{{ ansible_user_id }}/
+
+- name: Copy pip requirements files
+  copy: src=pip-stage3.txt dest=/home/{{ ansible_user_id }}/
+
+- name: Copy pip requirements files
+  copy: src=pip-stage4.txt dest=/home/{{ ansible_user_id }}/
+
 - name: install python packages in virtualenv -- stage 1
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/vagrant/provisioning/pip-stage1.txt
+       requirements=pip-stage1.txt
 
 - name: install python packages in virtualenv -- stage 2
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/vagrant/provisioning/pip-stage2.txt
+       requirements=pip-stage2.txt
 
 - name: install python packages in virtualenv -- stage 3
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/vagrant/provisioning/pip-stage3.txt
+       requirements=pip-stage3.txt
 
 - name: install latest version of SAPPHiRE in virtualenv
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/vagrant/provisioning/pip-stage4.txt
+       requirements=pip-stage4.txt
 
 - name: set up MySQL database
   mysql_db: name=publicdb state=present

@@ -1,16 +1,4 @@
 ---
-- name: ensure hisparc user is present
-  user: name=hisparc state=present
-  sudo: yes
-
-- name: ensure vagrant user is part of hisparc group
-  user: name=vagrant groups=hisparc append=yes
-  sudo: yes
-
-- name: kill active ssh connection (designed to FAIL)
-  script: kill_active_sshd.sh
-  ignore_errors: true
-
 - name: enable EPEL repositories
   command: /bin/rpm -U --force http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
   sudo: yes
