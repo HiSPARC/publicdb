@@ -71,3 +71,21 @@ containing this very file).  Then issue the following commands::
     $ veewee vbox export SLC5.9
 
 The Vagrant box is located in the current working directory.
+
+
+Updating the Vagrant box
+------------------------
+
+You can rebuild the vagrant box by adding the -f option to the build
+and export commands.  This will overwrite the previously existing VM.
+However, you still need to make sure that vagrant actually uses this new
+box.  To achieve this, simply remove the existing vagrant box using::
+
+    $ vagrant destroy
+    $ vagrant box remove SLC5.9
+
+You are now in a clean environment and::
+
+    $ vagrant up
+
+will create a new VM using the updated box.
