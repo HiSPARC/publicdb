@@ -13,7 +13,7 @@
 
 - name: download python 2.7 source
   get_url: url=http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2
-           dest=/usr/local/src/hisparc/
+           dest=/usr/local/src/hisparc/Python-2.7.5.tar.bz2
 
 - name: unpack python 2.7
   command: chdir=/usr/local/src/hisparc
@@ -28,7 +28,7 @@
 
 - name: download setuptools
   get_url: url=https://bitbucket.org/pypa/setuptools/raw/0.8/ez_setup.py
-           dest=/usr/local/src/hisparc/
+           dest=/usr/local/src/hisparc/ez_setup.py
 
 - name: install setuptools
   shell: chdir=/usr/local/src/hisparc
@@ -37,7 +37,7 @@
 
 - name: download pip install script
   get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-           dest=/usr/local/src/hisparc/
+           dest=/usr/local/src/hisparc/get-pip.py
 
 - name: install pip
   shell: chdir=/usr/local/src/hisparc creates=/usr/local/bin/pip
@@ -50,7 +50,7 @@
 
 - name: download hdf5 1.8 sources
   get_url: url=http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.11/src/hdf5-1.8.11.tar.bz2
-           dest=/usr/local/src/hisparc/
+           dest=/usr/local/src/hisparc/hdf5-1.8.11.tar.bz2
 
 - name: unpack hdf5 1.8 sources
   command: chdir=/usr/local/src/hisparc
