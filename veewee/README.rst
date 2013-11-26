@@ -57,6 +57,9 @@ four, the amount of memory was increased to 512 Mb and the kernel
 parameter 'divider=10' was added to work around an issue of the VM using a
 lot of CPU because of a high-frequency clock interrupt.
 
+Furthermore, a default 'hisparc' user was added so that we can simulate an
+actual HiSPARC server installation.
+
 
 Building the Vagrant box
 ------------------------
