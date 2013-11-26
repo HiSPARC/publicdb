@@ -32,19 +32,19 @@
 
 - name: install python packages in virtualenv -- stage 1
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=pip-stage1.txt
+       requirements=/home/{{ ansible_user_id }}/pip-stage1.txt
 
 - name: install python packages in virtualenv -- stage 2
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=pip-stage2.txt
+       requirements=/home/{{ ansible_user_id }}/pip-stage2.txt
 
 - name: install python packages in virtualenv -- stage 3
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=pip-stage3.txt
+       requirements=/home/{{ ansible_user_id }}/pip-stage3.txt
 
 - name: install latest version of SAPPHiRE in virtualenv
   pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=pip-stage4.txt
+       requirements=/home/{{ ansible_user_id }}/pip-stage4.txt
 
 - name: set up MySQL database
   mysql_db: name=publicdb state=present
