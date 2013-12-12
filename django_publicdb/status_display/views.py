@@ -367,7 +367,7 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
-        (station_number, year, month, day))
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -377,7 +377,7 @@ def get_pulseheight_histogram_source(request, station_number, year, month, day):
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseheight-s%s-%d%02d%02d.csv' %
-        (station_number, year, month, day))
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -387,7 +387,7 @@ def get_pulseintegral_histogram_source(request, station_number, year, month, day
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseintegral-s%s-%d%02d%02d.csv' %
-        (station_number, year, month, day))
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -397,7 +397,7 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=barometer-s%s-%d%02d%02d.csv' %
-        (station_number, year, month, day))
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -407,7 +407,7 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=temperature-s%s-%d%02d%02d.csv' %
-        (station_number, year, month, day))
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
