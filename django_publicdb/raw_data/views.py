@@ -25,7 +25,6 @@ dispatcher = SimpleXMLRPCDispatcher()
 
 
 class SingleLineStringIO:
-
     """Very limited file-like object buffering a single line."""
 
     def write(self, line):
@@ -34,6 +33,7 @@ class SingleLineStringIO:
 
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
+
     if request.method == 'POST':
         # Process XML-RPC call
         response = HttpResponse(mimetype='text/xml')
@@ -55,6 +55,7 @@ def call_xmlrpc(request):
 
 def xmlrpc(uri):
     """A decorator for XML-RPC functions."""
+
     def register_xmlrpc(fn):
         dispatcher.register_function(fn, uri)
         return fn
