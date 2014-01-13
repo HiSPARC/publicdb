@@ -19,7 +19,9 @@ from django.conf import settings
 
 logger = logging.getLogger('histograms.esd')
 
-COINCIDENCE_WINDOW = 1000  # nanoseconds, 1 microsecond
+# Limit the coincidence window to 1 microsecond,
+# to prevent coincidental coincidences to become more dominant.
+COINCIDENCE_WINDOW = 1000  # nanoseconds
 
 
 class ProcessEventsFromSource(process_events.ProcessEvents):
