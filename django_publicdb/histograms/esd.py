@@ -19,6 +19,8 @@ from django.conf import settings
 
 logger = logging.getLogger('histograms.esd')
 
+COINCIDENCE_WINDOW = 1000  # nanoseconds, 1 microsecond
+
 
 class ProcessEventsFromSource(process_events.ProcessEvents):
 
@@ -134,7 +136,7 @@ def search_coincidences_and_store_in_esd(summary):
                       and table._v_parent._v_name not in test_stations]
     coinc = coincidences.CoincidencesESD(data, '/coincidences', station_groups,
                                          overwrite=True)
-    coinc.search_coincidences()
+    coinc.search_coincidences(window=COINCIDENCE_WINDOW)
     coinc.store_coincidences()
     num_coincidences = len(coinc.coincidences)
     data.close()
