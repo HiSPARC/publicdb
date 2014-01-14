@@ -8,7 +8,6 @@ from operator import itemgetter
 import numpy as np
 import tables
 from sapphire.analysis import process_events
-from sapphire.storage import ProcessedHisparcEvent
 
 import datastore
 
@@ -85,7 +84,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
             length = len(self.source)
 
         table = self.dest_file.createTable(self.dest_group, 'events',
-                                           ProcessedHisparcEvent,
+                                           self.processed_events_description,
                                            expectedrows=length)
 
         for x in xrange(length):
