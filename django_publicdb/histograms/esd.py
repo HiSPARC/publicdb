@@ -132,7 +132,7 @@ def search_coincidences_and_store_in_esd(summary):
     data = tables.openFile(filepath, 'a')
     test_stations = ['station_%d' % station.number
                      for station in Station.objects.filter(pc__is_test=True)]
-    station_groups = [table._v_parent
+    station_groups = [table._v_parent._v_pathname
                       for table in data.walkNodes('/hisparc', 'Table')
                       if table.name == 'events'
                       and table._v_parent._v_name not in test_stations]
