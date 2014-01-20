@@ -6,6 +6,8 @@ docutils==0.10
 ipython==0.13.2
 mock==1.0.1
 numpy==1.7.1
+--allow-unverified progressbar
+--allow-external progressbar
 progressbar==2.3
 recaptcha-client==1.0.6
 simplejson==3.3.0
