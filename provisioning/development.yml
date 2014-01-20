@@ -3,6 +3,14 @@
   yum: name={{ item }} state=present
   sudo: yes
   with_items:
+    - gcc
+    - bzip2
+    - make
+    - gcc-c++
+    - zlib-devel
+    - openssl-devel
+    - readline-devel
+    - sqlite3-devel
     - pkgconfig
     - gcc-gfortran
     - lapack-devel
