@@ -64,7 +64,8 @@ containing this very file).  Then issue the following commands::
     $ veewee vbox build --auto SLC5.9
     $ veewee vbox export SLC5.9
 
-The Vagrant box is located in the current working directory.
+The Vagrant box is located in the current working directory.  Building the
+box takes approximately 25 minutes.
 
 
 Updating the Vagrant box
