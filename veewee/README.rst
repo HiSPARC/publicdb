@@ -8,30 +8,23 @@ Vagrant box.
 Installing Veewee
 -----------------
 
-The installation instructions included with Veewee encourage you to use
-one of several tools to isolate the Veewee gem (a gem is Ruby's equivalent
-of a Python package) in a virtualenv.  That did not work for me,
-unfortunately.  I gave up and installed Veewee system-wide.  This option
-is not included in the documentation.  You are encouraged by the Veewee
-team to build Veewee from source.  On a Mac, you might want to use the
-Homebrewed version of Ruby, not the system default::
+Veewee is written in Ruby.  On a Mac, you might want to use the Homebrewed
+version of Ruby, not the system default::
 
     $ brew install ruby
 
-To clone the Veewee repository::
+On GNU/Linux, Ruby is probably already installed.
 
-    $ git clone https://github.com/jedi4ever/veewee.git
+The installation instructions included with Veewee encourage you to use
+one of several tools to isolate the Veewee gem (a gem is Ruby's equivalent
+of a Python package) in a virtualenv.  That did not work for me,
+unfortunately.  I gave up and installed Veewee system-wide::
 
-To build the gem::
-
-    $ cd veewee/
-    $ gem build veewee.gemspec
-    $ gem install veewee-0.3.7.gem
+    $ gem install veewee
 
 To verify that the binary is in the correct place and included in your
 PATH::
 
-    $ cd
     $ which veewee
 
 
@@ -48,7 +41,8 @@ In a pristine publicdb repository, the veewee directory looks like::
             ├── ks.cfg
             └── postinstall.sh
 
-The definitions were originally created using::
+The definitions were originally created using (you don't have to run
+this!)::
 
     $ veewee vbox define SLC5.9 'scientificlinux-5.9-x86_64'
 
