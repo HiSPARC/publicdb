@@ -179,7 +179,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 
 
 def network_coincidences(request, year=None, month=None, day=None):
-    """Show daily histograms for a particular station"""
+    """Show daily coincidences histograms for the entire network"""
 
     # Redirect to latest date with data if no date is given
     if year is None:

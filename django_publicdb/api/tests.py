@@ -11,6 +11,7 @@ from django_publicdb.histograms.models import *
 
 
 def is_json(response):
+    """Check if the response is OK and of type application/json"""
 
     for left, right in [(response.getcode(), 200),
                         (response.info().getmaintype(), "application"),
@@ -22,13 +23,7 @@ def is_json(response):
 
 
 class ViewsTestCase(LiveServerTestCase):
-    fixtures = [
-        'tests_inforecords',
-        'tests_histograms']
-
-    #--------------------------------------------------------------------------
-    # Setup and teardown
-    #--------------------------------------------------------------------------
+    fixtures = ['tests_inforecords', 'tests_histograms']
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
@@ -36,20 +31,12 @@ class ViewsTestCase(LiveServerTestCase):
     def tearDown(self):
         super(ViewsTestCase, self).tearDown()
 
-    #--------------------------------------------------------------------------
-    # Helper functions
-    #--------------------------------------------------------------------------
-
     def check_and_get_response(self, url):
         response = urllib.urlopen("%s/api%s" % (self.live_server_url, url))
 
-        assert(is_json(response))
+        self.assertTrue(is_json(response))
 
         return response
-
-    #--------------------------------------------------------------------------
-    # Tests
-    #--------------------------------------------------------------------------
 
     def test_station_501(self, ):
         self.check_and_get_response("/station/501")
