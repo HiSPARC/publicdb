@@ -10,7 +10,7 @@
     - zlib-devel
     - openssl-devel
     - readline-devel
-    - sqlite3-devel
+    - sqlite-devel
     - pkgconfig
     - gcc-gfortran
     - lapack-devel
