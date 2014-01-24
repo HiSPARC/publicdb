@@ -1,98 +1,60 @@
-# Python
 import datetime
 import time
-import string
-import sys
 import os
 import code
-import logging
 
 import tables
 import numpy
 
-# Django
 from django.conf import settings
 from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
-# Publicdb
 from lib.test import datastore as test_datastore
 from django_publicdb.histograms import models, datastore, jobs, esd
 import fit_pulseheight_peak
 
+
+DATE1 = datetime.date(2011, 7, 7)
+DATE2 = datetime.date(2012, 5, 16)
+STATION = 501
+
+
 class BaseHistogramsTestCase(TransactionTestCase):
 
-    fixtures = [
-        'tests_inforecords'
-    ]
-
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
+    fixtures = ['tests_inforecords']
 
     def setUp(self):
 
-        #-----------------------------------------------------------------------
         # Contents
-        # 1. Setup test datastore directory
+        # 1. Setup test datastore
         # 2. Download data
         # 3. Reset last updated state
         # 4. Base class setUp()
-        #-----------------------------------------------------------------------
 
-        #-----------------------------------------------------------------------
         # 1. Setup test datastore
         #
         # The tests require a data file. We will download some data and put it
         # in a test directory. It needs to be writable by the user who initiates
         # the tests.
-        #-----------------------------------------------------------------------
 
         self.original_datastore_path = settings.DATASTORE_PATH
+        path = os.path.join(settings.TEST_DATASTORE_PATH, "histograms")
+        test_datastore.setup_test_datastore_directory(path)
 
-        test_datastore.setup_test_datastore_directory(os.path.join(
-            settings.TEST_DATASTORE_PATH,
-            "histograms"
-        ))
-
-        #-----------------------------------------------------------------------
         # 2. Download data
         #
-        # Data for: station 501 on 16 May 2012
-        #           station 501 on 7 July 2011
-        #-----------------------------------------------------------------------
-
-        # Download real data of station 501 on 16 May 2012, which also
-        # include weather data and configuration update.
-
-        date = datetime.date(2012, 5, 16)
-        file = test_datastore.get_datafile_path(date)
-
-        if not os.path.exists(file):
-            test_datastore.download_data_station(501, date, get_blobs=True)
-
-        self.assertTrue(os.path.exists(file))
-
-        try:
-            data = tables.openFile(file, "r")
-        except Exception:
-            self.assertTrue(False)
-
-        self.assertEqual(
-            len(data.root.hisparc.cluster_amsterdam.station_501.events),
-            6843
-        )
-
-        data.close()
+        # Data for: station 501 on 7 July 2011
+        #           station 501 on 16 May 2012
 
         # Download real data of station 501 on 7 July 2011, which has
         # data where we can fit the pulseheight MPV.
 
-        date = datetime.date(2011, 7, 7)
+        date = DATE1
         file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            test_datastore.download_data_station(501, date, get_blobs=True)
+            test_datastore.download_data_station(STATION, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 
@@ -101,28 +63,41 @@ class BaseHistogramsTestCase(TransactionTestCase):
         except Exception:
             self.assertTrue(False)
 
-        self.assertEqual(
-            len(data.root.hisparc.cluster_amsterdam.station_501.events),
-            63322
-        )
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 63322)
 
         data.close()
 
-        #-----------------------------------------------------------------------
+        # Download real data of station 501 on 16 May 2012, which also
+        # include weather data and configuration update.
+
+        date = DATE2
+        file = test_datastore.get_datafile_path(date)
+
+        if not os.path.exists(file):
+            test_datastore.download_data_station(STATION, date, get_blobs=True)
+
+        self.assertTrue(os.path.exists(file))
+
+        try:
+            data = tables.openFile(file, "r")
+        except Exception:
+            self.assertTrue(False)
+
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 6843)
+
+        data.close()
+
         # 3. Reset last updated state
         #
         # Reset generator state such that it will always update when new files
         # are found
-        #-----------------------------------------------------------------------
 
         state = models.GeneratorState.objects.get()
         state.update_last_run = datetime.datetime.fromtimestamp(0)
         state.check_last_run = datetime.datetime.fromtimestamp(0)
         state.save()
 
-        #-----------------------------------------------------------------------
         # 4. Base class setUp()
-        #-----------------------------------------------------------------------
 
         super(BaseHistogramsTestCase, self).setUp()
 
@@ -131,19 +106,11 @@ class BaseHistogramsTestCase(TransactionTestCase):
 
         settings.DATASTORE_PATH = self.original_datastore_path
 
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
-
     #def test_interactive_shell(self, ):
     #    code.interact(local=dict(globals(), **locals()))
 
 
 class DatastoreTestCase(BaseHistogramsTestCase):
-
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
 
     def setUp(self):
         super(DatastoreTestCase, self).setUp()
@@ -151,13 +118,10 @@ class DatastoreTestCase(BaseHistogramsTestCase):
     def tearDown(self):
         super(DatastoreTestCase, self).tearDown()
 
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
-
     def test_datastore_check_for_new_events(self):
-        """ Check for new events when the timestamp is 0. Since this corresponds
-            to 1 January 1970, this should return at least 1 result.
+        """ Check for new events when the timestamp is 0. Since this
+            corresponds to 1 January 1970, this should return at least 1
+            result.
         """
 
         last_check_time = time.mktime(datetime.date.fromtimestamp(0).timetuple())
@@ -168,7 +132,7 @@ class DatastoreTestCase(BaseHistogramsTestCase):
 
     def test_datastore_check_for_new_events_at_the_end_of_epoch(self):
         """ Check for new events when the timestamp is 2**31 - 1. Since this
-            corresponds to 1 January 1970, this should return zero results,
+            corresponds to 19 January 2038, this should return zero results,
             unless we are in or past the year 2038.
         """
 
@@ -181,19 +145,11 @@ class DatastoreTestCase(BaseHistogramsTestCase):
 
 class CheckForUpdatesTestCase(BaseHistogramsTestCase):
 
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
-
     def setUp(self):
         super(CheckForUpdatesTestCase, self).setUp()
 
     def tearDown(self):
         super(CheckForUpdatesTestCase, self).tearDown()
-
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
 
     def test_jobs_check_for_updates(self):
         """ Cross-checks the number of Summaries given by the datastore function
@@ -252,28 +208,17 @@ class CheckForUpdatesTestCase(BaseHistogramsTestCase):
 
 class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
-    fixtures = [
-        'tests_inforecords',
-        'tests_histograms'
-    ]
-
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
+    fixtures = ['tests_inforecords', 'tests_histograms']
 
     def setUp(self):
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Initialize work space
         # 2. Make sure there is an ESD (event summary data) file
-        #-----------------------------------------------------------------------
 
-        #-----------------------------------------------------------------------
         # 1. Initialize work space
         # Download data files
         # Empty all fits (there should be none beforehand)
-        #-----------------------------------------------------------------------
 
         # Download data files and setup the test datastore
         super(JobsPulseheightFitTestCase, self).setUp()
@@ -281,13 +226,11 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # Empty all fits
         models.PulseheightFit.objects.all().delete()
 
-        #-----------------------------------------------------------------------
         # 2. Make sure there is an ESD (event summary data) file
-        #-----------------------------------------------------------------------
 
         # When it already exists, do nothing.
 
-        if os.path.exists(esd.get_esd_data_path(datetime.date(2011, 7, 7))):
+        if os.path.exists(esd.get_esd_data_path(DATE1)):
             return
 
         # If it doesn't exist yet, generate the ESD file. This is done in
@@ -297,14 +240,13 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
         # jobs.check_for_updates
 
-        models.Summary.objects.filter(date__gte=datetime.date(2011, 7, 7)).delete()
+        models.Summary.objects.filter(date__gte=DATE1).delete()
 
         self.assertTrue(jobs.check_for_updates())
 
         # jobs.update_esd
 
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
         self.assertTrue(summary.needs_update)
 
@@ -313,24 +255,17 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
     def tearDown(self):
         super(JobsPulseheightFitTestCase, self).tearDown()
 
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
-
     def test_jobs_update_pulseheight_fit_normal(self, ):
         """ When everything is ok, in the end there should be 4 fits in the database
         """
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Initialize work space
         # 2. Try to fit data
         # 3. Validate output
-        #-----------------------------------------------------------------------
 
         # 1. Initialize work space
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
         # 2. Try to fit data
         jobs.update_pulseheight_fit(summary)
@@ -343,23 +278,19 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         self.assertEqual(len(fits), 4)
 
     def test_jobs_update_pulseheight_fit_no_config(self):
-        """ When there is no config, no fit should have been made
-        """
+        """ When there is no config, no fit should have been made"""
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Initialize work space
         # 2. Try to fit data, although there is no configuration.
         # 3. Validate output
-        #-----------------------------------------------------------------------
 
         # 1. Initialize work space
         # Delete all configurations
 
         models.Configuration.objects.all().delete()
 
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
         # 2. Try to fit data, although there is no configuration.
         # Configuration data contains info on whether there are two plates or
@@ -375,39 +306,23 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         self.assertEqual(len(fits), 0)
 
     def test_jobs_save_pulseheight_fit_normal(self):
-        """ Saving a PulseheightFit in normal conditions
-        """
+        """ Saving a PulseheightFit in normal conditions"""
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Initialize work space
         # 2. Create and save fits
         # 3. Validate output
-        #-----------------------------------------------------------------------
 
         # 1. Initialize work space
-
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
         # 2. Create and save fits
-
-        fits = []
-        for numberOfPlate in range(1, 5):
-            fits.append(
-                models.PulseheightFit(
-                    source = summary,
-                    plate = int(numberOfPlate),
-
-                    initial_mpv = 1,
-                    initial_width = 2,
-
-                    fitted_mpv = 3,
-                    fitted_mpv_error = 4,
-                    fitted_width = 5,
-                    fitted_width_error = 6,
-
-                    chi_square_reduced = 7))
+        fits = [models.PulseheightFit(source=summary, plate=detector_n,
+                                      initial_mpv=1, initial_width=2,
+                                      fitted_mpv=3, fitted_mpv_error=4,
+                                      fitted_width=5, fitted_width_error=6,
+                                      chi_square_reduced=7)
+                for detector_n in [1, 2, 3, 4]]
 
         jobs.save_pulseheight_fits(summary, fits)
 
@@ -419,107 +334,53 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
     def test_jobs_save_pulseheight_fit_no_fits(self):
         """ Saving no fits should do nothing
+
+        The second argument of save_pulseheight_fits is expected to be a list
+        of histograms.models.PulseheightFit. Instead we pass it an empty list
+        denoting no fit results. No fits in the database are expected.
+
         """
-
-        #-----------------------------------------------------------------------
-        # Contents
-        # 1. Initialize work space
-        # 2. Save empty fit results
-        # 3. Validate output
-        #-----------------------------------------------------------------------
-
-        # 1. Initialize work space
-
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
-
-        # 2. Save empty fit results
-        # The second argument of save_pulseheight_fits is expected to be a list
-        # of histograms.models.PulseheightFit. Instead we pass it an empty list
-        # denoting no fit results.
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
         jobs.save_pulseheight_fits(summary, [])
-
-        # 3. Validate output
-        # No fits in the database are expected
-
         fits = models.PulseheightFit.objects.all()
+
         self.assertEqual(len(fits), 0)
 
     def test_jobs_save_pulseheight_fit_update(self):
         """ Updating a PulseheightFit should be reflected in the database
+
+        Try to update an existing fit. What matters is that the source and
+        detector are the same, as the pair is defined to be unique in the table.
+
         """
+        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
 
-        #-----------------------------------------------------------------------
-        # Contents
-        # 1. Initialize work space
-        # 2. Create and save a fit into the database
-        # 3. Update fit
-        # 4. Validate output
-        #-----------------------------------------------------------------------
+        detector_n = 1
 
-        #-----------------------------------------------------------------------
-        # 1. Initialize work space
-        #-----------------------------------------------------------------------
-
-        summary = models.Summary.objects.get(station__number=501,
-                                             date = datetime.date(2011, 7, 7))
-
-        numberOfPlate = 1
-
-        #-----------------------------------------------------------------------
-        # 2. Create and save a fit into the database
-        #-----------------------------------------------------------------------
-
-        fit = models.PulseheightFit(
-            source = summary,
-            plate = int(numberOfPlate),
-
-            initial_mpv = 1,
-            initial_width = 2,
-
-            fitted_mpv = 3,
-            fitted_mpv_error = 4,
-            fitted_width = 5,
-            fitted_width_error = 6,
-
-            chi_square_reduced = 7)
+        fit = models.PulseheightFit(source=summary, plate=detector_n,
+                                    initial_mpv=1, initial_width=2,
+                                    fitted_mpv=3, fitted_mpv_error=4,
+                                    fitted_width=5, fitted_width_error=6,
+                                    chi_square_reduced=7)
 
         fit.save()
 
-        #-----------------------------------------------------------------------
-        # 3. Update fit
-        #-----------------------------------------------------------------------
-
-        # Try to update an existing fit. What matters is that the source and
-        # plate are the same, as the pair is defined to be unique in the table.
-
-        fits = models.PulseheightFit.objects.filter(source = summary)
+        fits = models.PulseheightFit.objects.filter(source=summary)
         self.assertEqual(len(fits), 1)
 
         fits[0].initial_mpv = 10
 
         jobs.save_pulseheight_fits(summary, fits)
 
-        #-----------------------------------------------------------------------
-        # 4. Validate output
-        #-----------------------------------------------------------------------
-
-        fits = models.PulseheightFit.objects.filter(source = summary)
+        fits = models.PulseheightFit.objects.filter(source=summary)
         self.assertEqual(len(fits), 1)
         self.assertEqual(fits[0].initial_mpv, 10.0)
 
 
 class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
-    fixtures = [
-        'tests_inforecords',
-        'tests_histograms'
-    ]
-
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
+    fixtures = ['tests_inforecords', 'tests_histograms']
 
     def setUp(self):
         # Download data files and setup the test datastore
@@ -531,10 +392,6 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
     def tearDown(self):
         super(UpdateAllHistogramsTestCase, self).tearDown()
-
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
 
     def test_jobs_update_all_histograms_while_update_is_running(self):
         """ When an update_all_histograms() is already running, a second call
@@ -554,35 +411,28 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             the pulseheight mpv.
         """
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Prepare tables
         # 2. Update only 1 station
         # 3. Run updates for that one station
         # 4. Validate output
-        #-----------------------------------------------------------------------
 
-        #-----------------------------------------------------------------------
         # 1. Prepare tables
-        #-----------------------------------------------------------------------
-
-        models.Summary.objects.filter(date__gte=datetime.date(2011, 7, 7)).delete()
+        models.Summary.objects.filter(date__gte=DATE1).delete()
 
         # Set the needs_update_x fields
         self.assertTrue(jobs.check_for_updates())
 
-        #-----------------------------------------------------------------------
         # 2. Update only 1 station
         #
         # Make sure there is only 1 station that needs to be updated
         # 2.1. Pick one summary
         # 2.2. Set all other summaries such that they don't need to be updated
-        #-----------------------------------------------------------------------
 
         # 2.1. Pick one summary
         # Should be for station 501 on 7 June 2011.
 
-        summaries = models.Summary.objects.filter(date=datetime.date(2011, 7, 7))
+        summaries = models.Summary.objects.filter(date=DATE1)
 
         self.assertEqual(len(summaries), 1)
 
@@ -599,9 +449,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             summary.needs_update_weather = False
             summary.save()
 
-        #-----------------------------------------------------------------------
         # 3. Run updates for that one station
-        #-----------------------------------------------------------------------
 
         self.assertTrue(jobs.update_all_histograms())
 
@@ -610,17 +458,14 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertEqual(len(models.Summary.objects.filter(needs_update=True)), 0)
 
-        #-----------------------------------------------------------------------
         # 4. Validate output
-        #-----------------------------------------------------------------------
 
         # Check for pulseheight, pulseintegral and eventtime histograms
         # This means there should be three entries in the DailyHistogram table.
 
         histograms = models.DailyHistogram.objects.filter(
-            source__station__number=501,
-            source__date=datetime.date(2011, 7, 7)
-        )
+                source__station__number=STATION, source__date=DATE1)
+
         self.assertEqual(len(histograms), 3)
 
         for h in histograms:
@@ -640,9 +485,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # This means there should be two entries in the DailyDataset table.
 
         datasets = models.DailyDataset.objects.filter(
-            source__station__number=501,
-            source__date=datetime.date(2011, 7, 7)
-        )
+                source__station__number=STATION, source__date=DATE1)
+
         self.assertEqual(len(datasets), 2)
 
         for d in datasets:
@@ -655,36 +499,30 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             but the events data does not contain sufficient events to do a fit.
         """
 
-        #-----------------------------------------------------------------------
         # Contents
         # 1. Prepare tables
         # 2. Update only 1 station
         # 3. Run updates for that one station
         # 4. Validate output
-        #-----------------------------------------------------------------------
 
-        #-----------------------------------------------------------------------
         # 1. Prepare tables
-        #-----------------------------------------------------------------------
 
-        models.Summary.objects.filter(date__gte=datetime.date(2012, 5, 16)).delete()
+        models.Summary.objects.filter(date__gte=DATE2).delete()
 
         # Set the needs_update_x fields
         self.assertTrue(jobs.check_for_updates())
 
-        #-----------------------------------------------------------------------
         # 2. Update only 1 station
         #
         # Make sure there is only 1 station that needs to be updated
         # 2.1. Pick one summary
         # 2.2. Set all other summaries such that they don't need to be updated
         # 2.3. Set the chosen summary to be updated
-        #-----------------------------------------------------------------------
 
         # 2.1. Pick one summary
         # Should be for station 501 on 16 May 2012.
 
-        summaries = models.Summary.objects.filter(date=datetime.date(2012, 5, 16))
+        summaries = models.Summary.objects.filter(date=DATE2)
 
         self.assertTrue(len(summaries) > 0)
 
@@ -709,9 +547,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         summary = summaries[0]
 
-        #-----------------------------------------------------------------------
         # 3. Run updates for that one station
-        #-----------------------------------------------------------------------
 
         self.assertTrue(jobs.update_all_histograms())
 
@@ -720,17 +556,14 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertEqual(len(models.Summary.objects.filter(needs_update=True)), 0)
 
-        #-----------------------------------------------------------------------
         # 4. Validate output
-        #-----------------------------------------------------------------------
 
         # Check for pulseheight, pulseintegral and eventtime histograms.
         # This means there should be three entries in the DailyHistogram table.
 
         histograms = models.DailyHistogram.objects.filter(
-            source__station__number=501,
-            source__date=datetime.date(2012, 5, 16)
-        )
+                source__station__number=STATION, source__date=DATE2)
+
         self.assertEqual(len(histograms), 3)
 
         for h in histograms:
@@ -739,9 +572,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # Check for config
 
         config = models.Configuration.objects.filter(
-            source__station__number=501,
-            source__date=datetime.date(2012, 5, 16)
-        )
+                source__station__number=STATION, source__date=DATE2)
+
         self.assertEqual(len(config), 1)
         self.assertEqual(config[0].source, test_summary)
 
@@ -749,9 +581,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # This means there should be two entries in the DailyDataset table.
 
         datasets = models.DailyDataset.objects.filter(
-            source__station__number=501,
-            source__date=datetime.date(2012, 5, 16)
-        )
+                source__station__number=STATION, source__date=DATE2)
+
         self.assertEqual(len(datasets), 2)
 
         for d in datasets:
@@ -775,6 +606,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
 
 class PulseheightFitErrorsTestCase(TestCase):
+
     def test_empty_data(self):
         fit = models.PulseheightFit()
 
