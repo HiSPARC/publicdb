@@ -39,8 +39,11 @@ def get_updated_files(rootdir, last_check_time):
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
                     if mtime >= last_check_time:
-                        date = datetime.datetime.strptime(
-                                    file, '%Y_%m_%d.h5').date()
+                        try:
+                            date = datetime.datetime.strptime(
+                                        file, '%Y_%m_%d.h5').date()
+                        except ValueError:
+                            continue
                         if date != datetime.date.today():
                             file_list.append((date, file_path))
 
