@@ -33,7 +33,6 @@ class BaseHistogramsTestCase(TransactionTestCase):
         # 4. Base class setUp()
 
         # 1. Setup test datastore
-        #
         # The tests require a data file. We will download some data and put it
         # in a test directory. It needs to be writable by the user who initiates
         # the tests.
@@ -43,10 +42,6 @@ class BaseHistogramsTestCase(TransactionTestCase):
         test_datastore.setup_test_datastore_directory(path)
 
         # 2. Download data
-        #
-        # Data for: station 501 on 7 July 2011
-        #           station 501 on 16 May 2012
-
         # Download real data of station 501 on 7 July 2011, which has
         # data where we can fit the pulseheight MPV.
 
@@ -64,6 +59,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
             self.assertTrue(False)
 
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 63322)
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.weather.nrows, 26317)
 
         data.close()
 
@@ -84,11 +80,12 @@ class BaseHistogramsTestCase(TransactionTestCase):
             self.assertTrue(False)
 
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 6843)
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.weather.nrows, 25918)
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.config.nrows, 1)
 
         data.close()
 
         # 3. Reset last updated state
-        #
         # Reset generator state such that it will always update when new files
         # are found
 
