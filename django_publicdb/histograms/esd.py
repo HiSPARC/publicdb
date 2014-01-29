@@ -21,7 +21,7 @@ logger = logging.getLogger('histograms.esd')
 
 # Limit the coincidence window to 1 microsecond,
 # to prevent coincidental coincidences to become more dominant.
-COINCIDENCE_WINDOW = 1000  # nanoseconds
+COINCIDENCE_WINDOW = 2000  # nanoseconds
 
 
 class ProcessEventsFromSource(process_events.ProcessEvents):
