@@ -32,22 +32,19 @@ def setup_test_datastore_directory(datastore_path):
 
 
 def get_datafile_path(date):
-    return os.path.join(settings.DATASTORE_PATH,
-                        '%d/%d' % (date.year, date.month),
-                        '%d_%d_%d.h5' % (date.year, date.month, date.day))
+    path = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(settings.DATASTORE_PATH, path)
 
 
 def download_data_station(station_number, date, get_blobs=False):
     station = inforecords.models.Station.objects.get(number=station_number)
 
-    file = get_datafile_path(date)
-
     f = download_test_datastore.open_or_create_file(settings.DATASTORE_PATH,
                                                     date)
-
     download_test_datastore.download_and_store_station_data(f, station,
                                                             date, get_blobs)
-
     f.close()
+
+    file = get_datafile_path(date)
 
     return file

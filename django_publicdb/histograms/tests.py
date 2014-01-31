@@ -16,7 +16,8 @@ from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
 from lib.test import datastore as test_datastore
-from django_publicdb.histograms import models, datastore, jobs, esd
+from django_publicdb.histograms import datastore, jobs, esd
+from django_publicdb.histograms.models import *
 import fit_pulseheight_peak
 
 
@@ -25,7 +26,8 @@ histograms_logger.setLevel(logging.INFO)
 
 DATE1 = datetime.date(2011, 7, 7)
 DATE2 = datetime.date(2012, 5, 16)
-STATION = 501
+STATION1 = 501
+STATION2 = 502
 
 
 class BaseHistogramsTestCase(TransactionTestCase):
@@ -55,24 +57,27 @@ class BaseHistogramsTestCase(TransactionTestCase):
         test_datastore.setup_test_datastore_directory(path)
 
         # 2. Download data
-        # Download real data of station 501 on 7 July 2011, which has
-        # data where we can fit the pulseheight MPV.
+        # Download real data of station 501 and 502 on 7 July 2011
+        # Here is data where we can fit the pulseheight MPV
+        # And we get two stations to find coincidences
 
         date = DATE1
         file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            test_datastore.download_data_station(STATION, date, get_blobs=True)
+            test_datastore.download_data_station(STATION1, date, get_blobs=True)
+            test_datastore.download_data_station(STATION2, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 
         try:
             data = tables.openFile(file, "r")
         except Exception:
-            self.assertTrue(False)
+            self.fail()
 
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 63322)
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.weather.nrows, 26317)
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_502.events.nrows, 55967)
 
         data.close()
 
@@ -83,14 +88,14 @@ class BaseHistogramsTestCase(TransactionTestCase):
         file = test_datastore.get_datafile_path(date)
 
         if not os.path.exists(file):
-            test_datastore.download_data_station(STATION, date, get_blobs=True)
+            test_datastore.download_data_station(STATION1, date, get_blobs=True)
 
         self.assertTrue(os.path.exists(file))
 
         try:
             data = tables.openFile(file, "r")
         except Exception:
-            self.assertTrue(False)
+            self.fail()
 
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.events.nrows, 6843)
         self.assertEqual(data.root.hisparc.cluster_amsterdam.station_501.weather.nrows, 25918)
@@ -102,7 +107,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
         # Reset generator state such that it will always update when new files
         # are found
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         state.update_last_run = datetime.datetime.fromtimestamp(0)
         state.check_last_run = datetime.datetime.fromtimestamp(0)
         state.save()
@@ -138,7 +143,7 @@ class DatastoreTestCase(BaseHistogramsTestCase):
 
         event_summary = datastore.check_for_new_events(last_check_time)
 
-        self.assertTrue(len(event_summary) > 0)
+        self.assertTrue(len(event_summary))
 
     def test_datastore_check_for_new_events_at_the_end_of_epoch(self):
         """ Check for new events when the timestamp is 2**31 - 1. Since this
@@ -170,31 +175,30 @@ class CheckForUpdatesTestCase(BaseHistogramsTestCase):
         self.assertTrue(jobs.check_for_updates())
 
         last_check_time = time.mktime(datetime.date.fromtimestamp(0).timetuple())
-        event_summary   = datastore.check_for_new_events(last_check_time)
+        event_summary = datastore.check_for_new_events(last_check_time)
 
         self.assertTrue(len(event_summary))
 
         # Cross-check event_summary with the database Summary
 
         count_need_updates = 0
-
         for date, station_list in event_summary.iteritems():
             for station, table_list in station_list.iteritems():
                 if len(table_list) > 0:
                     count_need_updates += 1
 
-        s = models.Summary.objects.filter(needs_update=True)
+        summaries_need_update = Summary.objects.filter(needs_update=True).count()
 
-        #code.interact(local=dict(globals(), **locals()))
+        # code.interact(local=dict(globals(), **locals()))
 
-        self.assertEqual(count_need_updates, len(s))
+        self.assertEqual(count_need_updates, summaries_need_update)
 
     def test_jobs_check_for_updates_while_check_is_running(self):
         """ When an check_for_updates() is already running, a second call
             to check_for_updates() should return False.
         """
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         state.check_is_running = True
         state.save()
 
@@ -205,15 +209,15 @@ class CheckForUpdatesTestCase(BaseHistogramsTestCase):
             should be set to be updated. Unless we are past 2038..
         """
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         state.check_last_run = datetime.datetime.fromtimestamp(2**31-1)
         state.save()
 
         self.assertTrue(jobs.check_for_updates())
 
-        s = models.Summary.objects.filter(needs_update=True)
+        summaries_need_update = Summary.objects.filter(needs_update=True).count()
 
-        self.assertEqual(len(s), 0)
+        self.assertEqual(summaries_need_update, 0)
 
 
 class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
@@ -234,12 +238,9 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         super(JobsPulseheightFitTestCase, self).setUp()
 
         # Empty all fits
-        models.PulseheightFit.objects.all().delete()
+        PulseheightFit.objects.all().delete()
 
         # 2. Make sure there is an ESD (event summary data) file
-
-        # When it already exists, do nothing.
-
         if os.path.exists(esd.get_esd_data_path(DATE1)):
             return
 
@@ -250,13 +251,13 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
         # jobs.check_for_updates
 
-        models.Summary.objects.filter(date__gte=DATE1).delete()
+        Summary.objects.filter(date__gte=DATE1).delete()
 
         self.assertTrue(jobs.check_for_updates())
 
         # jobs.update_esd
 
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         self.assertTrue(summary.needs_update)
 
@@ -265,7 +266,7 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
     def tearDown(self):
         super(JobsPulseheightFitTestCase, self).tearDown()
 
-    def test_jobs_update_pulseheight_fit_normal(self, ):
+    def test_jobs_update_pulseheight_fit_normal(self):
         """ When everything is ok, in the end there should be 4 fits in the database
         """
 
@@ -275,7 +276,7 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # 3. Validate output
 
         # 1. Initialize work space
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         # 2. Try to fit data
         jobs.update_pulseheight_fit(summary)
@@ -283,9 +284,9 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # 3. Validate output
         # Four fits are expected
 
-        fits = models.PulseheightFit.objects.all()
+        fits = PulseheightFit.objects.all().count()
 
-        self.assertEqual(len(fits), 4)
+        self.assertEqual(fits, 4)
 
     def test_jobs_update_pulseheight_fit_no_config(self):
         """ When there is no config, no fit should have been made"""
@@ -298,9 +299,9 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # 1. Initialize work space
         # Delete all configurations
 
-        models.Configuration.objects.all().delete()
+        Configuration.objects.all().delete()
 
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         # 2. Try to fit data, although there is no configuration.
         # Configuration data contains info on whether there are two plates or
@@ -311,9 +312,9 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # 3. Validate output
         # No fits are expected
 
-        fits = models.PulseheightFit.objects.all()
+        fits = PulseheightFit.objects.all().count()
 
-        self.assertEqual(len(fits), 0)
+        self.assertEqual(fits, 0)
 
     def test_jobs_save_pulseheight_fit_normal(self):
         """ Saving a PulseheightFit in normal conditions"""
@@ -324,21 +325,21 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         # 3. Validate output
 
         # 1. Initialize work space
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         # 2. Create and save fits
-        fits = [models.PulseheightFit(source=summary, plate=detector_n,
-                                      initial_mpv=1, initial_width=2,
-                                      fitted_mpv=3, fitted_mpv_error=4,
-                                      fitted_width=5, fitted_width_error=6,
-                                      chi_square_reduced=7)
+        fits = [PulseheightFit(source=summary, plate=detector_n,
+                               initial_mpv=1, initial_width=2,
+                               fitted_mpv=3, fitted_mpv_error=4,
+                               fitted_width=5, fitted_width_error=6,
+                               chi_square_reduced=7)
                 for detector_n in [1, 2, 3, 4]]
 
         jobs.save_pulseheight_fits(summary, fits)
 
         # 3. Validate output
 
-        fits = models.PulseheightFit.objects.filter(source = summary)
+        fits = PulseheightFit.objects.filter(source = summary)
         self.assertEqual(len(fits), 4)
         self.assertEqual(fits[0].initial_mpv, 1.0)
 
@@ -350,12 +351,12 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         denoting no fit results. No fits in the database are expected.
 
         """
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         jobs.save_pulseheight_fits(summary, [])
-        fits = models.PulseheightFit.objects.all()
+        fits = PulseheightFit.objects.all().count()
 
-        self.assertEqual(len(fits), 0)
+        self.assertEqual(fits, 0)
 
     def test_jobs_save_pulseheight_fit_update(self):
         """ Updating a PulseheightFit should be reflected in the database
@@ -364,11 +365,11 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         detector are the same, as the pair is defined to be unique in the table.
 
         """
-        summary = models.Summary.objects.get(station__number=STATION, date=DATE1)
+        summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         detector_n = 1
 
-        fit = models.PulseheightFit(source=summary, plate=detector_n,
+        fit = PulseheightFit(source=summary, plate=detector_n,
                                     initial_mpv=1, initial_width=2,
                                     fitted_mpv=3, fitted_mpv_error=4,
                                     fitted_width=5, fitted_width_error=6,
@@ -376,14 +377,14 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
         fit.save()
 
-        fits = models.PulseheightFit.objects.filter(source=summary)
+        fits = PulseheightFit.objects.filter(source=summary)
         self.assertEqual(len(fits), 1)
 
         fits[0].initial_mpv = 10
 
         jobs.save_pulseheight_fits(summary, fits)
 
-        fits = models.PulseheightFit.objects.filter(source=summary)
+        fits = PulseheightFit.objects.filter(source=summary)
         self.assertEqual(len(fits), 1)
         self.assertEqual(fits[0].initial_mpv, 10.0)
 
@@ -396,9 +397,9 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # Download data files and setup the test datastore
         super(UpdateAllHistogramsTestCase, self).setUp()
 
-        models.DailyHistogram.objects.all().delete()
-        models.DailyDataset.objects.all().delete()
-        models.PulseheightFit.objects.all().delete()
+        DailyHistogram.objects.all().delete()
+        DailyDataset.objects.all().delete()
+        PulseheightFit.objects.all().delete()
         self.redirect_stdout_stderr_to_devnull()
 
     def tearDown(self):
@@ -410,7 +411,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             to update_all_histograms() should return False.
         """
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         state.update_is_running = True
         state.save()
 
@@ -430,29 +431,21 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # 4. Validate output
 
         # 1. Prepare tables
-        models.Summary.objects.filter(date__gte=DATE1).delete()
+        Summary.objects.filter(date__gte=DATE1).delete()
 
         # Set the needs_update_x fields
         self.assertTrue(jobs.check_for_updates())
 
         # 2. Update only 1 station
         #
-        # Make sure there is only 1 station that needs to be updated
-        # 2.1. Pick one summary
-        # 2.2. Set all other summaries such that they don't need to be updated
-
-        # 2.1. Pick one summary
-        # Should be for station 501 on 7 June 2011.
-
-        summaries = models.Summary.objects.filter(date=DATE1)
-
+        # Pick one summary, set all other summaries such that they don't
+        # need to be updated.
+        summaries = Summary.objects.filter(station__number=STATION1, date=DATE1)
         self.assertEqual(len(summaries), 1)
 
         test_summary = summaries[0]
 
-        # 2.2. Set all other summaries such that they don't need to be updated
-
-        summaries = models.Summary.objects.exclude(id=test_summary.id)
+        summaries = Summary.objects.exclude(id=test_summary.id)
 
         for summary in summaries:
             summary.needs_update = False
@@ -465,18 +458,18 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertTrue(jobs.update_all_histograms())
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         self.assertEqual(state.update_is_running, False)
 
-        self.assertEqual(len(models.Summary.objects.filter(needs_update=True)), 0)
+        self.assertEqual(Summary.objects.filter(needs_update=True).count(), 0)
 
         # 4. Validate output
 
         # Check for pulseheight, pulseintegral and eventtime histograms
         # This means there should be three entries in the DailyHistogram table.
 
-        histograms = models.DailyHistogram.objects.filter(
-                source__station__number=STATION, source__date=DATE1)
+        histograms = DailyHistogram.objects.filter(
+                source__station__number=STATION1, source__date=DATE1)
 
         self.assertEqual(len(histograms), 3)
 
@@ -485,7 +478,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         # Check for pulseheight mpv fit
 
-        fits = models.PulseheightFit.objects.all()
+        fits = PulseheightFit.objects.all()
         self.assertEqual(len(fits), 4)
 
         self.assertTrue(222 < fits[0].fitted_mpv < 226)
@@ -496,8 +489,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # Check for temperature and barometer datasets
         # This means there should be two entries in the DailyDataset table.
 
-        datasets = models.DailyDataset.objects.filter(
-                source__station__number=STATION, source__date=DATE1)
+        datasets = DailyDataset.objects.filter(
+                source__station__number=STATION1, source__date=DATE1)
 
         self.assertEqual(len(datasets), 2)
 
@@ -519,30 +512,21 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         # 1. Prepare tables
 
-        models.Summary.objects.filter(date__gte=DATE2).delete()
+        Summary.objects.filter(date__gte=DATE2).delete()
 
         # Set the needs_update_x fields
         self.assertTrue(jobs.check_for_updates())
 
         # 2. Update only 1 station
         #
-        # Make sure there is only 1 station that needs to be updated
-        # 2.1. Pick one summary
-        # 2.2. Set all other summaries such that they don't need to be updated
-        # 2.3. Set the chosen summary to be updated
-
-        # 2.1. Pick one summary
-        # Should be for station 501 on 16 May 2012.
-
-        summaries = models.Summary.objects.filter(date=DATE2)
-
-        self.assertTrue(len(summaries) > 0)
+        # Pick one summary, set all other summaries such that they don't
+        # need to be updated.
+        summaries = Summary.objects.filter(station__number=STATION1, date=DATE2)
+        self.assertTrue(len(summaries), 1)
 
         test_summary = summaries[0]
 
-        # 2.2. Set all other summaries such that they don't need to be updated
-
-        summaries = models.Summary.objects.exclude(id=test_summary.id)
+        summaries = Summary.objects.exclude(id=test_summary.id)
 
         for summary in summaries:
             summary.needs_update = False
@@ -553,7 +537,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         # 2.3. Set the chosen summary to be updated
 
-        summaries = models.Summary.objects.filter(needs_update=True)
+        summaries = Summary.objects.filter(needs_update=True)
 
         self.assertEqual(len(summaries), 1)
 
@@ -563,18 +547,18 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertTrue(jobs.update_all_histograms())
 
-        state = models.GeneratorState.objects.get()
+        state = GeneratorState.objects.get()
         self.assertEqual(state.update_is_running, False)
 
-        self.assertEqual(len(models.Summary.objects.filter(needs_update=True)), 0)
+        self.assertEqual(Summary.objects.filter(needs_update=True).count(), 0)
 
         # 4. Validate output
 
         # Check for pulseheight, pulseintegral and eventtime histograms.
         # This means there should be three entries in the DailyHistogram table.
 
-        histograms = models.DailyHistogram.objects.filter(
-                source__station__number=STATION, source__date=DATE2)
+        histograms = DailyHistogram.objects.filter(
+                source__station__number=STATION1, source__date=DATE2)
 
         self.assertEqual(len(histograms), 3)
 
@@ -583,8 +567,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         # Check for config
 
-        config = models.Configuration.objects.filter(
-                source__station__number=STATION, source__date=DATE2)
+        config = Configuration.objects.filter(
+                source__station__number=STATION1, source__date=DATE2)
 
         self.assertEqual(len(config), 1)
         self.assertEqual(config[0].source, test_summary)
@@ -592,8 +576,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         # Check for temperature and barometer datasets
         # This means there should be two entries in the DailyDataset table.
 
-        datasets = models.DailyDataset.objects.filter(
-                source__station__number=STATION, source__date=DATE2)
+        datasets = DailyDataset.objects.filter(
+                source__station__number=STATION1, source__date=DATE2)
 
         self.assertEqual(len(datasets), 2)
 
@@ -633,20 +617,20 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 class PulseheightFitErrorsTestCase(TestCase):
 
     def test_empty_data(self):
-        fit = models.PulseheightFit()
+        fit = PulseheightFit()
 
         fit.error_message = ""
-        self.assertFalse(len(fit.error_message))
+        self.assertEqual(len(fit.error_message), 0)
 
         data = numpy.zeros(100)
         fit = fit_pulseheight_peak.fitPulseheightPeak(data)
         self.assertTrue(fit.error_message.count("Sum"))
 
     def test_data_low_average(self):
-        fit = models.PulseheightFit()
+        fit = PulseheightFit()
 
         fit.error_message = ""
-        self.assertFalse(len(fit.error_message))
+        self.assertEqual(len(fit.error_message), 0)
 
         data = numpy.random.normal(50, 5, 500)
         fit = fit_pulseheight_peak.fitPulseheightPeak(data)
