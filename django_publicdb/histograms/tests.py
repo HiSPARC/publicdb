@@ -53,6 +53,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
         # the tests.
 
         self.original_datastore_path = settings.DATASTORE_PATH
+        self.original_esd_path = settings.ESD_PATH
         path = os.path.join(settings.TEST_DATASTORE_PATH, "histograms")
         test_datastore.setup_test_datastore_directory(path)
 
@@ -120,8 +121,9 @@ class BaseHistogramsTestCase(TransactionTestCase):
         super(BaseHistogramsTestCase, self).tearDown()
 
         settings.DATASTORE_PATH = self.original_datastore_path
+        settings.ESD_PATH = self.original_esd_path
 
-    #def test_interactive_shell(self, ):
+    #def test_interactive_shell(self):
     #    code.interact(local=dict(globals(), **locals()))
 
 
@@ -134,11 +136,12 @@ class DatastoreTestCase(BaseHistogramsTestCase):
         super(DatastoreTestCase, self).tearDown()
 
     def test_datastore_check_for_new_events(self):
-        """ Check for new events when the timestamp is 0. Since this
-            corresponds to 1 January 1970, this should return at least 1
-            result.
-        """
+        """ Check for new events when the timestamp is 0.
 
+        Since this corresponds to 1 January 1970, this should return at
+        least 1 result.
+
+        """
         last_check_time = time.mktime(datetime.date.fromtimestamp(0).timetuple())
 
         event_summary = datastore.check_for_new_events(last_check_time)
@@ -146,11 +149,12 @@ class DatastoreTestCase(BaseHistogramsTestCase):
         self.assertTrue(len(event_summary))
 
     def test_datastore_check_for_new_events_at_the_end_of_epoch(self):
-        """ Check for new events when the timestamp is 2**31 - 1. Since this
-            corresponds to 19 January 2038, this should return zero results,
-            unless we are in or past the year 2038.
-        """
+        """ Check for new events when the timestamp is 2**31 - 1.
 
+        Since this corresponds to 19 January 2038, this should return
+        zero results, unless we are in or past the year 2038.
+
+        """
         last_check_time = 2**31 - 1.0
 
         event_summary = datastore.check_for_new_events(last_check_time)
@@ -389,6 +393,87 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         self.assertEqual(fits[0].initial_mpv, 10.0)
 
 
+class CoincidencesESDCase(BaseHistogramsTestCase):
+
+    fixtures = ['tests_inforecords', 'tests_histograms']
+
+    def setUp(self):
+        # Download data files and setup the test datastore
+        super(CoincidencesESDCase, self).setUp()
+
+        # Make sure the ESD (event summary data) files exist
+        for date, stations in [(DATE1, (STATION1, STATION2)), (DATE2, (STATION1,))]:
+            if not os.path.exists(esd.get_esd_data_path(date)):
+                for station in stations:
+                    jobs.process_possible_tables_for_station(station, {'events': 1},
+                                                             date)
+                    summary = Summary.objects.get(station__number=station,
+                                                  date=date)
+                    self.assertTrue(summary.needs_update)
+                jobs.update_esd()
+
+        # Make sure coincidences are analysed
+        for date in [DATE1, DATE2]:
+            with tables.openFile(esd.get_esd_data_path(date), "r") as data:
+                try:
+                    data.getNode('/', 'coincidences')
+                    NetworkSummary.objects.get_or_create(date=date)
+                except tables.NoSuchNodeError:
+                    jobs.process_possible_tables_for_network(date, 'events')
+        jobs.update_coincidences()
+
+    def tearDown(self):
+        super(CoincidencesESDCase, self).tearDown()
+
+    def test_create_network_summary(self):
+        """ Create or update Network Summary
+        """
+        for date in [DATE1, DATE2]:
+            network_summary = NetworkSummary.objects.get(date=date)
+            self.assertFalse(network_summary.needs_update)
+            self.assertFalse(network_summary.needs_update_coincidences)
+
+        NetworkSummary.objects.all().delete()
+        self.assertRaises(NetworkSummary.DoesNotExist, NetworkSummary.objects.get, date=DATE1)
+
+        for date in [DATE1, DATE2]:
+            jobs.process_possible_tables_for_network(date, 'events')
+            network_summary = NetworkSummary.objects.get(date=date)
+            self.assertTrue(network_summary.needs_update)
+            self.assertTrue(network_summary.needs_update_coincidences)
+
+    def test_coincidences_DATE1(self):
+        """Check number of entries in coincidence tables for DATE1
+
+        Some coincidences will be found, the station index should contain
+        the references to the two stations.
+
+        """
+        file = test_datastore.get_esd_datafile_path(DATE1)
+        data = tables.openFile(file, "r")
+        self.assertEqual(data.root.coincidences.coincidences.nrows, 1968)
+        self.assertEqual(data.root.coincidences.c_index.nrows,
+                         data.root.coincidences.coincidences.nrows)
+        self.assertEqual(data.root.coincidences.s_index.nrows, 2)
+        data.close()
+
+    def test_coincidences_DATE2(self):
+        """Check for zero coincidences for DATE2
+
+        So no coincidences should be found, the coincidences table should
+        still be created, but empty. The station index should contain
+        a reference to the one station.
+
+        """
+        file = test_datastore.get_esd_datafile_path(DATE2)
+        data = tables.openFile(file, "r")
+        self.assertEqual(data.root.coincidences.coincidences.nrows, 0)
+        self.assertEqual(data.root.coincidences.c_index.nrows,
+                         data.root.coincidences.coincidences.nrows)
+        self.assertEqual(data.root.coincidences.s_index.nrows, 1)
+        data.close()
+
+
 class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
     fixtures = ['tests_inforecords', 'tests_histograms']
@@ -407,17 +492,19 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         super(UpdateAllHistogramsTestCase, self).tearDown()
 
     def test_jobs_update_all_histograms_while_update_is_running(self):
-        """ When an update_all_histograms() is already running, a second call
-            to update_all_histograms() should return False.
-        """
+        """Only one update_all_histograms at a time
 
+        When an update_all_histograms() is already running, a second
+        call to update_all_histograms() should return False.
+
+        """
         state = GeneratorState.objects.get()
         state.update_is_running = True
         state.save()
 
         self.assertFalse(jobs.update_all_histograms())
 
-    def base_test_jobs_update_all_histograms_501_2011_7_7(self):
+    def base_test_jobs_update_all_histograms_501_DATE1(self):
         """ Tests jobs.update_all_histograms() by processing a single Summary.
             It then checks for the output in the database. The data of station
             501 on 2011/7/7 contains events data that is suitable for fitting
@@ -497,7 +584,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         for d in datasets:
             self.assertEqual(d.source, test_summary)
 
-    def base_test_jobs_update_all_histograms_501_2012_5_16(self):
+    def base_test_jobs_update_all_histograms_501_DATE2(self):
         """ Tests jobs.update_all_histograms() by processing a single Summary.
             It then checks for the output in the database. The data of station
             501 on 2012/5/16 contains events, configuration and weather data,
@@ -585,22 +672,26 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             self.assertEqual(d.source, test_summary)
 
     @override_settings(USE_MULTIPROCESSING=False)
-    def test_jobs_update_all_histograms_501_2011_7_7_single_threaded(self):
-        self.base_test_jobs_update_all_histograms_501_2011_7_7()
+    def test_jobs_update_all_histograms_501_DATE1_single_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_DATE1()
 
-    @unittest.skip("Does not seem to end well, test passes, but then hangs")
+    @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
+                     "MySQL and multiprocessing don't seem to go well together,"
+                     "test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
-    def test_jobs_update_all_histograms_501_2011_7_7_multi_threaded(self):
-        self.base_test_jobs_update_all_histograms_501_2011_7_7()
+    def test_jobs_update_all_histograms_501_DATE1_multi_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_DATE1()
 
     @override_settings(USE_MULTIPROCESSING=False)
-    def test_jobs_update_all_histograms_501_2012_5_16_single_threaded(self):
-        self.base_test_jobs_update_all_histograms_501_2012_5_16()
+    def test_jobs_update_all_histograms_501_DATE2_single_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_DATE2()
 
-    @unittest.skip("Does not seem to end well, test passes, but then hangs")
+    @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
+                     "MySQL and multiprocessing don't seem to go well together,"
+                     "test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
-    def test_jobs_update_all_histograms_501_2012_5_16_multi_threaded(self):
-        self.base_test_jobs_update_all_histograms_501_2012_5_16()
+    def test_jobs_update_all_histograms_501_DATE2_multi_threaded(self):
+        self.base_test_jobs_update_all_histograms_501_DATE2()
 
     def redirect_stdout_stderr_to_devnull(self):
         self.__stdout = sys.stdout
@@ -613,6 +704,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         sys.stderr.close()
         sys.stdout = self.__stdout
         sys.stderr = self.__stderr
+
 
 class PulseheightFitErrorsTestCase(TestCase):
 
