@@ -36,6 +36,11 @@ def get_datafile_path(date):
     return os.path.join(settings.DATASTORE_PATH, path)
 
 
+def get_esd_datafile_path(date):
+    path = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(settings.ESD_PATH, path)
+
+
 def download_data_station(station_number, date, get_blobs=False):
     station = inforecords.models.Station.objects.get(number=station_number)
 
