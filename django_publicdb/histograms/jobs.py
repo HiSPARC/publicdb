@@ -80,8 +80,13 @@ def check_for_new_events_and_update_flags(state):
 
 
 def process_possible_stations_for_date(date, station_list):
-    """Check stations for possible new data"""
+    """Check stations for possible new data
 
+    :param date: The date which needs to be updated as a date object
+    :param station_list: A nested dictionary:
+                         {'[station_number]': {'[table_name]': [n_rows], }, }
+
+    """
     logger.debug('Now processing %s' % date)
     unique_table_list = set([table_name for table_list in station_list.values()
                                         for table_name in table_list.keys()])
@@ -92,15 +97,20 @@ def process_possible_stations_for_date(date, station_list):
 
 
 def process_possible_tables_for_network(date, table_name):
-    """Check table and store summary for the network"""
+    """Check table and store summary for the network
+
+    :param date: The date which needs to be updated as a date object
+    :param table_name: The name of the changed table (e.g. 'events')
+
+    """
     try:
         update_flag_attr = 'needs_update_%s' % NETWORK_TABLES[table_name]
         logger.debug("New %s data on %s.", table_name,
                                            date.strftime("%a %b %d %Y"))
-        networksummary, created = NetworkSummary.objects.get_or_create(date=date)
-        setattr(networksummary, update_flag_attr, True)
-        networksummary.needs_update = True
-        networksummary.save()
+        network_summary, _ = NetworkSummary.objects.get_or_create(date=date)
+        setattr(network_summary, update_flag_attr, True)
+        network_summary.needs_update = True
+        network_summary.save()
     except KeyError:
         logger.debug('Unsupported table type for network: %s', table_name)
 
@@ -167,34 +177,64 @@ def perform_update_tasks():
 
 
 def update_esd():
-    worker_pool = multiprocessing.Pool(maxtasksperchild=10)
+    """Update the ESD for all Summaries with the needs_update flag
+
+    Depending on the USE_MULTIPROCESSING flag, the manager either does the
+    tasks himself or he grabs some workers and let them do it.
+
+    """
     summaries = Summary.objects.filter(needs_update=True).reverse()
-    results = worker_pool.imap_unordered(
-        process_and_store_temporary_esd_for_summary, summaries)
+    if settings.USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool(maxtasksperchild=10)
+        results = worker_pool.imap_unordered(
+            process_and_store_temporary_esd_for_summary, summaries)
 
-    for summary, tmp_locations in results:
-        for tmpfile_path, node_path in tmp_locations:
-            esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                               node_path)
-        summary.needs_update = False
-        summary.save()
+        for summary, tmp_locations in results:
+            for tmpfile_path, node_path in tmp_locations:
+                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                                   node_path)
+            summary.needs_update = False
+            summary.save()
 
-    worker_pool.close()
-    worker_pool.join()
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for summary in summaries:
+            summary, tmp_locations = \
+                process_and_store_temporary_esd_for_summary(summary)
+            for tmpfile_path, node_path in tmp_locations:
+                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                                   node_path)
+            summary.needs_update = False
+            summary.save()
 
 
 def update_coincidences():
-    worker_pool = multiprocessing.Pool()
-    summaries = NetworkSummary.objects.filter(needs_update=True).reverse()
-    results = worker_pool.imap_unordered(
-        search_and_store_coincidences_for_network_summary, summaries)
+    """Update coincidences for all NetworkSummaries with the needs_update flag
 
-    for summary in results:
-        summary.needs_update = False
-        summary.save()
+    Depending on the USE_MULTIPROCESSING flag, the manager either does the
+    tasks himself or he grabs some workers and let them do it.
 
-    worker_pool.close()
-    worker_pool.join()
+    """
+    network_summaries = (NetworkSummary.objects.filter(needs_update=True)
+                                               .reverse())
+    if settings.USE_MULTIPROCESSING:
+        worker_pool = multiprocessing.Pool()
+        results = worker_pool.imap_unordered(
+            search_and_store_coincidences_for_network_summary,
+            network_summaries)
+
+        for network_summary in results:
+            network_summary.needs_update = False
+            network_summary.save()
+
+        worker_pool.close()
+        worker_pool.join()
+    else:
+        for network_summary in network_summaries:
+            network_summary = search_and_store_coincidences_for_network_summary(network_summary)
+            network_summary.needs_update = False
+            network_summary.save()
 
 
 def process_and_store_temporary_esd_for_summary(summary):
@@ -207,11 +247,11 @@ def process_and_store_temporary_esd_for_summary(summary):
     return summary, tmp_locations
 
 
-def search_and_store_coincidences_for_network_summary(summary):
+def search_and_store_coincidences_for_network_summary(network_summary):
     django.db.close_connection()
-    if summary.needs_update_coincidences:
-        search_coincidences_and_store_esd(summary)
-    return summary
+    if network_summary.needs_update_coincidences:
+        search_coincidences_and_store_esd(network_summary)
+    return network_summary
 
 
 def update_histograms():
@@ -247,9 +287,6 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         worker_pool.join()
     else:
         for summary in summaries:
-            if not eval("summary.%s" % needs_update_item):
-                continue
-
             perform_certain_tasks(summary)
             exec "summary.%s=False" % needs_update_item
             summary.save()
@@ -278,11 +315,11 @@ def perform_weather_tasks(summary):
     return summary
 
 
-def perform_coincidences_tasks(summary):
+def perform_coincidences_tasks(network_summary):
     django.db.close_connection()
-    update_coincidencetime_histogram(summary)
-    update_coincidencenumber_histogram(summary)
-    return summary
+    update_coincidencetime_histogram(network_summary)
+    update_coincidencenumber_histogram(network_summary)
+    return network_summary
 
 
 def update_gps_coordinates():
@@ -322,14 +359,14 @@ def update_eventtime_histogram(summary):
     save_histograms(summary, 'eventtime', bins, hist)
 
 
-def update_coincidencetime_histogram(summary):
-    logger.debug("Updating coincidencetime histogram for %s" % summary)
-    timestamps = esd.get_coincidence_timestamps(summary)
+def update_coincidencetime_histogram(network_summary):
+    logger.debug("Updating coincidencetime histogram for %s" % network_summary)
+    timestamps = esd.get_coincidence_timestamps(network_summary)
 
     # creating a histogram with bins consisting of timestamps instead of
     # hours saves us from having to convert all timestamps to hours of day.
     # timestamp at midnight (start of day) of date
-    start = calendar.timegm(summary.date.timetuple())
+    start = calendar.timegm(network_summary.date.timetuple())
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
@@ -337,19 +374,20 @@ def update_coincidencetime_histogram(summary):
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
     hist = hist[0].tolist()
-    save_network_histograms(summary, 'coincidencetime', bins, hist)
+    save_network_histograms(network_summary, 'coincidencetime', bins, hist)
 
 
-def update_coincidencenumber_histogram(summary):
-    logger.debug("Updating coincidencenumber histogram for %s" % summary)
-    n_stations = esd.get_coincidence_data(summary, 'N')
+def update_coincidencenumber_histogram(network_summary):
+    logger.debug("Updating coincidencenumber histogram for %s" %
+                 network_summary)
+    n_stations = esd.get_coincidence_data(network_summary, 'N')
 
     # create bins, don't forget right-most edge
     bins = range(2, 101)
 
     hist = np.histogram(n_stations, bins=bins)
     hist = hist[0].tolist()
-    save_network_histograms(summary, 'coincidencenumber', bins, hist)
+    save_network_histograms(network_summary, 'coincidencenumber', bins, hist)
 
 
 def update_pulseheight_histogram(summary):
@@ -377,27 +415,29 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 
-def search_coincidences_and_store_esd(summary):
-    logger.debug("Processing coincidences and storing ESD for %s", summary)
+def search_coincidences_and_store_esd(network_summary):
+    logger.debug("Processing coincidences and storing ESD for %s" %
+                 network_summary)
     t0 = time.time()
-    num_coincidences = esd.search_coincidences_and_store_in_esd(summary)
+    num_coincidences = \
+        esd.search_coincidences_and_store_in_esd(network_summary)
     t1 = time.time()
-    summary.num_coincidences = num_coincidences
-    logger.debug("Processing took %.1f s.", t1 - t0)
+    network_summary.num_coincidences = num_coincidences
+    logger.debug("Processing took %.1f s." % (t1 - t0))
 
 
 def process_events_and_store_esd(summary):
-    logger.debug("Processing events and storing ESD for %s", summary)
+    logger.debug("Processing events and storing ESD for %s" % summary)
     t0 = time.time()
     tmpfile_path, node_path = \
         esd.process_events_and_store_temporary_esd(summary)
     t1 = time.time()
-    logger.debug("Processing took %.1f s.", t1 - t0)
+    logger.debug("Processing took %.1f s." % (t1 - t0))
     return tmpfile_path, node_path
 
 
 def process_weather_and_store_esd(summary):
-    logger.debug("Processing weather events and storing ESD for %s", summary)
+    logger.debug("Processing weather events and storing ESD for %s" % summary)
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
@@ -474,14 +514,14 @@ def save_histograms(summary, slug, bins, values):
     logger.debug("Saved succesfully")
 
 
-def save_network_histograms(summary, slug, bins, values):
+def save_network_histograms(network_summary, slug, bins, values):
     """Store the binned data in database"""
-    logger.debug("Saving histogram %s for %s" % (slug, summary))
+    logger.debug("Saving histogram %s for %s" % (slug, network_summary))
     type = HistogramType.objects.get(slug=slug)
     try:
-        h = NetworkHistogram.objects.get(source=summary, type=type)
+        h = NetworkHistogram.objects.get(source=network_summary, type=type)
     except NetworkHistogram.DoesNotExist:
-        h = NetworkHistogram(source=summary, type=type)
+        h = NetworkHistogram(source=network_summary, type=type)
     h.bins = bins
     h.values = values
     h.save()
