@@ -7,8 +7,8 @@
     - mysql-devel
     - MySQL-python
 
-- name: start MySQL server
-  service: name=mysqld state=started
+- name: start MySQL server now and on boot
+  service: name=mysqld state=started enabled=yes
   sudo: yes
 
 - name: update MySQL root password for all accounts
