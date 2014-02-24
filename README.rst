@@ -35,6 +35,7 @@ Then, navigate to the publicdb repository root and::
 
     $ vagrant up
 
+Building a vagrant box for the first time takes approximately 50 minutes.
 You can ssh into you box by issuing::
 
     $ vagrant ssh
