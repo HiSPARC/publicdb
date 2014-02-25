@@ -86,4 +86,4 @@
   sudo: yes
 
 - name: start uWSGI
-  supervisorctl: name=uwsgi state=started
+  supervisorctl: name=uwsgi state=restarted
