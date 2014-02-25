@@ -5,6 +5,8 @@ Vagrant.configure("2") do |config|
   config.vm.box = "SLC5.9"
   config.vm.box_url = "veewee/SLC5.9.box"
 
+  config.vm.network "forwarded_port", guest: 80, host: 8080
+
   config.vm.provision :ansible do |ansible|
     ansible.playbook = "provisioning/playbook.yml"
     ansible.host_key_checking = false
