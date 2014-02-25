@@ -72,3 +72,18 @@
 
 - name: copy uwsgi.ini
   copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
+
+- name: install supervisor daemon
+  yum: name=supervisor
+  sudo: yes
+
+- name: copy supervisord.conf
+  copy: src=supervisord.conf dest=/etc/supervisord.conf backup=yes
+  sudo: yes
+
+- name: start supervisord now and on boot
+  service: name=supervisord state=started enabled=yes
+  sudo: yes
+
+- name: start uWSGI
+  supervisorctl: name=uwsgi state=started
