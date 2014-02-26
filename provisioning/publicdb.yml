@@ -87,3 +87,15 @@
 
 - name: start uWSGI
   supervisorctl: name=uwsgi state=restarted
+
+- name: enable cron job for updating histograms and ESD
+  cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0
+        state=present user=hisparc
+        job="/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+  sudo: yes
+
+- name: enable cron job for cleaning out downloaded raw_data files
+  cron: name="clean downloaded data" cron_file=hisparc special_time=daily
+        state=present user=root
+        job="find /localstore/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
+  sudo: yes
