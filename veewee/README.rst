@@ -45,6 +45,7 @@ The definitions were originally created using (you don't have to run
 this!)::
 
     $ veewee vbox define SLC5.9 'scientificlinux-5.9-x86_64'
+    $ veewee vbox define SLC6.4 'scientificlinux-6.4-x86_64-netboot'
 
 Only slight modifications were made: the number of CPUs was increased to
 two, the amount of memory was increased to 512 Mb and the kernel parameter
