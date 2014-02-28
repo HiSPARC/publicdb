@@ -101,7 +101,7 @@ The complete requirements and installation instructions are::
     $ pip install mock
     $ pip install scipy
     $ pip install matplotlib
-    $ pip install https://github.com/hisparc/sapphire/zipball/master
+    $ pip install hisparc-sapphire
 
 You now have all the prerequisites for running the publicdb django app.
 For reference, the results from `pip freeze`::
