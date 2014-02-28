@@ -28,7 +28,7 @@ PATH::
     $ which veewee
 
 
-Source of the SLC5.9 box definitions
+Source of the SLC6.4 box definitions
 ------------------------------------
 
 In a pristine publicdb repository, the veewee directory looks like::
@@ -44,7 +44,6 @@ In a pristine publicdb repository, the veewee directory looks like::
 The definitions were originally created using (you don't have to run
 this!)::
 
-    $ veewee vbox define SLC5.9 'scientificlinux-5.9-x86_64'
     $ veewee vbox define SLC6.4 'scientificlinux-6.4-x86_64-netboot'
 
 Only slight modifications were made: the number of CPUs was increased to
@@ -62,11 +61,11 @@ Building the Vagrant box
 Navigate to the veewee directory in the publicdb repository (the directory
 containing this very file).  Then issue the following commands::
 
-    $ veewee vbox build --auto SLC5.9
-    $ veewee vbox export SLC5.9
+    $ veewee vbox build --auto SLC6.4
+    $ veewee vbox export SLC6.4
 
 The Vagrant box is located in the current working directory.  Building the
-box takes approximately 25 minutes.
+box takes approximately 40 minutes.
 
 
 Updating the Vagrant box
@@ -78,7 +77,7 @@ However, you still need to make sure that vagrant actually uses this new
 box.  To achieve this, simply remove the existing vagrant box using::
 
     $ vagrant destroy
-    $ vagrant box remove SLC5.9
+    $ vagrant box remove SLC6.4
 
 You are now in a clean environment and::
 

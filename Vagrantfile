@@ -2,8 +2,8 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "SLC5.9"
-  config.vm.box_url = "veewee/SLC5.9.box"
+  config.vm.box = "SLC6.4"
+  config.vm.box_url = "veewee/SLC6.4.box"
 
   config.vm.network "forwarded_port", guest: 80, host: 8080
 
