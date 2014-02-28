@@ -35,11 +35,20 @@ In a pristine publicdb repository, the veewee directory looks like::
 
     $ tree
     .
+    ├── README.rst
     └── definitions
-        └── SLC5.9
+        └── SLC6.4
+            ├── base.sh
+            ├── cfengine.sh
+            ├── chef.sh
+            ├── cleanup.sh
             ├── definition.rb
             ├── ks.cfg
-            └── postinstall.sh
+            ├── puppet.sh
+            ├── ruby.sh
+            ├── vagrant.sh
+            ├── virtualbox.sh
+            └── zerodisk.sh
 
 The definitions were originally created using (you don't have to run
 this!)::
@@ -47,9 +56,7 @@ this!)::
     $ veewee vbox define SLC6.4 'scientificlinux-6.4-x86_64-netboot'
 
 Only slight modifications were made: the number of CPUs was increased to
-two, the amount of memory was increased to 512 Mb and the kernel parameter
-'divider=10' was added to work around an issue of the VM using a lot of
-CPU because of a high-frequency clock interrupt.
+two.
 
 Furthermore, a default 'hisparc' user was added so that we can simulate an
 actual HiSPARC server installation.
