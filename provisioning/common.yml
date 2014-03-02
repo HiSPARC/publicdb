@@ -1,4 +1,10 @@
 ---
+- name: ensure /usr/local/bin is in sudoers
+  lineinfile: dest=/etc/sudoers regexp='secure_path'
+              line="Defaults    secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+              state=present
+  sudo: yes
+
 # Bootstrapping EPEL repository trick
 # http://zigg.com/2013/yum-repository-bootstrapping-ansible.html
 - name: bootstrap epel-release install
