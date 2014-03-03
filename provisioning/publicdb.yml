@@ -74,18 +74,24 @@
   copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
 
 - name: install supervisor daemon
-  yum: name=supervisor
+  pip: name=supervisor
+  sudo: yes
+
+- name: copy supervisord init script
+  copy: src=init-supervisord dest=/etc/init.d/supervisord backup=yes
+        owner=root group=root mode=0755
   sudo: yes
 
 - name: copy supervisord.conf
   copy: src=supervisord.conf dest=/etc/supervisord.conf backup=yes
+        owner=root group=root mode=0644
   sudo: yes
 
 - name: start supervisord now and on boot
   service: name=supervisord state=started enabled=yes
   sudo: yes
 
-- name: start uWSGI
+- name: restart uWSGI
   supervisorctl: name=uwsgi state=restarted
 
 - name: enable cron job for updating histograms and ESD
