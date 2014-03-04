@@ -5,6 +5,12 @@
               state=present
   sudo: yes
 
+- name: add HTTP access to firewall rules
+  lineinfile: dest=/etc/sysconfig/system-config-firewall
+              regexp='--service=http' line='--service=http'
+              state=present
+  sudo: yes
+
 # Bootstrapping EPEL repository trick
 # http://zigg.com/2013/yum-repository-bootstrapping-ansible.html
 - name: bootstrap epel-release install
