@@ -26,8 +26,10 @@ histograms_logger.setLevel(logging.INFO)
 
 DATE1 = datetime.date(2011, 7, 7)
 DATE2 = datetime.date(2012, 5, 16)
+DATETEST = datetime.date(2013, 11, 4)
 STATION1 = 501
 STATION2 = 502
+STATIONTEST = 99
 
 
 class BaseHistogramsTestCase(TransactionTestCase):
@@ -41,26 +43,22 @@ class BaseHistogramsTestCase(TransactionTestCase):
         self.progressbar_mock = self.progressbar_patcher.start()
         self.progressbar_mock.return_value.side_effect = lambda x: x
 
-        # Contents
-        # 1. Setup test datastore
-        # 2. Download data
-        # 3. Reset last updated state
-        # 4. Base class setUp()
+        # Setup test datastore
 
-        # 1. Setup test datastore
-        # The tests require a data file. We will download some data and put it
-        # in a test directory. It needs to be writable by the user who initiates
-        # the tests.
+        # The tests require a data file. We will download some data and
+        # put it in a test directory. It needs to be writable by the
+        # user who initiates the tests.
 
         self.original_datastore_path = settings.DATASTORE_PATH
         self.original_esd_path = settings.ESD_PATH
         path = os.path.join(settings.TEST_DATASTORE_PATH, "histograms")
         test_datastore.setup_test_datastore_directory(path)
 
-        # 2. Download data
+        # Download data
+
         # Download real data of station 501 and 502 on 7 July 2011
-        # Here is data where we can fit the pulseheight MPV
-        # And we get two stations to find coincidences
+        # Here is data where we can fit the pulseheight MPV,
+        # and we get two stations to find coincidences.
 
         date = DATE1
         file = test_datastore.get_datafile_path(date)
@@ -104,16 +102,36 @@ class BaseHistogramsTestCase(TransactionTestCase):
 
         data.close()
 
-        # 3. Reset last updated state
-        # Reset generator state such that it will always update when new files
-        # are found
+        # Download test data of station 99 on 4 November 2013.
+        # This contains 2 events and a configuration from this test station.
+
+        date = DATETEST
+        file = test_datastore.get_datafile_path(date)
+
+        if not os.path.exists(file):
+            test_datastore.download_data_station(STATIONTEST, date, get_blobs=True)
+
+        self.assertTrue(os.path.exists(file))
+
+        try:
+            data = tables.openFile(file, "r")
+        except Exception:
+            self.fail()
+
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_99.events.nrows, 2)
+        self.assertEqual(data.root.hisparc.cluster_amsterdam.station_99.config.nrows, 1)
+
+        data.close()
+
+        # Reset last updated state
+
+        # Reset generator state such that it will always update when new
+        # files are found.
 
         state = GeneratorState.objects.get()
         state.update_last_run = datetime.datetime.fromtimestamp(0)
         state.check_last_run = datetime.datetime.fromtimestamp(0)
         state.save()
-
-        # 4. Base class setUp()
 
         super(BaseHistogramsTestCase, self).setUp()
 
@@ -271,67 +289,44 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         super(JobsPulseheightFitTestCase, self).tearDown()
 
     def test_jobs_update_pulseheight_fit_normal(self):
-        """ When everything is ok, in the end there should be 4 fits in the database
+        """Try pulseheight fit on good data with available configuration.
+
+        With everything ok there should be 4 (number of detectors) fits
+        in the database.
+
         """
-
-        # Contents
-        # 1. Initialize work space
-        # 2. Try to fit data
-        # 3. Validate output
-
-        # 1. Initialize work space
         summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
-        # 2. Try to fit data
+        # Try to fit data
         jobs.update_pulseheight_fit(summary)
 
-        # 3. Validate output
-        # Four fits are expected
-
+        # Validate output, four fits are expected
         fits = PulseheightFit.objects.all().count()
-
         self.assertEqual(fits, 4)
 
     def test_jobs_update_pulseheight_fit_no_config(self):
         """ When there is no config, no fit should have been made"""
 
-        # Contents
-        # 1. Initialize work space
-        # 2. Try to fit data, although there is no configuration.
-        # 3. Validate output
-
-        # 1. Initialize work space
         # Delete all configurations
-
         Configuration.objects.all().delete()
 
         summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
-        # 2. Try to fit data, although there is no configuration.
-        # Configuration data contains info on whether there are two plates or
-        # four plates. If no config data is found, nothing should be done.
-
+        # Try to fit data, although there is no configuration.
+        # Configuration data contains info on the number of detectors.
+        # If no config data is found, nothing should be done.
         jobs.update_pulseheight_fit(summary)
 
-        # 3. Validate output
-        # No fits are expected
-
+        # Validate output, no fits are expected
         fits = PulseheightFit.objects.all().count()
-
         self.assertEqual(fits, 0)
 
     def test_jobs_save_pulseheight_fit_normal(self):
         """ Saving a PulseheightFit in normal conditions"""
 
-        # Contents
-        # 1. Initialize work space
-        # 2. Create and save fits
-        # 3. Validate output
-
-        # 1. Initialize work space
         summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
-        # 2. Create and save fits
+        # Create and save fits
         fits = [PulseheightFit(source=summary, plate=detector_n,
                                initial_mpv=1, initial_width=2,
                                fitted_mpv=3, fitted_mpv_error=4,
@@ -341,9 +336,8 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
 
         jobs.save_pulseheight_fits(summary, fits)
 
-        # 3. Validate output
-
-        fits = PulseheightFit.objects.filter(source = summary)
+        # Validate output
+        fits = PulseheightFit.objects.filter(source=summary)
         self.assertEqual(len(fits), 4)
         self.assertEqual(fits[0].initial_mpv, 1.0)
 
@@ -358,8 +352,8 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         summary = Summary.objects.get(station__number=STATION1, date=DATE1)
 
         jobs.save_pulseheight_fits(summary, [])
-        fits = PulseheightFit.objects.all().count()
 
+        fits = PulseheightFit.objects.all().count()
         self.assertEqual(fits, 0)
 
     def test_jobs_save_pulseheight_fit_update(self):
@@ -374,10 +368,10 @@ class JobsPulseheightFitTestCase(BaseHistogramsTestCase):
         detector_n = 1
 
         fit = PulseheightFit(source=summary, plate=detector_n,
-                                    initial_mpv=1, initial_width=2,
-                                    fitted_mpv=3, fitted_mpv_error=4,
-                                    fitted_width=5, fitted_width_error=6,
-                                    chi_square_reduced=7)
+                             initial_mpv=1, initial_width=2,
+                             fitted_mpv=3, fitted_mpv_error=4,
+                             fitted_width=5, fitted_width_error=6,
+                             chi_square_reduced=7)
 
         fit.save()
 
@@ -402,18 +396,20 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
         super(CoincidencesESDCase, self).setUp()
 
         # Make sure the ESD (event summary data) files exist
-        for date, stations in [(DATE1, (STATION1, STATION2)), (DATE2, (STATION1,))]:
+        for date, stations in [(DATE1, (STATION1, STATION2)),
+                               (DATE2, (STATION1,)),
+                               (DATETEST, (STATIONTEST,))]:
             if not os.path.exists(esd.get_esd_data_path(date)):
                 for station in stations:
-                    jobs.process_possible_tables_for_station(station, {'events': 1},
-                                                             date)
+                    jobs.process_possible_tables_for_station(
+                            station, {'events': 1}, date)
                     summary = Summary.objects.get(station__number=station,
                                                   date=date)
                     self.assertTrue(summary.needs_update)
                 jobs.update_esd()
 
         # Make sure coincidences are analysed
-        for date in [DATE1, DATE2]:
+        for date in [DATE1, DATE2, DATETEST]:
             with tables.openFile(esd.get_esd_data_path(date), "r") as data:
                 try:
                     data.getNode('/', 'coincidences')
@@ -426,9 +422,13 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
         super(CoincidencesESDCase, self).tearDown()
 
     def test_create_network_summary(self):
-        """ Create or update Network Summary
+        """Create or update Network Summary
+
+        Test that updates have run and the jobs correctly creates the
+        Network Summaries and sets the flags.
+
         """
-        for date in [DATE1, DATE2]:
+        for date in [DATE1, DATE2, DATETEST]:
             network_summary = NetworkSummary.objects.get(date=date)
             self.assertFalse(network_summary.needs_update)
             self.assertFalse(network_summary.needs_update_coincidences)
@@ -436,11 +436,28 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
         NetworkSummary.objects.all().delete()
         self.assertRaises(NetworkSummary.DoesNotExist, NetworkSummary.objects.get, date=DATE1)
 
-        for date in [DATE1, DATE2]:
+        for date in [DATE1, DATE2, DATETEST]:
             jobs.process_possible_tables_for_network(date, 'events')
             network_summary = NetworkSummary.objects.get(date=date)
             self.assertTrue(network_summary.needs_update)
             self.assertTrue(network_summary.needs_update_coincidences)
+
+    def base_coincidences_for_date(self, date, n_coincidences, n_stations):
+        """Check number of entries in coincidence tables for a date
+
+        Check the number of coincidences, check that this matches to the
+        number of c_indexes. Also check the number of participating
+        stations.
+
+        """
+        file = test_datastore.get_esd_datafile_path(date)
+        data = tables.openFile(file, "r")
+        self.assertEqual(data.root.coincidences.coincidences.nrows,
+                         n_coincidences)
+        self.assertEqual(data.root.coincidences.c_index.nrows,
+                         data.root.coincidences.coincidences.nrows)
+        self.assertEqual(data.root.coincidences.s_index.nrows, n_stations)
+        data.close()
 
     def test_coincidences_DATE1(self):
         """Check number of entries in coincidence tables for DATE1
@@ -449,13 +466,7 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
         the references to the two stations.
 
         """
-        file = test_datastore.get_esd_datafile_path(DATE1)
-        data = tables.openFile(file, "r")
-        self.assertEqual(data.root.coincidences.coincidences.nrows, 1968)
-        self.assertEqual(data.root.coincidences.c_index.nrows,
-                         data.root.coincidences.coincidences.nrows)
-        self.assertEqual(data.root.coincidences.s_index.nrows, 2)
-        data.close()
+        self.base_coincidences_for_date(DATE1, 1968, 2)
 
     def test_coincidences_DATE2(self):
         """Check for zero coincidences for DATE2
@@ -465,13 +476,16 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
         a reference to the one station.
 
         """
-        file = test_datastore.get_esd_datafile_path(DATE2)
-        data = tables.openFile(file, "r")
-        self.assertEqual(data.root.coincidences.coincidences.nrows, 0)
-        self.assertEqual(data.root.coincidences.c_index.nrows,
-                         data.root.coincidences.coincidences.nrows)
-        self.assertEqual(data.root.coincidences.s_index.nrows, 1)
-        data.close()
+        self.base_coincidences_for_date(DATE2, 0, 1)
+
+    def test_coincidences_DATETEST(self):
+        """Check for zero coincidences for DATETEST
+
+        No coincidences should be found, the coincidences tables should
+        still be created, but empty.
+
+        """
+        self.base_coincidences_for_date(DATETEST, 0, 0)
 
 
 class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
