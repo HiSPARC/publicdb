@@ -518,34 +518,26 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertFalse(jobs.update_all_histograms())
 
-    def base_test_jobs_update_all_histograms_501_DATE1(self):
-        """ Tests jobs.update_all_histograms() by processing a single Summary.
-            It then checks for the output in the database. The data of station
-            501 on 2011/7/7 contains events data that is suitable for fitting
-            the pulseheight mpv.
+    def base_test_jobs_update_all_histograms_501_date(self, date):
+        """Tests jobs.update_all_histograms() by processing a single Summary.
+
+        Also checks if event histograms are created.
+
+        :param date: Date for which to update the histograms of STATION1.
+        :returns: Summary object for which the histograms are processed.
+
         """
-
-        # Contents
-        # 1. Prepare tables
-        # 2. Update only 1 station
-        # 3. Run updates for that one station
-        # 4. Validate output
-
-        # 1. Prepare tables
-        Summary.objects.filter(date__gte=DATE1).delete()
+        # Prepare database
+        Summary.objects.filter(date__gte=date).delete()
 
         # Set the needs_update_x fields
         self.assertTrue(jobs.check_for_updates())
 
-        # 2. Update only 1 station
+        # Update only one station
         #
         # Pick one summary, set all other summaries such that they don't
         # need to be updated.
-        summaries = Summary.objects.filter(station__number=STATION1, date=DATE1)
-        self.assertEqual(len(summaries), 1)
-
-        test_summary = summaries[0]
-
+        test_summary = Summary.objects.get(station__number=STATION1, date=date)
         summaries = Summary.objects.exclude(id=test_summary.id)
 
         for summary in summaries:
@@ -555,7 +547,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             summary.needs_update_weather = False
             summary.save()
 
-        # 3. Run updates for that one station
+        # Run updates for that one station
 
         self.assertTrue(jobs.update_all_histograms())
 
@@ -564,18 +556,29 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
         self.assertEqual(Summary.objects.filter(needs_update=True).count(), 0)
 
-        # 4. Validate output
+        # Validate output
 
-        # Check for pulseheight, pulseintegral and eventtime histograms
-        # This means there should be three entries in the DailyHistogram table.
+        # Check for pulseheight, pulseintegral and eventtime histograms.
+        # There should be three entries in the DailyHistogram table.
 
         histograms = DailyHistogram.objects.filter(
-                source__station__number=STATION1, source__date=DATE1)
-
+                source__station__number=STATION1, source__date=date)
         self.assertEqual(len(histograms), 3)
 
         for h in histograms:
             self.assertEqual(h.source, test_summary)
+
+        return test_summary
+
+    def base_test_jobs_update_all_histograms_501_DATE1(self):
+        """Tests jobs.update_all_histograms() by processing a single Summary.
+
+        It then checks for the output in the database. The data of
+        station 501 on 2011/7/7 contains events data that is suitable
+        for fitting the pulseheight mpv.
+
+        """
+        test_summary = self.base_test_jobs_update_all_histograms_501_date(DATE1)
 
         # Check for pulseheight mpv fit
 
@@ -588,7 +591,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         self.assertTrue(231 < fits[3].fitted_mpv < 235)
 
         # Check for temperature and barometer datasets
-        # This means there should be two entries in the DailyDataset table.
+        # There should be two entries in the DailyDataset table.
 
         datasets = DailyDataset.objects.filter(
                 source__station__number=STATION1, source__date=DATE1)
@@ -599,72 +602,15 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
             self.assertEqual(d.source, test_summary)
 
     def base_test_jobs_update_all_histograms_501_DATE2(self):
-        """ Tests jobs.update_all_histograms() by processing a single Summary.
-            It then checks for the output in the database. The data of station
-            501 on 2012/5/16 contains events, configuration and weather data,
-            but the events data does not contain sufficient events to do a fit.
+        """Tests jobs.update_all_histograms() by processing a single Summary.
+
+        It then checks for the output in the database. The data of
+        station 501 on 2012/5/16 contains events, configuration and
+        weather data, but the events data does not contain sufficient
+        events to do a fit.
+
         """
-
-        # Contents
-        # 1. Prepare tables
-        # 2. Update only 1 station
-        # 3. Run updates for that one station
-        # 4. Validate output
-
-        # 1. Prepare tables
-
-        Summary.objects.filter(date__gte=DATE2).delete()
-
-        # Set the needs_update_x fields
-        self.assertTrue(jobs.check_for_updates())
-
-        # 2. Update only 1 station
-        #
-        # Pick one summary, set all other summaries such that they don't
-        # need to be updated.
-        summaries = Summary.objects.filter(station__number=STATION1, date=DATE2)
-        self.assertTrue(len(summaries), 1)
-
-        test_summary = summaries[0]
-
-        summaries = Summary.objects.exclude(id=test_summary.id)
-
-        for summary in summaries:
-            summary.needs_update = False
-            summary.needs_update_events = False
-            summary.needs_update_config = False
-            summary.needs_update_weather = False
-            summary.save()
-
-        # 2.3. Set the chosen summary to be updated
-
-        summaries = Summary.objects.filter(needs_update=True)
-
-        self.assertEqual(len(summaries), 1)
-
-        summary = summaries[0]
-
-        # 3. Run updates for that one station
-
-        self.assertTrue(jobs.update_all_histograms())
-
-        state = GeneratorState.objects.get()
-        self.assertEqual(state.update_is_running, False)
-
-        self.assertEqual(Summary.objects.filter(needs_update=True).count(), 0)
-
-        # 4. Validate output
-
-        # Check for pulseheight, pulseintegral and eventtime histograms.
-        # This means there should be three entries in the DailyHistogram table.
-
-        histograms = DailyHistogram.objects.filter(
-                source__station__number=STATION1, source__date=DATE2)
-
-        self.assertEqual(len(histograms), 3)
-
-        for h in histograms:
-            self.assertEqual(h.source, test_summary)
+        test_summary = self.base_test_jobs_update_all_histograms_501_date(DATE2)
 
         # Check for config
 
@@ -675,7 +621,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         self.assertEqual(config[0].source, test_summary)
 
         # Check for temperature and barometer datasets
-        # This means there should be two entries in the DailyDataset table.
+        # There should be two entries in the DailyDataset table.
 
         datasets = DailyDataset.objects.filter(
                 source__station__number=STATION1, source__date=DATE2)
@@ -687,6 +633,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
 
     @override_settings(USE_MULTIPROCESSING=False)
     def test_jobs_update_all_histograms_501_DATE1_single_threaded(self):
+        """Single threaded histograms for station 501 on 2011/7/7"""
         self.base_test_jobs_update_all_histograms_501_DATE1()
 
     @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
@@ -694,10 +641,12 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
                      "test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
     def test_jobs_update_all_histograms_501_DATE1_multi_threaded(self):
+        """Multi threaded histograms for station 501 on 2011/7/7"""
         self.base_test_jobs_update_all_histograms_501_DATE1()
 
     @override_settings(USE_MULTIPROCESSING=False)
     def test_jobs_update_all_histograms_501_DATE2_single_threaded(self):
+        """Single threaded histograms for station 501 on 2012/5/16"""
         self.base_test_jobs_update_all_histograms_501_DATE2()
 
     @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
@@ -705,6 +654,7 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
                      "test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
     def test_jobs_update_all_histograms_501_DATE2_multi_threaded(self):
+        """Multi threaded histograms for station 501 on 2012/5/16"""
         self.base_test_jobs_update_all_histograms_501_DATE2()
 
     def redirect_stdout_stderr_to_devnull(self):
