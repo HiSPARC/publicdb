@@ -30,6 +30,9 @@
 - name: Copy pip requirements files
   copy: src=pip-stage4.txt dest=/home/{{ ansible_user_id }}/
 
+- name: Copy conda requirements files
+  copy: src=conda.list dest=/home/{{ ansible_user_id }}/
+
 - name: install python packages in virtualenv -- stage 1
   pip: virtualenv=/srv/publicdb/publicdb_env
        requirements=/home/{{ ansible_user_id }}/pip-stage1.txt
@@ -45,6 +48,15 @@
 - name: install latest version of SAPPHiRE in virtualenv
   pip: virtualenv=/srv/publicdb/publicdb_env
        requirements=/home/{{ ansible_user_id }}/pip-stage4.txt
+
+- name: create conda environment
+  command: creates=/srv/publicdb/newenv
+           /opt/miniconda/bin/conda create -p /srv/publicdb/newenv python
+           --yes
+
+- name: install packages in conda environment
+  command: /opt/miniconda/bin/conda install -p /srv/publicdb/newenv
+           --file /home/{{ ansible_user_id }}/conda.list --yes
 
 - name: set up MySQL database
   mysql_db: name=publicdb state=present
