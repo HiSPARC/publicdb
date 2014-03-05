@@ -33,6 +33,9 @@
 - name: Copy conda requirements files
   copy: src=conda.list dest=/home/{{ ansible_user_id }}/
 
+- name: Copy pip requirements files
+  copy: src=pip.list dest=/home/{{ ansible_user_id }}/
+
 - name: install python packages in virtualenv -- stage 1
   pip: virtualenv=/srv/publicdb/publicdb_env
        requirements=/home/{{ ansible_user_id }}/pip-stage1.txt
@@ -54,9 +57,13 @@
            /opt/miniconda/bin/conda create -p /srv/publicdb/newenv python
            --yes
 
-- name: install packages in conda environment
+- name: install conda packages in conda environment
   command: /opt/miniconda/bin/conda install -p /srv/publicdb/newenv
            --file /home/{{ ansible_user_id }}/conda.list --yes
+
+- name: install packages in conda environment using pip
+  command: /srv/publicdb/newenv/bin/pip install
+           -r /home/{{ ansible_user_id }}/pip.list
 
 - name: set up MySQL database
   mysql_db: name=publicdb state=present
