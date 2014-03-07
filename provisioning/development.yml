@@ -26,6 +26,10 @@
               regexp='miniconda' line='PATH=/opt/miniconda/bin:$PATH'
   sudo: yes
 
+- name: install pip
+  command: /opt/miniconda/bin/conda install pip --yes
+  sudo: yes
+
 - name: install git
   yum: name=git state=present
   sudo: yes

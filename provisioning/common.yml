@@ -1,7 +1,7 @@
 ---
 - name: ensure /usr/local/bin is in sudoers
   lineinfile: dest=/etc/sudoers regexp='secure_path'
-              line="Defaults    secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+              line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
               state=present
   sudo: yes
 

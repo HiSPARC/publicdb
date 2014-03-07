@@ -22,7 +22,7 @@
 
 set -a
 
-PREFIX=/usr/local
+PREFIX=/opt/miniconda
 
 SUPERVISORD=$PREFIX/bin/supervisord
 SUPERVISORCTL=$PREFIX/bin/supervisorctl
