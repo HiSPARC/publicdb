@@ -1,5 +1,0 @@
---allow-unverified matplotlib
---allow-external matplotlib
-matplotlib==1.3.0
-numexpr==2.1
-scipy==0.12.0

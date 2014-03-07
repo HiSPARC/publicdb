@@ -18,51 +18,23 @@
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
 
-- name: Copy pip requirements files
-  copy: src=pip-stage1.txt dest=/home/{{ ansible_user_id }}/
-
-- name: Copy pip requirements files
-  copy: src=pip-stage2.txt dest=/home/{{ ansible_user_id }}/
-
-- name: Copy pip requirements files
-  copy: src=pip-stage3.txt dest=/home/{{ ansible_user_id }}/
-
-- name: Copy pip requirements files
-  copy: src=pip-stage4.txt dest=/home/{{ ansible_user_id }}/
-
 - name: Copy conda requirements files
   copy: src=conda.list dest=/home/{{ ansible_user_id }}/
 
 - name: Copy pip requirements files
   copy: src=pip.list dest=/home/{{ ansible_user_id }}/
 
-- name: install python packages in virtualenv -- stage 1
-  pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/home/{{ ansible_user_id }}/pip-stage1.txt
-
-- name: install python packages in virtualenv -- stage 2
-  pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/home/{{ ansible_user_id }}/pip-stage2.txt
-
-- name: install python packages in virtualenv -- stage 3
-  pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/home/{{ ansible_user_id }}/pip-stage3.txt
-
-- name: install latest version of SAPPHiRE in virtualenv
-  pip: virtualenv=/srv/publicdb/publicdb_env
-       requirements=/home/{{ ansible_user_id }}/pip-stage4.txt
-
 - name: create conda environment
-  command: creates=/srv/publicdb/newenv
-           /opt/miniconda/bin/conda create -p /srv/publicdb/newenv python
+  command: creates=/srv/publicdb/publicdb_env
+           /opt/miniconda/bin/conda create -p /srv/publicdb/publicdb_env python
            --yes
 
 - name: install conda packages in conda environment
-  command: /opt/miniconda/bin/conda install -p /srv/publicdb/newenv
+  command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
            --file /home/{{ ansible_user_id }}/conda.list --yes
 
 - name: install packages in conda environment using pip
-  command: /srv/publicdb/newenv/bin/pip install
+  command: /srv/publicdb/publicdb_env/bin/pip install
            -r /home/{{ ansible_user_id }}/pip.list
 
 - name: set up MySQL database

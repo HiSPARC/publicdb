@@ -7,17 +7,10 @@
     - bzip2
     - make
     - gcc-c++
-    - zlib-devel
-    - openssl-devel
-    - readline-devel
-    - sqlite-devel
-    - pkgconfig
-    - gcc-gfortran
-    - lapack-devel
-    - blas-devel
-    - freetype-devel
-    - libpng-devel
-    - bzip2-devel
+    - libSM
+    - libXrender
+    - libXext
+    - fontconfig
 
 - name: download miniconda installer
   get_url: url=http://repo.continuum.io/miniconda/Miniconda-3.0.5-Linux-x86_64.sh
@@ -32,58 +25,6 @@
   lineinfile: dest=/etc/profile.d/path.sh create=yes mode=0644
               regexp='miniconda' line='PATH=/opt/miniconda/bin:$PATH'
   sudo: yes
-
-- name: download python 2.7 source
-  get_url: url=http://www.python.org/ftp/python/2.7.5/Python-2.7.5.tar.bz2
-           dest=/usr/local/src/hisparc/Python-2.7.5.tar.bz2
-
-- name: unpack python 2.7
-  command: chdir=/usr/local/src/hisparc
-           creates=/usr/local/src/hisparc/Python-2.7.5
-           /bin/tar xjf Python-2.7.5.tar.bz2
-
-- name: build and install python 2.7
-  shell: chdir=/usr/local/src/hisparc/Python-2.7.5
-         creates=/usr/local/bin/python2.7
-         ./configure --enable-shared && make && sudo make install &&
-         sudo /sbin/ldconfig
-
-- name: download setuptools
-  get_url: url=https://bitbucket.org/pypa/setuptools/raw/0.8/ez_setup.py
-           dest=/usr/local/src/hisparc/ez_setup.py
-
-- name: install setuptools
-  shell: chdir=/usr/local/src/hisparc
-         creates=/usr/local/bin/easy_install python ez_setup.py
-  sudo: yes
-
-- name: download pip install script
-  get_url: url=https://raw.github.com/pypa/pip/master/contrib/get-pip.py
-           dest=/usr/local/src/hisparc/get-pip.py
-
-- name: install pip
-  shell: chdir=/usr/local/src/hisparc creates=/usr/local/bin/pip
-         python get-pip.py
-  sudo: yes
-
-- name: install virtualenv
-  pip: name=virtualenv
-  sudo: yes
-
-- name: download hdf5 1.8 sources
-  get_url: url=http://www.hdfgroup.org/ftp/HDF5/releases/hdf5-1.8.11/src/hdf5-1.8.11.tar.bz2
-           dest=/usr/local/src/hisparc/hdf5-1.8.11.tar.bz2
-
-- name: unpack hdf5 1.8 sources
-  command: chdir=/usr/local/src/hisparc
-           creates=/usr/local/src/hisparc/hdf5-1.8.11
-           /bin/tar xjf hdf5-1.8.11.tar.bz2
-
-- name: build and install hdf5 1.8
-  shell: chdir=/usr/local/src/hisparc/hdf5-1.8.11
-         creates=/usr/local/lib/libhdf5.so.8.0.0
-         ./configure --prefix=/usr/local && make && sudo make install
-         && sudo /sbin/ldconfig
 
 - name: install git
   yum: name=git state=present
