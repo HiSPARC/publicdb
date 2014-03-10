@@ -25,7 +25,6 @@ dispatcher = SimpleXMLRPCDispatcher()
 
 
 class SingleLineStringIO:
-
     """Very limited file-like object buffering a single line."""
 
     def write(self, line):
@@ -34,6 +33,7 @@ class SingleLineStringIO:
 
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
+
     if request.method == 'POST':
         # Process XML-RPC call
         response = HttpResponse(mimetype='text/xml')
@@ -55,6 +55,7 @@ def call_xmlrpc(request):
 
 def xmlrpc(uri):
     """A decorator for XML-RPC functions."""
+
     def register_xmlrpc(fn):
         dispatcher.register_function(fn, uri)
         return fn
@@ -62,13 +63,13 @@ def xmlrpc(uri):
 
 
 @xmlrpc('hisparc.get_data_url')
-def get_data_url(station_id, date, get_blobs=False):
+def get_data_url(station_number, date, get_blobs=False):
     """Return a link to a file containing requested data
 
     Based on the given parameters, copy requested data to a temporary file
     and provide a link to download that file.
 
-    :param station_id: the HiSPARC station number
+    :param station_number: the HiSPARC station number
     :param date: a xmlrpclib.DateTime instance; retrieve events from this
         day
 
@@ -76,7 +77,7 @@ def get_data_url(station_id, date, get_blobs=False):
     date = date.timetuple()
 
     datafile = get_raw_datafile(date)
-    station_node = get_station_node(datafile, station_id)
+    station_node = get_station_node(datafile, station_number)
     target = get_target()
 
     if get_blobs:
@@ -112,10 +113,10 @@ def get_raw_datafile(date):
     return datafile
 
 
-def get_station_node(datafile, station_id):
+def get_station_node(datafile, station_number):
     """Return the requested station's node"""
 
-    station = 'station_%d' % station_id
+    station = 'station_%d' % station_number
 
     for cluster in datafile.listNodes('/hisparc'):
         if station in cluster:
@@ -136,7 +137,7 @@ def get_target():
     return tables.openFile(file.name, 'w')
 
 
-def download_form(request, station_id=None, start=None, end=None):
+def download_form(request, station_number=None, start=None, end=None):
     if request.method == 'POST':
         form = DataDownloadForm(request.POST)
         if form.is_valid():
@@ -151,8 +152,8 @@ def download_form(request, station_id=None, start=None, end=None):
                                         (station.number, data_type,
                                          query_string))
     else:
-        if station_id:
-            station = get_object_or_404(Station, number=station_id)
+        if station_number:
+            station = get_object_or_404(Station, number=station_number)
         else:
             station = None
         form = DataDownloadForm(initial={'station': station,
@@ -163,18 +164,18 @@ def download_form(request, station_id=None, start=None, end=None):
     return render(request, 'data_download.html', {'form': form})
 
 
-def download_data(request, station_id, data_type='events'):
+def download_data(request, station_number, data_type='events'):
     """Download data.
 
-    :param station_id: station id
+    :param station_number: station number
     :param data_type: (optional) choose between event and weather data
     :param start: (optional, GET) start of data range
     :param end: (optional, GET) end of data range
     :param download: (optional, GET) download the csv
 
     """
-    station_id = int(station_id)
-    station = get_object_or_404(Station, number=station_id)
+    station_number = int(station_number)
+    station = get_object_or_404(Station, number=station_number)
 
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     yesterday = datetime.datetime.combine(yesterday, datetime.time())
@@ -203,10 +204,10 @@ def download_data(request, station_id, data_type='events'):
     timerange_string = prettyprint_timerange(start, end)
     if data_type == 'weather':
         csv_output = generate_weather_as_csv(station, start, end)
-        filename = 'weather-s%d-%s.csv' % (station_id, timerange_string)
+        filename = 'weather-s%d-%s.csv' % (station_number, timerange_string)
     elif data_type == 'events':
         csv_output = generate_events_as_csv(station, start, end)
-        filename = 'events-s%d-%s.csv' % (station_id, timerange_string)
+        filename = 'events-s%d-%s.csv' % (station_number, timerange_string)
 
     response = StreamingHttpResponse(csv_output, content_type='text/csv')
 

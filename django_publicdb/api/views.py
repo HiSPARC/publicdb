@@ -9,6 +9,7 @@ from django_publicdb.coincidences.models import *
 from django_publicdb.analysissessions.models import *
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
+import datastore
 
 import os
 import numpy
@@ -37,49 +38,65 @@ def man(request):
     man = {
         "base_url": 'http://data.hisparc.nl/api/',
         "stations": 'stations/',
-        "stations_in_subcluster": 'subclusters/{subcluster_id}/',
+        "stations_in_subcluster": 'subclusters/{subcluster_number}/',
         "subclusters": 'subclusters/',
-        "subclusters_in_cluster": 'clusters/{cluster_id}/',
+        "subclusters_in_cluster": 'clusters/{cluster_number}/',
         "clusters": 'clusters/',
-        "clusters_in_country": 'countries/{country_id}/',
+        "clusters_in_country": 'countries/{country_number}/',
         "countries": 'countries/',
         "stations_with_data": 'stations/data/{year}/{month}/{day}/',
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
-        "station_info": 'station/{station_id}/',
-        "has_data": 'station/{station_id}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_id}/weather/{year}/{month}/{day}/',
-        "configuration": 'station/{station_id}/config/{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_id}/num_events/{year}/{month}/{day}/{hour}/'}
+        "station_info": 'station/{station_number}/{year}/{month}/{day}/',
+        "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
+        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
+        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
+        "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
+        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
+        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/{year}/{month}/{day}/{number_of_days}/'}
 
     return json_dict(man)
 
 
-def station(request, station_id):
+def station(request, station_number, year=None, month=None, day=None):
     """Get station info
 
-    Retrieve important information about a station.
+    Retrieve important information about a station. If no date if given
+    the latest valid info will be sent, otherwise the latest on or
+    before the given date.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
+    :param year: the year part of the date.
+    :param month: the month part of the date.
+    :param day: the day part of the date.
 
     :return: dictionary containing info about the station. Most importantly,
              this contains information about the position of the station,
              including the position of the individual scintillators.
 
     """
-    today = datetime.date.today()
+    if year and month and day:
+        date = datetime.date(int(year), int(month), int(day))
+        if not validate_date(date):
+            return HttpResponseNotFound()
+    else:
+        date = datetime.date.today()
+
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
         detector = (DetectorHisparc.objects.filter(station=station,
-                                                   startdate__lte=today)
+                                                   startdate__lte=date)
                                            .latest('startdate'))
-        source = (Summary.objects.filter(station=station,
-                                         num_config__isnull=False,
-                                         date__lte=today)
-                                 .latest('date'))
-        config = (Configuration.objects.filter(source=source)
+        source_events = (Summary.objects.filter(station=station,
+                                                num_events__isnull=False,
+                                                date__lte=date).latest('date'))
+        source_config = (Summary.objects.filter(station=station,
+                                                num_config__isnull=False,
+                                                date__lte=date).latest('date'))
+        config = (Configuration.objects.filter(source=source_config)
                                        .latest('timestamp'))
-    except (Station.DoesNotExist, Summary.DoesNotExist,
-            Configuration.DoesNotExist):
+    except (Station.DoesNotExist, DetectorHisparc.DoesNotExist,
+            Summary.DoesNotExist, Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
@@ -87,14 +104,29 @@ def station(request, station_id):
     except IndexError:
         is_active = False
 
-    scintillator1 = {"alpha": detector.scintillator_1_alpha,
-                     "beta": detector.scintillator_1_beta,
-                     "radius": detector.scintillator_1_radius,
-                     "height": detector.scintillator_1_height}
-    scintillator2 = {"alpha": detector.scintillator_2_alpha,
-                     "beta": detector.scintillator_2_beta,
-                     "radius": detector.scintillator_2_radius,
-                     "height": detector.scintillator_2_height}
+    mpv_fits = []
+
+    for i in range(1, 5):
+        try:
+            mpv = (PulseheightFit.objects.get(source=source_events, plate=i)
+                                         .fitted_mpv)
+            if mpv == 0:
+                mpv_fits.append(None)
+            else:
+                mpv_fits.append(mpv)
+        except PulseheightFit.DoesNotExist:
+            mpv_fits.append(None)
+
+    scintillators = [{'alpha': detector.scintillator_1_alpha,
+                      'beta': detector.scintillator_1_beta,
+                      'radius': detector.scintillator_1_radius,
+                      'height': detector.scintillator_1_height,
+                      'mpv': mpv_fits[0]}]
+    scintillators.append({'alpha': detector.scintillator_2_alpha,
+                          'beta': detector.scintillator_2_beta,
+                          'radius': detector.scintillator_2_radius,
+                          'height': detector.scintillator_2_height,
+                          'mpv': mpv_fits[1]})
 
     station_info = {'number': station.number,
                     'name': station.name,
@@ -105,41 +137,38 @@ def station(request, station_id):
                     'longitude': config.gps_longitude,
                     'altitude': config.gps_altitude,
                     'active': is_active,
-                    'scintillators': 2,
-                    'scintillator1': scintillator1,
-                    'scintillator2': scintillator2}
+                    'scintillators': scintillators}
 
     if config.slave() != "no slave":
-        scintillator3 = {"alpha": detector.scintillator_3_alpha,
-                         "beta": detector.scintillator_3_beta,
-                         "radius": detector.scintillator_3_radius,
-                         "height": detector.scintillator_3_height}
-        scintillator4 = {"alpha": detector.scintillator_4_alpha,
-                         "beta": detector.scintillator_4_beta,
-                         "radius": detector.scintillator_4_radius,
-                         "height": detector.scintillator_4_height}
-        station_info.update({'scintillator3': scintillator3,
-                             'scintillator4': scintillator4})
-        station_info['scintillators'] = 4
+        scintillators.append({'alpha': detector.scintillator_3_alpha,
+                              'beta': detector.scintillator_3_beta,
+                              'radius': detector.scintillator_3_radius,
+                              'height': detector.scintillator_3_height,
+                              'mpv': mpv_fits[2]})
+        scintillators.append({'alpha': detector.scintillator_4_alpha,
+                              'beta': detector.scintillator_4_beta,
+                              'radius': detector.scintillator_4_radius,
+                              'height': detector.scintillator_4_height,
+                              'mpv': mpv_fits[3]})
 
     return json_dict(station_info)
 
 
-def stations(request, subcluster_id=None):
+def stations(request, subcluster_number=None):
     """Get station list
 
     Retrieve a list of all stations or all stations in a subcluster.
 
-    :param subcluster_id: a subcluster number identifier. If given, only
+    :param subcluster_number: a subcluster number identifier. If given, only
         stations belonging to that subcluster will be included in the list.
 
     :return: list containing dictionaries which consist of the name and number
              of each station (matching the subcluster).
 
     """
-    if subcluster_id:
+    if subcluster_number:
         try:
-            subcluster = Cluster.objects.get(number=subcluster_id)
+            subcluster = Cluster.objects.get(number=subcluster_number)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -150,208 +179,70 @@ def stations(request, subcluster_id=None):
     return json_dict(stations)
 
 
-def stations_with_data(request):
-    """Get stations with data
+def stations_with_data(request, type=None, year=None, month=None, day=None):
+    """Get stations with event or weather data
 
-    Retrieve a list of all stations which have recorded data.
+    Retrieve a list of all stations which have recorded events or
+    weather data in the given year, month, day or at all.
 
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events.
-
-    """
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__gte=datetime.date(2002, 1, 1),
-                                        summary__date__lte=datetime.date.today())
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_year(request, year):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data in the given year.
-
-    :param year: the year part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events in the given year.
-
-    """
-    date = datetime.date(int(year), 1, 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__year=int(year))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_month(request, year, month):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data in the given month.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events in the given month.
-
-    """
-    date = datetime.date(int(year), int(month), 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__year=int(year),
-                                        summary__date__month=int(month))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_day(request, year, month, day):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data on the given date.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events on the given date.
-
-    """
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = Summary.objects.filter(num_events__isnull=False, date=date)
-    stations = [{'number': summary.station.number, 'name': summary.station.name}
-                for summary in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather(request):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data.
-
-    """
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__gte=datetime.date(2002, 1, 1),
-                                        summary__date__lte=datetime.date.today())
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather_year(request, year):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data in the given year.
-
-    :param year: the year part of the date.
+    :param type: data type to check for, either weather or events.
+    :param year, month, day: the date, this has to be within the time
+                             HiSPARC has been operational and can be as
+                             specific as you desire.
 
     :return: list of dictionaries containing the name and number of each
              station that has measured weather data in the given year.
 
     """
-    date = datetime.date(int(year), 1, 1)
+    if type == 'events':
+        stations = Station.objects.filter(summary__num_events__isnull=False)
+    elif type == 'weather':
+        stations = Station.objects.filter(summary__num_weather__isnull=False)
+    else:
+        return HttpResponseNotFound()
+
+    if not year:
+        date = datetime.date.today()
+        stations = stations.filter(summary__date__gte=datetime.date(2002, 1, 1),
+                                   summary__date__lte=date)
+    elif not month:
+        date = datetime.date(int(year), 1, 1)
+        stations = stations.filter(summary__date__year=date.year)
+    elif not day:
+        date = datetime.date(int(year), int(month), 1)
+        stations = stations.filter(summary__date__year=date.year,
+                                   summary__date__month=date.month)
+    else:
+        date = datetime.date(int(year), int(month), int(day))
+        stations = stations.filter(summary__date=date)
+
+    stations = stations.distinct()
+
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__year=int(year))
-                                .distinct())
     stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
+                for station in stations]
 
     return json_dict(stations)
 
 
-def stations_with_weather_month(request, year, month):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data in the given month.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data in the given month.
-
-    """
-    date = datetime.date(int(year), int(month), 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__year=int(year),
-                                        summary__date__month=int(month))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather_day(request, year, month, day):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data on the given date.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data on the given date.
-
-    """
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = Summary.objects.filter(num_weather__isnull=False, date=date)
-    stations = [{'number': summary.station.number, 'name': summary.station.name}
-                for summary in summaries]
-
-    return json_dict(stations)
-
-
-def subclusters(request, cluster_id=None):
+def subclusters(request, cluster_number=None):
     """Get subcluster list
 
     Retrieve a list of all subclusters or all subclusters in a specific
     cluster.
 
-    :param cluster_id: a cluster number identifier, give this to only get
+    :param cluster_number: a cluster number identifier, give this to only get
         subclusters from this cluster.
 
     :return: list of dictionaries containing the name and number of all
              subclusters that matched the given parameters.
 
     """
-    if cluster_id:
+    if cluster_number:
         try:
-            cluster = Cluster.objects.get(number=cluster_id, parent=None)
+            cluster = Cluster.objects.get(number=cluster_number, parent=None)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -362,22 +253,22 @@ def subclusters(request, cluster_id=None):
     return json_dict(subclusters)
 
 
-def clusters(request, country_id=None):
+def clusters(request, country_number=None):
     """Get cluster list
 
     Retrieve a list of all clusters or only the clusters in a specific country.
     By cluster we here mean the main clusters, which contain subclusters.
 
-    :param country_id: a country number identifier, give this to only get
+    :param country_number: a country number identifier, give this to only get
         clusters from a specific country.
 
     :return: list of dictionaries containing the name and number of all
              clusters that matched the given parameters.
 
     """
-    if country_id:
+    if country_number:
         try:
-            country = Country.objects.get(number=country_id)
+            country = Country.objects.get(number=country_number)
         except Country.DoesNotExist:
             return HttpResponseNotFound()
     else:
@@ -497,62 +388,73 @@ def get_pulseheight_drift(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Fit drift
+    if len(fits) < 14:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "There are less than 14 fits in the requested date range, no drift rate will be calculated."})
+        return json_dict(dict)
 
-    t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
-    mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
+    try:
+        # Fit drift
 
-    linear_fit = lambda p, t: p[0] + p[1] * t # Target function
+        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+        mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-    # Determine the drift by a linear fit
-    errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+        linear_fit = lambda p, t: p[0] + p[1] * t # Target function
 
-    p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
-    p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
+        # Determine the drift by a linear fit
+        errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
 
-    drift = p1[1] * 86400.0
+        p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+        p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
 
-    # Calculate the relative fluctuation
+        drift = p1[1] * 86400.0
 
-    relative_mpv = []
+        # Calculate the relative fluctuation
 
-    for t, mpv in zip(t_array, mpv_array):
-        relative_mpv.append(mpv / linear_fit(p1, t))
+        relative_mpv = []
 
-    # Fit the relative fluctation with a gauss
-    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+        for t, mpv in zip(t_array, mpv_array):
+            relative_mpv.append(mpv / linear_fit(p1, t))
 
-    # x = ADC, y = number of events per dPulseheight
+        # Fit the relative fluctation with a gauss
+        gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
 
-    bins = numpy.arange(0.0, 2.0, 0.005)
-    y, bins = numpy.histogram(relative_mpv, bins=bins)
-    x = (bins[:-1] + bins[1:]) / 2
+        # x = ADC, y = number of events per dPulseheight
 
-    initial_N = 16
-    initial_mean = 1
-    initial_width = 0.03
+        bins = numpy.arange(0.0, 2.0, 0.005)
+        y, bins = numpy.histogram(relative_mpv, bins=bins)
+        x = (bins[:-1] + bins[1:]) / 2
 
-    popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
-                                                           initial_mean,
-                                                           initial_width))
+        initial_N = 16
+        initial_mean = 1
+        initial_width = 0.03
 
-    dict.update({'number_of_selected_days': len(t_array),
-                 'number_of_requested_days': number_of_days,
-                 'fit_offset': p1[0],
-                 'fit_slope': p1[1],
-                 'drift_per_day': drift,
-                 'timestamp': t_array.tolist(),
-                 'mpv': mpv_array.tolist(),
-                 'relative_mean': popt[1],
-                 'relative_width': popt[2],
+        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
+                                                               initial_mean,
+                                                               initial_width))
 
-                 # Debug
-                 #'relative_mpv': relative_mpv,
-                 #'frequency': frequency.tolist(),
-                 #'x': x.tolist()
-                 })
+        dict.update({'number_of_selected_days': len(t_array),
+                     'number_of_requested_days': number_of_days,
+                     'fit_offset': p1[0],
+                     'fit_slope': p1[1],
+                     'drift_per_day': drift,
+                     'timestamp': t_array.tolist(),
+                     'mpv': mpv_array.tolist(),
+                     'relative_mean': popt[1],
+                     'relative_width': popt[2],
 
-    return json_dict(dict)
+                     # Debug
+                     #'relative_mpv': relative_mpv,
+                     #'frequency': frequency.tolist(),
+                     #'x': x.tolist()
+                     })
+
+        return json_dict(dict)
+    except Exception, e:
+        dict.update({"nagios": Nagios.unknown,
+                     "error": "Error in calculating the drift",
+                     "exception": str(e)})
+        return json_dict(dict)
 
 
 def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
@@ -623,7 +525,10 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "fitted_mpv_error": fit.fitted_mpv_error,
                      "fitted_width": fit.fitted_width,
                      "fitted_width_error": fit.fitted_width_error,
-                     "chi_square_reduced": fit.chi_square_reduced})
+                     "degrees_of_freedom": fit.degrees_of_freedom,
+                     "chi_square_reduced": fit.chi_square_reduced,
+                     "error_type": fit.error_type,
+                     "error_message": fit.error_message})
     except Exception, e:
         dict.update({"nagios": Nagios.unknown,
                      "error": "Data has been found, "
@@ -631,7 +536,12 @@ def get_pulseheight_fit(request, station_number, plate_number,
                      "exception": str(e)})
         return json_dict(dict)
 
-    # Data quality
+    # Fit failures
+
+    if len(fit.error_message) > 0:
+        dict.update({"nagios" : Nagios.critical,
+                     "quality": fit.error_message})
+        return json_dict(dict)
 
     # Based on chi2 of the fit
 
@@ -665,8 +575,8 @@ def get_pulseheight_fit(request, station_number, plate_number,
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
         dict.update({"nagios": Nagios.critical,
-                "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
-                           (lower_bound, upper_bound, fit.fitted_mpv)})
+                     "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                                (lower_bound, upper_bound, fit.fitted_mpv)})
         return json_dict(dict)
 
     dict.update({"nagios": Nagios.ok,
@@ -675,39 +585,54 @@ def get_pulseheight_fit(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def has_data(request, station_id, year=None, month=None, day=None):
+def has_data(request, station_number, type=None, year=None, month=None,
+             day=None):
     """Check for presence of cosmic ray data
 
     Find out if the given station has measured shower data, either on a
     specific date, or at all.
 
-    :param station_id: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
+    :param station_number: a stationn number identifier.
+    :param type: the data type, either events or weather.
+    :param year, month, day: the date, this has to be within the time
+            HiSPARC has been operational and can be as specific as
+            you desire.
 
-    :return: boolean, True if the given station has shower data, False otherwise.
+    :return: boolean, True if the given station has data, False otherwise.
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
+    summaries = Summary.objects.filter(station=station)
 
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
+    if type=='events':
+        summaries = summaries.filter(num_events__isnull=False)
+    elif type=='weather':
+        summaries = summaries.filter(num_weather__isnull=False)
+
+    if day:
+        date = datetime.date(int(year), int(month), int(day))
+        summaries = summaries.filter(date=date)
+    elif month:
+        date = datetime.date(int(year), int(month), 1)
+        summaries = summaries.filter(date__year=date.year,
+                                     date__month=date.month)
+    elif year:
+        date = datetime.date(int(year), 1, 1)
+        summaries = summaries.filter(date__year=date.year)
+    else:
+        date = datetime.date.today()
+        summaries = summaries.filter(date__gte=datetime.date(2002, 1, 1),
+                                     date__lte=date)
+
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    try:
+        a_summary_exists = summaries[0]
         has_data = True
     except IndexError:
         has_data = False
@@ -715,54 +640,14 @@ def has_data(request, station_id, year=None, month=None, day=None):
     return json_dict(has_data)
 
 
-def has_weather(request, station_id, year=None, month=None, day=None):
-    """Check for presence of weather data
-
-    Find out if the given station has measured weather data, either on a
-    specific date, or at all.
-
-    :param station_id: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: boolean, True if the given station has weather data,
-        False otherwise.
-
-    """
-    try:
-        station = Station.objects.get(number=station_id)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
-        has_weather = True
-    except IndexError:
-        has_weather = False
-
-    return json_dict(has_weather)
-
-
-def config(request, station_id, year=None, month=None, day=None):
+def config(request, station_number, year=None, month=None, day=None):
     """Get station config settings
 
     Retrieve the entire configuration of a station. If no date if given the
     latest config will be sent, otherwise the latest on or before the given
     date.
 
-    :param station_id: a station number identifier.
+    :param station_number: a station number identifier.
     :param year: the year part of the date.
     :param month: the month part of the date.
     :param day: the day part of the date.
@@ -772,7 +657,7 @@ def config(request, station_id, year=None, month=None, day=None):
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -802,170 +687,92 @@ def config(request, station_id, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_id):
-    """Get total number of events for a station
+def num_events(request, station_number, year=None, month=None, day=None,
+               hour=None):
+    """Get number of events for a station
 
     Retrieve the number of events that a station has measured during its
-    entire operation. The following functions each dig a little deeper,
-    going for a shorter time period.
+    entire operation or during a specific period, which can be a year,
+    month, day or an hour.
 
-    :param station_id: a stationn number identifier.
+    :param station_number: a stationn number identifier.
+    :param year, month, day, hour: the date, this has to be within the
+            time HiSPARC has been operational and can be as specific as
+            you desire.
 
     :return: integer containing the total number of events ever recorded by
              the given station.
 
     """
     try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    start = datetime.date(2002, 1, 1)
-    end = datetime.date.today()
-    if not validate_date(start):
-        return HttpResponseNotFound()
+    histogram_type = HistogramType.objects.get(slug='eventtime')
 
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
+    histograms = DailyHistogram.objects.filter(source__station=station,
+                                               type=histogram_type)
 
-    return json_dict(num_events)
-
-
-def num_events_year(request, station_id, year):
-    """Get total number of events for a station in the given year
-
-    Retrieve the total number of events that a station has measured during
-    the given year.
-
-    :param station_id: a station number identifier.
-    :param year: the year for which the number of events is to be given.
-
-    :return: integer containing the total number of events recorded by the
-             given station in the given year.
-
-    """
-    try:
-        station = Station.objects.get(number=station_id)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    start = datetime.date(int(year), 1, 1)
-    end = datetime.date(int(year) + 1, 1, 1)
-    if not validate_date(start):
-        return HttpResponseNotFound()
-
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
-
-    return json_dict(num_events)
-
-
-def num_events_month(request, station_id, year, month):
-    """Get total number of events for a station in the given month of a year
-
-    Retrieve the total number of events that a station has measured during
-    the given month.
-
-    :param station_id: a station number identifier.
-    :param year: the year in which to look for the month.
-    :param month: the month for which the number of events is to be given.
-
-    :return: integer containing the total number of events recorded by the
-             given station in the given month of the given year.
-
-    """
-    try:
-        station = Station.objects.get(number=station_id)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    start = datetime.date(int(year), int(month), 1)
-    if int(month) == 12:
-        end = datetime.date(int(year) + 1, 1, 1)
+    if not year:
+        date = datetime.date.today()
+        start = datetime.date(2002, 1, 1)
+        histograms = histograms.filter(source__date__gte=start,
+                                       source__date__lt=date)
+    elif not month:
+        date = datetime.date(int(year), 1, 1)
+        histograms = histograms.filter(source__date__year=date.year)
+    elif not day:
+        date = datetime.date(int(year), int(month), 1)
+        histograms = histograms.filter(source__date__year=date.year,
+                                       source__date__month=date.month)
+    elif not hour:
+        date = datetime.date(int(year), int(month), int(day))
+        histograms = histograms.filter(source__date=date)
     else:
-        end = datetime.date(int(year), int(month) + 1, 1)
-    if not validate_date(start):
+        try:
+            date = datetime.date(int(year), int(month), int(day))
+            histogram = histograms.get(source__date=date)
+            num_events = histogram.values[int(hour)]
+        except DailyHistogram.DoesNotExist:
+            num_events = 0
+
+    if not validate_date(date):
         return HttpResponseNotFound()
 
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
+    if not hour:
+        num_events = sum([sum(histogram.values) for histogram in histograms])
 
     return json_dict(num_events)
 
 
-def num_events_day(request, station_id, year, month, day):
-    """Get total number of events for a station on a given date
+def get_event_traces(request, station_number, ext_timestamp):
+    """Get the traces for an event
 
-    Retrieve the total number of events that a station has measured on a date.
+    :param station_number: a station number identifier.
+    :param ext_timestamp: the extended timestamp (nanoseconds since UNIX epoch).
 
-    :param station_id: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: integer denoting the number of events recorded by the station
-             on the given date.
+    :return: two or four traces.
 
     """
-    try:
-        station = Station.objects.get(number=station_id)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
+    ext_timestamp = int(ext_timestamp)
 
-    date = datetime.date(int(year), int(month), int(day))
+    date = datetime.datetime.utcfromtimestamp(ext_timestamp / 1e9).date()
     if not validate_date(date):
         return HttpResponseNotFound()
 
     try:
-        summary = Summary.objects.get(station=station, date=date,
-                                      num_events__isnull=False)
-        num_events = summary.num_events
-    except Summary.DoesNotExist:
-        num_events = 0
-
-    return json_dict(num_events)
-
-
-def num_events_hour(request, station_id, year, month, day, hour):
-    """Get number of events for a station in an hour on the given date
-
-    Retrieve the total number of events that a station has measured in that
-    hour.
-
-    :param station_id: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-    :param hour: the hour for which the number of events is to be retrieved.
-
-    :return: integer giving the number of events recorded by the station
-             in hour on date.
-
-    """
-    try:
-        station = Station.objects.get(number=station_id)
+        station = Station.objects.get(number=station_number)
+        Summary.objects.get(station=station, date=date, num_events__isnull=False)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
+    try:
+        traces = datastore.get_event_traces(station, ext_timestamp)
+    except IndexError:
         return HttpResponseNotFound()
 
-    try:
-        histogram = DailyHistogram.objects.get(source__station=station,
-                                               type__slug='eventtime',
-                                               source__date=date)
-        num_events = histogram.values[int(hour)]
-    except (DailyHistogram.DoesNotExist, IndexError):
-        num_events = 0
-
-    return json_dict(num_events)
+    return json_dict(traces)
 
 
 def validate_date(date):

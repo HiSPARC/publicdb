@@ -9,13 +9,13 @@ from django_publicdb.inforecords.models import *
 from django_publicdb.status_display.nagios import *
 
 
-def station_on_map(request, station_id):
+def station_on_map(request, station_number):
     """Zoom in on a specific station on a map"""
 
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    center = (DetectorHisparc.objects.filter(station__number=int(station_id),
+    center = (DetectorHisparc.objects.filter(station__number=int(station_number),
                                              startdate__lte=today)
                                      .latest('startdate'))
 

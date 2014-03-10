@@ -249,7 +249,11 @@ class PulseheightFit(models.Model):
     fitted_width = models.FloatField()
     fitted_width_error = models.FloatField()
 
+    degrees_of_freedom = models.IntegerField(default=0)
     chi_square_reduced = models.FloatField()
+
+    error_type = models.CharField(default="", max_length=64)
+    error_message = models.TextField(default="")
 
     def station(self):
         return self.source.station.number

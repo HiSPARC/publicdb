@@ -41,6 +41,13 @@ ESD_PATH = os.path.join(publicdb_path, 'esd')
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
 
+# VPN and datastore host names
+VPN_HOST = 'localhost'
+DATASTORE_HOST = 'localhost'
+
+# Webserver of the publicdb where Nagios will retrieve active check results
+PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
+
 # reCAPTCHA settings
 RECAPTCHA_ENABLED = False
 RECAPTCHA_PUB_KEY = 'foobar'
