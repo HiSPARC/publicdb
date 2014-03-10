@@ -11,6 +11,18 @@
               state=present
   sudo: yes
 
+- name: Compile firewall rules
+  command: lokkit --update
+  sudo: yes
+
+- name: Restart firewall (IPv4)
+  service: name=iptables state=restarted enabled=yes
+  sudo: yes
+
+- name: Restart firewall (IPv6)
+  service: name=ip6tables state=restarted enabled=yes
+  sudo: yes
+
 # Bootstrapping EPEL repository trick
 # http://zigg.com/2013/yum-repository-bootstrapping-ansible.html
 - name: bootstrap epel-release install
