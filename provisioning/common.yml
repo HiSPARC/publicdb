@@ -1,7 +1,7 @@
 ---
 - name: ensure /usr/local/bin is in sudoers
   lineinfile: dest=/etc/sudoers regexp='secure_path'
-              line="Defaults    secure_path = /usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+              line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
               state=present
   sudo: yes
 
@@ -9,6 +9,18 @@
   lineinfile: dest=/etc/sysconfig/system-config-firewall
               regexp='--service=http' line='--service=http'
               state=present
+  sudo: yes
+
+- name: Compile firewall rules
+  command: lokkit --update
+  sudo: yes
+
+- name: Restart firewall (IPv4)
+  service: name=iptables state=restarted enabled=yes
+  sudo: yes
+
+- name: Restart firewall (IPv6)
+  service: name=ip6tables state=restarted enabled=yes
   sudo: yes
 
 # Bootstrapping EPEL repository trick
@@ -49,4 +61,8 @@
 
 - name: set default group write ACLs on /usr/local/src
   command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
+  sudo: yes
+
+- name: install screen
+  yum: name=screen
   sudo: yes
