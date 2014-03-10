@@ -78,7 +78,7 @@ var _coincidencenumberhistogram = {
     yaxis: {
         axisLabel: 'Number of coincidences',
         min: 0.7,
-        ticks: [1, 10, 100, 1000, 10000, 100000],
+        ticks: [0.1, 1, 10, 100, 1000, 10000, 100000],
         transform: function (N) {return Math.log(N);},
         inverseTransform: function (N) {return Math.exp(N);}},
     xaxis: {
