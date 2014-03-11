@@ -115,18 +115,18 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         return lambda x: x
 
 
-def search_coincidences_and_store_in_esd(summary):
+def search_coincidences_and_store_in_esd(network_summary):
     """Determine coincidences for events from Event Summary Data
 
     Events from all non-test stations in the ESD are processed
     for coincidences, the results of which are stored in the
     coincidences group.
 
-    :param summary: summary of data source (station and date)
-    :type summary: histograms.models.Summary instance
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
 
     """
-    date = summary.date
+    date = network_summary.date
 
     filepath = get_esd_data_path(date)
     data = tables.openFile(filepath, 'a')
@@ -328,17 +328,17 @@ def get_event_timestamps(summary):
     return get_event_data(summary, 'timestamp')
 
 
-def get_coincidence_timestamps(summary):
+def get_coincidence_timestamps(network_summary):
     """Get coincidence timestamps
 
     Read data from file and return a list of timestamps for all coincidences
     on the date specified by the summary.
 
-    :param summary: summary of data source (date)
-    :type summary: histograms.models.NetworkSummary instance
+    :param network_summary: summary of data source (date)
+    :type network_summary: histograms.models.NetworkSummary instance
 
     """
-    return get_coincidence_data(summary, 'timestamp')
+    return get_coincidence_data(network_summary, 'timestamp')
 
 
 def get_pulseheights(summary):
@@ -415,15 +415,15 @@ def get_event_data(summary, quantity):
     return get_data(summary, 'events', quantity)
 
 
-def get_coincidence_data(summary, quantity):
+def get_coincidence_data(network_summary, quantity):
     """Get event data of a specific quantity
 
-    :param summary: summary of data source (station and date)
-    :type summary: histograms.models.Summary instance
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
     :param quantity: the specific event data type (e.g., 'pulseheights')
 
     """
-    return get_coincidences(summary, 'coincidences', quantity)
+    return get_coincidences(network_summary, 'coincidences', quantity)
 
 
 def get_data(summary, tablename, quantity):
@@ -452,16 +452,16 @@ def get_data(summary, tablename, quantity):
     return data
 
 
-def get_coincidences(summary, tablename, quantity):
+def get_coincidences(network_summary, tablename, quantity):
     """Get data from the datastore from a table of a specific quantity
 
-    :param summary: summary of data source (date)
-    :type summary: histograms.models.NetworkSummary instance
+    :param network_summary: summary of data source (date)
+    :type network_summary: histograms.models.NetworkSummary instance
     :param tablename: table name (e.g. 'coincidences', 'observables', ...)
     :param quantity: the specific event data type (e.g., 'shower_size')
 
     """
-    date = summary.date
+    date = network_summary.date
 
     path = get_esd_data_path(date)
     with tables.openFile(path, 'r') as datafile:
@@ -469,7 +469,7 @@ def get_coincidences(summary, tablename, quantity):
             coincidences_node = get_coincidences_node(datafile)
             table = datafile.getNode(coincidences_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, summary)
+            logger.error("Cannot find table %s for %s", tablename, network_summary)
             data = None
         else:
             data = table.col(quantity)
