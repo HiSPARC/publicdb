@@ -7,9 +7,9 @@ from operator import itemgetter
 
 import numpy as np
 import tables
-from sapphire.analysis import process_events
-from sapphire.analysis import coincidences
+from sapphire.analysis import process_events, coincidences
 from sapphire.storage import ProcessedHisparcEvent
+from sapphire import clusters
 
 from django_publicdb.inforecords.models import Station
 import datastore
@@ -128,20 +128,28 @@ def search_coincidences_and_store_in_esd(network_summary):
     """
     date = network_summary.date
 
+    # Get non-test stations with events on the specified date
+    stations = Station.objects.filter(summary__date=date,
+                                      summary__num_events__isnull=False,
+                                      pc__is_test=False)
+
+    station_groups = ['/hisparc/cluster_%s/station_%d' %
+                      (station.cluster.main_cluster().lower(), station.number)
+                      for station in stations]
+
+    cluster = clusters.BaseCluster()
+    for station in stations:
+        # FIXME: Wrong station position and no detectors..
+        cluster._add_station((0, 0), 0, [], station.number)
+
     filepath = get_esd_data_path(date)
-    data = tables.openFile(filepath, 'a')
-    test_stations = ['station_%d' % station.number
-                     for station in Station.objects.filter(pc__is_test=True)]
-    station_groups = [table._v_parent._v_pathname
-                      for table in data.walkNodes('/hisparc', 'Table')
-                      if table.name == 'events'
-                      and table._v_parent._v_name not in test_stations]
-    coinc = coincidences.CoincidencesESD(data, '/coincidences', station_groups,
-                                         overwrite=True)
-    coinc.search_coincidences(window=COINCIDENCE_WINDOW)
-    coinc.store_coincidences()
-    num_coincidences = len(coinc.coincidences)
-    data.close()
+    with tables.openFile(filepath, 'a') as data:
+        coinc = coincidences.CoincidencesESD(data, '/coincidences',
+                                             station_groups, overwrite=True)
+        coinc.search_coincidences(window=COINCIDENCE_WINDOW)
+        coinc.store_coincidences(cluster=cluster)
+        num_coincidences = len(coinc.coincidences)
+
     return num_coincidences
 
 
