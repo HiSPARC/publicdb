@@ -5,7 +5,7 @@ var _base = {
     colors: ["#222", "#D22", "#1C2", "#1CC"],
     series: {
         lines: {
-            lineWidth: 1.5,
+            lineWidth: 1.25,
             steps: true},
         shadowSize: 0},
     yaxis: {
@@ -107,6 +107,7 @@ var _pulseheighthistogram = {
         transform: function (N) {return Math.log(N) / Math.LN10;},
         inverseTransform: function (N) {return Math.pow(10, N);}},
     xaxis: {
+        max: 2500,
         axisLabel: 'Pulseheight (mV)'}
 };
 

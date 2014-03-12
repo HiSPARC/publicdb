@@ -23,8 +23,8 @@ import fit_pulseheight_peak
 logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
-MAX_PH = 2000
-BIN_PH_NUM = 200
+MAX_PH = 2500
+BIN_PH_NUM = 250
 MAX_IN = 50000
 BIN_IN_NUM = 200
 
