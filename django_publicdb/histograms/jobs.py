@@ -24,9 +24,9 @@ logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
 MAX_PH = 2500
-BIN_PH_NUM = 250
-MAX_IN = 50000
-BIN_IN_NUM = 200
+BIN_PH_NUM = 250 # bin width = 10 mV
+MAX_IN = 62500
+BIN_IN_NUM = 250 # bin width = 250 mVns
 
 # Tables supported by this code
 SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']

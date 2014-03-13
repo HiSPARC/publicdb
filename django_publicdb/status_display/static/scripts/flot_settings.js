@@ -119,6 +119,7 @@ var _pulseintegralhistogram = {
         transform: function (N) {return Math.log(N) / Math.log(10);},
         inverseTransform: function (N) {return Math.pow(10, N);}},
     xaxis: {
+        max: 62500,
         axisLabel: 'Pulseintegral (mVns)'}
 };
 
