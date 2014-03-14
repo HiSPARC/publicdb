@@ -54,7 +54,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
     def _get_source(self):
         """Return the table containing the events.
 
-        :returns: table object
+        :return: table object
 
         """
         if '_events' in self.source_group:
@@ -239,7 +239,7 @@ def get_station_node_path(station):
 
     :param station: inforecords.Station instance
 
-    :returns: path to station group as used in datastore / ESD files
+    :return: path to station group as used in datastore / ESD files
 
     """
     cluster = station.cluster.main_cluster()
@@ -310,7 +310,7 @@ def get_or_create_esd_data_path(date):
 
     :param date: datetime.date object
 
-    :returns: path to ESD file
+    :return: path to ESD file
 
     """
     filepath = get_esd_data_path(date)

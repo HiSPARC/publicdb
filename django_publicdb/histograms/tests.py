@@ -524,7 +524,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         Also checks if event histograms are created.
 
         :param date: Date for which to update the histograms of STATION1.
-        :returns: Summary object for which the histograms are processed.
+
+        :return: Summary object for which the histograms are processed.
 
         """
         # Prepare database

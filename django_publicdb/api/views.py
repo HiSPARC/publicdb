@@ -775,7 +775,7 @@ def has_weather(request, station_number, year=None, month=None, day=None):
     :param day: the day part of the date.
 
     :return: boolean, True if the given station has weather data,
-        False otherwise.
+             False otherwise.
 
     """
     try:

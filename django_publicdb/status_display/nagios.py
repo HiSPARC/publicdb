@@ -99,6 +99,7 @@ def get_station_status(station_number, down, problem, up):
     :param down: list of stations that are DOWN.
     :param problem: list of stations that have a service CRITICAL (but are UP).
     :param up: list of stations that are UP.
+
     :return: string denoting the current status of requested station, if the
              station occurs in multiple lists, the worst case is returned.
 
@@ -114,10 +115,12 @@ def get_station_status(station_number, down, problem, up):
 
 
 def get_status_counts(down, problem, up):
-    """
+    """Put the lengths of each status list in a dictionary.
+
     :param down: list of stations that are DOWN.
     :param problem: list of stations that have a service CRITICAL (but are UP).
     :param up: list of stations that are UP.
+
     :return: dictionary containing the counts of stations with a status.
 
     """
