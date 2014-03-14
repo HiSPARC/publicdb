@@ -192,7 +192,8 @@ class NetworkHistogram(models.Model):
     values = SerializedDataField()
 
     def __unicode__(self):
-        return "%s - %s" % (self.source.date.strftime('%c'), self.type)
+        return '%s - %s' % (self.source.date.strftime('%d %b %Y'),
+                            self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -207,7 +208,8 @@ class DailyHistogram(models.Model):
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -222,7 +224,8 @@ class DailyDataset(models.Model):
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -290,7 +293,12 @@ class PulseheightFit(models.Model):
         return self.source.date
     date.admin_order_field = 'source__date'
 
+    def __unicode__(self):
+        return "%d - %s - %d" % (self.source.station.number,
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.plate)
+
     class Meta:
         verbose_name_plural = 'Pulseheight fit'
         unique_together = ('source', 'plate')
-
+        ordering = ('source', 'plate')
