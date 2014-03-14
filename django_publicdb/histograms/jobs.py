@@ -151,6 +151,8 @@ def check_table_and_update_flags(table_name, num_events, summary):
 
 
 def update_all_histograms():
+    """Perform the update tasks if no update is currently running."""
+
     state = GeneratorState.objects.get()
 
     if state.update_is_running:
@@ -255,7 +257,7 @@ def search_and_store_coincidences_for_network_summary(network_summary):
 
 
 def update_histograms():
-    """Update all histograms"""
+    """Update new configs, histograms and datasets"""
 
     perform_tasks_manager("Summary", "needs_update_config",
                           perform_config_tasks)
@@ -360,6 +362,8 @@ def update_eventtime_histogram(summary):
 
 
 def update_coincidencetime_histogram(network_summary):
+    """Histograms that show the number of coincidences per hour"""
+
     logger.debug("Updating coincidencetime histogram for %s" % network_summary)
     timestamps = esd.get_coincidence_timestamps(network_summary)
 
@@ -378,6 +382,8 @@ def update_coincidencetime_histogram(network_summary):
 
 
 def update_coincidencenumber_histogram(network_summary):
+    """Histograms of the number of stations participating in coincidences"""
+
     logger.debug("Updating coincidencenumber histogram for %s" %
                  network_summary)
     n_stations = esd.get_coincidence_data(network_summary, 'N')
@@ -391,6 +397,8 @@ def update_coincidencenumber_histogram(network_summary):
 
 
 def update_pulseheight_histogram(summary):
+    """Histograms of pulseheights for each detector individually"""
+
     logger.debug("Updating pulseheight histogram for %s" % summary)
     pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
@@ -409,6 +417,8 @@ def update_pulseheight_fit(summary):
 
 
 def update_pulseintegral_histogram(summary):
+    """Histograms of pulseintegral for each detector individually"""
+
     logger.debug("Updating pulseintegral histogram for %s" % summary)
     integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
@@ -444,6 +454,8 @@ def process_weather_and_store_esd(summary):
 
 
 def update_temperature_dataset(summary):
+    """Create dataset of timestamped temperature data"""
+
     logger.debug("Updating temperature dataset for %s" % summary)
     temperature = esd.get_temperature(summary)
     ERR = [-999, -2 ** 15]
@@ -453,6 +465,8 @@ def update_temperature_dataset(summary):
 
 
 def update_barometer_dataset(summary):
+    """Create dataset of timestamped barometer data"""
+
     logger.debug("Updating barometer dataset for %s" % summary)
     barometer = esd.get_barometer(summary)
     save_dataset(summary, 'barometer', barometer)
