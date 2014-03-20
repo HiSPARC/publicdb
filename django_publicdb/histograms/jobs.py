@@ -28,6 +28,10 @@ BIN_PH_NUM = 200
 MAX_IN = 50000
 BIN_IN_NUM = 200
 
+# Parameters for the datasets, interval in seconds
+INTERVAL_TEMP = 150
+INTERVAL_BARO = 150
+
 # Tables supported by this code
 SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
 # Tables ignored by this code (unsupported tables not listed here will
@@ -314,6 +318,7 @@ def update_temperature_dataset(summary):
     temperature = esd.get_temperature(summary)
     ERR = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in ERR]
+    temperature = shrink_dataset(temperature, INTERVAL_TEMP)
     if temperature != []:
         save_dataset(summary, 'temperature', temperature)
 
@@ -321,7 +326,23 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
     barometer = esd.get_barometer(summary)
+    barometer = shrink_dataset(barometer, INTERVAL_BARO)
     save_dataset(summary, 'barometer', barometer)
+
+
+def shrink_dataset(dataset, interval):
+    """Shrink a dataset by skipping over data.
+
+    :param dataset: list of x, y data to be shrunk.
+    :param interval: minimum value between subsequent x values.
+    :return: list of tuples with filtered x, y values.
+
+    """
+    data = [dataset[0]]
+    for x, y in dataset[1:]:
+        if ts - data[-1][0] >= interval:
+            data.append((x, y))
+    return data
 
 
 def update_config(summary):
