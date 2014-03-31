@@ -1,0 +1,147 @@
+{% extends 'base_station.html' %}
+
+{% load url from future %}
+{% load fix_data %}
+
+{% block current_data %}currentPage{% endblock %}
+
+{% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
+
+{% block head_styles %}
+    {{ block.super }}
+    <style type="text/css" media="all">
+        h3 {
+            text-align: center;}
+        #pageHeader {
+            top: 0px;
+            left: 1030px;}
+      {% if old_data %}
+        #date {
+            color: darkred;}
+        #date:after {
+            content: " (no recent data available)";}
+      {% endif %}
+        #header {
+            text-align: center;}
+        #container {
+            width: 1280px;}
+        #graphs {
+            width: 1280px;}
+        #sidebar {
+            display: none;}
+        .histogram {
+            display: inline-block;}
+    </style>
+{% endblock %}
+
+{% block head %}
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script type="text/javascript">
+        function resizeToFit() {
+            w_scale = $(window).width() / 1280;
+            h_scale = $(window).height() / 750;
+            scale = Math.min(w_scale, h_scale);
+            $('body').css({'zoom': scale,
+                           '-moz-transform': 'scale(' + scale + ')',
+                           '-moz-transform-origin': '0 0'})
+        }
+
+        $(document).ready(function() {
+            // Automatically resize the content to fit in window
+            resizeToFit();
+            $(window).resize(function() {
+                resizeToFit();
+            });
+        });
+    </script>
+    <!--[if lte IE 8]><script type="text/javascript">
+        var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
+        var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
+    </script><![endif]-->
+{% endblock %}
+
+{% block date %}{{ date|date:"D, j N Y" }}{% endblock %}
+
+{% block data %}
+    <div id="graphs">
+
+      {% if eventhistogram %}
+        <div id="eventHistogram" class="histogram">
+            <h3>Event histogram</h3>
+            <div class="plot" id="eh_histogram"></div>
+            <script type="text/javascript">
+                eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
+                $.extend(true, eh_options, eh_labels)
+                $.plot($("#eh_histogram"), [
+                  {% for data in eventhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], eh_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if barometerdata %}
+        <div id="barometerData" class="histogram">
+          {% if extra_station %}
+            <h3>Barometer data (source: station {{extra_station}})</h3>
+          {% else %}
+            <h3>Barometer data</h3>
+          {% endif %}
+            <div class="plot" id="bd_histogram"></div>
+            <script type="text/javascript">
+                bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
+                             xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
+                $.extend(true, bd_options, bd_labels)
+                $.plot($("#bd_histogram"), [
+                  {% for data in barometerdata.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:30|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
+            </script>
+        </div>
+      {% else %}
+        <div id="barometerData" class="histogram"><h4 style="text-align: center;">No weather data available.</h4></div>
+      {% endif %}
+
+      {% if pulseheighthistogram %}
+        <div id="pulseheightHistogram" class="histogram">
+            <h3>Pulseheight histogram</h3>
+            <div class="plot" id="ph_histogram"></div>
+            <script type="text/javascript">
+                ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
+                $.extend(true, ph_options, ph_labels)
+                $.plot($("#ph_histogram"), [
+                  {% for data in pulseheighthistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ph_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if pulseintegralhistogram %}
+        <div id="pulseintegralHistogram" class="histogram">
+            <h3>Pulseintegral histogram</h3>
+            <div class="plot" id="pi_histogram"></div>
+            <script type="text/javascript">
+                pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
+                $.extend(true, pi_options, pi_labels)
+                $.plot($("#pi_histogram"), [
+                  {% for data in pulseintegralhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], pi_options);
+            </script>
+        </div>
+      {% endif %}
+
+    </div>
+{% endblock %}
+
+
+{% block navigation_sidebar %}{% endblock %}
