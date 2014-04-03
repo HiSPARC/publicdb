@@ -362,6 +362,9 @@ def station_latest(request, station_number):
                                           date__lte=datetime.date.today())
                                   .latest('date'))
 
+    down, problem, up = status_lists()
+    status = get_station_status(station.number, down, problem, up)
+
     date = summary.date
 
     eventhistogram = create_histogram('eventtime', station, date)
@@ -390,6 +393,7 @@ def station_latest(request, station_number):
     return render_to_response('station_latest.html',
         {'station': station,
          'date': date,
+         'status': status,
          'eventhistogram': eventhistogram,
          'pulseheighthistogram': pulseheighthistogram,
          'pulseintegralhistogram': pulseintegralhistogram,
