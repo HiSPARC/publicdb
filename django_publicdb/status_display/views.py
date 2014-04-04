@@ -346,6 +346,68 @@ def station_config(request, station_number):
         context_instance=RequestContext(request))
 
 
+def station_latest(request, station_number):
+    """Show daily histograms for a particular station"""
+
+    station_number = int(station_number)
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    old_data = False
+
+    station = get_object_or_404(Station, number=station_number)
+    try:
+        summary = Summary.objects.get(num_events__isnull=False,
+                                      station=station,
+                                      date=yesterday)
+    except Summary.DoesNotExist:
+        # Do something nice, get older data
+        old_data = True
+        summary = (Summary.objects.filter(num_events__isnull=False,
+                                          station=station,
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                                  .latest('date'))
+
+    down, problem, up = status_lists()
+    status = get_station_status(station.number, down, problem, up)
+
+    date = summary.date
+
+    eventhistogram = create_histogram('eventtime', station, date)
+    pulseheighthistogram = create_histogram('pulseheight', station, date)
+    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
+    barometerdata = plot_dataset('barometer', station, date)
+
+    # Show alternative
+    extra_station = None
+    if barometerdata == None:
+        try:
+            sum_weather = Summary.objects.filter(num_weather__isnull=False,
+                                                 date=summary.date)
+            weather_stations = [s[0] for s in
+                                sum_weather.values_list('station__number')]
+            closest_station = min(weather_stations,
+                                  key=lambda x:abs(x - station_number))
+            summary_weather = sum_weather.get(station__number=closest_station)
+            barometerdata = plot_dataset('barometer', summary_weather.station,
+                                         summary_weather.date)
+            if not barometerdata == None:
+                extra_station = closest_station
+        except IndexError:
+            pass
+
+    return render_to_response('station_latest.html',
+        {'station': station,
+         'date': date,
+         'status': status,
+         'eventhistogram': eventhistogram,
+         'pulseheighthistogram': pulseheighthistogram,
+         'pulseintegralhistogram': pulseintegralhistogram,
+         'barometerdata': barometerdata,
+         'extra_station': extra_station,
+         'old_data': old_data},
+        context_instance=RequestContext(request))
+
+
 def station(request, station_number):
     """Show most recent histograms for a particular station"""
 
