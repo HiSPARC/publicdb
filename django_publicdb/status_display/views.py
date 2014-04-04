@@ -31,6 +31,7 @@ def stations_by_country(request):
     statuscount = get_status_counts(down, problem, up)
 
     countries = OrderedDict()
+    test_stations = []
 
     for station in (Station.objects.exclude(pc__type__slug='admin')
                                    .order_by('number')
@@ -53,6 +54,9 @@ def stations_by_country(request):
             cluster = station.cluster.name
         subcluster = station.cluster.name
 
+        if len(station.pc_set.filter(is_test=True)):
+            test_stations.append(station_info)
+            continue
         if not country in countries:
             countries[country] = OrderedDict()
         if not cluster in countries[country]:
@@ -63,6 +67,7 @@ def stations_by_country(request):
 
     return render_to_response('stations_by_country.html',
                               {'countries': countries,
+                               'test_stations': test_stations,
                                'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
