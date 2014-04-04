@@ -343,7 +343,7 @@ def shrink_dataset(dataset, interval):
     """
     data = [dataset[0]]
     for x, y in dataset[1:]:
-        if ts - data[-1][0] >= interval:
+        if x - data[-1][0] >= interval:
             data.append((x, y))
     return data
 
