@@ -321,7 +321,10 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     logger.debug("Updating barometer dataset for %s" % summary)
     barometer = esd.get_barometer(summary)
-    save_dataset(summary, 'barometer', barometer)
+    ERR = [-999]
+    barometer = [(x, y) for x, y in barometer if y not in ERR]
+    if barometer != []:
+        save_dataset(summary, 'barometer', barometer)
 
 
 def update_config(summary):
