@@ -14,7 +14,7 @@ def status_lists():
     """
     down = down_list()
     problem = problem_list()
-    up = up_list()
+    up = up_list().difference(problem)
 
     return down, problem, up
 
@@ -22,20 +22,20 @@ def status_lists():
 def down_list():
     """Get Nagios page which lists DOWN hosts
 
-    :return: list of station number of stations that are DOWN.
+    :return: set of station number of stations that are DOWN.
 
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=4'
     down = retrieve_station_status(query)
     down_numbers = pc_name_to_station_number(down)
 
-    return down_numbers
+    return set(down_numbers)
 
 
 def problem_list():
     """Get Nagios page which lists hosts with a problem
 
-    :return: list containing station number of stations for which
+    :return: set containing station number of stations for which
              the host has status OK, but some services are CRITICAL.
 
     """
@@ -43,20 +43,20 @@ def problem_list():
     problem = retrieve_station_status(query)
     problem_numbers = pc_name_to_station_number(problem)
 
-    return problem_numbers
+    return set(problem_numbers)
 
 
 def up_list():
     """Get Nagios page which lists UP hosts
 
-    :return: list of station numbers of stations that are OK.
+    :return: set of station numbers of stations that are OK.
 
     """
     query = 'hostgroup=all&style=hostdetail&hoststatustypes=2'
     up = retrieve_station_status(query)
     up_numbers = pc_name_to_station_number(up)
 
-    return up_numbers
+    return set(up_numbers)
 
 
 def retrieve_station_status(query):
@@ -114,12 +114,13 @@ def get_station_status(station_number, down, problem, up):
 
 
 def get_status_counts(down, problem, up):
-    """
-    :param down: list of stations that are DOWN.
-    :param problem: list of stations that have a service CRITICAL (but are UP).
-    :param up: list of stations that are UP.
+    """Get the lengths of the status lists
+
+    :param down: set of stations that are DOWN.
+    :param problem: set of stations that have a service CRITICAL (but are UP).
+    :param up: set of stations that are UP and have no services CRITICAL.
     :return: dictionary containing the counts of stations with a status.
 
     """
-    statuscount = {'up': len(up), 'problem': len(problem), 'down': len(down)}
+    statuscount = {'down': len(down), 'problem': len(problem), 'up': len(up)}
     return statuscount
