@@ -43,4 +43,23 @@
           {% endfor %}
     </div>
   {% endfor %}
+  {% if test_stations %}
+    <div class="country">
+        <h1>Test stations</h1>
+        <ul>
+          {% for station in test_stations %}
+            <li>
+                <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+              {% if station.link %}
+                <a href="{% url 'status_display.views.station' station.link %}">
+                  {{ station.number }} &mdash; {{ station.name }}
+                </a>
+              {% else %}
+                  {{ station.number }} &mdash; {{ station.name }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+    </div>
+  {% endif %}
 {% endblock %}
