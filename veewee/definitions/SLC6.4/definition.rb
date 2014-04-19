@@ -25,14 +25,9 @@ Veewee::Session.declare({
   :sudo_cmd => "echo '%p'|sudo -S sh '%f'",
   :shutdown_cmd => "/sbin/halt -h -p",
   :postinstall_files => [
-    #"base.sh",
-    #"ruby.sh",
-    #"chef.sh",
-    #"puppet.sh",
+    "base.sh",
     "vagrant.sh",
     "virtualbox.sh",
-    #"kvm.sh",
-    #"vmfusion.sh",
     "cleanup.sh",
     "zerodisk.sh"
   ],
