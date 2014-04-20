@@ -39,8 +39,8 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         self.source_file = source_file
         self.dest_file = dest_file
 
-        self.source_group = self.source_file.getNode(source_group)
-        self.dest_group = self.dest_file.getNode(dest_group)
+        self.source_group = self.source_file.get_node(source_group)
+        self.dest_group = self.dest_file.get_node(dest_group)
 
         self.source = self._get_source()
 
@@ -68,9 +68,9 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
             the destination table.
 
         """
-        new_events = self.dest_file.createTable(self.dest_group, '_events',
+        new_events = self.dest_file.create_table(self.dest_group, '_events',
             description=table.description)
-        selected_rows = table.readCoordinates(row_ids)
+        selected_rows = table.read_coordinates(row_ids)
         new_events.append(selected_rows)
         new_events.flush()
         return new_events
@@ -83,7 +83,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         else:
             length = len(self.source)
 
-        table = self.dest_file.createTable(self.dest_group, 'events',
+        table = self.dest_file.create_table(self.dest_group, 'events',
                                            self.processed_events_description,
                                            expectedrows=length)
 
@@ -122,10 +122,10 @@ def process_events_and_store_temporary_esd(summary):
     station = summary.station
 
     filepath = datastore.get_data_path(date)
-    with tables.openFile(filepath, 'r') as source_file:
+    with tables.open_file(filepath, 'r') as source_file:
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
-        with tables.openFile(tmp_filename, 'w') as tmp_file:
+        with tables.open_file(tmp_filename, 'w') as tmp_file:
             process_events = ProcessEventsFromSource(source_file,
                                                      tmp_file,
                                                      source_node, '/')
@@ -147,10 +147,10 @@ def process_weather_and_store_temporary_esd(summary):
     station = summary.station
 
     filepath = datastore.get_data_path(date)
-    with tables.openFile(filepath, 'r') as source_file:
+    with tables.open_file(filepath, 'r') as source_file:
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
-        with tables.openFile(tmp_filename, 'w') as tmp_file:
+        with tables.open_file(tmp_filename, 'w') as tmp_file:
             new_node = source_node.weather.copy(tmp_file.root)
             node_path = new_node._v_pathname
     return tmp_filename, node_path
@@ -161,9 +161,9 @@ def get_or_create_station_node(datafile, station):
     head, tail = os.path.split(node_path)
 
     if node_path in datafile:
-        return datafile.getNode(head, tail)
+        return datafile.get_node(head, tail)
     else:
-        return datafile.createGroup(head, tail, createparents=True)
+        return datafile.create_group(head, tail, createparents=True)
 
 
 def get_station_node(datafile, station):
@@ -174,7 +174,7 @@ def get_station_node(datafile, station):
 
     """
     node_path = get_station_node_path(station)
-    group = datafile.getNode(node_path)
+    group = datafile.get_node(node_path)
     return group
 
 
@@ -213,8 +213,8 @@ def copy_temporary_esd_node_to_esd(summary, file_path, node_path):
     :param node_path: the path to the node to be copied
 
     """
-    with tables.openFile(file_path, 'r') as tmp_file:
-        node = tmp_file.getNode(node_path)
+    with tables.open_file(file_path, 'r') as tmp_file:
+        node = tmp_file.get_node(node_path)
         copy_node_to_esd_file_for_summary(summary, node)
     os.remove(file_path)
 
@@ -229,7 +229,7 @@ def copy_node_to_esd_file_for_summary(summary, node):
     """
     esd_path = get_or_create_esd_data_path(summary.date)
 
-    with tables.openFile(esd_path, 'a') as esd_data:
+    with tables.open_file(esd_path, 'a') as esd_data:
         esd_group = get_or_create_station_node(esd_data, summary.station)
         node.copy(esd_group, createparents=True, overwrite=True)
 
@@ -367,10 +367,10 @@ def get_data(summary, tablename, quantity):
     station = summary.station
 
     path = get_esd_data_path(date)
-    with tables.openFile(path, 'r') as datafile:
+    with tables.open_file(path, 'r') as datafile:
         try:
             station_node = get_station_node(datafile, station)
-            table = datafile.getNode(station_node, tablename)
+            table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
             logger.error("Cannot find table %s for %s", tablename,
                          summary)
@@ -394,10 +394,10 @@ def get_time_series(summary, tablename, quantity):
     station = summary.station
 
     path = get_esd_data_path(date)
-    with tables.openFile(path, 'r') as datafile:
+    with tables.open_file(path, 'r') as datafile:
         try:
             station_node = get_station_node(datafile, station)
-            table = datafile.getNode(station_node, tablename)
+            table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
             logger.error("Cannot find table %s for %s", tablename,
                          summary)
