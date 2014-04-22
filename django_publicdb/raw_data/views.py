@@ -81,13 +81,13 @@ def get_data_url(station_number, date, get_blobs=False):
     target = get_target()
 
     if get_blobs:
-        datafile.copyNode(station_node, target.root, recursive=True)
+        datafile.copy_node(station_node, target.root, recursive=True)
     else:
-        datafile.copyNode(station_node, target.root, recursive=False)
-        target_node = target.getNode('/', station_node._v_name)
+        datafile.copy_node(station_node, target.root, recursive=False)
+        target_node = target.get_node('/', station_node._v_name)
         for node in station_node:
             if node.name != 'blobs':
-                datafile.copyNode(node, target_node)
+                datafile.copy_node(node, target_node)
 
     url = urlparse.urljoin(settings.MEDIA_URL, 'raw_data/')
     url = urlparse.urljoin(url, os.path.basename(target.filename))
@@ -106,7 +106,7 @@ def get_raw_datafile(date):
     name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon,
                                               date.tm_mday))
     try:
-        datafile = tables.openFile(name, 'r')
+        datafile = tables.open_file(name, 'r')
     except IOError:
         raise Exception("No data for that date")
 
@@ -118,9 +118,9 @@ def get_station_node(datafile, station_number):
 
     station = 'station_%d' % station_number
 
-    for cluster in datafile.listNodes('/hisparc'):
+    for cluster in datafile.list_nodes('/hisparc'):
         if station in cluster:
-            return datafile.getNode(cluster, station)
+            return datafile.get_node(cluster, station)
 
     raise Exception("No data available for this station on that date")
 
@@ -134,7 +134,7 @@ def get_target():
         pass
     #FIXME (for debugging only, sets extra permissions)
     #os.chmod(file.name, 0644)
-    return tables.openFile(file.name, 'w')
+    return tables.open_file(file.name, 'w')
 
 
 def download_form(request, station_number=None, start=None, end=None):
@@ -272,7 +272,7 @@ def get_events_from_esd_in_range(station, start, end):
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
-        with tables.openFile(filepath) as f:
+        with tables.open_file(filepath) as f:
             station_node = esd.get_station_node(f, station)
             ts0 = calendar.timegm(t0.utctimetuple())
             ts1 = calendar.timegm(t1.utctimetuple())
@@ -330,7 +330,7 @@ def get_weather_from_esd_in_range(station, start, end):
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
-        with tables.openFile(filepath) as f:
+        with tables.open_file(filepath) as f:
             station_node = esd.get_station_node(f, station)
             ts0 = calendar.timegm(t0.utctimetuple())
             ts1 = calendar.timegm(t1.utctimetuple())

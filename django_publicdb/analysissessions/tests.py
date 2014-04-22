@@ -62,7 +62,7 @@ class LiveSessionTestCase(LiveServerTestCase):
         self.assertTrue(os.path.exists(file))
 
         try:
-            data = tables.openFile(file, "r")
+            data = tables.open_file(file, "r")
         except Exception:
             self.assertTrue(False)
 

@@ -33,7 +33,7 @@ def retrieve_traces(node, timestamp, nanoseconds):
     :param timestamp, nanoseconds: time of the event
 
     """
-    event = node.events.readWhere('(timestamp == %d) & (nanoseconds == %d)' %
+    event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' %
                                   (timestamp, nanoseconds))[0]
     traces_idx = event['traces']
     baselines = event['baseline']
@@ -46,7 +46,7 @@ def retrieve_traces(node, timestamp, nanoseconds):
 
 
 def get_station_node(file, station):
-    node = file.getNode('/hisparc/cluster_%s/station_%d' %
+    node = file.get_node('/hisparc/cluster_%s/station_%d' %
                         (station.cluster.main_cluster().lower(),
                          station.number))
     return node
@@ -60,7 +60,7 @@ def get_datastore_file(path):
     :return: handler for the data file
 
     """
-    file = tables.openFile(path, 'r')
+    file = tables.open_file(path, 'r')
     return file
 
 
