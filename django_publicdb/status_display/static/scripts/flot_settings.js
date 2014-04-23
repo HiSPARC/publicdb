@@ -107,7 +107,7 @@ var _pulseheighthistogram = {
         transform: function (N) {return Math.log(N) / Math.LN10;},
         inverseTransform: function (N) {return Math.pow(10, N);}},
     xaxis: {
-        max: 2500,
+        max: 2000,
         axisLabel: 'Pulseheight (mV)'}
 };
 
