@@ -142,6 +142,7 @@ def search_coincidences_and_store_in_esd(network_summary):
         # FIXME: Wrong station position and no detectors..
         # FIXME: Requires commits from sapphire refactor_simulations branch
         # cluster._add_station((0, 0), 0, [], station.number)
+        pass
 
     filepath = get_esd_data_path(date)
     with tables.openFile(filepath, 'a') as data:
