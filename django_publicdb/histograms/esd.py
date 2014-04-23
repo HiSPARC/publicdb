@@ -145,7 +145,7 @@ def search_coincidences_and_store_in_esd(network_summary):
         pass
 
     filepath = get_esd_data_path(date)
-    with tables.openFile(filepath, 'a') as data:
+    with tables.open_file(filepath, 'a') as data:
         coinc = coincidences.CoincidencesESD(data, '/coincidences',
                                              station_groups, overwrite=True)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
@@ -232,7 +232,7 @@ def get_coincidences_node(datafile):
 
     """
     node_path = '/coincidences'
-    group = datafile.getNode(node_path)
+    group = datafile.get_node(node_path)
     return group
 
 
@@ -474,10 +474,10 @@ def get_coincidences(network_summary, tablename, quantity):
     date = network_summary.date
 
     path = get_esd_data_path(date)
-    with tables.openFile(path, 'r') as datafile:
+    with tables.open_file(path, 'r') as datafile:
         try:
             coincidences_node = get_coincidences_node(datafile)
-            table = datafile.getNode(coincidences_node, tablename)
+            table = datafile.get_node(coincidences_node, tablename)
         except tables.NoSuchNodeError:
             logger.error("Cannot find table %s for %s", tablename, network_summary)
             data = None

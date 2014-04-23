@@ -70,7 +70,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
         self.assertTrue(os.path.exists(file))
 
         try:
-            data = tables.openFile(file, "r")
+            data = tables.open_file(file, "r")
         except Exception:
             self.fail()
 
@@ -410,9 +410,9 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
 
         # Make sure coincidences are analysed
         for date in [DATE1, DATE2, DATETEST]:
-            with tables.openFile(esd.get_esd_data_path(date), "r") as data:
+            with tables.open_file(esd.get_esd_data_path(date), "r") as data:
                 try:
-                    data.getNode('/', 'coincidences')
+                    data.get_node('/', 'coincidences')
                     NetworkSummary.objects.get_or_create(date=date)
                 except tables.NoSuchNodeError:
                     jobs.process_possible_tables_for_network(date, 'events')
@@ -451,7 +451,7 @@ class CoincidencesESDCase(BaseHistogramsTestCase):
 
         """
         file = test_datastore.get_esd_datafile_path(date)
-        data = tables.openFile(file, "r")
+        data = tables.open_file(file, "r")
         self.assertEqual(data.root.coincidences.coincidences.nrows,
                          n_coincidences)
         self.assertEqual(data.root.coincidences.c_index.nrows,
