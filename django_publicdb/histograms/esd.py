@@ -9,7 +9,6 @@ import numpy as np
 import tables
 
 from sapphire.analysis import process_events, coincidences
-from sapphire.storage import ProcessedHisparcEvent
 from sapphire import clusters
 
 from django_publicdb.inforecords.models import Station
@@ -77,7 +76,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
 
         """
         new_events = self.dest_file.create_table(self.dest_group, '_events',
-            description=table.description)
+                                                 description=table.description)
         selected_rows = table.read_coordinates(row_ids)
         new_events.append(selected_rows)
         new_events.flush()
@@ -92,8 +91,8 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
             length = len(self.source)
 
         table = self.dest_file.create_table(self.dest_group, 'events',
-                                           self.processed_events_description,
-                                           expectedrows=length)
+                                            self.processed_events_description,
+                                            expectedrows=length)
 
         for x in xrange(length):
             table.row.append()
