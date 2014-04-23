@@ -27,9 +27,6 @@
                 <span class="key">Stations</span>
                 <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
                 <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
-            </div>
-
-            <div class="keyvalue"><span class="key">Network</span>
                 <span class="value"><a class="{% block current_coincidences %}{% endblock %}" href="{% url 'status_display.views.network_coincidences' %}">Coincidences</a></span>
             </div>
           {% endblock %}

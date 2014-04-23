@@ -313,6 +313,11 @@ def station_data(request, station_number, year, month, day):
     except IndexError:
         is_active = False
 
+    try:
+        coincidences_found = NetworkSummary.objects.get(date=date)
+    except NetworkSummary.DoesNotExist:
+        coincidences_found = False
+
     thismonth = nav_calendar(year, month, station)
     month_list = nav_months(year, station)
     year_list = nav_years(station)
@@ -346,7 +351,8 @@ def station_data(request, station_number, year, month, day):
          'link': (station_number, year, month, day),
          'has_data': True,
          'is_active': is_active,
-         'has_config': has_config},
+         'has_config': has_config,
+         'coincidences_found': coincidences_found},
         context_instance=RequestContext(request))
 
 
@@ -370,7 +376,8 @@ def station_status(request, station_number):
         {'station': station,
          'pc': pc,
          'has_data': has_data,
-         'has_config': has_config},
+         'has_config': has_config,
+         'coincidences_found': True},
         context_instance=RequestContext(request))
 
 
@@ -413,7 +420,8 @@ def station_config(request, station_number):
          'has_slave': has_slave,
          'has_data': has_data,
          'is_active': is_active,
-         'has_config': True},
+         'has_config': True,
+         'coincidences_found': True},
         context_instance=RequestContext(request))
 
 
@@ -817,12 +825,13 @@ def stations_with_data():
              weather or shower, between 2002 and now.
 
     """
-    stations = (Station.objects.filter(Q(summary__num_events__isnull=False) |
-                                       Q(summary__num_weather__isnull=False),
-                                       summary__date__gte=datetime.date(2002, 1, 1),
-                                       summary__date__lte=datetime.date.today())
-                               .distinct()
-                               .values_list('number', flat=True))
+    stations = (Station.objects
+                       .filter(Q(summary__num_events__isnull=False) |
+                               Q(summary__num_weather__isnull=False),
+                               summary__date__gte=datetime.date(2002, 1, 1),
+                               summary__date__lte=datetime.date.today())
+                       .distinct()
+                       .values_list('number', flat=True))
 
     return stations
 

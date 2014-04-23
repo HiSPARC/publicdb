@@ -32,6 +32,10 @@
                 <span class="key">Map</span>
                 <span class="value"><a class="{% block current_map %}{% endblock %}" href="{% url 'status_display.views.stations_on_map' %}">Overview</a></span>
             </div>
+            <div class="keyvalue">
+                <span class="key">Data</span>
+                <span class="value"><a href="{% url 'status_display.views.network_coincidences' %}">Coincidences</a></span>
+            </div>
           {% endblock %}
         </div>
     
