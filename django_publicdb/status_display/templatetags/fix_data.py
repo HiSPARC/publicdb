@@ -55,8 +55,18 @@ def slice_data(values, arg):
     else:
         return values
 
+
 @register.filter
 def round_data(values, arg):
     """Round every value to nth decimal place"""
 
     return [[round(x, arg), round(y, arg)] for x, y in values]
+
+
+@register.filter
+def shift_bins(values, arg):
+    """Shift bins edges by arg"""
+
+    values = [[x + arg, y] for x, y in values]
+
+    return values

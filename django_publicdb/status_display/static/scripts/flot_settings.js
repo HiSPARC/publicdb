@@ -84,8 +84,8 @@ var _coincidencenumberhistogram = {
     xaxis: {
         axisLabel: 'Number of stations in coincidence',
         ticks: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
-        min: 2,
-        max: 20}
+        min: 1.5,
+        max: 20.5}
 };
 
 var _eventhistogram = {
