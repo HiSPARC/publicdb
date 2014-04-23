@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/station_page.css" />
+{% endblock %}
+
+{% block title %}
+    HiSPARC Network - {{ date|date:"D, j N Y" }}
+{% endblock %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>{% block header %}HiSPARC Network{% endblock %}</h2>
+        <div id="date">{% block date %}{% now "D, j N Y" %}{% endblock %}</div>
+    </div>
+    
+    {% block data %}
+    {% endblock %}
+
+    <div id="sidebar">
+        <div id="navigation">
+          {% block navigation_sidebar %}
+            <div class="keyvalue">
+                <span class="key">Stations</span>
+                <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
+                <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+                <span class="value"><a class="{% block current_coincidences %}{% endblock %}" href="{% url 'status_display.views.network_coincidences' %}">Coincidences</a></span>
+            </div>
+          {% endblock %}
+        </div>
+
+        <div id="status">
+          {% block status %}{% endblock %}
+        </div>
+
+        <div id="help">
+          {% block help %}
+            <div class="keyvalue">
+                <span class="value"><a href="{% url 'status_display.views.help' %}" target="_blank">Help</a></span>
+            </div>
+          {% endblock %}    
+        </div>
+    </div>
+
+{% endblock %}

@@ -26,7 +26,8 @@ def get_updated_files(rootdir, last_check_time):
     """Check for updated data files
 
     Check each file in the datastore and compare its modification
-    timestamp to last_check_time.  If the file is newer, return its path.
+    timestamp to last_check_time.  If the file is newer, return its date
+    (from the file name) and path.
 
     """
     file_list = []
@@ -39,8 +40,11 @@ def get_updated_files(rootdir, last_check_time):
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
                     if mtime >= last_check_time:
-                        date = datetime.datetime.strptime(
-                                    file, '%Y_%m_%d.h5').date()
+                        try:
+                            date = datetime.datetime.strptime(
+                                        file, '%Y_%m_%d.h5').date()
+                        except ValueError:
+                            continue
                         if date != datetime.date.today():
                             file_list.append((date, file_path))
 
@@ -50,8 +54,12 @@ def get_updated_files(rootdir, last_check_time):
 def get_event_summary(file_list):
     """Summarize event numbers per station
 
-    For each file in file_list, return the number of events per station
-    for each event type
+    :param file_list: list of tuples containing a date and file path.
+
+    :return: the number of events per station for each event type for
+        each file in file_list. This info is compiled in a dictionary:
+        {'[date]': {'[station_number]': {'[table_name]': [n_rows], }, }, }
+
 
     """
     summary = {}

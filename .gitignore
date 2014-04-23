@@ -4,6 +4,7 @@ HiSPARC_coincidences.db
 public.db
 *.h5
 datastore/
+datastore_test/
 esd/
 _build/
 

@@ -30,6 +30,20 @@ class SerializedDataField(models.Field):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
+class NetworkSummary(models.Model):
+    date = models.DateField(unique=True)
+    num_coincidences = models.IntegerField(blank=True, null=True)
+    needs_update = models.BooleanField()
+    needs_update_coincidences = models.BooleanField()
+
+    def __unicode__(self):
+        return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
+
+    class Meta:
+        verbose_name_plural = 'network summaries'
+        ordering = ('date',)
+
+
 class Summary(models.Model):
     station = models.ForeignKey(inforecords.Station)
     date = models.DateField()
@@ -171,6 +185,21 @@ class Configuration(models.Model):
         return slave_fpga
 
 
+class NetworkHistogram(models.Model):
+    source = models.ForeignKey('NetworkSummary')
+    type = models.ForeignKey('HistogramType')
+    bins = SerializedDataField()
+    values = SerializedDataField()
+
+    def __unicode__(self):
+        return '%s - %s' % (self.source.date.strftime('%d %b %Y'),
+                            self.type)
+
+    class Meta:
+        unique_together = (('source', 'type'),)
+        ordering = ('source', 'type')
+
+
 class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('HistogramType')
@@ -179,7 +208,8 @@ class DailyHistogram(models.Model):
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -194,7 +224,8 @@ class DailyDataset(models.Model):
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
@@ -232,11 +263,10 @@ class GeneratorState(models.Model):
 
 
 class PulseheightFit(models.Model):
-    DETECTOR_CHOICES = (
-        (1, 'Scintillator 1'),
-        (2, 'Scintillator 2'),
-        (3, 'Scintillator 3'),
-        (4, 'Scintillator 4'))
+    DETECTOR_CHOICES = ((1, 'Scintillator 1'),
+                        (2, 'Scintillator 2'),
+                        (3, 'Scintillator 3'),
+                        (4, 'Scintillator 4'))
 
     source = models.ForeignKey('Summary')
     plate = models.IntegerField(choices=DETECTOR_CHOICES)
@@ -263,7 +293,12 @@ class PulseheightFit(models.Model):
         return self.source.date
     date.admin_order_field = 'source__date'
 
+    def __unicode__(self):
+        return "%d - %s - %d" % (self.source.station.number,
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.plate)
+
     class Meta:
         verbose_name_plural = 'Pulseheight fit'
         unique_together = ('source', 'plate')
-
+        ordering = ('source', 'plate')

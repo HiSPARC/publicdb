@@ -22,7 +22,7 @@ sys.path.append(publicdb_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
-from datetime import date, datetime, time, timedelta
+import datetime
 
 from sapphire.publicdb import download_data
 
@@ -32,8 +32,8 @@ from django_publicdb.inforecords.models import *
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
-START = date(2013, 1, 5)
-END = date(2013, 1, 7)
+START = datetime.date(2013, 1, 5)
+END = datetime.date(2013, 1, 7)
 
 
 def main():
@@ -58,7 +58,7 @@ def generate_date_range(start, end):
     date = start
     while date <= end:
         yield date
-        date += timedelta(days=1)
+        date += datetime.timedelta(days=1)
 
 
 def download_and_store_data_for_date(date):
@@ -73,8 +73,8 @@ def get_datastore_file_for_date(date):
 
 
 def download_and_store_station_data(f, station, date, get_blobs=True):
-    start = datetime.combine(date, time(0, 0, 0))
-    end = start + timedelta(days=1)
+    start = datetime.datetime.combine(date, datetime.time(0, 0, 0))
+    end = start + datetime.timedelta(days=1)
 
     cluster = station.cluster.main_cluster()
     station_group = get_or_create_station_group(f, cluster, station.number)

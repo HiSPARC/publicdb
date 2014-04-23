@@ -310,12 +310,12 @@ def getPulseheightFits(summary):
 
     fits = []
 
-    for numberOfPlate in range(1, n_plates + 1):
+    for detector_n in range(1, n_plates + 1):
         try:
-            fit = fitPulseheightPeak(pulseheights[:, numberOfPlate - 1])
+            fit = fitPulseheightPeak(pulseheights[:, detector_n - 1])
         except Exception, exception:
             logger.error("[%s plate %s] %s" %
-                         (summary, numberOfPlate, exception))
+                         (summary, detector_n, exception))
 
             fit = PulseheightFit(initial_mpv = 0,
                                  initial_width = 0,
@@ -331,7 +331,7 @@ def getPulseheightFits(summary):
             fit.error_message = traceback.format_exc()
 
         fit.source = summary
-        fit.plate = numberOfPlate
+        fit.plate = detector_n
 
         fits.append(fit)
 

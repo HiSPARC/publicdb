@@ -7,14 +7,22 @@ from operator import itemgetter
 
 import numpy as np
 import tables
-from sapphire.analysis import process_events
 
+from sapphire.analysis import process_events, coincidences
+from sapphire.storage import ProcessedHisparcEvent
+from sapphire import clusters
+
+from django_publicdb.inforecords.models import Station
 import datastore
 
 from django.conf import settings
 
 
 logger = logging.getLogger('histograms.esd')
+
+# Limit the coincidence window to 2 microseconds,
+# to prevent coincidental coincidences to become more dominant.
+COINCIDENCE_WINDOW = 2000  # nanoseconds
 
 
 class ProcessEventsFromSource(process_events.ProcessEvents):
@@ -47,7 +55,7 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
     def _get_source(self):
         """Return the table containing the events.
 
-        :returns: table object
+        :return: table object
 
         """
         if '_events' in self.source_group:
@@ -106,6 +114,44 @@ class ProcessEventsFromSource(process_events.ProcessEvents):
         """Override method, do not show a progressbar"""
 
         return lambda x: x
+
+
+def search_coincidences_and_store_in_esd(network_summary):
+    """Determine coincidences for events from Event Summary Data
+
+    Events from all non-test stations in the ESD are processed
+    for coincidences, the results of which are stored in the
+    coincidences group.
+
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
+
+    """
+    date = network_summary.date
+
+    # Get non-test stations with events on the specified date
+    stations = Station.objects.filter(summary__date=date,
+                                      summary__num_events__isnull=False,
+                                      pc__is_test=False)
+
+    station_groups = ['/hisparc/cluster_%s/station_%d' %
+                      (station.cluster.main_cluster().lower(), station.number)
+                      for station in stations]
+
+    cluster = clusters.BaseCluster()
+    for station in stations:
+        # FIXME: Wrong station position and no detectors..
+        cluster._add_station((0, 0), 0, [], station.number)
+
+    filepath = get_esd_data_path(date)
+    with tables.openFile(filepath, 'a') as data:
+        coinc = coincidences.CoincidencesESD(data, '/coincidences',
+                                             station_groups, overwrite=True)
+        coinc.search_coincidences(window=COINCIDENCE_WINDOW)
+        coinc.store_coincidences(cluster=cluster)
+        num_coincidences = len(coinc.coincidences)
+
+    return num_coincidences
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -178,12 +224,23 @@ def get_station_node(datafile, station):
     return group
 
 
+def get_coincidences_node(datafile):
+    """Return coincidences node in datastore file
+
+    :param data: datastore file
+
+    """
+    node_path = '/coincidences'
+    group = datafile.getNode(node_path)
+    return group
+
+
 def get_station_node_path(station):
     """Return station node path as used in data files
 
     :param station: inforecords.Station instance
 
-    :returns: path to station group as used in datastore / ESD files
+    :return: path to station group as used in datastore / ESD files
 
     """
     cluster = station.cluster.main_cluster()
@@ -254,7 +311,7 @@ def get_or_create_esd_data_path(date):
 
     :param date: datetime.date object
 
-    :returns: path to ESD file
+    :return: path to ESD file
 
     """
     filepath = get_esd_data_path(date)
@@ -278,6 +335,19 @@ def get_event_timestamps(summary):
 
     """
     return get_event_data(summary, 'timestamp')
+
+
+def get_coincidence_timestamps(network_summary):
+    """Get coincidence timestamps
+
+    Read data from file and return a list of timestamps for all coincidences
+    on the date specified by the summary.
+
+    :param network_summary: summary of data source (date)
+    :type network_summary: histograms.models.NetworkSummary instance
+
+    """
+    return get_coincidence_data(network_summary, 'timestamp')
 
 
 def get_pulseheights(summary):
@@ -354,6 +424,17 @@ def get_event_data(summary, quantity):
     return get_data(summary, 'events', quantity)
 
 
+def get_coincidence_data(network_summary, quantity):
+    """Get event data of a specific quantity
+
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
+    :param quantity: the specific event data type (e.g., 'pulseheights')
+
+    """
+    return get_coincidences(network_summary, 'coincidences', quantity)
+
+
 def get_data(summary, tablename, quantity):
     """Get data from the datastore from a table of a specific quantity
 
@@ -372,8 +453,32 @@ def get_data(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename,
-                         summary)
+            logger.error("Cannot find table %s for %s", tablename, summary)
+            data = None
+        else:
+            data = table.col(quantity)
+
+    return data
+
+
+def get_coincidences(network_summary, tablename, quantity):
+    """Get data from the datastore from a table of a specific quantity
+
+    :param network_summary: summary of data source (date)
+    :type network_summary: histograms.models.NetworkSummary instance
+    :param tablename: table name (e.g. 'coincidences', 'observables', ...)
+    :param quantity: the specific event data type (e.g., 'shower_size')
+
+    """
+    date = network_summary.date
+
+    path = get_esd_data_path(date)
+    with tables.openFile(path, 'r') as datafile:
+        try:
+            coincidences_node = get_coincidences_node(datafile)
+            table = datafile.getNode(coincidences_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename, network_summary)
             data = None
         else:
             data = table.col(quantity)

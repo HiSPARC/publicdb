@@ -7,6 +7,11 @@ class GeneratorStateAdmin(admin.ModelAdmin):
                     'update_is_running')
 
 
+class NetworkHistogramAdmin(admin.ModelAdmin):
+    list_filter = ('type',)
+    raw_id_fields = ('source',)
+
+
 class DailyHistogramAdmin(admin.ModelAdmin):
     list_filter = ('type',)
     raw_id_fields = ('source',)
@@ -20,6 +25,18 @@ class DailyDatasetAdmin(admin.ModelAdmin):
 class DailyHistogramInline(admin.StackedInline):
     model = DailyHistogram
     extra = 0
+
+
+class NetworkHistogramInline(admin.StackedInline):
+    model = NetworkHistogram
+    extra = 0
+
+
+class NetworkSummaryAdmin(admin.ModelAdmin):
+    list_display = ('date', 'needs_update', 'needs_update_coincidences',
+                    'num_coincidences',)
+    list_filter = ('needs_update_coincidences', 'date')
+    inlines = (NetworkHistogramInline,)
 
 
 class SummaryAdmin(admin.ModelAdmin):
@@ -45,10 +62,12 @@ class PulseheightFitAdmin(admin.ModelAdmin):
 
 
 admin.site.register(GeneratorState, GeneratorStateAdmin)
-admin.site.register(Summary, SummaryAdmin)
+admin.site.register(NetworkHistogram, NetworkHistogramAdmin)
 admin.site.register(DailyHistogram, DailyHistogramAdmin)
-admin.site.register(HistogramType)
 admin.site.register(DailyDataset, DailyDatasetAdmin)
-admin.site.register(DatasetType)
+admin.site.register(NetworkSummary, NetworkSummaryAdmin)
+admin.site.register(Summary, SummaryAdmin)
 admin.site.register(Configuration, ConfigurationAdmin)
 admin.site.register(PulseheightFit, PulseheightFitAdmin)
+admin.site.register(HistogramType)
+admin.site.register(DatasetType)
