@@ -33,11 +33,16 @@ your browser window. If you check the Download box the data will be
 downloaded to your PC as a csv file. The filename will contain the
 station number and the dates selected.
 
-This csv file can be read by many programs, like Excel.
+This csv file can be read by many programs, including Excel.
 
 
 Downloading via Python
 ----------------------
+
+.. note::
+
+    An easy to use module has been added to |sapphire| to download
+    data from the ESD. The following is an old (but working) example.
 
 This is an example of how to download the data from the Public database
 in Python. In this example we will download 1 hour of data for station

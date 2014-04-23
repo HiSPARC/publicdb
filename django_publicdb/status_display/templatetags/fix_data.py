@@ -44,10 +44,16 @@ def fix_timestamps_in_data(values):
 
 @register.filter
 def slice_data(values, arg):
-    """Get every nth value from the list"""
+    """Get every nth value from the list
 
-    return values[::arg]
+    Note: This only slices data if the data has at least 1000 elements.
+    This to prevent the new shrunken datasets (~576 long) to be sliced.
 
+    """
+    if len(values) > 1000:
+        return values[::arg]
+    else:
+        return values
 
 @register.filter
 def round_data(values, arg):

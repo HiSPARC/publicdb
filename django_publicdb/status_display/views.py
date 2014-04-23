@@ -31,6 +31,7 @@ def stations_by_country(request):
     statuscount = get_status_counts(down, problem, up)
 
     countries = OrderedDict()
+    test_stations = []
 
     for station in (Station.objects.exclude(pc__type__slug='admin')
                                    .order_by('number')
@@ -53,6 +54,9 @@ def stations_by_country(request):
             cluster = station.cluster.name
         subcluster = station.cluster.name
 
+        if len(station.pc_set.filter(is_test=True)):
+            test_stations.append(station_info)
+            continue
         if not country in countries:
             countries[country] = OrderedDict()
         if not cluster in countries[country]:
@@ -63,6 +67,7 @@ def stations_by_country(request):
 
     return render_to_response('stations_by_country.html',
                               {'countries': countries,
+                               'test_stations': test_stations,
                                'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
@@ -425,6 +430,68 @@ def station_config(request, station_number):
         context_instance=RequestContext(request))
 
 
+def station_latest(request, station_number):
+    """Show daily histograms for a particular station"""
+
+    station_number = int(station_number)
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    old_data = False
+
+    station = get_object_or_404(Station, number=station_number)
+    try:
+        summary = Summary.objects.get(num_events__isnull=False,
+                                      station=station,
+                                      date=yesterday)
+    except Summary.DoesNotExist:
+        # Do something nice, get older data
+        old_data = True
+        summary = (Summary.objects.filter(num_events__isnull=False,
+                                          station=station,
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                                  .latest('date'))
+
+    down, problem, up = status_lists()
+    status = get_station_status(station.number, down, problem, up)
+
+    date = summary.date
+
+    eventhistogram = create_histogram('eventtime', station, date)
+    pulseheighthistogram = create_histogram('pulseheight', station, date)
+    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
+    barometerdata = plot_dataset('barometer', station, date)
+
+    # Show alternative
+    extra_station = None
+    if barometerdata == None:
+        try:
+            sum_weather = Summary.objects.filter(num_weather__isnull=False,
+                                                 date=summary.date)
+            weather_stations = [s[0] for s in
+                                sum_weather.values_list('station__number')]
+            closest_station = min(weather_stations,
+                                  key=lambda x:abs(x - station_number))
+            summary_weather = sum_weather.get(station__number=closest_station)
+            barometerdata = plot_dataset('barometer', summary_weather.station,
+                                         summary_weather.date)
+            if not barometerdata == None:
+                extra_station = closest_station
+        except IndexError:
+            pass
+
+    return render_to_response('station_latest.html',
+        {'station': station,
+         'date': date,
+         'status': status,
+         'eventhistogram': eventhistogram,
+         'pulseheighthistogram': pulseheighthistogram,
+         'pulseintegralhistogram': pulseintegralhistogram,
+         'barometerdata': barometerdata,
+         'extra_station': extra_station,
+         'old_data': old_data},
+        context_instance=RequestContext(request))
+
+
 def station(request, station_number):
     """Show most recent histograms for a particular station"""
 
@@ -470,8 +537,8 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
     response = render_to_response('source_eventtime_histogram.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=eventtime-%s-%s-%s-%s.csv' %
-        (station_number, year, month, day))
+        'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -480,8 +547,8 @@ def get_pulseheight_histogram_source(request, station_number, year, month, day):
     response = render_to_response('source_pulseheight_histogram.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=pulseheight-%s-%s-%s-%s.csv' %
-        (station_number, year, month, day))
+        'attachment; filename=pulseheight-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -490,8 +557,8 @@ def get_pulseintegral_histogram_source(request, station_number, year, month, day
     response = render_to_response('source_pulseintegral_histogram.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=pulseintegral-%s-%s-%s-%s.csv' %
-        (station_number, year, month, day))
+        'attachment; filename=pulseintegral-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -500,8 +567,8 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
     response = render_to_response('source_barometer_dataset.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=barometer-%s-%s-%s-%s.csv' %
-        (station_number, year, month, day))
+        'attachment; filename=barometer-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -510,8 +577,8 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
     response = render_to_response('source_temperature_dataset.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=temperature-%s-%s-%s-%s.csv' %
-        (station_number, year, month, day))
+        'attachment; filename=temperature-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -520,7 +587,7 @@ def get_voltage_config_source(request, station_number):
     response = render_to_response('source_voltage_config.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=voltage-%s.csv' % station_number)
+        'attachment; filename=voltage-s%s.csv' % station_number)
     return response
 
 
@@ -529,7 +596,7 @@ def get_current_config_source(request, station_number):
     response = render_to_response('source_current_config.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=current-%s.csv' % station_number)
+        'attachment; filename=current-s%s.csv' % station_number)
     return response
 
 
@@ -538,7 +605,7 @@ def get_gps_config_source(request, station_number):
     response = render_to_response('source_gps_config.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=gps-%s.csv' % station_number)
+        'attachment; filename=gps-s%s.csv' % station_number)
     return response
 
 

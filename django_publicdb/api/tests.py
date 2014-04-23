@@ -39,43 +39,49 @@ class ViewsTestCase(LiveServerTestCase):
         return response
 
     def test_station_501(self, ):
-        self.check_and_get_response("/station/501")
+        self.check_and_get_response("/station/501/")
 
         self.check_and_get_response("/station/501/data/")
-        self.check_and_get_response("/station/501/data/2011/9/9")
+        self.check_and_get_response("/station/501/data/2011/")
+        self.check_and_get_response("/station/501/data/2011/9/")
+        self.check_and_get_response("/station/501/data/2011/9/9/")
 
         self.check_and_get_response("/station/501/weather/")
-        self.check_and_get_response("/station/501/weather/2011/9/9")
+        self.check_and_get_response("/station/501/weather/2011/")
+        self.check_and_get_response("/station/501/weather/2011/9/")
+        self.check_and_get_response("/station/501/weather/2011/9/9/")
 
         self.check_and_get_response("/station/501/config/")
-        self.check_and_get_response("/station/501/config/2011/9/9")
+        self.check_and_get_response("/station/501/config/2011/9/9/")
 
         self.check_and_get_response("/station/501/num_events/")
-        self.check_and_get_response("/station/501/num_events/2011")
-        self.check_and_get_response("/station/501/num_events/2011/9")
-        self.check_and_get_response("/station/501/num_events/2011/9/9")
+        self.check_and_get_response("/station/501/num_events/2011/")
+        self.check_and_get_response("/station/501/num_events/2011/9/")
+        self.check_and_get_response("/station/501/num_events/2011/9/9/")
 
-        response = self.check_and_get_response("/station/501/plate/1/pulseheight/fit/2011/7/7")
+        response = self.check_and_get_response("/station/501/plate/1/pulseheight/fit/2011/7/7/")
         json_data = json.loads(response.read())
         assert(json_data["year"] == 2011 and
                json_data["month"] == 7 and
                json_data["day"] == 7 and
                json_data["fitted_mpv"] == 222.101846139)
 
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/2011/9/1/30")
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_14_days")
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_30_days")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/2011/9/1/30/")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_14_days/")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_30_days/")
 
     def test_stations(self):
         self.check_and_get_response("/stations/")
+
         self.check_and_get_response("/stations/data/")
-        self.check_and_get_response("/stations/data/2011")
-        self.check_and_get_response("/stations/data/2011/9")
-        self.check_and_get_response("/stations/data/2011/9/9")
+        self.check_and_get_response("/stations/data/2011/")
+        self.check_and_get_response("/stations/data/2011/9/")
+        self.check_and_get_response("/stations/data/2011/9/9/")
+
         self.check_and_get_response("/stations/weather/")
         self.check_and_get_response("/stations/weather/2011/")
-        self.check_and_get_response("/stations/weather/2011/9")
-        self.check_and_get_response("/stations/weather/2011/9/9")
+        self.check_and_get_response("/stations/weather/2011/9/")
+        self.check_and_get_response("/stations/weather/2011/9/9/")
 
     def test_subclusters(self):
         response = self.check_and_get_response("/subclusters/")

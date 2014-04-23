@@ -26,3 +26,7 @@ Thumbs.db
 
 # Vim
 *.swp
+
+# Vagrant
+.vagrant
+vagrant_ansible_inventory_default

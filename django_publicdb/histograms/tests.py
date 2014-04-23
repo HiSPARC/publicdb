@@ -92,7 +92,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
         self.assertTrue(os.path.exists(file))
 
         try:
-            data = tables.openFile(file, "r")
+            data = tables.open_file(file, "r")
         except Exception:
             self.fail()
 
@@ -114,7 +114,7 @@ class BaseHistogramsTestCase(TransactionTestCase):
         self.assertTrue(os.path.exists(file))
 
         try:
-            data = tables.openFile(file, "r")
+            data = tables.open_file(file, "r")
         except Exception:
             self.fail()
 

@@ -180,10 +180,10 @@ class Station(models.Model):
         super(Station, self).delete(*args, **kwargs)
         reload_datastore()
 
-    def number_of_plates(self):
+    def number_of_detectors(self):
         from django_publicdb.histograms.models import Configuration
 
-        n_plates = 0
+        n_detectors = 0
         today = datetime.datetime.utcnow()
 
         config = (Configuration.objects.filter(source__station=self,
@@ -191,11 +191,11 @@ class Station(models.Model):
                                        .latest('timestamp'))
 
         if config.slave() == 'no slave':
-            n_plates = 2
+            n_detectors = 2
         else:
-            n_plates = 4
+            n_detectors = 4
 
-        return n_plates
+        return n_detectors
 
     class Meta:
         ordering = ('number',)

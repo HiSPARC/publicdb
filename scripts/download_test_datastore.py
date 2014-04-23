@@ -101,7 +101,7 @@ def open_or_create_file(data_dir, date):
         # create dir and parent dirs with mode rwxr-xr-x
         os.makedirs(dir, 0755)
 
-    return tables.openFile(file, 'a')
+    return tables.open_file(file, 'a')
 
 
 def get_or_create_cluster_group(file, cluster):
@@ -112,16 +112,16 @@ def get_or_create_cluster_group(file, cluster):
 
     """
     try:
-        hisparc = file.getNode('/', 'hisparc')
+        hisparc = file.get_node('/', 'hisparc')
     except tables.NoSuchNodeError:
-        hisparc = file.createGroup('/', 'hisparc', 'HiSPARC data')
+        hisparc = file.create_group('/', 'hisparc', 'HiSPARC data')
         file.flush()
 
     node_name = 'cluster_' + cluster.lower()
     try:
-        cluster = file.getNode(hisparc, node_name)
+        cluster = file.get_node(hisparc, node_name)
     except tables.NoSuchNodeError:
-        cluster = file.createGroup(hisparc, node_name,
+        cluster = file.create_group(hisparc, node_name,
                                    'HiSPARC cluster %s data' % cluster)
         file.flush()
 
@@ -139,9 +139,9 @@ def get_or_create_station_group(file, cluster, station_number):
     cluster = get_or_create_cluster_group(file, cluster)
     node_name = 'station_%d' % station_number
     try:
-        station = file.getNode(cluster, node_name)
+        station = file.get_node(cluster, node_name)
     except tables.NoSuchNodeError:
-        station = file.createGroup(cluster, node_name,
+        station = file.create_group(cluster, node_name,
                                    'HiSPARC station %d data' % station_number)
         file.flush()
 

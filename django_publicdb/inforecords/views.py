@@ -50,10 +50,14 @@ def create_nagios_config(request):
     # Start building the host list
     hosts = []
     for host in (Pc.objects.exclude(type__description='Admin PC')
-                           .filter(is_active=True)):
+                           .filter(is_active=True)
+                           .select_related('station__cluster',
+                                           'station__contact')):
 
         services = []
-        for service in host.enabledservice_set.all():
+        services_to_check = (host.enabledservice_set.all()
+                                 .select_related('monitor_service'))
+        for service in services_to_check:
             check_command = service.monitor_service.nagios_command
 
             # Skip pulseheight monitoring here, we will do it somewhere below
@@ -96,18 +100,18 @@ def create_nagios_config(request):
         pulseheight_thresholds = []
 
         try:
-            number_of_plates = host.station.number_of_plates()
-
-            for service in host.enabledservice_set.all():
+            for service in services_to_check:
                 check_command = service.monitor_service.nagios_command
 
                 if not check_command.count('check_pulseheight_mpv'):
                     continue
 
+                number_of_detectors = host.station.number_of_detectors()
+
                 pulseheight_thresholds = \
                     MonitorPulseheightThresholds.objects \
                                                 .filter(station=host.station,
-                                                        plate__lte=number_of_plates)
+                                                        plate__lte=number_of_detectors)
 
                 break
 
@@ -122,7 +126,8 @@ def create_nagios_config(request):
 
     # Render the template
     return render_to_response('nagios.cfg',
-                              {'contacts': Contact.objects.all(),
+                              {'contacts': Contact.objects.all()
+                                           .select_related('contactinformation'),
                                'clusters': Cluster.objects.all(),
                                'hosts': hosts},
                               mimetype='text/plain')
@@ -137,5 +142,6 @@ def create_datastore_config(request):
         raise PermissionDenied
 
     return render_to_response('datastore.cfg',
-                              {'stations': Station.objects.all()},
+                              {'stations': Station.objects.all()
+                                           .select_related('cluster__parent')},
                               mimetype='text/plain')
