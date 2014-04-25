@@ -147,7 +147,8 @@ def search_coincidences_and_store_in_esd(network_summary):
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
         coinc = coincidences.CoincidencesESD(data, '/coincidences',
-                                             station_groups, overwrite=True)
+                                             station_groups, overwrite=True,
+                                             progress=False)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
         coinc.store_coincidences(cluster=cluster)
         num_coincidences = len(coinc.coincidences)
