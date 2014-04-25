@@ -5,11 +5,12 @@ import os.path
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 
+# For production: set DEBUG to False !!!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+     ('Arne de Laat', 'adelaat@nikhef.nl'),
 )
 
 MANAGERS = ADMINS
@@ -35,11 +36,15 @@ DATASTORE_PATH = '/databases/frome'
 TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
-ESD_PATH = '/databases/esd'
+ESD_PATH = '/srv/publicdb/www/esd'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
+
+# VPN and datastore host names
+VPN_HOST = 'localhost'
+DATASTORE_HOST = 'localhost'
 
 # reCAPTCHA settings
 RECAPTCHA_ENABLED = False
@@ -52,10 +57,14 @@ RECAPTCHA_PRIVATE_KEY = 'foobaz'
 # Also, sqlite3 is single threaded. So when multi processing is used
 # together with sqlite3, you might get the message "database is locked".
 
-USE_MULTIPROCESSING = False
+USE_MULTIPROCESSING = True
 
 # E-mail settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For production
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.nikhef.nl'
+#EMAIL_PORT = 25
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -72,12 +81,12 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # DEV_ONLY
-MEDIA_ROOT = '/localstore/media/'
+MEDIA_ROOT = '/srv/publicdb/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).

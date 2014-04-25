@@ -15,8 +15,15 @@
   git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
        update=yes force=no
 
+- name: checkout jsparc in /srv/publicdb/jsparc
+  git: repo=https://github.com/HiSPARC/jsparc.git dest=/srv/publicdb/jsparc
+       update=yes force=no
+
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
+
+- name: create django media/raw_data folder
+  file: path=/srv/publicdb/media/raw_data state=directory
 
 - name: Copy conda requirements files
   copy: src=conda.list dest=/home/{{ ansible_user_id }}/
@@ -46,7 +53,7 @@
 
 - name: copy Django settings file
   copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
-        backup=yes
+        backup=yes force=no
 
 - name: synchronize Django database
   shell: chdir=/srv/publicdb/www/django_publicdb
@@ -94,5 +101,5 @@
 - name: enable cron job for cleaning out downloaded raw_data files
   cron: name="clean downloaded data" cron_file=hisparc special_time=daily
         state=present user=root
-        job="find /localstore/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
+        job="find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
   sudo: yes
