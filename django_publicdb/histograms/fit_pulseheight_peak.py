@@ -117,7 +117,7 @@ def getFitParameters(x, y):
     maxX = x_rebinned[binMaximum]
     minX = x_rebinned[binMinimum]
 
-    logger.debug("Approx maximum is at %s" % ((maxX + minX) / 2))
+    # logger.debug("Approx maximum is at %s" % ((maxX + minX) / 2))
 
     # Return fit peak, fit range minimum = maxX, fit range maximum = minX
 
@@ -182,8 +182,8 @@ def fitPulseheightPeak(pulseheights):
 
     try:
         initial_mpv, minRange, maxRange = getFitParameters(pulseheight, occurence)
-        logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
-	             (initial_mpv, minRange, maxRange))
+        # logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
+	    #              (initial_mpv, minRange, maxRange))
     except Exception, e:
         pulseheightFit.error_type = "Exception"
         pulseheightFit.error_message = "Unable to find initial fit parameters: %s" % e
@@ -278,9 +278,11 @@ def fitPulseheightPeak(pulseheights):
     logger.debug("Fit result: peak %.1f +- %.1f, width %.1f +- %.1f" %
                  (fitParameters[1], sqrt(fitCovariance[1,1]),
                   fitParameters[2], sqrt(fitCovariance[2,2])))
-    logger.debug("Chi square: %.3f" % chiSquare)
-    logger.debug("Degrees of freedom: %d" % pulseheightFit.degrees_of_freedom )
-    logger.debug("Reduced chi square: %.1f" % pulseheightFit.chi_square_reduced)
+    # logger.debug("Chi square: %.3f" % chiSquare)
+    # logger.debug("Degrees of freedom: %d" %
+    #              pulseheightFit.degrees_of_freedom)
+    # logger.debug("Reduced chi square: %.1f" %
+    #              pulseheightFit.chi_square_reduced)
 
     return pulseheightFit
 
