@@ -272,13 +272,16 @@ def get_events_from_esd_in_range(station, start, end):
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
-        with tables.open_file(filepath) as f:
-            station_node = esd.get_station_node(f, station)
-            ts0 = calendar.timegm(t0.utctimetuple())
-            ts1 = calendar.timegm(t1.utctimetuple())
-            for event in station_node.events.where(
-                '(ts0 <= timestamp) & (timestamp < ts1)'):
-                yield event
+        try:
+            with tables.open_file(filepath) as f:
+                station_node = esd.get_station_node(f, station)
+                ts0 = calendar.timegm(t0.utctimetuple())
+                ts1 = calendar.timegm(t1.utctimetuple())
+                for event in station_node.events.where(
+                        '(ts0 <= timestamp) & (timestamp < ts1)'):
+                    yield event
+        except (IOError, tables.NoSuchNodeError):
+            continue
 
 
 def generate_weather_as_csv(station, start, end):
@@ -330,13 +333,16 @@ def get_weather_from_esd_in_range(station, start, end):
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
-        with tables.open_file(filepath) as f:
-            station_node = esd.get_station_node(f, station)
-            ts0 = calendar.timegm(t0.utctimetuple())
-            ts1 = calendar.timegm(t1.utctimetuple())
-            for event in station_node.weather.where(
-                '(ts0 <= timestamp) & (timestamp < ts1)'):
-                yield event
+        try:
+            with tables.open_file(filepath) as f:
+                station_node = esd.get_station_node(f, station)
+                ts0 = calendar.timegm(t0.utctimetuple())
+                ts1 = calendar.timegm(t1.utctimetuple())
+                for event in station_node.weather.where(
+                        '(ts0 <= timestamp) & (timestamp < ts1)'):
+                    yield event
+        except (IOError, tables.NoSuchNodeError):
+            continue
 
 
 def clean_floats(number, precision=4):
