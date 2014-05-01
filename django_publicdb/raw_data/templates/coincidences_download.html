@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-HiSPARC Data Download Form
+HiSPARC Coincidences Download Form
 {% endblock %}
 
 {% block head_styles %}
@@ -10,11 +10,11 @@ HiSPARC Data Download Form
 
 {% block content %}
 
-<div id="header"><h2>Data Download Form</h2></div>
+<div id="header"><h2>Coincidences Download Form</h2></div>
 
 <p>Not all data is available for download yet, please only use dates in 2014 (2014-1-1 and later).</p>
 
-<form action='/data/download/' method="post">
+<form action='/data/download/coincidences/' method="post">
 {{ form.as_p }}
 <input type="submit" value="Submit" />
 </form>

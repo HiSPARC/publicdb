@@ -16,9 +16,10 @@ import urllib
 import dateutil.parser
 
 from django_publicdb.inforecords.models import Station
-from django_publicdb.histograms.models import Summary
+from django_publicdb.histograms.models import Summary, NetworkSummary
 from django_publicdb.histograms import esd
-from django_publicdb.raw_data.forms import DataDownloadForm
+from django_publicdb.raw_data.forms import (DataDownloadForm,
+                                            CoincidenceDownloadForm)
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
@@ -148,7 +149,7 @@ def download_form(request, station_number=None, start=None, end=None):
             data_type = form.cleaned_data['data_type']
             query_string = urllib.urlencode({'start': start, 'end': end,
                                              'download': download})
-            return HttpResponseRedirect('/data/%d/%s?%s' %
+            return HttpResponseRedirect('/data/%d/%s/?%s' %
                                         (station.number, data_type,
                                          query_string))
     else:
@@ -343,6 +344,157 @@ def get_weather_from_esd_in_range(station, start, end):
                     yield event
         except (IOError, tables.NoSuchNodeError):
             continue
+
+
+def coincidences_download_form(request, start=None, end=None):
+    if request.method == 'POST':
+        form = CoincidenceDownloadForm(request.POST)
+        if form.is_valid():
+            start = form.cleaned_data['start']
+            end = form.cleaned_data['end']
+            n = form.cleaned_data['n']
+            download = form.cleaned_data['download']
+            query_string = urllib.urlencode({'start': start, 'end': end,
+                                             'n': n, 'download': download})
+            return HttpResponseRedirect('/data/network/coincidences/?%s' %
+                                        query_string)
+    else:
+        form = CoincidenceDownloadForm(initial={'start': start,'end': end,
+                                                'n': 2})
+
+    return render(request, 'coincidences_download.html', {'form': form})
+
+
+def download_coincidences(request):
+    """Download coincidences.
+
+    :param start: (optional, GET) start of data range
+    :param end: (optional, GET) end of data range
+    :param n: (optional, GET) minimum number of events in a coincidence
+    :param download: (optional, GET) download the csv
+
+    """
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    yesterday = datetime.datetime.combine(yesterday, datetime.time())
+
+    try:
+        if 'start' in request.GET:
+            start = dateutil.parser.parse(request.GET['start'])
+        else:
+            start = yesterday
+
+        if 'end' in request.GET:
+            end = dateutil.parser.parse(request.GET['end'])
+        else:
+            end = start + datetime.timedelta(days=1)
+    except ValueError:
+        msg = ("Incorrect optional parameters (start [datetime], "
+               "end [datetime])")
+        return HttpResponseBadRequest(msg, content_type="text/plain")
+    n = int(request.GET.get('n', '2'))
+
+    download = request.GET.get('download', False)
+    if download in ['true', 'True']:
+        download = True
+    else:
+        download = False
+
+    timerange_string = prettyprint_timerange(start, end)
+    csv_output = generate_coincidences_as_csv(start, end, n)
+    filename = 'coincidences-%s.csv' % (timerange_string)
+
+    response = StreamingHttpResponse(csv_output, content_type='text/csv')
+
+    if download:
+        content_disposition = 'attachment; filename="%s"' % filename
+    else:
+        content_disposition = 'inline; filename="%s"' % filename
+    response['Content-Disposition'] = content_disposition
+    response['Access-Control-Allow-Origin'] = '*'
+
+    return response
+
+
+def generate_coincidences_as_csv(start, end, n):
+    """Render CSV output as an iterator."""
+
+    t = loader.get_template('coincidences.csv')
+    c = Context({'start': start, 'end': end, 'n': n})
+
+    yield t.render(c)
+
+    line_buffer = SingleLineStringIO()
+    writer = csv.writer(line_buffer, delimiter='\t')
+    for id, number, event in get_coincidences_from_esd_in_range(start, end, n):
+        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
+        row = [id,
+               number,
+               dt.date(), dt.time(),
+               event['timestamp'],
+               event['nanoseconds'],
+               event['pulseheights'][0],
+               event['pulseheights'][1],
+               event['pulseheights'][2],
+               event['pulseheights'][3],
+               event['integrals'][0],
+               event['integrals'][1],
+               event['integrals'][2],
+               event['integrals'][3],
+               clean_floats(event['n1']),
+               clean_floats(event['n2']),
+               clean_floats(event['n3']),
+               clean_floats(event['n4']),
+               clean_floats(event['t1']),
+               clean_floats(event['t2']),
+               clean_floats(event['t3']),
+               clean_floats(event['t4'])]
+        writer.writerow(row)
+        yield line_buffer.line
+
+
+def get_coincidences_from_esd_in_range(start, end, n):
+    """Get coincidences from ESD in time range.
+
+    :param start: start of datetime range
+    :param end: end of datetime range
+    :param n: minimum number of events in coincidence
+    :yield: id, station number and event
+
+    """
+    for t0, t1 in single_day_ranges(start, end):
+        try:
+            NetworkSummary.objects.get(date=t0)
+        except NetworkSummary.DoesNotExist:
+            continue
+        filepath = esd.get_esd_data_path(t0)
+        try:
+            with tables.open_file(filepath) as f:
+                coincidences_node = esd.get_coincidences_node(f)
+                ts0 = calendar.timegm(t0.utctimetuple())
+                ts1 = calendar.timegm(t1.utctimetuple())
+                for id, coin in enumerate(coincidences_node.coincidences.where(
+                        '(ts0 <= timestamp) & (timestamp < ts1) & (N >= n)')):
+                    for number, event in get_coincidence_events(f, coin):
+                        yield id, number, event
+        except (IOError, tables.NoSuchNodeError):
+            continue
+
+
+def get_coincidence_events(f, coincidence):
+    """Get events for a coincidence from an ESD file
+
+    :param f: PyTables file handle for an ESD file
+    :param coincidence: A coincidence row
+
+    """
+    coincidences_node = esd.get_coincidences_node(f)
+    c_idx = coincidences_node.c_index[coincidence['id']]
+    for s_idx, e_idx in c_idx:
+        s_path = coincidences_node.s_index[s_idx]
+        number = int(s_path.split('station_')[-1])
+        s_group = f.get_node(s_path)
+        event = s_group.events[e_idx]
+        yield number, event
 
 
 def clean_floats(number, precision=4):
