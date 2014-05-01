@@ -149,7 +149,7 @@ def download_form(request, station_number=None, start=None, end=None):
             data_type = form.cleaned_data['data_type']
             query_string = urllib.urlencode({'start': start, 'end': end,
                                              'download': download})
-            return HttpResponseRedirect('/data/%d/%s?%s' %
+            return HttpResponseRedirect('/data/%d/%s/?%s' %
                                         (station.number, data_type,
                                          query_string))
     else:
@@ -362,7 +362,7 @@ def coincidences_download_form(request, start=None, end=None):
         form = CoincidenceDownloadForm(initial={'start': start,'end': end,
                                                 'n': 2})
 
-    return render(request, 'data_download.html', {'form': form})
+    return render(request, 'coincidences_download.html', {'form': form})
 
 
 def download_coincidences(request):

@@ -22,5 +22,6 @@ class CoincidenceDownloadForm(forms.Form):
                                           "'2014-4-18 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2014-4-29', or "
                                         "'2014-04-30 9:05'")
-    n = forms.IntegerField(min_value=2)
+    n = forms.IntegerField(min_value=2, help_text="Minimum number of events "
+                                                  "in a coincidence")
     download = forms.BooleanField(required=False)
