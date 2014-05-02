@@ -514,21 +514,21 @@ def station(request, station_number):
 
 def get_coincidencetime_histogram_source(request, year, month, day):
     data = get_histogram_source(year, month, day, 'coincidencetime')
-    response = render_to_response('source_eventtime_histogram.csv',
+    response = render_to_response('source_coincidencetime_histogram.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=coincidencetime-%s-%s-%s.csv' %
-        (year, month, day))
+        'attachment; filename=coincidencetime-network-%d%02d%02d.csv' %
+        (int(year), int(month), int(day)))
     return response
 
 
 def get_coincidencenumber_histogram_source(request, year, month, day):
     data = get_histogram_source(year, month, day, 'coincidencenumber')
-    response = render_to_response('source_eventtime_histogram.csv',
+    response = render_to_response('source_coincidencenumber_histogram.csv',
                                   {'data': data}, mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=coincidencenumber-%s-%s-%s.csv' %
-        (year, month, day))
+        'attachment; filename=coincidencenumber-network-%d%02d%02d.csv' %
+        (int(year), int(month), int(day)))
     return response
 
 
