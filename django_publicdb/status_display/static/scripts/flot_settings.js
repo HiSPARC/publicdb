@@ -81,6 +81,8 @@ var _coincidencenumberhistogram = {
         ticks: [0.1, 1, 10, 100, 1000, 10000, 100000],
         transform: function (N) {return Math.log(N);},
         inverseTransform: function (N) {return Math.exp(N);}},
+    y2axis: {
+        tickLength: 0},
     xaxis: {
         axisLabel: 'Number of stations in coincidence',
         ticks: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
@@ -106,6 +108,8 @@ var _pulseheighthistogram = {
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         transform: function (N) {return Math.log(N) / Math.LN10;},
         inverseTransform: function (N) {return Math.pow(10, N);}},
+    y2axis: {
+        tickLength: 0},
     xaxis: {
         max: 2000,
         axisLabel: 'Pulseheight (mV)'}
@@ -118,6 +122,8 @@ var _pulseintegralhistogram = {
         min: 0.7,
         transform: function (N) {return Math.log(N) / Math.log(10);},
         inverseTransform: function (N) {return Math.pow(10, N);}},
+    y2axis: {
+        tickLength: 0},
     xaxis: {
         max: 62500,
         axisLabel: 'Pulseintegral (mVns)'}
