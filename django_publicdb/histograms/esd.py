@@ -24,97 +24,6 @@ logger = logging.getLogger('histograms.esd')
 COINCIDENCE_WINDOW = 2000  # nanoseconds
 
 
-class ProcessEventsFromSource(process_events.ProcessEvents):
-
-    """Process HiSPARC events from a different source.
-
-    This class is a subclass of ProcessEvents.  The difference is that in
-    this class, the source and destination are assumed to be different
-    files.  This also means that the source is untouched (no renaming of
-    original event tables) and the destination is assumed to be empty.
-    """
-
-    def __init__(self, source_file, dest_file, source_group, dest_group):
-        """Initialize the class.
-
-        :param source_file: the PyTables source file
-        :param dest_file: the PyTables dest file
-        :param group_path: the pathname of the source (and destination)
-            group
-
-        """
-        self.source_file = source_file
-        self.dest_file = dest_file
-
-        self.source_group = self.source_file.get_node(source_group)
-        self.dest_group = self.dest_file.get_node(dest_group)
-
-        self.source = self._get_source()
-
-    def _get_source(self):
-        """Return the table containing the events.
-
-        :return: table object
-
-        """
-        if '_events' in self.source_group:
-            source = self.source_group._events
-        else:
-            source = self.source_group.events
-        return source
-
-    def _check_destination(self, destination, overwrite):
-        """Override method, the destination is empty"""
-        pass
-
-    def _replace_table_with_selected_rows(self, table, row_ids):
-        """Replace events table with selected rows.
-
-        :param table: original table to be replaced.
-        :param row_ids: row ids of the selected rows which should go in
-            the destination table.
-
-        """
-        new_events = self.dest_file.create_table(self.dest_group, '_events',
-                                                 description=table.description)
-        selected_rows = table.read_coordinates(row_ids)
-        new_events.append(selected_rows)
-        new_events.flush()
-        return new_events
-
-    def _create_empty_results_table(self):
-        """Create empty results table with correct length."""
-
-        if self.limit:
-            length = self.limit
-        else:
-            length = len(self.source)
-
-        table = self.dest_file.create_table(self.dest_group, 'events',
-                                            self.processed_events_description,
-                                            expectedrows=length)
-
-        for x in xrange(length):
-            table.row.append()
-        table.flush()
-
-        return table
-
-    def _move_results_table_into_destination(self):
-        """Override, destination is temporary table"""
-        self.destination = self._tmp_events
-
-    def _get_blobs(self):
-        """Return blobs node"""
-
-        return self.source_group.blobs
-
-    def _create_progressbar_from_iterable(self, iterable, length=None):
-        """Override method, do not show a progressbar"""
-
-        return lambda x: x
-
-
 def search_coincidences_and_store_in_esd(network_summary):
     """Determine coincidences for events from Event Summary Data
 
@@ -174,9 +83,9 @@ def process_events_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process_events = ProcessEventsFromSource(source_file,
-                                                     tmp_file,
-                                                     source_node, '/')
+            process_events = \
+                process_events.ProcessEventsFromSourceWithTriggerOffset(
+                    source_file, tmp_file, source_node, '/')
             process_events.process_and_store_results()
             node_path = process_events.destination._v_pathname
     return tmp_filename, node_path
