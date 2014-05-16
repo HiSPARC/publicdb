@@ -43,16 +43,13 @@ def search_coincidences_and_store_in_esd(network_summary):
                                       summary__needs_update=False,
                                       pc__is_test=False)
 
+    station_numbers = [station.number for station in stations]
     station_groups = ['/hisparc/cluster_%s/station_%d' %
                       (station.cluster.main_cluster().lower(), station.number)
                       for station in stations]
 
-    cluster = clusters.BaseCluster()
-    for station in stations:
-        # FIXME: Wrong station position and no detectors..
-        # FIXME: Requires commits from sapphire refactor_simulations branch
-        # cluster._add_station((0, 0), 0, [], station.number)
-        pass
+    # FIXME: Gets *latest* known positions, which may be wrong.
+    cluster = clusters.HiSPARCStations(station_numbers)
 
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
