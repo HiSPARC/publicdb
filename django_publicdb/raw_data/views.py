@@ -254,7 +254,7 @@ def generate_events_as_csv(station, start, end):
                clean_floats(event['t2']),
                clean_floats(event['t3']),
                clean_floats(event['t4']),
-              ]
+               clean_floats(event['t_trigger'])]
         writer.writerow(row)
         yield line_buffer.line
 
@@ -447,7 +447,8 @@ def generate_coincidences_as_csv(start, end, n):
                clean_floats(event['t1']),
                clean_floats(event['t2']),
                clean_floats(event['t3']),
-               clean_floats(event['t4'])]
+               clean_floats(event['t4']),
+               clean_floats(event['t_trigger'])]
         writer.writerow(row)
         yield line_buffer.line
 
