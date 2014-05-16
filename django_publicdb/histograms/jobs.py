@@ -178,6 +178,7 @@ def update_all_histograms():
 
 def perform_update_tasks():
     update_esd()
+    update_histograms()
     update_coincidences()
     update_histograms()
 
@@ -280,8 +281,8 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     tasks himself or he grabs some workers and let them do it.
 
     """
-    summaries = eval("%s.objects.filter(%s=True).reverse()" %
-                     (model, needs_update_item))
+    summaries = eval("%s.objects.filter(%s=True, needs_update=False).reverse()"
+                     % (model, needs_update_item))
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool(maxtasksperchild=10)

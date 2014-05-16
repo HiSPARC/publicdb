@@ -40,6 +40,7 @@ def search_coincidences_and_store_in_esd(network_summary):
     # Get non-test stations with events on the specified date
     stations = Station.objects.filter(summary__date=date,
                                       summary__num_events__isnull=False,
+                                      summary__needs_update=False,
                                       pc__is_test=False)
 
     station_groups = ['/hisparc/cluster_%s/station_%d' %
