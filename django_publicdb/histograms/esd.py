@@ -83,11 +83,11 @@ def process_events_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process_events = \
+            process = \
                 process_events.ProcessEventsFromSourceWithTriggerOffset(
                     source_file, tmp_file, source_node, '/')
-            process_events.process_and_store_results()
-            node_path = process_events.destination._v_pathname
+            process.process_and_store_results()
+            node_path = process.destination._v_pathname
     return tmp_filename, node_path
 
 
