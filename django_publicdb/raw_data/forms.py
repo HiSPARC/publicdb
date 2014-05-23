@@ -1,6 +1,6 @@
 from django import forms
 
-from django_publicdb.inforecords.models import Station
+from django_publicdb.inforecords.models import Station, Cluster
 
 
 TYPES = [('events','Events'),
@@ -18,6 +18,9 @@ class DataDownloadForm(forms.Form):
 
 
 class CoincidenceDownloadForm(forms.Form):
+    cluster = forms.ModelChoiceField(Cluster.objects.filter(parent=None),
+                                     empty_label='All clusters',
+                                     required=False)
     start = forms.DateTimeField(help_text="e.g. '2014-4-5', or "
                                           "'2014-4-18 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2014-4-29', or "

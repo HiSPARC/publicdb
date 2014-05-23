@@ -1,7 +1,6 @@
 # Coincidences
 #
-# HiSPARC Network
-#
+# Coincidences between stations in the {% if cluster %}{{ cluster.name }} cluster{% else %}HiSPARC network{% endif %}
 # Data taken from {{ start }} to {{ end }}
 # Showing only coincidences with at least {{ n }} events
 #
