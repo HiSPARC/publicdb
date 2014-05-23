@@ -299,12 +299,12 @@ def getPulseheightFits(summary):
     if pulseheights == None:
         return []
 
-    # Get number of plates from the config data
+    # Get number of detectors from the config data
 
     today = datetime.datetime.utcnow()
 
     try:
-        n_plates = summary.station.number_of_detectors()
+        n_detectors = summary.station.number_of_detectors()
     except Configuration.DoesNotExist:
         raise
 
@@ -312,11 +312,11 @@ def getPulseheightFits(summary):
 
     fits = []
 
-    for detector_n in range(1, n_plates + 1):
+    for detector_n in range(1, n_detectors + 1):
         try:
             fit = fitPulseheightPeak(pulseheights[:, detector_n - 1])
         except Exception, exception:
-            logger.error("[%s plate %s] %s" %
+            logger.error("[%s detector %s] %s" %
                          (summary, detector_n, exception))
 
             fit = PulseheightFit(initial_mpv = 0,
