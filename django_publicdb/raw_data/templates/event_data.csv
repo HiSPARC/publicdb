@@ -15,6 +15,7 @@
 # integral (4x):       integral of the signal [ADC.ns]
 # number_of_mips (4x): estimate for the number of particles in the detector
 # arrival_times (4x):  relative time of arrival of the first particle in the detector [ns]
+# trigger_time:        relative time of the trigger timestamp [ns]
 #
 # Values of -1 for detectors 3 and 4 indicate that the station only has
 # two detectors.  Values of -999 indicate a problem in the analysis of
