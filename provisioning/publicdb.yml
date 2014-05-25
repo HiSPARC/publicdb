@@ -7,6 +7,11 @@
         owner=hisparc group=hisparc mode=2775
   sudo: yes
 
+- name: ensure /var/log/hisparc-update.log exists
+  file: path=/var/log/hisparc-update.log state=touch
+        owner=hisparc group=hisparc mode=644
+  sudo: yes
+
 - name: set default group write ACLs on /srv/publicdb
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
   sudo: yes
