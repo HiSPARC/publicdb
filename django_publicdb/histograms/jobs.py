@@ -110,7 +110,7 @@ def process_possible_tables_for_network(date, table_name):
     try:
         update_flag_attr = 'needs_update_%s' % NETWORK_TABLES[table_name]
         logger.info("New %s data on %s.", table_name,
-                                           date.strftime("%a %b %d %Y"))
+                    date.strftime("%a %b %d %Y"))
         network_summary, _ = NetworkSummary.objects.get_or_create(date=date)
         setattr(network_summary, update_flag_attr, True)
         network_summary.needs_update = True
@@ -142,8 +142,8 @@ def check_table_and_update_flags(table_name, num_events, summary):
 
         if getattr(summary, number_of_events_attr) != num_events:
             logger.info("New data (%s) on %s for station %d", table_name,
-                         summary.date.strftime("%a %b %d %Y"),
-                         summary.station.number)
+                        summary.date.strftime("%a %b %d %Y"),
+                        summary.station.number)
             # only record number of events for *some* tables at this time
             if table_name in RECORD_EARLY_NUM_EVENTS:
                 setattr(summary, number_of_events_attr, num_events)
@@ -301,6 +301,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
 
 def perform_events_tasks(summary):
     django.db.close_connection()
+    logger.info("Updating event histograms for %s" % summary)
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseheight_fit(summary)
@@ -310,6 +311,7 @@ def perform_events_tasks(summary):
 
 def perform_config_tasks(summary):
     django.db.close_connection()
+    logger.info("Updating configuration messages for %s" % summary)
     num_config = update_config(summary)
     summary.num_config = num_config
     return summary
@@ -317,6 +319,7 @@ def perform_config_tasks(summary):
 
 def perform_weather_tasks(summary):
     django.db.close_connection()
+    logger.info("Updating weather datasets for %s" % summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
     return summary
@@ -324,115 +327,15 @@ def perform_weather_tasks(summary):
 
 def perform_coincidences_tasks(network_summary):
     django.db.close_connection()
+    logger.info("Updating coincidence histograms for %s" % network_summary)
     update_coincidencetime_histogram(network_summary)
     update_coincidencenumber_histogram(network_summary)
     return network_summary
 
 
-def update_gps_coordinates():
-    """Update GPS coordinates for all stations"""
-
-    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-    for detector in DetectorHisparc.objects.all():
-        try:
-            config = (Configuration.objects
-                                   .filter(source__station=detector.station,
-                                           timestamp__lt=tomorrow)
-                                   .latest('timestamp'))
-        except Configuration.DoesNotExist:
-            pass
-        else:
-            detector.latitude = config.gps_latitude
-            detector.longitude = config.gps_longitude
-            detector.height = config.gps_altitude
-            detector.save()
-
-
-def update_eventtime_histogram(summary):
-    logger.info("Updating eventtime histogram for %s" % summary)
-    timestamps = esd.get_event_timestamps(summary)
-
-    # creating a histogram with bins consisting of timestamps instead of
-    # hours saves us from having to convert all timestamps to hours of day.
-    # timestamp at midnight (start of day) of date
-    start = calendar.timegm(summary.date.timetuple())
-    # create bins, don't forget right-most edge
-    bins = [start + hour * 3600 for hour in range(25)]
-
-    hist = np.histogram(timestamps, bins=bins)
-    # redefine bins and histogram, don't forget right-most edge
-    bins = range(25)
-    hist = hist[0].tolist()
-    save_histograms(summary, 'eventtime', bins, hist)
-
-
-def update_coincidencetime_histogram(network_summary):
-    """Histograms that show the number of coincidences per hour"""
-
-    logger.info("Updating coincidencetime histogram for %s" % network_summary)
-    timestamps = esd.get_coincidence_timestamps(network_summary)
-
-    # creating a histogram with bins consisting of timestamps instead of
-    # hours saves us from having to convert all timestamps to hours of day.
-    # timestamp at midnight (start of day) of date
-    start = calendar.timegm(network_summary.date.timetuple())
-    # create bins, don't forget right-most edge
-    bins = [start + hour * 3600 for hour in range(25)]
-
-    hist = np.histogram(timestamps, bins=bins)
-    # redefine bins and histogram, don't forget right-most edge
-    bins = range(25)
-    hist = hist[0].tolist()
-    save_network_histograms(network_summary, 'coincidencetime', bins, hist)
-
-
-def update_coincidencenumber_histogram(network_summary):
-    """Histograms of the number of stations participating in coincidences"""
-
-    logger.info("Updating coincidencenumber histogram for %s" %
-                 network_summary)
-    n_stations = esd.get_coincidence_data(network_summary, 'N')
-
-    # create bins, don't forget right-most edge
-    bins = range(2, 101)
-
-    hist = np.histogram(n_stations, bins=bins)
-    hist = hist[0].tolist()
-    save_network_histograms(network_summary, 'coincidencenumber', bins, hist)
-
-
-def update_pulseheight_histogram(summary):
-    """Histograms of pulseheights for each detector individually"""
-
-    logger.info("Updating pulseheight histogram for %s" % summary)
-    pulseheights = esd.get_pulseheights(summary)
-    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
-    save_histograms(summary, 'pulseheight', bins, histograms)
-
-
-def update_pulseheight_fit(summary):
-    logger.info("Updating pulseheight fit for %s" % summary)
-    try:
-        fits = fit_pulseheight_peak.getPulseheightFits(summary)
-    except Configuration.DoesNotExist:
-        logger.debug("No Configuration for station: %d." %
-                     summary.station.number)
-        return
-    save_pulseheight_fits(summary, fits)
-
-
-def update_pulseintegral_histogram(summary):
-    """Histograms of pulseintegral for each detector individually"""
-
-    logger.info("Updating pulseintegral histogram for %s" % summary)
-    integrals = esd.get_integrals(summary)
-    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
-    save_histograms(summary, 'pulseintegral', bins, histograms)
-
-
 def search_coincidences_and_store_esd(network_summary):
     logger.info("Processing coincidences and storing ESD for %s" %
-                 network_summary)
+                network_summary)
     t0 = time.time()
     num_coincidences = \
         esd.search_coincidences_and_store_in_esd(network_summary)
@@ -458,10 +361,111 @@ def process_weather_and_store_esd(summary):
     return tmpfile_path, node_path
 
 
+def update_gps_coordinates():
+    """Update GPS coordinates for all stations"""
+
+    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
+    for detector in DetectorHisparc.objects.all():
+        try:
+            config = (Configuration.objects
+                                   .filter(source__station=detector.station,
+                                           timestamp__lt=tomorrow)
+                                   .latest('timestamp'))
+        except Configuration.DoesNotExist:
+            pass
+        else:
+            detector.latitude = config.gps_latitude
+            detector.longitude = config.gps_longitude
+            detector.height = config.gps_altitude
+            detector.save()
+
+
+def update_eventtime_histogram(summary):
+    logger.debug("Updating eventtime histogram for %s" % summary)
+    timestamps = esd.get_event_timestamps(summary)
+
+    # creating a histogram with bins consisting of timestamps instead of
+    # hours saves us from having to convert all timestamps to hours of day.
+    # timestamp at midnight (start of day) of date
+    start = calendar.timegm(summary.date.timetuple())
+    # create bins, don't forget right-most edge
+    bins = [start + hour * 3600 for hour in range(25)]
+
+    hist = np.histogram(timestamps, bins=bins)
+    # redefine bins and histogram, don't forget right-most edge
+    bins = range(25)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'eventtime', bins, hist)
+
+
+def update_coincidencetime_histogram(network_summary):
+    """Histograms that show the number of coincidences per hour"""
+
+    logger.debug("Updating coincidencetime histogram for %s" % network_summary)
+    timestamps = esd.get_coincidence_timestamps(network_summary)
+
+    # creating a histogram with bins consisting of timestamps instead of
+    # hours saves us from having to convert all timestamps to hours of day.
+    # timestamp at midnight (start of day) of date
+    start = calendar.timegm(network_summary.date.timetuple())
+    # create bins, don't forget right-most edge
+    bins = [start + hour * 3600 for hour in range(25)]
+
+    hist = np.histogram(timestamps, bins=bins)
+    # redefine bins and histogram, don't forget right-most edge
+    bins = range(25)
+    hist = hist[0].tolist()
+    save_network_histograms(network_summary, 'coincidencetime', bins, hist)
+
+
+def update_coincidencenumber_histogram(network_summary):
+    """Histograms of the number of stations participating in coincidences"""
+
+    logger.debug("Updating coincidencenumber histogram for %s" %
+                 network_summary)
+    n_stations = esd.get_coincidence_data(network_summary, 'N')
+
+    # create bins, don't forget right-most edge
+    bins = range(2, 101)
+
+    hist = np.histogram(n_stations, bins=bins)
+    hist = hist[0].tolist()
+    save_network_histograms(network_summary, 'coincidencenumber', bins, hist)
+
+
+def update_pulseheight_histogram(summary):
+    """Histograms of pulseheights for each detector individually"""
+
+    logger.debug("Updating pulseheight histogram for %s" % summary)
+    pulseheights = esd.get_pulseheights(summary)
+    bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
+    save_histograms(summary, 'pulseheight', bins, histograms)
+
+
+def update_pulseheight_fit(summary):
+    logger.debug("Updating pulseheight fit for %s" % summary)
+    try:
+        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+    except Configuration.DoesNotExist:
+        logger.debug("No Configuration for station: %d." %
+                     summary.station.number)
+        return
+    save_pulseheight_fits(summary, fits)
+
+
+def update_pulseintegral_histogram(summary):
+    """Histograms of pulseintegral for each detector individually"""
+
+    logger.debug("Updating pulseintegral histogram for %s" % summary)
+    integrals = esd.get_integrals(summary)
+    bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
+    save_histograms(summary, 'pulseintegral', bins, histograms)
+
+
 def update_temperature_dataset(summary):
     """Create dataset of timestamped temperature data"""
 
-    logger.info("Updating temperature dataset for %s" % summary)
+    logger.debug("Updating temperature dataset for %s" % summary)
     temperature = esd.get_temperature(summary)
     ERR = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in ERR]
@@ -473,7 +477,7 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     """Create dataset of timestamped barometer data"""
 
-    logger.info("Updating barometer dataset for %s" % summary)
+    logger.debug("Updating barometer dataset for %s" % summary)
     barometer = esd.get_barometer(summary)
     ERR = [-999]
     barometer = [(x, y) for x, y in barometer if y not in ERR]
@@ -498,7 +502,6 @@ def shrink_dataset(dataset, interval):
 
 
 def update_config(summary):
-    logger.info("Updating configuration messages for %s" % summary)
     cluster, station_number = get_station_cluster_number(summary.station)
     file, configs, blobs = datastore.get_config_messages(cluster,
                                                          station_number,
@@ -583,20 +586,16 @@ def save_dataset(summary, slug, data):
 
 
 def save_pulseheight_fits(summary, fits):
-
     if len(fits) == 0:
         logger.debug("Empty pulseheight fit results. Nothing to save.")
         return
-
-    logger.info("Saving pulseheight fits for %s" % summary)
-
+    logger.debug("Saving pulseheight fits for %s" % summary)
     for fit in fits:
         try:
             fit.save()
         except django.db.IntegrityError:
             existing_fit = PulseheightFit.objects.get(source=summary,
                                                       plate=fit.plate)
-
             fit.id = existing_fit.id
             fit.save()
 
