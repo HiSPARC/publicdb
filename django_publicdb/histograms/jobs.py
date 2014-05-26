@@ -192,7 +192,7 @@ def update_esd():
     """
     summaries = Summary.objects.filter(needs_update=True).reverse()
     if settings.USE_MULTIPROCESSING:
-        worker_pool = multiprocessing.Pool(maxtasksperchild=10)
+        worker_pool = multiprocessing.Pool()
         results = worker_pool.imap_unordered(
             process_and_store_temporary_esd_for_summary, summaries)
 
@@ -285,7 +285,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
                      % (model, needs_update_item))
 
     if settings.USE_MULTIPROCESSING:
-        worker_pool = multiprocessing.Pool(maxtasksperchild=10)
+        worker_pool = multiprocessing.Pool()
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
             exec "summary.%s=False" % needs_update_item
