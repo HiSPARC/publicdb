@@ -45,7 +45,7 @@ def get_updated_files(rootdir, last_check_time):
                                         file, '%Y_%m_%d.h5').date()
                         except ValueError:
                             continue
-                        if date != datetime.date.today():
+                        if date != datetime.datetime.utcnow().date():
                             file_list.append((date, file_path))
 
     return file_list
