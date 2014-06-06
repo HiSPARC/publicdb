@@ -439,6 +439,8 @@ def generate_coincidences_as_csv(start, end, cluster, n):
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t')
+    coincidences_returned = False
+
     for id, number, event in get_coincidences_from_esd_in_range(start, end,
                                                                 cluster, n):
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
@@ -466,7 +468,10 @@ def generate_coincidences_as_csv(start, end, cluster, n):
                clean_floats(event['t_trigger'])]
         writer.writerow(row)
         yield line_buffer.line
+        coincidences_returned = True
 
+    if not coincidences_returned:
+        yield "# No coincidences found for the chosen query."
 
 def get_coincidences_from_esd_in_range(start, end, cluster, n):
     """Get coincidences from ESD in time range.
@@ -478,6 +483,7 @@ def get_coincidences_from_esd_in_range(start, end, cluster, n):
     :yield: id, station number and event
 
     """
+    id = -1
     for t0, t1 in single_day_ranges(start, end):
         try:
             NetworkSummary.objects.get(date=t0)
@@ -497,7 +503,7 @@ def get_coincidences_from_esd_in_range(start, end, cluster, n):
             else:
                 coincidences = cq.timerange(start=ts0, stop=ts1)
                 events = cq.all_events(coincidences, n)
-            for id, coin in enumerate(events):
+            for id, coin in enumerate(events, id + 1):
                 for number, event in coin:
                     yield id, number, event
         except (IOError, tables.NoSuchNodeError):
