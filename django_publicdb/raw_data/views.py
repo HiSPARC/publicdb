@@ -235,6 +235,8 @@ def generate_events_as_csv(station, start, end):
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t')
+    events_returned = False
+
     events = get_events_from_esd_in_range(station, start, end)
     for event in events:
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
@@ -260,6 +262,10 @@ def generate_events_as_csv(station, start, end):
                clean_floats(event['t_trigger'])]
         writer.writerow(row)
         yield line_buffer.line
+        events_returned = True
+
+    if not events_returned:
+        yield "# No events found for the chosen query."
 
 
 def get_events_from_esd_in_range(station, start, end):
