@@ -39,7 +39,7 @@ def retrieve_traces(node, timestamp, nanoseconds):
     baselines = event['baseline']
     traces_str = [zlib.decompress(node.blobs[trace_idx]).split(',')
                   for trace_idx in traces_idx if trace_idx != -1]
-    traces = [[int(val) - baseline if baseline not -999 else int(val)
+    traces = [[int(val) - baseline if not baseline is -999 else int(val)
                for val in trace_str if val != '']
               for baseline, trace_str in zip(baselines, traces_str)]
 
