@@ -304,6 +304,8 @@ def generate_weather_as_csv(station, start, end):
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t')
+    weather_returned = False
+
     events = get_weather_from_esd_in_range(station, start, end)
     for event in events:
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
@@ -326,6 +328,10 @@ def generate_weather_as_csv(station, start, end):
               ]
         writer.writerow(row)
         yield line_buffer.line
+        weather_returned = True
+
+    if not weather_returned:
+        yield "# No weather data found for the chosen query."
 
 
 def get_weather_from_esd_in_range(station, start, end):
