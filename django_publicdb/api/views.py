@@ -194,10 +194,12 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
              station that has measured weather data in the given year.
 
     """
+    stations = Station.objects.filter(pc__is_test=False)
+
     if type == 'events':
-        stations = Station.objects.filter(summary__num_events__isnull=False)
+        stations = stations.filter(summary__num_events__isnull=False)
     elif type == 'weather':
-        stations = Station.objects.filter(summary__num_weather__isnull=False)
+        stations = stations.filter(summary__num_weather__isnull=False)
     else:
         return HttpResponseNotFound()
 
@@ -294,20 +296,19 @@ def countries(request):
 
 
 def get_station_dict(subcluster=None):
-    if subcluster:
-        stations = Station.objects.filter(cluster=subcluster)
-    else:
-        stations = Station.objects.all()
+    """Return list of station numbers and names
 
-    station_dict = []
-    for station in stations:
-        try:
-            pc = Pc.objects.filter(station=station)[0]
-            if not pc.is_test:
-                station_dict.append({'number': station.number,
-                                     'name': station.name})
-        except IndexError:
-            pass
+    For all non-test stations in the given subcluster
+
+    """
+    if subcluster:
+        stations = Station.objects.filter(cluster=subcluster,
+                                          pc__is_test=False)
+    else:
+        stations = Station.objects.filter(pc__is_test=False)
+
+    station_dict = [{'number': station.number, 'name': station.name}
+                    for station in stations]
 
     return sorted(station_dict, key=itemgetter('number'))
 
