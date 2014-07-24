@@ -751,12 +751,15 @@ def get_event_traces(request, station_number, ext_timestamp):
     """Get the traces for an event
 
     :param station_number: a station number identifier.
-    :param ext_timestamp: the extended timestamp (nanoseconds since UNIX epoch).
+    :param ext_timestamp: extended timestamp (nanoseconds since UNIX epoch).
+    :param raw: (optional, GET) if present get the raw trace, i.e. without
+                subtracted baseline.
 
     :return: two or four traces.
 
     """
     ext_timestamp = int(ext_timestamp)
+    raw = True if 'raw' in request.GET else False
 
     date = datetime.datetime.utcfromtimestamp(ext_timestamp / 1e9).date()
     if not validate_date(date):
@@ -769,7 +772,7 @@ def get_event_traces(request, station_number, ext_timestamp):
         return HttpResponseNotFound()
 
     try:
-        traces = datastore.get_event_traces(station, ext_timestamp)
+        traces = datastore.get_event_traces(station, ext_timestamp, raw)
     except IndexError:
         return HttpResponseNotFound()
 
