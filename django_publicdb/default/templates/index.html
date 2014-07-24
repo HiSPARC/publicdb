@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block title %}HiSPARC Public Database{% endblock %}
+
+{% block content %}
+
+<div id="header">
+    <h2>HiSPARC Data</h2>
+</div>
+
+<p>
+    Choose one of the following pages to work with HiSPARC data.
+</p>
+
+<a href="{% url 'status_display.views.stations' %}"><h4>Data summaries and station status</h4></a>
+
+<p class="small">
+    This section shows daily data summaries and the current status for
+    all stations.
+</p>
+
+<a href="{% url 'status_display.views.stations_on_map' %}"><h4>Stations on a map</h4></a>
+
+<p class="small">
+    A nice overview of all stations on a map.
+</p>
+
+<a href="{% url 'raw_data.views.download_form' %}"><h4>Download data</h4></a>
+
+<p class="small">
+    Download HiSPARC data as csv files which can be imported by various
+    programs (e.g. Excel and Python).
+</p>
+
+<a href="{{ MEDIA_URL }}jsparc/"><h4>jSparc</h4></a>
+
+<p class="small">
+    Web-based tools to work with the detected data and metadata. Data is
+    loaded in the browser and can then be used to create graphs or used
+    in analysis.
+</p>
+
+    
+{% endblock %}

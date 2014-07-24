@@ -8,7 +8,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^$', RedirectView.as_view(url='show/stations', permanent=False)),
+    (r'^$', 'django_publicdb.default.views.index'),
 
     (r'^robots\.txt$', TemplateView.as_view(template_name='robots.txt',
                                             content_type='text/plain')),
