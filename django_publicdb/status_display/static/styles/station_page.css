@@ -141,14 +141,7 @@ h3 {
 #prev {
     padding: 0 !important;}
 
-a:hover {
-    color: #005;
-    text-decoration: underline;}
-
 a {
-    border-radius: 3px;
-    color: #25B;
-    text-decoration: none;
     font-weight: bold;}
 
 a.currentDate:hover,
@@ -169,12 +162,10 @@ a.currentPage {
 
 #download {
     margin-top: 5px;
-    margin-bottom: 5px;
-}
+    margin-bottom: 5px;}
 
 #download a{
-    padding: 0px;
-}
+    padding: 0px;}
 
 #prev {
     float: left;

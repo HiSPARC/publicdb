@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-HiSPARC Coincidences Download Form
+HiSPARC coincidences download form
 {% endblock %}
 
 {% block head_styles %}
@@ -10,11 +10,13 @@ HiSPARC Coincidences Download Form
 
 {% block content %}
 
-<div id="header"><h2>Coincidences Download Form</h2></div>
+<div id="header"><h2>Coincidences download form</h2></div>
 
 <form action='/data/download/coincidences/' method="post">
-{{ form.as_p }}
-<input type="submit" value="Submit" />
+    {{ form.as_p }}
+    <input type="submit" value="Submit" />
 </form>
+
+<p class="small"><a href="{% url 'raw_data.views.download_form' %}">Switch to station data download form</a></p>
 
 {% endblock %}
