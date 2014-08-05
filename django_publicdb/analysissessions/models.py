@@ -133,7 +133,7 @@ class SessionRequest(models.Model):
             data.close()
             return nvalid
 
-        coinc = coincidences.Coincidences(data, None, stations)
+        coinc = coincidences.Coincidences(data, None, stations, progress=False)
         c_list, timestamps = coinc._search_coincidences()
         for coincidence in c_list:
             if len(coincidence) >= 3:
