@@ -385,6 +385,8 @@ def coincidences_download_form(request, start=None, end=None):
 def download_coincidences(request):
     """Download coincidences.
 
+    :param stations: (optional, GET) station numbers, only coincidences with
+                     stations specified are returned
     :param cluster: (optional, GET) cluster name, only coincidences with
                     stations in the specified cluster are returned
     :param start: (optional, GET) start of data range
@@ -411,11 +413,30 @@ def download_coincidences(request):
                "end [datetime])")
         return HttpResponseBadRequest(msg, content_type="text/plain")
 
+    stations = request.GET.get('stations', None)
+    if stations == 'None':
+        stations = None
+
     cluster = request.GET.get('cluster', None)
     if cluster == 'None':
         cluster = None
-    if cluster:
+
+    if stations and cluster:
+        msg = "Both stations and cluster are defined."
+        return HttpResponseBadRequest(msg, content_type="text/plain")
+    elif stations:
+        stations = [int(number) for number in stations.split(',')]
+        if len(stations) >= 30:
+            msg = "To many stations in query, use less than 30."
+            return HttpResponseBadRequest(msg, content_type="text/plain")
+        if Station.objects.filter(number__in=stations).count() != len(stations):
+            msg = "Not all stations are valid."
+            return HttpResponseBadRequest(msg, content_type="text/plain")
+    elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
+        stations = (Station.objects.filter(Q(cluster__parent=cluster) |
+                                           Q(cluster=cluster))
+                                   .values_list('number', flat=True))
 
     n = int(request.GET.get('n', '2'))
 
@@ -426,7 +447,7 @@ def download_coincidences(request):
         download = False
 
     timerange_string = prettyprint_timerange(start, end)
-    csv_output = generate_coincidences_as_csv(start, end, cluster, n)
+    csv_output = generate_coincidences_as_csv(start, end, cluster, stations, n)
     filename = 'coincidences-%s.csv' % (timerange_string)
 
     response = StreamingHttpResponse(csv_output, content_type='text/csv')
@@ -441,11 +462,12 @@ def download_coincidences(request):
     return response
 
 
-def generate_coincidences_as_csv(start, end, cluster, n):
+def generate_coincidences_as_csv(start, end, cluster, stations, n):
     """Render CSV output as an iterator."""
 
     t = loader.get_template('coincidences.csv')
-    c = Context({'start': start, 'end': end, 'cluster': cluster, 'n': n})
+    c = Context({'start': start, 'end': end, 'cluster': cluster,
+                 'stations': stations, 'n': n})
 
     yield t.render(c)
 
@@ -454,7 +476,7 @@ def generate_coincidences_as_csv(start, end, cluster, n):
     coincidences_returned = False
 
     for id, number, event in get_coincidences_from_esd_in_range(start, end,
-                                                                cluster, n):
+                                                                stations, n):
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
         row = [id,
                number,
@@ -485,12 +507,12 @@ def generate_coincidences_as_csv(start, end, cluster, n):
     if not coincidences_returned:
         yield "# No coincidences found for the chosen query."
 
-def get_coincidences_from_esd_in_range(start, end, cluster, n):
+def get_coincidences_from_esd_in_range(start, end, stations, n):
     """Get coincidences from ESD in time range.
 
     :param start: start of datetime range
     :param end: end of datetime range
-    :param cluster: Cluster object
+    :param stations: station numbers
     :param n: minimum number of events in coincidence
     :yield: id, station number and event
 
@@ -501,25 +523,22 @@ def get_coincidences_from_esd_in_range(start, end, cluster, n):
             NetworkSummary.objects.get(date=t0)
         except NetworkSummary.DoesNotExist:
             continue
-        filepath = esd.get_esd_data_path(t0)
-        try:
-            cq = CoincidenceQuery(filepath)
-            ts0 = calendar.timegm(t0.utctimetuple())
-            ts1 = calendar.timegm(t1.utctimetuple())
-            if cluster:
-                stations = (Station.objects.filter(Q(cluster__parent=cluster) |
-                                                   Q(cluster=cluster))
-                                           .values_list('number', flat=True))
-                coincidences = cq.any(stations, start=ts0, stop=ts1)
-                events = cq.events_from_stations(coincidences, stations, n)
-            else:
-                coincidences = cq.timerange(start=ts0, stop=ts1)
-                events = cq.all_events(coincidences, n)
-            for id, coin in enumerate(events, id + 1):
-                for number, event in coin:
-                    yield id, number, event
-        except (IOError, tables.NoSuchNodeError):
-            continue
+        with tables.open_file(esd.get_esd_data_path(t0)) as f:
+            try:
+                cq = CoincidenceQuery(f)
+                ts0 = calendar.timegm(t0.utctimetuple())
+                ts1 = calendar.timegm(t1.utctimetuple())
+                if stations:
+                    coincidences = cq.at_least(stations, n, start=ts0, stop=ts1)
+                    events = cq.events_from_stations(coincidences, stations, n)
+                else:
+                    coincidences = cq.timerange(start=ts0, stop=ts1)
+                    events = cq.all_events(coincidences, n)
+                for id, coin in enumerate(events, id + 1):
+                    for number, event in coin:
+                        yield id, number, event
+            except (IOError, tables.NoSuchNodeError):
+                continue
 
 
 def get_coincidence_events(f, coincidence):
