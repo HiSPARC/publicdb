@@ -425,7 +425,7 @@ def download_coincidences(request):
         msg = "Both stations and cluster are defined."
         return HttpResponseBadRequest(msg, content_type="text/plain")
     elif stations:
-        stations = [int(number) for number in stations.split(',')]
+        stations = [int(number) for number in stations.strip('[]').split(',')]
         if len(stations) >= 30:
             msg = "To many stations in query, use less than 30."
             return HttpResponseBadRequest(msg, content_type="text/plain")
