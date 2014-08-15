@@ -17,3 +17,15 @@ html {
 
 #pageHeader span {
     display: none;}
+    
+a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+a {
+    border-radius: 3px;
+    color: #25B;
+    text-decoration: none;}
+
+.small {
+    font-size: 10pt;}

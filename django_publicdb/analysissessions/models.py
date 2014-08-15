@@ -122,7 +122,7 @@ class SessionRequest(models.Model):
         file = date.strftime('%Y_%-m_%-d.h5')
         datastore_path = os.path.join(settings.DATASTORE_PATH,
                                       date.strftime('%Y/%-m'), file)
-        data = tables.openFile(datastore_path, 'r')
+        data = tables.open_file(datastore_path, 'r')
         ndups = 0
         nvalid = 0
         try:
@@ -133,7 +133,7 @@ class SessionRequest(models.Model):
             data.close()
             return nvalid
 
-        coinc = coincidences.Coincidences(data, None, stations)
+        coinc = coincidences.Coincidences(data, None, stations, progress=False)
         c_list, timestamps = coinc._search_coincidences()
         for coincidence in c_list:
             if len(coincidence) >= 3:
@@ -156,7 +156,7 @@ class SessionRequest(models.Model):
         cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
 
         try:
-            cluster_group = data.getNode(cluster_group_name)
+            cluster_group = data.get_node(cluster_group_name)
         except tables.NodeError:
             return []
 
@@ -166,7 +166,7 @@ class SessionRequest(models.Model):
             station_group_name = 'station_%d' % station.number
 
             if station_group_name in cluster_group:
-                station_group = data.getNode(cluster_group_name,
+                station_group = data.get_node(cluster_group_name,
                                              station_group_name)
                 stations.append(station_group)
         return stations

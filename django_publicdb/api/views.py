@@ -179,188 +179,52 @@ def stations(request, subcluster_number=None):
     return json_dict(stations)
 
 
-def stations_with_data(request):
-    """Get stations with data
+def stations_with_data(request, type=None, year=None, month=None, day=None):
+    """Get stations with event or weather data
 
-    Retrieve a list of all stations which have recorded data.
+    Retrieve a list of all stations which have recorded events or
+    weather data in the given year, month, day or at all.
 
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events.
-
-    """
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__gte=datetime.date(2002, 1, 1),
-                                        summary__date__lte=datetime.date.today())
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_year(request, year):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data in the given year.
-
-    :param year: the year part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events in the given year.
-
-    """
-    date = datetime.date(int(year), 1, 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__year=int(year))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_month(request, year, month):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data in the given month.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events in the given month.
-
-    """
-    date = datetime.date(int(year), int(month), 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_events__isnull=False,
-                                        summary__date__year=int(year),
-                                        summary__date__month=int(month))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_data_day(request, year, month, day):
-    """Get stations with data
-
-    Retrieve a list of all stations which have data on the given date.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured events on the given date.
-
-    """
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = Summary.objects.filter(num_events__isnull=False, date=date)
-    stations = [{'number': summary.station.number, 'name': summary.station.name}
-                for summary in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather(request):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data.
-
-    """
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__gte=datetime.date(2002, 1, 1),
-                                        summary__date__lte=datetime.date.today())
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather_year(request, year):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data in the given year.
-
-    :param year: the year part of the date.
+    :param type: data type to check for, either weather or events.
+    :param year, month, day: the date, this has to be within the time
+                             HiSPARC has been operational and can be as
+                             specific as you desire.
 
     :return: list of dictionaries containing the name and number of each
              station that has measured weather data in the given year.
 
     """
-    date = datetime.date(int(year), 1, 1)
+    stations = Station.objects.filter(pc__is_test=False)
+
+    if type == 'events':
+        stations = stations.filter(summary__num_events__isnull=False)
+    elif type == 'weather':
+        stations = stations.filter(summary__num_weather__isnull=False)
+    else:
+        return HttpResponseNotFound()
+
+    if not year:
+        date = datetime.date.today()
+        stations = stations.filter(summary__date__gte=datetime.date(2002, 1, 1),
+                                   summary__date__lte=date)
+    elif not month:
+        date = datetime.date(int(year), 1, 1)
+        stations = stations.filter(summary__date__year=date.year)
+    elif not day:
+        date = datetime.date(int(year), int(month), 1)
+        stations = stations.filter(summary__date__year=date.year,
+                                   summary__date__month=date.month)
+    else:
+        date = datetime.date(int(year), int(month), int(day))
+        stations = stations.filter(summary__date=date)
+
+    stations = stations.distinct()
+
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__year=int(year))
-                                .distinct())
     stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather_month(request, year, month):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data in the given month.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data in the given month.
-
-    """
-    date = datetime.date(int(year), int(month), 1)
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = (Station.objects.filter(summary__num_weather__isnull=False,
-                                        summary__date__year=int(year),
-                                        summary__date__month=int(month))
-                                .distinct())
-    stations = [{'number': station.number, 'name': station.name}
-                for station in summaries]
-
-    return json_dict(stations)
-
-
-def stations_with_weather_day(request, year, month, day):
-    """Get stations with weather data
-
-    Retrieve a list of all stations which have weather data on the given date.
-
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: list of dictionaries containing the name and number of each
-             station that has measured weather data on the given date.
-
-    """
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    summaries = Summary.objects.filter(num_weather__isnull=False, date=date)
-    stations = [{'number': summary.station.number, 'name': summary.station.name}
-                for summary in summaries]
+                for station in stations]
 
     return json_dict(stations)
 
@@ -432,20 +296,19 @@ def countries(request):
 
 
 def get_station_dict(subcluster=None):
-    if subcluster:
-        stations = Station.objects.filter(cluster=subcluster)
-    else:
-        stations = Station.objects.all()
+    """Return list of station numbers and names
 
-    station_dict = []
-    for station in stations:
-        try:
-            pc = Pc.objects.filter(station=station)[0]
-            if not pc.is_test:
-                station_dict.append({'number': station.number,
-                                     'name': station.name})
-        except IndexError:
-            pass
+    For all non-test stations in the given subcluster
+
+    """
+    if subcluster:
+        stations = Station.objects.filter(cluster=subcluster,
+                                          pc__is_test=False)
+    else:
+        stations = Station.objects.filter(pc__is_test=False)
+
+    station_dict = [{'number': station.number, 'name': station.name}
+                    for station in stations]
 
     return sorted(station_dict, key=itemgetter('number'))
 
@@ -723,18 +586,20 @@ def get_pulseheight_fit(request, station_number, plate_number,
     return json_dict(dict)
 
 
-def has_data(request, station_number, year=None, month=None, day=None):
+def has_data(request, station_number, type=None, year=None, month=None,
+             day=None):
     """Check for presence of cosmic ray data
 
     Find out if the given station has measured shower data, either on a
     specific date, or at all.
 
     :param station_number: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
+    :param type: the data type, either events or weather.
+    :param year, month, day: the date, this has to be within the time
+            HiSPARC has been operational and can be as specific as
+            you desire.
 
-    :return: boolean, True if the given station has shower data, False otherwise.
+    :return: boolean, True if the given station has data, False otherwise.
 
     """
     try:
@@ -742,65 +607,38 @@ def has_data(request, station_number, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
+    summaries = Summary.objects.filter(station=station)
 
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_events__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
+    if type=='events':
+        summaries = summaries.filter(num_events__isnull=False)
+    elif type=='weather':
+        summaries = summaries.filter(num_weather__isnull=False)
+
+    if day:
+        date = datetime.date(int(year), int(month), int(day))
+        summaries = summaries.filter(date=date)
+    elif month:
+        date = datetime.date(int(year), int(month), 1)
+        summaries = summaries.filter(date__year=date.year,
+                                     date__month=date.month)
+    elif year:
+        date = datetime.date(int(year), 1, 1)
+        summaries = summaries.filter(date__year=date.year)
+    else:
+        date = datetime.date.today()
+        summaries = summaries.filter(date__gte=datetime.date(2002, 1, 1),
+                                     date__lte=date)
+
+    if not validate_date(date):
+        return HttpResponseNotFound()
+
+    try:
+        a_summary_exists = summaries[0]
         has_data = True
     except IndexError:
         has_data = False
 
     return json_dict(has_data)
-
-
-def has_weather(request, station_number, year=None, month=None, day=None):
-    """Check for presence of weather data
-
-    Find out if the given station has measured weather data, either on a
-    specific date, or at all.
-
-    :param station_number: a stationn number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: boolean, True if the given station has weather data,
-        False otherwise.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    try:
-        if year and month and day:
-            date = datetime.date(int(year), int(month), int(day))
-            if not validate_date(date):
-                return HttpResponseNotFound()
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date=date)[0]
-        else:
-            Summary.objects.filter(station=station,
-                                   num_weather__isnull=False,
-                                   date__gte=datetime.date(2002, 1, 1),
-                                   date__lte=datetime.date.today())[0]
-        has_weather = True
-    except IndexError:
-        has_weather = False
-
-    return json_dict(has_weather)
 
 
 def config(request, station_number, year=None, month=None, day=None):
@@ -850,14 +688,18 @@ def config(request, station_number, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_number):
-    """Get total number of events for a station
+def num_events(request, station_number, year=None, month=None, day=None,
+               hour=None):
+    """Get number of events for a station
 
     Retrieve the number of events that a station has measured during its
-    entire operation. The following functions each dig a little deeper,
-    going for a shorter time period.
+    entire operation or during a specific period, which can be a year,
+    month, day or an hour.
 
     :param station_number: a stationn number identifier.
+    :param year, month, day, hour: the date, this has to be within the
+            time HiSPARC has been operational and can be as specific as
+            you desire.
 
     :return: integer containing the total number of events ever recorded by
              the given station.
@@ -868,150 +710,39 @@ def num_events(request, station_number):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    start = datetime.date(2002, 1, 1)
-    end = datetime.date.today()
-    if not validate_date(start):
-        return HttpResponseNotFound()
+    histogram_type = HistogramType.objects.get(slug='eventtime')
 
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
+    histograms = DailyHistogram.objects.filter(source__station=station,
+                                               type=histogram_type)
 
-    return json_dict(num_events)
-
-
-def num_events_year(request, station_number, year):
-    """Get total number of events for a station in the given year
-
-    Retrieve the total number of events that a station has measured during
-    the given year.
-
-    :param station_number: a station number identifier.
-    :param year: the year for which the number of events is to be given.
-
-    :return: integer containing the total number of events recorded by the
-             given station in the given year.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    start = datetime.date(int(year), 1, 1)
-    end = datetime.date(int(year) + 1, 1, 1)
-    if not validate_date(start):
-        return HttpResponseNotFound()
-
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
-
-    return json_dict(num_events)
-
-
-def num_events_month(request, station_number, year, month):
-    """Get total number of events for a station in the given month of a year
-
-    Retrieve the total number of events that a station has measured during
-    the given month.
-
-    :param station_number: a station number identifier.
-    :param year: the year in which to look for the month.
-    :param month: the month for which the number of events is to be given.
-
-    :return: integer containing the total number of events recorded by the
-             given station in the given month of the given year.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    start = datetime.date(int(year), int(month), 1)
-    if int(month) == 12:
-        end = datetime.date(int(year) + 1, 1, 1)
+    if not year:
+        date = datetime.date.today()
+        start = datetime.date(2002, 1, 1)
+        histograms = histograms.filter(source__date__gte=start,
+                                       source__date__lt=date)
+    elif not month:
+        date = datetime.date(int(year), 1, 1)
+        histograms = histograms.filter(source__date__year=date.year)
+    elif not day:
+        date = datetime.date(int(year), int(month), 1)
+        histograms = histograms.filter(source__date__year=date.year,
+                                       source__date__month=date.month)
+    elif not hour:
+        date = datetime.date(int(year), int(month), int(day))
+        histograms = histograms.filter(source__date=date)
     else:
-        end = datetime.date(int(year), int(month) + 1, 1)
-    if not validate_date(start):
-        return HttpResponseNotFound()
+        try:
+            date = datetime.date(int(year), int(month), int(day))
+            histogram = histograms.get(source__date=date)
+            num_events = histogram.values[int(hour)]
+        except DailyHistogram.DoesNotExist:
+            num_events = 0
 
-    summary = Summary.objects.filter(station=station,
-                                     date__gte=start, date__lt=end,
-                                     num_events__isnull=False)
-    num_events = sum([s.num_events for s in summary])
-
-    return json_dict(num_events)
-
-
-def num_events_day(request, station_number, year, month, day):
-    """Get total number of events for a station on a given date
-
-    Retrieve the total number of events that a station has measured on a date.
-
-    :param station_number: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-
-    :return: integer denoting the number of events recorded by the station
-             on the given date.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    date = datetime.date(int(year), int(month), int(day))
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    try:
-        summary = Summary.objects.get(station=station, date=date,
-                                      num_events__isnull=False)
-        num_events = summary.num_events
-    except Summary.DoesNotExist:
-        num_events = 0
-
-    return json_dict(num_events)
-
-
-def num_events_hour(request, station_number, year, month, day, hour):
-    """Get number of events for a station in an hour on the given date
-
-    Retrieve the total number of events that a station has measured in that
-    hour.
-
-    :param station_number: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
-    :param hour: the hour for which the number of events is to be retrieved.
-
-    :return: integer giving the number of events recorded by the station
-             in hour on date.
-
-    """
-    try:
-        station = Station.objects.get(number=station_number)
-    except Station.DoesNotExist:
-        return HttpResponseNotFound()
-
-    date = datetime.date(int(year), int(month), int(day))
-    if not validate_date(date):
-        return HttpResponseNotFound()
-
-    try:
-        histogram = DailyHistogram.objects.get(source__station=station,
-                                               type__slug='eventtime',
-                                               source__date=date)
-        num_events = histogram.values[int(hour)]
-    except (DailyHistogram.DoesNotExist, IndexError):
-        num_events = 0
+    if not hour:
+        num_events = sum([sum(histogram.values) for histogram in histograms])
 
     return json_dict(num_events)
 
@@ -1020,12 +751,15 @@ def get_event_traces(request, station_number, ext_timestamp):
     """Get the traces for an event
 
     :param station_number: a station number identifier.
-    :param ext_timestamp: the extended timestamp (nanoseconds since UNIX epoch).
+    :param ext_timestamp: extended timestamp (nanoseconds since UNIX epoch).
+    :param raw: (optional, GET) if present get the raw trace, i.e. without
+                subtracted baseline.
 
     :return: two or four traces.
 
     """
     ext_timestamp = int(ext_timestamp)
+    raw = True if 'raw' in request.GET else False
 
     date = datetime.datetime.utcfromtimestamp(ext_timestamp / 1e9).date()
     if not validate_date(date):
@@ -1038,7 +772,7 @@ def get_event_traces(request, station_number, ext_timestamp):
         return HttpResponseNotFound()
 
     try:
-        traces = datastore.get_event_traces(station, ext_timestamp)
+        traces = datastore.get_event_traces(station, ext_timestamp, raw)
     except IndexError:
         return HttpResponseNotFound()
 

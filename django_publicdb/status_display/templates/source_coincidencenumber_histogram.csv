@@ -1,0 +1,7 @@
+# "HiSPARC coincidencenumber histogram source"
+#
+# "Please note: the 'bin' is the left bin edge.  The width of the bin is 1"
+#
+# bin	value
+{% for row in data %}{{ row.0 }}	{{ row.1 }}
+{% endfor %}

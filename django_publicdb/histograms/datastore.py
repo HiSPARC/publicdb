@@ -26,7 +26,8 @@ def get_updated_files(rootdir, last_check_time):
     """Check for updated data files
 
     Check each file in the datastore and compare its modification
-    timestamp to last_check_time.  If the file is newer, return its path.
+    timestamp to last_check_time.  If the file is newer, return its date
+    (from the file name) and path.
 
     """
     file_list = []
@@ -39,9 +40,13 @@ def get_updated_files(rootdir, last_check_time):
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
                     if mtime >= last_check_time:
-                        date = datetime.datetime.strptime(
-                                    file, '%Y_%m_%d.h5').date()
-                        if date != datetime.date.today():
+                        try:
+                            date = datetime.datetime.strptime(
+                                        file, '%Y_%m_%d.h5').date()
+                        except ValueError:
+                            continue
+                        if (date != datetime.datetime.utcnow().date() and
+                                date != datetime.datetime.today()):
                             file_list.append((date, file_path))
 
     return file_list
@@ -50,19 +55,23 @@ def get_updated_files(rootdir, last_check_time):
 def get_event_summary(file_list):
     """Summarize event numbers per station
 
-    For each file in file_list, return the number of events per station
-    for each event type
+    :param file_list: list of tuples containing a date and file path.
+
+    :return: the number of events per station for each event type for
+        each file in file_list. This info is compiled in a dictionary:
+        {'[date]': {'[station_number]': {'[table_name]': [n_rows], }, }, }
+
 
     """
     summary = {}
     for date, file in file_list:
         stations = {}
-        with tables.openFile(file, 'r') as data:
-            for cluster in data.listNodes('/hisparc'):
-                for station in data.listNodes(cluster):
+        with tables.open_file(file, 'r') as data:
+            for cluster in data.list_nodes('/hisparc'):
+                for station in data.list_nodes(cluster):
                     num = int(re.search('([0-9]+)$', station._v_name).group())
                     event_tables = {}
-                    for table in data.listNodes(station):
+                    for table in data.list_nodes(station):
                         event_tables[table.name] = len(table)
                     stations[num] = event_tables
         summary[date] = stations
@@ -84,9 +93,9 @@ def get_stations(date):
     path = get_data_path(date)
 
     station_list = []
-    with tables.openFile(path, 'r') as file:
-        for cluster in file.listNodes('/hisparc'):
-            for station in file.listNodes(cluster):
+    with tables.open_file(path, 'r') as file:
+        for cluster in file.list_nodes('/hisparc'):
+            for station in file.list_nodes(cluster):
                 m = re.match('station_(?P<station>[0-9]+)', station._v_name)
                 station_list.append(int(m.group('station')))
 
@@ -118,9 +127,9 @@ def get_config_messages(cluster, station_number, date):
     """
     path = get_data_path(date)
 
-    file = tables.openFile(path, 'r')
-    parent = file.getNode('/hisparc/cluster_%s/station_%d' %
+    file = tables.open_file(path, 'r')
+    parent = file.get_node('/hisparc/cluster_%s/station_%d' %
                           (cluster.lower(), station_number))
-    config = file.getNode(parent, 'config')
-    blobs = file.getNode(parent, 'blobs')
+    config = file.get_node(parent, 'config')
+    blobs = file.get_node(parent, 'blobs')
     return file, config, blobs

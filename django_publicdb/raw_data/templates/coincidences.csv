@@ -1,0 +1,26 @@
+# Coincidences
+#
+# Coincidences between {% if cluster %}stations in the {{ cluster.name }} cluster{% elif stations %}the following stations: {{ stations }}{% else %}HiSPARC network{% endif %}
+# Data taken from {{ start }} to {{ end }}
+# Showing only coincidences with at least {{ n }} events
+#
+# This data contains the following columns:
+#
+# coincidence_id:      events with the same id belong to the same coincidence
+# station_number:      the station number that detected the event
+# date:                time of event [GPS calendar date]
+# time:                time of event [GPS time of day]
+# timestamp:           time of event [UNIX timestamp]
+# nanoseconds:         time of event [number of nanoseconds after timestamp]
+# pulseheights (4x):   maximum signal pulseheight [ADC]
+# integral (4x):       integral of the signal [ADC.ns]
+# number_of_mips (4x): estimate for the number of particles in the detector
+# arrival_times (4x):  relative time of arrival of the first particle in the detector [ns]
+# trigger_time:        relative time of the trigger timestamp [ns]
+#
+# Values of -1 for detectors 3 and 4 indicate that the station only has
+# two detectors.  Values of -999 indicate a problem in the analysis of
+# that particular event.  Usually, this is the result from noise in the
+# signal.
+#
+#

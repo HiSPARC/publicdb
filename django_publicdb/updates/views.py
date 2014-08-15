@@ -1,10 +1,20 @@
 from django import http
+
 from urllib import urlencode
 
 from django_publicdb.updates.models import *
 
 USER_UPDATE = 1
 ADMIN_UPDATE = 2
+
+
+def get_latest_installer(request):
+    """Get latest full HiSPARC installer"""
+
+    installer = (InstallerUpdate.objects.filter(queue__slug='hisparc')
+                 .order_by('version').reverse()[0])
+    return http.HttpResponseRedirect(installer.installer.url)
+
 
 def update_check_querystring(request, queue):
     """Check for software updates"""
@@ -16,6 +26,7 @@ def update_check_querystring(request, queue):
         return http.HttpResponseBadRequest("Incomplete request.")
 
     return update_check(request, queue, admin_version, user_version)
+
 
 def update_check(request, queue, admin_version, user_version):
     try:
@@ -32,7 +43,7 @@ def update_check(request, queue, admin_version, user_version):
         latest = admin_updates.reverse()[0]
         answer['newVersionAdmin'] = latest.version
         answer['urlAdmin'] = latest.update.url
-    
+
     user_updates = UserUpdate.objects.filter(queue=queue,
                                              version__gt=user_version)
     if user_updates:

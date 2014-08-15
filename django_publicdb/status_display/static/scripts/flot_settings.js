@@ -5,7 +5,7 @@ var _base = {
     colors: ["#222", "#D22", "#1C2", "#1CC"],
     series: {
         lines: {
-            lineWidth: 1,
+            lineWidth: 1.25,
             steps: true},
         shadowSize: 0},
     yaxis: {
@@ -63,10 +63,34 @@ var _base = {
     legend: {show: false}
 };
 
+var _coincidencetimehistogram = {
+    yaxis: {
+        axisLabel: 'Number of coincidences',
+        min: 0},
+    xaxis: {
+        axisLabel: 'Hour of day (UTC)',
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
+        max: 24}
+};
+
+var _coincidencenumberhistogram = {
+    yaxis: {
+        axisLabel: 'Number of coincidences',
+        min: 0.7,
+        ticks: [0.1, 1, 10, 100, 1000, 10000, 100000],
+        transform: function (N) {return Math.log(N);},
+        inverseTransform: function (N) {return Math.exp(N);}},
+    y2axis: {
+        tickLength: 0},
+    xaxis: {
+        axisLabel: 'Number of stations in coincidence',
+        ticks: [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+        min: 1.5,
+        max: 20.5}
+};
+
 var _eventhistogram = {
-    series: {
-        lines: {
-            lineWidth: 1.5}},
     yaxis: {
         axisLabel: 'Number of events',
         min: 0},
@@ -84,7 +108,10 @@ var _pulseheighthistogram = {
         ticks: [1, 5, 10, 50, 100, 500, 1000, 5000, 10000],
         transform: function (N) {return Math.log(N) / Math.LN10;},
         inverseTransform: function (N) {return Math.pow(10, N);}},
+    y2axis: {
+        tickLength: 0},
     xaxis: {
+        max: 2000,
         axisLabel: 'Pulseheight (mV)'}
 };
 
@@ -95,7 +122,10 @@ var _pulseintegralhistogram = {
         min: 0.7,
         transform: function (N) {return Math.log(N) / Math.log(10);},
         inverseTransform: function (N) {return Math.pow(10, N);}},
+    y2axis: {
+        tickLength: 0},
     xaxis: {
+        max: 62500,
         axisLabel: 'Pulseintegral (mVns)'}
 };
 
@@ -170,7 +200,6 @@ var _altitudegraph = {
 var _tracegraph = {
     series: {
         lines: {
-            lineWidth: 1.5,
             steps: false}},
     xaxis: {
         axisLabel: 'Time (ns)',
@@ -181,6 +210,8 @@ var _tracegraph = {
         max: 0}
 };
 
+var ct_options = $.extend(true, {}, _base, _coincidencetimehistogram);
+var cn_options = $.extend(true, {}, _base, _coincidencenumberhistogram);
 var eh_options = $.extend(true, {}, _base, _eventhistogram);
 var ph_options = $.extend(true, {}, _base, _pulseheighthistogram);
 var pi_options = $.extend(true, {}, _base, _pulseintegralhistogram);

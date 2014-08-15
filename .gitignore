@@ -4,6 +4,7 @@ HiSPARC_coincidences.db
 public.db
 *.h5
 datastore/
+datastore_test/
 esd/
 _build/
 
@@ -25,3 +26,7 @@ Thumbs.db
 
 # Vim
 *.swp
+
+# Vagrant
+.vagrant
+vagrant_ansible_inventory_default

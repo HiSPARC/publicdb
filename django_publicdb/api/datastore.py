@@ -9,11 +9,13 @@ import tables
 from django.conf import settings
 
 
-def get_event_traces(station, ext_timestamp):
+def get_event_traces(station, ext_timestamp, raw=False):
     """Get the traces belonging to a station and a certain timestamp
 
-    :param station: inforecords Station object
-    :param iterator: row number (from the bottom) to get
+    :param station: :class:`django_publicdb.inforecords.models.Station` instance
+    :param ext_timestamp: extended timestamp (nanoseconds since UNIX epoch).
+    :param raw: (optional, GET) if present get the raw trace, i.e. without
+                subtracted baseline.
 
     """
     date = ext_timestamp_to_datetime(ext_timestamp)
@@ -21,32 +23,33 @@ def get_event_traces(station, ext_timestamp):
     file = get_datastore_file(path)
     node = get_station_node(file, station)
     ts, ns = split_ext_timestamp(ext_timestamp)
-    traces = retrieve_traces(node, ts, ns)
+    traces = retrieve_traces(node, ts, ns, raw)
     file.close()
     return traces
 
 
-def retrieve_traces(node, timestamp, nanoseconds):
+def retrieve_traces(node, timestamp, nanoseconds, raw=False):
     """Get the traces
 
     :param node: handler for the node of a station
     :param timestamp, nanoseconds: time of the event
 
     """
-    event = node.events.readWhere('(timestamp == %d) & (nanoseconds == %d)' %
+    event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' %
                                   (timestamp, nanoseconds))[0]
     traces_idx = event['traces']
     baselines = event['baseline']
     traces_str = [zlib.decompress(node.blobs[trace_idx]).split(',')
-                 for trace_idx in traces_idx if trace_idx != -1]
-    traces = [[int(val) - baseline for val in trace_str if val != '']
+                  for trace_idx in traces_idx if trace_idx != -1]
+    traces = [[int(val) if baseline is -999 or raw else int(val) - baseline
+               for val in trace_str if val != '']
               for baseline, trace_str in zip(baselines, traces_str)]
 
     return traces
 
 
 def get_station_node(file, station):
-    node = file.getNode('/hisparc/cluster_%s/station_%d' %
+    node = file.get_node('/hisparc/cluster_%s/station_%d' %
                         (station.cluster.main_cluster().lower(),
                          station.number))
     return node
@@ -60,7 +63,7 @@ def get_datastore_file(path):
     :return: handler for the data file
 
     """
-    file = tables.openFile(path, 'r')
+    file = tables.open_file(path, 'r')
     return file
 
 

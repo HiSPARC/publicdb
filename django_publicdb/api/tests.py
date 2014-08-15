@@ -11,6 +11,7 @@ from django_publicdb.histograms.models import *
 
 
 def is_json(response):
+    """Check if the response is OK and of type application/json"""
 
     for left, right in [(response.getcode(), 200),
                         (response.info().getmaintype(), "application"),
@@ -22,13 +23,7 @@ def is_json(response):
 
 
 class ViewsTestCase(LiveServerTestCase):
-    fixtures = [
-        'tests_inforecords',
-        'tests_histograms']
-
-    #--------------------------------------------------------------------------
-    # Setup and teardown
-    #--------------------------------------------------------------------------
+    fixtures = ['tests_inforecords', 'tests_histograms']
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
@@ -36,59 +31,57 @@ class ViewsTestCase(LiveServerTestCase):
     def tearDown(self):
         super(ViewsTestCase, self).tearDown()
 
-    #--------------------------------------------------------------------------
-    # Helper functions
-    #--------------------------------------------------------------------------
-
     def check_and_get_response(self, url):
         response = urllib.urlopen("%s/api%s" % (self.live_server_url, url))
 
-        assert(is_json(response))
+        self.assertTrue(is_json(response))
 
         return response
 
-    #--------------------------------------------------------------------------
-    # Tests
-    #--------------------------------------------------------------------------
-
     def test_station_501(self, ):
-        self.check_and_get_response("/station/501")
+        self.check_and_get_response("/station/501/")
 
         self.check_and_get_response("/station/501/data/")
-        self.check_and_get_response("/station/501/data/2011/9/9")
+        self.check_and_get_response("/station/501/data/2011/")
+        self.check_and_get_response("/station/501/data/2011/9/")
+        self.check_and_get_response("/station/501/data/2011/9/9/")
 
         self.check_and_get_response("/station/501/weather/")
-        self.check_and_get_response("/station/501/weather/2011/9/9")
+        self.check_and_get_response("/station/501/weather/2011/")
+        self.check_and_get_response("/station/501/weather/2011/9/")
+        self.check_and_get_response("/station/501/weather/2011/9/9/")
 
         self.check_and_get_response("/station/501/config/")
-        self.check_and_get_response("/station/501/config/2011/9/9")
+        self.check_and_get_response("/station/501/config/2011/9/9/")
 
         self.check_and_get_response("/station/501/num_events/")
-        self.check_and_get_response("/station/501/num_events/2011")
-        self.check_and_get_response("/station/501/num_events/2011/9")
-        self.check_and_get_response("/station/501/num_events/2011/9/9")
+        self.check_and_get_response("/station/501/num_events/2011/")
+        self.check_and_get_response("/station/501/num_events/2011/9/")
+        self.check_and_get_response("/station/501/num_events/2011/9/9/")
 
-        response = self.check_and_get_response("/station/501/plate/1/pulseheight/fit/2011/7/7")
+        response = self.check_and_get_response("/station/501/plate/1/pulseheight/fit/2011/7/7/")
         json_data = json.loads(response.read())
         assert(json_data["year"] == 2011 and
                json_data["month"] == 7 and
                json_data["day"] == 7 and
                json_data["fitted_mpv"] == 222.101846139)
 
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/2011/9/1/30")
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_14_days")
-        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_30_days")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/2011/9/1/30/")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_14_days/")
+        self.check_and_get_response("/station/501/plate/1/pulseheight/drift/last_30_days/")
 
     def test_stations(self):
         self.check_and_get_response("/stations/")
+
         self.check_and_get_response("/stations/data/")
-        self.check_and_get_response("/stations/data/2011")
-        self.check_and_get_response("/stations/data/2011/9")
-        self.check_and_get_response("/stations/data/2011/9/9")
+        self.check_and_get_response("/stations/data/2011/")
+        self.check_and_get_response("/stations/data/2011/9/")
+        self.check_and_get_response("/stations/data/2011/9/9/")
+
         self.check_and_get_response("/stations/weather/")
         self.check_and_get_response("/stations/weather/2011/")
-        self.check_and_get_response("/stations/weather/2011/9")
-        self.check_and_get_response("/stations/weather/2011/9/9")
+        self.check_and_get_response("/stations/weather/2011/9/")
+        self.check_and_get_response("/stations/weather/2011/9/9/")
 
     def test_subclusters(self):
         response = self.check_and_get_response("/subclusters/")

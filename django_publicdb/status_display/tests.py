@@ -1,25 +1,33 @@
-# Python
 import datetime
-
 import json
 import urllib
 
-# Django
 from django.conf import settings
 from django.test import LiveServerTestCase
 
-# Publicdb
 from lib.test import datastore as test_datastore
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 
-def is_html(response):
 
-    for left, right in [
-        (response.getcode(),            200),
-        (response.info().getmaintype(), "text"),
-        (response.info().getsubtype(),  "html")
-    ]:
+def is_html(response):
+    """Check if the response is OK and of type text/html"""
+
+    for left, right in [(response.getcode(), 200),
+                        (response.info().getmaintype(), "text"),
+                        (response.info().getsubtype(), "html")]:
+        if left != right:
+            return False
+
+    return True
+
+
+def is_csv(response):
+    """Check if the response is OK and of type text/csv"""
+
+    for left, right in [(response.getcode(), 200),
+                        (response.info().getmaintype(), "text"),
+                        (response.info().getsubtype(), "csv")]:
         if left != right:
             return False
 
@@ -27,39 +35,29 @@ def is_html(response):
 
 
 class ViewsTestCase(LiveServerTestCase):
-    fixtures = [
-        'tests_inforecords',
-        'tests_histograms'
-    ]
-
-    #---------------------------------------------------------------------------
-    # Setup and teardown
-    #---------------------------------------------------------------------------
+    fixtures = ['tests_inforecords', 'tests_histograms']
 
     def setUp(self):
         super(ViewsTestCase, self).setUp()
 
-
     def tearDown(self):
         super(ViewsTestCase, self).tearDown()
 
-    #---------------------------------------------------------------------------
-    # Helper functions
-    #---------------------------------------------------------------------------
-
     def check_and_get_response(self, url):
-        response = urllib.urlopen("%s%s%s" %(
-                                  self.live_server_url,
-                                  "/show",
-                                  url))
+        response = urllib.urlopen("%s%s%s" %
+                                  (self.live_server_url, "/show", url))
 
         self.assertTrue(is_html(response))
 
         return response
 
-    #---------------------------------------------------------------------------
-    # Tests
-    #---------------------------------------------------------------------------
+    def csv_check_and_get_response(self, url):
+        response = urllib.urlopen("%s%s%s" %
+                                  (self.live_server_url, "/show", url))
+
+        self.assertTrue(is_csv(response))
+
+        return response
 
     def test_stations(self):
         self.check_and_get_response("/stations")
@@ -92,29 +90,28 @@ class ViewsTestCase(LiveServerTestCase):
         self.check_and_get_response("/stations/501/config")
 
     def test_get_eventtime_histogram_source(self):
-        self.check_and_get_response("/source/eventtime/2011/7/7")
+        self.csv_check_and_get_response("/source/eventtime/2011/7/7")
 
     def test_get_pulseheight_histogram_source(self):
-        self.check_and_get_response("/source/pulseheight/2011/7/7")
+        self.csv_check_and_get_response("/source/pulseheight/2011/7/7")
 
     def test_get_pulseintegral_histogram_source(self):
-        self.check_and_get_response("/source/pulseintegral/2011/7/7")
+        self.csv_check_and_get_response("/source/pulseintegral/2011/7/7")
 
     def test_get_barometer_dataset_source(self):
-        self.check_and_get_response("/source/barometer/2011/7/7")
+        self.csv_check_and_get_response("/source/barometer/2011/7/7")
 
     def test_get_temperature_dataset_source(self):
-        self.check_and_get_response("/source/temperature/2011/7/7")
+        self.csv_check_and_get_response("/source/temperature/2011/7/7")
 
     def test_get_voltage_config_source(self):
-        self.check_and_get_response("/source/voltage/501")
+        self.csv_check_and_get_response("/source/voltage/501")
 
     def test_get_current_config_source(self):
-        self.check_and_get_response("/source/current/501")
+        self.csv_check_and_get_response("/source/current/501")
 
     def test_get_gps_config_source(self):
-        self.check_and_get_response("/source/gps/501")
+        self.csv_check_and_get_response("/source/gps/501")
 
     def test_help(self):
         self.check_and_get_response("/help")
-
