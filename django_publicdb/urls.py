@@ -26,6 +26,8 @@ urlpatterns = patterns('',
 
     (r'^keys/(?P<host>\w+)/$', 'django_publicdb.inforecords.views.keys'),
 
+    (r'^detector_position/$', 'django_publicdb.inforecords.urls'),
+
     # Uncomment the admin/doc line below and add 'django.contrib.admindocs'
     # to INSTALLED_APPS to enable admin documentation:
     (r'^admin/doc/', include('django.contrib.admindocs.urls')),
