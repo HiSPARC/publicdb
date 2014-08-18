@@ -1,7 +1,7 @@
 URL scheme for detector positions
 =================================
 
-	/detector_position
+	/detector-position
 			|
 			|-----------> /submit: 		Create new station layout
 			|
