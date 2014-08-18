@@ -19,7 +19,7 @@
 #
 # Values of -1 for detectors 3 and 4 indicate that the station only has
 # two detectors.  Values of -999 indicate a problem in the analysis of
-# that particular event.  Usually, this is the result from noise in the
+# that particular event.  This may be the result from noise in the
 # signal.
 #
 #

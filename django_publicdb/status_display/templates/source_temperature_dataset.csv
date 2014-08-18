@@ -1,5 +1,11 @@
-# "HiSPARC temperature dataset source"
+# HiSPARC temperature dataset source
 #
-# timestamp (seconds after 1970-1-1)	value
+# This data contains the following columns:
+#
+# timestamp: time of measurement, in seconds after 1970-1-1 [UNIX timestamp]
+# value:     temperature outside [deg C]
+#
+#
+# timestamp	value
 {% for row in data %}{{ row.0 }}	{{ row.1 }}
 {% endfor %}
