@@ -1,7 +1,7 @@
 # Coincidences
 #
 # Coincidences between {% if cluster %}stations in the {{ cluster.name }} cluster{% elif stations %}the following stations: {{ stations }}{% else %}HiSPARC network{% endif %}
-# Data taken from {{ start }} to {{ end }}
+# Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
 # Showing only coincidences with at least {{ n }} events
 #
 # This data contains the following columns:
@@ -20,7 +20,7 @@
 #
 # Values of -1 for detectors 3 and 4 indicate that the station only has
 # two detectors.  Values of -999 indicate a problem in the analysis of
-# that particular event.  Usually, this is the result from noise in the
+# that particular event.  This may be the result from noise in the
 # signal.
 #
 #
