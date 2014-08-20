@@ -1,8 +1,11 @@
 # HiSPARC barometer dataset source
 #
+# Station: {{ station_number }}
+# Data from {{ date }}
+#
 # This data contains the following columns:
 #
-# timestamp: time of measurement, in seconds after 1970-1-1 [UNIX timestamp]
+# timestamp: time of measurement in seconds after 1970-1-1 [UNIX timestamp]
 # value:     barometer [hPa]
 #
 #

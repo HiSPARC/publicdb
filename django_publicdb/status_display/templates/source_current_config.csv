@@ -1,8 +1,10 @@
 # HiSPARC current configuration source
 #
+# Station: {{ station_number }}
+#
 # This data contains the following columns:
 #
-# timestamp:  time of configuration, in seconds after 1970-1-1 [UNIX timestamp]
+# timestamp:  time of configuration in seconds after 1970-1-1 [UNIX timestamp]
 # scint (4x): current of the PMT [mA]
 #
 #

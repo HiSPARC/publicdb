@@ -1,5 +1,8 @@
 # HiSPARC pulseintegral histogram source
 #
+# Station: {{ station_number }}
+# Data from {{ date }}
+#
 # Please note: the 'bin' is the left bin edge.  The width of the bin is
 # defined by the value of the next bin.
 # 
