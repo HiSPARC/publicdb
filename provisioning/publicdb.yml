@@ -49,6 +49,26 @@
   command: /srv/publicdb/publicdb_env/bin/pip install
            -r /home/{{ ansible_user_id }}/pip.list
 
+- name: Add conda env alias to bashrc
+  lineinfile: dest=~/.bashrc
+              regexp="^alias envpub"
+              line="alias envpub='source activate /srv/publicdb/publicdb_env'"
+
+- name: Add publicdb cd alias to bashrc
+  lineinfile: dest=~/.bashrc
+              regexp="^alias cdpub"
+              line="alias cdpub='cd /srv/publicdb/www'"
+
+- name: Add alias to update publicdb in bashrc
+  lineinfile: dest=~/.bashrc
+              regexp="^alias uppub"
+              line="alias uppub='cdpub && envpub && git fetch && git reset --hard origin/master && touch /tmp/uwsgi-reload.me'"
+
+- name: Change PS1 in bashrc
+  lineinfile: dest=~/.bashrc
+              regexp="PS1="
+              line="[[ -n \"$SSH_CLIENT\" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '"
+
 - name: set up MySQL database
   mysql_db: name=publicdb state=present
 

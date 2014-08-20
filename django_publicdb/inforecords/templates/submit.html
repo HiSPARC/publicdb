@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}HiSPARC | Station layout submit form{% endblock %}
+{% block head_styles %}<style type="text/css" media="all">#pageHeader {position: absolute;}</style>{% endblock %}
+{% block content %}
+
+<div id="header">
+    <h2>HiSPARC station layout submit form</h2>
+</div>
+
+<div id='subform'>
+    <form action="{% url 'django_publicdb.inforecords.views.submit_station_layout_form' %}" method="post">
+    {% csrf_token %}
+        {{ form.as_p }}
+        {{ html_captcha|safe }}
+        <input type="submit" value="Submit" />
+    </form>
+</div>
+
+<div id='preview'>
+    [show preview of new layout]
+</div>
+
+{% endblock %}
