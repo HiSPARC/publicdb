@@ -87,6 +87,7 @@
 - name: migrate Django apps
   command: chdir=/srv/publicdb/www/django_publicdb
            /srv/publicdb/publicdb_env/bin/python manage.py migrate
+  run_once: true
 
 - name: collect static files of Django apps
   shell: chdir=/srv/publicdb/www/django_publicdb
