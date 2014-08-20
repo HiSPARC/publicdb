@@ -94,9 +94,9 @@ your own HTML file with this code:
 
 .. code-block:: html
 
-    <html xmlns="http://www.w3.org/1999/xhtml">
+    <html>
     <head>
-    <script src="http://data.hisparc.nl/media/static/scripts/jquery-1.8.2.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
     <script>
         $(function() {
             // Get an up-to-date list of HiSPARC stations
@@ -145,7 +145,8 @@ can be placed. Then a while loop is used to loop over all days between
 datum and end_datum, reading each corresponding url. Finally a plot is
 made, setting the dates against their values.
 
-Start Python and type (copy/paste) the following lines of code:
+Start Python and type (or copy/paste without the '>>> ') the following
+lines of code:
 
 .. code-block:: python
 

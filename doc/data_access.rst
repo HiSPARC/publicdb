@@ -5,14 +5,13 @@ Data access
 
 There are several ways in which the |hisparc| data can be accessed:
 
-- Via the Public database Download Form
+- Via the Public database download forms.
 - Via Python using the |sapphire| framework (see `SAPPHiRE Tutorial
   <http://docs.hisparc.nl/sapphire/tutorial.html#downloading-and-accessing
-  -hisparc-data>`_)
+  -hisparc-data>`_).
 
-On this page the second method is explained and examples are given. To
-access metadata, like a list of all stations or information about a
-specific station see the :doc:`api_tutorial`.
+ To access metadata, like a list of all stations or information about a
+ specific station see the :doc:`api_tutorial`.
 
 
 Download Form
@@ -21,19 +20,20 @@ Download Form
 When looking at the data page for a station (i.e. `Kaj Munk College
 <http://data.hisparc.nl/show/stations/202/>`_), you will see a 'Download
 event summary data' link on the right. When this link is clicked you
-will be taken to the `Data Download Form
+will be taken to the `Data download form
 <http://data.hisparc.nl/data/download>`_. On this page you can select
 the station, the start and end date for which you want to download the
 data. There is also an option to download weather data instead of events,
 however, not all stations gather weather data.
 
 When you click the Submit button without checking the checkbox to
-Download, the data should (Firefox always download the data) show up in
+Download, the data should (Firefox always downloads the data) show up in
 your browser window. If you check the Download box the data will be
-downloaded to your PC as a csv file. The filename will contain the
-station number and the dates selected.
+downloaded to your PC as a csv file.
 
-This csv file can be read by many programs, including Excel.
+This csv file can be read by many programs, including Excel. Use the
+Import option in Excel to make it recognize tabs as delimiter between
+columns.
 
 
 Downloading via Python
@@ -88,7 +88,7 @@ Now use numpy to convert the data from csv to a numpy array.
 
     >>> format = [('date', 'datetime64[D]'), ('time', '|S8'),
                   ('timestamp', 'uint32'), ('nanoseconds', 'uint32'),
-                  ('pulseheights', '4int16'), ('integrals', '4int16'),
+                  ('pulseheights', '4int16'), ('integrals', '4int32'),
                   ('n1', 'float32'), ('n2', 'float32'),
                   ('n3', 'float32'), ('n4', 'float32'),
                   ('t1', 'float32'), ('t2', 'float32'),
