@@ -51,22 +51,22 @@
 
 - name: Add conda env alias to bashrc
   lineinfile: dest=~/.bashrc
-              regex="^alias envpub"
+              regexp="^alias envpub"
               line="alias envpub='source activate /srv/publicdb/publicdb_env'"
 
 - name: Add publicdb cd alias to bashrc
   lineinfile: dest=~/.bashrc
-              regex="^alias cdpub"
+              regexp="^alias cdpub"
               line="alias cdpub='cd /srv/publicdb/www'"
 
 - name: Add alias to update publicdb in bashrc
   lineinfile: dest=~/.bashrc
-              regex="^alias uppub"
+              regexp="^alias uppub"
               line="alias uppub='cdpub && envpub && git fetch && git reset --hard origin/master && touch /tmp/uwsgi-reload.me'"
 
 - name: Change PS1 in bashrc
   lineinfile: dest=~/.bashrc
-              regex="PS1="
+              regexp="PS1="
               line="[[ -n \"$SSH_CLIENT\" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '"
 
 - name: set up MySQL database
