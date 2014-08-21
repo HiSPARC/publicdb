@@ -507,3 +507,13 @@ def reload_datastore():
     except:
         #FIXME logging!
         pass
+
+class Quarantine(models.Model):
+    first_name = models.CharField(max_length=50)
+    sur_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    station = models.ForeignKey(Station)
+    detectors = models.IntegerField()
+    createdAt = models.DateField(auto_now_add=True)
+    hash_applicant = models.CharField(max_length=32)
+    hash_reviewer = models.CharField(max_length=32)
