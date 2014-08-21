@@ -27,6 +27,10 @@
 #gpsPositions {
     margin-bottom: 20px;}
 
+#ct_histogram,
+#cn_histogram {
+    height: 250px;}
+
 #eh_histogram,
 #bd_histogram,
 #td_histogram,
@@ -94,12 +98,14 @@ h3 {
 
 #navigation,
 #config,
+#status,
 #help {
     padding-left: 20px;
     width: 220px;
     border-left: 1px solid black;}
 
 #config,
+#status,
 #help {
     margin-top: 30px;}
 
@@ -135,14 +141,7 @@ h3 {
 #prev {
     padding: 0 !important;}
 
-a:hover {
-    color: #005;
-    text-decoration: underline;}
-
 a {
-    border-radius: 3px;
-    color: #25B;
-    text-decoration: none;
     font-weight: bold;}
 
 a.currentDate:hover,
@@ -156,18 +155,17 @@ a.currentPage {
     font-size: 8pt;}
 
 #navigation > div,
-#config > div {
+#config > div,
+#status > div {
     padding-top: 10px;
     padding-bottom: 10px;}
 
 #download {
     margin-top: 5px;
-    margin-bottom: 5px;
-}
+    margin-bottom: 5px;}
 
 #download a{
-    padding: 0px;
-}
+    padding: 0px;}
 
 #prev {
     float: left;

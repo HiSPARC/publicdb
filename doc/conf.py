@@ -10,12 +10,13 @@
 
 import sys, os
 
-sys.path.append('../django_publicdb') # The directory that contains settings.py
+# The directory that contains settings_develop.py
+sys.path.append('../django_publicdb')
 
 # Set up the Django settings/environment
 from django.core.management import setup_environ
-from django_publicdb import settings
-setup_environ(settings)
+from django_publicdb import settings_develop
+setup_environ(settings_develop)
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -78,7 +79,7 @@ exclude_patterns = ['_build']
 
 # If true, the current module name will be prepended to all description
 # unit titles (such as .. function::).
-#add_module_names = True
+add_module_names = False
 
 # If true, sectionauthor and moduleauthor directives will be shown in the
 # output. They are ignored by default.

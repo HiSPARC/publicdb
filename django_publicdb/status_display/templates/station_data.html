@@ -4,6 +4,7 @@
 {% load fix_data %}
 
 {% block current_data %}currentPage{% endblock %}
+{% block current_date %}{% url 'status_display.views.network_coincidences' date.year date.month date.day %}{% endblock %}
 
 {% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
 

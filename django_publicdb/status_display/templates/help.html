@@ -21,24 +21,28 @@
 {% block content %}
 
 <div id="header">
-    <h2>HiSPARC Public Database Help</h2>
+    <h2>HiSPARC Public Database help</h2>
 </div>
 
 <div id="graphs">
     <div>
-        <p>Here is an overview of the various terms used on the HiSPARC data
-           pages. Each term is accompanied by an explanation.</p>
+        <p>
+            Here is an overview of the various terms used on the HiSPARC data
+            pages. Each term is accompanied by an explanation. For more
+            information about the Public Database you can have a look at the
+            <a href="http://docs.hisparc.nl/publicdb/">documentation</a>.
+        </p>
     </div>
 
     <div id="pmt">
         <h3 class="term">Arrival time</h3>
         <p class="meaning">
-            This is the time at which the first signal from a particle is seen
-            in a detector. With these arrival times we know in which order the
-            detectors were hit and can reconstruct the position on the sky
-            where the shower came from. The following graph shows the detector
-            signals of one event, the arrival times are indicated with the
-            vertical lines. 
+            The time, relative to the start of the signal trace, at
+            which the first signal is seen in a detector. With these
+            arrival times we know in which order the detectors were hit
+            and can reconstruct the shower direction. The following
+            graph shows the detector signal traces of one event, the
+            arrival times are indicated with the vertical lines. 
         </p>
         <div class="sourceLink">
             <a onclick="downloadGraph('#tr_graph_at')">Image</a>
@@ -70,6 +74,17 @@
         </p>
     </div>
 
+    <div id="coincidence">
+        <h3 class="term">Coincidence</h3>
+        <p class="meaning">
+            When different detector stations measure the same event this
+            is called a coincidence. It is possible to determine if
+            stations measured the same event by comparing the GPS
+            timestamps of events. If they are close together (< 200
+            &micro;s) it is likely from the same air shower.
+        </p>
+    </div>
+
     <div id="event">
         <h3 class="term">Event</h3>
         <p class="meaning">
@@ -81,49 +96,41 @@
     <div id="eventrate">
         <h3 class="term">Event rate</h3>
         <p class="meaning">
-            This is a value that expresses how many events occur in a given time period.
-            For example, a 2-detector station measures approximately 1100 events per hour.
-        </p>
-    </div>
-
-    <div id="coincidence">
-        <h3 class="term">Coincidence</h3>
-        <p class="meaning">
-            When different detector stations measure the same event this is
-            called a coincidence.
-            It is possible to determine if stations measured the same event by
-            comparing the GPS timestamps of events. If they are close together
-            it is likely from the same air shower.
+            This is a value that expresses how many events occur in a
+            given time period. For example, a 2-detector station
+            measures approximately 1100 events per hour.
         </p>
     </div>
 
     <div id="histogram">
         <h3 class="term">Histogram</h3>
         <p class="meaning">
-            The possible values of some variable (e.g. pulseheight) are split
-            into many ranges (bins), then a list of these values is sorted into the correct bins.
-            Then you have will have a number of 'counts' in each bin, which
-            tells you how often a certain value occurs.
+            The possible values of some variable (e.g. pulseheight) are
+            split into many ranges (bins), then a list of these values
+            is sorted into the correct bins. Then you have will have a
+            number of 'counts' in each bin, which tells you how often a
+            certain value occurs.
         </p>
     </div>
 
-    <div id="hisparcbox">
-        <h3 class="term">HiSPARC box</h3>
+    <div id="hisparcelectronics">
+        <h3 class="term">HiSPARC electronics</h3>
         <p class="meaning">
-            This electronics box converts the electric signals from the PMTs
-            into digital values. It constantly reads out the PMT. When the
-            signals crosses the thresholds and the trigger conditions are met
-            it will store the signals as an event. It will then combine this
-            with a timestamp from the GPS and send this data to the PC.
+            This contols the PMT voltages and converts their signals
+            into digital values. It constantly samples the PMT. When
+            signals cross the thresholds and the trigger conditions are met
+            it will store the signals as an event. After combining this
+            with a timestamp from the GPS this data is sent to the PC.
         </p>
     </div>
 
     <div id="masterslave">
         <h3 class="term">Master and Slave</h3>
         <p class="meaning">
-            All stations have one Master electronics box that reads out 2
-            detectors. Stations that have 4 detectors also have a Slave box
-            to read out the other two detectors. 
+            All stations have HiSPARC Master electronics that reads out
+            2 detectors. Stations that have 4 detectors also have
+            HiSPARC Slave electronics, linked to the Master, to read out
+            the other two detectors. 
         </p>
     </div>
 
@@ -131,9 +138,10 @@
         <h3 class="term">Minimum Ionizing Particle (MIP)</h3>
         <p class="meaning">
             This refers to the most probable energy that a particle will
-            release in a scintillator. Since this is the most probable value (MPV)
-            this can be found by looking for a peak in the pulseheight histogram.
-            This point is indicated in the graph, here the value is 155 mV.
+            release in a scintillator. Since this is the most probable
+            value (MPV) this can be found by looking for a peak in the
+            pulseheight histogram. This point is indicated in the graph,
+            here the value is 155 mV.
         <div class="sourceLink">
             <a onclick="downloadGraph('#ph_histogram_mip')">Image</a>
         </div>
@@ -153,9 +161,9 @@
         <h3 class="term">Nanosecond (ns)</h3>
         <p class="meaning">
             We need to measure the arrival times of the particles in the
-            detectors with very high accuracy. With these accurate times we can
-            do angle reconstruction and find coincidences.
-            So the times are measured with nanosecond precision, a nanosecond
+            detectors with very high accuracy. With these accurate times
+            we can do angle reconstruction and find coincidences. So the
+            times are measured with nanosecond precision, a nanosecond
             is equal to 10<sup>−9</sup> s or <sup>1</sup>/<sub>1 000 000 000</sub> s
         </p>
     </div>
@@ -163,18 +171,36 @@
     <div id="threshold">
         <h3 class="term">Threshold</h3>
         <p class="meaning">
-            This indicates the minimum signal strength that is needed before
-            a detector can be triggered.
-            This is used to filter low signals from background sources. 
+            This indicates the minimum signal strength that is needed
+            before a detector is triggered. This is used to filter low
+            signals from background sources. 
+        </p>
+    </div>
+
+    <div id="trigger">
+        <h3 class="term">Trigger</h3>
+        <p class="meaning">
+            When signals from at least 2 detectors go over the
+            thresholds within a short time window the event is recorded.
+            If only one detector is hit it is ignored, because it may eb
+            background radiation.
+        </p>
+    </div>
+
+    <div id="trigger_time">
+        <h3 class="term">Trigger Time</h3>
+        <p class="meaning">
+            The time, relative to the start of the signal trace, at
+            which the trigger took place. This allows you to relate the
+            arrival times in detectors to the GPS timestamp. 
         </p>
     </div>
 
     <div id="pmt">
         <h3 class="term">Photo Multiplier Tube (PMT)</h3>
         <p class="meaning">
-            When particles in the air shower traverse the scintillator it emits light.
-            The PMT converts the light from the scintillator into an electric signal
-            for the HiSPARC box.
+            The PMT converts the light emitted by the scintillator into
+            an electric signal for the HiSPARC electronics.
         </p>
     </div>
 
@@ -210,9 +236,10 @@
     <div id="pulseintegral">
         <h3 class="term">Pulseintegral</h3>
         <p class="meaning">
-            The pulseintegral is determined by taking the integral of the signal trace.
-            The pulseintegral histogram shows how often a value occured for a detector for all measured events.
-            This graph shows how this value is determined.
+            The pulseintegral is determined by taking the integral of
+            the signal trace. The pulseintegral histogram shows how
+            often a value occured for a detector for all measured
+            events. This graph shows how this value is determined.
         </p>
 
         <div class="sourceLink">

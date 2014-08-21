@@ -35,7 +35,7 @@ def run():
 
 if __name__ == '__main__':
     fmt = "%(asctime)s - %(levelname)s - [%(process)d] - %(message)s"
-    logging.basicConfig(level=logging.DEBUG, format=fmt)
+    logging.basicConfig(level=logging.INFO, format=fmt)
     logger = logging.getLogger('cron')
 
     try:

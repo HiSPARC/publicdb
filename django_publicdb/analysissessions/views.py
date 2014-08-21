@@ -2,7 +2,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
 from django.http import HttpResponseRedirect, HttpResponse
-from django.views.decorators.csrf import csrf_protect
+#from django.views.decorators.csrf import csrf_protect
 
 import numpy as np
 from numpy import pi, arccos, arcsin, arctan2, sin, cos
@@ -193,59 +193,68 @@ def get_core_positions(coincidences):
     return x, y, logenergy
 
 
-@csrf_protect
-def get_request(request):
+def request_form(request):
     if request.method == 'POST':
-        if settings.RECAPTCHA_ENABLED:
-            check_captcha = captcha.submit(
-                request.POST['recaptcha_challenge_field'],
-                request.POST['recaptcha_response_field'],
-                settings.RECAPTCHA_PRIVATE_KEY,
-                request.META['REMOTE_ADDR'])
-            if check_captcha.is_valid is False:
-                pass_captcha = False
-                html_captcha = captcha.displayhtml(
-                    settings.RECAPTCHA_PUB_KEY,
-                    error=check_captcha.error_code)
-            else:
-                pass_captcha = True
-        else:
-            pass_captcha = True
-
         form = SessionRequestForm(request.POST)
-        if pass_captcha:
-            if form.is_valid():
-                data = {}
-                data.update(form.cleaned_data)
-                new_request = SessionRequest(
-                        first_name=data['first_name'],
-                        sur_name=data['sur_name'],
-                        email=data['email'],
-                        school=data['school'],
-                        cluster=data['cluster'],
-                        start_date=data['start_date'],
-                        mail_send=False,
-                        session_created=False,
-                        session_pending=True,
-                        events_to_create=data['number_of_events'],
-                        events_created=0)
-                new_request.GenerateUrl()
-                new_request.save()
-                new_request.SendMail()
-                return render_to_response('thankyou.html', {'data': data},
-                        context_instance=RequestContext(request))
-            else:
-                html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
     else:
         form = SessionRequestForm()
-        if settings.RECAPTCHA_ENABLED:
-            html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-        else:
-            html_captcha = "reCAPTCHA disabled"
+
+    html_captcha = "reCAPTCHA disabled"
+
+    if settings.RECAPTCHA_ENABLED:
+        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
 
     return render_to_response('request.html',
-            {'form': form, 'html_captcha': html_captcha},
-            RequestContext(request, {}))
+                              {'form': form, 'html_captcha': html_captcha},
+                              context_instance = RequestContext(request))
+
+
+def validate_request_form(request):
+    if request.method != 'POST':
+        return redirect(request_form)
+
+    # Check reCaptcha input
+    if settings.RECAPTCHA_ENABLED:
+        check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
+                                       request.POST['recaptcha_response_field'],
+                                       settings.RECAPTCHA_PRIVATE_KEY,
+                                       request.META['REMOTE_ADDR'])
+        if not check_captcha.is_valid:
+            return request_form(request)
+
+        #html_captcha = captcha.displayhtml(
+        #    settings.RECAPTCHA_PUB_KEY,
+        #    error=check_captcha.error_code
+        #)
+
+    # Check form input
+    form = SessionRequestForm(request.POST)
+
+    if not form.is_valid():
+        return request_form(request)
+
+    # Send email and show overview
+    data = {}
+    data.update(form.cleaned_data)
+
+    new_request = SessionRequest(first_name = data['first_name'],
+                                 sur_name = data['sur_name'],
+                                 email = data['email'],
+                                 school = data['school'],
+                                 cluster = data['cluster'],
+                                 start_date = data['start_date'],
+                                 mail_send = False,
+                                 session_created = False,
+                                 session_pending = True,
+                                 events_to_create = data['number_of_events'],
+                                 events_created = 0)
+
+    new_request.generate_url()
+    new_request.save()
+    new_request.sendmail_request()
+
+    return render_to_response('thankyou.html', {'data': data},
+                              context_instance=RequestContext(request))
 
 
 def confirm_request(request, url):
@@ -267,7 +276,7 @@ def confirm_request(request, url):
             context_instance=RequestContext(request))
 
 
-def create_request(request):
+def create_session(request):
     sessionlist = (SessionRequest.objects.filter(session_confirmed=True)
                                          .filter(session_pending=True))
     for sessionrequest in sessionlist:

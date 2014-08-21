@@ -5,6 +5,7 @@ from django.template import RequestContext
 from django.conf import settings
 from django.db.models import Q
 
+from collections import OrderedDict
 from operator import itemgetter
 import calendar
 from numpy import arange, pi, sin
@@ -25,64 +26,65 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
-    countries = []
-    for country in Country.objects.all():
-        clusters = []
-        for cluster in Cluster.objects.filter(country=country, parent=None):
-            subclusters = []
-            for subcluster in Cluster.objects.filter(parent=cluster):
-                stations = []
-                for station in Station.objects.filter(cluster=subcluster):
-                    if station_has_data(station):
-                        link = station.number
-                    else:
-                        link = None
-                    status = get_station_status(station, down, problem, up)
+    statuscount = get_status_counts(down, problem, up)
 
-                    stations.append({'number': station.number,
-                                     'name': station.name,
-                                     'link': link,
-                                     'status': status})
-                subclusters.append({'name': subcluster.name,
-                                    'stations': stations})
-            stations = []
-            for station in Station.objects.filter(cluster=cluster):
-                if station_has_data(station):
-                    link = station.number
-                else:
-                    link = None
-                status = get_station_status(station, down, problem, up)
+    countries = OrderedDict()
+    test_stations = []
 
-                stations.append({'number': station.number,
-                                 'name': station.name,
-                                 'link': link,
-                                 'status': status})
-            clusters.append({'name': cluster.name,
-                             'subclusters': subclusters,
-                             'stations': stations})
-        countries.append({'number': country.number,
-                          'name': country.name,
-                          'clusters': clusters})
+    for station in (Station.objects.exclude(pc__type__slug='admin')
+                                   .order_by('number')
+                                   .select_related('cluster__country',
+                                                   'cluster__parent')):
+        if station.number in data_stations:
+            link = station.number
+        else:
+            link = None
+        status = get_station_status(station.number, down, problem, up)
+        station_info = {'number': station.number,
+                        'name': station.name,
+                        'link': link,
+                        'status': status}
 
-    countries = sorted(countries, key=itemgetter('number'))
+        country = station.cluster.country.name
+        if station.cluster.parent:
+            cluster = station.cluster.parent.name
+        else:
+            cluster = station.cluster.name
+        subcluster = station.cluster.name
+
+        if len(station.pc_set.filter(is_test=True)):
+            test_stations.append(station_info)
+            continue
+        if not country in countries:
+            countries[country] = OrderedDict()
+        if not cluster in countries[country]:
+            countries[country][cluster] = OrderedDict()
+        if not subcluster in countries[country][cluster]:
+            countries[country][cluster][subcluster] = []
+        countries[country][cluster][subcluster].append(station_info)
 
     return render_to_response('stations_by_country.html',
-                              {'countries': countries},
+                              {'countries': countries,
+                               'test_stations': test_stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
-        if station_has_data(station):
+    for station in Station.objects.exclude(pc__type__slug='admin'):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -90,21 +92,24 @@ def stations_by_number(request):
                          'status': status})
 
     return render_to_response('stations_by_number.html',
-                              {'stations': stations},
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     stations = []
-    for station in Station.objects.all():
-        if station_has_data(station):
+    for station in Station.objects.exclude(pc__type__slug='admin'):
+        if station.number in data_stations:
             link = station.number
         else:
             link = None
-        status = get_station_status(station, down, problem, up)
+        status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -113,14 +118,18 @@ def stations_by_name(request):
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render_to_response('stations_by_name.html', {'stations': stations},
+    return render_to_response('stations_by_name.html',
+                              {'stations': stations,
+                               'statuscount': statuscount},
                               context_instance=RequestContext(request))
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
+    statuscount = get_status_counts(down, problem, up)
     today = datetime.datetime.utcnow()
 
     if country:
@@ -144,14 +153,18 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in Station.objects.filter(cluster=subcluster,
-                                              pc__is_active=True,
-                                              pc__is_test=False):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
-            link = station_has_data(station)
-            status = get_station_status(station, down, problem, up)
+        for station in (Station.objects.select_related('cluster__parent',
+                                                       'cluster__country')
+                                       .filter(cluster=subcluster,
+                                               pc__is_test=False)):
+            try:
+                detector = (DetectorHisparc.objects.filter(station=station,
+                                                           startdate__lte=today)
+                                                   .latest('startdate'))
+            except DetectorHisparc.DoesNotExist:
+                continue
+            link = station.number in data_stations
+            status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
@@ -164,61 +177,138 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                             'stations': stations})
 
     return render_to_response('stations_on_map.html',
-        {'subclusters': subclusters,
-         'focus': focus},
-        context_instance=RequestContext(request))
+                              {'subclusters': subclusters,
+                               'focus': focus,
+                               'statuscount': statuscount},
+                              context_instance=RequestContext(request))
 
 
-def station_data(request, station_id, year, month, day):
-    """Show daily histograms for a particular station"""
+def network_coincidences(request, year=None, month=None, day=None):
+    """Show daily coincidences histograms for the entire network"""
 
-    station_id = int(station_id)
+    # Redirect to latest date with data if no date is given
+    if year is None:
+        try:
+            summary = (NetworkSummary.objects
+                                     .filter(num_coincidences__isnull=False,
+                                             date__gte=datetime.date(2002, 1, 1),
+                                             date__lte=datetime.date.today())
+                                     .latest('date'))
+        except NetworkSummary.DoesNotExist:
+            raise Http404
+
+        return redirect(network_coincidences,
+                        year=str(summary.date.year),
+                        month=str(summary.date.month),
+                        day=str(summary.date.day))
+
     year = int(year)
     month = int(month)
     day = int(day)
     date = datetime.date(year, month, day)
 
-    station = get_object_or_404(Station, number=station_id)
+    summary = get_object_or_404(NetworkSummary,
+                                num_coincidences__isnull=False,
+                                date=date)
+
+    # Find previous/next dates with data
+    try:
+        previous = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
+                                                  date__gte=datetime.date(2002, 1, 1),
+                                                  date__lt=date)
+                                           .latest('date')).date
+    except NetworkSummary.DoesNotExist:
+        previous = None
+
+    try:
+        next = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
+                                              date__gt=date,
+                                              date__lte=datetime.date.today())
+                                      .order_by('date'))[0].date
+    except IndexError:
+        next = None
+
+    station_summaries = Summary.objects.filter(date=date,
+                                               num_events__isnull=False)
+    status = {'station_count': station_summaries.count(),
+              'n_events': sum([s.num_events for s in station_summaries])}
+
+    thismonth = nav_calendar(year, month)
+    month_list = nav_months_network(year)
+    year_list = nav_years_network()
+    current_date = {'year': year,
+                    'month': calendar.month_name[month][:3],
+                    'day': day}
+
+    coincidencetimehistogram = create_histogram_network('coincidencetime', date)
+    coincidencenumberhistogram = create_histogram_network('coincidencenumber', date)
+
+    return render_to_response('network_coincidences.html',
+        {'date': date,
+         'tomorrow': date + datetime.timedelta(days=1),
+         'coincidencetimehistogram': coincidencetimehistogram,
+         'coincidencenumberhistogram': coincidencenumberhistogram,
+         'status': status,
+         'thismonth': thismonth,
+         'month_list': month_list,
+         'year_list': year_list,
+         'current_date': current_date,
+         'prev': previous,
+         'next': next,
+         'link': (year, month, day)},
+        context_instance=RequestContext(request))
+
+
+def station_data(request, station_number, year, month, day):
+    """Show daily histograms for a particular station"""
+
+    station_number = int(station_number)
+    year = int(year)
+    month = int(month)
+    day = int(day)
+    date = datetime.date(year, month, day)
+
+    station = get_object_or_404(Station, number=station_number)
     data = get_object_or_404(Summary,
                              Q(num_events__isnull=False) |
                              Q(num_weather__isnull=False),
                              station=station,
                              date=date)
 
-    # Use next_day and prev_day to add previous/next links
-    prev_day = date - datetime.timedelta(days=1)
-    next_day = date + datetime.timedelta(days=1)
-
+    # Find previous/next dates with data
     try:
-        previous = (Summary.objects.filter(Q(station=station),
-                                           Q(num_events__isnull=False) |
+        previous = (Summary.objects.filter(Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False),
+                                           station=station,
                                            date__gte=datetime.date(2002, 1, 1),
-                                           date__lte=prev_day)
+                                           date__lt=date)
                                    .latest('date')).date
     except Summary.DoesNotExist:
         previous = None
 
     try:
-        next = (Summary.objects.filter(Q(station=station),
-                                       Q(num_events__isnull=False) |
+        next = (Summary.objects.filter(Q(num_events__isnull=False) |
                                        Q(num_weather__isnull=False),
-                                       date__gte=next_day,
+                                       station=station,
+                                       date__gt=date,
                                        date__lte=datetime.date.today())
                                .order_by('date'))[0].date
     except IndexError:
         next = None
 
     try:
-        config = (Configuration.objects.filter(source__station=station,
-                                               timestamp__lt=next_day)
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=date)
+                                 .latest('date'))
+        config = (Configuration.objects.filter(source=source)
                                        .latest('timestamp'))
         if config.slv_version.count('0') == 2:
             has_slave = False
         else:
             has_slave = True
         has_config = True
-    except Configuration.DoesNotExist:
+    except (Summary.DoesNotExist, Configuration.DoesNotExist):
         config = None
         has_slave = False
         has_config = False
@@ -228,8 +318,13 @@ def station_data(request, station_id, year, month, day):
     except IndexError:
         is_active = False
 
-    thismonth = nav_calendar(station, year, month)
-    month_list = nav_months(station, year)
+    try:
+        coincidences_found = NetworkSummary.objects.get(date=date)
+    except NetworkSummary.DoesNotExist:
+        coincidences_found = False
+
+    thismonth = nav_calendar(year, month, station)
+    month_list = nav_months(year, station)
     year_list = nav_years(station)
     current_date = {'year': year,
                     'month': calendar.month_name[month][:3],
@@ -258,20 +353,21 @@ def station_data(request, station_id, year, month, day):
          'current_date': current_date,
          'prev': previous,
          'next': next,
-         'link': (station_id, year, month, day),
+         'link': (station_number, year, month, day),
          'has_data': True,
          'is_active': is_active,
-         'has_config': has_config},
+         'has_config': has_config,
+         'coincidences_found': coincidences_found},
         context_instance=RequestContext(request))
 
 
-def station_status(request, station_id):
+def station_status(request, station_number):
     """Show daily histograms for a particular station"""
 
-    station_id = int(station_id)
+    station_number = int(station_number)
 
-    station = get_object_or_404(Station, number=station_id)
-    pc = get_object_or_404(Pc, station=station, is_active=True)
+    station = get_object_or_404(Station, number=station_number)
+    pc = get_object_or_404(Pc, ~Q(type__slug='admin'), station=station)
 
     has_data = station_has_data(station)
 
@@ -285,17 +381,17 @@ def station_status(request, station_id):
         {'station': station,
          'pc': pc,
          'has_data': has_data,
-         'is_active': True,
-         'has_config': has_config},
+         'has_config': has_config,
+         'coincidences_found': True},
         context_instance=RequestContext(request))
 
 
-def station_config(request, station_id):
+def station_config(request, station_number):
     """Show configuration history for a particular station"""
 
-    station_id = int(station_id)
+    station_number = int(station_number)
 
-    station = get_object_or_404(Station, number=station_id)
+    station = get_object_or_404(Station, number=station_number)
     configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
                               source__station=station,
                               timestamp__gte=datetime.date(2002, 1, 1),
@@ -329,130 +425,244 @@ def station_config(request, station_id):
          'has_slave': has_slave,
          'has_data': has_data,
          'is_active': is_active,
-         'has_config': True},
+         'has_config': True,
+         'coincidences_found': True},
         context_instance=RequestContext(request))
 
 
-def station(request, station_id):
+def station_latest(request, station_number):
+    """Show daily histograms for a particular station"""
+
+    station_number = int(station_number)
+    yesterday = datetime.date.today() - datetime.timedelta(days=1)
+    old_data = False
+
+    station = get_object_or_404(Station, number=station_number)
+    try:
+        summary = Summary.objects.get(num_events__isnull=False,
+                                      station=station,
+                                      date=yesterday)
+    except Summary.DoesNotExist:
+        # Do something nice, get older data
+        old_data = True
+        summary = (Summary.objects.filter(num_events__isnull=False,
+                                          station=station,
+                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__lte=datetime.date.today())
+                                  .latest('date'))
+
+    down, problem, up = status_lists()
+    status = get_station_status(station.number, down, problem, up)
+
+    date = summary.date
+
+    eventhistogram = create_histogram('eventtime', station, date)
+    pulseheighthistogram = create_histogram('pulseheight', station, date)
+    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
+    barometerdata = plot_dataset('barometer', station, date)
+
+    # Show alternative
+    extra_station = None
+    if barometerdata == None:
+        try:
+            sum_weather = Summary.objects.filter(num_weather__isnull=False,
+                                                 date=summary.date)
+            weather_stations = [s[0] for s in
+                                sum_weather.values_list('station__number')]
+            closest_station = min(weather_stations,
+                                  key=lambda x:abs(x - station_number))
+            summary_weather = sum_weather.get(station__number=closest_station)
+            barometerdata = plot_dataset('barometer', summary_weather.station,
+                                         summary_weather.date)
+            if not barometerdata == None:
+                extra_station = closest_station
+        except IndexError:
+            pass
+
+    return render_to_response('station_latest.html',
+        {'station': station,
+         'date': date,
+         'status': status,
+         'eventhistogram': eventhistogram,
+         'pulseheighthistogram': pulseheighthistogram,
+         'pulseintegralhistogram': pulseintegralhistogram,
+         'barometerdata': barometerdata,
+         'extra_station': extra_station,
+         'old_data': old_data},
+        context_instance=RequestContext(request))
+
+
+def station(request, station_number):
     """Show most recent histograms for a particular station"""
 
     try:
         summary = (Summary.objects.filter(Q(num_events__isnull=False) |
                                           Q(num_weather__isnull=False),
-                                          station__number=station_id,
+                                          station__number=station_number,
                                           date__gte=datetime.date(2002, 1, 1),
                                           date__lte=datetime.date.today())
-                                    .latest('date'))
+                                  .latest('date'))
     except Summary.DoesNotExist:
         raise Http404
 
     return redirect(station_data,
-                    station_id=str(station_id),
+                    station_number=str(station_number),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
                     day=str(summary.date.day))
 
 
-def get_eventtime_histogram_source(request, station_id, year, month, day):
-    data = get_histogram_source(station_id, year, month, day, 'eventtime')
+def get_coincidencetime_histogram_source(request, year, month, day):
+    data = get_histogram_source(year, month, day, 'coincidencetime')
+    response = render_to_response('source_coincidencetime_histogram.csv',
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day))},
+                                  mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=coincidencetime-network-%d%02d%02d.csv' %
+        (int(year), int(month), int(day)))
+    return response
+
+
+def get_coincidencenumber_histogram_source(request, year, month, day):
+    data = get_histogram_source(year, month, day, 'coincidencenumber')
+    response = render_to_response('source_coincidencenumber_histogram.csv',
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day))},
+                                  mimetype='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=coincidencenumber-network-%d%02d%02d.csv' %
+        (int(year), int(month), int(day)))
+    return response
+
+
+def get_eventtime_histogram_source(request, station_number, year, month, day):
+    data = get_histogram_source(year, month, day, 'eventtime', station_number)
     response = render_to_response('source_eventtime_histogram.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day)),
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=eventtime-%s-%s-%s-%s.csv' %
-        (station_id, year, month, day))
+        'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
-def get_pulseheight_histogram_source(request, station_id, year, month, day):
-    data = get_histogram_source(station_id, year, month, day, 'pulseheight')
+def get_pulseheight_histogram_source(request, station_number, year, month, day):
+    data = get_histogram_source(year, month, day, 'pulseheight', station_number)
     response = render_to_response('source_pulseheight_histogram.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day)),
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=pulseheight-%s-%s-%s-%s.csv' %
-        (station_id, year, month, day))
+        'attachment; filename=pulseheight-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
-def get_pulseintegral_histogram_source(request, station_id, year, month, day):
-    data = get_histogram_source(station_id, year, month, day, 'pulseintegral')
+def get_pulseintegral_histogram_source(request, station_number, year, month, day):
+    data = get_histogram_source(year, month, day, 'pulseintegral', station_number)
     response = render_to_response('source_pulseintegral_histogram.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day)),
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=pulseintegral-%s-%s-%s-%s.csv' %
-        (station_id, year, month, day))
+        'attachment; filename=pulseintegral-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
-def get_barometer_dataset_source(request, station_id, year, month, day):
-    data = get_dataset_source(station_id, year, month, day, 'barometer')
+def get_barometer_dataset_source(request, station_number, year, month, day):
+    data = get_dataset_source(year, month, day, 'barometer', station_number)
     response = render_to_response('source_barometer_dataset.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day)),
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=barometer-%s-%s-%s-%s.csv' %
-        (station_id, year, month, day))
+        'attachment; filename=barometer-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
-def get_temperature_dataset_source(request, station_id, year, month, day):
-    data = get_dataset_source(station_id, year, month, day, 'temperature')
+def get_temperature_dataset_source(request, station_number, year, month, day):
+    data = get_dataset_source(year, month, day, 'temperature', station_number)
     response = render_to_response('source_temperature_dataset.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'date': '-'.join((year, month, day)),
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=temperature-%s-%s-%s-%s.csv' %
-        (station_id, year, month, day))
+        'attachment; filename=temperature-s%s-%d%02d%02d.csv' %
+        (station_number, int(year), int(month), int(day)))
     return response
 
 
-def get_voltage_config_source(request, station_id):
-    data = get_config_source(station_id, 'voltage')
+def get_voltage_config_source(request, station_number):
+    data = get_config_source(station_number, 'voltage')
     response = render_to_response('source_voltage_config.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=voltage-%s.csv' % station_id)
+        'attachment; filename=voltage-s%s.csv' % station_number)
     return response
 
 
-def get_current_config_source(request, station_id):
-    data = get_config_source(station_id, 'current')
+def get_current_config_source(request, station_number):
+    data = get_config_source(station_number, 'current')
     response = render_to_response('source_current_config.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=current-%s.csv' % station_id)
+        'attachment; filename=current-s%s.csv' % station_number)
     return response
 
 
-def get_gps_config_source(request, station_id):
-    data = get_config_source(station_id, 'gps')
+def get_gps_config_source(request, station_number):
+    data = get_config_source(station_number, 'gps')
     response = render_to_response('source_gps_config.csv',
-                                  {'data': data}, mimetype='text/csv')
+                                  {'data': data,
+                                   'station_number': station_number},
+                                  mimetype='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=gps-%s.csv' % station_id)
+        'attachment; filename=gps-s%s.csv' % station_number)
     return response
 
 
-def get_histogram_source(station_id, year, month, day, type):
+def get_histogram_source(year, month, day, type, station_number=None):
     date = datetime.date(int(year), int(month), int(day))
-    histogram = get_object_or_404(DailyHistogram,
-                                  source__station__number=int(station_id),
-                                  source__date=date,
-                                  type__slug=type)
-    if type == 'eventtime':
+    if station_number is None:
+        histogram = get_object_or_404(NetworkHistogram,
+                                      source__date=date,
+                                      type__slug=type)
+    else:
+        station_number = int(station_number)
+        histogram = get_object_or_404(DailyHistogram,
+                                      source__station__number=station_number,
+                                      source__date=date,
+                                      type__slug=type)
+    if type in ['eventtime', 'coincidencetime', 'coincidencenumber']:
         return zip(histogram.bins, histogram.values)
     else:
         return zip(histogram.bins, *histogram.values)
 
 
-def get_dataset_source(station_id, year, month, day, type):
+def get_dataset_source(year, month, day, type, station_number):
     date = datetime.date(int(year), int(month), int(day))
     dataset = get_object_or_404(DailyDataset,
-                                source__station__number=int(station_id),
+                                source__station__number=int(station_number),
                                 source__date=date,
                                 type__slug=type)
     return zip(dataset.x, dataset.y)
 
 
-def get_config_source(station_id, type):
-    configs = (Configuration.objects.filter(source__station__number=station_id,
+def get_config_source(station_number, type):
+    configs = (Configuration.objects.filter(source__station__number=station_number,
                                             timestamp__gte=datetime.date(2002, 1, 1),
                                             timestamp__lte=datetime.date.today())
                                     .order_by('timestamp'))
@@ -471,11 +681,28 @@ def get_config_source(station_id, type):
     return data
 
 
+def create_histogram_network(type, date):
+    """Create a histogram object"""
+
+    source = get_object_or_404(NetworkSummary, date=date)
+    type = HistogramType.objects.get(slug=type)
+
+    try:
+        histogram = NetworkHistogram.objects.get(source=source, type=type)
+    except NetworkHistogram.DoesNotExist:
+        return None
+
+    plot_object = create_plot_object(histogram.bins[:-1], histogram.values,
+                                     type.bin_axis_title,
+                                     type.value_axis_title)
+    return plot_object
+
+
 def create_histogram(type, station, date):
     """Create a histogram object"""
 
     source = get_object_or_404(Summary, station=station, date=date)
-    type = HistogramType.objects.get(slug__exact=type)
+    type = HistogramType.objects.get(slug=type)
 
     try:
         histogram = DailyHistogram.objects.get(source=source, type=type)
@@ -492,7 +719,7 @@ def plot_dataset(type, station, date, log=False):
     """Create a dataset plot object"""
 
     source = get_object_or_404(Summary, station=station, date=date)
-    type = DatasetType.objects.get(slug__exact=type)
+    type = DatasetType.objects.get(slug=type)
 
     try:
         dataset = DailyDataset.objects.get(source=source, type=type)
@@ -548,26 +775,38 @@ def create_plot_object(x_values, y_series, x_label, y_label):
     return plot_object
 
 
-def nav_calendar(station, theyear, themonth):
+def nav_calendar(theyear, themonth, station=None):
     """Create a month calendar with links"""
 
     month = calendar.Calendar().monthdatescalendar(theyear, themonth)
     month_name = '%s %d' % (calendar.month_name[themonth], theyear)
     days_names = calendar.weekheader(3).split(' ')
 
+    if station is None:
+        days_with_data = (NetworkSummary.objects
+                                        .filter(num_coincidences__isnull=False,
+                                                date__year=theyear,
+                                                date__month=themonth)
+                                        .values_list('date', flat=True))
+    else:
+        days_with_data = (Summary.objects.filter(Q(num_events__isnull=False) |
+                                                 Q(num_weather__isnull=False),
+                                                 station=station,
+                                                 date__year=theyear,
+                                                 date__month=themonth)
+                                         .values_list('date', flat=True))
+
     weeks = []
     for week in month:
         days = []
         for day in week:
             if day.month == themonth:
-                try:
-                    summary = (Summary.objects
-                                      .get(Q(station=station),
-                                           Q(date=day),
-                                           Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False)))
-                    link = (station.number, theyear, themonth, day.day)
-                except Summary.DoesNotExist:
+                if day in days_with_data:
+                    if station is None:
+                        link = (theyear, themonth, day.day)
+                    else:
+                        link = (station.number, theyear, themonth, day.day)
+                else:
                     link = None
                 days.append({'day': day.day, 'link': link})
             else:
@@ -577,7 +816,28 @@ def nav_calendar(station, theyear, themonth):
     return {'month': month_name, 'days': days_names, 'weeks': weeks}
 
 
-def nav_months(station, theyear):
+def nav_months_network(theyear):
+    """Create list of months with links"""
+
+    date_list = (NetworkSummary.objects.filter(date__year=theyear,
+                                               num_coincidences__isnull=False)
+                                       .dates('date', 'month'))
+
+    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
+
+    for date in date_list:
+        first_day = (NetworkSummary.objects
+                                   .filter(date__year=date.year,
+                                           date__month=date.month,
+                                           num_coincidences__isnull=False)
+                                   .dates('date', 'day')[0])
+        link = (date.year, date.month, first_day.day)
+        month_list[date.month - 1]['link'] = link
+
+    return month_list
+
+
+def nav_months(theyear, station):
     """Create list of months with links"""
 
     date_list = (Summary.objects.filter(Q(station=station),
@@ -600,7 +860,31 @@ def nav_months(station, theyear):
     return month_list
 
 
-def nav_years(station):
+def nav_years_network():
+    """Create list of previous years"""
+
+    valid_years = (NetworkSummary.objects
+                                 .filter(num_coincidences__isnull=False,
+                                         date__gte=datetime.date(2002, 1, 1),
+                                         date__lte=datetime.date.today())
+                                 .dates('date', 'year'))
+    valid_years = [date.year for date in valid_years]
+
+    year_list = []
+    for year in range(valid_years[0], valid_years[-1] + 1):
+        if year in valid_years:
+            first_day = (NetworkSummary.objects
+                                       .filter(date__year=year,
+                                               num_coincidences__isnull=False)
+                                       .dates('date', 'day')[0])
+            link = (year, first_day.month, first_day.day)
+            year_list.append({'year': year, 'link': link})
+        else:
+            year_list.append({'year': year, 'link': None})
+    return year_list
+
+
+def nav_years(station=None):
     """Create list of previous years"""
 
     valid_years = (Summary.objects.filter(Q(station=station),
@@ -624,6 +908,24 @@ def nav_years(station):
         else:
             year_list.append({'year': year, 'link': None})
     return year_list
+
+
+def stations_with_data():
+    """Get list of station numbers with valid event or weather data
+
+    :return: list with station numbers for stations that recorded data, either
+             weather or shower, between 2002 and now.
+
+    """
+    stations = (Station.objects
+                       .filter(Q(summary__num_events__isnull=False) |
+                               Q(summary__num_weather__isnull=False),
+                               summary__date__gte=datetime.date(2002, 1, 1),
+                               summary__date__lte=datetime.date.today())
+                       .distinct()
+                       .values_list('number', flat=True))
+
+    return stations
 
 
 def station_has_data(station):

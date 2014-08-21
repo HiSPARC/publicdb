@@ -8,11 +8,13 @@ def upload_queue(instance, filename):
 
     return 'uploads/%s/%s' % (instance.queue, filename)
 
+
 class UpdateQueue(models.Model):
     slug = models.SlugField(unique=True)
 
     def __unicode__(self):
         return self.slug
+
 
 class AdminUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
@@ -30,6 +32,7 @@ class AdminUpdate(models.Model):
     class Meta:
         unique_together = ('queue', 'version')
         ordering = ('version',)
+
 
 class UserUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
@@ -50,6 +53,7 @@ class UserUpdate(models.Model):
     class Meta:
         unique_together = ('queue', 'version')
         ordering = ('version',)
+
 
 class InstallerUpdate(models.Model):
     version = models.CharField(max_length=5)

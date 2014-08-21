@@ -22,7 +22,7 @@ sys.path.append(publicdb_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import tables
-from datetime import date, datetime, time, timedelta
+import datetime
 
 from sapphire.publicdb import download_data
 
@@ -32,8 +32,8 @@ from django_publicdb.inforecords.models import *
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
 
-START = date(2013, 1, 5)
-END = date(2013, 1, 7)
+START = datetime.date(2013, 1, 5)
+END = datetime.date(2013, 1, 7)
 
 
 def main():
@@ -58,7 +58,7 @@ def generate_date_range(start, end):
     date = start
     while date <= end:
         yield date
-        date += timedelta(days=1)
+        date += datetime.timedelta(days=1)
 
 
 def download_and_store_data_for_date(date):
@@ -72,14 +72,16 @@ def get_datastore_file_for_date(date):
     return open_or_create_file(datastore_path, date)
 
 
-def download_and_store_station_data(f, station, date):
-    start = datetime.combine(date, time(0, 0, 0))
-    end = start + timedelta(days=1)
+def download_and_store_station_data(f, station, date, get_blobs=True):
+    start = datetime.datetime.combine(date, datetime.time(0, 0, 0))
+    end = start + datetime.timedelta(days=1)
 
     cluster = station.cluster.main_cluster()
     station_group = get_or_create_station_group(f, cluster, station.number)
 
-    download_data(f, station_group, station.number, start, end, get_blobs=True)
+    download_data(f, station_group, station.number,
+                  start, end,
+                  get_blobs=get_blobs)
 
 
 def open_or_create_file(data_dir, date):
@@ -99,7 +101,7 @@ def open_or_create_file(data_dir, date):
         # create dir and parent dirs with mode rwxr-xr-x
         os.makedirs(dir, 0755)
 
-    return tables.openFile(file, 'a')
+    return tables.open_file(file, 'a')
 
 
 def get_or_create_cluster_group(file, cluster):
@@ -110,37 +112,37 @@ def get_or_create_cluster_group(file, cluster):
 
     """
     try:
-        hisparc = file.getNode('/', 'hisparc')
+        hisparc = file.get_node('/', 'hisparc')
     except tables.NoSuchNodeError:
-        hisparc = file.createGroup('/', 'hisparc', 'HiSPARC data')
+        hisparc = file.create_group('/', 'hisparc', 'HiSPARC data')
         file.flush()
 
     node_name = 'cluster_' + cluster.lower()
     try:
-        cluster = file.getNode(hisparc, node_name)
+        cluster = file.get_node(hisparc, node_name)
     except tables.NoSuchNodeError:
-        cluster = file.createGroup(hisparc, node_name,
+        cluster = file.create_group(hisparc, node_name,
                                    'HiSPARC cluster %s data' % cluster)
         file.flush()
 
     return cluster
 
 
-def get_or_create_station_group(file, cluster, station_id):
+def get_or_create_station_group(file, cluster, station_number):
     """Get an existing station group or create a new one
 
     :param file: the PyTables data file
     :param cluster: the name of the cluster
-    :param station_id: the station number
+    :param station_number: the station number
 
     """
     cluster = get_or_create_cluster_group(file, cluster)
-    node_name = 'station_%d' % station_id
+    node_name = 'station_%d' % station_number
     try:
-        station = file.getNode(cluster, node_name)
+        station = file.get_node(cluster, node_name)
     except tables.NoSuchNodeError:
-        station = file.createGroup(cluster, node_name,
-                                   'HiSPARC station %d data' % station_id)
+        station = file.create_group(cluster, node_name,
+                                   'HiSPARC station %d data' % station_number)
         file.flush()
 
     return station

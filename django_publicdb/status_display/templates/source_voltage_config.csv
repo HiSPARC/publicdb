@@ -1,5 +1,13 @@
-# "HiSPARC voltage configuration source"
+# HiSPARC voltage configuration source
 #
-# timestamp (seconds after 1970-1-1)	scint1	scint2	scint3	scint4
+# Station: {{ station_number }}
+#
+# This data contains the following columns:
+#
+# timestamp:  time of configuration in seconds after 1970-1-1 [UNIX timestamp]
+# scint (4x): voltage of the PMT [V]
+#
+#
+# timestamp	scint1	scint2	scint3	scint4
 {% for row in data %}{{ row.0 }}	{{ row.1|floatformat:0 }}	{{ row.2|floatformat:0 }}	{{ row.3|floatformat:0 }}	{{ row.4|floatformat:0 }}
 {% endfor %}

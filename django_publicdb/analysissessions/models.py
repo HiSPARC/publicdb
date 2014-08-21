@@ -103,7 +103,7 @@ class SessionRequest(models.Model):
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
-        enddate = self.start_date + search_length
+        enddate = min([self.start_date + search_length, datetime.date.today()])
         while (self.events_created < self.events_to_create and date < enddate):
             self.events_created += self.find_coincidence(date, session)
             date += datetime.timedelta(days=1)
@@ -122,7 +122,7 @@ class SessionRequest(models.Model):
         file = date.strftime('%Y_%-m_%-d.h5')
         datastore_path = os.path.join(settings.DATASTORE_PATH,
                                       date.strftime('%Y/%-m'), file)
-        data = tables.openFile(datastore_path, 'r')
+        data = tables.open_file(datastore_path, 'r')
         ndups = 0
         nvalid = 0
         try:
@@ -133,7 +133,7 @@ class SessionRequest(models.Model):
             data.close()
             return nvalid
 
-        coinc = coincidences.Coincidences(data, None, stations)
+        coinc = coincidences.Coincidences(data, None, stations, progress=False)
         c_list, timestamps = coinc._search_coincidences()
         for coincidence in c_list:
             if len(coincidence) >= 3:
@@ -156,7 +156,7 @@ class SessionRequest(models.Model):
         cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
 
         try:
-            cluster_group = data.getNode(cluster_group_name)
+            cluster_group = data.get_node(cluster_group_name)
         except tables.NodeError:
             return []
 
@@ -166,7 +166,7 @@ class SessionRequest(models.Model):
             station_group_name = 'station_%d' % station.number
 
             if station_group_name in cluster_group:
-                station_group = data.getNode(cluster_group_name,
+                station_group = data.get_node(cluster_group_name,
                                              station_group_name)
                 stations.append(station_group)
         return stations
@@ -227,14 +227,14 @@ class SessionRequest(models.Model):
             trace_timing = -999
         return trace_timing
 
-    def GenerateUrl(self):
+    def generate_url(self):
         chars = string.letters + string.digits
         newurl = ''.join([choice(chars) for i in range(20)])
         if SessionRequest.objects.filter(url=newurl):
             newurl = ''.join([choice(chars) for i in range(20)])
         self.url = newurl
 
-    def SendMail(self):
+    def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
         message = ('Hello %s,'
                    '\n\nPlease click on this link to confirm your request for'

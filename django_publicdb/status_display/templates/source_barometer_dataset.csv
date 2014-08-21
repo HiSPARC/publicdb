@@ -1,5 +1,14 @@
-# "HiSPARC barometer dataset source"
+# HiSPARC barometer dataset source
 #
-# timestamp (seconds after 1970-1-1)	value
+# Station: {{ station_number }}
+# Data from {{ date }}
+#
+# This data contains the following columns:
+#
+# timestamp: time of measurement in seconds after 1970-1-1 [UNIX timestamp]
+# value:     barometer [hPa]
+#
+#
+# timestamp	value
 {% for row in data %}{{ row.0 }}	{{ row.1 }}
 {% endfor %}

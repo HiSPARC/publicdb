@@ -14,33 +14,17 @@
 {% endblock %}
 
 {% block list %}
-  {% for country in countries %}
+  {% for country, clusters in countries.items %}
     <div class="country">
-        <h1><a href="{% url 'status_display.views.stations_on_map' country.name %}">{{ country.name }}</a></h1>
-          {% for cluster in country.clusters %}
+        <h1><a href="{% url 'status_display.views.stations_on_map' country %}">{{ country }}</a></h1>
+          {% for cluster, subclusters in clusters.items %}
             <div class="cluster">
+                <h2><a href="{% url 'status_display.views.stations_on_map' country cluster %}">{{ cluster }}</a></h2>
+                {% for subcluster, stations in subclusters.items %}
                 <div class="subcluster">
-                    <h2><a href="{% url 'status_display.views.stations_on_map' country.name cluster.name %}">{{ cluster.name }}</a></h2>
+                    <h3><a href="{% url 'status_display.views.stations_on_map' country cluster subcluster %}">{{ subcluster }}</a></h3>
                     <ul>
-                      {% for station in cluster.stations %}
-                        <li>
-                            <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
-                          {% if station.link %}
-                            <a href="{% url 'status_display.views.station' station.link %}">
-                              {{ station.number }} &mdash; {{ station.name }}
-                            </a>
-                          {% else %}
-                              {{ station.number }} &mdash; {{ station.name }}
-                          {% endif %}
-                        </li>
-                      {% endfor %}
-                    </ul>
-                </div>
-                {% for subcluster in cluster.subclusters %}
-                <div class="subcluster">
-                    <h3><a href="{% url 'status_display.views.stations_on_map'  country.name cluster.name subcluster.name %}">{{ subcluster.name }}</a></h3>
-                    <ul>
-                      {% for station in subcluster.stations %}
+                      {% for station in stations %}
                         <li>
                             <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
                           {% if station.link %}
@@ -59,4 +43,23 @@
           {% endfor %}
     </div>
   {% endfor %}
+  {% if test_stations %}
+    <div class="country">
+        <h1>Test stations</h1>
+        <ul>
+          {% for station in test_stations %}
+            <li>
+                <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+              {% if station.link %}
+                <a href="{% url 'status_display.views.station' station.link %}">
+                  {{ station.number }} &mdash; {{ station.name }}
+                </a>
+              {% else %}
+                  {{ station.number }} &mdash; {{ station.name }}
+              {% endif %}
+            </li>
+          {% endfor %}
+        </ul>
+    </div>
+  {% endif %}
 {% endblock %}

@@ -5,23 +5,25 @@ import os.path
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 
+# For production: set DEBUG to False !!!
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    # ('Your Name', 'your_email@domain.com'),
+     ('Arne de Laat', 'adelaat@nikhef.nl'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
 # DF: relative path, just for running test server!
-        'NAME': os.path.join(publicdb_path, 'public.db'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
+        'NAME': 'publicdb', # Or path to database file if using sqlite3.
+        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'), # Or path to database file if using sqlite3.
+        'USER': 'hisparc',                      # Not used with sqlite3.
+        'PASSWORD': 'Data4user!',                  # Not used with sqlite3.
+        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
@@ -30,22 +32,39 @@ DATABASES = {
 # DEV_ONLY
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = os.path.join(publicdb_path, 'datastore')
+DATASTORE_PATH = '/databases/frome'
+TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
-ESD_PATH = os.path.join(publicdb_path, 'esd')
+ESD_PATH = '/srv/publicdb/www/esd'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
+
+# VPN and datastore host names
+VPN_HOST = 'localhost'
+DATASTORE_HOST = 'localhost'
 
 # reCAPTCHA settings
 RECAPTCHA_ENABLED = False
 RECAPTCHA_PUB_KEY = 'foobar'
 RECAPTCHA_PRIVATE_KEY = 'foobaz'
 
+# Process data with multiple threads. Default is disabled (False).
+# Disable multiprocessing for debugging purposes. When multithreaded
+# processing is enabled the traceback doesn't go to the exact location.
+# Also, sqlite3 is single threaded. So when multi processing is used
+# together with sqlite3, you might get the message "database is locked".
+
+USE_MULTIPROCESSING = True
+
 # E-mail settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# For production
+#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+#EMAIL_HOST = 'smtp.nikhef.nl'
+#EMAIL_PORT = 25
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -62,17 +81,17 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = True
+USE_I18N = False
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # DEV_ONLY
-MEDIA_ROOT = os.path.join(publicdb_path, '/mediaroot/')
+MEDIA_ROOT = '/srv/publicdb/media/'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://localhost:8008/mediaroot/'
+MEDIA_URL = '/media/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -82,7 +101,7 @@ STATIC_ROOT = '/srv/publicdb/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = '/media/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -151,7 +170,6 @@ INSTALLED_APPS = (
     'django_publicdb.updates',
     'django_publicdb.raw_data',
     'django_publicdb.api',
-    'django_publicdb.live',
     'django_publicdb.maps',
     'django_publicdb.jsparc',
     'django_publicdb.default',

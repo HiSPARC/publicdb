@@ -83,9 +83,9 @@ def get_events(coincidence):
                                                .utctimetuple()),
                      nanoseconds=e.nanoseconds,
                      number=s.number,
-                     lat=d.latitude,
-                     lon=d.longitude,
-                     alt=d.height,
+                     latitude=d.latitude,
+                     longitude=d.longitude,
+                     altitude=d.height,
                      status='on',
                      detectors=len(e.traces),
                      traces=e.traces,
@@ -113,8 +113,7 @@ def data_json(coincidence, events):
 
 def error_json(error_code, message):
     """Construct error response json for jSparc requests"""
-    data = dict(message=message,
-                code=error_code)
+    data = dict(message=message, code=error_code)
     response = HttpResponse(json.dumps(data), status=error_code,
                             mimetype='application/json')
     response['Access-Control-Allow-Origin'] = '*'
@@ -159,16 +158,16 @@ def result(request):
         return test_result()
 
     student_name = request.GET['student_name']
-    lat = request.GET['lat']
-    lon = request.GET['lon']
+    latitude = request.GET['latitude']
+    longitude = request.GET['longitude']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
 
     assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
-    coincidence.core_position_x = lon
-    coincidence.core_position_y = lat
+    coincidence.core_position_x = longitude
+    coincidence.core_position_y = latitude
     coincidence.log_energy = log_energy
     coincidence.error_estimate = error_estimate
     coincidence.is_analyzed = True

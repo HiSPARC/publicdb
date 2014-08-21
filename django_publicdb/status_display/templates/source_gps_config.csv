@@ -1,5 +1,15 @@
-# "HiSPARC GPS positions configuration source"
+# HiSPARC GPS positions configuration source
 #
-# timestamp (seconds after 1970-1-1)	latitude	longitude	altitude
+# Station: {{ station_number }}
+#
+# This data contains the following columns:
+#
+# timestamp: time of position calibration in seconds after 1970-1-1 [UNIX timestamp]
+# latitude:  latitude of the GPS [degrees]
+# longitude: longitude of the GPS [degrees]
+# altitude:  height of the GPS [meters]
+#
+#
+# timestamp	latitude	longitude	altitude
 {% for row in data %}{{ row.0 }}	{{ row.1 }}	{{ row.2 }}	{{ row.3 }}
 {% endfor %}

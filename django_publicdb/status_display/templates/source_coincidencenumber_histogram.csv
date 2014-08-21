@@ -1,0 +1,13 @@
+# HiSPARC coincidencenumber histogram source
+#
+# Data from {{ date }}
+#
+# This data contains the following columns:
+#
+# bin:   number of stations in a coincidence [counts]
+# value: number of coincidences [counts]
+#
+#
+# bin	value
+{% for row in data %}{{ row.0 }}	{{ row.1 }}
+{% endfor %}

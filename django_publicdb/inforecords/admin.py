@@ -94,9 +94,9 @@ class MonitorServiceAdmin(admin.ModelAdmin):
 
 
 class PcAdmin(admin.ModelAdmin):
-    list_display = ('station', 'name', 'is_active', 'type', 'ip', 'url',
+    list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url',
                     'keys')
-    list_filter = ('is_active',)
+    list_filter = ('is_active', 'is_test')
     ordering = ('station',)
     inlines = (EnabledServiceInline,)
     list_per_page = 200
