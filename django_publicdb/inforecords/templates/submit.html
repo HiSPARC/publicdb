@@ -8,10 +8,9 @@
 </div>
 
 <div id='subform'>
-    <form action="{% url 'django_publicdb.inforecords.views.submit_station_layout_form' %}" method="post">
+    <form action="{% url 'django_publicdb.inforecords.views.submit_position' %}" method="post">
     {% csrf_token %}
         {{ form.as_p }}
-        {{ html_captcha|safe }}
         <input type="submit" value="Submit" />
     </form>
 </div>
