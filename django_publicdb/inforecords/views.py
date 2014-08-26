@@ -11,6 +11,7 @@ import base64
 
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
+from django_publicdb.inforecords.forms import *
 from django_publicdb.status_display.views import station_has_data
 
 import os
@@ -149,7 +150,11 @@ def create_datastore_config(request):
 
 
 def submit_position(request):
-  """Show some simple text to make sure we get this working"""
+  if request.method == 'POST':
+    form = QuarantineForm(request.POST)
+  else:
+    form = QuarantineForm()
 
   return render_to_response('submit.html',
-    context_instance=RequestContext(request))
+                            {'form': form},
+                            context_instance=RequestContext(request))
