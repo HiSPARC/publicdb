@@ -9,7 +9,7 @@ class QuarantineForm(forms.Form):
     first_name = forms.CharField(max_length=50)
     sur_name = forms.CharField(max_length=50)
     email = forms.EmailField()
-    station = forms.ModelChoiceField(queryset=inforecords.Station.objects.all())
+    station = forms.ModelChoiceField(queryset=Station.objects.all())
     scintillator_1_alpha = models.FloatField(null=True, blank=True)
     scintillator_1_beta = models.FloatField(null=True, blank=True)
     scintillator_1_radius = models.FloatField(null=True, blank=True)
