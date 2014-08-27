@@ -1,6 +1,9 @@
 {% extends "base.html" %}
 {% block title %}HiSPARC | Station layout submit form{% endblock %}
-{% block head_styles %}<style type="text/css" media="all">#pageHeader {position: absolute;}</style>{% endblock %}
+{% block head_styles %}
+    <style type="text/css" media="all">#pageHeader {position: absolute;}</style>
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/submit.css" />
+{% endblock %}
 {% block content %}
 
 <div id="header">
