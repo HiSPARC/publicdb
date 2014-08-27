@@ -35,16 +35,30 @@
         </p>    
         <div class="columnWrapper">
     		<div class="leftColumn">
+                {{ form.scintillator_1_alpha.label_tag }}:
 	    		{{ form.scintillator_1_alpha }}
+                <br>
+                {{ form.scintillator_1_beta.label_tag }}:
 	    		{{ form.scintillator_1_beta }}
+                <br>
+                {{ form.scintillator_1_radius.label_tag }}:
 	    		{{ form.scintillator_1_radius }}
+                <br>
+                {{ form.scintillator_1_heigth.label_tag }}:
     			{{ form.scintillator_1_height }}
     		</div>
     		<div class="rightColumn">
-	    		{{ form.scintillator_2_alpha }}
-	    		{{ form.scintillator_2_beta }}
-	    		{{ form.scintillator_2_radius }}
-    			{{ form.scintillator_2_height }}
+	    		{{ form.scintillator_2_alpha.label_tag }}:
+                {{ form.scintillator_2_alpha }}
+                <br>
+                {{ form.scintillator_2_beta.label_tag }}:
+                {{ form.scintillator_2_beta }}
+                <br>
+                {{ form.scintillator_2_radius.label_tag }}:
+                {{ form.scintillator_2_radius }}
+                <br>
+                {{ form.scintillator_2_heigth.label_tag }}:
+                {{ form.scintillator_2_height }}
     		</div>
     	</div>
         <input type="submit" value="Submit" />
