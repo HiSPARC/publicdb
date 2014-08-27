@@ -1,10 +1,15 @@
 h4 {
 	margin:0;}
 
+.wrapperDiv {
+	min-height: 100%;}
+
 .leftColumn {
+	min-height: 100%;
 	float: left;
 	width: 50%;}
 
 .rightColumn {
+	min-height: 100%;
 	float: right;
 	width: 50%;}
