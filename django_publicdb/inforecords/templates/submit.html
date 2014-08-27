@@ -10,15 +10,27 @@
 <div id='subform'>
     <form action="{% url 'django_publicdb.inforecords.views.submit_position' %}" method="post">
     {% csrf_token %}
-    	{{ form.first_name.label_tag }}
-    	{{ form.first_name }}
-    	{{ form.sur_name.label_tag }}
-   		{{ form.sur_name }}
-    	{{ form.email.label_tag }}
-    	{{ form.email }}
-    	{{ form.station.label_tag }}
-    	{{ form.station }}
-    	<div class="columnWrapper">
+        <p>
+        	{{ form.first_name.label_tag }}:
+        	{{ form.first_name }}
+    	</p>
+        <p>
+            {{ form.sur_name.label_tag }}:
+       		{{ form.sur_name }}
+    	</p>
+        <p>
+            {{ form.email.label_tag }}:
+            {{ form.email }}
+    	</p>
+        <p>
+            {{ form.station.label_tag }}:
+            {{ form.station }}
+    	</p>
+        <p>
+            {{ form.active_date.label_tag }}:
+            {{ form.active_date }}
+        </p>    
+        <div class="columnWrapper">
     		<div class="leftColumn">
 	    		{{ form.scintillator_1_alpha }}
 	    		{{ form.scintillator_1_beta }}
