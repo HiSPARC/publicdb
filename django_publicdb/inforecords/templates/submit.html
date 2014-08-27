@@ -10,13 +10,13 @@
 <div id='subform'>
     <form action="{% url 'django_publicdb.inforecords.views.submit_position' %}" method="post">
     {% csrf_token %}
-    	{{ form.first_name.label_tag() }}
+    	{{ form.first_name.label_tag }}
     	{{ form.first_name }}
-    	{{ form.sur_name.label_tag() }}
+    	{{ form.sur_name.label_tag }}
    		{{ form.sur_name }}
-    	{{ form.email.label_tag() }}
+    	{{ form.email.label_tag }}
     	{{ form.email }}
-    	{{ form.station.label_tag() }}
+    	{{ form.station.label_tag }}
     	{{ form.station }}
     	<div class="columnWrapper">
     		<div class="leftColumn">
