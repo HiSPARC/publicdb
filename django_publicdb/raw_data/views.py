@@ -365,18 +365,21 @@ def coincidences_download_form(request, start=None, end=None):
     if request.method == 'POST':
         form = CoincidenceDownloadForm(request.POST)
         if form.is_valid():
-            cluster = form.cleaned_data['cluster']
+            cluster = form.cleaned_data.get('cluster')
+            stations = form.cleaned_data.get('stations')
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
             query_string = urllib.urlencode({'cluster': cluster,
+                                             'stations': stations,
                                              'start': start, 'end': end,
                                              'n': n, 'download': download})
             return HttpResponseRedirect('/data/network/coincidences/?%s' %
                                         query_string)
     else:
-        form = CoincidenceDownloadForm(initial={'start': start,'end': end,
+        form = CoincidenceDownloadForm(initial={'filter_by': 'network',
+                                                'start': start,'end': end,
                                                 'n': 2})
 
     return render(request, 'coincidences_download.html', {'form': form})
@@ -413,6 +416,8 @@ def download_coincidences(request):
                "end [datetime])")
         return HttpResponseBadRequest(msg, content_type="text/plain")
 
+    n = int(request.GET.get('n', '2'))
+
     stations = request.GET.get('stations', None)
     if stations == 'None':
         stations = None
@@ -426,6 +431,9 @@ def download_coincidences(request):
         return HttpResponseBadRequest(msg, content_type="text/plain")
     elif stations:
         stations = [int(number) for number in stations.strip('[]').split(',')]
+        if len(stations) < n:
+            msg = "To few stations in query, give at least n."
+            return HttpResponseBadRequest(msg, content_type="text/plain")
         if len(stations) >= 30:
             msg = "To many stations in query, use less than 30."
             return HttpResponseBadRequest(msg, content_type="text/plain")
@@ -437,8 +445,6 @@ def download_coincidences(request):
         stations = (Station.objects.filter(Q(cluster__parent=cluster) |
                                            Q(cluster=cluster))
                                    .values_list('number', flat=True))
-
-    n = int(request.GET.get('n', '2'))
 
     download = request.GET.get('download', False)
     if download in ['true', 'True']:
