@@ -39,20 +39,20 @@ HiSPARC coincidences download form
     <p>
         {{ form.filter_by.errors }}{{ form.cluster.errors }}{{ form.stations.errors }}
         {{ form.filter_by.label_tag }}:
-        <ul>
-            <li>{{ form.filter_by.0 }}</li>
-            <li>
-                {{ form.filter_by.1 }}:
-                {{ form.cluster }}
-                <span class="helptext">{{ form.cluster.help_text }}</span>
-            </li>
-            <li>
-                {{ form.filter_by.2 }}:
-                {{ form.stations }}
-                <span class="helptext">{{ form.stations.help_text }}</span>
-            </li>
-        </ul>
     </p>
+    <ul>
+        <li>{{ form.filter_by.0 }}</li>
+        <li>
+            {{ form.filter_by.1 }}:
+            {{ form.cluster }}
+            <span class="helptext">{{ form.cluster.help_text }}</span>
+        </li>
+        <li>
+            {{ form.filter_by.2 }}:
+            {{ form.stations }}
+            <span class="helptext">{{ form.stations.help_text }}</span>
+        </li>
+    </ul>
     <p>
         {{ form.start.errors }}
         {{ form.start.label_tag }}:
