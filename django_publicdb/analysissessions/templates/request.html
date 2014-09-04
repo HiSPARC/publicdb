@@ -1,6 +1,12 @@
 {% extends "base.html" %}
+
 {% block title %}jSparc | Session request{% endblock %}
-{% block head_styles %}<style type="text/css" media="all">#pageHeader {position: absolute;}</style>{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/request_form.css" />
+{% endblock %}
+
+
 {% block content %}
 
 <div id="header">

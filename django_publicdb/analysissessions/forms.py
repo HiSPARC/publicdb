@@ -4,7 +4,7 @@ from django_publicdb.inforecords.models import *
 from datetime import date
 from django.forms.extras.widgets import SelectDateWidget
 
-todays_year = range(2004, int(date.today().strftime("%Y")) + 1)
+todays_year = range(2004, date.today().year + 1)
 
 
 class SessionRequestForm(forms.Form):
