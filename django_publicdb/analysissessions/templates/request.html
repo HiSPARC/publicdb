@@ -3,7 +3,7 @@
 {% block title %}jSparc | Session request{% endblock %}
 
 {% block head_styles %}
-<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/request_form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/request_form.css">
 {% endblock %}
 
 
@@ -18,7 +18,7 @@
     {% csrf_token %}
         {{ form.as_p }}
         {{ html_captcha|safe }}
-        <input type="submit" value="Submit" />
+        <input type="submit" value="Submit">
     </form>
 </div>
 

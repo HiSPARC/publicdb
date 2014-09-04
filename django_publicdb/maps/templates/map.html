@@ -6,21 +6,21 @@
 <html>
 
 <head>
-    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon.ico" />
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon.ico">
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
     <title>HiSPARC Station map</title>
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/base.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/OpenLayers-2.12.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/map_controls.css" />
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/maps.css" />
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery-1.8.2.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot-0.8a.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot.axislabels.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/jquery.flot.time.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayers-2.13b.min.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <!--[if lte IE 8]><script type="text/javascript" src="{{ STATIC_URL }}scripts/excanvas.min.js"></script><![endif]-->
-    <script type="text/javascript">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/base.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/OpenLayers-2.12.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/map_controls.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/maps.css">
+    <script src="{{ STATIC_URL }}scripts/jquery-1.8.2.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot-0.8a.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot.axislabels.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot.time.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayers-2.13b.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <!--[if lte IE 8]><script src="{{ STATIC_URL }}scripts/excanvas.min.js"></script><![endif]-->
+    <script>
         $(document).ready(function() {
             var map = createMap("map");
             var style = createStyle(map);

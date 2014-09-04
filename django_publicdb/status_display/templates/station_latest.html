@@ -51,9 +51,9 @@
 {% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <script type="text/javascript">
+    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
         var time = new Date().getTime();
 
         function refresh() {
@@ -88,7 +88,7 @@
             });
         });
     </script>
-    <!--[if lte IE 8]><script type="text/javascript">
+    <!--[if lte IE 8]><script>
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
     </script><![endif]-->
 {% endblock %}
@@ -108,7 +108,7 @@
         <div id="eventHistogram" class="histogram">
             <h3>Event histogram</h3>
             <div class="plot" id="eh_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
                 $.extend(true, eh_options, eh_labels)
@@ -133,7 +133,7 @@
             <h3>Barometer data</h3>
           {% endif %}
             <div class="plot" id="bd_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
                              xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
                 $.extend(true, bd_options, bd_labels)
@@ -154,7 +154,7 @@
         <div id="pulseheightHistogram" class="histogram">
             <h3>Pulseheight histogram</h3>
             <div class="plot" id="ph_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
                 $.extend(true, ph_options, ph_labels)
@@ -171,7 +171,7 @@
         <div id="pulseintegralHistogram" class="histogram">
             <h3>Pulseintegral histogram</h3>
             <div class="plot" id="pi_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
                 $.extend(true, pi_options, pi_labels)

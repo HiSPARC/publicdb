@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/stations.css" />
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/stations.css">
 {% endblock %}
 
 {% block content %}
@@ -44,7 +44,7 @@
             <div class="sectionTitle">Data availability</div>
             <div class="keyvalue">
                 <span class="key thin" style='color: #23B;'>Station</span>
-                <span class="value">&larr; Link to data</span><br />
+                <span class="value">&larr; Link to data</span><br>
             </div>
             <div class="keyvalue">
                 <span class="key thin">Station</span>
@@ -55,19 +55,19 @@
             <div class="sectionTitle">Current status</div>
             <div class="keyvalue">
                 <span class='key statusBall up'></span>
-                <span class="value">Up {% if statuscount %}({{ statuscount.up }}){% endif %}</span><br />
+                <span class="value">Up {% if statuscount %}({{ statuscount.up }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
                 <span class='key statusBall problem'></span>
-                <span class="value">Problem {% if statuscount %}({{ statuscount.problem }}){% endif %}</span><br />
+                <span class="value">Problem {% if statuscount %}({{ statuscount.problem }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
                 <span class='key statusBall down'></span>
-                <span class="value">Down {% if statuscount %}({{ statuscount.down }}){% endif %}</span><br />
+                <span class="value">Down {% if statuscount %}({{ statuscount.down }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
                 <span class='key statusBall unknown'></span>
-                <span class="value">Unknown</span><br />
+                <span class="value">Unknown</span><br>
             </div>
             <div class="keyvalue">
                 <span class='key statusBall'></span>
@@ -77,7 +77,7 @@
             <div class="sectionTitle">Region map</div>
             <div class="keyvalue">
                 <span class="key">Cluster</span>
-                <span class="value">&larr; Link to map</span><br />
+                <span class="value">&larr; Link to map</span><br>
             </div>
           {% endblock %}
         </div>

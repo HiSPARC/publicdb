@@ -8,9 +8,9 @@
 {% block title %}{{ block.super }} - Configuration{% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <script type="text/javascript">
+    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
       {% if config %}
 
         $(document).ready(function() {
@@ -69,7 +69,7 @@
                 <a href="{% url 'status_display.views.get_voltage_config_source' station.number %}">Source</a>
             </div>
             <div class="plot" id="vg_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 vg_labels = {yaxis: {axisLabel: "{{ voltagegraph.y_label }}"},
                              xaxis: {axisLabel: "{{ voltagegraph.x_label }}"}}
                 $.extend(true, vg_options, vg_labels)
@@ -90,7 +90,7 @@
                 <a href="{% url 'status_display.views.get_current_config_source' station.number %}">Source</a>
             </div>
             <div class="plot" id="cg_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 cg_labels = {yaxis: {axisLabel: "{{ currentgraph.y_label }}"},
                              xaxis: {axisLabel: "{{ currentgraph.x_label }}"}}
                 $.extend(true, cg_options, cg_labels)
@@ -114,7 +114,7 @@
                 <a onclick="downloadGraph('#ag_histogram')">Image</a>
             </div>
             <div class="plot" id="ag_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 ag_labels = {yaxis: {axisLabel: "{{ altitudegraph.y_label }}"},
                              xaxis: {axisLabel: "{{ altitudegraph.x_label }}"}}
                 $.extend(true, ag_options, ag_labels)

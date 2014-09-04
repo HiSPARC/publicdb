@@ -14,9 +14,9 @@
 {% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <script type="text/javascript">
+    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
             window.open(dataurl, '_blank', "height=350, width=630, toolbar=yes")
@@ -37,7 +37,7 @@
                 <a href="{% url 'status_display.views.get_coincidencetime_histogram_source' link.0 link.1 link.2 %}">Source</a>
             </div>
             <div class="plot" id="ct_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 ct_labels = {yaxis: {axisLabel: "{{ coincidencetimehistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ coincidencetimehistogram.x_label }}"}}
                 $.extend(true, ct_options, ct_labels)
@@ -58,7 +58,7 @@
                 <a href="{% url 'status_display.views.get_coincidencenumber_histogram_source' link.0 link.1 link.2 %}">Source</a>
             </div>
             <div class="plot" id="cn_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 cn_labels = {yaxis: {axisLabel: "{{ coincidencenumberhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ coincidencenumberhistogram.x_label }}"}}
                 $.extend(true, cn_options, cn_labels)

@@ -17,13 +17,13 @@
 {% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <!--[if lte IE 8]><script type="text/javascript">
+    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <!--[if lte IE 8]><script>
         var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
     </script><![endif]-->
-    <script type="text/javascript">
+    <script>
       {% if config %}
         $(document).ready(function() {
             var map = createMap("stationMap");
@@ -70,7 +70,7 @@
                 <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="eh_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
                 $.extend(true, eh_options, eh_labels)
@@ -91,7 +91,7 @@
                 <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="ph_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
                 $.extend(true, ph_options, ph_labels)
@@ -112,7 +112,7 @@
                 <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="pi_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
                 $.extend(true, pi_options, pi_labels)
@@ -133,7 +133,7 @@
                 <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="bd_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
                              xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
                 $.extend(true, bd_options, bd_labels)
@@ -154,7 +154,7 @@
                 <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="td_histogram"></div>
-            <script type="text/javascript">
+            <script>
                 td_labels = {yaxis: {axisLabel: "{{ temperaturedata.y_label }}"},
                              xaxis: {axisLabel: "{{ temperaturedata.x_label }}"}}
                 $.extend(true, td_options, td_labels)

@@ -6,12 +6,12 @@
 
 
 {% block head_styles %}
-        <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/results.css" />
+        <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/results.css">
 {% endblock %}
 
 {% block head %}
     <meta http-equiv="refresh" content="60">
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/flot_settings_results.js"></script>
+    <script src="{{ STATIC_URL }}scripts/flot_settings_results.js"></script>
 {% endblock %}
 
 {% block content %}
@@ -24,7 +24,7 @@
     <div id="energyHistogram">
         <h3>Energy histogram</h3>
         <div class="plot" id="en_histogram" style="height: 300px; width: 591px;"></div>
-        <script type="text/javascript">
+        <script>
             en_labels = {yaxis: {axisLabel: "{{ energy_histogram.y_label }}"},
                          xaxis: {axisLabel: "{{ energy_histogram.x_label }}"}}
             $.extend(true, en_options, en_labels)

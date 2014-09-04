@@ -6,8 +6,8 @@
 {% block current_map %}currentPage{% endblock %}
 
 {% block head %}
-    <script type="text/javascript" src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
-    <script type="text/javascript">
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
         var stationlink;
         var clusterlink;
         $(document).ready(function() {
@@ -95,11 +95,11 @@
 {% block extra %}
     <div class="sectionTitle">Selected Station</div>
     <div class="keyvalue">
-        <span class="key">Station</span><br />
+        <span class="key">Station</span><br>
         <span class="value" id="stationLink"><span class="statusBall"></span> None</span>
     </div>
     <div class="keyvalue">
-        <span class="key">Cluster</span><br />
+        <span class="key">Cluster</span><br>
         <span class="value" id="clusterLink">None</span>
     </div>
 {% endblock %}

@@ -5,7 +5,7 @@ HiSPARC coincidences download form
 {% endblock %}
 
 {% block head_styles %}
-<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/download_form.css" />
+<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/download_form.css">
 {% endblock %}
 
 {% block head %}
@@ -78,7 +78,7 @@ HiSPARC coincidences download form
         <span class="helptext">{{ form.download.help_text }}</span>
     </p>
 
-    <input type="submit" value="Submit" />
+    <input type="submit" value="Submit">
 </form>
 
 <p class="small"><a href="{% url 'raw_data.views.download_form' %}">Switch to station data download form</a></p>
