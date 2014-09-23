@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Max
 from django.core.urlresolvers import reverse
+from django.utils.text import slugify
 import xmlrpclib
 
 from django.conf import settings
@@ -173,6 +174,8 @@ class Station(models.Model):
         return '%5d: %s' % (self.number, self.name)
 
     def save(self, *args, **kwargs):
+        # Strip some problematic characters
+        self.name = self.name.replace('"', '').replace("'", '')
         if self.number is None:
             self.number = self.cluster.last_station_number() + 1
         new = self.pk is None
@@ -364,7 +367,7 @@ class Pc(models.Model):
         if self.type.description == 'Admin PC':
             return ''
         else:
-            return '<a href=vnc://%s.his>%s.his</a>' % (self.name, self.name)
+            return '<a href=vnc://s%d.his>s%d.his</a>' % (self.station.number, self.station.number)
     url.short_description = 'VNC URL'
     url.allow_tags = True
 
@@ -392,7 +395,8 @@ class Pc(models.Model):
         return '.'.join(q)
 
     def save(self, *args, **kwargs):
-        self.name = self.name.lower().replace(' ', '')
+        # slugify the short name to keep it clean
+        self.name = slugify(self.name)
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
