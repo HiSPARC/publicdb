@@ -36,7 +36,8 @@ class CoincidenceDownloadForm(forms.Form):
     download = forms.BooleanField(required=False)
 
     def clean(self):
-        """Check"""
+        """Check the choices to ensure the combination of choices are valid"""
+
         cleaned_data = super(CoincidenceDownloadForm, self).clean()
         filter_by = cleaned_data.get('filter_by')
         if filter_by == 'network':
