@@ -21,7 +21,8 @@ class Contact(models.Model):
     first_name = models.CharField(max_length=40)
     prefix_surname = models.CharField(max_length=10, blank=True)
     surname = models.CharField(max_length=40)
-    contactinformation = models.ForeignKey('ContactInformation', related_name='contacts')
+    contactinformation = models.ForeignKey('ContactInformation',
+                                           related_name='contacts')
 
     def __unicode__(self):
         return "%s %s %s %s" % (self.title, self.first_name,
@@ -107,7 +108,8 @@ class ContactInformation(models.Model):
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True,blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='children')
+    parent = models.ForeignKey('self', null=True, blank=True,
+                               related_name='children')
     country = models.ForeignKey('Country', related_name='clusters')
     url = models.URLField(null=True, blank=True)
 
@@ -115,11 +117,11 @@ class Cluster(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
-        if self.number==None:
-           if self.parent==None:
-              self.number = self.country.last_cluster_number()+1000
+        if self.number is None:
+           if self.parent is None:
+              self.number = self.country.last_cluster_number() + 1000
            else:
-              self.number = self.parent.last_cluster_number()+100
+              self.number = self.parent.last_cluster_number() + 100
         super(Cluster, self).save(*args, **kwargs)
         reload_datastore()
 
@@ -134,7 +136,7 @@ class Cluster(models.Model):
             return self.name
 
     def last_station_number(self):
-        stations=self.stations.filter(number__lt=(self.number+90))
+        stations=self.stations.filter(number__lt=(self.number + 90))
         if stations:
             stationmax=stations.aggregate(Max('number'))
             return stationmax['number__max']
@@ -155,7 +157,7 @@ class Cluster(models.Model):
 
 class Station(models.Model):
     name = models.CharField(max_length=70)
-    number = models.IntegerField(unique=True,blank=True)
+    number = models.IntegerField(unique=True, blank=True)
     contactinformation = models.ForeignKey('ContactInformation',
                                            related_name='stations')
     cluster = models.ForeignKey('Cluster', related_name='stations')
@@ -171,9 +173,14 @@ class Station(models.Model):
         return '%5d: %s' % (self.number, self.name)
 
     def save(self, *args, **kwargs):
-        if self.number==None:
-           self.number = self.cluster.last_station_number()+1
+        if self.number is None:
+            self.number = self.cluster.last_station_number() + 1
+        new = self.pk is None
         super(Station, self).save(*args, **kwargs)
+        if new:
+            # New station, so create a DetectorHisparc object
+            dh = DetectorHisparc(station=self, startdate=datetime.date.today())
+            dh.save()
         reload_datastore()
 
     def delete(self, *args, **kwargs):
@@ -203,7 +210,7 @@ class Station(models.Model):
 
 class Country(models.Model):
     name = models.CharField(max_length=40, unique=True)
-    number = models.IntegerField(unique=True,blank=True)
+    number = models.IntegerField(unique=True, blank=True)
 
     def __unicode__(self):
         return self.name
@@ -220,7 +227,7 @@ class Country(models.Model):
         verbose_name_plural = "Countries"
 
     def save(self, *args, **kwargs):
-        if self.number == None:
+        if self.number is None:
             if Country.objects.count() > 0:
                 countrymax = Country.objects.aggregate(Max('number'))
                 self.number = countrymax['number__max'] + 10000
@@ -260,6 +267,7 @@ class DetectorHisparc(models.Model):
         return unicode(self.station)
 
     class Meta:
+        unique_together = [('station', 'startdate')]
         verbose_name_plural = 'Detector HiSPARC'
         ordering = ('station__number',)
 
@@ -364,17 +372,22 @@ class Pc(models.Model):
         verbose_name_plural = 'PC and Certificates'
         ordering = ('name',)
 
-    def ipAdresGenereer(self,ipadres):
-        # bron: http://aspn.activestate.com/ASPN/Cookbook/Python/Recipe/65219
-        hexn = ''.join(["%02X" % long(i) for i in ipadres.split('.')])
+    def generate_ip_address(self, ipaddress):
+        """Generate new IP address
+
+        Increments given IP address by 1.
+        Source: http://code.activestate.com/recipes/65219/
+
+        """
+        hexn = ''.join(["%02X" % long(i) for i in ipaddress.split('.')])
         n = long(hexn, 16) + 1
 
         d = 256 * 256 * 256
         q = []
         while d > 0:
-                m, n = divmod(n, d)
-                q.append(str(m))
-                d = d / 256
+            m, n = divmod(n, d)
+            q.append(str(m))
+            d = d / 256
 
         return '.'.join(q)
 
@@ -386,12 +399,12 @@ class Pc(models.Model):
             super(Pc, self).save(*args, **kwargs)
         else:
             if self.type.description == "Admin PC":
-                vorigip = Pc.objects.filter(type__description="Admin PC").\
-                          latest('id').ip
+                last_ip = (Pc.objects.filter(type__description="Admin PC")
+                                     .latest('id').ip)
             else:
-                vorigip = Pc.objects.exclude(type__description="Admin PC").\
-                          latest('id').ip
-            self.ip = self.ipAdresGenereer(vorigip)
+                last_ip = (Pc.objects.exclude(type__description="Admin PC")
+                                     .latest('id').ip)
+            self.ip = self.generate_ip_address(last_ip)
 
             # First create keys, then issue final save
             proxy.create_key(self.name, self.type.slug, self.ip)
