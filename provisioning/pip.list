@@ -5,7 +5,4 @@ Django==1.5.10
 South
 recaptcha-client
 
---allow-unverified progressbar
---allow-external progressbar
-progressbar==2.3
 hisparc-sapphire

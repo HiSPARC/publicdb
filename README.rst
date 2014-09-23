@@ -132,7 +132,7 @@ The complete requirements and installation instructions are::
     $ pip install South
     $ pip install docutils
 
-    $ pip install progressbar
+    $ pip install progressbar2
     $ pip install mock
     $ pip install scipy
     $ pip install matplotlib
@@ -152,9 +152,9 @@ For reference, the results from `pip freeze`::
     mock==1.0.1
     numexpr==2.1
     numpy==1.7.1
-    progressbar==2.3
+    progressbar==2.6.7
     recaptcha-client==1.0.6
-    sapphire==0.9.2b
+    sapphire==0.9.20
     scipy==0.12.0
     tables==3.0.0
     wsgiref==0.1.2
