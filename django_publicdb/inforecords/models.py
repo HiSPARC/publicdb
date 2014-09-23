@@ -367,7 +367,8 @@ class Pc(models.Model):
         if self.type.description == 'Admin PC':
             return ''
         else:
-            return '<a href=vnc://s%d.his>s%d.his</a>' % (self.station.number, self.station.number)
+            return ('<a href=vnc://s{0}.his>s{0}.his</a>'
+                    .format(self.station.number))
     url.short_description = 'VNC URL'
     url.allow_tags = True
 
