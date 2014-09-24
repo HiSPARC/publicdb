@@ -17,6 +17,9 @@ from django_publicdb.inforecords.models import *
 from nagios import *
 
 
+FIRSTDATE = datetime.date(2002, 1, 1)
+
+
 def stations(request):
     """Show the default station list"""
 
@@ -57,11 +60,11 @@ def stations_by_country(request):
         if len(station.pc_set.filter(is_test=True)):
             test_stations.append(station_info)
             continue
-        if not country in countries:
+        if country not in countries:
             countries[country] = OrderedDict()
-        if not cluster in countries[country]:
+        if cluster not in countries[country]:
             countries[country][cluster] = OrderedDict()
-        if not subcluster in countries[country][cluster]:
+        if subcluster not in countries[country][cluster]:
             countries[country][cluster][subcluster] = []
         countries[country][cluster][subcluster].append(station_info)
 
@@ -135,18 +138,23 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     if country:
         get_object_or_404(Country, name=country)
         if cluster:
-            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
+            get_object_or_404(Cluster, name=cluster, parent=None,
+                              country__name=country)
             if subcluster:
                 if cluster == subcluster:
                     get_object_or_404(Cluster, name=subcluster, parent=None)
                 else:
-                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
-                focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
+                    get_object_or_404(Cluster, name=subcluster,
+                                      parent__name=cluster)
+                focus = (Cluster.objects.filter(name=subcluster)
+                                        .values_list('name', flat=True))
             else:
                 focus = [Cluster.objects.get(name=cluster, parent=None).name]
-                focus.extend(Cluster.objects.filter(parent__name=cluster).values_list('name', flat=True))
+                focus.extend(Cluster.objects.filter(parent__name=cluster)
+                                            .values_list('name', flat=True))
         else:
-            focus = Cluster.objects.filter(country__name=country).values_list('name', flat=True)
+            focus = (Cluster.objects.filter(country__name=country)
+                                    .values_list('name', flat=True))
     else:
         focus = Cluster.objects.all().values_list('name', flat=True)
 
@@ -191,7 +199,7 @@ def network_coincidences(request, year=None, month=None, day=None):
         try:
             summary = (NetworkSummary.objects
                                      .filter(num_coincidences__isnull=False,
-                                             date__gte=datetime.date(2002, 1, 1),
+                                             date__gte=FIRSTDATE,
                                              date__lte=datetime.date.today())
                                      .latest('date'))
         except NetworkSummary.DoesNotExist:
@@ -214,9 +222,9 @@ def network_coincidences(request, year=None, month=None, day=None):
     # Find previous/next dates with data
     try:
         previous = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                                  date__gte=datetime.date(2002, 1, 1),
+                                                  date__gte=FIRSTDATE,
                                                   date__lt=date)
-                                           .latest('date')).date
+                                  .latest('date')).date
     except NetworkSummary.DoesNotExist:
         previous = None
 
@@ -280,7 +288,7 @@ def station_data(request, station_number, year, month, day):
         previous = (Summary.objects.filter(Q(num_events__isnull=False) |
                                            Q(num_weather__isnull=False),
                                            station=station,
-                                           date__gte=datetime.date(2002, 1, 1),
+                                           date__gte=FIRSTDATE,
                                            date__lt=date)
                                    .latest('date')).date
     except Summary.DoesNotExist:
@@ -394,7 +402,7 @@ def station_config(request, station_number):
     station = get_object_or_404(Station, number=station_number)
     configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
                               source__station=station,
-                              timestamp__gte=datetime.date(2002, 1, 1),
+                              timestamp__gte=FIRSTDATE,
                               timestamp__lte=datetime.date.today())
 
     has_data = station_has_data(station)
@@ -447,7 +455,7 @@ def station_latest(request, station_number):
         old_data = True
         summary = (Summary.objects.filter(num_events__isnull=False,
                                           station=station,
-                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__gte=FIRSTDATE,
                                           date__lte=datetime.date.today())
                                   .latest('date'))
 
@@ -463,18 +471,18 @@ def station_latest(request, station_number):
 
     # Show alternative
     extra_station = None
-    if barometerdata == None:
+    if barometerdata is None:
         try:
             sum_weather = Summary.objects.filter(num_weather__isnull=False,
                                                  date=summary.date)
             weather_stations = [s[0] for s in
                                 sum_weather.values_list('station__number')]
             closest_station = min(weather_stations,
-                                  key=lambda x:abs(x - station_number))
+                                  key=lambda x: abs(x - station_number))
             summary_weather = sum_weather.get(station__number=closest_station)
             barometerdata = plot_dataset('barometer', summary_weather.station,
                                          summary_weather.date)
-            if not barometerdata == None:
+            if barometerdata is not None:
                 extra_station = closest_station
         except IndexError:
             pass
@@ -499,7 +507,7 @@ def station(request, station_number):
         summary = (Summary.objects.filter(Q(num_events__isnull=False) |
                                           Q(num_weather__isnull=False),
                                           station__number=station_number,
-                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__gte=FIRSTDATE,
                                           date__lte=datetime.date.today())
                                   .latest('date'))
     except Summary.DoesNotExist:
@@ -663,18 +671,26 @@ def get_dataset_source(year, month, day, type, station_number):
 
 def get_config_source(station_number, type):
     configs = (Configuration.objects.filter(source__station__number=station_number,
-                                            timestamp__gte=datetime.date(2002, 1, 1),
+                                            timestamp__gte=FIRSTDATE,
                                             timestamp__lte=datetime.date.today())
                                     .order_by('timestamp'))
     if type == 'voltage':
-        data = configs.values_list('timestamp', 'mas_ch1_voltage', 'mas_ch2_voltage', 'slv_ch1_voltage', 'slv_ch2_voltage')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+        data = configs.values_list('timestamp', 'mas_ch1_voltage',
+                                   'mas_ch2_voltage', 'slv_ch1_voltage',
+                                   'slv_ch2_voltage')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
+                 row[3], row[4]] for row in data]
     elif type == 'current':
-        data = configs.values_list('timestamp', 'mas_ch1_current', 'mas_ch2_current', 'slv_ch1_current', 'slv_ch2_current')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3], row[4]] for row in data]
+        data = configs.values_list('timestamp', 'mas_ch1_current',
+                                   'mas_ch2_current', 'slv_ch1_current',
+                                   'slv_ch2_current')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
+                 row[3], row[4]] for row in data]
     elif type == 'gps':
-        data = configs.values_list('timestamp', 'gps_latitude', 'gps_longitude', 'gps_altitude')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2], row[3]] for row in data]
+        data = configs.values_list('timestamp', 'gps_latitude',
+                                   'gps_longitude', 'gps_altitude')
+        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
+                 row[3]] for row in data]
     else:
         data = None
 
@@ -865,7 +881,7 @@ def nav_years_network():
 
     valid_years = (NetworkSummary.objects
                                  .filter(num_coincidences__isnull=False,
-                                         date__gte=datetime.date(2002, 1, 1),
+                                         date__gte=FIRSTDATE,
                                          date__lte=datetime.date.today())
                                  .dates('date', 'year'))
     valid_years = [date.year for date in valid_years]
@@ -890,7 +906,7 @@ def nav_years(station=None):
     valid_years = (Summary.objects.filter(Q(station=station),
                                           Q(num_events__isnull=False) |
                                           Q(num_weather__isnull=False),
-                                          date__gte=datetime.date(2002, 1, 1),
+                                          date__gte=FIRSTDATE,
                                           date__lte=datetime.date.today())
                           .dates('date', 'year'))
     valid_years = [date.year for date in valid_years]
@@ -920,7 +936,7 @@ def stations_with_data():
     stations = (Station.objects
                        .filter(Q(summary__num_events__isnull=False) |
                                Q(summary__num_weather__isnull=False),
-                               summary__date__gte=datetime.date(2002, 1, 1),
+                               summary__date__gte=FIRSTDATE,
                                summary__date__lte=datetime.date.today())
                        .distinct()
                        .values_list('number', flat=True))
@@ -941,7 +957,7 @@ def station_has_data(station):
         Summary.objects.filter(Q(station=station),
                                Q(num_events__isnull=False) |
                                Q(num_weather__isnull=False),
-                               date__gte=datetime.date(2002, 1, 1),
+                               date__gte=FIRSTDATE,
                                date__lte=datetime.date.today())[0]
         has_data = True
     except IndexError:

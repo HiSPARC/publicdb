@@ -48,8 +48,8 @@ def get_coincidence(request):
         student = Student.objects.get(session=session,
                                       name='Test student')
     else:
-        student, is_created = Student.objects.get_or_create(
-                                    session=session, name=student_name)
+        student, is_created = Student.objects.get_or_create(session=session,
+                                                            name=student_name)
 
     ranking = top_lijst(session.slug)
     try:
@@ -100,9 +100,9 @@ def get_events(coincidence):
 def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
     data = dict(pk=coincidence.pk,
-                timestamp=calendar.timegm(datetime.datetime
-                                  .combine(coincidence.coincidence.date,
-                                           coincidence.coincidence.time)
+                timestamp=calendar.timegm(
+                    datetime.datetime.combine(coincidence.coincidence.date,
+                                              coincidence.coincidence.time)
                                   .utctimetuple()),
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)

@@ -12,10 +12,11 @@ from django_publicdb.status_display.nagios import *
 def station_on_map(request, station_number):
     """Zoom in on a specific station on a map"""
 
+    station_number = int(station_number)
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    center = (DetectorHisparc.objects.filter(station__number=int(station_number),
+    center = (DetectorHisparc.objects.filter(station__number=station_number,
                                              startdate__lte=today)
                                      .latest('startdate'))
 
@@ -42,9 +43,9 @@ def station_on_map(request, station_number):
                             'stations': stations})
 
     return render_to_response('map.html',
-        {'subclusters': subclusters,
-         'center': center},
-        context_instance=RequestContext(request))
+                              {'subclusters': subclusters,
+                               'center': center},
+                              context_instance=RequestContext(request))
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -56,18 +57,23 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     if country:
         get_object_or_404(Country, name=country)
         if cluster:
-            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
+            get_object_or_404(Cluster, name=cluster, parent=None,
+                              country__name=country)
             if subcluster:
                 if cluster == subcluster:
                     get_object_or_404(Cluster, name=subcluster, parent=None)
                 else:
-                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
-                focus = Cluster.objects.filter(name=subcluster).values_list('name', flat=True)
+                    get_object_or_404(Cluster, name=subcluster,
+                                      parent__name=cluster)
+                focus = (Cluster.objects.filter(name=subcluster)
+                                .values_list('name', flat=True))
             else:
                 focus = [Cluster.objects.get(name=cluster, parent=None).name]
-                focus.extend(Cluster.objects.filter(parent__name=cluster).values_list('name', flat=True))
+                focus.extend(Cluster.objects.filter(parent__name=cluster)
+                                    .values_list('name', flat=True))
         else:
-            focus = Cluster.objects.filter(country__name=country).values_list('name', flat=True)
+            focus = (Cluster.objects.filter(country__name=country)
+                            .values_list('name', flat=True))
     else:
         focus = Cluster.objects.all().values_list('name', flat=True)
 
@@ -96,6 +102,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                             'stations': stations})
 
     return render_to_response('map.html',
-        {'subclusters': subclusters,
-         'focus': focus},
-        context_instance=RequestContext(request))
+                              {'subclusters': subclusters,
+                               'focus': focus},
+                              context_instance=RequestContext(request))

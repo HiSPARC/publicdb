@@ -17,6 +17,9 @@ import scipy
 from scipy import optimize
 
 
+FIRSTDATE = datetime.date(2002, 1, 1)
+
+
 class Nagios:
     ok = (0, 'OK')
     warning = (1, 'WARNING')
@@ -205,7 +208,7 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
 
     if not year:
         date = datetime.date.today()
-        stations = stations.filter(summary__date__gte=datetime.date(2002, 1, 1),
+        stations = stations.filter(summary__date__gte=FIRSTDATE,
                                    summary__date__lte=date)
     elif not month:
         date = datetime.date(int(year), 1, 1)
@@ -391,21 +394,23 @@ def get_pulseheight_drift(request, station_number, plate_number,
 
     if len(fits) < 14:
         dict.update({"nagios": Nagios.unknown,
-                     "error": "There are less than 14 fits in the requested date range, no drift rate will be calculated."})
+                     "error": ("There are less than 14 fits in the requested "
+                               "date range, no drift rate will be calculated.")})
         return json_dict(dict)
 
     try:
         # Fit drift
 
-        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+        t_array = numpy.float_([int(fit.source.date.strftime("%s"))
+                                for fit in fits])
         mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-        linear_fit = lambda p, t: p[0] + p[1] * t # Target function
+        linear_fit = lambda p, t: p[0] + p[1] * t  # Target function
 
         # Determine the drift by a linear fit
-        errfunc = lambda p, t, y: linear_fit(p, t) - y # Distance to the target function
+        errfunc = lambda p, t, y: linear_fit(p, t) - y  # Distance to the target function
 
-        p0 = [1.0, 1.0 / 86400.0] # Initial guess for the parameters
+        p0 = [1.0, 1.0 / 86400.0]  # Initial guess for the parameters
         p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
 
         drift = p1[1] * 86400.0
@@ -445,9 +450,9 @@ def get_pulseheight_drift(request, station_number, plate_number,
                      'relative_width': popt[2],
 
                      # Debug
-                     #'relative_mpv': relative_mpv,
-                     #'frequency': frequency.tolist(),
-                     #'x': x.tolist()
+                     # 'relative_mpv': relative_mpv,
+                     # 'frequency': frequency.tolist(),
+                     # 'x': x.tolist()
                      })
 
         return json_dict(dict)
@@ -474,12 +479,12 @@ def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
 
 def get_pulseheight_fit(request, station_number, plate_number,
                         year=None, month=None, day=None):
-    """Get fit values of the pulseheight distribution for a station on a given day
+    """Get fit values of the pulseheight distribution for a station on a date
 
-    Retrieve fit values of the pulseheight distribution. The fitting has to be
-    done before and stored somewhere. This function retrieves the fit values from
-    storage and returns to the client. Returns an error meesage if the values
-    are not found on storage.
+    Retrieve fit values of the pulseheight distribution. The fitting has
+    to be done before and stored somewhere. This function retrieves the
+    fit values from storage and returns to the client. Returns an error
+    meesage if the values are not found on storage.
 
     :param station_number: a station number identifier.
     :param plate_number: plate number in the range 1..4
@@ -495,7 +500,7 @@ def get_pulseheight_fit(request, station_number, plate_number,
     station_number = int(station_number)
     plate_number = int(plate_number)
 
-    if year == None and month == None and day == None:
+    if year is None and month is None and day is None:
         today = datetime.date.today()
         yesterday = today - datetime.timedelta(days=1)
         requested_date = yesterday
@@ -540,20 +545,20 @@ def get_pulseheight_fit(request, station_number, plate_number,
     # Fit failures
 
     if len(fit.error_message) > 0:
-        dict.update({"nagios" : Nagios.critical,
+        dict.update({"nagios": Nagios.critical,
                      "quality": fit.error_message})
         return json_dict(dict)
 
     # Based on chi2 of the fit
 
     if fit.chi_square_reduced < 0.01:
-        dict.update({"nagios" : Nagios.critical,
+        dict.update({"nagios": Nagios.critical,
                      "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
                                 fit.chi_square_reduced})
         return json_dict(dict)
 
     if fit.chi_square_reduced > 8.0:
-        dict.update({"nagios" : Nagios.critical,
+        dict.update({"nagios": Nagios.critical,
                      "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
                                 fit.chi_square_reduced})
         return json_dict(dict)
@@ -609,9 +614,9 @@ def has_data(request, station_number, type=None, year=None, month=None,
 
     summaries = Summary.objects.filter(station=station)
 
-    if type=='events':
+    if type == 'events':
         summaries = summaries.filter(num_events__isnull=False)
-    elif type=='weather':
+    elif type == 'weather':
         summaries = summaries.filter(num_weather__isnull=False)
 
     if day:
@@ -626,7 +631,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
         summaries = summaries.filter(date__year=date.year)
     else:
         date = datetime.date.today()
-        summaries = summaries.filter(date__gte=datetime.date(2002, 1, 1),
+        summaries = summaries.filter(date__gte=FIRSTDATE,
                                      date__lte=date)
 
     if not validate_date(date):
@@ -717,7 +722,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
 
     if not year:
         date = datetime.date.today()
-        start = datetime.date(2002, 1, 1)
+        start = FIRSTDATE
         histograms = histograms.filter(source__date__gte=start,
                                        source__date__lt=date)
     elif not month:
@@ -767,7 +772,8 @@ def get_event_traces(request, station_number, ext_timestamp):
 
     try:
         station = Station.objects.get(number=station_number)
-        Summary.objects.get(station=station, date=date, num_events__isnull=False)
+        Summary.objects.get(station=station, date=date,
+                            num_events__isnull=False)
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
@@ -787,5 +793,4 @@ def validate_date(date):
     :return: boolean, True if the date is in the range, False otherwise.
 
     """
-    return datetime.date(2002, 1, 1) <= date <= datetime.date.today()
-
+    return FIRSTDATE <= date <= datetime.date.today()

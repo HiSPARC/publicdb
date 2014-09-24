@@ -136,8 +136,8 @@ def get_target():
     with tempfile.NamedTemporaryFile(suffix='.h5', dir=dir,
                                      delete=False) as file:
         pass
-    #FIXME (for debugging only, sets extra permissions)
-    #os.chmod(file.name, 0644)
+    # FIXME (for debugging only, sets extra permissions)
+    # os.chmod(file.name, 0644)
     return tables.open_file(file.name, 'w')
 
 
@@ -325,7 +325,7 @@ def generate_weather_as_csv(station, start, end):
                event['heat_index'],
                clean_floats(event['dew_point'], precision=2),
                clean_floats(event['wind_chill'], precision=2),
-              ]
+               ]
         writer.writerow(row)
         yield line_buffer.line
         weather_returned = True
@@ -379,7 +379,7 @@ def coincidences_download_form(request, start=None, end=None):
                                         query_string)
     else:
         form = CoincidenceDownloadForm(initial={'filter_by': 'network',
-                                                'start': start,'end': end,
+                                                'start': start, 'end': end,
                                                 'n': 2})
 
     return render(request, 'coincidences_download.html', {'form': form})
@@ -513,6 +513,7 @@ def generate_coincidences_as_csv(start, end, cluster, stations, n):
     if not coincidences_returned:
         yield "# No coincidences found for the chosen query."
 
+
 def get_coincidences_from_esd_in_range(start, end, stations, n):
     """Get coincidences from ESD in time range.
 
@@ -577,16 +578,14 @@ def prettyprint_timerange(t0, t1):
     """Pretty print a time range."""
 
     duration = t1 - t0
-    if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or
-        t0.hour > 0):
+    if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or t0.hour > 0):
         timerange = '%s %s' % (t0, t1)
     elif duration.days == 1:
         timerange = str(t0.date())
     else:
         timerange = '%s %s' % (t0.date(), t1.date())
 
-    timerange = (timerange.replace('-', '').replace(' ', '_')
-                          .replace(':', ''))
+    timerange = timerange.replace('-', '').replace(' ', '_').replace(':', '')
     return timerange
 
 

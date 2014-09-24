@@ -15,6 +15,7 @@ from django_publicdb.status_display.views import station_has_data
 import os
 import datetime
 
+
 @login_required
 def keys(request, host):
     """Return a zip-file containing the hosts OpenVPN keys"""
@@ -82,8 +83,8 @@ def create_nagios_config(request):
 
                 # Append the parameters to the check command
                 check_command += ('!%s:%s!%s:%s' %
-                                 (min_warning, max_warning, min_critical,
-                                  max_critical))
+                                  (min_warning, max_warning, min_critical,
+                                   max_critical))
 
             # Append this service to the hosts service list
             services.append(
@@ -108,11 +109,9 @@ def create_nagios_config(request):
 
                 number_of_detectors = host.station.number_of_detectors()
 
-                pulseheight_thresholds = \
-                    MonitorPulseheightThresholds.objects \
-                                                .filter(station=host.station,
-                                                        plate__lte=number_of_detectors)
-
+                pulseheight_thresholds = (
+                    MonitorPulseheightThresholds.objects.filter(
+                        station=host.station, plate__lte=number_of_detectors))
                 break
 
         except Configuration.DoesNotExist:
@@ -126,8 +125,8 @@ def create_nagios_config(request):
 
     # Render the template
     return render_to_response('nagios.cfg',
-                              {'contacts': Contact.objects.all()
-                                           .select_related('contactinformation'),
+                              {'contacts': (Contact.objects.all()
+                                            .select_related('contactinformation')),
                                'clusters': Cluster.objects.all(),
                                'hosts': hosts},
                               mimetype='text/plain')
@@ -138,10 +137,10 @@ def create_datastore_config(request):
 
     # Limit access to only allow access from the Datastore server
     if (request.META["REMOTE_ADDR"] !=
-        socket.gethostbyname(settings.DATASTORE_HOST)):
+            socket.gethostbyname(settings.DATASTORE_HOST)):
         raise PermissionDenied
 
     return render_to_response('datastore.cfg',
-                              {'stations': Station.objects.all()
-                                           .select_related('cluster__parent')},
+                              {'stations': (Station.objects.all()
+                                            .select_related('cluster__parent'))},
                               mimetype='text/plain')

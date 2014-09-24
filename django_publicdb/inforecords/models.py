@@ -67,11 +67,11 @@ class ContactInformation(models.Model):
 
     def type(self):
         if self.contacts.all():
-           type = 'Contact'
+            type = 'Contact'
         elif self.stations.all():
-           type = 'Station'
+            type = 'Station'
         else:
-           type = 'no owner'
+            type = 'no owner'
         return type
     type = property(type)
 
@@ -90,9 +90,9 @@ class ContactInformation(models.Model):
         if contacts:
             contact_owner = self.contacts.get().name
         elif self.stations.all():
-           contact_owner = self.stations.all()[0].name
+            contact_owner = self.stations.all()[0].name
         else:
-           contact_owner = 'no owner'
+            contact_owner = 'no owner'
         return contact_owner
     contact_owner = property(contact_owner)
 
@@ -108,7 +108,7 @@ class ContactInformation(models.Model):
 
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
-    number = models.IntegerField(unique=True,blank=True)
+    number = models.IntegerField(unique=True, blank=True)
     parent = models.ForeignKey('self', null=True, blank=True,
                                related_name='children')
     country = models.ForeignKey('Country', related_name='clusters')
@@ -119,10 +119,10 @@ class Cluster(models.Model):
 
     def save(self, *args, **kwargs):
         if self.number is None:
-           if self.parent is None:
-              self.number = self.country.last_cluster_number() + 1000
-           else:
-              self.number = self.parent.last_cluster_number() + 100
+            if self.parent is None:
+                self.number = self.country.last_cluster_number() + 1000
+            else:
+                self.number = self.parent.last_cluster_number() + 100
         super(Cluster, self).save(*args, **kwargs)
         reload_datastore()
 
@@ -137,17 +137,17 @@ class Cluster(models.Model):
             return self.name
 
     def last_station_number(self):
-        stations=self.stations.filter(number__lt=(self.number + 90))
+        stations = self.stations.filter(number__lt=(self.number + 90))
         if stations:
-            stationmax=stations.aggregate(Max('number'))
+            stationmax = stations.aggregate(Max('number'))
             return stationmax['number__max']
         else:
             return self.number - 1
 
     def last_cluster_number(self):
-        clusters=self.children.all()
+        clusters = self.children.all()
         if clusters:
-            clustermax=clusters.aggregate(Max('number'))
+            clustermax = clusters.aggregate(Max('number'))
             return clustermax['number__max']
         else:
             return self.number
@@ -415,7 +415,7 @@ class Pc(models.Model):
             proxy.create_key(self.name, self.type.slug, self.ip)
             super(Pc, self).save(*args, **kwargs)
 
-            #FIXME this doesn't check for preselected services
+            # FIXME this doesn't check for preselected services
             self.install_default_services()
 
         aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
@@ -433,8 +433,8 @@ class Pc(models.Model):
 
     def install_default_services(self):
         if self.type.description != "Admin PC":
-            for service in MonitorService.objects. \
-                            filter(is_default_service=True):
+            for service in (MonitorService.objects
+                                          .filter(is_default_service=True)):
                 EnabledService(pc=self, monitor_service=service).save()
 
 
@@ -512,7 +512,7 @@ def reload_nagios():
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
     except:
-        #FIXME logging!
+        # FIXME logging!
         pass
 
 
@@ -523,5 +523,5 @@ def reload_datastore():
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
     except:
-        #FIXME logging!
+        # FIXME logging!
         pass
