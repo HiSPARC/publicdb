@@ -19,18 +19,15 @@ class SerializedDataField(models.Field):
     def db_type(self, connection):
         return 'LONGBLOB'
 
-    #--------------------------
     # DB/Deserializer -> Python
 
     def to_python(self, value):
 
-        #-----------------------------------------------------------------------
         # Couple possibilities:
         #
         # 1. It is already a list
         # 2. It is a JSON array formatted string
         # 3. It is a base64 encoded zlib compressed pickle string
-        #-----------------------------------------------------------------------
 
 
         # 1. If it is a list
@@ -70,13 +67,11 @@ class SerializedDataField(models.Field):
             else:
                 return unpickled
 
-    #-------------
     # Python -> DB
 
     def get_prep_value(self, value):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
-    #---------------------
     # Python -> Serializer
 
     def value_to_string(self, obj):

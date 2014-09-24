@@ -167,7 +167,7 @@ class SessionRequest(models.Model):
 
             if station_group_name in cluster_group:
                 station_group = data.get_node(cluster_group_name,
-                                             station_group_name)
+                                              station_group_name)
                 stations.append(station_group)
         return stations
 
