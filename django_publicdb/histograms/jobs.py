@@ -374,10 +374,14 @@ def update_gps_coordinates():
         except Configuration.DoesNotExist:
             pass
         else:
-            detector.latitude = config.gps_latitude
-            detector.longitude = config.gps_longitude
-            detector.height = config.gps_altitude
-            detector.save()
+            if config.gps_latitude == 0. and config.gps_longitude == 0.:
+                logger.error('Invalid GPS location (0, 0) for station: %s' %
+                             station)
+            else:
+                detector.latitude = config.gps_latitude
+                detector.longitude = config.gps_longitude
+                detector.height = config.gps_altitude
+                detector.save()
 
 
 def update_eventtime_histogram(summary):
