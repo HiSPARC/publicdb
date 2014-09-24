@@ -3,6 +3,7 @@
 import datetime
 import sys
 import os
+from textwrap import dedent
 
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
@@ -11,6 +12,7 @@ sys.path.append(publicdb_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 from django_publicdb.inforecords.models import *
+
 
 def prepare_inforecords_fixture():
     for contact in Contact.objects.all():
@@ -52,13 +54,14 @@ def prepare_inforecords_fixture():
 
 
 def print_warning():
-    print """This script modifies the inforecords tables. It replaces sensitive
-information with placeholder values. Since it directly changes the database,
-you have to add the --shut-up argument to imply that you know what you are
-doing.
+    print dedent("""\
+                 This script modifies the inforecords tables. It
+                 replaces sensitive information with placeholder
+                 values. Since it directly changes the database, you
+                 have to add the --shut-up argument to imply that you
+                 know what you are doing.
 
-Usage: prepare_inforecords_fixture.py --shut-up
-"""
+                 Usage: prepare_inforecords_fixture.py --shut-up""")
 
 
 if __name__ == '__main__':
