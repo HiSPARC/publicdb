@@ -5,16 +5,18 @@ Data access
 
 There are several ways in which the |hisparc| data can be accessed:
 
-- Via the Public database download forms.
+- Via the Public database `download forms
+  <http://data.hisparc.nl/data/download/>`_.
 - Via Python using the |sapphire| framework (see `SAPPHiRE Tutorial
   <http://docs.hisparc.nl/sapphire/tutorial.html#downloading-and-accessing
   -hisparc-data>`_).
+- Via the `jSparc <http://data.hisparc.nl/media/jsparc/>`_ web applications.
 
- To access metadata, like a list of all stations or information about a
- specific station see the :doc:`api_tutorial`.
+To access metadata, like a list of all stations or information about a
+specific station see the :doc:`api_tutorial`.
 
 
-Download Form
+Download form
 -------------
 
 When looking at the data page for a station (i.e. `Kaj Munk College
@@ -92,10 +94,11 @@ Now use numpy to convert the data from csv to a numpy array.
                   ('n1', 'float32'), ('n2', 'float32'),
                   ('n3', 'float32'), ('n4', 'float32'),
                   ('t1', 'float32'), ('t2', 'float32'),
-                  ('t3', 'float32'), ('t4', 'float32')]
+                  ('t3', 'float32'), ('t4', 'float32'),
+                  ('t_trigger', 'float32')]
     >>> a = genfromtxt(StringIO(data), delimiter="\t", dtype=format)
     >>> print a[0]
     (datetime.date(2013, 7, 2), '11:00:02', 1372762802L, 466307811L,
      [78, 798, -1, -1], [535, 10882, -1, -1],
      0.14720000326633453, 3.854599952697754, -1.0, -1.0,
-     345.0, 12.5, -1.0, -1.0)
+     345.0, 12.5, -1.0, -1.0, 345.0)

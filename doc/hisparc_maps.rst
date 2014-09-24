@@ -1,6 +1,6 @@
 .. include:: subst.inc
 
-HiSPARC Maps
+HiSPARC maps
 ============
 
 Each |hisparc| station is equipped with a GPS antenne. This GPS is used
