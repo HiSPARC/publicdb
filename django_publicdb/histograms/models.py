@@ -33,8 +33,8 @@ class SerializedDataField(models.Field):
 class NetworkSummary(models.Model):
     date = models.DateField(unique=True)
     num_coincidences = models.IntegerField(blank=True, null=True)
-    needs_update = models.BooleanField()
-    needs_update_coincidences = models.BooleanField()
+    needs_update = models.BooleanField(default=False)
+    needs_update_coincidences = models.BooleanField(default=False)
 
     def __unicode__(self):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
@@ -51,11 +51,11 @@ class Summary(models.Model):
     num_config = models.IntegerField(blank=True, null=True)
     num_errors = models.IntegerField(blank=True, null=True)
     num_weather = models.IntegerField(blank=True, null=True)
-    needs_update = models.BooleanField()
-    needs_update_events = models.BooleanField()
-    needs_update_config = models.BooleanField()
-    needs_update_errors = models.BooleanField()
-    needs_update_weather = models.BooleanField()
+    needs_update = models.BooleanField(default=False)
+    needs_update_events = models.BooleanField(default=False)
+    needs_update_config = models.BooleanField(default=False)
+    needs_update_errors = models.BooleanField(default=False)
+    needs_update_weather = models.BooleanField(default=False)
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
@@ -235,7 +235,7 @@ class DailyDataset(models.Model):
 class HistogramType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
-    has_multiple_datasets = models.BooleanField()
+    has_multiple_datasets = models.BooleanField(default=False)
     bin_axis_title = models.CharField(max_length=40)
     value_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
@@ -257,9 +257,9 @@ class DatasetType(models.Model):
 
 class GeneratorState(models.Model):
     check_last_run = models.DateTimeField()
-    check_is_running = models.BooleanField()
+    check_is_running = models.BooleanField(default=False)
     update_last_run = models.DateTimeField()
-    update_is_running = models.BooleanField()
+    update_is_running = models.BooleanField(default=False)
 
 
 class PulseheightFit(models.Model):
