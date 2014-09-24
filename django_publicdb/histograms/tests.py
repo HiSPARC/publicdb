@@ -680,7 +680,7 @@ class PulseheightFitErrorsTestCase(TestCase):
         self.assertEqual(len(fit.error_message), 0)
 
         data = numpy.zeros(100)
-        fit = fit_pulseheight_peak.fitPulseheightPeak(data)
+        fit = fit_pulseheight_peak.fit_pulseheight_peak(data)
         self.assertTrue(fit.error_message.count("Sum"))
 
     def test_data_low_average(self):
@@ -690,5 +690,5 @@ class PulseheightFitErrorsTestCase(TestCase):
         self.assertEqual(len(fit.error_message), 0)
 
         data = numpy.random.normal(50, 5, 500)
-        fit = fit_pulseheight_peak.fitPulseheightPeak(data)
+        fit = fit_pulseheight_peak.fit_pulseheight_peak(data)
         self.assertTrue(fit.error_message.count("Average"))

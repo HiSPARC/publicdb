@@ -24,9 +24,9 @@ logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
 MAX_PH = 2500
-BIN_PH_NUM = 250 # bin width = 10 mV
+BIN_PH_NUM = 250  # bin width = 10 mV
 MAX_IN = 62500
-BIN_IN_NUM = 250 # bin width = 250 mVns
+BIN_IN_NUM = 250  # bin width = 250 mVns
 
 # Parameters for the datasets, interval in seconds
 INTERVAL_TEMP = 150
@@ -445,7 +445,7 @@ def update_pulseheight_histogram(summary):
 def update_pulseheight_fit(summary):
     logger.debug("Updating pulseheight fit for %s" % summary)
     try:
-        fits = fit_pulseheight_peak.getPulseheightFits(summary)
+        fits = fit_pulseheight_peak.get_pulseheight_fits(summary)
     except Configuration.DoesNotExist:
         logger.debug("No Configuration for station: %d." %
                      summary.station.number)
