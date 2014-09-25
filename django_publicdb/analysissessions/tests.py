@@ -228,4 +228,3 @@ class LiveSessionTestCase(LiveServerTestCase):
         #image_url = image.get_attribute("src")
 
         #driver.get(image_url)
-

@@ -12,15 +12,15 @@ class ClusterAdmin(admin.ModelAdmin):
 
 class ContactInline(admin.StackedInline):
     model = Contact
-    extra = 0 #this stops empty forms being shown
-    max_num = 0 #this removes the add more button
+    extra = 0  # this stops empty forms being shown
+    max_num = 0  # this removes the add more button
     can_delete = False
 
 
 class StationInline(admin.StackedInline):
     model = Station
-    extra = 0 #this stops empty forms being shown
-    max_num = 0 #this removes the add more button
+    extra = 0  # this stops empty forms being shown
+    max_num = 0  # this removes the add more button
     can_delete = False
 
 
@@ -56,7 +56,8 @@ class EnabledServiceAdmin(admin.ModelAdmin):
 
 
 class StationAdmin(admin.ModelAdmin):
-    list_display = ('number', 'name', 'cluster', 'contactinformation', 'contact')
+    list_display = ('number', 'name', 'cluster', 'contactinformation',
+                    'contact')
     search_fields = ('number', 'name', 'cluster__name')
     list_filter = ('cluster__country',)
     list_per_page = 200
@@ -65,14 +66,14 @@ class StationAdmin(admin.ModelAdmin):
 class ContactInformationAdmin(admin.ModelAdmin):
 
     def owner_name(self, obj):
-       return obj.contact_owner
+        return obj.contact_owner
 
     list_display = ('owner_name', 'street_1', 'postalcode', 'city', 'type')
     list_filter = ('city',)
     list_max_show_all = 400
 
     def type(self, obj):
-       return obj.type
+        return obj.type
 
     inlines = (ContactInline, StationInline)
 

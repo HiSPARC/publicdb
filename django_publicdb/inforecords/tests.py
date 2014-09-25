@@ -112,7 +112,7 @@ class NagiosConfigTestCase(LiveServerTestCase):
             'define command\s*?{\s*?command_name\s+?%s\s+?' % command_name +
             'command_line\s+?(.*?)\s.*?}',
             text, re.S)
-        self.assertFalse(search_result == None)
+        self.assertIsNotNone(search_result)
 
         # Check if the check_pulseheight_mpv.py script can be found
         # FIXME: This will fail, except on the Nagios server..
@@ -140,7 +140,7 @@ class NagiosPluginTestCase(LiveServerTestCase):
         # Should return exit code 3, which stands for UNKNOWN to nagios.
         # Should return exit code 3 because no fit has been found.
 
-        with open(os.devnull,"w") as devnull:
+        with open(os.devnull, "w") as devnull:
             returncode = subprocess.call(
                 [inspect.getsourcefile(check_pulseheight_mpv), ""],
                 stdout=devnull, shell=True)
@@ -169,16 +169,15 @@ class NagiosPluginTestCase(LiveServerTestCase):
         # Should return exit code 3, which stands for UNKNOWN to nagios.
         # Should return exit code 3 because no fit has been found.
 
-        with open(os.devnull,"w") as devnull:
+        with open(os.devnull, "w") as devnull:
             returncode = subprocess.call(
                 [inspect.getsourcefile(check_pulseheight_mpv), "501 1"],
                 stdout=devnull, shell=True)
             self.assertEqual(returncode, 3)
 
-
     def test_plugin_fit_within_thresholds(self):
-        """ Tests the check_pulseheight_mpv plugin in case of a fit within thresholds.
-            Should return exit code 0 (OK).
+        """ Tests the check_pulseheight_mpv plugin in case of a fit
+            within thresholds. Should return exit code 0 (OK).
         """
 
         # Initialize work space
@@ -192,15 +191,15 @@ class NagiosPluginTestCase(LiveServerTestCase):
         thresholds = MonitorPulseheightThresholds.objects.filter(station=summary.station)
         threshold = thresholds[1]
 
-        fit = PulseheightFit(source = summary,
-                             plate = threshold.plate,
-                             initial_mpv = threshold.mpv_mean,
-                             initial_width = 50,
-                             fitted_mpv = threshold.mpv_mean,
-                             fitted_mpv_error = threshold.mpv_mean * 0.01,
-                             fitted_width = threshold.mpv_sigma,
-                             fitted_width_error = threshold.mpv_sigma * 0.01,
-                             chi_square_reduced = 1)
+        fit = PulseheightFit(source=summary,
+                             plate=threshold.plate,
+                             initial_mpv=threshold.mpv_mean,
+                             initial_width=50,
+                             fitted_mpv=threshold.mpv_mean,
+                             fitted_mpv_error=threshold.mpv_mean * 0.01,
+                             fitted_width=threshold.mpv_sigma,
+                             fitted_width_error=threshold.mpv_sigma * 0.01,
+                             chi_square_reduced=1)
 
         fit.save()
 
@@ -215,8 +214,8 @@ class NagiosPluginTestCase(LiveServerTestCase):
         self.assertEqual(status[0], 0)
 
     def test_plugin_fit_below_thresholds(self):
-        """ Tests the check_pulseheight_mpv plugin in case of a fit below thresholds.
-            Should return exit code 2 (CRITICAL).
+        """ Tests the check_pulseheight_mpv plugin in case of a fit
+            below thresholds. Should return exit code 2 (CRITICAL).
         """
 
         # Initialize work space
@@ -230,15 +229,15 @@ class NagiosPluginTestCase(LiveServerTestCase):
         thresholds = MonitorPulseheightThresholds.objects.filter(station=summary.station)
         threshold = thresholds[1]
 
-        fit = PulseheightFit(source = summary,
-                             plate = threshold.plate,
-                             initial_mpv = threshold.mpv_mean * 0.2,
-                             initial_width = 50,
-                             fitted_mpv = threshold.mpv_mean * 0.3,
-                             fitted_mpv_error = threshold.mpv_mean * 0.3 * 0.01,
-                             fitted_width = threshold.mpv_sigma,
-                             fitted_width_error = threshold.mpv_sigma * 0.01,
-                             chi_square_reduced = 1)
+        fit = PulseheightFit(source=summary,
+                             plate=threshold.plate,
+                             initial_mpv=threshold.mpv_mean * 0.2,
+                             initial_width=50,
+                             fitted_mpv=threshold.mpv_mean * 0.3,
+                             fitted_mpv_error=threshold.mpv_mean * 0.3 * 0.01,
+                             fitted_width=threshold.mpv_sigma,
+                             fitted_width_error=threshold.mpv_sigma * 0.01,
+                             chi_square_reduced=1)
 
         fit.save()
 
@@ -253,8 +252,8 @@ class NagiosPluginTestCase(LiveServerTestCase):
         self.assertEqual(status[0], 2)
 
     def test_plugin_fit_above_thresholds(self):
-        """ Tests the check_pulseheight_mpv plugin in case of a fit above thresholds.
-            Should return exit code 2 (CRITICAL).
+        """ Tests the check_pulseheight_mpv plugin in case of a fit
+            above thresholds. Should return exit code 2 (CRITICAL).
         """
 
         # Initialize work space
@@ -268,15 +267,15 @@ class NagiosPluginTestCase(LiveServerTestCase):
         thresholds = MonitorPulseheightThresholds.objects.filter(station=summary.station)
         threshold = thresholds[1]
 
-        fit = PulseheightFit(source = summary,
-                             plate = threshold.plate,
-                             initial_mpv = threshold.mpv_mean * 2.2,
-                             initial_width = 50,
-                             fitted_mpv = threshold.mpv_mean * 2.3,
-                             fitted_mpv_error = threshold.mpv_mean * 2.3 * 0.01,
-                             fitted_width = threshold.mpv_sigma,
-                             fitted_width_error = threshold.mpv_sigma * 0.01,
-                             chi_square_reduced = 1)
+        fit = PulseheightFit(source=summary,
+                             plate=threshold.plate,
+                             initial_mpv=threshold.mpv_mean * 2.2,
+                             initial_width=50,
+                             fitted_mpv=threshold.mpv_mean * 2.3,
+                             fitted_mpv_error=threshold.mpv_mean * 2.3 * 0.01,
+                             fitted_width=threshold.mpv_sigma,
+                             fitted_width_error=threshold.mpv_sigma * 0.01,
+                             chi_square_reduced=1)
 
         fit.save()
 

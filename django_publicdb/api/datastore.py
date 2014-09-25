@@ -36,7 +36,7 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
 
     """
     event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' %
-                                  (timestamp, nanoseconds))[0]
+                                   (timestamp, nanoseconds))[0]
     traces_idx = event['traces']
     baselines = event['baseline']
     traces_str = [zlib.decompress(node.blobs[trace_idx]).split(',')
@@ -50,8 +50,8 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
 
 def get_station_node(file, station):
     node = file.get_node('/hisparc/cluster_%s/station_%d' %
-                        (station.cluster.main_cluster().lower(),
-                         station.number))
+                         (station.cluster.main_cluster().lower(),
+                          station.number))
     return node
 
 

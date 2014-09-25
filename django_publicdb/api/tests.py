@@ -103,4 +103,3 @@ class ViewsTestCase(LiveServerTestCase):
         json_data = json.loads(response.read())
         response = self.check_and_get_response("/countries/%d" %
                                                json_data[0]["number"])
-

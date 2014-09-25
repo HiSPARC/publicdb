@@ -638,8 +638,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         self.base_test_jobs_update_all_histograms_501_DATE1()
 
     @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
-                     "MySQL and multiprocessing don't seem to go well together,"
-                     "test passes, but then hangs indefinitely.")
+                     "MySQL and multiprocessing don't seem to go well together"
+                     ", test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
     def test_jobs_update_all_histograms_501_DATE1_multi_threaded(self):
         """Multi threaded histograms for station 501 on 2011/7/7"""
@@ -651,8 +651,8 @@ class UpdateAllHistogramsTestCase(BaseHistogramsTestCase):
         self.base_test_jobs_update_all_histograms_501_DATE2()
 
     @unittest.skipIf('mysql' in settings.DATABASES['default']['ENGINE'],
-                     "MySQL and multiprocessing don't seem to go well together,"
-                     "test passes, but then hangs indefinitely.")
+                     "MySQL and multiprocessing don't seem to go well together"
+                     ", test passes, but then hangs indefinitely.")
     @override_settings(USE_MULTIPROCESSING=True)
     def test_jobs_update_all_histograms_501_DATE2_multi_threaded(self):
         """Multi threaded histograms for station 501 on 2012/5/16"""

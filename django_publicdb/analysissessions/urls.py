@@ -1,7 +1,6 @@
 from django.conf.urls import patterns
 
-urlpatterns = patterns(
-    'django_publicdb.analysissessions.views',
+urlpatterns = patterns('django_publicdb.analysissessions.views',
     (r'^(?P<slug>[\w-]+)/data/$', 'data_display'),
 
     (r'^request/$', 'request_form'),
