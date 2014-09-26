@@ -397,7 +397,7 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
-        self.name = slugify(self.name)
+        self.name = unicode(slugify(self.name))
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
