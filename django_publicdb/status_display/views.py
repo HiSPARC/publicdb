@@ -14,7 +14,7 @@ import time
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
-from nagios import *
+from nagios import status_lists, get_status_counts, get_station_status
 
 
 FIRSTDATE = datetime.date(2002, 1, 1)
