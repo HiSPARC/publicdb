@@ -111,7 +111,7 @@
 
 - name: enable cron job for creating analysis sessions
   cron: name="create confirmed sessions" cron_file=hisparc
-        month=* weekday=* day=* hour=* minute=*
+        minute=* hour=* day=* month=* weekday=*
         state=present user=hisparc
         job="curl http://data.hisparc.nl/analysis-session/request/create/"
   sudo: yes
