@@ -108,3 +108,10 @@
         state=present user=root
         job="find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
   sudo: yes
+
+- name: enable cron job for creating analysis sessions
+  cron: name="create confirmed sessions" cron_file=hisparc
+        month=* weekday=* day=* hour=* minute=*
+        state=present user=hisparc
+        job="curl http://data.hisparc.nl/analysis-session/request/create/"
+  sudo: yes
