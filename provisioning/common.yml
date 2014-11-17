@@ -1,4 +1,8 @@
 ---
+- name: upgrade all packages
+  yum: name=* state=latest
+  sudo: yes
+
 - name: ensure /usr/local/bin is in sudoers
   lineinfile: dest=/etc/sudoers regexp='secure_path'
               line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
