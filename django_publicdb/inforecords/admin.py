@@ -1,7 +1,5 @@
 from django.contrib import admin
 from models import *
-from django.utils.encoding import force_unicode
-from django.utils.functional import update_wrapper
 
 
 class ClusterAdmin(admin.ModelAdmin):
