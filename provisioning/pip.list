@@ -1,7 +1,7 @@
 uWSGI
 uwsgitop
 
-Django==1.5.10
+Django==1.6.8
 South
 recaptcha-client
 
