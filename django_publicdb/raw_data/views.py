@@ -610,3 +610,13 @@ def single_day_ranges(start, end):
         cur = next_day
         next_day = cur + datetime.timedelta(days=1)
     yield cur, end
+
+
+def get_lightning_path(date):
+    """Return a reference to the raw data file on a specified date"""
+
+    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.tm_year,
+                                                           date.tm_mon))
+    name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon,
+                                              date.tm_mday))
+    return name
