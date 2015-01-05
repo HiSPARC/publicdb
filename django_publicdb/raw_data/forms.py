@@ -4,7 +4,8 @@ from django_publicdb.inforecords.models import Station, Cluster
 
 
 TYPES = [('events', 'Events'),
-         ('weather', 'Weather')]
+         ('weather', 'Weather'),
+         ('lightning', ' Lightning')]  # added for lightning
 FILTER = [('network', 'Network'),
           ('cluster', 'Cluster'),
           ('stations', 'Stations')]
@@ -15,7 +16,7 @@ class LightningDownloadForm(forms.Form):
                                           "'2013-5-17 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2013-5-18', or "
                                         "'2013-5-18 9:05'")
-#     lightning_type = forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect())
+    lightning_type = forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect())
     download = forms.BooleanField(required=False)
 
 

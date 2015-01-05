@@ -22,7 +22,8 @@ from django_publicdb.inforecords.models import Station, Cluster
 from django_publicdb.histograms.models import Summary, NetworkSummary
 from django_publicdb.histograms import esd
 from django_publicdb.raw_data.forms import (DataDownloadForm,
-                                            CoincidenceDownloadForm)
+                                            CoincidenceDownloadForm,
+                                            LightningDownloadForm)
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
