@@ -86,3 +86,6 @@
 - name: install screen
   yum: name=screen
   sudo: yes
+
+- name: use custom .bashrc
+  copy: src=bashrc dest=~/.bashrc backup=yes
