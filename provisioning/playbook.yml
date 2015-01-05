@@ -5,3 +5,7 @@
     - include: mysqldb.yml mysql_root_password=Data4admin!
     - include: development.yml
     - include: publicdb.yml mysql_password=Data4user!
+
+- hosts: vagrant
+  tasks:
+    - include: fake_datastore.yml
