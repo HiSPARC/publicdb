@@ -5,11 +5,15 @@
 #
 #
 # This data contains the following columns:
+# Currently lightning is all type 4: Cloud -> ground discharge 
 #
-# date:                 time of event [GPS calendar date]
-# timestamp:            time of event [UNIX timestamp]
-
-# wind_chill:           perceived temperature taking wind into account [deg C]
+# date:                time of event [GPS calendar date]
+# time:                time of event [GPS time of day]
+# timestamp:           time of event [UNIX timestamp]
+# nanoseconds:         time of event upto microsecond accuracy [number of nanoseconds after timestamp]
+# latitude:            latitude of discharge [degrees]
+# longitude:           longitude of discharge [degrees]
+# current:             discharge in amps [Ampere]
 #
 # Values of -1 or -999 indicate a problem in that measurement or
 # the absence of that sensor.
