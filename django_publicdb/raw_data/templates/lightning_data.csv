@@ -1,12 +1,13 @@
 # Event Summary Data - Lightning
 #
+# Showing only lightning of type {{ lightning_type }}
 #
 # Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
 #
-# Data from KNMI: Royal Dutch Meteorological Institute.
+# Data from KNMI: Royal Dutch Meteorological Institute
+#
 #
 # This data contains the following columns:
-# Currently lightning is all type 4: Cloud -> ground discharge 
 #
 # date:                time of event [GPS calendar date]
 # time:                time of event [GPS time of day]

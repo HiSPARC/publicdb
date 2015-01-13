@@ -37,8 +37,10 @@ HiSPARC coincidences download form
 <form action='/data/download/coincidences/' method="post">
     {% csrf_token %}
     <p>
-        {{ form.filter_by.errors }}{{ form.cluster.errors }}{{ form.stations.errors }}
-        {{ form.filter_by.label_tag }}:
+        {{ form.filter_by.errors }}
+        {{ form.cluster.errors }}
+        {{ form.stations.errors }}
+        {{ form.filter_by.label_tag }}
     </p>
     <ul>
         <li>{{ form.filter_by.0 }}</li>
@@ -55,25 +57,25 @@ HiSPARC coincidences download form
     </ul>
     <p>
         {{ form.start.errors }}
-        {{ form.start.label_tag }}:
+        {{ form.start.label_tag }}
         {{ form.start }}
         <span class="helptext">{{ form.start.help_text }}</span>
     </p>
     <p>
         {{ form.end.errors }}
-        {{ form.end.label_tag }}:
+        {{ form.end.label_tag }}
         {{ form.end }}
         <span class="helptext">{{ form.end.help_text }}</span>
     </p>
     <p>
         {{ form.n.errors }}
-        {{ form.n.label_tag }}:
+        {{ form.n.label_tag }}
         {{ form.n }}
         <span class="helptext">{{ form.n.help_text }}</span>
     </p>
     <p>
         {{ form.download.errors }}
-        {{ form.download.label_tag }}:
+        {{ form.download.label_tag }}
         {{ form.download }}
         <span class="helptext">{{ form.download.help_text }}</span>
     </p>
@@ -81,6 +83,10 @@ HiSPARC coincidences download form
     <input type="submit" value="Submit">
 </form>
 
-<p class="small"><a href="{% url 'raw_data.views.download_form' %}">Switch to station data download form</a></p>
+<p class="small">
+    <a href="{% url 'raw_data.views.download_form' %}">
+        Switch to station data download form
+    </a>
+</p>
 
 {% endblock %}
