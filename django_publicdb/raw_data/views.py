@@ -231,7 +231,7 @@ def download_data(request, data_type='events', station_number=None,
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type="text/plain")
         csv_output = generate_lightning_as_csv(lightning_type, start, end)
-        filename = 'lightning-%s.csv' % (timerange_string)
+        filename = 'lightning-knmi-%s.csv' % (timerange_string)
 
     response = StreamingHttpResponse(csv_output, content_type='text/csv')
 
