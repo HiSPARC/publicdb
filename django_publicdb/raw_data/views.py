@@ -24,6 +24,8 @@ from django_publicdb.histograms import esd
 from django_publicdb.raw_data.forms import (DataDownloadForm,
                                             CoincidenceDownloadForm)
 
+import knmi_lightning
+
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
@@ -145,41 +147,52 @@ def download_form(request, station_number=None, start=None, end=None):
     if request.method == 'POST':
         form = DataDownloadForm(request.POST)
         if form.is_valid():
-            station = form.cleaned_data['station']
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
             data_type = form.cleaned_data['data_type']
             query_string = urllib.urlencode({'start': start, 'end': end,
                                              'download': download})
-            return HttpResponseRedirect('/data/%d/%s/?%s' %
-                                        (station.number, data_type,
-                                         query_string))
+            if data_type == 'lightning':
+                lightning_type = form.cleaned_data['lightning_type']
+                return HttpResponseRedirect('/data/knmi/%s/%s/?%s' %
+                                            (data_type, lightning_type,
+                                             query_string))
+            else:
+                station = form.cleaned_data['station']
+                return HttpResponseRedirect('/data/%d/%s/?%s' %
+                                            (station.number, data_type,
+                                             query_string))
     else:
         if station_number:
             station = get_object_or_404(Station, number=station_number)
         else:
             station = None
-        form = DataDownloadForm(initial={'station': station,
-                                         'start': start,
+        form = DataDownloadForm(initial={'start': start,
                                          'end': end,
                                          'data_type': 'events'})
 
     return render(request, 'data_download.html', {'form': form})
 
 
-def download_data(request, station_number, data_type='events'):
+def download_data(request, data_type='events', station_number=None,
+                  lightning_type=None):
     """Download data.
 
-    :param station_number: station number
-    :param data_type: (optional) choose between event and weather data
+    :param data_type: (optional) choose between event, weather, and
+                      lightning data
+    :param station_number: (optional) station number, required for event
+                           and weather data
+    :param lightning_type: (optional) lightning type, required for lightning
+                           data
     :param start: (optional, GET) start of data range
     :param end: (optional, GET) end of data range
     :param download: (optional, GET) download the csv
 
     """
-    station_number = int(station_number)
-    station = get_object_or_404(Station, number=station_number)
+    if data_type in ['events', 'weather']:
+        station_number = int(station_number)
+        station = get_object_or_404(Station, number=station_number)
 
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     yesterday = datetime.datetime.combine(yesterday, datetime.time())
@@ -206,12 +219,19 @@ def download_data(request, station_number, data_type='events'):
         download = False
 
     timerange_string = prettyprint_timerange(start, end)
-    if data_type == 'weather':
-        csv_output = generate_weather_as_csv(station, start, end)
-        filename = 'weather-s%d-%s.csv' % (station_number, timerange_string)
-    elif data_type == 'events':
+    if data_type == 'events':
         csv_output = generate_events_as_csv(station, start, end)
         filename = 'events-s%d-%s.csv' % (station_number, timerange_string)
+    elif data_type == 'weather':
+        csv_output = generate_weather_as_csv(station, start, end)
+        filename = 'weather-s%d-%s.csv' % (station_number, timerange_string)
+    elif data_type == 'lightning':
+        lightning_type = int(lightning_type)
+        if lightning_type not in range(6):
+            msg = ("Incorrect lightning type, should be a value between 0-5")
+            return HttpResponseBadRequest(msg, content_type="text/plain")
+        csv_output = generate_lightning_as_csv(lightning_type, start, end)
+        filename = 'lightning-%s.csv' % (timerange_string)
 
     response = StreamingHttpResponse(csv_output, content_type='text/csv')
 
@@ -324,8 +344,7 @@ def generate_weather_as_csv(station, start, end):
                clean_floats(event['rain_rate'], precision=2),
                event['heat_index'],
                clean_floats(event['dew_point'], precision=2),
-               clean_floats(event['wind_chill'], precision=2),
-               ]
+               clean_floats(event['wind_chill'], precision=2)]
         writer.writerow(row)
         yield line_buffer.line
         weather_returned = True
@@ -356,6 +375,60 @@ def get_weather_from_esd_in_range(station, start, end):
                 ts1 = calendar.timegm(t1.utctimetuple())
                 for event in station_node.weather.where(
                         '(ts0 <= timestamp) & (timestamp < ts1)'):
+                    yield event
+        except (IOError, tables.NoSuchNodeError):
+            continue
+
+
+def generate_lightning_as_csv(lightning_type, start, end):
+    """Render CSV output as an iterator."""
+
+    types = ('Single-point', 'Cloud-cloud', 'Cloud-cloud mid',
+             'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
+    type_str = '%d: %s' % (lightning_type, types[lightning_type])
+
+    t = loader.get_template('lightning_data.csv')
+    c = Context({'lightning_type': type_str, 'start': start, 'end': end})
+
+    yield t.render(c)
+
+    line_buffer = SingleLineStringIO()
+    writer = csv.writer(line_buffer, delimiter='\t')
+    lightning_returned = False
+
+    events = get_lightning_in_range(lightning_type, start, end)
+    for event in events:
+        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
+        row = [dt.date(), dt.time(),
+               event['timestamp'],
+               event['nanoseconds'],
+               clean_floats(event['latitude'], precision=6),
+               clean_floats(event['longitude'], precision=6),
+               int(event['current'])]
+        writer.writerow(row)
+        yield line_buffer.line
+        lightning_returned = True
+
+    if not lightning_returned:
+        yield "# No lightning data found for the chosen query."
+
+
+def get_lightning_in_range(lightning_type, start, end):
+    """Get lightning in time range.
+
+    :param lightning_type: lighting of specific type
+    :param start: start of datetime range
+    :param end: end of datetime range
+
+    """
+    for t0, t1 in single_day_ranges(start, end):
+        filepath = knmi_lightning.data_path(t0)
+        try:
+            with tables.open_file(filepath) as f:
+                ts0 = calendar.timegm(t0.utctimetuple())
+                ts1 = calendar.timegm(t1.utctimetuple())
+                for event in knmi_lightning.discharges(f, ts0, ts1,
+                                                       type=lightning_type):
                     yield event
         except (IOError, tables.NoSuchNodeError):
             continue
@@ -610,3 +683,13 @@ def single_day_ranges(start, end):
         cur = next_day
         next_day = cur + datetime.timedelta(days=1)
     yield cur, end
+
+
+def get_lightning_path(date):
+    """Return a reference to the raw data file on a specified date"""
+
+    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.tm_year,
+                                                           date.tm_mon))
+    name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon,
+                                              date.tm_mday))
+    return name
