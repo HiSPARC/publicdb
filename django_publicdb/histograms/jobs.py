@@ -170,6 +170,7 @@ def update_all_histograms():
             perform_update_tasks()
             state.update_last_run = update_last_run
         finally:
+            django.db.close_connection()
             state.update_is_running = False
             state.save()
 
