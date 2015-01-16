@@ -377,7 +377,7 @@ def update_gps_coordinates():
         else:
             if config.gps_latitude == 0. and config.gps_longitude == 0.:
                 logger.error('Invalid GPS location (0, 0) for station: %s' %
-                             station)
+                             detector.station)
             else:
                 detector.latitude = config.gps_latitude
                 detector.longitude = config.gps_longitude
