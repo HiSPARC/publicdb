@@ -294,6 +294,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
             exec "summary.%s=False" % needs_update_item
+            django.db.close_connection()
             summary.save()
         worker_pool.close()
         worker_pool.join()
@@ -301,6 +302,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         for summary in summaries:
             perform_certain_tasks(summary)
             exec "summary.%s=False" % needs_update_item
+            django.db.close_connection()
             summary.save()
 
 
@@ -386,6 +388,7 @@ def update_gps_coordinates():
                 detector.latitude = config.gps_latitude
                 detector.longitude = config.gps_longitude
                 detector.height = config.gps_altitude
+                django.db.close_connection()
                 detector.save()
 
 
@@ -527,6 +530,7 @@ def update_config(summary):
                 vars(new_config)[var] = ts
             else:
                 vars(new_config)[var] = config[var]
+        django.db.close_connection()
         new_config.save()
 
     num_config = len(configs)
