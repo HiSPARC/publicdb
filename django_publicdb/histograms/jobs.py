@@ -202,6 +202,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
+            django.db.close_connection()
             summary.save()
 
         worker_pool.close()
@@ -214,6 +215,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
+            django.db.close_connection()
             summary.save()
 
 
@@ -234,6 +236,7 @@ def update_coincidences():
 
         for network_summary in results:
             network_summary.needs_update = False
+            django.db.close_connection()
             network_summary.save()
 
         worker_pool.close()
@@ -242,6 +245,7 @@ def update_coincidences():
         for network_summary in network_summaries:
             network_summary = search_and_store_coincidences_for_network_summary(network_summary)
             network_summary.needs_update = False
+            django.db.close_connection()
             network_summary.save()
 
 
