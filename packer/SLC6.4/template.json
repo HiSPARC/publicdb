@@ -16,7 +16,6 @@
       "shutdown_command": "echo '!Usr4hisp' | sudo -S shutdown -P now"
     }
   ],
-  "post-processors": null,
   "provisioners": [
     {
       "override": {
@@ -33,5 +32,6 @@
       ],
       "type": "shell"
     }
-  ]
+  ],
+  "post-processors": ["vagrant"]
 }
