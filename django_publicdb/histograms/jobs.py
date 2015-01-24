@@ -170,6 +170,7 @@ def update_all_histograms():
             perform_update_tasks()
             state.update_last_run = update_last_run
         finally:
+            django.db.close_connection()
             state.update_is_running = False
             state.save()
 
@@ -201,6 +202,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
+            django.db.close_connection()
             summary.save()
 
         worker_pool.close()
@@ -213,6 +215,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
+            django.db.close_connection()
             summary.save()
 
 
@@ -233,6 +236,7 @@ def update_coincidences():
 
         for network_summary in results:
             network_summary.needs_update = False
+            django.db.close_connection()
             network_summary.save()
 
         worker_pool.close()
@@ -241,6 +245,7 @@ def update_coincidences():
         for network_summary in network_summaries:
             network_summary = search_and_store_coincidences_for_network_summary(network_summary)
             network_summary.needs_update = False
+            django.db.close_connection()
             network_summary.save()
 
 
@@ -289,6 +294,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
             exec "summary.%s=False" % needs_update_item
+            django.db.close_connection()
             summary.save()
         worker_pool.close()
         worker_pool.join()
@@ -296,6 +302,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         for summary in summaries:
             perform_certain_tasks(summary)
             exec "summary.%s=False" % needs_update_item
+            django.db.close_connection()
             summary.save()
 
 
@@ -376,11 +383,12 @@ def update_gps_coordinates():
         else:
             if config.gps_latitude == 0. and config.gps_longitude == 0.:
                 logger.error('Invalid GPS location (0, 0) for station: %s' %
-                             station)
+                             detector.station)
             else:
                 detector.latitude = config.gps_latitude
                 detector.longitude = config.gps_longitude
                 detector.height = config.gps_altitude
+                django.db.close_connection()
                 detector.save()
 
 
@@ -522,6 +530,7 @@ def update_config(summary):
                 vars(new_config)[var] = ts
             else:
                 vars(new_config)[var] = config[var]
+        django.db.close_connection()
         new_config.save()
 
     num_config = len(configs)

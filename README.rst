@@ -231,6 +231,7 @@ There are also non-functional tests and they include among other things:
 - Security testing
 - Stress testing
 
+
 Running tests
 ^^^^^^^^^^^^^
 
@@ -248,6 +249,7 @@ For example::
     $ ./manage.py test histograms
     $ ./manage.py test histograms.PulseheightFitTestCase
     $ ./manage.py test histograms.PulseheightFitTestCase.test_jobs_update_pulseheight_fit_normal
+
 
 Longer story
 ############
@@ -275,7 +277,7 @@ Tests can also be run by executing the next line::
 
     $ ./manage.py test
 
-however this also include the tests defined in the Django framework itself and
+however, this also include the tests defined in the Django framework itself and
 is not recommended.
 
 Tests for an application consists of one or more test cases. Each can be
@@ -296,6 +298,7 @@ following expected syntax::
 For example
 
     $ ./manage.py test histograms.PulseheightFitTestCase.test_jobs_update_pulseheight_fit_normal
+
 
 Writing tests
 ^^^^^^^^^^^^^

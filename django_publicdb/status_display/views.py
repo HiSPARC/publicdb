@@ -322,11 +322,6 @@ def station_data(request, station_number, year, month, day):
         has_config = False
 
     try:
-        is_active = Pc.objects.filter(station=station)[0].is_active
-    except IndexError:
-        is_active = False
-
-    try:
         coincidences_found = NetworkSummary.objects.get(date=date)
     except NetworkSummary.DoesNotExist:
         coincidences_found = False
@@ -363,27 +358,24 @@ def station_data(request, station_number, year, month, day):
          'next': next,
          'link': (station_number, year, month, day),
          'has_data': True,
-         'is_active': is_active,
          'has_config': has_config,
          'coincidences_found': coincidences_found},
         context_instance=RequestContext(request))
 
 
 def station_status(request, station_number):
-    """Show daily histograms for a particular station"""
+    """Show Nagios status for a particular station"""
 
     station_number = int(station_number)
 
     station = get_object_or_404(Station, number=station_number)
-    pc = get_object_or_404(Pc, ~Q(type__slug='admin'), station=station)
+    # Check if there is at least one non-admin pc for the station
+    pcs = get_list_or_404(Pc, ~Q(type__slug='admin'), station=station)
+    # Get the first active Pc, if there are non get an inactive Pc
+    pc = next((pc for pc in pcs if pc.is_active), pcs[0])
 
     has_data = station_has_data(station)
-
-    try:
-        Configuration.objects.filter(source__station=station)[0]
-        has_config = True
-    except IndexError:
-        has_config = False
+    has_config = Configuration.objects.filter(source__station=station).exists()
 
     return render_to_response('station_status.html',
         {'station': station,
@@ -407,11 +399,6 @@ def station_config(request, station_number):
 
     has_data = station_has_data(station)
 
-    try:
-        is_active = Pc.objects.filter(station=station)[0].is_active
-    except IndexError:
-        is_active = False
-
     config = configs[-1]
     if config.slv_version.count('0') == 2:
         has_slave = False
@@ -432,7 +419,6 @@ def station_config(request, station_number):
          'gpstrack': gpstrack,
          'has_slave': has_slave,
          'has_data': has_data,
-         'is_active': is_active,
          'has_config': True,
          'coincidences_found': True},
         context_instance=RequestContext(request))
@@ -953,15 +939,11 @@ def station_has_data(station):
              weather or shower, between 2002 and now.
 
     """
-    try:
-        Summary.objects.filter(Q(station=station),
-                               Q(num_events__isnull=False) |
-                               Q(num_weather__isnull=False),
-                               date__gte=FIRSTDATE,
-                               date__lte=datetime.date.today())[0]
-        has_data = True
-    except IndexError:
-        has_data = False
+    has_data = Summary.objects.filter(Q(station=station),
+                                      Q(num_events__isnull=False) |
+                                      Q(num_weather__isnull=False),
+                                      date__gte=FIRSTDATE,
+                                      date__lte=datetime.date.today()).exists()
 
     return has_data
 

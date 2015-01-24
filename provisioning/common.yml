@@ -1,16 +1,4 @@
 ---
-- name: scientific linux 6 repo file (with NL mirror!)
-  copy: src=sl.repo
-        dest=/etc/yum.repos.d/
-        owner=root group=root mode=0644
-  sudo: yes
-
-- name: scientific linux 6x repo file (with NL mirror!)
-  copy: src=sl6x.repo
-        dest=/etc/yum.repos.d/
-        owner=root group=root mode=0644
-  sudo: yes
-
 - name: upgrade all packages
   yum: name=* state=latest
   sudo: yes

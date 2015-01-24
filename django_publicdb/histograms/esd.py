@@ -49,7 +49,7 @@ def search_coincidences_and_store_in_esd(network_summary):
                       for station in stations]
 
     # FIXME: Gets *latest* known positions, which may be wrong.
-    cluster = clusters.HiSPARCStations(station_numbers)
+    cluster = clusters.HiSPARCStations(station_numbers, allow_missing=True)
 
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:

@@ -102,10 +102,7 @@ def station(request, station_number, year=None, month=None, day=None):
             Summary.DoesNotExist, Configuration.DoesNotExist):
         return HttpResponseNotFound()
 
-    try:
-        is_active = Pc.objects.filter(station=station)[0].is_active
-    except IndexError:
-        is_active = False
+    is_active = Pc.objects.filter(station=station, is_active=True).exists()
 
     mpv_fits = []
 
@@ -637,11 +634,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    try:
-        a_summary_exists = summaries[0]
-        has_data = True
-    except IndexError:
-        has_data = False
+    has_data = summaries.exists()
 
     return json_dict(has_data)
 

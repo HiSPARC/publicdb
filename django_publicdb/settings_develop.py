@@ -37,6 +37,9 @@ TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = os.path.join(publicdb_path, 'esd')
 
+# Path of the mounted KNMI Lightning data root folder
+LGT_PATH = os.path.join(publicdb_path, 'knmi_lightning')
+
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'
@@ -202,6 +205,10 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'django.security.DisallowedHost': {
+            'handlers': ['null_handler'],
+            'propagate': False,
         },
         'django.db.backends': {
             'handlers': ['null_handler'],
