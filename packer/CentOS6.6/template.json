@@ -15,10 +15,18 @@
 
       "ssh_username": "hisparc",
       "ssh_password": "!Usr4hisp"
+    },
+    {
+      "type": "null",
+      "host": "127.0.0.1",
+      "port": 2022,
+      "ssh_username": "hisparc",
+      "ssh_private_key_file": "../../.vagrant/machines/vagrant/virtualbox/private_key"
     }
   ],
   "provisioners": [
     {
+      "only": ["virtualbox-iso"],
       "type": "shell",
       "scripts": [
         "scripts/base.sh",
@@ -27,7 +35,19 @@
         "scripts/cleanup.sh",
         "scripts/zerodisk.sh"
       ],
-      "execute_command": "echo '!Usr4hisp' | {{ .Vars }} sudo -E -S sh '{{ .Path }}'"
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
+    },
+    {
+      "type": "shell",
+      "inline": [
+        "sudo yum -y install epel-release",
+        "sudo yum -y install ansible"
+      ]
+    },
+    {
+      "type": "ansible-local",
+      "playbook_file": "../../provisioning/playbook.yml",
+      "playbook_dir": "../../provisioning/"
     }
   ],
   "post-processors": ["vagrant"]
