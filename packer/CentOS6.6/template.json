@@ -3,8 +3,6 @@
     {
       "type": "virtualbox-iso",
       "guest_os_type": "RedHat_64",
-      "ssh_username": "hisparc",
-      "ssh_password": "!Usr4hisp",
       "iso_url": "http://ftp.tudelft.nl/centos.org/6.6/isos/x86_64/CentOS-6.6-x86_64-netinstall.iso",
       "iso_checksum": "2560335ef975907799251ae9d6a0fa2e4d289704",
       "iso_checksum_type": "sha1",
@@ -13,7 +11,10 @@
       "boot_command": [
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
       ],
-      "shutdown_command": "echo '!Usr4hisp' | sudo -S shutdown -P now"
+      "shutdown_command": "echo '!Usr4hisp' | sudo -S shutdown -P now",
+
+      "ssh_username": "hisparc",
+      "ssh_password": "!Usr4hisp"
     }
   ],
   "provisioners": [
