@@ -37,9 +37,9 @@
   copy: src=pip.list dest=/home/{{ ansible_user_id }}/
 
 - name: create conda environment
-  command: creates=/srv/publicdb/publicdb_env
-           /opt/miniconda/bin/conda create -p /srv/publicdb/publicdb_env python
-           --yes
+  shell: creates=/srv/publicdb/publicdb_env
+         yes | /opt/miniconda/bin/conda create
+         -p /srv/publicdb/publicdb_env python --yes
 
 - name: install conda packages in conda environment
   command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
