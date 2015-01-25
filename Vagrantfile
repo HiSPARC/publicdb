@@ -6,8 +6,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "vagrant" do |machine|
-    machine.vm.box = "SLC6.4"
-    machine.vm.box_url = "veewee/SLC6.4.box"
+    machine.vm.box = "CentOS6.6"
+    machine.vm.box_url = "packer/CentOS6.6/packer_virtualbox-iso_virtualbox.box"
   end
 
   config.vm.network "forwarded_port", guest: 80, host: 8080
