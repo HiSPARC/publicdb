@@ -7,6 +7,8 @@
       "iso_checksum": "2560335ef975907799251ae9d6a0fa2e4d289704",
       "iso_checksum_type": "sha1",
 
+      "disk_size": 10240,
+
       "http_directory": "http",
       "boot_command": [
         "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
