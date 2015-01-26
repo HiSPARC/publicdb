@@ -24,23 +24,26 @@ Using Vagrant to run inside a virtual machine
 
 We use `Vagrant <http://www.vagrantup.com>`_ to set up a virtual machine
 nearly identical to our production server *Pique*.  You can download
-Vagrant binaries for all major platforms.
+Vagrant binaries for all major platforms.  On a Mac::
+
+   $ brew tap Caskroom/cask
+   $ brew install Caskroom/cask/vagrant
 
 To correctly provision the VM, you need to have Python installed, with the
-`Ansible <http://www.ansibleworks.com>`_ package::
+`Ansible <http://www.ansibleworks.com>`_ package, available from PyPI.  On
+a Mac::
 
-    $ pip install ansible
+    $ brew install ansible
 
 Then, navigate to the publicdb repository root and::
 
     $ vagrant up
 
-Building a vagrant box for the first time takes approximately 50 minutes.
 You can ssh into you box by issuing::
 
     $ vagrant ssh
 
-or you can reach it at 192.168.10.10.  To halt the VM, issue::
+To halt the VM, issue::
 
     $ vagrant halt
 
@@ -49,136 +52,30 @@ Please consult the `Vagrant documentation
 Vagrant.
 
 
-Setting up a personal development environment
----------------------------------------------
+Creating the Vagrant base box
+-----------------------------
 
-Besides all the Python packages that will need to be installed next you
-also need the HDF5 libraries.  These are required to work with the h5 data
-files and to install the python tables package.  If your system does not
-provide a recent versions of these libraries, download the source::
+The Vagrant base box is created using `Packer <https://www.packer.io>`_.
+We formerly used Veewee, but Packer sees more active development and
+allows us to pre-provision the base box.  If you want to build your own
+base box, you can install Packer on a Mac using::
 
-    $ wget http://www.hdfgroup.org/ftp/HDF5/prev-releases/hdf5-1.8.9/src/hdf5-1.8.9.tar.gz
-    $ tar xvzf hdf5-1.8.9.tar.gz
-    $ cd hdf5-1.8.9
+    $ brew install Caskroom/cask/packer
 
-Then apply this patch::
+Then, navigate to the packer/CentOS6.6/ directory and issue::
 
-    --- CMakeLists.txt (revision 22471)
-    +++ CMakeLists.txt (working copy)
-    @@ -884,7 +884,7 @@
-    -        ${HDF5_SOURCE_DIR}/release_docs/Using_CMake.txt
-    +        ${HDF5_SOURCE_DIR}/release_docs/USING_CMake.txt
+    $ packer build template.json
 
-And continue the build::
+If you need to really make sure the new box is used, remove the old box
+from Vagrant::
 
-    $ ./configure --prefix=/usr/local
-    $ make
-    $ make install
-    $ ldconfig
+    $ vagrant box remove CentOS6.6
 
-We recommend you to use virtualenv (with virtualenvwrapper) to set up an
-isolated python environment.  Throughout this document we assume you have
-pip installed and we prefer that above easy_install.  You can install pip
-with::
-
-    $ easy_install pip
-
-And virtualenv/virtualenvwrapper with::
-
-    $ pip install virtualenvwrapper
-
-Add this line to your login file (.bashrc) and restart your Terminal::
-
-    source [PATHTO]/virtualenvwrapper.sh
-
-Create a clean environment with::
-
-    $ mkvirtualenv --distribute publicdb
-
-where you can replace *publicdb* with any name you like.  If the
-environment is not already automatically activated, do that with::
-
-    $ workon publicdb
-
-
-Python Packages
-^^^^^^^^^^^^^^^
-
-We will now populate this environment with all prerequisites.  To
-duplicate the environment used while writing this documentation, use the
-following instructions, including version numbers.  To install the latest
-versions of the software, drop the `==<version>` part.  For example, you
-can install ipython 0.13.1 using::
-
-    $ pip install ipython==0.13.2
-
-Alternatively, install the latest version with::
-
-    $ pip install ipython
-
-The complete requirements and installation instructions are::
-
-    $ pip install ipython
-
-    $ pip install numpy
-
-    $ pip install Cython
-    $ pip install numexpr
-    $ pip install tables
-
-    $ pip install recaptcha-client
-
-    $ pip install Django
-    $ pip install South
-    $ pip install docutils
-
-    $ pip install progressbar2
-    $ pip install mock
-    $ pip install scipy
-    $ pip install matplotlib
-    $ pip install hisparc-sapphire
-
-You now have all the prerequisites for running the publicdb django app.
-For reference, the results from `pip freeze`::
-
-    $ pip freeze
-    Cython==0.19.1
-    Django==1.5.1
-    South==0.8.1
-    distribute==0.6.34
-    docutils==0.10
-    ipython==0.13.2
-    matplotlib==1.2.1
-    mock==1.0.1
-    numexpr==2.1
-    numpy==1.7.1
-    progressbar==2.6.7
-    recaptcha-client==1.0.6
-    sapphire==0.9.20
-    scipy==0.12.0
-    tables==3.0.0
-    wsgiref==0.1.2
-
-Note for Mac OS X users: python has trouble detecting the default locale.
-Before continuing, it's best to type this into your terminal::
-
-    $ export LC_ALL=en_US.UTF-8
-
-Navigate to the `django_publicdb` folder and populate (and migrate) a test
-database with::
-
-    $ cp settings_develop.py settings.py
-    $ ./manage.py syncdb
-    $ ./manage.py migrate
+And you can simply `vagrant up`.
 
 
 Hints for running a development publicdb server
 -----------------------------------------------
-
-First, we assume that you're working in the virtualenv you created
-previously::
-
-    $ workon publicdb
 
 In order to create a tiny copy of the datastore for development purposes,
 do::
@@ -188,11 +85,6 @@ do::
 To generate the histograms for the downloaded data::
 
     $ python scripts/hisparc-update.py
-
-You can start the Django development server from inside the Django app
-directory (the one containing your settings.py) with::
-
-    $ ./manage.py runserver
 
 
 Testing
@@ -414,128 +306,3 @@ Applications such as "histograms" and "analysissessions" require event data.
 Their test suite include functionality to download event data from
 data.hisparc.nl. The downloaded files are stored in the path specified by the
 variable TEST_DATASTORE_PATH in the file settings.py.
-
-
-Deployment
-----------
-
-We recently ditched Apache.  We've had problems with mod_wsgi before and
-now Apache proper (or mod_wsgi) was breaking our streaming HTTP response
-for downloading the event summary data.  So, finally, we're moving to a
-modern solution: `uWSGI <http://projects.unbit.it/uwsgi/>`_.  We've taken
-the opportunity to clean up a few things.
-
-Following the FHS, we've deployed the public database code in ``/srv``.
-We've created a ``publicdb`` directory containing a virtualenv, git
-repository and static files.  The ``hisparc`` group has write access and
-using ACLs all newly-created files have group write permissions.  As
-root::
-
-    $ cd /srv
-    $ mkdir publicdb
-    $ chown hisparc.hisparc publicdb
-    $ chmod g+rwx publicdb
-
-To set a default ACL entry granting group write permissons for all files,
-type::
-
-    $ setfacl -m d:g::rwx publicdb
-
-Now we can drop root privileges and continue as a regular user, which must
-be a member of the ``hisparc`` group.  To clone the publicdb git
-repository::
-
-    $ cd publicdb
-    $ git clone https://github.com/HiSPARC/publicdb.git www
-
-Unfortunately, due to some unknown quirk, ``git clone`` does not respect
-the default ACL entry, so we have to grant group write permissions::
-
-    $ chmod g+w www
-
-Then, create the directory holding the static files::
-
-    $ mkdir static
-
-Create a python virtualenv for the web server::
-
-    $ virtualenv --distribute publicdb_env
-
-Be sure to activate the virtualenv whenever you work on the web server::
-
-    $ source /srv/publicdb/publicdb_env/bin/activate
-
-Or, if you're stuck with a csh::
-
-    $ source /srv/publicdb/publicdb_env/bin/activate.csh
-
-At this point we've followed the python package install instructions as
-documented in the `Python Packages`_ section.  Furthermore, we need some
-additional packages to install the uWSGI server, and access the MySQL
-database::
-
-    $ pip install uwsgi uwsgitop
-    $ pip install mysql-python
-
-At this point it is necessary to modify Django's ``settings.py`` for
-production.  We've used ``settings_develop.py`` as a starting point.  The
-``settings.py`` file is added to ``.gitignore``, so you don't have to
-worry about accidentally committing sensitive information.  To deploy the
-static files::
-
-    $ cd /srv/publicdb/www/django_publicdb/
-    $ ./manage.py collectstatic
-
-This has to be repeated whenever a commit introduces new or changed static
-files.
-
-We've installed `supervisor <http://supervisord.org>`_ to manage the uWSGI
-process.  Unfortunately, Scientific Linux contains an archaic version
-which uses up 100 % CPU when child process redirects the output for
-logging purposes.  Now, we let supervisord do the logging.
-
-We've added the following program entry::
-
-    [program:uwsgi]
-    command=/srv/publicdb/publicdb_env/bin/uwsgi --ini /srv/publicdb/www/uwsgi.ini
-    stopsignal=INT
-    logfile=/var/log/uwsgi.log
-    log_stdout=true
-    log_stderr=true
-
-The uWSGI config file currently in production::
-
-    [uwsgi]
-    master = True
-    master-as-root = True
-    uid = hisparc
-    gid = hisparc
-
-    processes = 9
-    threads = 4
-    http-timeout = 300
-
-    http = 0.0.0.0:80
-    stats = 127.0.0.1:9191
-
-    chdir = /srv/publicdb/www/django_publicdb/
-    home = /srv/publicdb/publicdb_env/
-    pythonpath = ..
-    env = DJANGO_SETTINGS_MODULE=django_publicdb.settings
-    module = django.core.handlers.wsgi:WSGIHandler()
-    static-map = /media/static=/srv/publicdb/static
-    static-map = /media/raw_data=/localstore/media/raw_data
-    static-map = /media/jsparc=/srv/publicdb/jsparc
-    static-map = /media/uploads=/srv/publicdb/uploads
-
-    auto-procname = True
-    pidfile = /var/run/uwsgi.pid
-    #logto = /var/log/uwsgi.log
-    #logfile-chown = True
-    touch-reload = /tmp/uwsgi-reload.me
-
-    route-uri = ^/django/(.*)$ redirect-permanent:/$1
-
-And the cron job to do a nightly run of data processing::
-
-    0 4 * * * hisparc /srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1
