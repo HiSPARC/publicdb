@@ -31,13 +31,12 @@
       "scripts": [
         "scripts/base.sh",
         "scripts/vagrant.sh",
-        "scripts/virtualbox.sh",
-        "scripts/cleanup.sh",
-        "scripts/zerodisk.sh"
+        "scripts/virtualbox.sh"
       ],
       "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
     },
     {
+      "only": ["virtualbox-iso"],
       "type": "shell",
       "inline": [
         "sudo yum -y install epel-release",
@@ -48,7 +47,21 @@
       "type": "ansible-local",
       "playbook_file": "../../provisioning/playbook.yml",
       "playbook_dir": "../../provisioning/"
+    },
+    {
+      "only": ["virtualbox-iso"],
+      "type": "shell",
+      "scripts": [
+        "scripts/cleanup.sh",
+        "scripts/zerodisk.sh"
+      ],
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
     }
   ],
-  "post-processors": ["vagrant"]
+  "post-processors": [
+    {
+      "only": ["virtualbox-iso"],
+      "type": "vagrant"
+    }
+  ]
 }

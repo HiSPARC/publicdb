@@ -96,6 +96,7 @@
 
 - name: restart uWSGI
   supervisorctl: name=uwsgi state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
 
 - name: enable cron job for updating histograms and ESD
   cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0
