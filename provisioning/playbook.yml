@@ -2,9 +2,9 @@
 - hosts: all
   tasks:
     - include: common.yml
-    - include: mysqldb.yml mysql_root_password=Data4admin!
+    - include: mysqldb.yml
     - include: development.yml
-    - include: publicdb.yml mysql_password=Data4user!
+    - include: publicdb.yml
 
 - hosts: vagrant
   tasks:
