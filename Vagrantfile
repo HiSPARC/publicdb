@@ -10,6 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.box_url = "packer/CentOS6.6/packer_virtualbox-iso_virtualbox.box"
   end
 
+  config.vm.hostname = "vagrant"
   config.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
   config.vm.network "forwarded_port", guest: 80, host: 8080
 
