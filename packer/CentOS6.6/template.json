@@ -32,7 +32,8 @@
       "type": "shell",
       "scripts": [
         "scripts/base.sh",
-        "scripts/vagrant.sh"
+        "scripts/vagrant.sh",
+        "scripts/virtualbox.sh"
       ],
       "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
     },
@@ -53,7 +54,6 @@
       "only": ["virtualbox-iso"],
       "type": "shell",
       "scripts": [
-        "scripts/virtualbox.sh",
         "scripts/cleanup.sh",
         "scripts/zerodisk.sh"
       ],
