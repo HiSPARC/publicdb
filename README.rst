@@ -23,15 +23,25 @@ Using Vagrant to run inside a virtual machine
 ---------------------------------------------
 
 We use `Vagrant <http://www.vagrantup.com>`_ to set up a virtual machine
-nearly identical to our production server *Pique*.  You can download
-Vagrant binaries for all major platforms.  On a Mac::
+nearly identical to our production server *Pique*.  The VM runs on
+Virtualbox.  You can download Vagrant and Virtualbox binaries for all
+major platforms.  On a Mac::
 
    $ brew tap Caskroom/cask
+   $ brew install Caskroom/cask/virtualbox
    $ brew install Caskroom/cask/vagrant
 
+Kernel upgrades in the VM can break the Virtualbox guest modules, which
+need to be rebuilt.  There is a nice plugin for vagrant which checks if
+the module version matches the virtualbox version and if the modules are
+loaded or need to be rebuilt.  This also handles upgrading Virtualbox
+itself.  Install the plugin with::
+
+   $ vagrant plugin install vagrant-vbguest
+
 To correctly provision the VM, you need to have Python installed, with the
-`Ansible <http://www.ansibleworks.com>`_ package, available from PyPI.  On
-a Mac::
+`Ansible <http://www.ansibleworks.com>`_ package, available from PyPI.
+Shortcut on a Mac::
 
     $ brew install ansible
 
