@@ -1,0 +1,7 @@
+- hosts: 127.0.0.1
+  tasks:
+    - name: set hostname to vagrant
+      hostname: name=vagrant.localdomain
+      sudo: yes
+
+- include: playbook.yml

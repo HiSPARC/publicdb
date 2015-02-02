@@ -27,31 +27,6 @@
   service: name=ip6tables state=restarted enabled=yes
   sudo: yes
 
-# Bootstrapping EPEL repository trick
-# http://zigg.com/2013/yum-repository-bootstrapping-ansible.html
-- name: bootstrap epel-release install
-  copy: src=ansible-bootstrap-epel.repo
-        dest=/etc/yum.repos.d/
-        owner=root group=root mode=0644
-  sudo: yes
-
-- name: epel-release install
-  yum: name=epel-release
-       enablerepo=ansible-bootstrap-epel
-       state=present
-  sudo: yes
-
-- name: epel repository enable
-  ini_file: dest=/etc/yum.repos.d/epel.repo
-            section=epel
-            option=enabled
-            value=1
-  sudo: yes
-
-- name: upgrade all packages (including EPEL)
-  yum: name=* state=latest
-  sudo: yes
-
 - name: install ACL utilities
   yum: name=acl
   sudo: yes
@@ -74,3 +49,6 @@
 - name: install screen
   yum: name=screen
   sudo: yes
+
+- name: use custom .bashrc
+  copy: src=bashrc dest=~/.bashrc backup=yes

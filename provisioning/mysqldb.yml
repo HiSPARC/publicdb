@@ -14,7 +14,8 @@
 - name: update MySQL root password for all accounts
   mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
   with_items:
-    - $ansible_fqdn
+    - "{{ ansible_fqdn }}"
+    - "{{ ansible_hostname }}"
     - 127.0.0.1
     - localhost
 
@@ -24,7 +25,8 @@
 - name: delete anonymous accounts
   mysql_user: user='' host={{ item }} state=absent
   with_items:
-    - $ansible_fqdn
+    - "{{ ansible_fqdn }}"
+    - "{{ ansible_hostname }}"
     - 127.0.0.1
     - localhost
 

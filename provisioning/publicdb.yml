@@ -37,9 +37,9 @@
   copy: src=pip.list dest=/home/{{ ansible_user_id }}/
 
 - name: create conda environment
-  command: creates=/srv/publicdb/publicdb_env
-           /opt/miniconda/bin/conda create -p /srv/publicdb/publicdb_env python
-           --yes
+  shell: creates=/srv/publicdb/publicdb_env
+         yes | /opt/miniconda/bin/conda create
+         -p /srv/publicdb/publicdb_env python --yes
 
 - name: install conda packages in conda environment
   command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
@@ -96,6 +96,7 @@
 
 - name: restart uWSGI
   supervisorctl: name=uwsgi state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
 
 - name: enable cron job for updating histograms and ESD
   cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0

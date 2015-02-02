@@ -1,10 +1,17 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-Vagrant.configure("2") do |config|
-  config.vm.box = "SLC6.4"
-  config.vm.box_url = "veewee/SLC6.4.box"
+# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
+VAGRANTFILE_API_VERSION = "2"
 
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+  config.vm.define "vagrant" do |machine|
+    machine.vm.box = "CentOS6.6"
+    machine.vm.box_url = "packer/CentOS6.6/packer_virtualbox-iso_virtualbox.box"
+  end
+
+  config.vm.hostname = "vagrant.localdomain"
+  config.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
   config.vm.network "forwarded_port", guest: 80, host: 8080
 
   config.vm.provider :virtualbox do |vb|
