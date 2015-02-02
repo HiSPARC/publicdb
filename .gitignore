@@ -31,3 +31,5 @@ Thumbs.db
 # Vagrant
 .vagrant
 vagrant_ansible_inventory_default
+
+.remote-sync.json
