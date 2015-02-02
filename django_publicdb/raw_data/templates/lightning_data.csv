@@ -4,7 +4,7 @@
 #
 # Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
 #
-# Data from KNMI: Royal Dutch Meteorological Institute
+# Data from: Royal Netherlands Meteorological Institute (KNMI)
 #
 #
 # This data contains the following columns:
