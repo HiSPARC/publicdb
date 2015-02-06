@@ -11,7 +11,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.hostname = "vagrant.localdomain"
-  config.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
+  config.vm.network "private_network", ip: "192.168.99.10"
   config.vm.network "forwarded_port", guest: 80, host: 8080
 
   config.vm.provider :virtualbox do |vb|
@@ -19,8 +19,10 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision :ansible do |ansible|
+    ansible.inventory_path = "provisioning/ansible_inventory"
     ansible.playbook = "provisioning/playbook.yml"
     ansible.host_key_checking = false
+    ansible.ask_vault_pass = true
   end
   config.ssh.username = "hisparc"
 end
