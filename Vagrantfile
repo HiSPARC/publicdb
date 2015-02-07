@@ -12,6 +12,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.hostname = "vagrant.localdomain"
   config.vm.network "private_network", ip: "192.168.99.10"
+  config.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
   config.vm.network "forwarded_port", guest: 80, host: 8080
 
   config.vm.provider :virtualbox do |vb|
