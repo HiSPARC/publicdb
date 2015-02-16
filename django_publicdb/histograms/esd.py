@@ -106,8 +106,10 @@ def process_weather_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            new_node = source_node.weather.copy(tmp_file.root)
-            node_path = new_node._v_pathname
+            process = process_events.ProcessWeatherFromSource(
+                    source_file, tmp_file, source_node, '/')
+            process.process_and_store_results()
+            node_path = process.source._v_pathname
     return tmp_filename, node_path
 
 
