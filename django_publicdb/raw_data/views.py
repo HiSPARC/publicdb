@@ -518,6 +518,10 @@ def download_coincidences(request):
         stations = (Station.objects.filter(Q(cluster__parent=cluster) |
                                            Q(cluster=cluster))
                                    .values_list('number', flat=True))
+        if len(stations) >= 30:
+            msg = ("To many stations in this cluster, "
+                   "manually select a subset of stations.")
+            return HttpResponseBadRequest(msg, content_type="text/plain")
 
     download = request.GET.get('download', False)
     if download in ['true', 'True']:
