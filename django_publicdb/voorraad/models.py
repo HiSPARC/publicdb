@@ -118,13 +118,14 @@ class Gebruikt(models.Model):
     def save(self):
         if self.id:
             oudewaarde = Gebruikt.objects.get(id=self.id).aantal
-            self.artikel.aantal = self.artikel.aantal-(self.aantal-oudewaarde)
+            self.artikel.aantal = (self.artikel.aantal -
+                                   (self.aantal - oudewaarde))
             self.artikel.save()
             super(Gebruikt, self).save()
         else:
             # self.persoon = threadlocals.get_current_user()
             super(Gebruikt, self).save()
-            self.artikel.aantal = self.artikel.aantal-self.aantal
+            self.artikel.aantal = self.artikel.aantal - self.aantal
             self.artikel.save()
 
     # standaard waarde

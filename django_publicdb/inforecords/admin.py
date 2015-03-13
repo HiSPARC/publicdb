@@ -43,16 +43,6 @@ class CountryAdmin(admin.ModelAdmin):
     ordering = ['number']
 
 
-class ElectronicsAdmin(admin.ModelAdmin):
-    list_filter = ('batch',)
-
-
-class EnabledServiceAdmin(admin.ModelAdmin):
-    list_display = ('pc', 'monitor_service', 'min_critical', 'max_critical',
-                    'min_warning', 'max_warning')
-    list_filter = ('pc', 'monitor_service')
-
-
 class StationAdmin(admin.ModelAdmin):
     list_display = ('number', 'name', 'cluster', 'contactinformation',
                     'contact')

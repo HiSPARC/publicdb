@@ -3,7 +3,7 @@ from django.views.generic import RedirectView, TemplateView
 
 from django_publicdb.inforecords.views import *
 
-#Uncomment the next two lines to enable the admin:
+# Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 

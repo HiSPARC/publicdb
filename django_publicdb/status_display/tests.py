@@ -1,11 +1,7 @@
-import datetime
-import json
 import urllib
 
-from django.conf import settings
 from django.test import LiveServerTestCase
 
-from lib.test import datastore as test_datastore
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 

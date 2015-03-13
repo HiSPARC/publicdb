@@ -20,7 +20,6 @@ class SerializationTestCase(TestCase):
         # Create an event and save it to the database
 
         station = Station.objects.all()[0]
-
         event = Event(date="2010-05-01",
                       time="00:09:15",
                       nanoseconds=665162853,
@@ -28,7 +27,6 @@ class SerializationTestCase(TestCase):
                       pulseheights=[1, 2, 3, 4],
                       integrals=[1, 2, 3, 4],
                       traces=[[1, 2, 3, 4], [1, 2, 3, 4]])
-
         event.save()
 
         self.assertEqual(len(Event.objects.all()), 1)
@@ -58,7 +56,6 @@ class SerializationTestCase(TestCase):
                       pulseheights=[1, 2, 3, 4],
                       integrals=[1, 2, 3, 4],
                       traces=[[1, 2, 3, 4], [1, 2, 3, 4]])
-
         event.save()
 
         self.assertEqual(len(Event.objects.all()), 1)
@@ -74,4 +71,3 @@ class SerializationTestCase(TestCase):
         deserialized_event = iterator.next().object
 
         self.assertEqual(original_event, deserialized_event)
-

@@ -1,12 +1,6 @@
-import re
-import time
-import string
-import sys
-
 import json
 import urllib
 
-from django.core import mail
 from django.test import LiveServerTestCase
 
 from django_publicdb.analysissessions.models import *
@@ -101,8 +95,7 @@ class LiveSessionTestCase(LiveServerTestCase):
         session = AnalysisSession.objects.all()[0]
 
         try:
-            response = client.receive_coincidence(session.title, 0000,
-                                                  "Student 1")
+            client.receive_coincidence(session.title, 0000, "Student 1")
         except IOError, e:
             # raise IOError, ('http error', errcode, errmsg, headers)
             self.assertEqual(e[1], 401)

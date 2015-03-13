@@ -12,9 +12,6 @@ from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 from django_publicdb.status_display.views import station_has_data
 
-import os
-import datetime
-
 
 @login_required
 def keys(request, host):

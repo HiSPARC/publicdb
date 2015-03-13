@@ -1,7 +1,5 @@
 import os
-import re
 import datetime
-from operator import itemgetter
 import zlib
 
 import tables

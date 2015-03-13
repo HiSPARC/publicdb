@@ -29,7 +29,6 @@ class SerializedDataField(models.Field):
         # 2. It is a JSON array formatted string
         # 3. It is a base64 encoded zlib compressed pickle string
 
-
         # 1. If it is a list
 
         if isinstance(value, list):
@@ -101,6 +100,7 @@ class Event(models.Model):
     def __unicode__(self):
         return '%d - %s %s %d' % (self.station.number, self.date, self.time,
                                   self.nanoseconds)
+
 
 class Coincidence(models.Model):
     date = models.DateField()

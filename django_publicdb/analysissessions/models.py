@@ -4,19 +4,17 @@ from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
 from django.template.defaultfilters import slugify
 
-from random import choice, randint
+from random import choice
 import string
 import datetime
 import hashlib
 import tables
-import sys
 import os
 import re
 
 import numpy as np
 
 from sapphire.analysis import coincidences
-from sapphire import publicdb
 
 
 class AnalysisSession(models.Model):
@@ -242,8 +240,7 @@ class SessionRequest(models.Model):
                    '\nhttp://data.hisparc.nl/analysis-session/request/%s' %
                    (self.name, self.url))
         sender = 'info@hisparc.nl'
-        mail = self.email
-        send_mail(subject, message, sender, [self.email,], fail_silently=False)
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
         self.save()
 
@@ -261,8 +258,7 @@ class SessionRequest(models.Model):
                    (self.name, self.sid, self.pin, self.events_created,
                     slugify(self.sid)))
         sender = 'info@hisparc.nl'
-        mail = self.email
-        send_mail(subject, message, sender, [self.email,], fail_silently=False)
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
         self.save()
 
@@ -282,8 +278,7 @@ class SessionRequest(models.Model):
                    (self.name, self.sid, self.pin, self.events_created,
                     slugify(self.sid)))
         sender = 'info@hisparc.nl'
-        mail = self.email
-        send_mail(subject, message, sender, [self.email,], fail_silently=False)
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
         self.save()
 
@@ -296,7 +291,6 @@ class SessionRequest(models.Model):
                    '\nPlease try selecting a different cluster or date.' %
                    self.name)
         sender = 'info@hisparc.nl'
-        mail = self.email
-        send_mail(subject, message, sender, [self.email,], fail_silently=False)
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
         self.save()

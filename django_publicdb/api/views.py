@@ -11,7 +11,6 @@ from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
 import datastore
 
-import os
 import numpy
 import scipy
 from scipy import optimize

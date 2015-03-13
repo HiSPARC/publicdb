@@ -1,11 +1,11 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.conf import settings
-from django.http import HttpResponseRedirect, HttpResponse
+from django.http import HttpResponse
 # from django.views.decorators.csrf import csrf_protect
 
 import numpy as np
-from numpy import pi, arccos, arcsin, arctan2, sin, cos
+from numpy import pi, arcsin, arctan2, sin, cos
 import operator
 import os
 import datetime
@@ -26,16 +26,14 @@ def data_display(request, slug):
     core_plot = None  # create_core_plot(slug, coincidences)
     star_map = None  # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
-    title = session.title
-    pin = session.pin
 
     return render_to_response('results.html',
-        {'energy_histogram': energy_histogram,
-         'core_plot': core_plot,
-         'star_map': star_map,
-         'scores': scores,
-         'slug': slug,
-         'session': session},
+                              {'energy_histogram': energy_histogram,
+                               'core_plot': core_plot,
+                               'star_map': star_map,
+                               'scores': scores,
+                               'slug': slug,
+                               'session': session},
         context_instance=RequestContext(request))
 
 
@@ -222,10 +220,10 @@ def validate_request_form(request):
         if not check_captcha.is_valid:
             return request_form(request)
 
-        #html_captcha = captcha.displayhtml(
-        #    settings.RECAPTCHA_PUB_KEY,
-        #    error=check_captcha.error_code
-        #)
+        # html_captcha = captcha.displayhtml(
+        #     settings.RECAPTCHA_PUB_KEY,
+        #     error=check_captcha.error_code
+        # )
 
     # Check form input
     form = SessionRequestForm(request.POST)
@@ -264,11 +262,8 @@ def confirm_request(request, url):
         sessionrequest.pin = randint(1000, 9999)
         starts = datetime.datetime.now()
         ends = datetime.datetime.now()
-        session = AnalysisSession(starts=starts,
-                                  ends=ends,
-                                  pin=str(sessionrequest.id),
-                                  title=sessionrequest.sid)
-
+        AnalysisSession(starts=starts, ends=ends,
+                        pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
     return render_to_response('confirm.html',

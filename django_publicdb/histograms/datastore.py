@@ -2,7 +2,6 @@ import os
 import re
 import datetime
 import logging
-from operator import itemgetter
 
 import tables
 
@@ -42,7 +41,7 @@ def get_updated_files(rootdir, last_check_time):
                     if mtime >= last_check_time:
                         try:
                             date = datetime.datetime.strptime(
-                                        file, '%Y_%m_%d.h5').date()
+                                file, '%Y_%m_%d.h5').date()
                         except ValueError:
                             continue
                         if (date != datetime.datetime.utcnow().date() and

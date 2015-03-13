@@ -3,7 +3,6 @@ from django.http import HttpResponse
 import calendar
 import datetime
 import json
-from random import randrange
 
 import numpy as np
 import operator

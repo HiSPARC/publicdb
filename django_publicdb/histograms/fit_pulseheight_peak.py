@@ -1,15 +1,9 @@
 #!/usr/bin/env python
 
-import sys
-import os
-import string
 import logging
 from math import sqrt
-import datetime
-import types
 import traceback
 
-import tables
 import numpy
 import scipy
 import scipy.optimize
@@ -263,9 +257,9 @@ def fit_pulseheight_peak(pulseheights):
     # It is assumed that the events per bin are poisson distributed.
     # Sigma^2 for a poisson process is the same as the number of events in the bin
 
-    chiSquare = (residual(fitParameters,
-                          fit_window_pulseheight,
-                          fit_window_occurence)**2 / fit_window_occurence).sum()
+    chiSquare = (residual(fitParameters, fit_window_pulseheight,
+                          fit_window_occurence) ** 2 /
+                 fit_window_occurence).sum()
 
     pulseheightFit.degrees_of_freedom = (len(fit_window_occurence) -
                                          len(fitParameters))
@@ -306,9 +300,6 @@ def get_pulseheight_fits(summary):
         return []
 
     # Get number of detectors from the config data
-
-    today = datetime.datetime.utcnow()
-
     try:
         n_detectors = summary.station.number_of_detectors()
     except Configuration.DoesNotExist:

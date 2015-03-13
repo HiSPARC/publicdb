@@ -2,15 +2,12 @@ from django.shortcuts import (render_to_response, get_object_or_404,
                               get_list_or_404, redirect)
 from django.http import Http404
 from django.template import RequestContext
-from django.conf import settings
 from django.db.models import Q
 
 from collections import OrderedDict
 from operator import itemgetter
 import calendar
-from numpy import arange, pi, sin
 import datetime
-import time
 
 from django_publicdb.histograms.models import *
 from django_publicdb.inforecords.models import *
@@ -277,11 +274,11 @@ def station_data(request, station_number, year, month, day):
     date = datetime.date(year, month, day)
 
     station = get_object_or_404(Station, number=station_number)
-    data = get_object_or_404(Summary,
-                             Q(num_events__isnull=False) |
-                             Q(num_weather__isnull=False),
-                             station=station,
-                             date=date)
+    get_object_or_404(Summary,
+                      Q(num_events__isnull=False) |
+                      Q(num_weather__isnull=False),
+                      station=station,
+                      date=date)
 
     # Find previous/next dates with data
     try:

@@ -10,7 +10,6 @@ import urllib
 import tables
 
 from selenium import webdriver
-from selenium.webdriver.remote.webelement import WebElement
 
 # Selenium WebDriver documentation:
 # http://selenium.googlecode.com/svn/trunk/docs/api/py/webdriver_remote/selenium.webdriver.remote.webdriver.html

@@ -274,7 +274,7 @@ def get_pulseheights(summary):
     if pulseheights is None:
         return None
     else:
-        #FIXME: do we need configurations for this?
+        # FIXME: do we need configurations for this?
         pulseheights = np.where(pulseheights >= 0, pulseheights * .57,
                                 pulseheights)
 
@@ -296,7 +296,7 @@ def get_integrals(summary):
         return None
     else:
         # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
-        #FIXME: do we need configurations for this?
+        # FIXME: do we need configurations for this?
         integrals = np.where(integrals >= 0, integrals * .57 * 2.5,
                              integrals)
 
