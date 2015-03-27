@@ -50,12 +50,12 @@ function createStyle(map) {
             else {
                 return ''}},
         getSize: function(feature) {
-            return .5 * map.getZoom();}};
+            return .55 * map.getZoom();}};
     var pointStyle = {
         fillColor: "${getColor}", // using context.getColor(feature)
-        fillOpacity: 0.8,
-        strokeColor: 'black',
-        strokeOpacity: 0.75,
+        fillOpacity: 0.75,
+        strokeColor: "${getColor}",
+        strokeOpacity: 1,
         strokeWidth: 1,
         pointRadius: "${getSize}", // using context.getSize(feature)
         cursor: 'pointer',
