@@ -53,14 +53,14 @@ function createStyle(map) {
             return .55 * map.getZoom();}};
     var pointStyle = {
         fillColor: "${getColor}", // using context.getColor(feature)
-        fillOpacity: 0.75,
+        fillOpacity: 0.6,
         strokeColor: "${getColor}",
         strokeOpacity: 1,
-        strokeWidth: 1,
+        strokeWidth: 1.5,
         pointRadius: "${getSize}", // using context.getSize(feature)
         cursor: 'pointer',
         label: '${getLabel}', // using context.getLabel(feature)
-        labelYOffset: 16,
+        labelYOffset: 17,
         fontSize: 12,
         fontFamily: 'sans-serif',
         fontWeight: 'bold'};
