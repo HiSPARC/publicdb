@@ -4,12 +4,14 @@ from django.conf import settings
 from django.http import HttpResponse
 # from django.views.decorators.csrf import csrf_protect
 
-import numpy as np
-from numpy import pi, arcsin, arctan2, sin, cos
 import operator
 import os
 import datetime
 import calendar
+from random import randint
+
+import numpy as np
+from numpy import pi, arcsin, arctan2, sin, cos
 
 from models import *
 from forms import *
