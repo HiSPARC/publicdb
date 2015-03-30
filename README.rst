@@ -27,9 +27,9 @@ nearly identical to our production server *Pique*.  The VM runs on
 Virtualbox.  You can download Vagrant and Virtualbox binaries for all
 major platforms.  On a Mac::
 
-   $ brew tap Caskroom/cask
-   $ brew install Caskroom/cask/virtualbox
-   $ brew install Caskroom/cask/vagrant
+   $ brew install caskroom/cask/brew-cask
+   $ brew cask install virtualbox
+   $ brew cask install vagrant
 
 Kernel upgrades in the VM can break the Virtualbox guest modules, which
 need to be rebuilt.  There is a nice plugin for vagrant which checks if
@@ -70,7 +70,7 @@ We formerly used Veewee, but Packer sees more active development and
 allows us to pre-provision the base box.  If you want to build your own
 base box, you can install Packer on a Mac using::
 
-    $ brew install Caskroom/cask/packer
+    $ brew cask install packer
 
 Then, navigate to the packer/CentOS6.6/ directory and issue::
 
