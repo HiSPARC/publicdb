@@ -62,9 +62,14 @@ def get_coincidence(request):
         coincidence = coincidences.filter(student=student,
                                           is_analyzed=False)[0]
     except IndexError:
-        coincidence = coincidences.filter(student=None, is_analyzed=False)[0]
-        coincidence.student = student
-        coincidence.save()
+        try:
+            coincidence = coincidences.filter(student=None,
+                                              is_analyzed=False)[0]
+            coincidence.student = student
+            coincidence.save()
+        except IndexError:
+            return error_json(404, "No unanalysed coincidences available, "
+                                   "request a new session.")
 
     events = get_events(coincidence)
     response = data_json(coincidence, events)
