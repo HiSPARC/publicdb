@@ -191,9 +191,22 @@ class NetworkHistogram(models.Model):
     bins = SerializedDataField()
     values = SerializedDataField()
 
+    def save(self, *args, **kwargs):
+        """Ensure the stored bins and values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the string to
+        a list of floats.
+
+        """
+        if isinstance(self.bins, basestring):
+            self.bins = [float(s) for s in self.bins[1:-1].split(',')]
+        if isinstance(self.values, basestring):
+            self.values = [int(s) for s in self.values[1:-1].split(',')]
+        super(NetworkHistogram, self).save(*args, **kwargs)
+
     def __unicode__(self):
-        return '%s - %s' % (self.source.date.strftime('%d %b %Y'),
-                            self.type)
+        return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
