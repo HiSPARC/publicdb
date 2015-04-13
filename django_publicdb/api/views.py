@@ -756,7 +756,7 @@ def get_event_traces(request, station_number, ext_timestamp):
 
     """
     ext_timestamp = int(ext_timestamp)
-    raw = True if 'raw' in request.GET else False
+    raw = 'raw' in request.GET
 
     date = datetime.datetime.utcfromtimestamp(ext_timestamp / 1e9).date()
     if not validate_date(date):
