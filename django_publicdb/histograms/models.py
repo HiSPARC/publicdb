@@ -164,14 +164,22 @@ class Configuration(models.Model):
     station.admin_order_field = 'source__station__number'
 
     def master(self):
-        master = re.search(r'\d+', self.mas_version).group()
+        result = re.search(r'\d+', self.mas_version)
+        if result is None:
+            master = 'no master'
+        else:
+            master = result.group()
         return master
     master.admin_order_field = 'mas_version'
 
     def slave(self):
-        slave = re.search(r'\d+', self.slv_version).group()
-        if slave == '0':
+        result = re.search(r'\d+', self.slv_version)
+        if result is None:
             slave = 'no slave'
+        else:
+            slave = result.group()
+            if slave == '0':
+                slave = 'no slave'
         return slave
     slave.admin_order_field = 'slv_version'
 
