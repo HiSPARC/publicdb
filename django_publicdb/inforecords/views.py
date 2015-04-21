@@ -1,4 +1,5 @@
 from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -10,6 +11,7 @@ import base64
 
 from django_publicdb.inforecords.models import *
 from django_publicdb.histograms.models import *
+from django_publicdb.inforecords.forms import *
 from django_publicdb.status_display.views import station_has_data
 
 
@@ -141,3 +143,14 @@ def create_datastore_config(request):
                               {'stations': (Station.objects.all()
                                             .select_related('cluster__parent'))},
                               mimetype='text/plain')
+
+
+def submit_position(request):
+  if request.method == 'POST':
+    form = QuarantineForm(request.POST)
+  else:
+    form = QuarantineForm()
+
+  return render_to_response('submit.html',
+                            {'form': form},
+                            context_instance=RequestContext(request))

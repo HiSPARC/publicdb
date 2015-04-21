@@ -1,0 +1,14 @@
+h4 {
+	height: 18px;
+	margin:0 0 10px 0;}
+
+.wrapperDiv {
+	height: 110px;}
+
+.leftColumn {
+	float: left;
+	width: 50%;}
+
+.rightColumn {
+	float: right;
+	width: 50%;}

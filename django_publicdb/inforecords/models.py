@@ -526,3 +526,38 @@ def reload_datastore():
     except:
         # FIXME logging!
         pass
+
+class Quarantine(models.Model):
+    first_name = models.CharField(max_length=50)
+    sur_name = models.CharField(max_length=50)
+    email = models.EmailField()
+    email_reviewer = models.EmailField()
+    station = models.ForeignKey(Station)
+    active_date = models.DateField()
+    submit_date = models.DateField(auto_now_add=True)
+    hash_applicant = models.CharField(max_length=32)
+    applicant_verified = models.BooleanField()
+    hash_reviewer = models.CharField(max_length=32)
+    slug_applicant = models.SlugField(unique=True)
+    slug_reviewer = models.SlugField(unique=True)
+    scintillator_1_alpha = models.FloatField(null=True, blank=True)
+    scintillator_1_beta = models.FloatField(null=True, blank=True)
+    scintillator_1_radius = models.FloatField(null=True, blank=True)
+    scintillator_1_height = models.FloatField(null=True, blank=True)
+    scintillator_2_alpha = models.FloatField(null=True, blank=True)
+    scintillator_2_beta = models.FloatField(null=True, blank=True)
+    scintillator_2_radius = models.FloatField(null=True, blank=True)
+    scintillator_2_height = models.FloatField(null=True, blank=True)
+    scintillator_3_alpha = models.FloatField(null=True, blank=True)
+    scintillator_3_beta = models.FloatField(null=True, blank=True)
+    scintillator_3_radius = models.FloatField(null=True, blank=True)
+    scintillator_3_height = models.FloatField(null=True, blank=True)
+    scintillator_4_alpha = models.FloatField(null=True, blank=True)
+    scintillator_4_beta = models.FloatField(null=True, blank=True)
+    scintillator_4_radius = models.FloatField(null=True, blank=True)
+    scintillator_4_height = models.FloatField(null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+        self.hash_applicant = hashlib.md5(self.slug_applicant).hexdigest()
+        self.hash_reviewer = hashlib.md5(self.slug_reviewer).hexdigest()
+        super(Quarantine, self).save(*args, **kwargs)
