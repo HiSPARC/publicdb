@@ -191,9 +191,9 @@
     </div>
     <div id="stationPosition">
         <div class="sectionTitle">Position</div>
-        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude }}</span></div>
-        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude }}</span></div>
-        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude }}</span></div>
+        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude|floatformat:7 }}°</span></div>
+        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude|floatformat:7 }}°</span></div>
+        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude|floatformat:2 }} m</span></div>
         <div class="keyvalue"><span class="key gpsBall curr"></span><span class="value">Current position</span></div>
         <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Old positions</span></div>
     </div>
