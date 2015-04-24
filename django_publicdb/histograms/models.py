@@ -4,6 +4,7 @@ import zlib
 import cPickle as pickle
 import base64
 import re
+import ast
 
 from django_publicdb.inforecords import models as inforecords
 from south.modelsinspector import add_introspection_rules
@@ -203,14 +204,14 @@ class NetworkHistogram(models.Model):
         """Ensure the stored bins and values are numbers
 
         Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the string to
-        a list of floats.
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
 
         """
         if isinstance(self.bins, basestring):
-            self.bins = [float(s) for s in self.bins[1:-1].split(',')]
+            self.bins = ast.literal_eval(self.bins)
         if isinstance(self.values, basestring):
-            self.values = [int(s) for s in self.values[1:-1].split(',')]
+            self.values = ast.literal_eval(self.values)
         super(NetworkHistogram, self).save(*args, **kwargs)
 
     def __unicode__(self):
@@ -227,6 +228,20 @@ class DailyHistogram(models.Model):
     bins = SerializedDataField()
     values = SerializedDataField()
 
+    def save(self, *args, **kwargs):
+        """Ensure the stored bins and values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
+
+        """
+        if isinstance(self.bins, basestring):
+            self.bins = ast.literal_eval(self.bins)
+        if isinstance(self.values, basestring):
+            self.values = ast.literal_eval(self.values)
+        super(DailyHistogram, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
                                  self.source.date.strftime('%d %b %Y'),
@@ -242,6 +257,20 @@ class DailyDataset(models.Model):
     type = models.ForeignKey('DatasetType')
     x = SerializedDataField()
     y = SerializedDataField()
+
+    def save(self, *args, **kwargs):
+        """Ensure the stored values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
+
+        """
+        if isinstance(self.x, basestring):
+            self.x = ast.literal_eval(self.x)
+        if isinstance(self.y, basestring):
+            self.y = ast.literal_eval(self.y)
+        super(DailyDataset, self).save(*args, **kwargs)
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
