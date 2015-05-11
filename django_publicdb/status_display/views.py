@@ -680,6 +680,20 @@ def get_config_source(station_number, type):
     return data
 
 
+def get_detector_timing_offsets_source(station_number):
+    offsets = (DetectorTimingOffset.objects.filter(
+        source__station__number=station_number,
+        timestamp__gte=FIRSTDATE,
+        timestamp__lte=datetime.date.today()).order_by('timestamp'))
+
+    data = offsets.values_list('source__date', 'offset_1', 'offset_2',
+                               'offset_3', 'offset_4')
+    data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
+             row[3], row[4]] for row in data]
+
+    return data
+
+
 def create_histogram_network(type, date):
     """Create a histogram object"""
 
