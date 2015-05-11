@@ -8,7 +8,7 @@ from operator import itemgetter
 import numpy as np
 import tables
 
-from sapphire.analysis import process_events, coincidences
+from sapphire.analysis import process_events, coincidences, calibration
 from sapphire import clusters
 
 from django_publicdb.inforecords.models import Station
@@ -302,6 +302,30 @@ def get_integrals(summary):
 
         # transpose, so we have '4 arrays of many integrals'
         return integrals.T
+
+
+def determine_detector_timing_offsets(summary):
+    """Get all detector timing offsets
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+    station = summary.station
+
+    path = get_esd_data_path(date)
+    with tables.open_file(path, 'r') as datafile:
+        try:
+            station_node = get_station_node(datafile, station)
+            table = datafile.get_node(station_node, 'events')
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename, summary)
+            offsets = [nan, nan, nan, nan]
+        else:
+            offsets = calibration.determine_detector_timing_offsets(table)
+
+    return offsets
 
 
 def get_temperature(summary):

@@ -313,6 +313,7 @@ def perform_events_tasks(summary):
     update_pulseheight_histogram(summary)
     update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
+    update_detector_timing_offsets(summary)
     return summary
 
 
@@ -474,6 +475,14 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 
+def update_detector_timing_offsets(summary):
+    """Determine detector timing offsets"""
+
+    logger.debug("Determining detector timing offsets for %s" % summary)
+    offsets = esd.determine_detector_timing_offsets(summary)
+    save_offsets(summary, offsets)
+
+
 def update_temperature_dataset(summary):
     """Create dataset of timestamped temperature data"""
 
@@ -613,6 +622,28 @@ def save_pulseheight_fits(summary, fits):
             fit.save()
 
     logger.debug("Saved successfully")
+
+
+def save_offsets(summary, offsets):
+    """Store the detector timing offset data in database
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param offsets: list of 4 timing offsets
+
+    """
+    logger.debug("Saving detector timing offsets for %s" % summary)
+    try:
+        o = DetectorTimingOffset.objects.get(source=summary)
+    except DetectorTimingOffset.DoesNotExist:
+        o = DetectorTimingOffset(source=summary)
+    offsets = [off if not isnan(off) else None for off in offsets]
+    o.offset_1 = offsets[0]
+    o.offset_2 = offsets[1]
+    o.offset_3 = offsets[2]
+    o.offset_4 = offsets[3]
+    o.save()
+    logger.debug("Saved succesfully")
 
 
 def get_station_cluster_number(station):

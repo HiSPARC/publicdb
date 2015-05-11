@@ -352,3 +352,11 @@ class PulseheightFit(models.Model):
         verbose_name_plural = 'Pulseheight fit'
         unique_together = ('source', 'plate')
         ordering = ('source', 'plate')
+
+
+class DetectorTimingOffset(models.Model):
+    source = models.ForeignKey('Summary')
+    offset_1 = models.FloatField(blank=True, null=True)
+    offset_2 = models.FloatField(blank=True, null=True)
+    offset_3 = models.FloatField(blank=True, null=True)
+    offset_4 = models.FloatField(blank=True, null=True)
