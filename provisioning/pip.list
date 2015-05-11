@@ -5,4 +5,4 @@ Django==1.6.10
 South
 recaptcha-client
 
-hisparc-sapphire>=0.9.31,<0.10
+hisparc-sapphire>=0.10,<0.11
