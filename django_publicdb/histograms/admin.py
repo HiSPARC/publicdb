@@ -8,17 +8,20 @@ class GeneratorStateAdmin(admin.ModelAdmin):
 
 
 class NetworkHistogramAdmin(admin.ModelAdmin):
-    list_filter = ('type',)
+    list_filter = ('type', 'source__station__number',)
+    list_display = ('source__date', 'source__station', 'type',)
     raw_id_fields = ('source',)
 
 
 class DailyHistogramAdmin(admin.ModelAdmin):
-    list_filter = ('type',)
+    list_filter = ('type', 'source__station__number',)
+    list_display = ('source__date', 'source__station', 'type',)
     raw_id_fields = ('source',)
 
 
 class DailyDatasetAdmin(admin.ModelAdmin):
-    list_filter = ('type',)
+    list_filter = ('type', 'source__station__number',)
+    list_display = ('source__date', 'source__station', 'type',)
     raw_id_fields = ('source',)
 
 
@@ -61,6 +64,13 @@ class PulseheightFitAdmin(admin.ModelAdmin):
     raw_id_fields = ('source',)
 
 
+class DetectorTimingOffsetAdmin(admin.ModelAdmin):
+    list_filter = ('source__station__number',)
+    list_display = ('source__date', 'source__station', 'offset_1', 'offset_2',
+                    'offset_3', 'offset_4')
+    raw_id_fields = ('source',)
+
+
 admin.site.register(GeneratorState, GeneratorStateAdmin)
 admin.site.register(NetworkHistogram, NetworkHistogramAdmin)
 admin.site.register(DailyHistogram, DailyHistogramAdmin)
@@ -71,3 +81,4 @@ admin.site.register(Configuration, ConfigurationAdmin)
 admin.site.register(PulseheightFit, PulseheightFitAdmin)
 admin.site.register(HistogramType)
 admin.site.register(DatasetType)
+admin.site.register(DetectorTimingOffset, DetectorTimingOffsetAdmin)
