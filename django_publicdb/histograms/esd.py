@@ -321,7 +321,7 @@ def determine_detector_timing_offsets(summary):
             table = datafile.get_node(station_node, 'events')
         except tables.NoSuchNodeError:
             logger.error("Cannot find table %s for %s", tablename, summary)
-            offsets = [nan, nan, nan, nan]
+            offsets = [np.nan, np.nan, np.nan, np.nan]
         else:
             offsets = calibration.determine_detector_timing_offsets(table)
 
