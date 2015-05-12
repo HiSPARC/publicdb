@@ -1,4 +1,4 @@
-# HiSPARC detector timing offsets
+{% load fix_data %}# HiSPARC detector timing offsets
 #
 # Station: {{ station_number }}
 #
