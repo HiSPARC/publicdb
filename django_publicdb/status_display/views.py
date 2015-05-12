@@ -625,7 +625,7 @@ def get_gps_config_source(request, station_number):
     return response
 
 
-def get_detector_timing_offsets_source(station_number):
+def get_detector_timing_offsets_source(request, station_number):
     offsets = (DetectorTimingOffset.objects.filter(
         source__station__number=station_number,
         timestamp__gte=FIRSTDATE,
