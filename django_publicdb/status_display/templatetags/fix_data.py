@@ -71,3 +71,13 @@ def shift_bins(values, arg):
     values = [[x + arg, y] for x, y in values]
 
     return values
+
+
+@register.filter
+def none_to_nan(value):
+    """Print nan instead of nothing for None values"""
+
+    if value is None:
+        return 'nan'
+    else:
+        return value
