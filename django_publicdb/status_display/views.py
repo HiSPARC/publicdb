@@ -628,8 +628,8 @@ def get_gps_config_source(request, station_number):
 def get_detector_timing_offsets_source(request, station_number):
     offsets = (DetectorTimingOffset.objects.filter(
         source__station__number=station_number,
-        timestamp__gte=FIRSTDATE,
-        timestamp__lte=datetime.date.today()).order_by('timestamp'))
+        source__date__gte=FIRSTDATE,
+        source__date__lte=datetime.date.today()).order_by('source__date'))
 
     data = offsets.values_list('source__date', 'offset_1', 'offset_2',
                                'offset_3', 'offset_4')
