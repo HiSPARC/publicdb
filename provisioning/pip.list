@@ -1,8 +1,8 @@
 uWSGI
 uwsgitop
 
-Django==1.6.10
 South
+Django>=1.7,<1.8
 recaptcha-client
 
 hisparc-sapphire>=0.10,<0.11
