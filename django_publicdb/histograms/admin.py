@@ -8,20 +8,20 @@ class GeneratorStateAdmin(admin.ModelAdmin):
 
 
 class NetworkHistogramAdmin(admin.ModelAdmin):
-    list_filter = ('type', 'source__station__number',)
-    list_display = ('source__date', 'source__station', 'type',)
+    list_display = ('source', 'type',)
+    list_filter = ('type', 'source__date',)
     raw_id_fields = ('source',)
 
 
 class DailyHistogramAdmin(admin.ModelAdmin):
+    list_display = ('source', 'type',)
     list_filter = ('type', 'source__station__number',)
-    list_display = ('source__date', 'source__station', 'type',)
     raw_id_fields = ('source',)
 
 
 class DailyDatasetAdmin(admin.ModelAdmin):
+    list_display = ('source', 'type',)
     list_filter = ('type', 'source__station__number',)
-    list_display = ('source__date', 'source__station', 'type',)
     raw_id_fields = ('source',)
 
 
@@ -65,9 +65,8 @@ class PulseheightFitAdmin(admin.ModelAdmin):
 
 
 class DetectorTimingOffsetAdmin(admin.ModelAdmin):
+    list_display = ('source', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
     list_filter = ('source__station__number',)
-    list_display = ('source__date', 'source__station', 'offset_1', 'offset_2',
-                    'offset_3', 'offset_4')
     raw_id_fields = ('source',)
 
 
