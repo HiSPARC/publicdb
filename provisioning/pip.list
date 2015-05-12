@@ -1,7 +1,6 @@
 uWSGI
 uwsgitop
 
-South
 Django>=1.7,<1.8
 recaptcha-client
 

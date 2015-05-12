@@ -173,7 +173,6 @@ INSTALLED_APPS = (
     'django_publicdb.maps',
     'django_publicdb.jsparc',
     'django_publicdb.default',
-    'south',
 )
 
 # A sample logging configuration. The only tangible logging
