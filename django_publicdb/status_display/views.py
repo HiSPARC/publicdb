@@ -633,7 +633,7 @@ def get_detector_timing_offsets_source(request, station_number):
 
     data = offsets.values_list('source__date', 'offset_1', 'offset_2',
                                'offset_3', 'offset_4')
-    data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
+    data = [[calendar.timegm(row[0].timetuple()), row[1], row[2],
              row[3], row[4]] for row in data]
 
     response = render_to_response('source_detector_timing_offsets.csv',
