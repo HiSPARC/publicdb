@@ -637,7 +637,7 @@ def save_offsets(summary, offsets):
         o = DetectorTimingOffset.objects.get(source=summary)
     except DetectorTimingOffset.DoesNotExist:
         o = DetectorTimingOffset(source=summary)
-    offsets = [off if not isnan(off) else None for off in offsets]
+    offsets = [off if not np.isnan(off) else None for off in offsets]
     o.offset_1 = round(offsets[0], 1)
     o.offset_2 = round(offsets[1], 1)
     o.offset_3 = round(offsets[2], 1)
