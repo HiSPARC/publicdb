@@ -111,7 +111,7 @@ def data_json(coincidence, events):
                                   .utctimetuple()),
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
-    response = HttpResponse(json.dumps(data), mimetype='application/json')
+    response = HttpResponse(json.dumps(data), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -120,7 +120,7 @@ def error_json(error_code, message):
     """Construct error response json for jSparc requests"""
     data = dict(message=message, code=error_code)
     response = HttpResponse(json.dumps(data), status=error_code,
-                            mimetype='application/json')
+                            content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -187,7 +187,7 @@ def result(request):
         rank = None
     msg = "OK [result stored]"
     response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
-                            mimetype='application/json')
+                            content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -197,6 +197,6 @@ def test_result():
     msg = "Test session, result not stored"
     rank = randint(1, 10)
     response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
-                            mimetype='application/json')
+                            content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
