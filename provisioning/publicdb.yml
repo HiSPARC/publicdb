@@ -60,10 +60,6 @@
   copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
         backup=yes force=no
 
-- name: synchronize Django database
-  shell: chdir=/srv/publicdb/www/django_publicdb
-         yes 'no' | /srv/publicdb/publicdb_env/bin/python manage.py syncdb
-
 - name: migrate Django apps
   command: chdir=/srv/publicdb/www/django_publicdb
            /srv/publicdb/publicdb_env/bin/python manage.py migrate
