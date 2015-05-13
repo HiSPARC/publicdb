@@ -43,9 +43,7 @@ class DataDownloadForm(forms.Form):
             del cleaned_data["lightning_type"]
             station = cleaned_data.get('station_events')
             if not station:
-                self._errors["station_events"] = \
-                    self.error_class([u'Choose a station'])
-                del cleaned_data["station_events"]
+                self.add_error("station_events", u'Choose a station')
             else:
                 cleaned_data["station"] = station
         elif data_type == 'weather':
@@ -53,9 +51,7 @@ class DataDownloadForm(forms.Form):
             del cleaned_data["lightning_type"]
             station = cleaned_data.get('station_weather')
             if not station:
-                self._errors["station_weather"] = \
-                    self.error_class([u'Choose a station'])
-                del cleaned_data["station_weather"]
+                self.add_error("station_weather", u'Choose a station')
             else:
                 cleaned_data["station"] = station
         elif data_type == 'lightning':
