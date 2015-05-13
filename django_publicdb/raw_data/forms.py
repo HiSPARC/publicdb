@@ -87,43 +87,32 @@ class CoincidenceDownloadForm(forms.Form):
         if filter_by == 'network':
             del cleaned_data["cluster"]
             del cleaned_data["stations"]
-            return cleaned_data
         elif filter_by == 'cluster':
             del cleaned_data["stations"]
             cluster = cleaned_data.get('cluster')
             if not cluster:
-                self._errors["cluster"] = \
-                    self.error_class([u'Choose a cluster'])
-                del cleaned_data["cluster"]
+                self.add_error("cluster", u'Choose a cluster.')
         elif filter_by == 'stations':
             del cleaned_data["cluster"]
+            msg = None
             stations = cleaned_data.get('stations')
             if not stations:
-                self._errors["stations"] = \
-                    self.error_class([u'A list of stations is required'])
+                msg = u'A list of stations is required.'
             else:
                 try:
                     s_numbers = [int(x)
                                  for x in stations.strip('[]').split(',')]
                 except:
-                    self._errors["stations"] = \
-                        self.error_class([u'Incorrect station entry'])
-                    del cleaned_data["stations"]
-                    return cleaned_data
-                if len(s_numbers) < cleaned_data.get('n'):
-                    self._errors["stations"] = \
-                        self.error_class([u'Enter at least N stations.'])
-                    del cleaned_data["stations"]
-                    return cleaned_data
-                if len(s_numbers) > 30:
-                    self._errors["stations"] = \
-                        self.error_class([u'Exceeded limit of 30 stations.'])
-                    del cleaned_data["stations"]
-                    return cleaned_data
-                if not (Station.objects.filter(number__in=s_numbers).count() ==
-                        len(s_numbers)):
-                    self._errors["stations"] = \
-                        self.error_class([u'Invalid station numbers.'])
-                    del cleaned_data["stations"]
-                    return cleaned_data
+                    msg = u'Incorrect station entry.'
+                else:
+                    if len(s_numbers) < cleaned_data.get('n'):
+                        msg = u'Enter at least N stations.'
+                    elif len(s_numbers) > 30:
+                        msg = u'Exceeded limit of 30 stations.'
+                    elif not (Station.objects.filter(number__in=s_numbers)
+                                     .count() == len(s_numbers)):
+                        msg = u'Invalid station numbers.'
+            if msg not None:
+                self.add_error('stations', msg)
+
         return cleaned_data
