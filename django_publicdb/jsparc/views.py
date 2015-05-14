@@ -22,7 +22,7 @@ def get_coincidence(request):
     if session_title.lower() == 'example':
         today = datetime.date.today()
         coincidences = AnalyzedCoincidence.objects.filter(
-                                                session__ends__gt=today)
+            session__ends__gt=today)
         count = coincidences.count()
         random_index = randint(0, count - 1)
         coincidence = coincidences[random_index]
