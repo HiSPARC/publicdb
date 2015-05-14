@@ -3,8 +3,10 @@ from django.template import RequestContext
 
 import datetime
 
-from ..inforecords.models import Station, Cluster, Country, DetectorHisparc
-from ..status_display.nagios import status_lists, get_station_status
+from django_publicdb.inforecords.models import (Station, Cluster, Country,
+                                                DetectorHisparc)
+from django_publicdb.status_display.nagios import (status_lists,
+                                                   get_station_status)
 
 
 def station_on_map(request, station_number):

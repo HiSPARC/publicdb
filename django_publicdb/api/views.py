@@ -5,16 +5,17 @@ import json
 from operator import itemgetter
 import datetime
 
-from ..inforecords.models import (Pc, Station, Cluster, Country,
-                                  DetectorHisparc,
-                                  MonitorPulseheightThresholds)
-from ..histograms.models import (Summary, DailyHistogram, HistogramType,
-                                 Configuration, PulseheightFit)
-import datastore
-
 import numpy
 import scipy
 from scipy import optimize
+
+from django_publicdb.inforecords.models import (Pc, Station, Cluster, Country,
+                                                DetectorHisparc,
+                                                MonitorPulseheightThresholds)
+from django_publicdb.histograms.models import (Summary, DailyHistogram,
+                                               HistogramType, Configuration,
+                                               PulseheightFit)
+import datastore
 
 
 FIRSTDATE = datetime.date(2002, 1, 1)

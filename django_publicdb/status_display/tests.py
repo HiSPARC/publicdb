@@ -2,8 +2,8 @@ import urllib
 
 from django.test import LiveServerTestCase
 
-from ..inforecords.models import *
-from ..histograms.models import *
+from django_publicdb.inforecords.models import *
+from django_publicdb.histograms.models import *
 
 
 def is_html(response):

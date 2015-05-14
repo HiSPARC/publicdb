@@ -191,7 +191,7 @@ class Station(models.Model):
         reload_datastore()
 
     def number_of_detectors(self):
-        from ..histograms.models import Configuration
+        from django_publicdb.histograms.models import Configuration
 
         n_detectors = 0
         today = datetime.datetime.utcnow()

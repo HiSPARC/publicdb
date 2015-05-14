@@ -3,7 +3,7 @@ from django.forms.extras.widgets import SelectDateWidget
 
 from datetime import date
 
-from ..inforecords.models import Cluster
+from django_publicdb.inforecords.models import Cluster
 
 todays_year = range(2004, date.today().year + 1)
 

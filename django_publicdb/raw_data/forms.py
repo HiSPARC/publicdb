@@ -1,6 +1,6 @@
 from django import forms
 
-from ..inforecords.models import Station, Cluster
+from django_publicdb.inforecords.models import Station, Cluster
 
 
 TYPES = [('events', 'Events'),

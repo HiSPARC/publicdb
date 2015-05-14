@@ -11,7 +11,7 @@ import tables
 from sapphire.analysis import process_events, coincidences, calibration
 from sapphire import clusters
 
-from ..inforecords.models import Station
+from django_publicdb.inforecords.models import Station
 import datastore
 
 from django.conf import settings

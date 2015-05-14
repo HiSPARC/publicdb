@@ -15,8 +15,8 @@ import numpy as np
 
 from sapphire.analysis import coincidences
 
-from ..coincidences.models import Coincidence, Event
-from ..inforecords.models import Station
+from django_publicdb.coincidences.models import Coincidence, Event
+from django_publicdb.inforecords.models import Station
 
 
 class AnalysisSession(models.Model):

@@ -9,11 +9,13 @@ from operator import itemgetter
 import calendar
 import datetime
 
-from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
-                                 NetworkHistogram, HistogramType, DatasetType,
-                                 DetectorTimingOffset)
-from ..inforecords.models import (Summary, NetworkSummary, Pc, Station,
-                                  Cluster, Country, DetectorHisparc)
+from django_publicdb.histograms.models import (DailyHistogram, DailyDataset,
+                                               Configuration, NetworkHistogram,
+                                               HistogramType, DatasetType,
+                                               DetectorTimingOffset)
+from django_publicdb.inforecords.models import (Summary, NetworkSummary, Pc,
+                                                Station, Cluster, Country,
+                                                DetectorHisparc)
 from nagios import status_lists, get_status_counts, get_station_status
 
 
