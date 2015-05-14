@@ -11,9 +11,9 @@ import datetime
 
 from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  NetworkHistogram, HistogramType, DatasetType,
-                                 DetectorTimingOffset)
-from ..inforecords.models import (Summary, NetworkSummary, Pc, Station,
-                                  Cluster, Country, DetectorHisparc)
+                                 DetectorTimingOffset, Summary, NetworkSummary)
+from ..inforecords.models import (Pc, Station, Cluster, Country,
+                                  DetectorHisparc)
 from nagios import status_lists, get_status_counts, get_station_status
 
 
