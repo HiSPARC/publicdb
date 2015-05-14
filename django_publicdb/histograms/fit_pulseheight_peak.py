@@ -9,7 +9,7 @@ import scipy
 import scipy.optimize
 import scipy.stats
 
-from models import *
+from models import Configuration, PulseheightFit
 import esd
 
 
@@ -83,7 +83,8 @@ def get_fit_parameters(x, y):
         y_smoothed.append(0.0)
         y_smoothed = numpy.float_(y_smoothed)
 
-    y_smoothed_rebinned = 2 * y_smoothed.reshape(len(y_smoothed) / 2, 2).mean(axis=1)
+    y_smoothed_rebinned = (2 * y_smoothed.reshape(len(y_smoothed) / 2, 2)
+                                         .mean(axis=1))
 
     y_diff = numpy.diff(y_smoothed_rebinned)
 
@@ -95,7 +96,7 @@ def get_fit_parameters(x, y):
 
     # Smooth y by averaging while keeping sharp cut at 120 ADC
 
-    y_diff_smoothed = numpy.convolve(y_diff, [0.2, 0.2, 0.2, 0.2, 0.2, 0], "same")
+    y_diff_smoothed = numpy.convolve(y_diff, [.2, .2, .2, .2, .2, 0], "same")
 
     for i in range(len(y_diff_smoothed)):
         if x_rebinned[i] > 120:
@@ -167,13 +168,15 @@ def fit_pulseheight_peak(pulseheights):
     average_pulseheight = (pulseheight * occurence).sum() / occurence.sum()
 
     if average_pulseheight < 100:
-        pulseheightFit.error_message = "Average pulseheight is less than 100 ADC"
+        pulseheightFit.error_message = ("Average pulseheight is less than "
+                                        "100 ADC")
         return pulseheightFit
 
     # 3. Get initial fit parameters for gauss: mean and width
 
     try:
-        initial_mpv, minRange, maxRange = get_fit_parameters(pulseheight, occurence)
+        initial_mpv, minRange, maxRange = get_fit_parameters(pulseheight,
+                                                             occurence)
         # logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
         #              (initial_mpv, minRange, maxRange))
     except Exception, e:
@@ -255,7 +258,8 @@ def fit_pulseheight_peak(pulseheights):
 
     # Chi2 = Sum((y_data - y_fitted)^2 / sigma^2)
     # It is assumed that the events per bin are poisson distributed.
-    # Sigma^2 for a poisson process is the same as the number of events in the bin
+    # Sigma^2 for a poisson process is the same as the number of
+    # events in the bin
 
     chiSquare = (residual(fitParameters, fit_window_pulseheight,
                           fit_window_occurence) ** 2 /
