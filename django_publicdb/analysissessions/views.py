@@ -12,10 +12,11 @@ from random import randint
 
 import numpy as np
 from numpy import pi, arcsin, arctan2, sin, cos
-
-from models import *
-from forms import *
 from recaptcha.client import captcha
+
+from .models import (AnalysisSession, AnalyzedCoincidence, Student,
+                     SessionRequest)
+from .forms import SessionRequestForm
 
 
 def data_display(request, slug):

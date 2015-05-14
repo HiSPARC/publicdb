@@ -5,10 +5,11 @@ import json
 from operator import itemgetter
 import datetime
 
-from django_publicdb.coincidences.models import *
-from django_publicdb.analysissessions.models import *
-from django_publicdb.inforecords.models import *
-from django_publicdb.histograms.models import *
+from ..inforecords.models import (Pc, Station, Cluster, Country,
+                                  DetectorHisparc,
+                                  MonitorPulseheightThresholds)
+from ..histograms.models import (Summary, DailyHistogram, HistogramType,
+                                 Configuration, PulseheightFit)
 import datastore
 
 import numpy

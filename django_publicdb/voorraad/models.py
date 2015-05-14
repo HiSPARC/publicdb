@@ -1,8 +1,9 @@
 from django.db import models
-from django_publicdb.inforecords.models import *
 from django.contrib.auth.models import User
 from django_publicdb.middleware import threadlocals
 from django.utils.safestring import mark_safe
+
+from ..inforecords.models import Cluster
 
 
 class Leverancier(models.Model):

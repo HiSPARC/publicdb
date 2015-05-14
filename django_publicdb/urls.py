@@ -1,7 +1,7 @@
-from django.conf.urls import *
+from django.conf.urls import patterns, include
 from django.views.generic import RedirectView, TemplateView
 
-from django_publicdb.inforecords.views import *
+from .inforecords.views import create_nagios_config, create_datastore_config
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin

@@ -2,7 +2,7 @@ import urllib2
 import socket
 import re
 
-from django_publicdb.inforecords.models import *
+from ..inforecords.models import Station
 
 
 def status_lists():

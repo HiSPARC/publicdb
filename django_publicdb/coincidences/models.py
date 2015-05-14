@@ -6,7 +6,7 @@ import base64
 import numpy as np
 import json
 
-from django_publicdb.inforecords import models as inforecords
+from ..inforecords.models import Station
 from south.modelsinspector import add_introspection_rules
 
 
@@ -89,7 +89,7 @@ class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     nanoseconds = models.IntegerField()
-    station = models.ForeignKey(inforecords.Station)
+    station = models.ForeignKey(Station)
     pulseheights = SerializedDataField()
     integrals = SerializedDataField()
     traces = SerializedDataField()

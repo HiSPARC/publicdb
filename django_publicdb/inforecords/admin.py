@@ -1,5 +1,10 @@
 from django.contrib import admin
-from models import *
+
+from .models import (Profession, Contact, ContactInformation, Cluster,
+                     Station, Country, DetectorHisparc, ElectronicsType,
+                     ElectronicsStatus, ElectronicsBatch, Electronics,
+                     PcType, Pc, MonitorPulseheightThresholds,
+                     MonitorService, EnabledService)
 
 
 class ClusterAdmin(admin.ModelAdmin):

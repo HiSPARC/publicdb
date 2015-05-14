@@ -8,9 +8,8 @@ from random import randint
 import numpy as np
 import operator
 
-from django_publicdb.coincidences.models import *
-from django_publicdb.analysissessions.models import *
-from django_publicdb.inforecords.models import *
+from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
+                                       Student)
 
 
 def get_coincidence(request):

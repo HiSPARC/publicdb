@@ -2,7 +2,7 @@ from django import http
 
 from urllib import urlencode
 
-from django_publicdb.updates.models import *
+from .models import InstallerUpdate, AdminUpdate, UserUpdate, UpdateQueue
 
 USER_UPDATE = 1
 ADMIN_UPDATE = 2

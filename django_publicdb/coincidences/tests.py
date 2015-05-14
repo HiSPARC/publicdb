@@ -1,8 +1,8 @@
 from django.test import TestCase
 from django.core import serializers
 
-from django_publicdb.coincidences.models import *
-from django_publicdb.inforecords.models import *
+from .models import *
+from ..inforecords.models import *
 
 
 class SerializationTestCase(TestCase):

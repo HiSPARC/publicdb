@@ -16,9 +16,8 @@ from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
 from lib.test import datastore as test_datastore
-from django_publicdb.histograms import datastore, jobs, esd
-from django_publicdb.histograms.models import *
-import fit_pulseheight_peak
+from . import datastore, jobs, esd, fit_pulseheight_peak
+from .models import *
 
 
 histograms_logger = logging.getLogger('histograms')

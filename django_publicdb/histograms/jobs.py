@@ -11,11 +11,11 @@ import multiprocessing
 import numpy as np
 
 import django.db
-from models import (GeneratorState, NetworkSummary, Summary,
-                    Configuration, HistogramType, DatasetType,
-                    DailyHistogram, NetworkHistogram, DailyDataset,
-                    PulseheightFit, DetectorTimingOffset)
-from django_publicdb.inforecords.models import Station, DetectorHisparc
+from .models import (GeneratorState, NetworkSummary, Summary,
+                     Configuration, HistogramType, DatasetType,
+                     DailyHistogram, NetworkHistogram, DailyDataset,
+                     PulseheightFit, DetectorTimingOffset)
+from ..inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
