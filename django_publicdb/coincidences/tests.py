@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.core import serializers
 
 from .models import *
-from django_publicdb.inforecords.models import *
+from ..inforecords.models import *
 
 
 class SerializationTestCase(TestCase):

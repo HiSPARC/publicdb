@@ -15,7 +15,7 @@ from .models import (GeneratorState, NetworkSummary, Summary,
                      Configuration, HistogramType, DatasetType,
                      DailyHistogram, NetworkHistogram, DailyDataset,
                      PulseheightFit, DetectorTimingOffset)
-from django_publicdb.inforecords.models import Station, DetectorHisparc
+from ..inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 

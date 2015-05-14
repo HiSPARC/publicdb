@@ -10,8 +10,8 @@ from django.conf import settings
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 
-from django_publicdb.inforecords.models import *
-from django_publicdb.histograms.models import *
+from ..inforecords.models import *
+from ..histograms.models import *
 from scripts.nagios.check_pulseheight_mpv import check_pulseheight_mpv
 
 

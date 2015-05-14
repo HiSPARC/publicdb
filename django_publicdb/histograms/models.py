@@ -6,7 +6,7 @@ import base64
 import re
 import ast
 
-from django_publicdb.inforecords.models import Station
+from ..inforecords.models import Station
 from south.modelsinspector import add_introspection_rules
 
 
