@@ -108,7 +108,7 @@ class CoincidenceDownloadForm(forms.Form):
                     elif not (Station.objects.filter(number__in=s_numbers)
                                      .count() == len(s_numbers)):
                         msg = u'Invalid station numbers.'
-            if msg not None:
+            if msg is not None:
                 self.add_error('stations', msg)
 
         return cleaned_data
