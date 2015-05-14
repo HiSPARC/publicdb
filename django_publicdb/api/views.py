@@ -6,8 +6,7 @@ from operator import itemgetter
 import datetime
 
 import numpy
-import scipy
-from scipy import optimize
+from scipy import optimize, stats
 
 from django_publicdb.inforecords.models import (Pc, Station, Cluster, Country,
                                                 DetectorHisparc,
@@ -421,7 +420,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
             relative_mpv.append(mpv / linear_fit(p1, t))
 
         # Fit the relative fluctation with a gauss
-        gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
+        gauss = lambda x, N, m, s: N * stats.norm.pdf(x, m, s)
 
         # x = ADC, y = number of events per dPulseheight
 
@@ -433,9 +432,9 @@ def get_pulseheight_drift(request, station_number, plate_number,
         initial_mean = 1
         initial_width = 0.03
 
-        popt, pcov = scipy.optimize.curve_fit(gauss, x, y, p0=(initial_N,
-                                                               initial_mean,
-                                                               initial_width))
+        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_N,
+                                                         initial_mean,
+                                                         initial_width))
 
         dict.update({'number_of_selected_days': len(t_array),
                      'number_of_requested_days': number_of_days,
