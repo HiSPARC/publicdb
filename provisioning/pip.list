@@ -4,4 +4,4 @@ uwsgitop
 Django>=1.7,<1.8
 recaptcha-client
 
-hisparc-sapphire>=0.10,<0.11
+hisparc-sapphire>=0.10.1,<0.11
