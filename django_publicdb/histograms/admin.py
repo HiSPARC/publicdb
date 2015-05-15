@@ -39,6 +39,7 @@ class NetworkSummaryAdmin(admin.ModelAdmin):
     list_display = ('date', 'needs_update', 'needs_update_coincidences',
                     'num_coincidences',)
     list_filter = ('needs_update_coincidences', 'date')
+    list_editable = ('needs_update', 'needs_update_coincidences')
     inlines = (NetworkHistogramInline,)
 
 
@@ -48,7 +49,8 @@ class SummaryAdmin(admin.ModelAdmin):
                     'needs_update_errors', 'needs_update_weather',
                     'num_events', 'num_config', 'num_errors', 'num_weather')
     list_filter = ('station', 'needs_update', 'date')
-    list_editable = ('needs_update',)
+    list_editable = ('needs_update', 'needs_update_events',
+                     'needs_update_weather', 'needs_update_config')
     inlines = (DailyHistogramInline,)
 
 
