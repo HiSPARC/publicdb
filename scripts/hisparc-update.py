@@ -38,6 +38,9 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO, format=fmt)
     logger = logging.getLogger('cron')
 
+    import django
+    django.setup()
+
     try:
         run()
     except:
