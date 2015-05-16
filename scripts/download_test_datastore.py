@@ -27,7 +27,7 @@ import datetime
 from sapphire.publicdb import download_data
 
 from django.conf import settings
-from django_publicdb.inforecords.models import *
+from django_publicdb.inforecords.models import Station
 
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)
@@ -122,7 +122,7 @@ def get_or_create_cluster_group(file, cluster):
         cluster = file.get_node(hisparc, node_name)
     except tables.NoSuchNodeError:
         cluster = file.create_group(hisparc, node_name,
-                                   'HiSPARC cluster %s data' % cluster)
+                                    'HiSPARC cluster %s data' % cluster)
         file.flush()
 
     return cluster
@@ -142,7 +142,7 @@ def get_or_create_station_group(file, cluster, station_number):
         station = file.get_node(cluster, node_name)
     except tables.NoSuchNodeError:
         station = file.create_group(cluster, node_name,
-                                   'HiSPARC station %d data' % station_number)
+                                    'HiSPARC station %d data' % station_number)
         file.flush()
 
     return station

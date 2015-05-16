@@ -11,10 +11,6 @@
 """
 from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import subprocess
-import cStringIO as StringIO
-import zipfile
-import os
 import base64
 
 HOSTS_FILE = '/tmp/hosts-hisparc'
