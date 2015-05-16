@@ -23,13 +23,13 @@ def data_display(request, slug):
     coincidences = AnalyzedCoincidence.objects.filter(session=session,
                                                       is_analyzed=True)
     energy_histogram = create_energy_histogram(slug, coincidences)
-    core_plot = None  # create_core_plot(slug, coincidences)
+    core_map = get_cores(slug, coincidences)
     star_map = None  # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
 
     return render_to_response('results.html',
                               {'energy_histogram': energy_histogram,
-                               'core_plot': core_plot,
+                               'core_map': core_map,
                                'star_map': star_map,
                                'scores': scores,
                                'slug': slug,
@@ -51,6 +51,14 @@ def create_energy_histogram(slug, coincidences):
     plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
                                      'Count')
     return plot_object
+
+
+def get_cores(slug, coincidences):
+    """Create data to plot on map"""
+
+    cores = [(c.core_position_x, c.core_position_y) for c in coincidences]
+
+    return cores
 
 
 def create_plot_object(x_values, y_series, x_label, y_label):

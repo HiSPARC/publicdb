@@ -12,6 +12,33 @@
 {% block head %}
     <meta http-equiv="refresh" content="60">
     <script src="{{ STATIC_URL }}scripts/flot_settings_results.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
+      {% if core_map %}
+        $(document).ready(function() {
+            var map = createMap("coreMap");
+            var style = createStyle(map);
+
+            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+
+            var coreLayer = new OpenLayers.Layer.Vector("cores", {styleMap: new OpenLayers.StyleMap(style)});
+
+            {% for core in core_map %}
+                var feature = new OpenLayers.Feature.Vector(
+                    new OpenLayers.Geometry.Point{{ core }}.transform(fromProjection, toProjection),
+                    {id: "", status: "gpsold"});
+                coreLayer.addFeatures(feature);
+            {% endfor %}
+
+            map.addLayer(coreLayer);
+
+            var bounds = coreLayer.getDataExtent();
+            map.zoomToExtent(bounds);
+
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+        });
+      {% endif %}
+    </script>
 {% endblock %}
 
 {% block content %}
@@ -35,11 +62,13 @@
                 {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], en_options);
         </script>
     </div>
-{% comment %} 
-    <div id="corePlot">
-        <h3>Shower core positions</h3>
-        <img src="{{ core_plot }}">
+{% if core_map %} 
+    <h3>Shower core positions</h3>
+    <div id="coreMap">
     </div>
+{% endif %}
+
+{% comment %}
     {% ifnotequal slug 'leerlingensymposium-2011' %}
         {% ifnotequal slug 'middelharnis2011' %}
             <div id="starMap">
