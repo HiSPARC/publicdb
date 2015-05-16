@@ -5,13 +5,10 @@ from django.http import HttpResponse
 # from django.views.decorators.csrf import csrf_protect
 
 import operator
-import os
 import datetime
-import calendar
 from random import randint
 
 import numpy as np
-from numpy import pi, arcsin, arctan2, sin, cos
 from recaptcha.client import captcha
 
 from .models import (AnalysisSession, AnalyzedCoincidence, Student,
@@ -53,40 +50,6 @@ def create_energy_histogram(slug, coincidences):
 
     plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
                                      'Count')
-    return plot_object
-
-
-def create_core_plot(slug, coincidences):
-    """Create a plot showing analyzed shower cores"""
-
-    if 'middelharnis' in slug:
-        xbounds = (4.15268, 4.16838)
-        ybounds = (51.75011, 51.76069)
-        filename = 'map-middelharnis.png'
-    else:
-        xbounds = (4.93772, 4.96952)
-        ybounds = (52.34542, 52.36592)
-        filename = 'map-flipped.png'
-
-    x, y, logenergy = get_core_positions(coincidences)
-    data.set_data('x', x)
-    data.set_data('y', y)
-    data.set_data('logenergy', logenergy)
-
-    image_file = os.path.join(settings.MEDIA_ROOT, 'static', filename)
-    image = chaco.ImageData.fromfile(image_file)
-    data.set_data('map', image.get_data())
-
-    plot.img_plot('map', xbounds=xbounds, ybounds=ybounds)
-    plot.plot(('x', 'y', 'logenergy'), type='cmap_scatter', marker='circle',
-              marker_size=3, color_mapper=chaco.autumn)
-
-    i = plot.index_range
-    i.low_setting, i.high_setting = xbounds
-    v = plot.value_range
-    v.low_setting, v.high_setting = ybounds
-
-    render_and_save_plot(plot, name, 300, 326)
     return plot_object
 
 
