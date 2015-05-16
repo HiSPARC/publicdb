@@ -18,11 +18,10 @@ import dateutil.parser
 
 from sapphire.analysis.coincidence_queries import CoincidenceQuery
 
-from django_publicdb.inforecords.models import Station, Cluster
-from django_publicdb.histograms.models import Summary, NetworkSummary
-from django_publicdb.histograms import esd
-from django_publicdb.raw_data.forms import (DataDownloadForm,
-                                            CoincidenceDownloadForm)
+from ..inforecords.models import Station, Cluster
+from ..histograms.models import Summary, NetworkSummary
+from ..histograms import esd
+from ..raw_data.forms import DataDownloadForm, CoincidenceDownloadForm
 
 import knmi_lightning
 

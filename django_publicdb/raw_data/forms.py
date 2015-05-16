@@ -1,11 +1,11 @@
 from django import forms
 
-from django_publicdb.inforecords.models import Station, Cluster
+from ..inforecords.models import Station, Cluster
 
 
 TYPES = [('events', 'Events'),
          ('weather', 'Weather'),
-         ('lightning', ' Lightning')]  # added for lightning
+         ('lightning', ' Lightning')]
 LGT_TYPES = [('0', 'Single-point'),
              ('1', 'Cloud-cloud'),
              ('2', 'Cloud-cloud mid'),

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import *
+
+from .models import (AnalysisSession, AnalyzedCoincidence, Student,
+                     SessionRequest)
 
 
 class AnalysisSessionAdmin(admin.ModelAdmin):

@@ -38,6 +38,9 @@ TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = '/srv/publicdb/www/esd'
 
+# Path of the mounted KNMI Lightning data root folder
+LGT_PATH = '/srv/publicdb/www/knmi_lightning'
+
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = 'http://localhost:8001'
 DATASTORE_PROXY = 'http://localhost:8002'

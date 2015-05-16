@@ -6,7 +6,7 @@ import base64
 import numpy as np
 import json
 
-from django_publicdb.inforecords import models as inforecords
+from ..inforecords.models import Station
 
 
 class SerializedDataField(models.Field):
@@ -22,10 +22,6 @@ class SerializedDataField(models.Field):
     def to_python(self, value):
 
         # Couple possibilities:
-        #
-        # 1. It is already a list
-        # 2. It is a JSON array formatted string
-        # 3. It is a base64 encoded zlib compressed pickle string
 
         # 1. If it is a list
 
@@ -87,7 +83,7 @@ class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     nanoseconds = models.IntegerField()
-    station = models.ForeignKey(inforecords.Station)
+    station = models.ForeignKey(Station)
     pulseheights = SerializedDataField()
     integrals = SerializedDataField()
     traces = SerializedDataField()

@@ -1,5 +1,9 @@
 from django.contrib import admin
-from models import *
+
+from .models import (GeneratorState, NetworkHistogram, DailyHistogram,
+                     DailyDataset, NetworkSummary, Summary, Configuration,
+                     PulseheightFit, HistogramType, DatasetType,
+                     DetectorTimingOffset)
 
 
 class GeneratorStateAdmin(admin.ModelAdmin):

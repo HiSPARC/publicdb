@@ -2,7 +2,7 @@ import urllib2
 import socket
 import re
 
-from django_publicdb.inforecords.models import *
+from ..inforecords.models import Station
 
 
 def status_lists():
@@ -39,7 +39,8 @@ def problem_list():
              the host has status OK, but some services are CRITICAL.
 
     """
-    query = 'hostgroup=all&style=detail&servicestatustypes=16&hoststatustypes=2'
+    query = ('hostgroup=all&style=detail&servicestatustypes=16&'
+             'hoststatustypes=2')
     problem = retrieve_station_status(query)
     problem_numbers = pc_name_to_station_number(problem)
 

@@ -6,7 +6,7 @@ import base64
 import re
 import ast
 
-from django_publicdb.inforecords import models as inforecords
+from ..inforecords.models import Station
 
 
 class SerializedDataField(models.Field):
@@ -44,7 +44,7 @@ class NetworkSummary(models.Model):
 
 
 class Summary(models.Model):
-    station = models.ForeignKey(inforecords.Station)
+    station = models.ForeignKey(Station)
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)

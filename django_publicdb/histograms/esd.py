@@ -11,7 +11,7 @@ import tables
 from sapphire.analysis import process_events, coincidences, calibration
 from sapphire import clusters
 
-from django_publicdb.inforecords.models import Station
+from ..inforecords.models import Station
 import datastore
 
 from django.conf import settings
@@ -320,7 +320,7 @@ def determine_detector_timing_offsets(summary):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, 'events')
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, summary)
+            logger.error("Cannot find table events for %s", summary)
             offsets = [np.nan, np.nan, np.nan, np.nan]
         else:
             offsets = calibration.determine_detector_timing_offsets(table)

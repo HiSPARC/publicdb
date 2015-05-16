@@ -12,8 +12,11 @@ from sapphire.utils import round_in_base
 import numpy as np
 
 import django.db
-from models import *
-from django_publicdb.inforecords.models import Station, DetectorHisparc
+from .models import (GeneratorState, NetworkSummary, Summary,
+                     Configuration, HistogramType, DatasetType,
+                     DailyHistogram, NetworkHistogram, DailyDataset,
+                     PulseheightFit, DetectorTimingOffset)
+from ..inforecords.models import Station, DetectorHisparc
 import datastore
 import esd
 
@@ -93,8 +96,9 @@ def process_possible_stations_for_date(date, station_list):
 
     """
     logger.info('Now processing %s' % date)
-    unique_table_list = set([table_name for table_list in station_list.values()
-                                        for table_name in table_list.keys()])
+    unique_table_list = set([table_name
+                             for table_list in station_list.values()
+                             for table_name in table_list.keys()])
     for table_name in unique_table_list:
         process_possible_tables_for_network(date, table_name)
     for station, table_list in station_list.iteritems():
@@ -232,7 +236,7 @@ def update_coincidences():
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
         results = worker_pool.imap_unordered(
-            search_and_store_coincidences_for_network_summary,
+            search_and_store_coincidences,
             network_summaries)
 
         for network_summary in results:
@@ -244,7 +248,7 @@ def update_coincidences():
         worker_pool.join()
     else:
         for network_summary in network_summaries:
-            network_summary = search_and_store_coincidences_for_network_summary(network_summary)
+            network_summary = search_and_store_coincidences(network_summary)
             network_summary.needs_update = False
             django.db.close_connection()
             network_summary.save()
@@ -260,7 +264,12 @@ def process_and_store_temporary_esd_for_summary(summary):
     return summary, tmp_locations
 
 
-def search_and_store_coincidences_for_network_summary(network_summary):
+def search_and_store_coincidences(network_summary):
+    """Perform the search and storing of coincidences for a network summary
+
+    :param network_summary: a NetworkSummary object.
+
+    """
     django.db.close_connection()
     if network_summary.needs_update_coincidences:
         search_coincidences_and_store_esd(network_summary)

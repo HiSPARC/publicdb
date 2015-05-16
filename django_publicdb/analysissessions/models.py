@@ -1,8 +1,7 @@
 from django.db import models
-from django_publicdb.coincidences.models import *
-from django_publicdb.inforecords.models import *
 from django.core.mail import send_mail
 from django.template.defaultfilters import slugify
+from django.conf import settings
 
 from random import choice
 import string
@@ -15,6 +14,9 @@ import re
 import numpy as np
 
 from sapphire.analysis import coincidences
+
+from ..coincidences.models import Coincidence, Event
+from ..inforecords.models import Station
 
 
 class AnalysisSession(models.Model):

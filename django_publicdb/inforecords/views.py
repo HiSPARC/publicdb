@@ -8,9 +8,9 @@ import socket
 import xmlrpclib
 import base64
 
-from django_publicdb.inforecords.models import *
-from django_publicdb.histograms.models import *
-from django_publicdb.status_display.views import station_has_data
+from .models import Pc, Contact, Station, Cluster, MonitorPulseheightThresholds
+from ..histograms.models import Configuration
+from ..status_display.views import station_has_data
 
 
 @login_required

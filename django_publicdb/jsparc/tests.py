@@ -3,7 +3,7 @@ import urllib
 
 from django.test import LiveServerTestCase
 
-from django_publicdb.analysissessions.models import *
+from ..analysissessions.models import *
 
 
 def is_json(response):

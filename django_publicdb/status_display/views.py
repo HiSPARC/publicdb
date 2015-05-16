@@ -9,8 +9,11 @@ from operator import itemgetter
 import calendar
 import datetime
 
-from django_publicdb.histograms.models import *
-from django_publicdb.inforecords.models import *
+from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
+                                 NetworkHistogram, HistogramType, DatasetType,
+                                 DetectorTimingOffset, Summary, NetworkSummary)
+from ..inforecords.models import (Pc, Station, Cluster, Country,
+                                  DetectorHisparc)
 from nagios import status_lists, get_status_counts, get_station_status
 
 
@@ -245,8 +248,10 @@ def network_coincidences(request, year=None, month=None, day=None):
                     'month': calendar.month_name[month][:3],
                     'day': day}
 
-    coincidencetimehistogram = create_histogram_network('coincidencetime', date)
-    coincidencenumberhistogram = create_histogram_network('coincidencenumber', date)
+    coincidencetimehistogram = create_histogram_network('coincidencetime',
+                                                        date)
+    coincidencenumberhistogram = create_histogram_network('coincidencenumber',
+                                                          date)
 
     return render_to_response('network_coincidences.html',
         {'date': date,
@@ -540,8 +545,10 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
     return response
 
 
-def get_pulseheight_histogram_source(request, station_number, year, month, day):
-    data = get_histogram_source(year, month, day, 'pulseheight', station_number)
+def get_pulseheight_histogram_source(request, station_number, year, month,
+                                     day):
+    data = get_histogram_source(year, month, day, 'pulseheight',
+                                station_number)
     response = render_to_response('source_pulseheight_histogram.csv',
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
@@ -553,8 +560,10 @@ def get_pulseheight_histogram_source(request, station_number, year, month, day):
     return response
 
 
-def get_pulseintegral_histogram_source(request, station_number, year, month, day):
-    data = get_histogram_source(year, month, day, 'pulseintegral', station_number)
+def get_pulseintegral_histogram_source(request, station_number, year, month,
+                                       day):
+    data = get_histogram_source(year, month, day, 'pulseintegral',
+                                station_number)
     response = render_to_response('source_pulseintegral_histogram.csv',
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
@@ -641,7 +650,8 @@ def get_detector_timing_offsets_source(request, station_number):
                                    'station_number': station_number},
                                   content_type='text/csv')
     response['Content-Disposition'] = (
-        'attachment; filename=detector_timing_offsets-s%s.csv' % station_number)
+        'attachment; filename=detector_timing_offsets-s%s.csv' %
+        station_number)
     return response
 
 

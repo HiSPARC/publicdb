@@ -8,14 +8,13 @@ from random import randint
 import numpy as np
 import operator
 
-from django_publicdb.coincidences.models import *
-from django_publicdb.analysissessions.models import *
-from django_publicdb.inforecords.models import *
+from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
+                                       Student)
 
 
 def get_coincidence(request):
     """Return a coincidence for jSparc client"""
-    print("got jSparc coincidence request")
+
     session_title = request.GET.get('session_title', None)
     session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
@@ -23,7 +22,7 @@ def get_coincidence(request):
     if session_title.lower() == 'example':
         today = datetime.date.today()
         coincidences = AnalyzedCoincidence.objects.filter(
-                                                session__ends__gt=today)
+            session__ends__gt=today)
         count = coincidences.count()
         random_index = randint(0, count - 1)
         coincidence = coincidences[random_index]
