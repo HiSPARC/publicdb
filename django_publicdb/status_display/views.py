@@ -635,16 +635,7 @@ def get_gps_config_source(request, station_number):
 
 
 def get_detector_timing_offsets_source(request, station_number):
-    offsets = (DetectorTimingOffset.objects.filter(
-        source__station__number=station_number,
-        source__date__gte=FIRSTDATE,
-        source__date__lte=datetime.date.today()).order_by('source__date'))
-
-    data = offsets.values_list('source__date', 'offset_1', 'offset_2',
-                               'offset_3', 'offset_4')
-    data = [[calendar.timegm(row[0].timetuple()), row[1], row[2],
-             row[3], row[4]] for row in data]
-
+    data = get_detector_timing_offsets(station_number)
     response = render_to_response('source_detector_timing_offsets.csv',
                                   {'data': data,
                                    'station_number': station_number},
@@ -784,6 +775,18 @@ def plot_config(type, configs):
         y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
+
+
+def get_detector_timing_offsets(station_number):
+    offsets = (DetectorTimingOffset.objects.filter(
+        source__station__number=station_number,
+        source__date__gte=FIRSTDATE,
+        source__date__lte=datetime.date.today()).order_by('source__date'))
+
+    data = offsets.values_list('source__date', 'offset_1', 'offset_2',
+                               'offset_3', 'offset_4')
+    data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
+    return data
 
 
 def get_gpspositions(configs):
