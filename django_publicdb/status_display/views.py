@@ -409,6 +409,7 @@ def station_config(request, station_number):
 
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
+    timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
 
@@ -417,6 +418,7 @@ def station_config(request, station_number):
          'config': config,
          'voltagegraph': voltagegraph,
          'currentgraph': currentgraph,
+         'timingoffsetgraph': timingoffsetgraph,
          'altitudegraph': altitudegraph,
          'gpstrack': gpstrack,
          'has_slave': has_slave,
@@ -774,6 +776,19 @@ def plot_config(type, configs):
         values = [config.gps_altitude for config in configs]
         y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
+    return plot_object
+
+
+def plot_timing_offsets(station_number):
+    """Create a plot object from station configs"""
+
+    data = get_detector_timing_offsets(station_number)
+    data = zip(*data)
+
+    x_label = 'Date (month/year)'
+    y_label = 'Timing offset (ns)'
+
+    plot_object = create_plot_object(data[0], data[1:], x_label, y_label)
     return plot_object
 
 

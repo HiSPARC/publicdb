@@ -187,6 +187,17 @@ var _currentgraph = {
         min: 0}
 };
 
+var _timingoffsetgraph = {
+    xaxis: {
+        axisLabel: 'Date',
+        mode: "time",
+        timeformat: "%m/%Y"},
+    yaxis: {
+        axisLabel: 'Timing offset (ns)',
+        min: -20,
+        max: 20}
+};
+
 var _altitudegraph = {
     xaxis: {
         axisLabel: 'Date',
@@ -219,5 +230,6 @@ var td_options = $.extend(true, {}, _base, _temperaturedata);
 var bd_options = $.extend(true, {}, _base, _barometerdata);
 var vg_options = $.extend(true, {}, _base, _voltagegraph);
 var cg_options = $.extend(true, {}, _base, _currentgraph);
+var to_options = $.extend(true, {}, _base, _timingoffsetgraph);
 var ag_options = $.extend(true, {}, _base, _altitudegraph);
 var tr_options = $.extend(true, {}, _base, _tracegraph);
