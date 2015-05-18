@@ -114,5 +114,5 @@
   cron: name="create confirmed sessions" cron_file=hisparc
         minute=* hour=* day=* month=* weekday=*
         state=present user=hisparc
-        job="curl http://data.hisparc.nl/analysis-session/request/create/"
+        job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
   sudo: yes
