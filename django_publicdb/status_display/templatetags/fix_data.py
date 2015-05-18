@@ -10,13 +10,19 @@ register = template.Library()
 def fix_histogram_data(value):
     """Append one value to end of data, to fix step histogram"""
 
-    return value + [[value[-1][0] + (value[-1][0] - value[-2][0]),
-                     value[-1][1]]]
+    if len(value) > 1:
+        return value + [[value[-1][0] + (value[-1][0] - value[-2][0]),
+                         value[-1][1]]]
+    else:
+        return value
 
 
 @register.filter
 def fix_histogram_time(value):
     """Extend last known value to the current date"""
+
+    if not len(value):
+        return value
 
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     timestamp = calendar.timegm(tomorrow.timetuple())
