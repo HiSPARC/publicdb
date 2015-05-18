@@ -193,9 +193,7 @@ var _timingoffsetgraph = {
         mode: "time",
         timeformat: "%m/%Y"},
     yaxis: {
-        axisLabel: 'Timing offset (ns)',
-        min: -20,
-        max: 20}
+        axisLabel: 'Timing offset (ns)'}
 };
 
 var _altitudegraph = {
