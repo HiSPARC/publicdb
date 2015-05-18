@@ -13,7 +13,6 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import urllib2
 import hashlib
-import subprocess
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'

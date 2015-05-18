@@ -14,7 +14,6 @@ import datetime
 import os
 import urllib2
 import json
-import signal
 import socket
 
 
@@ -52,9 +51,9 @@ def check_pulseheight_mpv(publicdb_host, stationNumber, plateNumber, date):
     publicdb_host = publicdb_host.replace("http://", "")
 
     try:
-        uri = "http://%s/api/station/%s/plate/%s/pulseheight/fit/%s/%s/%s" % (
-                publicdb_host, stationNumber, plateNumber,
-                date.year, date.month, date.day)
+        uri = ("http://%s/api/station/%s/plate/%s/pulseheight/fit/%s/%s/%s" %
+               (publicdb_host, stationNumber, plateNumber,
+                date.year, date.month, date.day))
     except:
         return Nagios.unknown, "Exception raised"
 
@@ -65,16 +64,16 @@ def check_pulseheight_mpv(publicdb_host, stationNumber, plateNumber, date):
 
     try:
         j = json.load(urllib2.urlopen(uri, timeout=timeout))
-    except urllib2.HTTPError, ex:
+    except urllib2.HTTPError:
         exit_code = Nagios.unknown
         exit_message = 'unable to retrieve url: "%s"' % uri
-    except urllib2.URLError, ex:
+    except urllib2.URLError:
         exit_code = Nagios.critical
         exit_message = 'unable to retrieve url: "%s"' % uri
-    except socket.timeout, ex:
+    except socket.timeout:
         exit_code = Nagios.warning
-        exit_message = 'timeout in %d seconds trying to retrieve url: "%s"' % (
-                            timeout, uri)
+        exit_message = ('timeout in %d seconds trying to retrieve url: "%s"' %
+                        (timeout, uri))
 
     if exit_code is not None:
         return exit_code, exit_message
@@ -105,7 +104,7 @@ if __name__ == '__main__':
              "%s, %s, %s, %s" % (sys.argv[1], sys.argv[2]))
 
     today = datetime.date.today()
-    #today = datetime.date(2011, 5, 1)
+    # today = datetime.date(2011, 5, 1)
     yesterday = today - datetime.timedelta(days=1)
 
     exit_code, exit_message = check_pulseheight_mpv(PUBLICDB_HOST_FOR_NAGIOS,

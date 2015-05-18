@@ -513,7 +513,7 @@ def get_coincidencetime_histogram_source(request, year, month, day):
     response = render_to_response('source_coincidencetime_histogram.csv',
                                   {'data': data,
                                    'date': '-'.join((year, month, day))},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=coincidencetime-network-%d%02d%02d.csv' %
         (int(year), int(month), int(day)))
@@ -525,7 +525,7 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
     response = render_to_response('source_coincidencenumber_histogram.csv',
                                   {'data': data,
                                    'date': '-'.join((year, month, day))},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=coincidencenumber-network-%d%02d%02d.csv' %
         (int(year), int(month), int(day)))
@@ -538,7 +538,7 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -553,7 +553,7 @@ def get_pulseheight_histogram_source(request, station_number, year, month,
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseheight-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -568,7 +568,7 @@ def get_pulseintegral_histogram_source(request, station_number, year, month,
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseintegral-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -581,7 +581,7 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=barometer-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -594,7 +594,7 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
                                   {'data': data,
                                    'date': '-'.join((year, month, day)),
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=temperature-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -606,7 +606,7 @@ def get_voltage_config_source(request, station_number):
     response = render_to_response('source_voltage_config.csv',
                                   {'data': data,
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=voltage-s%s.csv' % station_number)
     return response
@@ -617,7 +617,7 @@ def get_current_config_source(request, station_number):
     response = render_to_response('source_current_config.csv',
                                   {'data': data,
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=current-s%s.csv' % station_number)
     return response
@@ -628,7 +628,7 @@ def get_gps_config_source(request, station_number):
     response = render_to_response('source_gps_config.csv',
                                   {'data': data,
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=gps-s%s.csv' % station_number)
     return response
@@ -648,7 +648,7 @@ def get_detector_timing_offsets_source(request, station_number):
     response = render_to_response('source_detector_timing_offsets.csv',
                                   {'data': data,
                                    'station_number': station_number},
-                                  mimetype='text/csv')
+                                  content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=detector_timing_offsets-s%s.csv' %
         station_number)

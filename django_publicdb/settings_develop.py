@@ -16,14 +16,14 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-# DF: relative path, just for running test server!
-        'NAME': os.path.join(publicdb_path, 'public.db'), # Or path to database file if using sqlite3.
-        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'), # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.sqlite3',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        # DF: relative path, just for running test server!
+        'NAME': os.path.join(publicdb_path, 'public.db'),  # Or path to database file if using sqlite3.
+        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),  # Or path to database file if using sqlite3.
+        'USER': '',  # Not used with sqlite3.
+        'PASSWORD': '',  # Not used with sqlite3.
+        'HOST': '',  # Set to empty string for localhost. Not used with sqlite3.
+        'PORT': '',  # Set to empty string for default. Not used with sqlite3.
     }
 }
 
@@ -116,7 +116,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -130,7 +130,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    #'django.middleware.gzip.GZipMiddleware',
+    # 'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -144,7 +144,6 @@ ROOT_URLCONF = 'django_publicdb.urls'
 
 ALLOWED_HOSTS = [
     'data.hisparc.nl',
-    'data.hisparc.nl.', # Also allow FQDN
 ]
 
 TEMPLATE_DIRS = (
@@ -174,7 +173,6 @@ INSTALLED_APPS = (
     'django_publicdb.maps',
     'django_publicdb.jsparc',
     'django_publicdb.default',
-    'south',
 )
 
 # A sample logging configuration. The only tangible logging

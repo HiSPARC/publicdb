@@ -6,7 +6,3 @@
   file: path=/databases/frome state=directory
         owner=hisparc group=hisparc mode=2775
   sudo: yes
-
-- name: load initial generator state
-  command: chdir=/srv/publicdb/www/django_publicdb
-           /srv/publicdb/publicdb_env/bin/python manage.py loaddata initial_generator_state.json

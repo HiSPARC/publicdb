@@ -11,7 +11,8 @@ sys.path.append(publicdb_path)
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
-from django_publicdb.histograms.models import *
+from django_publicdb.histograms.models import (Summary, DailyDataset,
+                                               DailyHistogram, PulseheightFit)
 
 
 def prepare_histograms_fixture():

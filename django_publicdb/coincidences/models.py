@@ -7,14 +7,12 @@ import numpy as np
 import json
 
 from ..inforecords.models import Station
-from south.modelsinspector import add_introspection_rules
 
 
 class SerializedDataField(models.Field):
     # This makes sure that to_python() will be called when objects are
     # initialized
     __metaclass__ = models.SubfieldBase
-    add_introspection_rules([], ["^django_publicdb\.coincidences\.models\.SerializedDataField"])
 
     def db_type(self, connection):
         return 'LONGBLOB'
@@ -24,10 +22,6 @@ class SerializedDataField(models.Field):
     def to_python(self, value):
 
         # Couple possibilities:
-        #
-        # 1. It is already a list
-        # 2. It is a JSON array formatted string
-        # 3. It is a base64 encoded zlib compressed pickle string
 
         # 1. If it is a list
 

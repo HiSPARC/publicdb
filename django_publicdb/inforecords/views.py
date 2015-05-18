@@ -23,7 +23,7 @@ def keys(request, host):
     key_file = proxy.get_key(host.name, host.type.slug)
     key_file = base64.b64decode(key_file)
 
-    response = HttpResponse(key_file, mimetype='application/zip')
+    response = HttpResponse(key_file, content_type='application/zip')
     response['Content-Disposition'] = ('attachment; filename=%s.zip' %
                                        host.name)
     return response
@@ -126,7 +126,7 @@ def create_nagios_config(request):
                                             .select_related('contactinformation')),
                                'clusters': Cluster.objects.all(),
                                'hosts': hosts},
-                              mimetype='text/plain')
+                              content_type='text/plain')
 
 
 def create_datastore_config(request):
@@ -140,4 +140,4 @@ def create_datastore_config(request):
     return render_to_response('datastore.cfg',
                               {'stations': (Station.objects.all()
                                             .select_related('cluster__parent'))},
-                              mimetype='text/plain')
+                              content_type='text/plain')

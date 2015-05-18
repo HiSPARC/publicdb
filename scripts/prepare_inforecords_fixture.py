@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import datetime
 import sys
 import os
 from textwrap import dedent
@@ -11,7 +10,8 @@ sys.path.append(publicdb_path)
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
-from django_publicdb.inforecords.models import *
+from django_publicdb.inforecords.models import (Contact, ContactInformation,
+                                                Station, Pc)
 
 
 def prepare_inforecords_fixture():
@@ -32,7 +32,7 @@ def prepare_inforecords_fixture():
         contact_info.phone_work = "555-5555"
         contact_info.phone_home = None
         contact_info.fax = None
-        contact_info.email_work = "%d@somewhere.com" % contact_info.id
+        contact_info.email_work = "%d@example.com" % contact_info.id
         contact_info.email_private = None
         contact_info.url = None
 

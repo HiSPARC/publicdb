@@ -8,6 +8,7 @@ import calendar
 import logging
 import multiprocessing
 
+from sapphire.utils import round_in_base
 import numpy as np
 
 import django.db
@@ -577,13 +578,9 @@ def save_histograms(summary, slug, bins, values):
     """Store the binned data in database"""
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
-    try:
-        h = DailyHistogram.objects.get(source=summary, type=type)
-    except DailyHistogram.DoesNotExist:
-        h = DailyHistogram(source=summary, type=type)
-    h.bins = bins
-    h.values = values
-    h.save()
+    histogram = {'bins': bins, 'values': values}
+    DailyHistogram.objects.update_or_create(source=summary, type=type,
+                                            defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -591,13 +588,9 @@ def save_network_histograms(network_summary, slug, bins, values):
     """Store the binned data in database"""
     logger.debug("Saving histogram %s for %s" % (slug, network_summary))
     type = HistogramType.objects.get(slug=slug)
-    try:
-        h = NetworkHistogram.objects.get(source=network_summary, type=type)
-    except NetworkHistogram.DoesNotExist:
-        h = NetworkHistogram(source=network_summary, type=type)
-    h.bins = bins
-    h.values = values
-    h.save()
+    histogram = {'bins': bins, 'values': values}
+    NetworkHistogram.objects.update_or_create(source=network_summary,
+                                              type=type, defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -605,14 +598,10 @@ def save_dataset(summary, slug, data):
     """Store the data in database"""
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
-    try:
-        d = DailyDataset.objects.get(source=summary, type=type)
-    except DailyDataset.DoesNotExist:
-        d = DailyDataset(source=summary, type=type)
     x, y = zip(*data)
-    d.x = x
-    d.y = y
-    d.save()
+    dataset = {'x': x, 'y': y}
+    DailyDataset.objects.update_or_create(source=summary, type=type,
+                                          defaults=dataset)
     logger.debug("Saved succesfully")
 
 
@@ -642,15 +631,9 @@ def save_offsets(summary, offsets):
 
     """
     logger.debug("Saving detector timing offsets for %s" % summary)
-    try:
-        o = DetectorTimingOffset.objects.get(source=summary)
-    except DetectorTimingOffset.DoesNotExist:
-        o = DetectorTimingOffset(source=summary)
-    o.offset_1 = round(offsets[0], 1) if not np.isnan(offsets[0]) else None
-    o.offset_2 = round(offsets[1], 1) if not np.isnan(offsets[1]) else None
-    o.offset_3 = round(offsets[2], 1) if not np.isnan(offsets[2]) else None
-    o.offset_4 = round(offsets[3], 1) if not np.isnan(offsets[3]) else None
-    o.save()
+    off = {'offset_%d' % i: round_in_base(o, 0.25) if not np.isnan(o) else None
+           for i, o in enumerate(offsets, 1)}
+    DetectorTimingOffset.objects.update_or_create(source=summary, defaults=off)
     logger.debug("Saved succesfully")
 
 

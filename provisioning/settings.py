@@ -10,21 +10,20 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-     ('Arne de Laat', 'adelaat@nikhef.nl'),
+    ('Arne de Laat', 'adelaat@nikhef.nl'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-# DF: relative path, just for running test server!
-        'NAME': 'publicdb', # Or path to database file if using sqlite3.
-        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'), # Or path to database file if using sqlite3.
-        'USER': 'hisparc',                      # Not used with sqlite3.
-        'PASSWORD': 'Data4user!',                  # Not used with sqlite3.
-        'HOST': '127.0.0.1',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'publicdb',
+        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
+        'USER': 'hisparc',
+        'PASSWORD': 'Data4user!',
+        'HOST': '127.0.0.1',
+        'PORT': '',
     }
 }
 
@@ -65,9 +64,9 @@ USE_MULTIPROCESSING = True
 # E-mail settings
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 # For production
-#EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-#EMAIL_HOST = 'smtp.nikhef.nl'
-#EMAIL_PORT = 25
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.nikhef.nl'
+# EMAIL_PORT = 25
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -118,7 +117,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -132,7 +131,7 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    #'django.middleware.gzip.GZipMiddleware',
+    # 'django.middleware.gzip.GZipMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -146,7 +145,6 @@ ROOT_URLCONF = 'django_publicdb.urls'
 
 ALLOWED_HOSTS = [
     'data.hisparc.nl',
-    'data.hisparc.nl.', # Also allow FQDN
 ]
 
 TEMPLATE_DIRS = (
@@ -176,7 +174,6 @@ INSTALLED_APPS = (
     'django_publicdb.maps',
     'django_publicdb.jsparc',
     'django_publicdb.default',
-    'south',
 )
 
 # A sample logging configuration. The only tangible logging

@@ -2,8 +2,6 @@
 import os
 import sys
 import logging
-import traceback
-import time
 
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
@@ -12,6 +10,7 @@ sys.path.append(publicdb_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
 import django_publicdb.histograms as hg
+
 
 def run():
     logger.info("Checking for new events...")
@@ -37,6 +36,9 @@ if __name__ == '__main__':
     fmt = "%(asctime)s - %(levelname)s - [%(process)d] - %(message)s"
     logging.basicConfig(level=logging.INFO, format=fmt)
     logger = logging.getLogger('cron')
+
+    import django
+    django.setup()
 
     try:
         run()

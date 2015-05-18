@@ -4,7 +4,6 @@
 #graphs {
     float: left;}
 
-
 #session, #scores {
     float: right;
     margin-top: 40px;
@@ -35,6 +34,11 @@ th {
 .student {
     padding-right: 5px;
     padding-left: 5px;}
+
+#coreMap {
+    clear: both;
+    width: 585px;
+    height: 300px;}
 
 #starMap {
     position: absolute;

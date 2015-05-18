@@ -16,6 +16,9 @@
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
   sudo: yes
 
+- name: remove compiled python code
+  command: find /srv/publicdb/www -name *.pyc -delete
+
 - name: checkout publicdb in /srv/publicdb/www
   git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
        update=yes force=no
@@ -60,13 +63,9 @@
   copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
         backup=yes force=no
 
-- name: synchronize Django database
-  shell: chdir=/srv/publicdb/www/django_publicdb
-         yes 'no' | /srv/publicdb/publicdb_env/bin/python manage.py syncdb
-
 - name: migrate Django apps
-  command: chdir=/srv/publicdb/www/django_publicdb
-           /srv/publicdb/publicdb_env/bin/python manage.py migrate
+  shell: chdir=/srv/publicdb/www/django_publicdb
+         yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
 
 - name: collect static files of Django apps
   shell: chdir=/srv/publicdb/www/django_publicdb
