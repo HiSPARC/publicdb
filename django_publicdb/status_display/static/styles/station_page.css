@@ -35,7 +35,8 @@
 #bd_histogram,
 #td_histogram,
 #vg_histogram,
-#cg_histogram {
+#cg_histogram,
+#to_histogram {
     height: 200px;}
 
 #ag_histogram {

@@ -409,6 +409,7 @@ def station_config(request, station_number):
 
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
+    timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
 
@@ -417,6 +418,7 @@ def station_config(request, station_number):
          'config': config,
          'voltagegraph': voltagegraph,
          'currentgraph': currentgraph,
+         'timingoffsetgraph': timingoffsetgraph,
          'altitudegraph': altitudegraph,
          'gpstrack': gpstrack,
          'has_slave': has_slave,
@@ -635,16 +637,7 @@ def get_gps_config_source(request, station_number):
 
 
 def get_detector_timing_offsets_source(request, station_number):
-    offsets = (DetectorTimingOffset.objects.filter(
-        source__station__number=station_number,
-        source__date__gte=FIRSTDATE,
-        source__date__lte=datetime.date.today()).order_by('source__date'))
-
-    data = offsets.values_list('source__date', 'offset_1', 'offset_2',
-                               'offset_3', 'offset_4')
-    data = [[calendar.timegm(row[0].timetuple()), row[1], row[2],
-             row[3], row[4]] for row in data]
-
+    data = get_detector_timing_offsets(station_number)
     response = render_to_response('source_detector_timing_offsets.csv',
                                   {'data': data,
                                    'station_number': station_number},
@@ -786,6 +779,34 @@ def plot_config(type, configs):
     return plot_object
 
 
+def plot_timing_offsets(station_number):
+    """Create a plot object from station configs"""
+
+    data = get_detector_timing_offsets(station_number)
+    data = zip(*data)
+
+    timestamps = data[0]
+    values = zip(*data[1])
+
+    x_label = 'Date (month/year)'
+    y_label = 'Timing offset (ns)'
+
+    plot_object = create_plot_object(timestamps, values, x_label, y_label)
+    return plot_object
+
+
+def get_detector_timing_offsets(station_number):
+    offsets = (DetectorTimingOffset.objects.filter(
+        source__station__number=station_number,
+        source__date__gte=FIRSTDATE,
+        source__date__lte=datetime.date.today()).order_by('source__date'))
+
+    data = offsets.values_list('source__date', 'offset_1', 'offset_2',
+                               'offset_3', 'offset_4')
+    data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
+    return data
+
+
 def get_gpspositions(configs):
     """Get all unique gps positions from the configs"""
 
@@ -797,8 +818,8 @@ def get_gpspositions(configs):
 def create_plot_object(x_values, y_series, x_label, y_label):
     if type(y_series[0]) != list and type(y_series[0]) != tuple:
             y_series = [y_series]
-    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
-            y_values in y_series]
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values) if yv is not None]
+            for y_values in y_series]
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object

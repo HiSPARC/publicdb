@@ -63,7 +63,7 @@
     <div id="graphs">
       {% if voltagegraph %}
         <div id="voltageGraph" class="histogram">
-            <h3>PMT Voltage</h3>
+            <h3>PMT voltage</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#vg_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_voltage_config_source' station.number %}">Source</a>
@@ -84,7 +84,7 @@
 
       {% if currentgraph %}
         <div id="currentGraph" class="histogram">
-            <h3>PMT Current</h3>
+            <h3>PMT current</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#cg_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_current_config_source' station.number %}">Source</a>
@@ -103,8 +103,29 @@
         </div>
       {% endif %}
 
+      {% if timingoffsetgraph %}
+        <div id="timingoffsetGraph" class="histogram">
+            <h3>Detector timing offsets</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#to_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_detector_timing_offsets_source' station.number %}">Source</a>
+            </div>
+            <div class="plot" id="to_histogram"></div>
+            <script>
+                to_labels = {yaxis: {axisLabel: "{{ timingoffsetgraph.y_label }}"},
+                             xaxis: {axisLabel: "{{ timingoffsetgraph.x_label }}"}}
+                $.extend(true, to_options, to_labels)
+                $.plot($("#to_histogram"), [
+                  {% for data in timingoffsetgraph.data %}
+                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], to_options);
+            </script>
+        </div>
+      {% endif %}
+
         <div id="gpsPositions">
-            <h3>GPS Positions</h3>
+            <h3>GPS positions</h3>
             <div class="sourceLink">
                 <a href="{% url 'status_display.views.get_gps_config_source' station.number %}">Source</a>
             </div>
