@@ -63,7 +63,7 @@
     <div id="graphs">
       {% if voltagegraph %}
         <div id="voltageGraph" class="histogram">
-            <h3>PMT Voltage</h3>
+            <h3>PMT voltage</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#vg_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_voltage_config_source' station.number %}">Source</a>
@@ -84,7 +84,7 @@
 
       {% if currentgraph %}
         <div id="currentGraph" class="histogram">
-            <h3>PMT Current</h3>
+            <h3>PMT current</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#cg_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_current_config_source' station.number %}">Source</a>
@@ -104,7 +104,7 @@
       {% endif %}
 
         <div id="gpsPositions">
-            <h3>GPS Positions</h3>
+            <h3>GPS positions</h3>
             <div class="sourceLink">
                 <a href="{% url 'status_display.views.get_gps_config_source' station.number %}">Source</a>
             </div>
