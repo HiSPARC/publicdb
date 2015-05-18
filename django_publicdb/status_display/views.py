@@ -785,10 +785,13 @@ def plot_timing_offsets(station_number):
     data = get_detector_timing_offsets(station_number)
     data = zip(*data)
 
+    timestamps = data[0]
+    values = zip(*data[1])
+
     x_label = 'Date (month/year)'
     y_label = 'Timing offset (ns)'
 
-    plot_object = create_plot_object(data[0], data[1:], x_label, y_label)
+    plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
 
 
@@ -815,8 +818,8 @@ def get_gpspositions(configs):
 def create_plot_object(x_values, y_series, x_label, y_label):
     if type(y_series[0]) != list and type(y_series[0]) != tuple:
             y_series = [y_series]
-    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
-            y_values in y_series]
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values) if yv is not None]
+            for y_values in y_series]
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
