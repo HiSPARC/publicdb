@@ -1,5 +1,6 @@
 from django.db import models
 from django.db.models import Max
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse
 from django.utils.text import slugify
 import xmlrpclib
@@ -117,6 +118,28 @@ class Cluster(models.Model):
     def __unicode__(self):
         return self.name
 
+    def clean(self):
+        if self.parent is None:
+            if self.number % 1000:
+                raise ValidationError("Cluster number must be multiple of "
+                                      "1000")
+            if not 0 < (self.number - self.country.number) < 10000:
+                raise ValidationError("Cluster number must be in range of "
+                                      "numbers for the country (%d, %d)." %
+                                      (self.country.number,
+                                       self.country.number + 10000))
+        if self.parent is not None:
+            if self.parent.parent is not None:
+                raise ValidationError("Subsubclusters are not allowed")
+            if self.number % 100:
+                raise ValidationError("Subcluster number must be multiple of "
+                                      "100")
+            if not 0 < (self.number - self.parent.number) < 1000:
+                raise ValidationError("Subcluster number must be in range of "
+                                      "numbers for the cluster (%d, %d)." %
+                                      (self.parent.number,
+                                       self.parent.number + 1000))
+
     def save(self, *args, **kwargs):
         if self.number is None:
             if self.parent is None:
@@ -173,6 +196,13 @@ class Station(models.Model):
     def __unicode__(self):
         return '%5d: %s' % (self.number, self.name)
 
+    def clean(self):
+        if not 0 < (self.number - self.cluster.number) < 100:
+            raise ValidationError("Station number must be in range of "
+                                  "numbers for the (sub)cluster (%d, %d)." %
+                                  (self.cluster.number,
+                                   self.cluster.number + 100))
+
     def save(self, *args, **kwargs):
         # Strip some problematic characters
         self.name = self.name.replace('"', '').replace("'", '')
@@ -218,6 +248,19 @@ class Country(models.Model):
     def __unicode__(self):
         return self.name
 
+    def clean(self):
+        if self.number % 10000:
+            raise ValidationError("Country number must be multiple of 10000")
+
+    def save(self, *args, **kwargs):
+        if self.number is None:
+            if Country.objects.count() > 0:
+                countrymax = Country.objects.aggregate(Max('number'))
+                self.number = countrymax['number__max'] + 10000
+            else:
+                self.number = 0
+        super(Country, self).save(*args, **kwargs)
+
     def last_cluster_number(self):
         clusters = self.clusters.filter(parent=None)
         if clusters:
@@ -228,15 +271,6 @@ class Country(models.Model):
 
     class Meta:
         verbose_name_plural = "Countries"
-
-    def save(self, *args, **kwargs):
-        if self.number is None:
-            if Country.objects.count() > 0:
-                countrymax = Country.objects.aggregate(Max('number'))
-                self.number = countrymax['number__max'] + 10000
-            else:
-                self.number = 0
-        super(Country, self).save(*args, **kwargs)
 
 
 class DetectorHisparc(models.Model):
