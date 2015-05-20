@@ -197,6 +197,8 @@ class Station(models.Model):
         return '%5d: %s' % (self.number, self.name)
 
     def clean(self):
+        if self.number is None:
+            self.number = self.cluster.last_station_number() + 1
         if not 0 < (self.number - self.cluster.number) < 100:
             raise ValidationError("Station number must be in range of "
                                   "numbers for the (sub)cluster (%d, %d)." %
