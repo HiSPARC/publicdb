@@ -2,6 +2,9 @@
 #
 # Data from {{ date }}
 #
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
 # This data contains the following columns:
 #
 # bin:   number of stations in a coincidence [counts]

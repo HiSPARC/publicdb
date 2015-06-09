@@ -2,6 +2,9 @@
 #
 # Station: {{ station_number }}
 #
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
 # This data contains the following columns:
 #
 # timestamp: time of position calibration in seconds after 1970-1-1 [UNIX timestamp]
