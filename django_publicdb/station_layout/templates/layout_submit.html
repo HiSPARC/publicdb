@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}HiSPARC | Station layout submit form{% endblock %}
+
+{% block head_styles %}
+    <style type="text/css" media="all">#pageHeader {position: absolute;}</style>
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/submit.css" />
+{% endblock %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>HiSPARC station layout submit form</h2>
+    </div>
+
+    <div id='subform'>
+        <form action="{% url 'django_publicdb.inforecords.views.submit_position' %}" method="post">
+        {% csrf_token %}
+            <p>
+                {{ form.name.label_tag }}:
+                {{ form.name }}
+            </p>
+            <p>
+                {{ form.email.label_tag }}:
+                {{ form.email }}
+            </p>
+            <p>
+                {{ form.station.label_tag }}:
+                {{ form.station }}
+            </p>
+            <p>
+                {{ form.active_date.label_tag }}:
+                {{ form.active_date }}
+            </p>
+            <div class="wrapperDiv">    
+                <h4>Master</h4>
+                <div class="leftColumn">
+                    {{ form.scintillator_1_alpha.label_tag }}:
+                    {{ form.scintillator_1_alpha }}
+                    <br>
+                    {{ form.scintillator_1_beta.label_tag }}:
+                    {{ form.scintillator_1_beta }}
+                    <br>
+                    {{ form.scintillator_1_radius.label_tag }}:
+                    {{ form.scintillator_1_radius }}
+                    <br>
+                    {{ form.scintillator_1_height.label_tag }}:
+                    {{ form.scintillator_1_height }}
+                </div>
+                <div class="rightColumn">
+                    {{ form.scintillator_2_alpha.label_tag }}:
+                    {{ form.scintillator_2_alpha }}
+                    <br>
+                    {{ form.scintillator_2_beta.label_tag }}:
+                    {{ form.scintillator_2_beta }}
+                    <br>
+                    {{ form.scintillator_2_radius.label_tag }}:
+                    {{ form.scintillator_2_radius }}
+                    <br>
+                    {{ form.scintillator_2_height.label_tag }}:
+                    {{ form.scintillator_2_height }}
+                </div>
+            </div>     
+            <br>
+            <div class="wrapperDiv">
+                <h4>Slave</h4>
+                <div class="leftColumn">
+                    {{ form.scintillator_3_alpha.label_tag }}:
+                    {{ form.scintillator_3_alpha }}
+                    <br>
+                    {{ form.scintillator_3_beta.label_tag }}:
+                    {{ form.scintillator_3_beta }}
+                    <br>
+                    {{ form.scintillator_3_radius.label_tag }}:
+                    {{ form.scintillator_3_radius }}
+                    <br>
+                    {{ form.scintillator_3_height.label_tag }}:
+                    {{ form.scintillator_3_height }}
+                </div>
+                <div class="rightColumn">
+                    {{ form.scintillator_4_alpha.label_tag }}:
+                    {{ form.scintillator_4_alpha }}
+                    <br>
+                    {{ form.scintillator_4_beta.label_tag }}:
+                    {{ form.scintillator_4_beta }}
+                    <br>
+                    {{ form.scintillator_4_radius.label_tag }}:
+                    {{ form.scintillator_4_radius }}
+                    <br>
+                    {{ form.scintillator_4_height.label_tag }}:
+                    {{ form.scintillator_4_height }}
+                </div>
+            </div>     
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+
+    <div id='preview'>
+        [show preview of new layout]
+    </div>
+
+{% endblock %} 
