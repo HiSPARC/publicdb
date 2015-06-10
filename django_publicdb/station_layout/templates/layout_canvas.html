@@ -1,0 +1,40 @@
+<canvas id="station_layout" width="600" height="600"></canvas>
+
+<script>
+    var canvas = document.getElementById('station_layout');
+    var context = canvas.getContext('2d');
+    var scale = .25;
+
+    function radians(degrees) {
+        return degrees * Math.PI / 180;}
+
+    function drawGPS(ctx) {
+        var size = scale * 20;
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(-size / 2, -size / 2, size, size);}
+
+    function drawStation(ctx, r, alpha, beta, color) {
+        var detector_width = 50 * scale;
+        var detector_height = 100 * scale;
+
+        r = -r * 100 * scale
+        ctx.lineWidth = 1;  
+        ctx.rotate(radians(alpha));
+        ctx.translate(0, r);
+        ctx.rotate(-radians(alpha));
+        ctx.rotate(radians(beta));
+        ctx.fillStyle = color;
+        ctx.fillRect(-detector_width / 2, -detector_height / 2,
+                     detector_width, detector_height);
+        ctx.restore();
+        ctx.save()}
+
+    context.translate(250, 500);
+    context.save();
+
+    drawGPS(context);
+    drawStation(context, 8.66, 0, 0, 'black');
+    drawStation(context, 2.66, 0, 0, 'red');
+    drawStation(context, 5, 90, 90, 'green');
+    drawStation(context, 5, -90, 90, 'blue');
+</script>
