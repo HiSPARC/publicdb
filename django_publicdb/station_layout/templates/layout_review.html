@@ -8,14 +8,14 @@
     </div>
 
     <p>
-        This is a new station layout for station {{ station.number }} - {{ station.name }}.<br>
-        These measurements where submitted by {{ data.first_name }} {{ data.sur_name }}.<br>
-        The submitter can be reached via: {{ data.email }}.<br>
+        This is a new station layout for station {{ layout.station }}.<br>
+        These measurements where submitted by {{ layout.name }}.<br>
+        The submitter can be reached via: {{ layout.email }}.<br>
         Please review the new layout and either approve or dismiss it.
     </p>
 
     <div id='reviewform'>
-        <form action="{% url 'django_publicdb.inforecords.views.station_layout_review_form' %}" method="post">
+        <form action="{% url 'django_publicdb.inforecords.views.validate_review_layout' %}" method="post">
         {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Submit" />
