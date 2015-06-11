@@ -12,7 +12,7 @@ class StationLayoutQuarantineForm(forms.Form):
     email = forms.EmailField()
 
     station = forms.ModelChoiceField(queryset=Station.objects.filter(pc__is_test=False))
-    active_date = forms.DateTimeField(help_text="Choose date and time when this configuration became active")
+    active_date = forms.DateTimeField(help_text="Choose date and time when this configuration became active.")
 
     # Master detectors
     detector_1_alpha = forms.FloatField(min_value=-360, max_value=360)
@@ -33,3 +33,7 @@ class StationLayoutQuarantineForm(forms.Form):
     detector_4_beta = forms.FloatField(min_value=360, max_value=360, required=False)
     detector_4_radius = forms.FloatField(min_value=60, max_value=60, required=False)
     detector_4_height = forms.FloatField(min_value=60, max_value=60, initial=0., required=False)
+
+
+class ReviewStationLayoutForm(forms.Form):
+    approved = forms.BooleanField(required=False, help_text="To decline the layout leave the box unchecked.")
