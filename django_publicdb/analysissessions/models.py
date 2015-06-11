@@ -3,8 +3,6 @@ from django.core.mail import send_mail
 from django.template.defaultfilters import slugify
 from django.conf import settings
 
-from random import choice
-import string
 import datetime
 import hashlib
 import tables
@@ -228,11 +226,11 @@ class SessionRequest(models.Model):
         return trace_timing
 
     def generate_url(self):
-        chars = string.letters + string.digits
-        newurl = ''.join([choice(chars) for i in range(20)])
+        newurl = os.urandom(10).encode('hex')
         if SessionRequest.objects.filter(url=newurl):
-            newurl = ''.join([choice(chars) for i in range(20)])
-        self.url = newurl
+            self.generate_url()
+        else:
+            self.url = newurl
 
     def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
