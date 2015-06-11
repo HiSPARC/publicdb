@@ -17,86 +17,63 @@
         <form action="{% url 'django_publicdb.inforecords.views.submit_position' %}" method="post">
         {% csrf_token %}
             <p>
+                {{ form.name.errors }}
                 {{ form.name.label_tag }}:
                 {{ form.name }}
             </p>
             <p>
+                {{ form.email.errors }}
                 {{ form.email.label_tag }}:
                 {{ form.email }}
             </p>
             <p>
+                {{ form.station.errors }}
                 {{ form.station.label_tag }}:
                 {{ form.station }}
             </p>
             <p>
+                {{ form.active_date.error }}:
                 {{ form.active_date.label_tag }}:
                 {{ form.active_date }}
             </p>
             <div class="wrapperDiv">    
                 <h4>Master</h4>
                 <div class="leftColumn">
-                    {{ form.scintillator_1_alpha.label_tag }}:
-                    {{ form.scintillator_1_alpha }}
-                    <br>
-                    {{ form.scintillator_1_beta.label_tag }}:
-                    {{ form.scintillator_1_beta }}
-                    <br>
-                    {{ form.scintillator_1_radius.label_tag }}:
-                    {{ form.scintillator_1_radius }}
-                    <br>
-                    {{ form.scintillator_1_height.label_tag }}:
-                    {{ form.scintillator_1_height }}
+                    {{ form.detector_1_alpha }}<br>
+                    {{ form.detector_1_beta }}<br>
+                    {{ form.detector_1_radius }}<br>
+                    {{ form.detector_1_height }}
                 </div>
                 <div class="rightColumn">
-                    {{ form.scintillator_2_alpha.label_tag }}:
-                    {{ form.scintillator_2_alpha }}
-                    <br>
-                    {{ form.scintillator_2_beta.label_tag }}:
-                    {{ form.scintillator_2_beta }}
-                    <br>
-                    {{ form.scintillator_2_radius.label_tag }}:
-                    {{ form.scintillator_2_radius }}
-                    <br>
-                    {{ form.scintillator_2_height.label_tag }}:
-                    {{ form.scintillator_2_height }}
+                    {{ form.detector_2_alpha }}<br>
+                    {{ form.detector_2_beta }}<br>
+                    {{ form.detector_2_radius }}<br>
+                    {{ form.detector_2_height }}
                 </div>
             </div>     
             <br>
             <div class="wrapperDiv">
                 <h4>Slave</h4>
                 <div class="leftColumn">
-                    {{ form.scintillator_3_alpha.label_tag }}:
-                    {{ form.scintillator_3_alpha }}
-                    <br>
-                    {{ form.scintillator_3_beta.label_tag }}:
-                    {{ form.scintillator_3_beta }}
-                    <br>
-                    {{ form.scintillator_3_radius.label_tag }}:
-                    {{ form.scintillator_3_radius }}
-                    <br>
-                    {{ form.scintillator_3_height.label_tag }}:
-                    {{ form.scintillator_3_height }}
+                    {{ form.detector_3_alpha }}<br>
+                    {{ form.detector_3_beta }}<br>
+                    {{ form.detector_3_radius }}<br>
+                    {{ form.detector_3_height }}
                 </div>
                 <div class="rightColumn">
-                    {{ form.scintillator_4_alpha.label_tag }}:
-                    {{ form.scintillator_4_alpha }}
-                    <br>
-                    {{ form.scintillator_4_beta.label_tag }}:
-                    {{ form.scintillator_4_beta }}
-                    <br>
-                    {{ form.scintillator_4_radius.label_tag }}:
-                    {{ form.scintillator_4_radius }}
-                    <br>
-                    {{ form.scintillator_4_height.label_tag }}:
-                    {{ form.scintillator_4_height }}
+                    {{ form.detector_4_alpha }}<br>
+                    {{ form.detector_4_beta }}<br>
+                    {{ form.detector_4_radius }}<br>
+                    {{ form.detector_4_height }}
                 </div>
-            </div>     
+            </div>
+            {{ html_captcha|safe }}
             <input type="submit" value="Submit" />
         </form>
     </div>
 
     <div id='preview'>
-        [show preview of new layout]
+        {% include layout_canvas.html %}
     </div>
 
 {% endblock %} 

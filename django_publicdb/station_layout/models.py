@@ -5,14 +5,14 @@ import os
 class StationLayout(models.Model):
     station = models.ForeignKey(Station)
     active_date = models.DateTimeField()
-    detector_1_alpha = models.FloatField(null=True, blank=True)
-    detector_1_beta = models.FloatField(null=True, blank=True)
-    detector_1_radius = models.FloatField(null=True, blank=True)
-    detector_1_height = models.FloatField(null=True, blank=True)
-    detector_2_alpha = models.FloatField(null=True, blank=True)
-    detector_2_beta = models.FloatField(null=True, blank=True)
-    detector_2_radius = models.FloatField(null=True, blank=True)
-    detector_2_height = models.FloatField(null=True, blank=True)
+    detector_1_alpha = models.FloatField()
+    detector_1_beta = models.FloatField()
+    detector_1_radius = models.FloatField()
+    detector_1_height = models.FloatField()
+    detector_2_alpha = models.FloatField()
+    detector_2_beta = models.FloatField()
+    detector_2_radius = models.FloatField()
+    detector_2_height = models.FloatField()
     detector_3_alpha = models.FloatField(null=True, blank=True)
     detector_3_beta = models.FloatField(null=True, blank=True)
     detector_3_radius = models.FloatField(null=True, blank=True)
@@ -21,6 +21,9 @@ class StationLayout(models.Model):
     detector_4_beta = models.FloatField(null=True, blank=True)
     detector_4_radius = models.FloatField(null=True, blank=True)
     detector_4_height = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        unique_together = [('station', 'active_date')]
 
 
 class StationLayoutQuarantine(models.Model):
@@ -34,14 +37,14 @@ class StationLayoutQuarantine(models.Model):
 
     station = models.ForeignKey(Station)
     active_date = models.DateTimeField()
-    detector_1_alpha = models.FloatField(null=True, blank=True)
-    detector_1_beta = models.FloatField(null=True, blank=True)
-    detector_1_radius = models.FloatField(null=True, blank=True)
-    detector_1_height = models.FloatField(null=True, blank=True)
-    detector_2_alpha = models.FloatField(null=True, blank=True)
-    detector_2_beta = models.FloatField(null=True, blank=True)
-    detector_2_radius = models.FloatField(null=True, blank=True)
-    detector_2_height = models.FloatField(null=True, blank=True)
+    detector_1_alpha = models.FloatField()
+    detector_1_beta = models.FloatField()
+    detector_1_radius = models.FloatField()
+    detector_1_height = models.FloatField()
+    detector_2_alpha = models.FloatField()
+    detector_2_beta = models.FloatField()
+    detector_2_radius = models.FloatField()
+    detector_2_height = models.FloatField()
     detector_3_alpha = models.FloatField(null=True, blank=True)
     detector_3_beta = models.FloatField(null=True, blank=True)
     detector_3_radius = models.FloatField(null=True, blank=True)
