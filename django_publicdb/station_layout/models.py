@@ -33,10 +33,12 @@ class StationLayoutQuarantine(models.Model):
     name = models.CharField(max_length=50)
     email = models.EmailField()
     submit_date = models.DateTimeField(auto_now_add=True)
-    applicant_verified = models.BooleanField(default=False)
+    email_verified = models.BooleanField(default=False)
+    approved = models.BooleanField(default=False)
+    reviewed = models.BooleanField(default=False)
 
-    hash_submitter = models.CharField(max_length=32)
-    hash_reviewer = models.CharField(max_length=32)
+    hash_submit = models.CharField(max_length=32)
+    hash_review = models.CharField(max_length=32)
 
     station = models.ForeignKey(Station)
     active_date = models.DateTimeField()
@@ -57,12 +59,17 @@ class StationLayoutQuarantine(models.Model):
     detector_4_radius = models.FloatField(null=True, blank=True)
     detector_4_height = models.FloatField(null=True, blank=True)
 
-    def save(self, *args, **kwargs):
-        self.hash_submitter = os.urandom(16).encode('hex')
-        self.hash_reviewer = os.urandom(16).encode('hex')
-        super(Quarantine, self).save(*args, **kwargs)
+    def generate_hashes(self):
+        hashs = os.urandom(16).encode('hex')
+        hashr = os.urandom(16).encode('hex')
+        if (StationLayoutQuarantine.objects.filter(hash_submit=hashs) or
+                StationLayoutQuarantine.objects.filter(hash_review=hashr)):
+            self.generate_hashes()
+        else:
+            self.hash_submit = hashs
+            self.hash_review = hashr
 
-    def sendmail_confirm(self):
+    def sendmail_submit(self):
         subject = 'HiSPARC station layout submission'
         message = dedent('''\
             Hello %s,
@@ -73,7 +80,7 @@ class StationLayoutQuarantine(models.Model):
 
             Greetings,
             The HiSPARC Team''') %
-            (self.name, self.station, self.hash_submitter))
+            (self.name, self.station, self.hash_submit))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
@@ -91,7 +98,7 @@ class StationLayoutQuarantine(models.Model):
 
             Greetings,
             The HiSPARC Team''') %
-            (self.station, self.hash_reviewer))
+            (self.station, self.hash_review))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, ['beheer@hisparc.nl'],
                   fail_silently=False)
