@@ -1,6 +1,9 @@
 from django.db import models
+from django.core.mail import send_mail
 
 import os
+from textwrap import dedent
+
 
 class StationLayout(models.Model):
     station = models.ForeignKey(Station)
@@ -58,3 +61,65 @@ class StationLayoutQuarantine(models.Model):
         self.hash_submitter = os.urandom(16).encode('hex')
         self.hash_reviewer = os.urandom(16).encode('hex')
         super(Quarantine, self).save(*args, **kwargs)
+
+    def sendmail_confirm(self):
+        subject = 'HiSPARC station layout submission'
+        message = dedent('''\
+            Hello %s,
+
+            Please click on this link to confirm your submission
+            of a new layout for station %s.
+            http://data.hisparc.nl/layout/confirm/%s/
+
+            Greetings,
+            The HiSPARC Team''') %
+            (self.name, self.station, self.hash_submitter))
+        sender = 'info@hisparc.nl'
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
+
+    def sendmail_review(self):
+        subject = 'HiSPARC station layout review'
+        message = dedent('''\
+            Hello,
+
+            A new station layout has been submitted for station %s.
+            Before it is stored in the database we request that you
+            review the validity of the submission.
+            Use the following link to view and either approve or
+            decline the submission:
+            http://data.hisparc.nl/layout/review/%s/
+
+            Greetings,
+            The HiSPARC Team''') %
+            (self.station, self.hash_reviewer))
+        sender = 'info@hisparc.nl'
+        send_mail(subject, message, sender, ['beheer@hisparc.nl'],
+                  fail_silently=False)
+
+    def sendmail_accepted(self):
+        subject = 'HiSPARC station layout accepted'
+        message = dedent('''\
+            Hello %s,
+
+            The station layout which you submitted for station %s
+            has been approved by the reviewer.
+
+            Greetings,
+            The HiSPARC Team''') %
+            (self.name, self.station))
+        sender = 'info@hisparc.nl'
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
+
+    def sendmail_declined(self):
+        subject = 'HiSPARC station layout declined'
+        message = dedent('''\
+            Hello %s,
+
+            The station layout which you submitted for station %s
+            has been declined by the reviewer.
+
+            Greetings,
+            The HiSPARC Team''') %
+            (self.name, self.station))
+        sender = 'info@hisparc.nl'
+        send_mail(subject, message, sender, [self.email], fail_silently=False)
