@@ -14,7 +14,7 @@
     </div>
 
     <div id='subform'>
-        <form action="{% url 'django_publicdb.inforecords.views.validate_layout_submit' %}" method="post">
+        <form action="{% url 'django_publicdb.station_layout.views.validate_layout_submit' %}" method="post">
         {% csrf_token %}
             <p>
                 {{ form.name.errors }}
