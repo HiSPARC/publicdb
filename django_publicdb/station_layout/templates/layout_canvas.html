@@ -3,7 +3,6 @@
 <script>
     var canvas = document.getElementById('station_layout');
     var context = canvas.getContext('2d');
-    var colors = ['black', 'red', 'green', 'blue'];
 
     function radians(degrees) {
         return degrees * Math.PI / 180;}
@@ -45,7 +44,7 @@
         min_x -= margin;
         max_x += margin;
         min_y -= margin;
-        max_x += margin;
+        max_y += margin;
         return [min_x, max_x, min_y, max_y];}
 
     function draw_station(ctx, r, alpha, beta) {
@@ -55,28 +54,27 @@
 
         */
         clear_canvas(ctx);
+        var colors = ['black', 'red', 'green', 'blue'];
         var bounds = calculate_bounds(r, alpha);
         var station_width = bounds[1] - bounds[0];
         var station_height = bounds[3] - bounds[2];
         var scale = Math.min(canvas.width / station_width,
                              canvas.height / station_height);
         ctx.scale(scale, scale);
-        ctx.translate(bounds[0], -bounds[3]);
+        ctx.translate(-bounds[0], bounds[3]);
         ctx.save();
         draw_gps(ctx);
         for (var i = 0; i < r.length; i++) {
             draw_detector(ctx, r[i], alpha[i], beta[i], colors[i]);}}
 
     function clear_canvas(ctx) {
-        /* Clear objects on the canvas
+        /* Clear objects on the canvas and reset origin
 
         from: http://stackoverflow.com/a/6722031/1033535
 
         */
-        ctx.save();
         ctx.setTransform(1, 0, 0, 1, 0, 0);
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.restore();}
+        ctx.clearRect(0, 0, canvas.width, canvas.height);}
    
     draw_station(context, [10, 8.66, 5, 5], [0, 0, -90, 90], [0, 0, 0, 90]);
 </script>
