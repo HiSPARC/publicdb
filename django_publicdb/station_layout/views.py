@@ -98,7 +98,7 @@ def review_layout(request, hash):
         form = ReviewStationLayoutForm()
 
     return render(request, 'layout_review.html',
-                  {'layout': submitted_layout, 'form': form})
+                  {'layout': submitted_layout, 'form': form, 'hash': hash})
 
 
 def validate_review_layout(request, hash):
@@ -116,6 +116,7 @@ def validate_review_layout(request, hash):
                                          reviewed=False)
     submitted_layout.reviewed = True
     submitted_layout.approved = form.cleaned_data['approved']
+    submitted_layout.save()
 
     if form.cleaned_data['approved']:
         accepted_layout = StationLayout(

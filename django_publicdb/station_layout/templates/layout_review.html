@@ -16,7 +16,7 @@
     </p>
 
     <div id='reviewform'>
-        <form action="{% url 'django_publicdb.station_layout.views.validate_review_layout' %}" method="post">
+        <form action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
         {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="Submit" />
