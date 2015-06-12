@@ -1,7 +1,11 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import Http404
+from django.conf import settings
 
-from ..inforecords.models import Station
+import datetime
+
+from recaptcha.client import captcha
+
 from .models import StationLayout, StationLayoutQuarantine
 from .forms import StationLayoutQuarantineForm, ReviewStationLayoutForm
 
@@ -46,22 +50,22 @@ def validate_layout_submit(request):
         email=form.cleaned_data['email'],
         station=form.cleaned_data['station'],
         active_date=form.cleaned_data['active_date'],
-        detector_1_alpha = form.cleaned_data['detector_1_alpha'],
-        detector_1_beta = form.cleaned_data['detector_1_beta'],
-        detector_1_radius = form.cleaned_data['detector_1_radius'],
-        detector_1_height = form.cleaned_data['detector_1_height'],
-        detector_2_alpha = form.cleaned_data['detector_2_alpha'],
-        detector_2_beta = form.cleaned_data['detector_2_beta'],
-        detector_2_radius = form.cleaned_data['detector_2_radius'],
-        detector_2_height = form.cleaned_data['detector_2_height'],
-        detector_3_alpha = form.cleaned_data['detector_3_alpha'],
-        detector_3_beta = form.cleaned_data['detector_3_beta'],
-        detector_3_radius = form.cleaned_data['detector_3_radius'],
-        detector_3_height = form.cleaned_data['detector_3_height'],
-        detector_4_alpha = form.cleaned_data['detector_4_alpha'],
-        detector_4_beta = form.cleaned_data['detector_4_beta'],
-        detector_4_radius = form.cleaned_data['detector_4_radius'],
-        detector_4_height = form.cleaned_data['detector_4_height'])
+        detector_1_alpha=form.cleaned_data['detector_1_alpha'],
+        detector_1_beta=form.cleaned_data['detector_1_beta'],
+        detector_1_radius=form.cleaned_data['detector_1_radius'],
+        detector_1_height=form.cleaned_data['detector_1_height'],
+        detector_2_alpha=form.cleaned_data['detector_2_alpha'],
+        detector_2_beta=form.cleaned_data['detector_2_beta'],
+        detector_2_radius=form.cleaned_data['detector_2_radius'],
+        detector_2_height=form.cleaned_data['detector_2_height'],
+        detector_3_alpha=form.cleaned_data['detector_3_alpha'],
+        detector_3_beta=form.cleaned_data['detector_3_beta'],
+        detector_3_radius=form.cleaned_data['detector_3_radius'],
+        detector_3_height=form.cleaned_data['detector_3_height'],
+        detector_4_alpha=form.cleaned_data['detector_4_alpha'],
+        detector_4_beta=form.cleaned_data['detector_4_beta'],
+        detector_4_radius=form.cleaned_data['detector_4_radius'],
+        detector_4_height=form.cleaned_data['detector_4_height'])
 
     new_layout.generate_hashes()
     new_layout.save()
@@ -117,22 +121,22 @@ def validate_review_layout(request, hash):
         accepted_layout = StationLayout(
             station=submitted_layout.station,
             active_date=submitted_layout.active_date,
-            detector_1_alpha = submitted_layout.detector_1_alpha,
-            detector_1_beta = submitted_layout.detector_1_beta,
-            detector_1_radius = submitted_layout.detector_1_radius,
-            detector_1_height = submitted_layout.detector_1_height,
-            detector_2_alpha = submitted_layout.detector_2_alpha,
-            detector_2_beta = submitted_layout.detector_2_beta,
-            detector_2_radius = submitted_layout.detector_2_radius,
-            detector_2_height = submitted_layout.detector_2_height,
-            detector_3_alpha = submitted_layout.detector_3_alpha,
-            detector_3_beta = submitted_layout.detector_3_beta,
-            detector_3_radius = submitted_layout.detector_3_radius,
-            detector_3_height = submitted_layout.detector_3_height,
-            detector_4_alpha = submitted_layout.detector_4_alpha,
-            detector_4_beta = submitted_layout.detector_4_beta,
-            detector_4_radius = submitted_layout.detector_4_radius,
-            detector_4_height = submitted_layout.detector_4_height)
+            detector_1_alpha=submitted_layout.detector_1_alpha,
+            detector_1_beta=submitted_layout.detector_1_beta,
+            detector_1_radius=submitted_layout.detector_1_radius,
+            detector_1_height=submitted_layout.detector_1_height,
+            detector_2_alpha=submitted_layout.detector_2_alpha,
+            detector_2_beta=submitted_layout.detector_2_beta,
+            detector_2_radius=submitted_layout.detector_2_radius,
+            detector_2_height=submitted_layout.detector_2_height,
+            detector_3_alpha=submitted_layout.detector_3_alpha,
+            detector_3_beta=submitted_layout.detector_3_beta,
+            detector_3_radius=submitted_layout.detector_3_radius,
+            detector_3_height=submitted_layout.detector_3_height,
+            detector_4_alpha=submitted_layout.detector_4_alpha,
+            detector_4_beta=submitted_layout.detector_4_beta,
+            detector_4_radius=submitted_layout.detector_4_radius,
+            detector_4_height=submitted_layout.detector_4_height)
         accepted_layout.save()
         submitted_layout.sendmail_accepted()
     else:
