@@ -12,7 +12,7 @@ class StationLayoutQuarantineForm(forms.Form):
     email = forms.EmailField()
 
     station = forms.ModelChoiceField(queryset=Station.objects.filter(pc__is_test=False))
-    active_date = forms.DateTimeField(help_text="Choose date and time when this configuration became active.")
+    active_date = forms.DateTimeField(help_text="e.g. '2010-5-17 12:45'.")
 
     # Master detectors
     detector_1_alpha = forms.FloatField(min_value=-360, max_value=360)

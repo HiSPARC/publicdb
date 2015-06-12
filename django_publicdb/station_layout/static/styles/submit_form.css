@@ -1,0 +1,9 @@
+.helptext {
+    font-size: 0.8em;}
+
+.errorlist {
+    color: red;}
+
+input[type="number"] {
+    text-align: right;
+    width: 100px;}
