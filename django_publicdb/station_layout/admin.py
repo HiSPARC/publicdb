@@ -9,8 +9,8 @@ class StationLayoutAdmin(admin.ModelAdmin):
 
 
 class StationLayoutQuarantineAdmin(admin.ModelAdmin):
-    list_display = ('station', 'active_date', 'applicant_verified')
-    list_filter = ('station', 'applicant_verified')
+    list_display = ('station', 'active_date', 'email_verified', 'approved', 'reviewed')
+    list_filter = ('station', 'email_verified', 'approved', 'reviewed')
 
 
 admin.site.register(StationLayout, StationLayoutAdmin)
