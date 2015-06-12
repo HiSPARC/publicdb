@@ -17,22 +17,22 @@ class StationLayoutQuarantineForm(forms.Form):
     # Master detectors
     detector_1_alpha = forms.FloatField(min_value=-360, max_value=360)
     detector_1_beta = forms.FloatField(min_value=-360, max_value=360)
-    detector_1_radius = forms.FloatField(min_value=60, max_value=60)
-    detector_1_height = forms.FloatField(min_value=60, max_value=60, initial=0.)
+    detector_1_radius = forms.FloatField(min_value=-60, max_value=60)
+    detector_1_height = forms.FloatField(min_value=-60, max_value=60, initial=0.)
     detector_2_alpha = forms.FloatField(min_value=-360, max_value=360)
-    detector_2_beta = forms.FloatField(min_value=360, max_value=360)
-    detector_2_radius = forms.FloatField(min_value=60, max_value=60)
-    detector_2_height = forms.FloatField(min_value=60, max_value=60, initial=0.)
+    detector_2_beta = forms.FloatField(min_value=-360, max_value=360)
+    detector_2_radius = forms.FloatField(min_value=-60, max_value=60)
+    detector_2_height = forms.FloatField(min_value=-60, max_value=60, initial=0.)
 
     # Optional slave detectors
     detector_3_alpha = forms.FloatField(min_value=-360, max_value=360, required=False)
     detector_3_beta = forms.FloatField(min_value=-360, max_value=360, required=False)
-    detector_3_radius = forms.FloatField(min_value=60, max_value=60, required=False)
-    detector_3_height = forms.FloatField(min_value=60, max_value=60, initial=0., required=False)
+    detector_3_radius = forms.FloatField(min_value=-60, max_value=60, required=False)
+    detector_3_height = forms.FloatField(min_value=-60, max_value=60, initial=0., required=False)
     detector_4_alpha = forms.FloatField(min_value=-360, max_value=360, required=False)
-    detector_4_beta = forms.FloatField(min_value=360, max_value=360, required=False)
-    detector_4_radius = forms.FloatField(min_value=60, max_value=60, required=False)
-    detector_4_height = forms.FloatField(min_value=60, max_value=60, initial=0., required=False)
+    detector_4_beta = forms.FloatField(min_value=-360, max_value=360, required=False)
+    detector_4_radius = forms.FloatField(min_value=-60, max_value=60, required=False)
+    detector_4_height = forms.FloatField(min_value=-60, max_value=60, initial=0., required=False)
 
 
 class ReviewStationLayoutForm(forms.Form):
