@@ -1,4 +1,4 @@
-<canvas id="station_layout" width="600" height="600"></canvas>
+<canvas id="station_layout" width="600" height="400"></canvas>
 
 <script>
     var canvas = document.getElementById('station_layout');
@@ -8,9 +8,12 @@
         return degrees * Math.PI / 180;}
 
     function draw_gps(ctx) {
-        var size = .2;
-        ctx.fillStyle = 'gray';
-        ctx.fillRect(-size / 2, -size / 2, size, size);}
+        var size = .1;
+        ctx.fillStyle = 'darkgray';
+        ctx.beginPath();
+        ctx.arc(0, 0, size, 0, Math.PI*2, true); 
+        ctx.closePath();
+        ctx.fill();}
 
     function draw_detector(ctx, r, alpha, beta, color) {
         /* Draw a detector defined by r, alpha, beta coordinates on the canvas
@@ -20,7 +23,7 @@
 
         ctx.lineWidth = 1;  
         ctx.rotate(radians(alpha));
-        ctx.translate(0, -r);
+        ctx.translate(0, -r);  // positive y is down on canvas
         ctx.rotate(-radians(alpha));
         ctx.rotate(radians(beta));
         ctx.fillStyle = color;
@@ -67,7 +70,7 @@
         var scale = Math.min(canvas.width / station_width,
                              canvas.height / station_height);
         ctx.scale(scale, scale);
-        ctx.translate(-bounds[0], bounds[3]);
+        ctx.translate(-bounds[0], bounds[3]);  // positive y is down on canvas
         ctx.save();
         for (var i = 0; i < r.length; i++) {
             draw_detector(ctx, r[i], alpha[i], beta[i], colors[i]);}
