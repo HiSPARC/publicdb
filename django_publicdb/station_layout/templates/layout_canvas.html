@@ -9,7 +9,7 @@
 
     function draw_gps(ctx) {
         var size = .2;
-        ctx.fillStyle = 'blue';
+        ctx.fillStyle = 'gray';
         ctx.fillRect(-size / 2, -size / 2, size, size);}
 
     function draw_detector(ctx, r, alpha, beta, color) {
@@ -52,6 +52,12 @@
 
         r, alpha, beta should be equal length lists with the coordinates.
 
+        Example:
+        4-detector station:
+        draw_station(context, [8.66, 2.77, 5, 5], [0, 0, -90, 90], [0, 0, 0, 90]);
+        2-detector station:
+        draw_station(context, [5, 5], [-30, 150], [60, 60]);
+
         */
         clear_canvas(ctx);
         var colors = ['black', 'red', 'green', 'blue'];
@@ -63,9 +69,9 @@
         ctx.scale(scale, scale);
         ctx.translate(-bounds[0], bounds[3]);
         ctx.save();
-        draw_gps(ctx);
         for (var i = 0; i < r.length; i++) {
-            draw_detector(ctx, r[i], alpha[i], beta[i], colors[i]);}}
+            draw_detector(ctx, r[i], alpha[i], beta[i], colors[i]);}
+        draw_gps(ctx);}
 
     function clear_canvas(ctx) {
         /* Clear objects on the canvas and reset origin
@@ -75,6 +81,5 @@
         */
         ctx.setTransform(1, 0, 0, 1, 0, 0);
         ctx.clearRect(0, 0, canvas.width, canvas.height);}
-   
-    draw_station(context, [8.66, 2.77, 5, 5], [0, 0, -90, 90], [0, 0, 0, 90]);
+
 </script>
