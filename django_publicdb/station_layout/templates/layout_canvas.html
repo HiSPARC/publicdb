@@ -35,7 +35,7 @@
     function calculate_bounds(r, alpha) {
         /* Calculate the bounding box to contain the detectors and gps
         */
-        var min_x = 0, max_x = 0, min_y = 0, max_y = 0;
+        var min_x = -3, max_x = 3, min_y = -3, max_y = 3;
         var margin = 1;  // To ensure the detectors will fit
         for (var i = 0; i < r.length; i++) {
             x = Math.sin(radians(alpha[i])) * r[i];
