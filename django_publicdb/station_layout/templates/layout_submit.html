@@ -73,9 +73,7 @@
                     <td>{{ form.detector_3_height }}
                     <td>{{ form.detector_4_height }}
         </table>
-        <div id='preview'>
-            {% include "layout_canvas.html" %}
-        </div>
+        {% include "layout_canvas.html" %}
         {{ html_captcha|safe }}<br>
         <input type="submit" value="Submit" />
     </form>
