@@ -14,7 +14,7 @@
 
     <p>
         This is the submitted station layout for station <strong>{{ layout.station }}</strong>.<br>
-        This layout became active on <strong>{{ layout.active_date }}</strong>.<br>
+        This layout became active on <strong>{{ layout.active_date|date:"Y/m/s H:i" }}</strong>.<br>
         These measurements where submitted by <strong>{{ layout.name }}</strong>.<br>
         The submitter can be reached via: <strong>{{ layout.email }}</strong>.<br>
         Please review the layout and either approve or dismiss it.
