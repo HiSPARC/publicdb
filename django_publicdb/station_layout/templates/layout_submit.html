@@ -35,6 +35,9 @@
             {{ form.station }}
         </p>
         <p>
+            Number of detectors: <input name="n" type="radio" value="2"> 2 <input name="n" type="radio" value="4"> 4
+        </p>
+        <p>
             {{ form.active_date.error }}
             {{ form.active_date.label_tag }}
             {{ form.active_date }}
@@ -87,17 +90,36 @@
 
 {% block script %}
     $('form table').on('change', function(event) {
-        var radius = [Number($('#id_detector_1_radius')[0].value),
-                      Number($('#id_detector_2_radius')[0].value),
-                      Number($('#id_detector_3_radius')[0].value),
-                      Number($('#id_detector_4_radius')[0].value)]
-        var alpha = [Number($('#id_detector_1_alpha')[0].value),
-                     Number($('#id_detector_2_alpha')[0].value),
-                     Number($('#id_detector_3_alpha')[0].value),
-                     Number($('#id_detector_4_alpha')[0].value)]
-        var beta = [Number($('#id_detector_1_beta')[0].value),
-                    Number($('#id_detector_2_beta')[0].value),
-                    Number($('#id_detector_3_beta')[0].value),
-                    Number($('#id_detector_4_beta')[0].value)]
+        if ($('input[name=n]:checked').val() == '2') {
+            var radius = [Number($('#id_detector_1_radius')[0].value),
+                          Number($('#id_detector_2_radius')[0].value)]
+            var alpha = [Number($('#id_detector_1_alpha')[0].value),
+                         Number($('#id_detector_2_alpha')[0].value)]
+            var beta = [Number($('#id_detector_1_beta')[0].value),
+                        Number($('#id_detector_2_beta')[0].value)]}
+        else {
+            var radius = [Number($('#id_detector_1_radius')[0].value),
+                          Number($('#id_detector_2_radius')[0].value),
+                          Number($('#id_detector_3_radius')[0].value),
+                          Number($('#id_detector_4_radius')[0].value)]
+            var alpha = [Number($('#id_detector_1_alpha')[0].value),
+                         Number($('#id_detector_2_alpha')[0].value),
+                         Number($('#id_detector_3_alpha')[0].value),
+                         Number($('#id_detector_4_alpha')[0].value)]
+            var beta = [Number($('#id_detector_1_beta')[0].value),
+                        Number($('#id_detector_2_beta')[0].value),
+                        Number($('#id_detector_3_beta')[0].value),
+                        Number($('#id_detector_4_beta')[0].value)]}
         draw_station(context, radius, alpha, beta);});
+
+    $('input[name=n]').change(function() {disable_inputs()};
+
+    function disable_inputs() {
+        if ($('input[name=n]:checked').val() == '2') {
+            $('td:nth-last-child(2) input').prop('disabled', true);
+            $('td:last-child input').prop('disabled', true);}
+        else {
+            $('td:nth-last-child(2) input').prop('disabled', false);
+            $('td:last-child input').prop('disabled', false);}}
+
 {% endblock %}
