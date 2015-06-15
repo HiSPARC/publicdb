@@ -14,7 +14,7 @@
 
     <p>
         This is the submitted station layout for station <strong>{{ layout.station }}</strong>.<br>
-        This layout became active on <strong>{{ layout.active_date|date:"Y/m/s H:i" }}</strong>.<br>
+        This layout became active on <strong>{{ layout.active_date|date:"Y/m/d H:i" }}</strong>.<br>
         These measurements where submitted by <strong>{{ layout.name }}</strong>.<br>
         The submitter can be reached via: <strong>{{ layout.email }}</strong>.<br>
         Please review the layout and either approve or dismiss it.
@@ -61,10 +61,17 @@
 
     {% include "layout_canvas.html" %}
 
-    <form action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    <div style="clear: both;"></div>
+
+    <form style="inline-block" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
     {% csrf_token %}
-        {{ form.as_p }}
-        <input type="submit" value="Submit" />
+        <input id="id_approved" name="approved" type="hidden">
+        <input type="submit" value="Accept">
+    </form>
+
+    <form style="inline-block" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    {% csrf_token %}
+        <input type="submit" value="Decline">
     </form>
 
 {% endblock %}

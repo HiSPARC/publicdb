@@ -36,4 +36,4 @@ class StationLayoutQuarantineForm(forms.Form):
 
 
 class ReviewStationLayoutForm(forms.Form):
-    approved = forms.BooleanField(required=False, help_text="To decline the layout leave the box unchecked.")
+    approved = forms.BooleanField(required=False)
