@@ -12,6 +12,11 @@
         <h2>HiSPARC station layout submit form</h2>
     </div>
 
+    <a href="http://docs.hisparc.nl/coordinates/HiSPARC_coordinates.pdf" target="_blank">
+        <img style="float: right;" title="HiSPARC station layout coordinate system"
+             src="{% static 'images/coordinate_system.png' %}">
+    </a>
+
     <form action="{% url 'django_publicdb.station_layout.views.validate_layout_submit' %}" method="post">
     {% csrf_token %}
         <p>
