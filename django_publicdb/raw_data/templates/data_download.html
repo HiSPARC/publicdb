@@ -46,7 +46,7 @@ HiSPARC data download form
 
 <div id="header"><h2>Data download form</h2></div>
 
-<form action='{% url raw_data.views.download_form %}' method="post">
+<form action="{% url 'raw_data.views.download_form' %}" method="post">
     {{ form.as_p }}
     <input type="submit" value="Submit">
 </form>
