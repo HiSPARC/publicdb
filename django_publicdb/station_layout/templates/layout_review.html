@@ -63,13 +63,13 @@
 
     <div style="clear: both;"></div>
 
-    <form style="inline-block" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    <form style="display: inline-block;" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
     {% csrf_token %}
         <input id="id_approved" name="approved" type="hidden">
         <input type="submit" value="Accept">
     </form>
 
-    <form style="inline-block" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    <form style="display: inline-block;" action="{% url 'django_publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
     {% csrf_token %}
         <input type="submit" value="Decline">
     </form>
