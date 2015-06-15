@@ -35,7 +35,7 @@
             {{ form.station }}
         </p>
         <p>
-            Number of detectors: <input name="n" type="radio" value="2"> 2 <input name="n" type="radio" value="4"> 4
+            Number of detectors: <input name="n" type="radio" value="2"> 2 <input name="n" type="radio" value="4" checked> 4
         </p>
         <p>
             {{ form.active_date.error }}
@@ -82,6 +82,9 @@
                     <td>{{ form.detector_4_height }}
         </table>
         {% include "layout_canvas.html" %}
+
+        <div style="clear: both;"></div>
+
         {{ html_captcha|safe }}<br>
         <input type="submit" value="Submit">
     </form>
