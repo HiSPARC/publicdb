@@ -14,6 +14,7 @@ from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  DetectorTimingOffset, Summary, NetworkSummary)
 from ..inforecords.models import (Pc, Station, Cluster, Country,
                                   DetectorHisparc)
+from ..station_layout.models import StationLayout
 from nagios import status_lists, get_status_counts, get_station_status
 
 
@@ -633,6 +634,27 @@ def get_gps_config_source(request, station_number):
                                   content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=gps-s%s.csv' % station_number)
+    return response
+
+
+def get_station_layout_source(request, station_number):
+    data = get_detector_timing_offsets(station_number)
+
+    layouts = (StationLayout.objects.filter(station__number=station_number,
+                                            timestamp__gte=FIRSTDATE,
+                                            timestamp__lte=datetime.date.today())
+                                    .order_by('active_date'))
+
+    for layout in layouts:
+        layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
+
+    response = render_to_response('source_station_layout.csv',
+                                  {'layouts': layouts,
+                                   'station_number': station_number},
+                                  content_type='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=station_layout-s%s.csv' %
+        station_number)
     return response
 
 
