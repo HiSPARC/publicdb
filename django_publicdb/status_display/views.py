@@ -641,8 +641,8 @@ def get_station_layout_source(request, station_number):
     data = get_detector_timing_offsets(station_number)
 
     layouts = (StationLayout.objects.filter(station__number=station_number,
-                                            timestamp__gte=FIRSTDATE,
-                                            timestamp__lte=datetime.date.today())
+                                            active_date__gte=FIRSTDATE,
+                                            active_date__lte=datetime.date.today())
                                     .order_by('active_date'))
 
     for layout in layouts:
