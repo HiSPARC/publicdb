@@ -46,7 +46,7 @@ HiSPARC data download form
 
 <div id="header"><h2>Data download form</h2></div>
 
-<form action='/data/download/' method="post">
+<form action='{% url raw_data.views.download_form %}' method="post">
     {{ form.as_p }}
     <input type="submit" value="Submit">
 </form>
@@ -57,6 +57,8 @@ HiSPARC data download form
     </a>
 </p>
 
-<p class="reference">Lightning data obtained from Royal Netherlands Meteorological Institute </p>
+<p class="reference">
+    Lightning data obtained from Royal Netherlands Meteorological Institute.
+    Available for 2004-1-1 through 2013-4-13.</p>
 
 {% endblock %}

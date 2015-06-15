@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}HiSPARC | Station layout submitted{% endblock %}
+
+{% block content %}
+    <div id="header">
+        <h2>HiSPARC station layout submission</h2>
+    </div>
+
+    <p>
+        {{ name }}, thank you for your submission.<br>
+        An email has been send to you ({{ email }}) with a link to confirm your sumbission.<br>
+        Once you have confirmed the submission the new layout will be reviewed.
+    </p>
+
+    <p>
+        <strong>Submission overview</strong><br>
+        Station: {{ station.number }} - {{ station.name }}<br>
+    </p>
+
+{% endblock %}

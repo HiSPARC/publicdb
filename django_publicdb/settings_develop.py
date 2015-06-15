@@ -172,6 +172,7 @@ INSTALLED_APPS = (
     'django_publicdb.api',
     'django_publicdb.maps',
     'django_publicdb.jsparc',
+    'django_publicdb.station_layout',
     'django_publicdb.default',
 )
 
