@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect
 from django.template import RequestContext
 from django.conf import settings
 from django.http import HttpResponse
@@ -27,14 +27,13 @@ def data_display(request, slug):
     star_map = None  # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
 
-    return render_to_response('results.html',
-                              {'energy_histogram': energy_histogram,
-                               'core_map': core_map,
-                               'star_map': star_map,
-                               'scores': scores,
-                               'slug': slug,
-                               'session': session},
-                              context_instance=RequestContext(request))
+    return render(request, 'results.html',
+                  {'energy_histogram': energy_histogram,
+                   'core_map': core_map,
+                   'star_map': star_map,
+                   'scores': scores,
+                   'slug': slug,
+                   'session': session})
 
 
 def create_energy_histogram(slug, coincidences):
@@ -117,9 +116,8 @@ def request_form(request):
     if settings.RECAPTCHA_ENABLED:
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
 
-    return render_to_response('request.html',
-                              {'form': form, 'html_captcha': html_captcha},
-                              context_instance=RequestContext(request))
+    return render(request, 'request.html',
+                  {'form': form, 'html_captcha': html_captcha})
 
 
 def validate_request_form(request):
@@ -166,8 +164,7 @@ def validate_request_form(request):
     new_request.save()
     new_request.sendmail_request()
 
-    return render_to_response('thankyou.html', {'data': data},
-                              context_instance=RequestContext(request))
+    return render(request, 'thankyou.html', {'data': data})
 
 
 def confirm_request(request, url):
@@ -181,10 +178,9 @@ def confirm_request(request, url):
                         pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
-    return render_to_response('confirm.html',
-                              {'id': sessionrequest.sid,
-                               'pin': sessionrequest.pin},
-                              context_instance=RequestContext(request))
+    return render(request, 'confirm.html',
+                  {'id': sessionrequest.sid,
+                   'pin': sessionrequest.pin})
 
 
 def create_session(request):

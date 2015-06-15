@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 
 import datetime
@@ -40,10 +40,9 @@ def station_on_map(request, station_number):
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
-    return render_to_response('map.html',
-                              {'subclusters': subclusters,
-                               'center': center},
-                              context_instance=RequestContext(request))
+    return render(request, 'map.html',
+                  {'subclusters': subclusters,
+                   'center': center})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -99,7 +98,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
-    return render_to_response('map.html',
-                              {'subclusters': subclusters,
-                               'focus': focus},
-                              context_instance=RequestContext(request))
+    return render(request, 'map.html',
+                  {'subclusters': subclusters,
+                   'focus': focus})

@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -121,12 +121,12 @@ def create_nagios_config(request):
                       'has_data': has_data})
 
     # Render the template
-    return render_to_response('nagios.cfg',
-                              {'contacts': (Contact.objects.all()
-                                            .select_related('contactinformation')),
-                               'clusters': Cluster.objects.all(),
-                               'hosts': hosts},
-                              content_type='text/plain')
+    return render(request, 'nagios.cfg',
+                  {'contacts': (Contact.objects.all()
+                                .select_related('contactinformation')),
+                   'clusters': Cluster.objects.all(),
+                   'hosts': hosts},
+                  content_type='text/plain')
 
 
 def create_datastore_config(request):
@@ -137,7 +137,7 @@ def create_datastore_config(request):
             socket.gethostbyname(settings.DATASTORE_HOST)):
         raise PermissionDenied
 
-    return render_to_response('datastore.cfg',
-                              {'stations': (Station.objects.all()
-                                            .select_related('cluster__parent'))},
-                              content_type='text/plain')
+    return render(request, 'datastore.cfg',
+                  {'stations': (Station.objects.all()
+                                       .select_related('cluster__parent'))},
+                  content_type='text/plain')

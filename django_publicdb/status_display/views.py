@@ -1,4 +1,4 @@
-from django.shortcuts import (render_to_response, get_object_or_404,
+from django.shortcuts import (render, get_object_or_404,
                               get_list_or_404, redirect)
 from django.http import Http404
 from django.template import RequestContext
@@ -69,11 +69,10 @@ def stations_by_country(request):
             countries[country][cluster][subcluster] = []
         countries[country][cluster][subcluster].append(station_info)
 
-    return render_to_response('stations_by_country.html',
-                              {'countries': countries,
-                               'test_stations': test_stations,
-                               'statuscount': statuscount},
-                              context_instance=RequestContext(request))
+    return render(request, 'stations_by_country.html',
+                  {'countries': countries,
+                   'test_stations': test_stations,
+                   'statuscount': statuscount})
 
 
 def stations_by_number(request):
@@ -95,10 +94,9 @@ def stations_by_number(request):
                          'link': link,
                          'status': status})
 
-    return render_to_response('stations_by_number.html',
-                              {'stations': stations,
-                               'statuscount': statuscount},
-                              context_instance=RequestContext(request))
+    return render(request, 'stations_by_number.html',
+                  {'stations': stations,
+                   'statuscount': statuscount})
 
 
 def stations_by_name(request):
@@ -122,10 +120,9 @@ def stations_by_name(request):
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render_to_response('stations_by_name.html',
-                              {'stations': stations,
-                               'statuscount': statuscount},
-                              context_instance=RequestContext(request))
+    return render(request, 'stations_by_name.html',
+                  {'stations': stations,
+                   'statuscount': statuscount})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -185,11 +182,10 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
-    return render_to_response('stations_on_map.html',
-                              {'subclusters': subclusters,
-                               'focus': focus,
-                               'statuscount': statuscount},
-                              context_instance=RequestContext(request))
+    return render(request, 'stations_on_map.html',
+                 {'subclusters': subclusters,
+                  'focus': focus,
+                  'statuscount': statuscount})
 
 
 def network_coincidences(request, year=None, month=None, day=None):
@@ -254,20 +250,19 @@ def network_coincidences(request, year=None, month=None, day=None):
     coincidencenumberhistogram = create_histogram_network('coincidencenumber',
                                                           date)
 
-    return render_to_response('network_coincidences.html',
-        {'date': date,
-         'tomorrow': date + datetime.timedelta(days=1),
-         'coincidencetimehistogram': coincidencetimehistogram,
-         'coincidencenumberhistogram': coincidencenumberhistogram,
-         'status': status,
-         'thismonth': thismonth,
-         'month_list': month_list,
-         'year_list': year_list,
-         'current_date': current_date,
-         'prev': previous,
-         'next': next,
-         'link': (year, month, day)},
-        context_instance=RequestContext(request))
+    return render(request, 'network_coincidences.html',
+                  {'date': date,
+                   'tomorrow': date + datetime.timedelta(days=1),
+                   'coincidencetimehistogram': coincidencetimehistogram,
+                   'coincidencenumberhistogram': coincidencenumberhistogram,
+                   'status': status,
+                   'thismonth': thismonth,
+                   'month_list': month_list,
+                   'year_list': year_list,
+                   'current_date': current_date,
+                   'prev': previous,
+                   'next': next,
+                   'link': (year, month, day)})
 
 
 def station_data(request, station_number, year, month, day):
@@ -342,28 +337,27 @@ def station_data(request, station_number, year, month, day):
     barometerdata = plot_dataset('barometer', station, date)
     temperaturedata = plot_dataset('temperature', station, date)
 
-    return render_to_response('station_data.html',
-        {'station': station,
-         'date': date,
-         'tomorrow': date + datetime.timedelta(days=1),
-         'config': config,
-         'has_slave': has_slave,
-         'eventhistogram': eventhistogram,
-         'pulseheighthistogram': pulseheighthistogram,
-         'pulseintegralhistogram': pulseintegralhistogram,
-         'barometerdata': barometerdata,
-         'temperaturedata': temperaturedata,
-         'thismonth': thismonth,
-         'month_list': month_list,
-         'year_list': year_list,
-         'current_date': current_date,
-         'prev': previous,
-         'next': next,
-         'link': (station_number, year, month, day),
-         'has_data': True,
-         'has_config': has_config,
-         'coincidences_found': coincidences_found},
-        context_instance=RequestContext(request))
+    return render(request, 'station_data.html',
+                  {'station': station,
+                   'date': date,
+                   'tomorrow': date + datetime.timedelta(days=1),
+                   'config': config,
+                   'has_slave': has_slave,
+                   'eventhistogram': eventhistogram,
+                   'pulseheighthistogram': pulseheighthistogram,
+                   'pulseintegralhistogram': pulseintegralhistogram,
+                   'barometerdata': barometerdata,
+                   'temperaturedata': temperaturedata,
+                   'thismonth': thismonth,
+                   'month_list': month_list,
+                   'year_list': year_list,
+                   'current_date': current_date,
+                   'prev': previous,
+                   'next': next,
+                   'link': (station_number, year, month, day),
+                   'has_data': True,
+                   'has_config': has_config,
+                   'coincidences_found': coincidences_found})
 
 
 def station_status(request, station_number):
@@ -380,13 +374,12 @@ def station_status(request, station_number):
     has_data = station_has_data(station)
     has_config = Configuration.objects.filter(source__station=station).exists()
 
-    return render_to_response('station_status.html',
-        {'station': station,
-         'pc': pc,
-         'has_data': has_data,
-         'has_config': has_config,
-         'coincidences_found': True},
-        context_instance=RequestContext(request))
+    return render(request, 'station_status.html',
+                  {'station': station,
+                   'pc': pc,
+                   'has_data': has_data,
+                   'has_config': has_config,
+                   'coincidences_found': True})
 
 
 def station_config(request, station_number):
@@ -414,19 +407,18 @@ def station_config(request, station_number):
     altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
 
-    return render_to_response('station_config.html',
-        {'station': station,
-         'config': config,
-         'voltagegraph': voltagegraph,
-         'currentgraph': currentgraph,
-         'timingoffsetgraph': timingoffsetgraph,
-         'altitudegraph': altitudegraph,
-         'gpstrack': gpstrack,
-         'has_slave': has_slave,
-         'has_data': has_data,
-         'has_config': True,
-         'coincidences_found': True},
-        context_instance=RequestContext(request))
+    return render(request, 'station_config.html',
+                  {'station': station,
+                   'config': config,
+                   'voltagegraph': voltagegraph,
+                   'currentgraph': currentgraph,
+                   'timingoffsetgraph': timingoffsetgraph,
+                   'altitudegraph': altitudegraph,
+                   'gpstrack': gpstrack,
+                   'has_slave': has_slave,
+                   'has_data': has_data,
+                   'has_config': True,
+                   'coincidences_found': True})
 
 
 def station_latest(request, station_number):
@@ -478,17 +470,16 @@ def station_latest(request, station_number):
         except IndexError:
             pass
 
-    return render_to_response('station_latest.html',
-        {'station': station,
-         'date': date,
-         'status': status,
-         'eventhistogram': eventhistogram,
-         'pulseheighthistogram': pulseheighthistogram,
-         'pulseintegralhistogram': pulseintegralhistogram,
-         'barometerdata': barometerdata,
-         'extra_station': extra_station,
-         'old_data': old_data},
-        context_instance=RequestContext(request))
+    return render(request, 'station_latest.html',
+                  {'station': station,
+                   'date': date,
+                   'status': status,
+                   'eventhistogram': eventhistogram,
+                   'pulseheighthistogram': pulseheighthistogram,
+                   'pulseintegralhistogram': pulseintegralhistogram,
+                   'barometerdata': barometerdata,
+                   'extra_station': extra_station,
+                   'old_data': old_data})
 
 
 def station(request, station_number):
@@ -513,10 +504,10 @@ def station(request, station_number):
 
 def get_coincidencetime_histogram_source(request, year, month, day):
     data = get_histogram_source(year, month, day, 'coincidencetime')
-    response = render_to_response('source_coincidencetime_histogram.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day))},
-                                  content_type='text/csv')
+    response = render(request, 'source_coincidencetime_histogram.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day))},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=coincidencetime-network-%d%02d%02d.csv' %
         (int(year), int(month), int(day)))
@@ -525,10 +516,10 @@ def get_coincidencetime_histogram_source(request, year, month, day):
 
 def get_coincidencenumber_histogram_source(request, year, month, day):
     data = get_histogram_source(year, month, day, 'coincidencenumber')
-    response = render_to_response('source_coincidencenumber_histogram.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day))},
-                                  content_type='text/csv')
+    response = render(request, 'source_coincidencenumber_histogram.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day))},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=coincidencenumber-network-%d%02d%02d.csv' %
         (int(year), int(month), int(day)))
@@ -537,11 +528,11 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
 
 def get_eventtime_histogram_source(request, station_number, year, month, day):
     data = get_histogram_source(year, month, day, 'eventtime', station_number)
-    response = render_to_response('source_eventtime_histogram.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day)),
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_eventtime_histogram.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -552,11 +543,11 @@ def get_pulseheight_histogram_source(request, station_number, year, month,
                                      day):
     data = get_histogram_source(year, month, day, 'pulseheight',
                                 station_number)
-    response = render_to_response('source_pulseheight_histogram.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day)),
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_pulseheight_histogram.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseheight-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -567,11 +558,11 @@ def get_pulseintegral_histogram_source(request, station_number, year, month,
                                        day):
     data = get_histogram_source(year, month, day, 'pulseintegral',
                                 station_number)
-    response = render_to_response('source_pulseintegral_histogram.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day)),
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_pulseintegral_histogram.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=pulseintegral-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -580,11 +571,11 @@ def get_pulseintegral_histogram_source(request, station_number, year, month,
 
 def get_barometer_dataset_source(request, station_number, year, month, day):
     data = get_dataset_source(year, month, day, 'barometer', station_number)
-    response = render_to_response('source_barometer_dataset.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day)),
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_barometer_dataset.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=barometer-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -593,11 +584,11 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
 
 def get_temperature_dataset_source(request, station_number, year, month, day):
     data = get_dataset_source(year, month, day, 'temperature', station_number)
-    response = render_to_response('source_temperature_dataset.csv',
-                                  {'data': data,
-                                   'date': '-'.join((year, month, day)),
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_temperature_dataset.csv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=temperature-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
@@ -606,10 +597,10 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
 
 def get_voltage_config_source(request, station_number):
     data = get_config_source(station_number, 'voltage')
-    response = render_to_response('source_voltage_config.csv',
-                                  {'data': data,
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_voltage_config.csv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=voltage-s%s.csv' % station_number)
     return response
@@ -617,10 +608,10 @@ def get_voltage_config_source(request, station_number):
 
 def get_current_config_source(request, station_number):
     data = get_config_source(station_number, 'current')
-    response = render_to_response('source_current_config.csv',
-                                  {'data': data,
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_current_config.csv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=current-s%s.csv' % station_number)
     return response
@@ -628,10 +619,10 @@ def get_current_config_source(request, station_number):
 
 def get_gps_config_source(request, station_number):
     data = get_config_source(station_number, 'gps')
-    response = render_to_response('source_gps_config.csv',
-                                  {'data': data,
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_gps_config.csv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=gps-s%s.csv' % station_number)
     return response
@@ -648,10 +639,10 @@ def get_station_layout_source(request, station_number):
     for layout in layouts:
         layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
 
-    response = render_to_response('source_station_layout.csv',
-                                  {'layouts': layouts,
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_station_layout.csv',
+                      {'layouts': layouts,
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=station_layout-s%s.csv' %
         station_number)
@@ -660,10 +651,10 @@ def get_station_layout_source(request, station_number):
 
 def get_detector_timing_offsets_source(request, station_number):
     data = get_detector_timing_offsets(station_number)
-    response = render_to_response('source_detector_timing_offsets.csv',
-                                  {'data': data,
-                                   'station_number': station_number},
-                                  content_type='text/csv')
+    response = render(request, 'source_detector_timing_offsets.csv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type='text/csv')
     response['Content-Disposition'] = (
         'attachment; filename=detector_timing_offsets-s%s.csv' %
         station_number)
@@ -1020,5 +1011,4 @@ def station_has_data(station):
 
 def help(request):
     """Show the static help page"""
-    return render_to_response('help.html',
-                              context_instance=RequestContext(request))
+    return render(request, 'help.html')
