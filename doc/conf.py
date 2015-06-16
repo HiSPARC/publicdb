@@ -15,7 +15,7 @@ sys.path.append('../django_publicdb')
 
 # Set up the Django settings/environment
 import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_publicdb.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_publicdb.settings_develop")
 django.setup()
 
 
