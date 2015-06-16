@@ -13,6 +13,7 @@ Contents:
    data_access
    api_tutorial
    hisparc_maps
+   station_layout
    api
    status_display
 

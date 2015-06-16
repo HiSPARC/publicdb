@@ -60,8 +60,8 @@ Cluster list
 
 This tells us that if we want a list of all clusters we need to use the
 clusters option by appending :code:`"clusters/"` to the base url,
-resulting in the following: `http://data.hisparc.nl/api/clusters/
-<http://data.hisparc.nl/api/clusters/>`_.
+resulting in the following:
+`http://data.hisparc.nl/api/clusters/ <http://data.hisparc.nl/api/clusters/>`_.
 
 With this result:
 
@@ -145,8 +145,8 @@ can be placed. Then a while loop is used to loop over all days between
 datum and end_datum, reading each corresponding url. Finally a plot is
 made, setting the dates against their values.
 
-Start Python and type (or copy/paste without the '>>> ') the following
-lines of code:
+Start Python and type (or copy/paste without the :code:`>>> `) the
+following lines of code:
 
 .. code-block:: python
 
@@ -167,3 +167,12 @@ lines of code:
     ...
     >>> step(dates, events)
     >>> show()
+
+
+SAPPHiRE
+^^^^^^^^
+
+The HiSPARC Python framework SAPPHiRE includes an API module. This module
+simplifies access to the API. See the SAPPHiRE documentation for more
+information:
+`http://docs.hisparc.nl/sapphire/ <http://docs.hisparc.nl/sapphire/>`_.
