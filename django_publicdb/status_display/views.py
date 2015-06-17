@@ -629,8 +629,6 @@ def get_gps_config_source(request, station_number):
 
 
 def get_station_layout_source(request, station_number):
-    data = get_detector_timing_offsets(station_number)
-
     layouts = (StationLayout.objects.filter(station__number=station_number,
                                             active_date__gte=FIRSTDATE,
                                             active_date__lte=datetime.date.today())
