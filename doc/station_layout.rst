@@ -28,13 +28,13 @@ For each detector 3 (or 4) coordinates need to be determined:
   scintillator (in meters).
 - Next the alpha angle (:code:`α`) which is the clock-wise turning angle
   between North and the detector as seen from the GPS (in degrees).
-- The rotation of the detector is described by the beta angle
-  (:code:`β`), which is the clock-wise turning rotation of the long side
-  of the detector relative to North (in degrees).
-- Finally a height (:code:`z`) coordinate can be measured if there is a
+- A height (:code:`z`) coordinate can be measured if there is a
   significant altitude difference between the GPS antenna and the
   detectors, or if the detectors are not at the same height. Up is
   positive (in meters).
+- The rotation of the detector is described by the beta angle
+  (:code:`β`), which is the clock-wise turning rotation of the long side
+  of the detector relative to North (in degrees).
 
 For more information about the coordinate systems used in HiSPARC see:
 `Coordinate systems and units in HiSPARC
