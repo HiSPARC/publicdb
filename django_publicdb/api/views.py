@@ -116,15 +116,15 @@ def station(request, station_number, year=None, month=None, day=None):
         except PulseheightFit.DoesNotExist:
             mpv_fits.append(None)
 
-    scintillators = [{'alpha': detector.scintillator_1_alpha,
-                      'beta': detector.scintillator_1_beta,
-                      'radius': detector.scintillator_1_radius,
+    scintillators = [{'radius': detector.scintillator_1_radius,
+                      'alpha': detector.scintillator_1_alpha,
                       'height': detector.scintillator_1_height,
+                      'beta': detector.scintillator_1_beta,
                       'mpv': mpv_fits[0]}]
-    scintillators.append({'alpha': detector.scintillator_2_alpha,
-                          'beta': detector.scintillator_2_beta,
-                          'radius': detector.scintillator_2_radius,
+    scintillators.append({'radius': detector.scintillator_2_radius,
+                          'alpha': detector.scintillator_2_alpha,
                           'height': detector.scintillator_2_height,
+                          'beta': detector.scintillator_2_beta,
                           'mpv': mpv_fits[1]})
 
     station_info = {'number': station.number,
@@ -139,15 +139,15 @@ def station(request, station_number, year=None, month=None, day=None):
                     'scintillators': scintillators}
 
     if config.slave() != "no slave":
-        scintillators.append({'alpha': detector.scintillator_3_alpha,
-                              'beta': detector.scintillator_3_beta,
-                              'radius': detector.scintillator_3_radius,
+        scintillators.append({'radius': detector.scintillator_3_radius,
+                              'alpha': detector.scintillator_3_alpha,
                               'height': detector.scintillator_3_height,
+                              'beta': detector.scintillator_3_beta,
                               'mpv': mpv_fits[2]})
-        scintillators.append({'alpha': detector.scintillator_4_alpha,
-                              'beta': detector.scintillator_4_beta,
-                              'radius': detector.scintillator_4_radius,
+        scintillators.append({'radius': detector.scintillator_4_radius,
+                              'alpha': detector.scintillator_4_alpha,
                               'height': detector.scintillator_4_height,
+                              'beta': detector.scintillator_4_beta,
                               'mpv': mpv_fits[3]})
 
     return json_dict(station_info)
