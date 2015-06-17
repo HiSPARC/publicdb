@@ -11,9 +11,9 @@
 # per detector (4x):
 #     radius: distance to detector from GPS, in plane of GPS [meters]
 #     alpha: angle between detector and true north as seen from GPS [degrees]
-#     beta: angle of the long side of the scintillator to true north [degrees]
 #     height: altitude of the detector above plane of GPS [meters]
+#     beta: angle of the long side of the scintillator to true north [degrees]
 #
 #
-{% for layout in layouts %}{{ layout.timestamp }}	{{ layout.detector_1_radius }}	{{ layout.detector_1_alpha }}	{{ layout.detector_1_beta }}	{{ layout.detector_1_height }}	{{ layout.detector_2_radius }}	{{ layout.detector_2_alpha }}	{{ layout.detector_2_beta }}	{{ layout.detector_2_height }}	{{ layout.detector_3_radius }}	{{ layout.detector_3_alpha }}	{{ layout.detector_3_beta }}	{{ layout.detector_3_height }}	{{ layout.detector_4_radius }}	{{ layout.detector_4_alpha }}	{{ layout.detector_4_beta }}	{{ layout.detector_4_height }}
+{% for layout in layouts %}{{ layout.timestamp }}	{{ layout.detector_1_radius }}	{{ layout.detector_1_alpha }}	{{ layout.detector_1_height }}	{{ layout.detector_1_beta }}	{{ layout.detector_2_radius }}	{{ layout.detector_2_alpha }}	{{ layout.detector_2_height }}	{{ layout.detector_2_beta }}	{{ layout.detector_3_radius }}	{{ layout.detector_3_alpha }}	{{ layout.detector_3_height }}	{{ layout.detector_3_beta }}	{{ layout.detector_4_radius }}	{{ layout.detector_4_alpha }}	{{ layout.detector_4_height }}	{{ layout.detector_4_beta }}
 {% endfor %}

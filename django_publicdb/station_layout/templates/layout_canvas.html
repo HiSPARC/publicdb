@@ -19,7 +19,7 @@
         /* Draw a detector defined by r, alpha, beta coordinates on the canvas
         */
         var detector_width = .5;
-        var detector_height = 1;
+        var detector_length = 1;
 
         ctx.lineWidth = 1;  
         ctx.rotate(radians(alpha));
@@ -27,8 +27,8 @@
         ctx.rotate(-radians(alpha));
         ctx.rotate(radians(beta));
         ctx.fillStyle = color;
-        ctx.fillRect(-detector_width / 2, -detector_height / 2,
-                     detector_width, detector_height);
+        ctx.fillRect(-detector_width / 2, -detector_length / 2,
+                     detector_width, detector_length);
         ctx.restore();
         ctx.save();}
 
