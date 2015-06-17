@@ -1,7 +1,6 @@
 from django.shortcuts import (render, get_object_or_404,
                               get_list_or_404, redirect)
 from django.http import Http404
-from django.template import RequestContext
 from django.db.models import Q
 
 from collections import OrderedDict
@@ -183,9 +182,9 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                             'stations': stations})
 
     return render(request, 'stations_on_map.html',
-                 {'subclusters': subclusters,
-                  'focus': focus,
-                  'statuscount': statuscount})
+                  {'subclusters': subclusters,
+                   'focus': focus,
+                   'statuscount': statuscount})
 
 
 def network_coincidences(request, year=None, month=None, day=None):

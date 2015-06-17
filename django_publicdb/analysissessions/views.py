@@ -1,5 +1,4 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.template import RequestContext
 from django.conf import settings
 from django.http import HttpResponse
 # from django.views.decorators.csrf import csrf_protect
