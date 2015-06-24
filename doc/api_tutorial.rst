@@ -145,7 +145,7 @@ can be placed. Then a while loop is used to loop over all days between
 datum and end_datum, reading each corresponding url. Finally a plot is
 made, setting the dates against their values.
 
-Start Python and type (or copy/paste without the :code:`>>> `) the
+Start Python and type (or copy/paste without the :code:`>>>`) the
 following lines of code:
 
 .. code-block:: python

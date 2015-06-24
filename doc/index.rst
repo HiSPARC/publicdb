@@ -8,7 +8,6 @@ Contents:
 
 .. toctree::
    :maxdepth: 2
-   :numbered:
 
    data_access
    api_tutorial

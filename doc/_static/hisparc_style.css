@@ -48,18 +48,18 @@ div.body h6 {
 div.body h1 {
     border-top: none;
     padding-top: 20px;
-    font-size: 310%;}
+    font-size: 260%;}
 
 div.body h2 {
-    font-size: 240%;
+    font-size: 210%;
     padding-top: 15px;}
 
 div.body h3 {
-    font-size: 190%;
+    font-size: 170%;
     border-bottom: 1px solid #BBB;}
 
 div.body h4 {
-    font-size: 150%;
+    font-size: 130%;
     margin-top: 20px;
     padding-left: 3px;}
 
