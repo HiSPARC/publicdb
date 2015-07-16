@@ -672,7 +672,7 @@ def config(request, station_number, year=None, month=None, day=None):
                                          date__lte=date)
                                  .latest('date'))
         c = Configuration.objects.filter(source=source).latest('timestamp')
-    except Configuration.DoesNotExist:
+    except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
     config = serializers.serialize("json", [c])
