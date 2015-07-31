@@ -9,8 +9,8 @@ import scipy
 import scipy.optimize
 import scipy.stats
 
-from models import Configuration, PulseheightFit
-import esd
+from .models import Configuration, PulseheightFit
+from . import esd
 
 
 logger = logging.getLogger('histograms.fit_pulseheight_peak')

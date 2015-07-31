@@ -21,9 +21,9 @@ from sapphire.analysis.coincidence_queries import CoincidenceQuery
 from ..inforecords.models import Station, Cluster
 from ..histograms.models import Summary, NetworkSummary
 from ..histograms import esd
-from ..raw_data.forms import DataDownloadForm, CoincidenceDownloadForm
-
-import knmi_lightning
+from .forms import DataDownloadForm, CoincidenceDownloadForm
+from .date_generator import single_day_ranges
+from . import knmi_lightning
 
 from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
@@ -663,29 +663,6 @@ def prettyprint_timerange(t0, t1):
 
     timerange = timerange.replace('-', '').replace(' ', '_').replace(':', '')
     return timerange
-
-
-def single_day_ranges(start, end):
-    """Generate datetime ranges consisting of a single day.
-
-    Generate datetime ranges, a single day at a time.  The generator keeps
-    returning two datetime values, making up a range of a full day.
-    However, the first and last days may be shorter, if a specific
-    time-of-day was specified.
-
-    :param start: start of range
-    :param end: end of range
-
-    """
-    cur = start
-    next_day = (cur.replace(hour=0, minute=0, second=0, microsecond=0) +
-                datetime.timedelta(days=1))
-
-    while next_day < end:
-        yield cur, next_day
-        cur = next_day
-        next_day = cur + datetime.timedelta(days=1)
-    yield cur, end
 
 
 def get_lightning_path(date):

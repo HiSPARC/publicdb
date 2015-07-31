@@ -14,7 +14,7 @@ from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
 from ..inforecords.models import (Pc, Station, Cluster, Country,
                                   DetectorHisparc)
 from ..station_layout.models import StationLayout
-from nagios import status_lists, get_status_counts, get_station_status
+from .nagios import status_lists, get_status_counts, get_station_status
 
 
 FIRSTDATE = datetime.date(2002, 1, 1)
