@@ -549,7 +549,11 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     """Get all eventtime data from start to end"""
 
     if end is None:
-        end = datetime.date.today()
+        today = datetime.date.today()
+        last = Summary.objects.filter(station__number=station_number,
+                                      date__gte=FIRSTDATE, date__lt=today,
+                                      num_events__isnull=False).last().date
+        end = last + datetime.timedelta(days=1)
     if start is None:
         # Get first date with data
         start = Summary.objects.filter(station__number=station_number,
