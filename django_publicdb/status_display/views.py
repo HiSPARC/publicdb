@@ -554,7 +554,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         # Get first date with data
         start = Summary.objects.filter(station__number=station_number,
                                        date__gte=FIRSTDATE, date__lt=end,
-                                       num_events__isnull=False).first()
+                                       num_events__isnull=False).first().date
 
     data = get_eventtime_histogram_sources(station_number, start, end)
     response = render(request, 'source_eventtime.csv',
