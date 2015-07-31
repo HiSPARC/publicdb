@@ -22,6 +22,7 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/coincidencetime/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_coincidencetime_histogram_source'),
     (r'^source/coincidencenumber/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_coincidencenumber_histogram_source'),
 
+    (r'^source/eventtime/(?P<station_number>\d+)/$', 'get_eventtime_source'),
     (r'^source/eventtime/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_eventtime_histogram_source'),
     (r'^source/pulseheight/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_pulseheight_histogram_source'),
     (r'^source/pulseintegral/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_pulseintegral_histogram_source'),

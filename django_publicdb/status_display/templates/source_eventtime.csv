@@ -1,0 +1,21 @@
+# HiSPARC eventtime source
+#
+# Station: {{ station_number }}
+# Data taken from {{ start|date:"Y-m-d H:00:00" }} to {{ end|date:"Y-m-d H:00:00" }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# Please note: the 'timestamp' is the left bin edge. The width of each bin
+# is 1 hour, i.e. 3600 seconds. Value means the number of events which were
+# measured during 1 hour.
+#
+# This data contains the following columns:
+#
+# timestamp: start of hour [UNIX timestamp]
+# value:     number of events [counts]
+#
+#
+# timestamp	value
+{% for row in data %}{{ row.0 }}	{{ row.1 }}
+{% endfor %}

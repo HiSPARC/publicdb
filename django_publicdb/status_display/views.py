@@ -8,12 +8,17 @@ from operator import itemgetter
 import calendar
 import datetime
 
+from numpy import arange
+
+from sapphire.transformations.clock import datetime_to_gps
+
 from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  NetworkHistogram, HistogramType, DatasetType,
                                  DetectorTimingOffset, Summary, NetworkSummary)
 from ..inforecords.models import (Pc, Station, Cluster, Country,
                                   DetectorHisparc)
 from ..station_layout.models import StationLayout
+from ..raw_data.date_generator import daterange
 from .nagios import status_lists, get_status_counts, get_station_status
 
 
@@ -526,6 +531,8 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
 
 
 def get_eventtime_histogram_source(request, station_number, year, month, day):
+    """Get all eventtime histograms for a specific date"""
+
     data = get_histogram_source(year, month, day, 'eventtime', station_number)
     response = render(request, 'source_eventtime_histogram.csv',
                       {'data': data,
@@ -536,6 +543,54 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
         'attachment; filename=eventtime-s%s-%d%02d%02d.csv' %
         (station_number, int(year), int(month), int(day)))
     return response
+
+
+def get_eventtime_source(request, station_number, start=None, end=None):
+    """Get all eventtime data from start to end"""
+
+    if end is None:
+        end = datetime.date.today()
+    if start is None:
+        # Get first date with data
+        start = Summary.objects.filter(station__number=station_number,
+                                       date__gte=FIRSTDATE, date__lt=end,
+                                       num_events__isnull=False).first()
+
+    data = get_eventtime_histogram_sources(station_number, start, end)
+    response = render(request, 'source_eventtime.csv',
+                      {'data': data,
+                       'start': start,
+                       'end': end,
+                       'station_number': station_number},
+                      content_type='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename=eventtime-s%s-%s-%s.csv' %
+        (station_number, start.strftime('%Y%m%d'), end.strftime('%Y%m%d')))
+    return response
+
+
+def get_eventtime_histogram_sources(station_number, start, end):
+    histograms = get_list_or_404(
+        DailyHistogram.objects.select_related('source'),
+        source__station__number=station_number,
+        source__date__gte=start, source__date__lt=end,
+        type__slug='eventtime')
+    bins = []
+    values = []
+    hours = arange(24) * 3600
+    no_data = [0] * 24
+    i = 0
+    for date in daterange(start, end):
+        ts = datetime_to_gps(date)
+        bins.extend(ts + hours)
+        if histograms[i].source.date == date:
+            values.extend(histograms[i].values)
+            i += 1
+            if i == len(histograms):
+                break
+        else:
+            values.extend(no_data)
+    return zip(bins, values)
 
 
 def get_pulseheight_histogram_source(request, station_number, year, month,
