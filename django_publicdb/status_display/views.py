@@ -5,6 +5,7 @@ from django.db.models import Q
 
 from collections import OrderedDict
 from operator import itemgetter
+from itertools import izip
 import calendar
 import datetime
 
@@ -594,7 +595,7 @@ def get_eventtime_histogram_sources(station_number, start, end):
                 break
         else:
             values.extend(no_data)
-    return zip(bins, values)
+    return izip(bins, values)
 
 
 def get_pulseheight_histogram_source(request, station_number, year, month,
