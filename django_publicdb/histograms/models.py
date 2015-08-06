@@ -41,6 +41,7 @@ class NetworkSummary(models.Model):
     class Meta:
         verbose_name_plural = 'network summaries'
         ordering = ('date',)
+        get_latest_by = 'date'
 
 
 class Summary(models.Model):
@@ -64,6 +65,7 @@ class Summary(models.Model):
         verbose_name_plural = 'summaries'
         unique_together = (('station', 'date'),)
         ordering = ('date', 'station')
+        get_latest_by = 'date'
 
 
 class Configuration(models.Model):
@@ -157,6 +159,10 @@ class Configuration(models.Model):
 
     def __unicode__(self):
         return "%d - %s" % (self.source.station.number, self.timestamp)
+
+    class Meta:
+        verbose_name_plural = 'configurations'
+        get_latest_by = 'timestamp'
 
     def station(self):
         return self.source.station.number

@@ -197,7 +197,7 @@ def network_coincidences(request, year=None, month=None, day=None):
                                      .filter(num_coincidences__isnull=False,
                                              date__gte=FIRSTDATE,
                                              date__lte=datetime.date.today())
-                                     .latest('date'))
+                                     .latest())
         except NetworkSummary.DoesNotExist:
             raise Http404
 
@@ -220,7 +220,7 @@ def network_coincidences(request, year=None, month=None, day=None):
         previous = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
                                                   date__gte=FIRSTDATE,
                                                   date__lt=date)
-                                  .latest('date')).date
+                                  .latest()).date
     except NetworkSummary.DoesNotExist:
         previous = None
 
@@ -287,7 +287,7 @@ def station_data(request, station_number, year, month, day):
                                            station=station,
                                            date__gte=FIRSTDATE,
                                            date__lt=date)
-                                   .latest('date')).date
+                                   .latest()).date
     except Summary.DoesNotExist:
         previous = None
 
@@ -297,17 +297,16 @@ def station_data(request, station_number, year, month, day):
                                        station=station,
                                        date__gt=date,
                                        date__lte=datetime.date.today())
-                               .order_by('date'))[0].date
-    except IndexError:
+                               .earliest()).date
+    except Summary.DoesNotExist:
         next = None
 
     try:
         source = (Summary.objects.filter(station=station,
                                          num_config__isnull=False,
                                          date__lte=date)
-                                 .latest('date'))
-        config = (Configuration.objects.filter(source=source)
-                                       .latest('timestamp'))
+                                 .latest())
+        config = Configuration.objects.filter(source=source).latest()
         if config.slv_version.count('0') == 2:
             has_slave = False
         else:
@@ -439,7 +438,7 @@ def station_latest(request, station_number):
                                           station=station,
                                           date__gte=FIRSTDATE,
                                           date__lte=datetime.date.today())
-                                  .latest('date'))
+                                  .latest())
 
     down, problem, up = status_lists()
     status = get_station_status(station.number, down, problem, up)
@@ -490,7 +489,7 @@ def station(request, station_number):
                                           station__number=station_number,
                                           date__gte=FIRSTDATE,
                                           date__lte=datetime.date.today())
-                                  .latest('date'))
+                                  .latest())
     except Summary.DoesNotExist:
         raise Http404
 

@@ -9,10 +9,10 @@ import numpy
 from scipy import optimize, stats
 
 from ..inforecords.models import (Pc, Station, Cluster, Country,
-                                  DetectorHisparc,
                                   MonitorPulseheightThresholds)
 from ..histograms.models import (Summary, DailyHistogram, HistogramType,
                                  Configuration, PulseheightFit)
+from ..station_layout.models import StationLayout
 import datastore
 
 
@@ -86,20 +86,23 @@ def station(request, station_number, year=None, month=None, day=None):
 
     try:
         station = Station.objects.get(number=station_number)
-        detector = (DetectorHisparc.objects.filter(station=station,
-                                                   startdate__lte=date)
-                                           .latest('startdate'))
         source_events = (Summary.objects.filter(station=station,
                                                 num_events__isnull=False,
-                                                date__lte=date).latest('date'))
+                                                date__lte=date).latest())
         source_config = (Summary.objects.filter(station=station,
                                                 num_config__isnull=False,
-                                                date__lte=date).latest('date'))
-        config = (Configuration.objects.filter(source=source_config)
-                                       .latest('timestamp'))
-    except (Station.DoesNotExist, DetectorHisparc.DoesNotExist,
-            Summary.DoesNotExist, Configuration.DoesNotExist):
+                                                date__lte=date).latest())
+        config = (Configuration.objects.filter(source=source_config).latest())
+    except (Station.DoesNotExist, Summary.DoesNotExist,
+            Configuration.DoesNotExist):
         return HttpResponseNotFound()
+
+    try:
+        layout = StationLayout.objects.filter(station=station,
+                                              active_date__lte=date).latest()
+    except  StationLayout.DoesNotExist:
+        # Get new StationLayout with all None values
+        layout = StationLayout()
 
     is_active = Pc.objects.filter(station=station, is_active=True).exists()
 
@@ -109,23 +112,37 @@ def station(request, station_number, year=None, month=None, day=None):
         try:
             mpv = (PulseheightFit.objects.get(source=source_events, plate=i)
                                          .fitted_mpv)
+        except PulseheightFit.DoesNotExist:
+            mpv_fits.append(None)
+        else:
             if mpv == 0:
                 mpv_fits.append(None)
             else:
                 mpv_fits.append(mpv)
-        except PulseheightFit.DoesNotExist:
-            mpv_fits.append(None)
 
-    scintillators = [{'radius': detector.scintillator_1_radius,
-                      'alpha': detector.scintillator_1_alpha,
-                      'height': detector.scintillator_1_height,
-                      'beta': detector.scintillator_1_beta,
+
+    scintillators = [{'radius': layout.detector_1_radius,
+                      'alpha': layout.detector_1_alpha,
+                      'height': layout.detector_1_height,
+                      'beta': layout.detector_1_beta,
                       'mpv': mpv_fits[0]}]
-    scintillators.append({'radius': detector.scintillator_2_radius,
-                          'alpha': detector.scintillator_2_alpha,
-                          'height': detector.scintillator_2_height,
-                          'beta': detector.scintillator_2_beta,
+    scintillators.append({'radius': layout.detector_2_radius,
+                          'alpha': layout.detector_alpha,
+                          'height': layout.detector_2_height,
+                          'beta': layout.detector_2_beta,
                           'mpv': mpv_fits[1]})
+
+    if config.slave() != "no slave":
+        scintillators.append({'radius': layout.detector_3_radius,
+                              'alpha': layout.detector_3_alpha,
+                              'height': layout.detector_3_height,
+                              'beta': layout.detector_3_beta,
+                              'mpv': mpv_fits[2]})
+        scintillators.append({'radius': layout.detector_4_radius,
+                              'alpha': layout.detector_4_alpha,
+                              'height': layout.detector_4_height,
+                              'beta': layout.detector_4_beta,
+                              'mpv': mpv_fits[3]})
 
     station_info = {'number': station.number,
                     'name': station.name,
@@ -137,18 +154,6 @@ def station(request, station_number, year=None, month=None, day=None):
                     'altitude': config.gps_altitude,
                     'active': is_active,
                     'scintillators': scintillators}
-
-    if config.slave() != "no slave":
-        scintillators.append({'radius': detector.scintillator_3_radius,
-                              'alpha': detector.scintillator_3_alpha,
-                              'height': detector.scintillator_3_height,
-                              'beta': detector.scintillator_3_beta,
-                              'mpv': mpv_fits[2]})
-        scintillators.append({'radius': detector.scintillator_4_radius,
-                              'alpha': detector.scintillator_4_alpha,
-                              'height': detector.scintillator_4_height,
-                              'beta': detector.scintillator_4_beta,
-                              'mpv': mpv_fits[3]})
 
     return json_dict(station_info)
 
@@ -667,11 +672,10 @@ def config(request, station_number, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        source = (Summary.objects.filter(station=station,
-                                         num_config__isnull=False,
-                                         date__lte=date)
-                                 .latest('date'))
-        c = Configuration.objects.filter(source=source).latest('timestamp')
+        source = Summary.objects.filter(station=station,
+                                        num_config__isnull=False,
+                                        date__lte=date).latest()
+        c = Configuration.objects.filter(source=source).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 

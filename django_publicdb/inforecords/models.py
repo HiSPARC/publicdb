@@ -229,8 +229,7 @@ class Station(models.Model):
         today = datetime.datetime.utcnow()
 
         config = (Configuration.objects.filter(source__station=self,
-                                               timestamp__lte=today)
-                                       .latest('timestamp'))
+                                               timestamp__lte=today).latest())
 
         if config.slave() == 'no slave':
             n_detectors = 2
