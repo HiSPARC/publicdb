@@ -307,7 +307,7 @@ class DetectorHisparc(models.Model):
     class Meta:
         unique_together = [('station', 'startdate')]
         verbose_name_plural = 'Detector HiSPARC'
-        ordering = ('station__number',)
+        ordering = ('station',)
 
 
 class ElectronicsType(models.Model):

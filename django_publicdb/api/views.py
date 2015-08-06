@@ -127,7 +127,7 @@ def station(request, station_number, year=None, month=None, day=None):
                       'beta': layout.detector_1_beta,
                       'mpv': mpv_fits[0]}]
     scintillators.append({'radius': layout.detector_2_radius,
-                          'alpha': layout.detector_alpha,
+                          'alpha': layout.detector_2_alpha,
                           'height': layout.detector_2_height,
                           'beta': layout.detector_2_beta,
                           'mpv': mpv_fits[1]})
