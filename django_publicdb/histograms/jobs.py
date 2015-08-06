@@ -387,8 +387,7 @@ def update_gps_coordinates():
         try:
             config = (Configuration.objects
                                    .filter(source__station=detector.station,
-                                           timestamp__lt=tomorrow)
-                                   .latest('timestamp'))
+                                           timestamp__lt=tomorrow).latest())
         except Configuration.DoesNotExist:
             pass
         else:

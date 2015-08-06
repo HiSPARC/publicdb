@@ -29,6 +29,8 @@ class StationLayout(models.Model):
 
     class Meta:
         unique_together = [('station', 'active_date')]
+        ordering = ('station', 'active_date')
+        get_latest_by = 'active_date'
 
 
 class StationLayoutQuarantine(models.Model):

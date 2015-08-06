@@ -5,7 +5,7 @@
     "fields": {
         "value_axis_title": "Number of events",
         "description": "This histogram will show you the number of events each hour for a given day.",
-        "bin_axis_title": "Hour of day (UTC)",
+        "bin_axis_title": "Hour of day (GPS)",
         "has_multiple_datasets": false,
         "slug": "eventtime",
         "name": "Event time histogram"
@@ -64,7 +64,7 @@
     "model": "histograms.datasettype",
     "fields": {
         "description": "Temperature measurements on this day.",
-        "x_axis_title": "Hour of day (UTC)",
+        "x_axis_title": "Hour of day (GPS)",
         "y_axis_title": "Temperature (\u00b0C)",
         "name": "Temperature",
         "slug": "temperature"
@@ -75,7 +75,7 @@
     "model": "histograms.datasettype",
     "fields": {
         "description": "Air pressure measurements for this day.",
-        "x_axis_title": "Hour of day (UTC)",
+        "x_axis_title": "Hour of day (GPS)",
         "y_axis_title": "Air Pressure (hPa)",
         "name": "Barometer",
         "slug": "barometer"

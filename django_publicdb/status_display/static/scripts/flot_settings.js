@@ -68,7 +68,7 @@ var _coincidencetimehistogram = {
         axisLabel: 'Number of coincidences',
         min: 0},
     xaxis: {
-        axisLabel: 'Hour of day (UTC)',
+        axisLabel: 'Hour of day (GPS)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         min: 0,
         max: 24}
@@ -95,7 +95,7 @@ var _eventhistogram = {
         axisLabel: 'Number of events',
         min: 0},
     xaxis: {
-        axisLabel: 'Hour of day (UTC)',
+        axisLabel: 'Hour of day (GPS)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         min: 0,
         max: 24}
@@ -142,7 +142,7 @@ var _temperaturedata = {
     yaxis: {
         axisLabel: 'Temperature (°C)'},
     xaxis: {
-        axisLabel: 'Hour of day (UTC)',
+        axisLabel: 'Hour of day (GPS)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         min: 0,
         max: 24}
@@ -161,7 +161,7 @@ var _barometerdata = {
     yaxis: {
         axisLabel: 'Air pressure (hPa)'},
     xaxis: {
-        axisLabel: 'Hour of day (UTC)',
+        axisLabel: 'Hour of day (GPS)',
         ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
         min: 0,
         max: 24}
