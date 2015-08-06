@@ -550,15 +550,23 @@ def get_eventtime_source(request, station_number, start=None, end=None):
 
     if end is None:
         today = datetime.date.today()
-        last = Summary.objects.filter(station__number=station_number,
-                                      date__gte=FIRSTDATE, date__lt=today,
-                                      num_events__isnull=False).last().date
+        try:
+            last = (Summary.objects.filter(station__number=station_number,
+                                           date__gte=FIRSTDATE, date__lt=today,
+                                           num_events__isnull=False)
+                                   .latest().date)
+        except Summary.DoesNotExist:
+            raise Http404
         end = last + datetime.timedelta(days=1)
     if start is None:
         # Get first date with data
-        start = Summary.objects.filter(station__number=station_number,
-                                       date__gte=FIRSTDATE, date__lt=end,
-                                       num_events__isnull=False).first().date
+        try:
+            start = (Summary.objects.filter(station__number=station_number,
+                                            date__gte=FIRSTDATE, date__lt=end,
+                                            num_events__isnull=False)
+                                    .earliest().date)
+        except Summary.DoesNotExist:
+            raise Http404
 
     data = get_eventtime_histogram_sources(station_number, start, end)
     response = render(request, 'source_eventtime.csv',
