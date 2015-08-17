@@ -118,31 +118,31 @@ def station(request, station_number, year=None, month=None, day=None):
             if mpv == 0:
                 mpv_fits.append(None)
             else:
-                mpv_fits.append(mpv)
+                mpv_fits.append(round(mpv))
 
 
     scintillators = [{'radius': layout.detector_1_radius,
                       'alpha': layout.detector_1_alpha,
                       'height': layout.detector_1_height,
                       'beta': layout.detector_1_beta,
-                      'mpv': round(mpv_fits[0])}]
+                      'mpv': mpv_fits[0]}]
     scintillators.append({'radius': layout.detector_2_radius,
                           'alpha': layout.detector_2_alpha,
                           'height': layout.detector_2_height,
                           'beta': layout.detector_2_beta,
-                          'mpv': round(mpv_fits[1])})
+                          'mpv': mpv_fits[1]})
 
     if config.slave() != "no slave":
         scintillators.append({'radius': layout.detector_3_radius,
                               'alpha': layout.detector_3_alpha,
                               'height': layout.detector_3_height,
                               'beta': layout.detector_3_beta,
-                              'mpv': round(mpv_fits[2])})
+                              'mpv': mpv_fits[2]})
         scintillators.append({'radius': layout.detector_4_radius,
                               'alpha': layout.detector_4_alpha,
                               'height': layout.detector_4_height,
                               'beta': layout.detector_4_beta,
-                              'mpv': round(mpv_fits[3])})
+                              'mpv': mpv_fits[3]})
 
     station_info = {'number': station.number,
                     'name': station.name,
