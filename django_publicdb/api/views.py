@@ -125,33 +125,33 @@ def station(request, station_number, year=None, month=None, day=None):
                       'alpha': layout.detector_1_alpha,
                       'height': layout.detector_1_height,
                       'beta': layout.detector_1_beta,
-                      'mpv': mpv_fits[0]}]
+                      'mpv': round(mpv_fits[0])}]
     scintillators.append({'radius': layout.detector_2_radius,
                           'alpha': layout.detector_2_alpha,
                           'height': layout.detector_2_height,
                           'beta': layout.detector_2_beta,
-                          'mpv': mpv_fits[1]})
+                          'mpv': round(mpv_fits[1])})
 
     if config.slave() != "no slave":
         scintillators.append({'radius': layout.detector_3_radius,
                               'alpha': layout.detector_3_alpha,
                               'height': layout.detector_3_height,
                               'beta': layout.detector_3_beta,
-                              'mpv': mpv_fits[2]})
+                              'mpv': round(mpv_fits[2])})
         scintillators.append({'radius': layout.detector_4_radius,
                               'alpha': layout.detector_4_alpha,
                               'height': layout.detector_4_height,
                               'beta': layout.detector_4_beta,
-                              'mpv': mpv_fits[3]})
+                              'mpv': round(mpv_fits[3])})
 
     station_info = {'number': station.number,
                     'name': station.name,
                     'subcluster': station.cluster.name,
                     'cluster': station.cluster.main_cluster(),
                     'country': station.cluster.country.name,
-                    'latitude': config.gps_latitude,
-                    'longitude': config.gps_longitude,
-                    'altitude': config.gps_altitude,
+                    'latitude': round(config.gps_latitude, 7),
+                    'longitude': round(config.gps_longitude, 7),
+                    'altitude': round(config.gps_altitude, 2),
                     'active': is_active,
                     'scintillators': scintillators}
 
