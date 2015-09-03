@@ -11,10 +11,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterUniqueTogether(
-            name='detectorhisparc',
-            unique_together=None,
-        ),
         migrations.RemoveField(
             model_name='detectorhisparc',
             name='station',
