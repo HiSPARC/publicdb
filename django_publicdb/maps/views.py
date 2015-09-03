@@ -3,7 +3,7 @@ from django.http import Http404
 
 import datetime
 
-from ..histogram.models import Configuration, Summary
+from ..histograms.models import Configuration, Summary
 from ..inforecords.models import Station, Cluster, Country
 from ..status_display.nagios import status_lists, get_station_status
 
