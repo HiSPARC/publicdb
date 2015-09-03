@@ -1,7 +1,7 @@
 from django.http import HttpResponse
 
 import calendar
-import datetime
+from datetime import datetime, date
 import json
 from random import randint
 
@@ -21,7 +21,7 @@ def get_coincidence(request):
     student_name = request.GET.get('student_name', None)
 
     if session_title.lower() == 'example':
-        today = datetime.date.today()
+        today = date.today()
         coincidences = AnalyzedCoincidence.objects.filter(
             session__ends__gt=today)
         count = coincidences.count()
@@ -90,9 +90,9 @@ def get_events(coincidence):
         except (Summary.DoesNotExist, Configuration.DoesNotExist):
             continue
 
-        event_dict = dict(timestamp=calendar.timegm(datetime.datetime
-                                               .combine(event.date, event.time)
-                                               .utctimetuple()),
+        timestamp = calendar.timegm(datetime.combine(event.date, event.time)
+                                            .utctimetuple())
+        event_dict = dict(timestamp=timestamp,
                           nanoseconds=event.nanoseconds,
                           number=event.station.number,
                           latitude=config.gps_latitude,
@@ -113,9 +113,9 @@ def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
     data = dict(pk=coincidence.pk,
                 timestamp=calendar.timegm(
-                    datetime.datetime.combine(coincidence.coincidence.date,
-                                              coincidence.coincidence.time)
-                                  .utctimetuple()),
+                    datetime.combine(coincidence.coincidence.date,
+                                     coincidence.coincidence.time)
+                            .utctimetuple()),
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
     response = HttpResponse(json.dumps(data), content_type='application/json')
