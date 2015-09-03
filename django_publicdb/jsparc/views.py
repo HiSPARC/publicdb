@@ -79,33 +79,33 @@ def get_coincidence(request):
 def get_events(coincidence):
     """Get events that belong to this coincidence"""
     events = []
-    for e in coincidence.coincidence.events.all():
-        s = e.station
+    for event in coincidence.coincidence.events.all():
         try:
-            source_config = (Summary.objects.filter(station=station,
+            source_config = (Summary.objects.filter(station=event.station,
                                                     num_config__isnull=False,
-                                                    date__lte=e.date).latest())
+                                                    date__lte=event.date)
+                                            .latest())
             config = (Configuration.objects.filter(source=source_config)
                                            .latest())
         except (Summary.DoesNotExist, Configuration.DoesNotExist):
             continue
 
-        event = dict(timestamp=calendar.timegm(datetime.datetime
-                                               .combine(e.date, e.time)
+        event_dict = dict(timestamp=calendar.timegm(datetime.datetime
+                                               .combine(event.date, event.time)
                                                .utctimetuple()),
-                     nanoseconds=e.nanoseconds,
-                     number=s.number,
-                     latitude=d.gps_latitude,
-                     longitude=d.gps_longitude,
-                     altitude=d.gps_altitude,
-                     status='on',
-                     detectors=len(e.traces),
-                     traces=e.traces,
-                     pulseheights=e.pulseheights,
-                     integrals=e.integrals,
-                     mips=[ph / 200. if ph > 0 else ph
-                           for ph in e.pulseheights])
-        events.append(event)
+                          nanoseconds=event.nanoseconds,
+                          number=event.station.number,
+                          latitude=config.gps_latitude,
+                          longitude=config.gps_longitude,
+                          altitude=config.gps_altitude,
+                          status='on',
+                          detectors=len(event.traces),
+                          traces=event.traces,
+                          pulseheights=event.pulseheights,
+                          integrals=event.integrals,
+                          mips=[ph / 200. if ph > 0 else ph
+                                for ph in event.pulseheights])
+        events.append(event_dict)
     return events
 
 
