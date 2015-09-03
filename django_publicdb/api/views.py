@@ -100,7 +100,7 @@ def station(request, station_number, year=None, month=None, day=None):
     try:
         layout = StationLayout.objects.filter(station=station,
                                               active_date__lte=date).latest()
-    except  StationLayout.DoesNotExist:
+    except StationLayout.DoesNotExist:
         # Get new StationLayout with all None values
         layout = StationLayout()
 
@@ -119,7 +119,6 @@ def station(request, station_number, year=None, month=None, day=None):
                 mpv_fits.append(None)
             else:
                 mpv_fits.append(round(mpv))
-
 
     scintillators = [{'radius': layout.detector_1_radius,
                       'alpha': layout.detector_1_alpha,
