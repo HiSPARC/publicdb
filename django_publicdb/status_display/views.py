@@ -16,8 +16,7 @@ from sapphire.transformations.clock import datetime_to_gps
 from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  NetworkHistogram, HistogramType, DatasetType,
                                  DetectorTimingOffset, Summary, NetworkSummary)
-from ..inforecords.models import (Pc, Station, Cluster, Country,
-                                  DetectorHisparc)
+from ..inforecords.models import Pc, Station, Cluster, Country
 from ..station_layout.models import StationLayout
 from ..raw_data.date_generator import daterange
 from .nagios import status_lists, get_status_counts, get_station_status
@@ -169,10 +168,11 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                        .filter(cluster=subcluster,
                                                pc__is_test=False)):
             try:
-                detector = (DetectorHisparc.objects.filter(station=station,
-                                                           startdate__lte=today)
-                                                   .latest('startdate'))
-            except DetectorHisparc.DoesNotExist:
+                source = (Summary.objects.filter(station=station,
+                                                 num_config__isnull=False,
+                                                 date__lte=today).latest())
+                config = (Configuration.objects.filter(source=source).latest())
+            except (Summary.DoesNotExist, Configuration.DoesNotExist):
                 continue
             link = station.number in data_stations
             status = get_station_status(station.number, down, problem, up)
@@ -181,9 +181,9 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                              'cluster': station.cluster,
                              'link': link,
                              'status': status,
-                             'longitude': detector.longitude,
-                             'latitude': detector.latitude,
-                             'altitude': detector.height})
+                             'longitude': config.gps_longitude,
+                             'latitude': config.gps_latitude,
+                             'altitude': config.gps_altitude})
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 

@@ -1,8 +1,10 @@
 from django.shortcuts import render, get_object_or_404
+from django.http import Http404
 
 import datetime
 
-from ..inforecords.models import Station, Cluster, Country, DetectorHisparc
+from ..histogram.models import Configuration, Summary
+from ..inforecords.models import Station, Cluster, Country
 from ..status_display.nagios import status_lists, get_station_status
 
 
@@ -13,9 +15,14 @@ def station_on_map(request, station_number):
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    center = (DetectorHisparc.objects.filter(station__number=station_number,
-                                             startdate__lte=today)
-                                     .latest('startdate'))
+    station = Station.objects.get_or_404(number=station_number)
+    try:
+        source = (Summary.objects.filter(station=station,
+                                         num_config__isnull=False,
+                                         date__lte=today).latest())
+        center = (Configuration.objects.filter(source=source).latest())
+    except (Summary.DoesNotExist, Configuration.DoesNotExist):
+        raise Http404
 
     subclusters = []
     for subcluster in Cluster.objects.all():
@@ -25,17 +32,21 @@ def station_on_map(request, station_number):
                                        .filter(cluster=subcluster,
                                                pc__is_active=True,
                                                pc__is_test=False)):
-            detector = (DetectorHisparc.objects.filter(station=station,
-                                                       startdate__lte=today)
-                                               .latest('startdate'))
+            try:
+                source = (Summary.objects.filter(station=station,
+                                                 num_config__isnull=False,
+                                                 date__lte=today).latest())
+                config = (Configuration.objects.filter(source=source).latest())
+            except (Summary.DoesNotExist, Configuration.DoesNotExist):
+                continue
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
                              'status': status,
-                             'longitude': detector.longitude,
-                             'latitude': detector.latitude,
-                             'altitude': detector.height})
+                             'longitude': config.gps_longitude,
+                             'latitude': config.gps_latitude,
+                             'altitude': config.gps_altitude})
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
@@ -81,19 +92,20 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                        .filter(cluster=subcluster,
                                                pc__is_test=False)):
             try:
-                detector = (DetectorHisparc.objects.filter(station=station,
-                                                           startdate__lte=today)
-                                                   .latest('startdate'))
-            except DetectorHisparc.DoesNotExist:
+                source = (Summary.objects.filter(station=station,
+                                                 num_config__isnull=False,
+                                                 date__lte=today).latest())
+                config = (Configuration.objects.filter(source=source).latest())
+            except (Summary.DoesNotExist, Configuration.DoesNotExist):
                 continue
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
                              'cluster': station.cluster,
                              'status': status,
-                             'longitude': detector.longitude,
-                             'latitude': detector.latitude,
-                             'altitude': detector.height})
+                             'longitude': config.gps_longitude,
+                             'latitude': config.gps_latitude,
+                             'altitude': config.gps_altitude})
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 

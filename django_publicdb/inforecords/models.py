@@ -210,12 +210,7 @@ class Station(models.Model):
         self.name = self.name.replace('"', '').replace("'", '')
         if self.number is None:
             self.number = self.cluster.last_station_number() + 1
-        new = self.pk is None
         super(Station, self).save(*args, **kwargs)
-        if new:
-            # New station, so create a DetectorHisparc object
-            dh = DetectorHisparc(station=self, startdate=datetime.date.today())
-            dh.save()
         reload_datastore()
 
     def delete(self, *args, **kwargs):
@@ -272,42 +267,6 @@ class Country(models.Model):
 
     class Meta:
         verbose_name_plural = "Countries"
-
-
-class DetectorHisparc(models.Model):
-    station = models.ForeignKey(Station)
-    startdate = models.DateField()
-    enddate = models.DateField(null=True, blank=True)
-    latitude = models.FloatField(null=True, blank=True)
-    longitude = models.FloatField(null=True, blank=True)
-    height = models.FloatField(null=True, blank=True)
-    direction = models.FloatField(null=True, blank=True)
-    translation_perp = models.FloatField(null=True, blank=True)
-    translation_long = models.FloatField(null=True, blank=True)
-    scintillator_1_alpha = models.FloatField(null=True, blank=True)
-    scintillator_1_beta = models.FloatField(null=True, blank=True)
-    scintillator_1_radius = models.FloatField(null=True, blank=True)
-    scintillator_1_height = models.FloatField(null=True, blank=True)
-    scintillator_2_alpha = models.FloatField(null=True, blank=True)
-    scintillator_2_beta = models.FloatField(null=True, blank=True)
-    scintillator_2_radius = models.FloatField(null=True, blank=True)
-    scintillator_2_height = models.FloatField(null=True, blank=True)
-    scintillator_3_alpha = models.FloatField(null=True, blank=True)
-    scintillator_3_beta = models.FloatField(null=True, blank=True)
-    scintillator_3_radius = models.FloatField(null=True, blank=True)
-    scintillator_3_height = models.FloatField(null=True, blank=True)
-    scintillator_4_alpha = models.FloatField(null=True, blank=True)
-    scintillator_4_beta = models.FloatField(null=True, blank=True)
-    scintillator_4_radius = models.FloatField(null=True, blank=True)
-    scintillator_4_height = models.FloatField(null=True, blank=True)
-
-    def __unicode__(self):
-        return unicode(self.station)
-
-    class Meta:
-        unique_together = [('station', 'startdate')]
-        verbose_name_plural = 'Detector HiSPARC'
-        ordering = ('station',)
 
 
 class ElectronicsType(models.Model):

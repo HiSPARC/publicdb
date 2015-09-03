@@ -26,9 +26,6 @@ def run():
         logger.info("Histograms did not complete a previous run yet")
     else:
         logger.info("Finished building histograms")
-
-    logger.info("Updating GPS coordinates...")
-    hg.jobs.update_gps_coordinates()
     logger.info("Done.")
 
 

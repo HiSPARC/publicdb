@@ -16,7 +16,7 @@ from .models import (GeneratorState, NetworkSummary, Summary,
                      Configuration, HistogramType, DatasetType,
                      DailyHistogram, NetworkHistogram, DailyDataset,
                      PulseheightFit, DetectorTimingOffset)
-from ..inforecords.models import Station, DetectorHisparc
+from ..inforecords.models import Station
 import datastore
 import esd
 
@@ -377,29 +377,6 @@ def process_weather_and_store_esd(summary):
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
-
-
-def update_gps_coordinates():
-    """Update GPS coordinates for all stations"""
-
-    tomorrow = datetime.datetime.utcnow() + datetime.timedelta(days=1)
-    for detector in DetectorHisparc.objects.all():
-        try:
-            config = (Configuration.objects
-                                   .filter(source__station=detector.station,
-                                           timestamp__lt=tomorrow).latest())
-        except Configuration.DoesNotExist:
-            pass
-        else:
-            if config.gps_latitude == 0. and config.gps_longitude == 0.:
-                logger.error('Invalid GPS location (0, 0) for station: %s' %
-                             detector.station)
-            else:
-                detector.latitude = config.gps_latitude
-                detector.longitude = config.gps_longitude
-                detector.height = config.gps_altitude
-                django.db.close_connection()
-                detector.save()
 
 
 def update_eventtime_histogram(summary):
