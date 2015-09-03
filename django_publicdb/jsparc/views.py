@@ -8,6 +8,7 @@ from random import randint
 import numpy as np
 import operator
 
+from ..histograms.models import Configuration, Summary
 from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
                                        Student)
 
@@ -80,16 +81,23 @@ def get_events(coincidence):
     events = []
     for e in coincidence.coincidence.events.all():
         s = e.station
-        d = s.detectorhisparc_set.all().reverse()[0]
+        try:
+            source_config = (Summary.objects.filter(station=station,
+                                                    num_config__isnull=False,
+                                                    date__lte=e.date).latest())
+            config = (Configuration.objects.filter(source=source_config)
+                                           .latest())
+        except (Summary.DoesNotExist, Configuration.DoesNotExist):
+            continue
 
         event = dict(timestamp=calendar.timegm(datetime.datetime
                                                .combine(e.date, e.time)
                                                .utctimetuple()),
                      nanoseconds=e.nanoseconds,
                      number=s.number,
-                     latitude=d.latitude,
-                     longitude=d.longitude,
-                     altitude=d.height,
+                     latitude=d.gps_latitude,
+                     longitude=d.gps_longitude,
+                     altitude=d.gps_altitude,
                      status='on',
                      detectors=len(e.traces),
                      traces=e.traces,
