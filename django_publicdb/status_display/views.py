@@ -42,7 +42,6 @@ def stations_by_country(request):
     test_stations = []
 
     for station in (Station.objects.exclude(pc__type__slug='admin')
-                                   .order_by('number')
                                    .select_related('cluster__country',
                                                    'cluster__parent')):
         if station.number in data_stations:
@@ -196,13 +195,14 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 def network_coincidences(request, year=None, month=None, day=None):
     """Show daily coincidences histograms for the entire network"""
 
+    today = datetime.date.today()
     # Redirect to latest date with data if no date is given
     if year is None:
         try:
             summary = (NetworkSummary.objects
                                      .filter(num_coincidences__isnull=False,
                                              date__gte=FIRSTDATE,
-                                             date__lte=datetime.date.today())
+                                             date__lte=today)
                                      .latest())
         except NetworkSummary.DoesNotExist:
             raise Http404
@@ -223,19 +223,17 @@ def network_coincidences(request, year=None, month=None, day=None):
 
     # Find previous/next dates with data
     try:
-        previous = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                                  date__gte=FIRSTDATE,
-                                                  date__lt=date)
-                                  .latest()).date
+        previous = NetworkSummary.objects.filter(num_coincidences__isnull=False,
+                                                 date__gte=FIRSTDATE,
+                                                 date__lt=date).latest().date
     except NetworkSummary.DoesNotExist:
         previous = None
 
     try:
-        next = (NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                              date__gt=date,
-                                              date__lte=datetime.date.today())
-                                      .order_by('date'))[0].date
-    except IndexError:
+        next = NetworkSummary.objects.filter(num_coincidences__isnull=False,
+                                             date__gt=date,
+                                             date__lte=today).earliest().date
+    except NetworkSummary.DoesNotExist:
         next = None
 
     station_summaries = Summary.objects.filter(date=date,
@@ -390,12 +388,13 @@ def station_config(request, station_number):
     """Show configuration history for a particular station"""
 
     station_number = int(station_number)
+    today = datetime.date.today()
 
     station = get_object_or_404(Station, number=station_number)
     configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
                               source__station=station,
                               timestamp__gte=FIRSTDATE,
-                              timestamp__lte=datetime.date.today())
+                              timestamp__lte=today)
 
     has_data = station_has_data(station)
 
@@ -695,10 +694,10 @@ def get_gps_config_source(request, station_number):
 
 
 def get_station_layout_source(request, station_number):
-    layouts = (StationLayout.objects.filter(station__number=station_number,
-                                            active_date__gte=FIRSTDATE,
-                                            active_date__lte=datetime.date.today())
-                                    .order_by('active_date'))
+    today = datetime.date.today()
+    layouts = StationLayout.objects.filter(station__number=station_number,
+                                           active_date__gte=FIRSTDATE,
+                                           active_date__lte=today)
 
     for layout in layouts:
         layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
@@ -850,7 +849,8 @@ def plot_config(type, configs):
         values = zip(*values)
         y_label = 'PMT Current (mA)'
     if type == 'altitude':
-        values = [config.gps_altitude for config in configs]
+        values = [config.gps_altitude for config in configs
+                  if config.gps_altitude != 0.]
         y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
@@ -876,7 +876,7 @@ def get_detector_timing_offsets(station_number):
     offsets = (DetectorTimingOffset.objects.filter(
         source__station__number=station_number,
         source__date__gte=FIRSTDATE,
-        source__date__lte=datetime.date.today()).order_by('source__date'))
+        source__date__lte=datetime.date.today()).order_by('source'))
 
     data = offsets.values_list('source__date', 'offset_1', 'offset_2',
                                'offset_3', 'offset_4')
@@ -888,7 +888,7 @@ def get_gpspositions(configs):
     """Get all unique gps positions from the configs"""
 
     gps = [(config.gps_longitude, config.gps_latitude) for config in configs
-           if config.gps_longitude != 0.0 and config.gps_latitude != 0.0]
+           if config.gps_longitude != 0. and config.gps_latitude != 0.]
     return set(gps)
 
 
