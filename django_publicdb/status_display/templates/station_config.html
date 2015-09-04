@@ -145,9 +145,9 @@
             {% endif %}
         </div>
 
-      {% if layout %}
         <div id="stationLayout">
             <h3>Station layout</h3>
+          {% if layout %}
             <div class="sourceLink">
                 <a href="{% url 'station_layout.views.layout_submit' %}">Submit layout</a> |
                 <a href="{% url 'status_display.views.get_station_layout_source' station.number %}">Source</a>
@@ -168,8 +168,13 @@
                             {{ layout.detector_4_beta }}]
                 draw_station(context, radius, alpha, beta);
             </script>
+          {% else %}
+            <p>
+                No detector positions available yet for this station.<br>
+                A layout can be submitted on the <a href="{% url 'station_layout.views.layout_submit' %}">Submit layout</a> page.
+            </p>
+          {% endif %}
         </div>
-      {% endif %}
     </div>
 {% endblock %}
 
