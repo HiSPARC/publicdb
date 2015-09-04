@@ -12,7 +12,6 @@
     <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
     <script>
       {% if config %}
-
         $(document).ready(function() {
             var map = createMap("gpsMap");
             var style = createStyle(map);
@@ -46,7 +45,6 @@
 
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
         });
-
       {% endif %}
 
         function downloadGraph(target) {
