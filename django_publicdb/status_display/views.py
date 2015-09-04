@@ -409,6 +409,9 @@ def station_config(request, station_number):
     timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
     gpstrack = get_gpspositions(configs)
+    layout = StationLayout.objects.filter(station=station,
+                                          active_date__gte=FIRSTDATE,
+                                          active_date__lte=today).last()
 
     return render(request, 'station_config.html',
                   {'station': station,
@@ -418,6 +421,7 @@ def station_config(request, station_number):
                    'timingoffsetgraph': timingoffsetgraph,
                    'altitudegraph': altitudegraph,
                    'gpstrack': gpstrack,
+                   'layout': layout,
                    'has_slave': has_slave,
                    'has_data': has_data,
                    'has_config': True,

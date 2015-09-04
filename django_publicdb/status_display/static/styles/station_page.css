@@ -16,16 +16,14 @@
 
 #graphs {
     float: left;
-    width: 609px;}
+    width: 609px;
+    margin-bottom: 20px;}
 
 #nagios {
     position: absolute;
     z-index: -1;
     width: 850px;
     height: 600px;}
-
-#gpsPositions {
-    margin-bottom: 20px;}
 
 #ct_histogram,
 #cn_histogram {
@@ -55,7 +53,8 @@
     height: 225px;}
 
 .histogram,
-#gpsPositions {
+#gpsPositions,
+#stationLayout {
     width: 600px;}
 
 .plot {

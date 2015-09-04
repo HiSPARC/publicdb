@@ -31,7 +31,6 @@
                 gpsLayer.addFeatures(feature);
             {% endfor %}
 
-
             var feature = new OpenLayers.Feature.Vector(
                                 new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
                                                        .transform(fromProjection, toProjection),
@@ -46,11 +45,9 @@
             map.zoomToExtent(bounds);
 
             var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
-
         });
 
       {% endif %}
-
 
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();
@@ -146,8 +143,33 @@
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ag_options);
             </script>
             {% endif %}
-
         </div>
+
+      {% if layout %}
+        <div id="stationLayout">
+            <h3>Station layout</h3>
+            <div class="sourceLink">
+                <a href="{% url 'station_layout.views.layout_submit' %}">Submit layout</a> |
+                <a href="{% url 'status_display.views.get_station_layout_source' station.number %}">Source</a>
+            </div>
+            {% include "layout_canvas.html" %}
+            <script>
+                var radius = [{{ layout.detector_1_radius }},
+                              {{ layout.detector_2_radius }},
+                              {{ layout.detector_3_radius }},
+                              {{ layout.detector_4_radius }}]
+                var alpha = [{{ layout.detector_1_alpha }},
+                             {{ layout.detector_2_alpha }},
+                             {{ layout.detector_3_alpha }},
+                             {{ layout.detector_4_alpha }}]
+                var beta = [{{ layout.detector_1_beta }},
+                            {{ layout.detector_2_beta }},
+                            {{ layout.detector_3_beta }},
+                            {{ layout.detector_4_beta }}]
+                draw_station(context, radius, alpha, beta);
+            </script>
+        </div>
+      {% endif %}
     </div>
 {% endblock %}
 
