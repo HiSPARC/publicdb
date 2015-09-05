@@ -15,7 +15,7 @@ def station_on_map(request, station_number):
     down, problem, up = status_lists()
     today = datetime.datetime.utcnow()
 
-    station = Station.objects.get_or_404(number=station_number)
+    station = get_object_or_404(Station, number=station_number)
     try:
         source = (Summary.objects.filter(station=station,
                                          num_config__isnull=False,
