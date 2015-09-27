@@ -28,7 +28,7 @@
                         <li>
                             <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
                           {% if station.link %}
-                            <a href="{% url 'status_display.views.station' station.link %}">
+                            <a href="{% url 'status_display.views.station' station.number %}">
                               {{ station.number }} &mdash; {{ station.name }}
                             </a>
                           {% else %}
@@ -51,7 +51,7 @@
             <li>
                 <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
               {% if station.link %}
-                <a href="{% url 'status_display.views.station' station.link %}">
+                <a href="{% url 'status_display.views.station' station.number %}">
                   {{ station.number }} &mdash; {{ station.name }}
                 </a>
               {% else %}

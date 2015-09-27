@@ -44,11 +44,9 @@ def stations_by_country(request):
     for station in (Station.objects.exclude(pc__type__slug='admin')
                                    .select_related('cluster__country',
                                                    'cluster__parent')):
-        if station.number in data_stations:
-            link = station.number
-        else:
-            link = None
+        link = station in data_stations
         status = get_station_status(station.number, down, problem, up)
+
         station_info = {'number': station.number,
                         'name': station.name,
                         'link': link,
@@ -86,10 +84,7 @@ def stations_by_number(request):
     statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
-        if station.number in data_stations:
-            link = station.number
-        else:
-            link = None
+        link = station in data_stations
         status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
@@ -110,10 +105,7 @@ def stations_by_name(request):
     statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
-        if station.number in data_stations:
-            link = station.number
-        else:
-            link = None
+        link = station in data_stations
         status = get_station_status(station.number, down, problem, up)
 
         stations.append({'number': station.number,
@@ -173,7 +165,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                 config = (Configuration.objects.filter(source=source).latest())
             except (Summary.DoesNotExist, Configuration.DoesNotExist):
                 continue
-            link = station.number in data_stations
+            link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
             stations.append({'number': station.number,
                              'name': station.name,
@@ -1055,8 +1047,7 @@ def stations_with_data():
                                Q(summary__num_weather__isnull=False),
                                summary__date__gte=FIRSTDATE,
                                summary__date__lte=datetime.date.today())
-                       .distinct()
-                       .values_list('number', flat=True))
+                       .distinct())
 
     return stations
 
@@ -1065,7 +1056,6 @@ def station_has_data(station):
     """Check if there is valid event or weather data for the given station
 
     :param station: Station object for which to check.
-
     :return: boolean indicating if the station has recorded data, either
              weather or shower, between 2002 and now.
 
