@@ -855,6 +855,8 @@ def plot_config(type, configs):
     if type == 'altitude':
         values = [config.gps_altitude for config in configs
                   if config.gps_altitude != 0.]
+        if not len(values):
+            return None
         y_label = 'Altitude (m)'
     plot_object = create_plot_object(timestamps, values, x_label, y_label)
     return plot_object
@@ -897,8 +899,8 @@ def get_gpspositions(configs):
 
 
 def create_plot_object(x_values, y_series, x_label, y_label):
-    if type(y_series[0]) != list and type(y_series[0]) != tuple:
-            y_series = [y_series]
+    if type(y_series[0]) not in [list, tuple]:
+        y_series = [y_series]
     data = [[[xv, yv] for xv, yv in zip(x_values, y_values) if yv is not None]
             for y_values in y_series]
 
