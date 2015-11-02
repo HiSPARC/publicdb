@@ -88,23 +88,19 @@ h1 a:hover {
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: grey;
-    opacity: 0.3;}
-
-.statusBall:hover {
-    opacity: 0.8;}
-
-.down {
-    background-color: red;}
-
-.problem {
-    background-color: gold;}
-
-.up {
-    background-color: green;}
-
-.unknown {
     background-color: grey;}
+
+.down {background-color: rgba(255, 0, 0, .3);}
+.down:hover {background-color: rgba(255, 0, 0, .8);}
+
+.problem {background-color: rgba(255, 215, 0, .3);}
+.problem {background-color: rgba(255, 215, 0, .8);}
+
+.up {background-color: rgba(0, 128, 0, .3);}
+.up:hover {background-color: rgba(0, 128, 0, .8);}
+
+.unknown {background-color: rgba(128, 128, 128, .3);}
+.unknown:hover {background-color: rgba(128, 128, 128, .8);}
 
 
 /* Sidebar */
