@@ -93,8 +93,8 @@ h1 a:hover {
 .down {background-color: rgba(255, 0, 0, .3);}
 .down:hover {background-color: rgba(255, 0, 0, .8);}
 
-.problem {background-color: rgba(255, 215, 0, .3);}
-.problem:hover {background-color: rgba(255, 215, 0, .8);}
+.problem {background-color: rgba(255, 215, 0, .5);}
+.problem:hover {background-color: rgba(255, 215, 0, .9);}
 
 .up {background-color: rgba(0, 128, 0, .3);}
 .up:hover {background-color: rgba(0, 128, 0, .8);}
