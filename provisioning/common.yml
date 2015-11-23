@@ -59,3 +59,7 @@
 
 - name: use custom .bashrc
   copy: src=bashrc dest=~/.bashrc backup=yes
+
+- name: install mailcap
+  yum: name=mailcap
+  sudo: yes
