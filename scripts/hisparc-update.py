@@ -9,6 +9,9 @@ sys.path.append(publicdb_path)
 
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
 
+import django
+django.setup()
+
 import django_publicdb.histograms as hg
 
 
