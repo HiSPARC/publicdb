@@ -4,7 +4,7 @@
       "type": "virtualbox-iso",
       "guest_os_type": "RedHat_64",
       "iso_url": "http://ftp.tudelft.nl/centos.org/6/isos/x86_64/CentOS-6.7-x86_64-netinstall.iso",
-      "iso_checksum": "2560335ef975907799251ae9d6a0fa2e4d289704",
+      "iso_checksum": "c3678c6b72cbf2ed9b4e8a1ddb190fd262db8b7f",
       "iso_checksum_type": "sha1",
 
       "disk_size": 10240,
