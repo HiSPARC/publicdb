@@ -31,6 +31,7 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/voltage/(?P<station_number>\d+)/$', 'get_voltage_config_source'),
     (r'^source/current/(?P<station_number>\d+)/$', 'get_current_config_source'),
     (r'^source/gps/(?P<station_number>\d+)/$', 'get_gps_config_source'),
+    (r'^source/trigger/(?P<station_number>\d+)/$', 'get_trigger_config_source'),
     (r'^source/layout/(?P<station_number>\d+)/$', 'get_station_layout_source'),
     (r'^source/detector_timing_offsets/(?P<station_number>\d+)/$', 'get_detector_timing_offsets_source'),
 

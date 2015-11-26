@@ -23,6 +23,7 @@ from .nagios import status_lists, get_status_counts, get_station_status
 
 
 FIRSTDATE = datetime.date(2002, 1, 1)
+MIME_TSV = MIME_TSV
 
 
 def stations(request):
@@ -506,7 +507,7 @@ def get_coincidencetime_histogram_source(request, year, month, day):
     response = render(request, 'source_coincidencetime_histogram.tsv',
                       {'data': data,
                        'date': '-'.join((year, month, day))},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=coincidencetime-network-%d%02d%02d.tsv' %
         (int(year), int(month), int(day)))
@@ -518,7 +519,7 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
     response = render(request, 'source_coincidencenumber_histogram.tsv',
                       {'data': data,
                        'date': '-'.join((year, month, day))},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=coincidencenumber-network-%d%02d%02d.tsv' %
         (int(year), int(month), int(day)))
@@ -533,7 +534,7 @@ def get_eventtime_histogram_source(request, station_number, year, month, day):
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=eventtime-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
@@ -569,7 +570,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
                        'start': start,
                        'end': end,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=eventtime-s%s-%s-%s.tsv' %
         (station_number, start.strftime('%Y%m%d'), end.strftime('%Y%m%d')))
@@ -608,7 +609,7 @@ def get_pulseheight_histogram_source(request, station_number, year, month,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=pulseheight-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
@@ -623,7 +624,7 @@ def get_pulseintegral_histogram_source(request, station_number, year, month,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=pulseintegral-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
@@ -636,7 +637,7 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=barometer-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
@@ -649,7 +650,7 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=temperature-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
@@ -661,7 +662,7 @@ def get_voltage_config_source(request, station_number):
     response = render(request, 'source_voltage_config.tsv',
                       {'data': data,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=voltage-s%s.tsv' % station_number)
     return response
@@ -672,7 +673,7 @@ def get_current_config_source(request, station_number):
     response = render(request, 'source_current_config.tsv',
                       {'data': data,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=current-s%s.tsv' % station_number)
     return response
@@ -683,9 +684,20 @@ def get_gps_config_source(request, station_number):
     response = render(request, 'source_gps_config.tsv',
                       {'data': data,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=gps-s%s.tsv' % station_number)
+    return response
+
+
+def get_trigger_config_source(request, station_number):
+    data = get_config_source(station_number, 'trigger')
+    response = render(request, 'source_trigger_config.tsv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type=MIME_TSV)
+    response['Content-Disposition'] = (
+        'attachment; filename=trigger-s%s.tsv' % station_number)
     return response
 
 
@@ -701,7 +713,7 @@ def get_station_layout_source(request, station_number):
     response = render(request, 'source_station_layout.tsv',
                       {'layouts': layouts,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=station_layout-s%s.tsv' %
         station_number)
@@ -713,7 +725,7 @@ def get_detector_timing_offsets_source(request, station_number):
     response = render(request, 'source_detector_timing_offsets.tsv',
                       {'data': data,
                        'station_number': station_number},
-                      content_type='text/tab-separated-values')
+                      content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=detector_timing_offsets-s%s.tsv' %
         station_number)
@@ -748,29 +760,37 @@ def get_dataset_source(year, month, day, type, station_number):
 
 
 def get_config_source(station_number, type):
-    configs = (Configuration.objects.filter(source__station__number=station_number,
-                                            timestamp__gte=FIRSTDATE,
-                                            timestamp__lte=datetime.date.today())
-                                    .order_by('timestamp'))
+    """Get configuration data for a specific station
+
+    :param station_number: station for which to get the configuration data.
+    :param type: the type of configuration data to get. The following
+                 are supported: voltage, current, gps, trigger.
+    :return: list of lists containing the configuration history.
+
+    """
     if type == 'voltage':
-        data = configs.values_list('timestamp', 'mas_ch1_voltage',
-                                   'mas_ch2_voltage', 'slv_ch1_voltage',
-                                   'slv_ch2_voltage')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
-                 row[3], row[4]] for row in data]
+        fields = ['timestamp', 'mas_ch1_voltage', 'mas_ch2_voltage',
+                  'slv_ch1_voltage', 'slv_ch2_voltage']
     elif type == 'current':
-        data = configs.values_list('timestamp', 'mas_ch1_current',
-                                   'mas_ch2_current', 'slv_ch1_current',
-                                   'slv_ch2_current')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
-                 row[3], row[4]] for row in data]
+        fields = ['timestamp', 'mas_ch1_current', 'mas_ch2_current',
+                  'slv_ch1_current', 'slv_ch2_current']
     elif type == 'gps':
-        data = configs.values_list('timestamp', 'gps_latitude',
-                                   'gps_longitude', 'gps_altitude')
-        data = [[calendar.timegm(row[0].utctimetuple()), row[1], row[2],
-                 row[3]] for row in data]
+        fields = ['timestamp', 'gps_latitude', 'gps_longitude', 'gps_altitude']
+    elif type == 'trigger':
+        fields = ['timestamp']
+        fields.extend('%s_ch%d_thres_%s' % (i, j, k) for k in ['low', 'high']
+                       for i in ['mas', 'slv'] for j in [1, 2])
+        fields.extend(['trig_low_signals', 'trig_high_signals', 'trig_and_or',
+                       'trig_external'])
     else:
-        data = None
+        return None
+
+    configs = Configuration.objects.filter(
+        source__station__number=station_number,
+        timestamp__gte=FIRSTDATE,
+        timestamp__lte=datetime.date.today()).order_by('timestamp')
+
+    data = list(configs.values_list(*fields))
 
     return data
 

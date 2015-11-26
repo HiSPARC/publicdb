@@ -14,5 +14,5 @@
 #
 #
 # timestamp	latitude	longitude	altitude
-{% for row in data %}{% if row.1 and row.2 %}{% ifchanged row.1 row.2 row.3 %}{{ row.0 }}	{{ row.1|floatformat:7 }}	{{ row.2|floatformat:7 }}	{{ row.3|floatformat:2 }}
+{% for row in data %}{% if row.1 and row.2 %}{% ifchanged row|slice:"1:" %}{{ row.0|date:"U" }}	{{ row.1|floatformat:7 }}	{{ row.2|floatformat:7 }}	{{ row.3|floatformat:2 }}
 {% endifchanged %}{% endif %}{% endfor %}

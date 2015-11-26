@@ -87,3 +87,13 @@ def none_to_nan(value):
         return 'nan'
     else:
         return value
+
+
+@register.filter
+def mv_to_adc(value):
+    """Convert mv_to_adc"""
+
+    if value >= 0:
+        return value
+    else:
+        return round(value * -0.57 + 200)
