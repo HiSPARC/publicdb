@@ -23,7 +23,7 @@ from .nagios import status_lists, get_status_counts, get_station_status
 
 
 FIRSTDATE = datetime.date(2002, 1, 1)
-MIME_TSV = MIME_TSV
+MIME_TSV = 'tab-separated-values'
 
 
 def stations(request):
