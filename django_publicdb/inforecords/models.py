@@ -123,7 +123,7 @@ class Cluster(models.Model):
             if self.number % 1000:
                 raise ValidationError("Cluster number must be multiple of "
                                       "1000")
-            if not 0 < (self.number - self.country.number) < 10000:
+            if not 0 <= (self.number - self.country.number) < 10000:
                 raise ValidationError("Cluster number must be in range of "
                                       "numbers for the country (%d, %d)." %
                                       (self.country.number,
