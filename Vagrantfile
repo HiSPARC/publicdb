@@ -6,8 +6,8 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "vagrant" do |machine|
-    machine.vm.box = "CentOS6.6"
-    machine.vm.box_url = "packer/CentOS6.6/packer_virtualbox-iso_virtualbox.box"
+    machine.vm.box = "CentOS6"
+    machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
   end
 
   config.vm.hostname = "vagrant.localdomain"
