@@ -31,7 +31,7 @@ class DataDownloadForm(forms.Form):
                                           "'2013-5-17 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2013-5-18', or "
                                         "'2013-5-18 9:05'")
-    download = forms.BooleanField(required=False)
+    download = forms.BooleanField(initial=True, required=False)
 
     def clean(self):
         """Check the choices to ensure the combination of choices are valid"""
@@ -73,7 +73,7 @@ class CoincidenceDownloadForm(forms.Form):
                                         "'2014-04-30 9:05'")
     n = forms.IntegerField(min_value=2, help_text="Minimum number of events "
                                                   "in a coincidence")
-    download = forms.BooleanField(required=False)
+    download = forms.BooleanField(initial=True, required=False)
 
     def clean(self):
         """Check the choices to ensure the combination of choices are valid"""
