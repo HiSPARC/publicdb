@@ -16,12 +16,12 @@
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
   sudo: yes
 
-- name: remove compiled python code
-  command: find /srv/publicdb/www -name *.pyc -delete
-
 - name: checkout publicdb in /srv/publicdb/www
   git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
        update=yes force=no
+
+- name: remove compiled python code
+  command: find /srv/publicdb/www -name *.pyc -delete
 
 - name: checkout jsparc in /srv/publicdb/jsparc
   git: repo=https://github.com/HiSPARC/jsparc.git dest=/srv/publicdb/jsparc

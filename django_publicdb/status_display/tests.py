@@ -18,12 +18,12 @@ def is_html(response):
     return True
 
 
-def is_csv(response):
-    """Check if the response is OK and of type text/csv"""
+def is_tsv(response):
+    """Check if the response is OK and of type text/tab-separated-values"""
 
     for left, right in [(response.getcode(), 200),
                         (response.info().getmaintype(), "text"),
-                        (response.info().getsubtype(), "csv")]:
+                        (response.info().getsubtype(), "tab-separated-values")]:
         if left != right:
             return False
 
@@ -47,11 +47,11 @@ class ViewsTestCase(LiveServerTestCase):
 
         return response
 
-    def csv_check_and_get_response(self, url):
+    def tsv_check_and_get_response(self, url):
         response = urllib.urlopen("%s%s%s" %
                                   (self.live_server_url, "/show", url))
 
-        self.assertTrue(is_csv(response))
+        self.assertTrue(is_tsv(response))
 
         return response
 
@@ -86,28 +86,28 @@ class ViewsTestCase(LiveServerTestCase):
         self.check_and_get_response("/stations/501/config")
 
     def test_get_eventtime_histogram_source(self):
-        self.csv_check_and_get_response("/source/eventtime/2011/7/7")
+        self.tsv_check_and_get_response("/source/eventtime/2011/7/7")
 
     def test_get_pulseheight_histogram_source(self):
-        self.csv_check_and_get_response("/source/pulseheight/2011/7/7")
+        self.tsv_check_and_get_response("/source/pulseheight/2011/7/7")
 
     def test_get_pulseintegral_histogram_source(self):
-        self.csv_check_and_get_response("/source/pulseintegral/2011/7/7")
+        self.tsv_check_and_get_response("/source/pulseintegral/2011/7/7")
 
     def test_get_barometer_dataset_source(self):
-        self.csv_check_and_get_response("/source/barometer/2011/7/7")
+        self.tsv_check_and_get_response("/source/barometer/2011/7/7")
 
     def test_get_temperature_dataset_source(self):
-        self.csv_check_and_get_response("/source/temperature/2011/7/7")
+        self.tsv_check_and_get_response("/source/temperature/2011/7/7")
 
     def test_get_voltage_config_source(self):
-        self.csv_check_and_get_response("/source/voltage/501")
+        self.tsv_check_and_get_response("/source/voltage/501")
 
     def test_get_current_config_source(self):
-        self.csv_check_and_get_response("/source/current/501")
+        self.tsv_check_and_get_response("/source/current/501")
 
     def test_get_gps_config_source(self):
-        self.csv_check_and_get_response("/source/gps/501")
+        self.tsv_check_and_get_response("/source/gps/501")
 
     def test_help(self):
         self.check_and_get_response("/help")

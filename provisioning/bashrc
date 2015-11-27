@@ -10,7 +10,7 @@ fi
 # Activate env
 alias envpub='source activate /srv/publicdb/publicdb_env'
 alias cdpub='cd /srv/publicdb/www'
-alias uppub='cdpub && envpub && git fetch && git reset --hard origin/master && touch /tmp/uwsgi-reload.me'
+alias uppub='cdpub && envpub && git fetch && git reset --hard origin/master && cd django_publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
 # Prompt
 [[ -n "$SSH_CLIENT" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '

@@ -26,6 +26,9 @@ import datetime
 
 from sapphire.publicdb import download_data
 
+import django
+django.setup()
+
 from django.conf import settings
 from django_publicdb.inforecords.models import Station
 

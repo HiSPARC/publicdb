@@ -29,6 +29,11 @@ from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
 
+MIME_PLAIN = 'text/plain'
+MIME_TSV = 'text/tab-separated-values'
+MIME_XML = 'text/xml'
+
+
 class SingleLineStringIO:
     """Very limited file-like object buffering a single line."""
 
@@ -41,7 +46,7 @@ def call_xmlrpc(request):
 
     if request.method == 'POST':
         # Process XML-RPC call
-        response = HttpResponse(content_type='text/xml')
+        response = HttpResponse(content_type=MIME_XML)
         response.write(dispatcher._marshaled_dispatch(request.body))
         response['Content-length'] = str(len(response.content))
         return response
@@ -186,7 +191,7 @@ def download_data(request, data_type='events', station_number=None,
                            data
     :param start: (optional, GET) start of data range
     :param end: (optional, GET) end of data range
-    :param download: (optional, GET) download the csv
+    :param download: (optional, GET) download the tsv
 
     """
     if data_type in ['events', 'weather']:
@@ -209,7 +214,7 @@ def download_data(request, data_type='events', station_number=None,
     except ValueError:
         msg = ("Incorrect optional parameters (start [datetime], "
                "end [datetime])")
-        return HttpResponseBadRequest(msg, content_type="text/plain")
+        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
 
     download = request.GET.get('download', False)
     if download in ['true', 'True']:
@@ -219,20 +224,20 @@ def download_data(request, data_type='events', station_number=None,
 
     timerange_string = prettyprint_timerange(start, end)
     if data_type == 'events':
-        csv_output = generate_events_as_csv(station, start, end)
-        filename = 'events-s%d-%s.csv' % (station_number, timerange_string)
+        tsv_output = generate_events_as_tsv(station, start, end)
+        filename = 'events-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'weather':
-        csv_output = generate_weather_as_csv(station, start, end)
-        filename = 'weather-s%d-%s.csv' % (station_number, timerange_string)
+        tsv_output = generate_weather_as_tsv(station, start, end)
+        filename = 'weather-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'lightning':
         lightning_type = int(lightning_type)
         if lightning_type not in range(6):
             msg = ("Incorrect lightning type, should be a value between 0-5")
-            return HttpResponseBadRequest(msg, content_type="text/plain")
-        csv_output = generate_lightning_as_csv(lightning_type, start, end)
-        filename = 'lightning-knmi-%s.csv' % (timerange_string)
+            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+        tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
+        filename = 'lightning-knmi-%s.tsv' % (timerange_string)
 
-    response = StreamingHttpResponse(csv_output, content_type='text/csv')
+    response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
         content_disposition = 'attachment; filename="%s"' % filename
@@ -244,10 +249,10 @@ def download_data(request, data_type='events', station_number=None,
     return response
 
 
-def generate_events_as_csv(station, start, end):
-    """Render CSV output as an iterator."""
+def generate_events_as_tsv(station, start, end):
+    """Render TSV output as an iterator."""
 
-    t = loader.get_template('event_data.csv')
+    t = loader.get_template('event_data.tsv')
     c = Context({'station': station, 'start': start, 'end': end})
 
     yield t.render(c)
@@ -313,10 +318,10 @@ def get_events_from_esd_in_range(station, start, end):
             continue
 
 
-def generate_weather_as_csv(station, start, end):
-    """Render CSV output as an iterator."""
+def generate_weather_as_tsv(station, start, end):
+    """Render TSV output as an iterator."""
 
-    t = loader.get_template('weather_data.csv')
+    t = loader.get_template('weather_data.tsv')
     c = Context({'station': station, 'start': start, 'end': end})
 
     yield t.render(c)
@@ -379,14 +384,14 @@ def get_weather_from_esd_in_range(station, start, end):
             continue
 
 
-def generate_lightning_as_csv(lightning_type, start, end):
-    """Render CSV output as an iterator."""
+def generate_lightning_as_tsv(lightning_type, start, end):
+    """Render TSV output as an iterator."""
 
     types = ('Single-point', 'Cloud-cloud', 'Cloud-cloud mid',
              'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
     type_str = '%d: %s' % (lightning_type, types[lightning_type])
 
-    t = loader.get_template('lightning_data.csv')
+    t = loader.get_template('lightning_data.tsv')
     c = Context({'lightning_type': type_str, 'start': start, 'end': end})
 
     yield t.render(c)
@@ -467,7 +472,7 @@ def download_coincidences(request):
     :param start: (optional, GET) start of data range
     :param end: (optional, GET) end of data range
     :param n: (optional, GET) minimum number of events in a coincidence
-    :param download: (optional, GET) download the csv
+    :param download: (optional, GET) download the tsv
 
     """
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -486,7 +491,7 @@ def download_coincidences(request):
     except ValueError:
         msg = ("Incorrect optional parameters (start [datetime], "
                "end [datetime])")
-        return HttpResponseBadRequest(msg, content_type="text/plain")
+        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
 
     n = int(request.GET.get('n', '2'))
 
@@ -500,18 +505,18 @@ def download_coincidences(request):
 
     if stations and cluster:
         msg = "Both stations and cluster are defined."
-        return HttpResponseBadRequest(msg, content_type="text/plain")
+        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
     elif stations:
         stations = [int(number) for number in stations.strip('[]').split(',')]
         if len(stations) < n:
             msg = "To few stations in query, give at least n."
-            return HttpResponseBadRequest(msg, content_type="text/plain")
+            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         if len(stations) >= 30:
             msg = "To many stations in query, use less than 30."
-            return HttpResponseBadRequest(msg, content_type="text/plain")
+            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         if Station.objects.filter(number__in=stations).count() != len(stations):
             msg = "Not all stations are valid."
-            return HttpResponseBadRequest(msg, content_type="text/plain")
+            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
         stations = (Station.objects.filter(Q(cluster__parent=cluster) |
@@ -520,7 +525,7 @@ def download_coincidences(request):
         if len(stations) >= 30:
             msg = ("To many stations in this cluster, "
                    "manually select a subset of stations.")
-            return HttpResponseBadRequest(msg, content_type="text/plain")
+            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
 
     download = request.GET.get('download', False)
     if download in ['true', 'True']:
@@ -529,10 +534,10 @@ def download_coincidences(request):
         download = False
 
     timerange_string = prettyprint_timerange(start, end)
-    csv_output = generate_coincidences_as_csv(start, end, cluster, stations, n)
-    filename = 'coincidences-%s.csv' % (timerange_string)
+    tsv_output = generate_coincidences_as_tsv(start, end, cluster, stations, n)
+    filename = 'coincidences-%s.tsv' % (timerange_string)
 
-    response = StreamingHttpResponse(csv_output, content_type='text/csv')
+    response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
         content_disposition = 'attachment; filename="%s"' % filename
@@ -544,10 +549,10 @@ def download_coincidences(request):
     return response
 
 
-def generate_coincidences_as_csv(start, end, cluster, stations, n):
-    """Render CSV output as an iterator."""
+def generate_coincidences_as_tsv(start, end, cluster, stations, n):
+    """Render TSV output as an iterator."""
 
-    t = loader.get_template('coincidences.csv')
+    t = loader.get_template('coincidences.tsv')
     c = Context({'start': start, 'end': end, 'cluster': cluster,
                  'stations': stations, 'n': n})
 
