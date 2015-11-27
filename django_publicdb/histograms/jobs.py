@@ -521,7 +521,7 @@ def update_config(summary):
             elif var in ['mas_version', 'slv_version']:
                 vars(new_config)[var] = blobs[config[var]]
             elif var == 'timestamp':
-                ts = datetime.datetime.fromtimestamp(config[var])
+                ts = datetime.datetime.utcfromtimestamp(config[var])
                 vars(new_config)[var] = ts
             else:
                 vars(new_config)[var] = config[var]
