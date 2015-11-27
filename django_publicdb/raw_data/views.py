@@ -327,7 +327,7 @@ def generate_weather_as_tsv(station, start, end):
     yield t.render(c)
 
     line_buffer = SingleLineStringIO()
-    writer = tsv.writer(line_buffer, delimiter='\t')
+    writer = csv.writer(line_buffer, delimiter='\t')
     weather_returned = False
 
     events = get_weather_from_esd_in_range(station, start, end)

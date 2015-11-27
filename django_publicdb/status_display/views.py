@@ -779,7 +779,7 @@ def get_config_source(station_number, type):
     elif type == 'trigger':
         fields = ['timestamp']
         fields.extend('%s_ch%d_thres_%s' % (i, j, k) for k in ['low', 'high']
-                       for i in ['mas', 'slv'] for j in [1, 2])
+                      for i in ['mas', 'slv'] for j in [1, 2])
         fields.extend(['trig_low_signals', 'trig_high_signals', 'trig_and_or',
                        'trig_external'])
     else:
