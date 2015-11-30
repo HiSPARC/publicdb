@@ -19,9 +19,8 @@ from django.conf import settings
 
 logger = logging.getLogger('histograms.esd')
 
-# Limit the coincidence window to 2 microseconds,
-# to prevent coincidental coincidences to become more dominant.
-COINCIDENCE_WINDOW = 2000  # nanoseconds
+# Limit the coincidence window to 10 microseconds,
+COINCIDENCE_WINDOW = 10000  # nanoseconds
 
 
 def search_coincidences_and_store_in_esd(network_summary):
