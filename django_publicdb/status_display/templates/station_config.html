@@ -152,18 +152,27 @@
             </div>
             {% include "layout_canvas.html" %}
             <script>
-                var radius = [{{ layout.detector_1_radius }},
-                              {{ layout.detector_2_radius }},
-                              {{ layout.detector_3_radius }},
-                              {{ layout.detector_4_radius }}]
-                var alpha = [{{ layout.detector_1_alpha }},
-                             {{ layout.detector_2_alpha }},
-                             {{ layout.detector_3_alpha }},
-                             {{ layout.detector_4_alpha }}]
-                var beta = [{{ layout.detector_1_beta }},
-                            {{ layout.detector_2_beta }},
-                            {{ layout.detector_3_beta }},
-                            {{ layout.detector_4_beta }}]
+                {% if layout.detector_3_radius == None %}
+                    var radius = [{{ layout.detector_1_radius }},
+                                  {{ layout.detector_2_radius }}]
+                    var alpha = [{{ layout.detector_1_alpha }},
+                                 {{ layout.detector_2_alpha }}]
+                    var beta = [{{ layout.detector_1_beta }},
+                                {{ layout.detector_2_beta }}]
+                {% else %}
+                    var radius = [{{ layout.detector_1_radius }},
+                                  {{ layout.detector_2_radius }},
+                                  {{ layout.detector_3_radius }},
+                                  {{ layout.detector_4_radius }}]
+                    var alpha = [{{ layout.detector_1_alpha }},
+                                 {{ layout.detector_2_alpha }},
+                                 {{ layout.detector_3_alpha }},
+                                 {{ layout.detector_4_alpha }}]
+                    var beta = [{{ layout.detector_1_beta }},
+                                {{ layout.detector_2_beta }},
+                                {{ layout.detector_3_beta }},
+                                {{ layout.detector_4_beta }}]
+                {% endif %}
                 draw_station(context, radius, alpha, beta);
             </script>
           {% else %}
