@@ -94,6 +94,9 @@ def mv_to_adc(value):
     """Convert mv_to_adc"""
 
     if value >= 0:
-        return value
+        if int(value) == value:
+            return int(value)
+        else:
+            return value
     else:
         return int(round(value / -0.57 + 200))
