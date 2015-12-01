@@ -229,10 +229,15 @@ def network_coincidences(request, year=None, month=None, day=None):
     except NetworkSummary.DoesNotExist:
         next = None
 
-    station_summaries = Summary.objects.filter(date=date,
-                                               num_events__isnull=False)
-    status = {'station_count': station_summaries.count(),
-              'n_events': sum([s.num_events for s in station_summaries])}
+    n_stations = Station.objects.filter(summary__date=date,
+                                        summary__num_events__isnull=False,
+                                        pc__is_test=False).count()
+    histograms = DailyHistogram.objects.filter(
+        source__date=date, source__station__pc__is_test=False,
+        type__slug='eventtime')
+    number_of_events = sum(sum(histogram.values) for histogram in histograms)
+    status = {'station_count': n_stations,
+              'n_events': number_of_events}
 
     thismonth = nav_calendar(year, month)
     month_list = nav_months_network(year)
