@@ -258,7 +258,7 @@ def generate_events_as_tsv(station, start, end):
     yield t.render(c)
 
     line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t')
+    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     events_returned = False
 
     events = get_events_from_esd_in_range(station, start, end)
@@ -327,7 +327,7 @@ def generate_weather_as_tsv(station, start, end):
     yield t.render(c)
 
     line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t')
+    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     weather_returned = False
 
     events = get_weather_from_esd_in_range(station, start, end)
@@ -397,7 +397,7 @@ def generate_lightning_as_tsv(lightning_type, start, end):
     yield t.render(c)
 
     line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t')
+    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     lightning_returned = False
 
     events = get_lightning_in_range(lightning_type, start, end)
@@ -559,7 +559,7 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
     yield t.render(c)
 
     line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t')
+    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     coincidences_returned = False
 
     for id, number, event in get_coincidences_from_esd_in_range(start, end,
