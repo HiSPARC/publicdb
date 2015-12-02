@@ -305,10 +305,14 @@ def get_station_dict(subcluster=None):
 
     """
     if subcluster:
-        stations = Station.objects.filter(cluster=subcluster,
-                                          pc__is_test=False)
+        stations = (Station.objects.filter(cluster=subcluster,
+                                           pc__is_test=False,
+                                           summary__num_config__isnull=False)
+                                   .distinct())
     else:
-        stations = Station.objects.filter(pc__is_test=False)
+        stations = (Station.objects.filter(pc__is_test=False,
+                                           summary__num_config__isnull=False)
+                                   .distinct())
 
     station_dict = [{'number': station.number, 'name': station.name}
                     for station in stations]
