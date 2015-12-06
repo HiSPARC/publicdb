@@ -1,0 +1,72 @@
+{% load url from future %}
+{% load fix_strings %}
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+    "http://www.w3.org/TR/html4/strict.dtd">
+
+<html>
+
+<head>
+    <link rel="icon" type="image/vnd.microsoft.icon" href="{{ STATIC_URL }}favicon.ico">
+    <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+    <title>HiSPARC Station map</title>
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/base.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/OpenLayers-2.12.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/map_controls.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/maps.css">
+    <script src="{{ STATIC_URL }}scripts/jquery-1.8.2.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot-0.8a.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot.axislabels.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/jquery.flot.time.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayers-2.13b.min.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <!--[if lte IE 8]><script src="{{ STATIC_URL }}scripts/excanvas.min.js"></script><![endif]-->
+    <script>
+        $(document).ready(function() {
+            var map = createMap("map");
+            var style = createStyle(map);
+
+            {% if center %}
+                map.setCenter(new OpenLayers.LonLat({{ center.gps_longitude }}, {{ center.gps_latitude }}).transform(fromProjection, toProjection), 17);
+            {% else %}
+                map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+            {% endif %}
+
+            {% for subcluster in subclusters %}
+                var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                    {% for station in subcluster.stations %}
+                        {% if station.longitude and station.latitude %}
+                            var feature = new OpenLayers.Feature.Vector(
+                                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
+                                                       .transform(fromProjection, toProjection),
+                                {id: {{ station.number }},
+                                 name: "{{ station.name }}",
+                                 subcluster: "{{ station.cluster }}",
+                                 cluster: "{{ station.cluster.parent }}",
+                                 status: "{{ station.status }}"});
+                            {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                        {% endif %}
+                    {% endfor %}
+                map.addLayer({{ subcluster.name|slugify|remove_hyphens }});
+            {% endfor %}
+            // Zoom to fit cluster
+            {% if focus %}
+                {% for layer in focus %}
+                    {% if forloop.first %}
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getDataExtent();
+                    {% else %}
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getDataExtent());
+                    {% endif %}
+                {% endfor %}
+                if (bounds) {
+                    map.zoomToExtent(bounds);
+                    map.zoomTo(Math.floor(map.getZoom()));}
+            {% endif %}
+        });
+    </script>
+</head>
+
+<body>
+<div id="map"></div>
+</body>
+
+</html>

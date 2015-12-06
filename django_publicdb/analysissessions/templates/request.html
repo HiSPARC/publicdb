@@ -1,11 +1,25 @@
-{% extends "admin/base_site.html" %}
+{% extends "base.html" %}
 
-{% block title %}Session request{% endblock %}
+{% block title %}jSparc | Session request{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/request_form.css">
+{% endblock %}
+
+
 {% block content %}
 
-<form action="" method="post">
-{{ form.as_p }}
-{{ html_captcha|safe }}
-<input type="submit" value="Submit" />
-</form>
+<div id="header">
+    <h2>jSparc Session Request Form</h2>
+</div>
+
+<div id='reqform'>
+    <form action="{% url 'django_publicdb.analysissessions.views.validate_request_form' %}" method="post">
+    {% csrf_token %}
+        {{ form.as_p }}
+        {{ html_captcha|safe }}
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
 {% endblock %}

@@ -1,0 +1,13 @@
+---
+- hosts: all
+  tasks:
+    - include: common.yml
+    - include: mysqldb.yml
+    - include: development.yml
+    - include: publicdb.yml
+  handlers:
+    - include: handlers.yml
+
+- hosts: vagrant
+  tasks:
+    - include: fake_datastore.yml

@@ -1,43 +1,55 @@
 from django.http import HttpResponse
 
 import calendar
-import datetime
+from datetime import datetime, date
 import json
-from random import randrange
+from random import randint
+
 import numpy as np
 import operator
 
-from django_publicdb.coincidences.models import *
-from django_publicdb.analysissessions.models import *
-from django_publicdb.inforecords.models import *
+from ..histograms.models import Configuration, Summary
+from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
+                                       Student)
 
 
 def get_coincidence(request):
-    """Return a coincidence for jsparc client test"""
-    print("got request")
+    """Return a coincidence for jSparc client"""
+
     session_title = request.GET.get('session_title', None)
     session_pin = request.GET.get('session_pin', None)
     student_name = request.GET.get('student_name', None)
-    print(session_title)
+
+    if session_title.lower() == 'example':
+        today = date.today()
+        coincidences = AnalyzedCoincidence.objects.filter(
+            session__ends__gt=today)
+        count = coincidences.count()
+        random_index = randint(0, count - 1)
+        coincidence = coincidences[random_index]
+        events = get_events(coincidence)
+        response = data_json(coincidence, events)
+        return response
+
     try:
         session = AnalysisSession.objects.get(title=session_title)
         if session.pin != session_pin:
-            raise ValueError('Wrong pin for this session')
+            return error_json(401, 'Wrong pin for this session.')
     except AnalysisSession.DoesNotExist:
-        raise Exception('No such analysis session!')
+        return error_json(404, 'No session with that title.')
     except ValueError:
         raise
     else:
         if not session.in_progress():
-            raise Exception("Analysis session hasn't started yet or "
-                            "is already closed!")
+            return error_json(404, "The requested session has not started yet "
+                                   "or is already expired.")
 
     if not student_name:
         student = Student.objects.get(session=session,
                                       name='Test student')
     else:
-        student, is_created = Student.objects.get_or_create(
-                                    session=session, name=student_name)
+        student, is_created = Student.objects.get_or_create(session=session,
+                                                            name=student_name)
 
     ranking = top_lijst(session.slug)
     try:
@@ -50,36 +62,75 @@ def get_coincidence(request):
         coincidence = coincidences.filter(student=student,
                                           is_analyzed=False)[0]
     except IndexError:
-        coincidence = coincidences.filter(student=None,
-                                          is_analyzed=False)[0]
-        coincidence.student = student
-        coincidence.save()
+        try:
+            coincidence = coincidences.filter(student=None,
+                                              is_analyzed=False)[0]
+            coincidence.student = student
+            coincidence.save()
+        except IndexError:
+            return error_json(404, "No unanalysed coincidences available, "
+                                   "request a new session.")
 
-    c = coincidence
+    events = get_events(coincidence)
+    response = data_json(coincidence, events)
+    return response
+
+
+def get_events(coincidence):
+    """Get events that belong to this coincidence"""
     events = []
-    for e in c.coincidence.events.all():
-        s = e.station
-        d = s.detectorhisparc_set.all().reverse()[0]
+    for event in coincidence.coincidence.events.all():
+        try:
+            source_config = (Summary.objects.filter(station=event.station,
+                                                    num_config__isnull=False,
+                                                    date__lte=event.date)
+                                            .latest())
+            config = (Configuration.objects.filter(source=source_config)
+                                           .latest())
+        except (Summary.DoesNotExist, Configuration.DoesNotExist):
+            continue
+
+        timestamp = calendar.timegm(datetime.combine(event.date, event.time)
+                                            .utctimetuple())
+        event_dict = dict(timestamp=timestamp,
+                          nanoseconds=event.nanoseconds,
+                          number=event.station.number,
+                          latitude=config.gps_latitude,
+                          longitude=config.gps_longitude,
+                          altitude=config.gps_altitude,
+                          status='on',
+                          detectors=len(event.traces),
+                          traces=event.traces,
+                          pulseheights=event.pulseheights,
+                          integrals=event.integrals,
+                          mips=[ph / 200. if ph > 0 else ph
+                                for ph in event.pulseheights])
+        events.append(event_dict)
+    return events
 
 
-        event = dict(timestamp=calendar.timegm(datetime.datetime.combine(e.date, e.time).utctimetuple()),
-                     nanoseconds=e.nanoseconds, number=s.number,
-                     lat=d.latitude, lon=d.longitude, alt=d.height,
-                     status='on', detectors=len(e.traces),
-                     traces=e.traces, pulseheights=e.pulseheights,
-                     integrals=e.integrals,
-                     mips=[x / 200. for x in e.pulseheights])
-        events.append(event)
-
-    data = dict(pk=c.pk, timestamp=calendar.timegm(datetime.datetime
-                                                  .combine(c.coincidence.date,
-                                                           c.coincidence.time)
-                                                  .utctimetuple()),
-                nanoseconds=c.coincidence.nanoseconds, events=events)
-
-    response = HttpResponse(json.dumps(data), mimetype='application/json')
+def data_json(coincidence, events):
+    """Construct json with data for jSparc to display"""
+    data = dict(pk=coincidence.pk,
+                timestamp=calendar.timegm(
+                    datetime.combine(coincidence.coincidence.date,
+                                     coincidence.coincidence.time)
+                            .utctimetuple()),
+                nanoseconds=coincidence.coincidence.nanoseconds,
+                events=events)
+    response = HttpResponse(json.dumps(data), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
+
+
+def error_json(error_code, message):
+    """Construct error response json for jSparc requests"""
+    data = dict(message=message, code=error_code)
+    response = HttpResponse(json.dumps(data), status=error_code,
+                            content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
+
 
 def top_lijst(slug):
     coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug,
@@ -102,39 +153,57 @@ def top_lijst(slug):
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
+
 def result(request):
+    """Process results from jSparc sessions"""
     session_title = request.GET['session_title']
-    student_name = request.GET['student_name']
+
+    # If session is example, do not save result.
+    if session_title.lower() == 'example':
+        return test_result()
+
     pk = request.GET['pk']
-    lat = request.GET['lat']
-    lon = request.GET['lon']
+    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
+
+    # If student is test student, do not save result.
+    if coincidence.student.name.lower() == 'test student':
+        return test_result()
+
+    student_name = request.GET['student_name']
+    latitude = request.GET['latitude']
+    longitude = request.GET['longitude']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
 
-    coincidence = AnalyzedCoincidence.objects.get(pk=pk)
-    assert coincidence.session.hash == session_hash
+    assert coincidence.session.title.lower() == session_title.lower()
     assert coincidence.student.name.lower() == student_name.lower()
 
-    if coincidence.student.name == 'Test student':
-        return
-    else:
-        coincidence.core_position_x = lon
-        coincidence.core_position_y = lat
-        coincidence.log_energy = log_energy
-        coincidence.error_estimate = error_estimate
-        coincidence.is_analyzed = True
-        #FIXME
-        coincidence.theta = 0
-        coincidence.phi = 0
-        coincidence.save()
+    coincidence.core_position_x = longitude
+    coincidence.core_position_y = latitude
+    coincidence.log_energy = log_energy
+    coincidence.error_estimate = error_estimate
+    coincidence.is_analyzed = True
+    coincidence.theta = 0
+    coincidence.phi = 0
+    coincidence.save()
 
     ranking = top_lijst(coincidence.session.slug)
     try:
         rank = [x['name'] for x in ranking].index(student_name) + 1
     except ValueError:
         rank = None
+    msg = "OK [result stored]"
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
+                            content_type='application/json')
+    response['Access-Control-Allow-Origin'] = '*'
+    return response
 
-    response = HttpResponse(json.dumps(dict(msg="OK [result stored]", rank=rank)),
-                            mimetype='application/json')
+
+def test_result():
+    """Generate random ranking for test sessions"""
+    msg = "Test session, result not stored"
+    rank = randint(1, 10)
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
+                            content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response

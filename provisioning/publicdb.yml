@@ -1,0 +1,117 @@
+- name: ensure /srv directory exists
+  file: path=/srv state=directory
+  sudo: yes
+
+- name: ensure /srv/publicdb directory exists
+  file: path=/srv/publicdb state=directory
+        owner=hisparc group=hisparc mode=2775
+  sudo: yes
+
+- name: ensure /var/log/hisparc-update.log exists
+  file: path=/var/log/hisparc-update.log state=touch
+        owner=hisparc group=hisparc mode=644
+  sudo: yes
+
+- name: set default group write ACLs on /srv/publicdb
+  command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
+  sudo: yes
+
+- name: checkout publicdb in /srv/publicdb/www
+  git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
+       update=yes force=no
+
+- name: remove compiled python code
+  command: find /srv/publicdb/www -name *.pyc -delete
+
+- name: checkout jsparc in /srv/publicdb/jsparc
+  git: repo=https://github.com/HiSPARC/jsparc.git dest=/srv/publicdb/jsparc
+       update=yes force=no
+
+- name: create django static folder
+  file: path=/srv/publicdb/static state=directory
+
+- name: create django media/raw_data folder
+  file: path=/srv/publicdb/media/raw_data state=directory
+
+- name: Copy conda requirements files
+  copy: src=conda.list dest=/home/{{ ansible_user_id }}/
+
+- name: Copy pip requirements files
+  copy: src=pip.list dest=/home/{{ ansible_user_id }}/
+
+- name: create conda environment
+  shell: creates=/srv/publicdb/publicdb_env
+         yes | /opt/miniconda/bin/conda create
+         -p /srv/publicdb/publicdb_env python --yes
+
+- name: install conda packages in conda environment
+  command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
+           --file /home/{{ ansible_user_id }}/conda.list --yes
+
+- name: install packages in conda environment using pip
+  command: /srv/publicdb/publicdb_env/bin/pip install
+           -r /home/{{ ansible_user_id }}/pip.list
+
+- name: set up MySQL database
+  mysql_db: name=publicdb state=present
+
+- name: set up MySQL user
+  mysql_user: name=hisparc password={{ mysql_password }}
+              priv=publicdb.*:ALL state=present
+
+- name: copy Django settings file
+  copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
+        backup=yes force=no
+
+- name: migrate Django apps
+  shell: chdir=/srv/publicdb/www/django_publicdb
+         yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
+
+- name: collect static files of Django apps
+  shell: chdir=/srv/publicdb/www/django_publicdb
+         yes 'yes' |
+         /srv/publicdb/publicdb_env/bin/python manage.py collectstatic
+
+- name: copy uwsgi.ini
+  copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
+
+- name: install supervisor daemon
+  pip: name=supervisor
+  sudo: yes
+
+- name: copy supervisord init script
+  copy: src=init-supervisord dest=/etc/init.d/supervisord backup=yes
+        owner=root group=root mode=0755
+  sudo: yes
+
+- name: copy supervisord.conf
+  copy: src=supervisord.conf dest=/etc/supervisord.conf backup=yes
+        owner=root group=root mode=0644
+  sudo: yes
+
+- name: start supervisord now and on boot
+  service: name=supervisord state=started enabled=yes
+  sudo: yes
+
+- name: restart uWSGI
+  supervisorctl: name=uwsgi state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+
+- name: enable cron job for updating histograms and ESD
+  cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0
+        state=present user=hisparc
+        job="/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+  sudo: yes
+
+- name: enable cron job for cleaning out downloaded raw_data files
+  cron: name="clean downloaded data" cron_file=hisparc special_time=daily
+        state=present user=root
+        job="find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
+  sudo: yes
+
+- name: enable cron job for creating analysis sessions
+  cron: name="create confirmed sessions" cron_file=hisparc
+        minute=* hour=* day=* month=* weekday=*
+        state=present user=hisparc
+        job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
+  sudo: yes

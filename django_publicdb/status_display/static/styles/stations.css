@@ -1,79 +1,179 @@
-#stationListPages {
-    font-size: 10pt;
-    float: right;
-    border: 1px solid;
-    border-radius: 5px;
-    padding: 2px 5px;}
-
-#stationListPages a {
-    color: #23B;
-    text-decoration: none;}
-
-#stationListPages a:hover {
-    color: #005;
-    text-decoration: underline;}
+#header {
+    margin-bottom: 10px;}
 
 #stationList {
+    float: left;
+    margin-bottom: 30px;
+    width: 609px;
     font-size: 10pt;
     -webkit-column-count: 2;
     -moz-column-count: 2;
     column-count: 2;}
 
-.country h1 {
-    -moz-column-span: all;
-    -webkit-column-span: all;
-    column-span: all;
-    padding-top: 10px;
-    font-size: 32px;}
+#stationMap {
+    float: left;
+    width: 585px;
+    height: 550px;}
+
+.country {
+    -webkit-column-count: 2;
+    -moz-column-count: 2;
+    column-count: 2;}
 
 .cluster {
+    display: block;}
+
+.subcluster {
     display: block;
+    break-inside: avoid-column;
     -webkit-column-break-inside: avoid;
     -moz-column-break-inside: avoid;
-    column-break-inside: avoid;
-    break-inside: avoid-column;}
+    column-break-inside: avoid;}
 
-.cluster h3 {
-    margin-top: 0px;}
+.country h1 {
+    font-size: 32px;
+    -webkit-column-span: all;
+    -moz-column-span: all;
+    column-span: all;}
 
 #stationList ul {
-    margin: 0px 0px 15px 0px;
-    list-style: none;}
+    margin: 0 0 15px 0;
+    padding-left: 15px;
+    list-style: none;
+    font-size: 10pt;}
 
 #stationList li {
-    line-height:140%}
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 140%;}
 
-#stationList a {
-    font-size: 10pt;
+#stationList ul a,
+#stationLink a,
+#clusterLink a {
     color: #23B;
     text-decoration: none;}
 
-#stationList a:hover {
+#stationList ul a:hover,
+#stationLink a:hover {
     color: #005;
     text-decoration: underline;}
 
-#stationMap {
-    width: 100%;
-    height: 500px;}
+#stationLink,
+#clusterLink {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 10pt;}
 
-.olControlAttribution {
-    position: absolute !important;
-    font-size: 10px !important;
-    bottom: 0 !important;
-    right: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 5px 0 0 0 !important;}
+h2 {
+    margin-top: 0;
+    font-size: 24px;}
 
-.olControlScaleLine {
-    position: absolute !important;
-    bottom: 0px !important;
-    left: 0 !important;
-    background: rgba(255,255,255,0.7);
-    font-family: Arial !important;
-    padding: 2px 4px !important;
-    border-radius: 0 5px 0 0 !important;}
+h3 a,
+h2 a,
+h1 a {
+    color: #000;
+    text-decoration: none;}
 
-#selectedStation {
-    margin: 10px;}
+h3 a:hover,
+h2 a:hover,
+h1 a:hover {
+    color: #027;
+    text-decoration: underline;}
+
+.statusBall {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: grey;}
+
+.down {background-color: rgba(255, 0, 0, .3);}
+.down:hover {background-color: rgba(255, 0, 0, .8);}
+
+.problem {background-color: rgba(255, 215, 0, .5);}
+.problem:hover {background-color: rgba(255, 215, 0, .9);}
+
+.up {background-color: rgba(0, 128, 0, .3);}
+.up:hover {background-color: rgba(0, 128, 0, .8);}
+
+.unknown {background-color: rgba(128, 128, 128, .3);}
+.unknown:hover {background-color: rgba(128, 128, 128, .8);}
+
+
+/* Sidebar */
+
+#sidebar {
+    float: right;
+    font-size: 9pt;}
+
+#legend,
+#extra,
+#help {
+    margin-top: 20px;}
+
+#legend,
+#extra,
+#help,
+#navigation {
+    padding-left: 20px;
+    width: 220px;
+    border-left: 1px solid black;}
+
+#navigation .nolink {
+    color: black;
+    font-weight: normal;}
+    
+#navigation .nolink:hover {
+    color: black;
+    text-decoration: none;}
+    
+#navigation a,
+#navigation .nolink {
+    padding: 3px;}
+
+#navigation a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+#help a,
+#navigation a {
+    border-radius: 3px;
+    color: #25B;
+    text-decoration: none;
+    font-weight: bold;}
+
+#navigation a.currentDate:hover,
+#navigation a.currentPage:hover,
+#navigation a.currentDate,
+#navigation a.currentPage {
+    background: #075EBB;
+    color: white;}
+
+#navigation > div,
+#config > div {
+    padding-top: 10px;
+    padding-bottom: 10px;}
+
+.sectionTitle {
+    margin-top: 5px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    font-weight: bold;
+    font-size: 130%;}
+
+.keyvalue {
+    margin-top: 5px;
+    margin-bottom: 5px;}
+
+.key {
+    margin-right: 10px;
+    font-weight: bold;}
+
+.thin {
+    font-weight: normal;}
+
+.value {
+    margin-right: 2px;}

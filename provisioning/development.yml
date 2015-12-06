@@ -1,0 +1,36 @@
+---
+- name: install libraries
+  yum: name={{ item }} state=present
+  sudo: yes
+  with_items:
+    - gcc
+    - bzip2
+    - make
+    - gcc-c++
+    - libSM
+    - libXrender
+    - libXext
+    - fontconfig
+    - pcre-devel
+
+- name: download miniconda installer
+  get_url: url=http://repo.continuum.io/miniconda/Miniconda-3.7.3-Linux-x86_64.sh
+           dest=/usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh
+
+- name: install miniconda
+  command: creates=/opt/miniconda
+           /bin/sh /usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh -b -p /opt/miniconda
+  sudo: yes
+
+- name: ensure miniconda is in path
+  lineinfile: dest=/etc/profile.d/path.sh create=yes mode=0644
+              regexp='miniconda' line='PATH=/opt/miniconda/bin:$PATH'
+  sudo: yes
+
+- name: install pip
+  command: /opt/miniconda/bin/conda install pip --yes
+  sudo: yes
+
+- name: install git
+  yum: name=git state=present
+  sudo: yes

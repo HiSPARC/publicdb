@@ -1,0 +1,88 @@
+<canvas id="station_layout" width="600" height="400"></canvas>
+
+<script>
+    var canvas = document.getElementById('station_layout');
+    var context = canvas.getContext('2d');
+
+    function radians(degrees) {
+        return degrees * Math.PI / 180;}
+
+    function draw_gps(ctx) {
+        var size = .15;
+        ctx.fillStyle = 'darkgray';
+        ctx.beginPath();
+        ctx.arc(0, 0, size, 0, Math.PI*2, true); 
+        ctx.closePath();
+        ctx.fill();}
+
+    function draw_detector(ctx, r, alpha, beta, color) {
+        /* Draw a detector defined by r, alpha, beta coordinates on the canvas
+        */
+        var detector_width = .5;
+        var detector_length = 1;
+
+        ctx.lineWidth = 1;  
+        ctx.rotate(radians(alpha));
+        ctx.translate(0, -r);  // positive y is down on canvas
+        ctx.rotate(-radians(alpha));
+        ctx.rotate(radians(beta));
+        ctx.fillStyle = color;
+        ctx.fillRect(-detector_width / 2, -detector_length / 2,
+                     detector_width, detector_length);
+        ctx.restore();
+        ctx.save();}
+
+    function calculate_bounds(r, alpha) {
+        /* Calculate the bounding box to contain the detectors and gps
+        */
+        var min_x = -2, max_x = 2, min_y = -2, max_y = 2;
+        var margin = 1;  // To ensure the detectors will fit
+        for (var i = 0; i < r.length; i++) {
+            x = Math.sin(radians(alpha[i])) * r[i];
+            min_x = Math.min(x, min_x);
+            max_x = Math.max(x, max_x);
+            y = Math.cos(radians(alpha[i])) * r[i];
+            min_y = Math.min(y, min_y);
+            max_y = Math.max(y, max_y);}
+        min_x -= margin;
+        max_x += margin;
+        min_y -= margin;
+        max_y += margin;
+        return [min_x, max_x, min_y, max_y];}
+
+    function draw_station(ctx, r, alpha, beta) {
+        /* Draw a station on the canvas
+
+        r, alpha, beta should be equal length lists with the coordinates.
+
+        Example:
+        4-detector station:
+        draw_station(context, [8.66, 2.77, 5, 5], [0, 0, -90, 90], [0, 0, 0, 90]);
+        2-detector station:
+        draw_station(context, [5, 5], [-30, 150], [60, 60]);
+
+        */
+        clear_canvas(ctx);
+        var colors = ['black', 'red', 'green', 'blue'];
+        var bounds = calculate_bounds(r, alpha);
+        var station_width = bounds[1] - bounds[0];
+        var station_height = bounds[3] - bounds[2];
+        var scale = Math.min(canvas.width / station_width,
+                             canvas.height / station_height);
+        ctx.scale(scale, scale);
+        ctx.translate(-bounds[0], bounds[3]);  // positive y is down on canvas
+        ctx.save();
+        for (var i = 0; i < r.length; i++) {
+            draw_detector(ctx, r[i], alpha[i], beta[i], colors[i]);}
+        draw_gps(ctx);}
+
+    function clear_canvas(ctx) {
+        /* Clear objects on the canvas and reset origin
+
+        from: http://stackoverflow.com/a/6722031/1033535
+
+        */
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);}
+
+</script>

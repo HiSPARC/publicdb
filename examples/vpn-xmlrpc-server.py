@@ -21,21 +21,21 @@ OPENVPN_DIR = '/home/david/tmp/openvpn'
 HOSTS_FILE = '/tmp/hosts-hisparc'
 FLAG = '/tmp/flag_nagios_reload'
 
+
 def create_key(host, type, ip):
     """create keys for a host and set up openvpn"""
 
     if type == 'client':
         subprocess.check_call(['./create_keys.sh', OPENVPN_DIR, host])
         with open(os.path.join(OPENVPN_DIR, 'ccd', host), 'w') as file:
-            file.write('ifconfig-push %s 255.255.254.0 194.171.82.1\n' %
-                       ip)
+            file.write('ifconfig-push %s 255.255.254.0 194.171.82.1\n' % ip)
     elif type == 'admin':
-        subprocess.check_call(['./create_admin_keys.sh', OPENVPN_DIR,
-                               host])
+        subprocess.check_call(['./create_admin_keys.sh', OPENVPN_DIR, host])
     else:
         raise Exception('Unknown type %s' % type)
 
     return True
+
 
 def register_hosts_ip(host_list):
     """Register all hosts ips"""
@@ -46,6 +46,7 @@ def register_hosts_ip(host_list):
     subprocess.check_call(['/sbin/service', 'dnsmasq', 'reload'])
 
     return True
+
 
 def get_key(host, type):
     """Get a zip-archive containing all relevant keys"""
@@ -74,6 +75,7 @@ def get_key(host, type):
     memfile.close()
 
     return base64.b64encode(zip_file)
+
 
 def reload_nagios():
     """Signal a reload of nagios"""

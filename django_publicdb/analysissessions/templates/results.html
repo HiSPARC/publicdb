@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% load fix_data %}
+
+{% block title %}{{ session.title }} - jSparc analysis results {% endblock %}
+
+
+{% block head_styles %}
+        <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/results.css">
+{% endblock %}
+
+{% block head %}
+    <meta http-equiv="refresh" content="60">
+    <script src="{{ STATIC_URL }}scripts/flot_settings_results.js"></script>
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
+      {% if core_map %}
+        $(document).ready(function() {
+            var map = createMap("coreMap");
+            var style = createStyle(map);
+
+            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+
+            var coreLayer = new OpenLayers.Layer.Vector("cores", {styleMap: new OpenLayers.StyleMap(style)});
+
+            {% for core in core_map %}
+                var feature = new OpenLayers.Feature.Vector(
+                    new OpenLayers.Geometry.Point{{ core }}.transform(fromProjection, toProjection),
+                    {id: "", status: "gpsold"});
+                coreLayer.addFeatures(feature);
+            {% endfor %}
+
+            map.addLayer(coreLayer);
+
+            var bounds = coreLayer.getDataExtent();
+            map.zoomToExtent(bounds);
+
+            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+        });
+      {% endif %}
+    </script>
+{% endblock %}
+
+{% block content %}
+
+<div id="header">
+    <h2>{{ session.title }} Results</h2>
+</div>
+
+<div id="graphs">
+    <div id="energyHistogram">
+        <h3>Energy histogram</h3>
+        <div class="plot" id="en_histogram" style="height: 300px; width: 591px;"></div>
+        <script>
+            en_labels = {yaxis: {axisLabel: "{{ energy_histogram.y_label }}"},
+                         xaxis: {axisLabel: "{{ energy_histogram.x_label }}"}}
+            $.extend(true, en_options, en_labels)
+            $.plot($("#en_histogram"), [
+              {% for data in energy_histogram.data %}
+                {data: {{ data|fix_histogram_data }}, yaxis: 1},
+              {% endfor %}
+                {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], en_options);
+        </script>
+    </div>
+{% if core_map %} 
+    <h3>Shower core positions</h3>
+    <div id="coreMap">
+    </div>
+{% endif %}
+
+{% comment %}
+    {% ifnotequal slug 'leerlingensymposium-2011' %}
+        {% ifnotequal slug 'middelharnis2011' %}
+            <div id="starMap">
+                <h3>Star map</h3>
+                <img src="{{ star_map }}">
+            </div>
+        {% endifnotequal %}
+    {% endifnotequal %}
+{% endcomment %}
+</div>
+
+<div id="session">
+    <div class="sectionTitle">Session details</div>
+    <div class="keyvalue"><span class="key">Title</span><span class="value">{{ session.title }}</span></div>
+    <div class="keyvalue"><span class="key">PIN</span><span class="value">{{ session.pin }}</span></div>
+    <div class="keyvalue"><span class="key">Start date</span><span class="value">{{ session.starts|date:'j M Y' }}</span></div>
+    <div class="keyvalue"><span class="key">End date</span><span class="value">{{ session.ends|date:'j M Y' }}</span></div>
+</div>
+
+<div id="scores">
+    <h3>List of student scores</h3>
+    <table>
+    <tr>
+        <th class="rank">#</th>
+        <th class="student">Student</th>
+        <th class="error">Error</th>
+    </tr>
+    {% for student in scores %}
+        <tr>
+            <td class="rank">{{ forloop.counter }}</td>
+            <td class="student">{{ student.name }}</td>
+            <td class="error">{{ student.wgh_error|floatformat:8 }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+
+{% endblock %}

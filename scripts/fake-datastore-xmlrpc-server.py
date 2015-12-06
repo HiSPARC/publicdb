@@ -13,11 +13,11 @@ from SimpleXMLRPCServer import SimpleXMLRPCServer
 from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import urllib2
 import hashlib
-import subprocess
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
 CFG_URL = 'http://localhost:8003/config/datastore'
+
 
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""

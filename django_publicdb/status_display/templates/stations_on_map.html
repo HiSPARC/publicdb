@@ -1,104 +1,105 @@
 {% extends 'base_stations.html' %}
 
 {% load url from future %}
+{% load fix_strings %}
 
-{% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{ STATIC_URL }}styles/stations.css" />
-{% endblock %}
+{% block current_map %}currentPage{% endblock %}
 
 {% block head %}
-    <script type="text/javascript">
-        var pointStyle = {
-            fillColor: '#E23F1E',
-            fillOpacity: 0.8,
-            pointRadius: 3,
-            stroke: false,};
-
+    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script>
+        var stationlink;
+        var clusterlink;
         $(document).ready(function() {
-            var fromProjection = new OpenLayers.Projection("EPSG:4326"); // transform from WGS 1984
-            var toProjection = new OpenLayers.Projection("EPSG:900913"); // to Spherical Mercator Projection
-            var options = {
-                controls: [
-                    new OpenLayers.Control.Navigation(
-                        {dragPanOptions: {enableKinetic: true}}),
-                    new OpenLayers.Control.Attribution(),
-                    new OpenLayers.Control.ScaleLine()]};
-            map = new OpenLayers.Map("stationMap", options);
-            var mapLayer = new OpenLayers.Layer.OSM();
-            map.addLayer(mapLayer);
+            stationlink = $('#stationLink');
+            clusterlink = $('#clusterLink');
+
+            var map = createMap("stationMap");
+            var style = createStyle(map);
 
             map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
-
-            var stationLayer = new OpenLayers.Layer.Vector("stations");
-            {% for station in stations %}
-            {% if station.longitude and station.latitude %} 
-            var feature = new OpenLayers.Feature.Vector(
-                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
-                                       .transform(fromProjection, toProjection),
-                {id: {{ station.number }},
-                 name: "{{ station.name }}",
-                 cluster: "{{ station.cluster }}",
-                 link: {{ station.link }}},
-                pointStyle);
-            stationLayer.addFeatures(feature);
-            {% endif %}
+            {% for subcluster in subclusters %}
+                var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                    {% for station in subcluster.stations %}
+                        {% if station.longitude and station.latitude %}
+                            var feature = new OpenLayers.Feature.Vector(
+                                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
+                                                       .transform(fromProjection, toProjection),
+                                {id: {{ station.number }},
+                                 name: "{{ station.name }}",
+                                 subcluster: "{{ station.cluster }}",
+                                 cluster: "{{ station.cluster.parent }}",
+                                 country: "{{ station.cluster.country }}",
+                                 link: {{ station.link|lower }},
+                                 status: "{{ station.status }}"});
+                            {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                        {% endif %}
+                    {% endfor %}
+                map.addLayer({{ subcluster.name|slugify|remove_hyphens }});
             {% endfor %}
-            map.addLayer(stationLayer);
-            
-            var layer_style = OpenLayers.Util.extend({},OpenLayers.Feature.Vector.style['default']);
-
-            map.events.register('zoomend', this, function(event) {
-                var zLevel = map.getZoom();
-                if (zLevel <= 5) {
-                    $('circle').attr('r', '3');
-                    pointStyle.pointRadius = 3;}
-                else if (zLevel <= 8) {
-                    $('circle').attr('r', '4');
-                    pointStyle.pointRadius = 4;}
-                else if (zLevel <= 11) {
-                    $('circle').attr('r', '5');
-                    pointStyle.pointRadius = 5;}
-                else if (zLevel <= 14) {
-                    $('circle').attr('r', '6');
-                    pointStyle.pointRadius = 6;}
-                else if (zLevel <= 18) {
-                    $('circle').attr('r', '8');
-                    pointStyle.pointRadius = 8;}
-            });
-
-            selectControl = new OpenLayers.Control.SelectFeature(
-                [stationLayer],
-                {clickout: true, toggle: false, multiple: false, hover: false,
-                 toggleKey: "ctrlKey", multipleKey: "shiftKey"});
+            // Zoom to fit cluster
+            {% if focus %}
+                {% for layer in focus %}
+                    {% if forloop.first %}
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getDataExtent();
+                    {% else %}
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getDataExtent());
+                    {% endif %}
+                {% endfor %}
+                if (bounds) {
+                    map.zoomToExtent(bounds);
+                    map.zoomTo(Math.floor(map.getZoom()));}
+            {% endif %}
+            var selectControl = new OpenLayers.Control.SelectFeature(
+                [{% for subcluster in subclusters %}
+                    {{ subcluster.name|slugify|remove_hyphens }}{% if not forloop.last %},{% endif %}
+                 {% endfor %}],
+                {clickout: true, hover: false});
             map.addControl(selectControl);
             selectControl.activate();
-            
-            stationLayer.events.on({
-                "featureselected": function(e) {
-                    attr = e.feature.attributes
-                    stationInfo("Station: <a href='../stations/" + attr.link + "'> " + attr.name +
-                                " (" + attr.id + ")</a><br />Cluster: " + attr.cluster);},});
+            {% for subcluster in subclusters %}
+                {{ subcluster.name|slugify|remove_hyphens }}.events.on({
+                    "featureselected": function(e) {showStationInfo(e);}});
+            {% endfor %}
         });
 
-        function stationInfo(text) {
-            $('#selectedStation').html(text);            
-        }
+        function showStationInfo(e) {
+            var attr = e.feature.attributes
+            // Do not link to data if attr.link is false
+            if(attr.link) {
+                stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
+                            "<a href='{% url 'status_display.views.stations' %}" + attr.id + "'>" + attr.name + " (" + attr.id + ")</a>");}
+            else {stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
+                              attr.name + " (" + attr.id + ")");}
+
+            if (attr.cluster == "None") {cluster = attr.subcluster}
+            else {cluster = attr.cluster}
+            clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.country + '/' + cluster + '/' + attr.subcluster + "'> " + attr.subcluster + " (" +  cluster + ")</a>");}
+
+        function stationLink(text) {
+            stationlink.html(text);}
+
+        function clusterLink(text) {
+            clusterlink.html(text);}
     </script>
 {% endblock %}
 
 {% block header %}
-    Map of stations
-{% endblock %}
-
-{% block intro %}
-    The following is a map with all active stations shown on it, based on their last known GPS location.
-    Clicking on a station will show some info about it and give you a link to its data page.</p>
+    Map of HiSPARC stations
 {% endblock %}
 
 {% block map %}
-<div id="stationMap">
-</div>
+    <div id="stationMap"></div>
+{% endblock %}
 
-<div id="selectedStation">
-</div>
+{% block extra %}
+    <div class="sectionTitle">Selected Station</div>
+    <div class="keyvalue">
+        <span class="key">Station</span><br>
+        <span class="value" id="stationLink"><span class="statusBall"></span> None</span>
+    </div>
+    <div class="keyvalue">
+        <span class="key">Cluster</span><br>
+        <span class="value" id="clusterLink">None</span>
+    </div>
 {% endblock %}

@@ -1,0 +1,33 @@
+# Event Summary Data - Weather
+#
+# Station: ({{ station.number }}) {{ station.name }}
+#
+# Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# This data contains the following columns:
+#
+# date:                 time of event [GPS calendar date]
+# time:                 time of event [GPS time of day]
+# timestamp:            time of event [UNIX timestamp]
+# temperature_inside:   temperature inside [deg C]
+# temperature_outside:  temperature outside [deg C]
+# humidity_inside:      relative humidity of the air inside [%]
+# humidity_outside:     relative humidity of the air [%]
+# atmospheric_pressure: barometer data [hPa]
+# wind_direction:       wind direction [deg]
+# wind_speed:           wind speed [m/s]
+# solar_radiation:      intensity of solar radiation [W/m/m]
+# uv_index:             measurement for UV intensity [0-16]
+# evapotranspiration:   amount of evaporated and transpirated water [mm]
+# rain_rate:            amount of rainfall [mm/h]
+# heat_index:           perceived temperature taking humidity into account [deg C]
+# dew_point:            water vapor below this temperature will start to condensate [deg C]
+# wind_chill:           perceived temperature taking wind into account [deg C]
+#
+# Values of -1 or -999 indicate a problem in that measurement or
+# the absence of that sensor.
+#
+#

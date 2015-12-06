@@ -6,14 +6,29 @@ html {
     width: 850px;}
 
 #pageHeader {
-    background: url(../header.png) top right no-repeat;
-    height: 63px;
-    width: 200px;
-    margin: 0;
-    padding: 0;
+    position: relative;
     left: 630px;
     display: inline-block;
-    position: relative;}
+    margin: 0;
+    padding: 0;
+    width: 200px;
+    height: 63px;
+    background: url(../header.png) top right no-repeat;}
 
 #pageHeader span {
     display: none;}
+
+a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+a {
+    border-radius: 3px;
+    color: #25B;
+    text-decoration: none;}
+
+.small {
+    font-size: 10pt;}
+
+.reference {
+    font-size: 8pt;}

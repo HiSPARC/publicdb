@@ -3,8 +3,10 @@ from django.db import models
 import zlib
 import cPickle as pickle
 import base64
+import re
+import ast
 
-from django_publicdb.inforecords import models as inforecords
+from ..inforecords.models import Station
 
 
 class SerializedDataField(models.Field):
@@ -27,18 +29,33 @@ class SerializedDataField(models.Field):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
+class NetworkSummary(models.Model):
+    date = models.DateField(unique=True)
+    num_coincidences = models.IntegerField(blank=True, null=True)
+    needs_update = models.BooleanField(default=False)
+    needs_update_coincidences = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
+
+    class Meta:
+        verbose_name_plural = 'network summaries'
+        ordering = ('date',)
+        get_latest_by = 'date'
+
+
 class Summary(models.Model):
-    station = models.ForeignKey(inforecords.Station)
+    station = models.ForeignKey(Station)
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
     num_errors = models.IntegerField(blank=True, null=True)
     num_weather = models.IntegerField(blank=True, null=True)
-    needs_update = models.BooleanField()
-    needs_update_events = models.BooleanField()
-    needs_update_config = models.BooleanField()
-    needs_update_errors = models.BooleanField()
-    needs_update_weather = models.BooleanField()
+    needs_update = models.BooleanField(default=False)
+    needs_update_events = models.BooleanField(default=False)
+    needs_update_config = models.BooleanField(default=False)
+    needs_update_errors = models.BooleanField(default=False)
+    needs_update_weather = models.BooleanField(default=False)
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
@@ -48,6 +65,8 @@ class Summary(models.Model):
         verbose_name_plural = 'summaries'
         unique_together = (('station', 'date'),)
         ordering = ('date', 'station')
+        get_latest_by = 'date'
+
 
 class Configuration(models.Model):
     source = models.ForeignKey('Summary')
@@ -141,9 +160,72 @@ class Configuration(models.Model):
     def __unicode__(self):
         return "%d - %s" % (self.source.station.number, self.timestamp)
 
+    class Meta:
+        verbose_name_plural = 'configurations'
+        get_latest_by = 'timestamp'
+        ordering = ('source',)
+
     def station(self):
         return self.source.station.number
     station.admin_order_field = 'source__station__number'
+
+    def master(self):
+        result = re.search(r'\d+', self.mas_version)
+        if result is None:
+            master = 'no master'
+        else:
+            master = result.group()
+        return master
+    master.admin_order_field = 'mas_version'
+
+    def slave(self):
+        result = re.search(r'\d+', self.slv_version)
+        if result is None:
+            slave = 'no slave'
+        else:
+            slave = result.group()
+            if slave == '0':
+                slave = 'no slave'
+        return slave
+    slave.admin_order_field = 'slv_version'
+
+    def master_fpga(self):
+        master_fpga = re.findall(r'\d+', self.mas_version)[1]
+        return master_fpga
+
+    def slave_fpga(self):
+        slave_fpga = re.findall(r'\d+', self.slv_version)[1]
+
+        return slave_fpga
+
+
+class NetworkHistogram(models.Model):
+    source = models.ForeignKey('NetworkSummary')
+    type = models.ForeignKey('HistogramType')
+    bins = SerializedDataField()
+    values = SerializedDataField()
+
+    def save(self, *args, **kwargs):
+        """Ensure the stored bins and values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
+
+        """
+        if isinstance(self.bins, basestring):
+            self.bins = ast.literal_eval(self.bins)
+        if isinstance(self.values, basestring):
+            self.values = ast.literal_eval(self.values)
+        super(NetworkHistogram, self).save(*args, **kwargs)
+
+    def __unicode__(self):
+        return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
+
+    class Meta:
+        unique_together = (('source', 'type'),)
+        ordering = ('source', 'type')
+
 
 class DailyHistogram(models.Model):
     source = models.ForeignKey('Summary')
@@ -151,13 +233,29 @@ class DailyHistogram(models.Model):
     bins = SerializedDataField()
     values = SerializedDataField()
 
+    def save(self, *args, **kwargs):
+        """Ensure the stored bins and values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
+
+        """
+        if isinstance(self.bins, basestring):
+            self.bins = ast.literal_eval(self.bins)
+        if isinstance(self.values, basestring):
+            self.values = ast.literal_eval(self.values)
+        super(DailyHistogram, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
         ordering = ('source', 'type')
+
 
 class DailyDataset(models.Model):
     source = models.ForeignKey('Summary')
@@ -165,24 +263,41 @@ class DailyDataset(models.Model):
     x = SerializedDataField()
     y = SerializedDataField()
 
+    def save(self, *args, **kwargs):
+        """Ensure the stored values are numbers
+
+        Saving a model via the admin interface can cause the list to be
+        interpreted as unicode. This code converts the strings to
+        numbers in a safe way.
+
+        """
+        if isinstance(self.x, basestring):
+            self.x = ast.literal_eval(self.x)
+        if isinstance(self.y, basestring):
+            self.y = ast.literal_eval(self.y)
+        super(DailyDataset, self).save(*args, **kwargs)
+
     def __unicode__(self):
         return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%c'), self.type)
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
 
     class Meta:
         unique_together = (('source', 'type'),)
         ordering = ('source', 'type')
 
+
 class HistogramType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
-    has_multiple_datasets = models.BooleanField()
+    has_multiple_datasets = models.BooleanField(default=False)
     bin_axis_title = models.CharField(max_length=40)
     value_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
+
 
 class DatasetType(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -194,8 +309,62 @@ class DatasetType(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class GeneratorState(models.Model):
     check_last_run = models.DateTimeField()
-    check_is_running = models.BooleanField()
+    check_is_running = models.BooleanField(default=False)
     update_last_run = models.DateTimeField()
-    update_is_running = models.BooleanField()
+    update_is_running = models.BooleanField(default=False)
+
+
+class PulseheightFit(models.Model):
+    DETECTOR_CHOICES = ((1, 'Scintillator 1'),
+                        (2, 'Scintillator 2'),
+                        (3, 'Scintillator 3'),
+                        (4, 'Scintillator 4'))
+
+    source = models.ForeignKey('Summary')
+    plate = models.IntegerField(choices=DETECTOR_CHOICES)
+
+    initial_mpv = models.FloatField()
+    initial_width = models.FloatField()
+
+    fitted_mpv = models.FloatField()
+    fitted_mpv_error = models.FloatField()
+    fitted_width = models.FloatField()
+    fitted_width_error = models.FloatField()
+
+    degrees_of_freedom = models.IntegerField(default=0)
+    chi_square_reduced = models.FloatField()
+
+    error_type = models.CharField(default="", max_length=64)
+    error_message = models.TextField(default="")
+
+    def station(self):
+        return self.source.station.number
+    station.admin_order_field = 'source__station__number'
+
+    def date(self):
+        return self.source.date
+    date.admin_order_field = 'source__date'
+
+    def __unicode__(self):
+        return "%d - %s - %d" % (self.source.station.number,
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.plate)
+
+    class Meta:
+        verbose_name_plural = 'Pulseheight fit'
+        unique_together = ('source', 'plate')
+        ordering = ('source', 'plate')
+
+
+class DetectorTimingOffset(models.Model):
+    source = models.ForeignKey('Summary')
+    offset_1 = models.FloatField(blank=True, null=True)
+    offset_2 = models.FloatField(blank=True, null=True)
+    offset_3 = models.FloatField(blank=True, null=True)
+    offset_4 = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        ordering = ('source',)

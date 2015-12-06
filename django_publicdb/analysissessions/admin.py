@@ -1,5 +1,7 @@
 from django.contrib import admin
-from models import *
+
+from .models import (AnalysisSession, AnalyzedCoincidence, Student,
+                     SessionRequest)
 
 
 class AnalysisSessionAdmin(admin.ModelAdmin):
@@ -12,7 +14,7 @@ class AnalyzedCoincidenceAdmin(admin.ModelAdmin):
     exclude = ('coincidence',)
     list_display = ('session', 'coincidence', 'student', 'is_analyzed')
     list_display_links = ('session', 'coincidence')
-    list_filter = ('session', 'is_analyzed', 'student')
+    list_filter = ('session', 'is_analyzed')
 
 
 class StudentAdmin(admin.ModelAdmin):
@@ -21,7 +23,7 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class SessionRequestAdmin(admin.ModelAdmin):
-    lis_filter = ('email',)
+    list_display = ('cluster', 'school', 'name', 'start_date')
 
 
 admin.site.register(AnalysisSession, AnalysisSessionAdmin)

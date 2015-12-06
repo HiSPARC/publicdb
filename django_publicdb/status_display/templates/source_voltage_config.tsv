@@ -1,0 +1,16 @@
+# HiSPARC voltage configuration source
+#
+# Station: {{ station_number }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# This data contains the following columns:
+#
+# timestamp:  time of configuration in seconds after 1970-1-1 [UNIX timestamp]
+# scint (4x): voltage of the PMT [V]
+#
+#
+# timestamp	scint1	scint2	scint3	scint4
+{% for row in data %}{% ifchanged row|slice:"1:" %}{{ row.0|date:"U" }}{% for value in row|slice:"1:" %}	{{ value|floatformat:0 }}{% endfor %}
+{% endifchanged %}{% endfor %}

@@ -1,0 +1,18 @@
+# HiSPARC GPS positions configuration source
+#
+# Station: {{ station_number }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# This data contains the following columns:
+#
+# timestamp: time of position calibration in seconds after 1970-1-1 [UNIX timestamp]
+# latitude:  latitude of the GPS [degrees]
+# longitude: longitude of the GPS [degrees]
+# altitude:  height of the GPS [meters]
+#
+#
+# timestamp	latitude	longitude	altitude
+{% for row in data %}{% if row.1 and row.2 %}{% ifchanged row|slice:"1:" %}{{ row.0|date:"U" }}	{{ row.1|floatformat:7 }}	{{ row.2|floatformat:7 }}	{{ row.3|floatformat:2 }}
+{% endifchanged %}{% endif %}{% endfor %}

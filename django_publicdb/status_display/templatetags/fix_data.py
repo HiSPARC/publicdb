@@ -1,5 +1,8 @@
 from django import template
 
+import datetime
+import calendar
+
 register = template.Library()
 
 
@@ -7,22 +10,58 @@ register = template.Library()
 def fix_histogram_data(values):
     """Append one value to end of data, to fix step histogram"""
 
-    return values + [[values[-1][0] + (values[-1][0] - values[-2][0]),
-                      values[-1][1]]]
+    if len(value) > 1:
+        return value + [[value[-1][0] + (value[-1][0] - value[-2][0]),
+                         value[-1][1]]]
+    else:
+        return value
+
+
+@register.filter
+def fix_histogram_time(value):
+    """Extend last known value to the current date"""
+
+    if not len(value):
+        return value
+
+    tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+    timestamp = calendar.timegm(tomorrow.timetuple())
+
+    return value + [[timestamp, value[-1][1]]]
+
+
+@register.filter
+def fix_timestamps(values):
+    """Convert timestamps to milliseconds"""
+
+    return [[x * 1000, y] for x, y in values]
 
 
 @register.filter
 def fix_timestamps_in_data(values):
     """Convert timestamps to hour of day"""
 
-    return [[x % 86400 / 3600., y] for x, y in values]
+    x, y = zip(*values)
+    seconds_in_day = [u % 86400 for u in x]
+    hours_in_day = [u / 3600. for u in seconds_in_day]
+    values = [list(u) for u in zip(hours_in_day, y)]
+
+    return values
 
 
 @register.filter
 def slice_data(values, arg):
-    """Get every nth value from the list"""
+    """Get every nth value from the list
 
-    return values[::arg]
+    Note: This only slices data if the data has at least 1000 elements.
+    This to prevent the new shrunken datasets (~576 long) to be sliced.
+
+    """
+    if len(values) > 1000:
+        return values[::arg]
+    else:
+        return values
+
 
 
 @register.filter
@@ -40,21 +79,46 @@ def real_temperature(values):
 
 
 @register.filter
-def fix_hour(values):
-    """Offset hours by half an hour"""
-
-    return [[x - 0.5, y] for x, y in values]
-
-
-@register.filter
 def divide_data(values, arg):
-    """Offset hours by half an hour"""
+    """Divide data by a value"""
 
     return [[x, y / arg] for x, y in values]
 
 
 @register.filter
 def real_pressure(values):
-    """Only allow physically possible pressures"""
+    """Only allow physically possible air pressures"""
 
     return [[x, y] for x, y in values if y > 0]
+
+
+@register.filter
+def shift_bins(values, arg):
+    """Shift bins edges by arg"""
+
+    values = [[x + arg, y] for x, y in values]
+
+    return values
+
+
+@register.filter
+def none_to_nan(value):
+    """Print nan instead of nothing for None values"""
+
+    if value is None:
+        return 'nan'
+    else:
+        return value
+
+
+@register.filter
+def mv_to_adc(value):
+    """Convert mv_to_adc"""
+
+    if value >= 0:
+        if int(value) == value:
+            return int(value)
+        else:
+            return value
+    else:
+        return int(round(value / -0.57 + 200))

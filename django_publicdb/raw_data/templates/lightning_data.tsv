@@ -1,0 +1,23 @@
+# Event Summary Data - Lightning
+#
+# Showing only lightning of type {{ lightning_type }}
+#
+# Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
+#
+# Data from: Royal Netherlands Meteorological Institute (KNMI)
+#
+#
+# This data contains the following columns:
+#
+# date:                time of event [GPS calendar date]
+# time:                time of event [GPS time of day]
+# timestamp:           time of event [UNIX timestamp]
+# nanoseconds:         time of event upto microsecond accuracy [number of nanoseconds after timestamp]
+# latitude:            latitude of discharge [degrees]
+# longitude:           longitude of discharge [degrees]
+# current:             discharge in amps [Ampere]
+#
+# Values of -1 or -999 indicate a problem in that measurement or
+# the absence of that sensor.
+#
+#

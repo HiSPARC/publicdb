@@ -1,0 +1,21 @@
+# HiSPARC eventtime histogram source
+#
+# Station: {{ station_number }}
+# Data from {{ date }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# Please note: the 'bin' is the left bin edge. The width of the bin is 1
+# hour.  So bin 0 means between 0:00 and 1:00. Value means the number of
+# events which were measured during 1 hour.
+#
+# This data contains the following columns:
+#
+# bin:   time [hour of day]
+# value: number of events [counts]
+#
+#
+# bin	value
+{% for row in data %}{{ row.0 }}	{{ row.1 }}
+{% endfor %}

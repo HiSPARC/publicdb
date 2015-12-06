@@ -1,7 +1,13 @@
 # Specific
+uwsgi.ini
 HiSPARC_coincidences.db
 public.db
 *.h5
+datastore/
+datastore_test/
+esd/
+_build/
+*.sql
 
 # Python
 *.pyc
@@ -18,3 +24,12 @@ public.db
 ehthumbs.db
 Icon?
 Thumbs.db
+
+# Vim
+*.swp
+
+# Vagrant
+.vagrant
+vagrant_ansible_inventory_default
+
+.remote-sync.json
