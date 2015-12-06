@@ -163,6 +163,7 @@ class Configuration(models.Model):
     class Meta:
         verbose_name_plural = 'configurations'
         get_latest_by = 'timestamp'
+        ordering = ('source',)
 
     def station(self):
         return self.source.station.number
@@ -364,3 +365,6 @@ class DetectorTimingOffset(models.Model):
     offset_2 = models.FloatField(blank=True, null=True)
     offset_3 = models.FloatField(blank=True, null=True)
     offset_4 = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        ordering = ('source',)
