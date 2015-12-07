@@ -92,7 +92,9 @@ def station(request, station_number, year=None, month=None, day=None):
         source_config = (Summary.objects.filter(station=station,
                                                 num_config__isnull=False,
                                                 date__lte=date).latest())
-        config = (Configuration.objects.filter(source=source_config).latest())
+        config = (Configuration.objects.filter(source=source_config)
+                                       .exclude(gps_latitude=0,
+                                                gps_longitude=0).latest())
     except (Station.DoesNotExist, Summary.DoesNotExist,
             Configuration.DoesNotExist):
         return HttpResponseNotFound()
