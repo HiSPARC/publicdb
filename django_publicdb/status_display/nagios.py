@@ -70,9 +70,6 @@ def retrieve_station_status(query):
     """
     nagios_base = "http://vpn.hisparc.nl/cgi-bin/status.cgi?"
 
-    # Temporary 'fix' because Nagios is unavailable
-    return []
-
     try:
         req = urllib2.urlopen(nagios_base + query, timeout=1)
         res = req.read()
