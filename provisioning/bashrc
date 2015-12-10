@@ -12,6 +12,7 @@ alias envpub='source activate /srv/publicdb/publicdb_env'
 alias cdpub='cd /srv/publicdb/www'
 alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && cd django_publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 alias upjs='envpub && cdpub && cd ../jsparc && git fetch && git reset --hard origin/master'
+alias uphis='envpub && cdpub && python scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1'
 
 # Prompt
 [[ -n "$SSH_CLIENT" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '
