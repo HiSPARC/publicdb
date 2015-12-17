@@ -309,15 +309,15 @@ def station_data(request, station_number, year, month, day):
                                          date__lte=date)
                                  .latest())
         config = Configuration.objects.filter(source=source).latest()
-        if config.slv_version.count('0') == 2:
+        if config.slv_version.count(' 0') == 2:
             has_slave = False
         else:
             has_slave = True
-        has_config = True
     except (Summary.DoesNotExist, Configuration.DoesNotExist):
         config = None
         has_slave = False
-        has_config = False
+
+    has_config = station_has_config()
 
     try:
         coincidences_found = NetworkSummary.objects.get(date=date)
@@ -372,7 +372,7 @@ def station_status(request, station_number):
     pc = next((pc for pc in pcs if pc.is_active), pcs[0])
 
     has_data = station_has_data(station)
-    has_config = Configuration.objects.filter(source__station=station).exists()
+    has_config = station_has_config(station)
 
     return render(request, 'station_status.html',
                   {'station': station,
@@ -1075,6 +1075,23 @@ def stations_with_data():
                        .distinct())
 
     return stations
+
+
+def station_has_config(station):
+    """Check if there is a valid configuration for the given station
+
+    :param station: Station object for which to check.
+    :return: boolean indicating if the station has a configuration available.
+
+    """
+    has_config = (Summary.objects
+                         .filter(station=station,
+                                 num_config__isnull=False,
+                                 date__gte=FIRSTDATE,
+                                 date__lte=datetime.date.today())
+                         .exists())
+
+    return has_config
 
 
 def station_has_data(station):

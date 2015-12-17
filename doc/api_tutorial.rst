@@ -16,6 +16,7 @@ tutorial will give you an overview of some of possibilities with the
 please see the :doc:`api`.
 
 .. note::
+
     We'll require you to know some basic programming, i.e. to understand
     what an :code:`if` statement is and :code:`for` loop does. If you
     are new to coding you can try a tutorial online, for instance
