@@ -397,7 +397,7 @@ def station_config(request, station_number):
     has_data = station_has_data(station)
 
     config = configs[-1]
-    if config.slv_version.count('0') == 2:
+    if config.slv_version.count(' 0') == 2:
         has_slave = False
     else:
         has_slave = True
