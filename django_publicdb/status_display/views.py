@@ -317,7 +317,7 @@ def station_data(request, station_number, year, month, day):
         config = None
         has_slave = False
 
-    has_config = station_has_config()
+    has_config = station_has_config(station)
 
     try:
         coincidences_found = NetworkSummary.objects.get(date=date)
