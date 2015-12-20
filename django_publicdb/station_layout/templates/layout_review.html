@@ -20,7 +20,7 @@
         Please review the layout and either approve or dismiss it.
         {% if config %}
             <br>It may help to check satellite imagery (from an unknown date) of the station:
-            <a target="_blank" href="https://maps.googleapis.com/maps/api/staticmap?center={{ config.gps_latitude }},{{ config.longitude }}&zoom=20&size=640x640&maptype=satellite">Google Static Map</a>.
+            <a target="_blank" href="https://maps.googleapis.com/maps/api/staticmap?center={{ config.gps_latitude }},{{ config.gps_longitude }}&zoom=20&size=640x640&maptype=satellite">Google Static Map</a>.
         {% endif %}
     </p>
 
