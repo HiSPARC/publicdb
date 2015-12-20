@@ -8,6 +8,8 @@ from recaptcha.client import captcha
 
 from .models import StationLayout, StationLayoutQuarantine
 from .forms import StationLayoutQuarantineForm, ReviewStationLayoutForm
+from ..histograms.models import Configuration
+
 
 FIRSTDATE = datetime.date(2002, 1, 1)
 
@@ -97,8 +99,20 @@ def review_layout(request, hash):
     else:
         form = ReviewStationLayoutForm()
 
+    try:
+        station = submitted_layout.station
+        active_date = submitted_layout.active_date.replace(hour=23, minute=59,
+                                                           second=59)
+        config = (Configuration.objects.filter(source__station=station,
+                                               timestamp__gte=FIRSTDATE,
+                                               timestamp__lte=active_date)
+                                       .exclude(gps_latitude=0.)).latest()
+    except Configuration.DoesNotExist:
+        config = None
+
     return render(request, 'layout_review.html',
-                  {'layout': submitted_layout, 'form': form, 'hash': hash})
+                  {'layout': submitted_layout, 'form': form, 'hash': hash,
+                   'config': config})
 
 
 def validate_review_layout(request, hash):
