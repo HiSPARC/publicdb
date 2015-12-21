@@ -72,14 +72,14 @@ base box, you can install Packer on a Mac using::
 
     $ brew cask install packer
 
-Then, navigate to the packer/CentOS6.6/ directory and issue::
+Then, navigate to the packer/CentOS6/ directory and issue::
 
     $ packer build template.json
 
 If you need to really make sure the new box is used, remove the old box
 from Vagrant::
 
-    $ vagrant box remove CentOS6.6
+    $ vagrant box remove CentOS6
 
 And you can simply `vagrant up`.
 
