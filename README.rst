@@ -27,7 +27,6 @@ nearly identical to our production server *Pique*.  The VM runs on
 Virtualbox.  You can download Vagrant and Virtualbox binaries for all
 major platforms.  On a Mac::
 
-   $ brew install caskroom/cask/brew-cask
    $ brew cask install virtualbox
    $ brew cask install vagrant
 
