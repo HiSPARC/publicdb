@@ -10,12 +10,6 @@
   failed_when: result.rc >= 2
   notify: reboot
 
-- name: ensure /usr/local/bin is in sudoers
-  lineinfile: dest=/etc/sudoers regexp='secure_path'
-              line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
-              state=present
-  sudo: yes
-
 - name: add HTTP access to firewall rules
   lineinfile: dest=/etc/sysconfig/system-config-firewall
               regexp='--service=http' line='--service=http'
@@ -36,21 +30,6 @@
 
 - name: install ACL utilities
   yum: name=acl
-  sudo: yes
-
-- name: ensure /usr/local/lib is in ld.so.conf
-  lineinfile: dest=/etc/ld.so.conf
-              regexp='/usr/local/lib'
-              line='/usr/local/lib' state=present
-  sudo: yes
-
-- name: ensure local source directory exists
-  file: path=/usr/local/src/hisparc state=directory
-        owner=hisparc group=hisparc mode=2775
-  sudo: yes
-
-- name: set default group write ACLs on /usr/local/src
-  command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
   sudo: yes
 
 - name: install screen
