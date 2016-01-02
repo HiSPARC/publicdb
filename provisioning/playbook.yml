@@ -5,7 +5,7 @@
   handlers:
     - include: handlers.yml
 
-- hosts: publicdb
+- hosts: publicdb:pique.nikhef.nl
   tasks:
     - include: mysqldb.yml
     - include: development.yml
