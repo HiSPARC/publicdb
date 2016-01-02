@@ -25,7 +25,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     machine.vm.network "forwarded_port", guest: 80, host: 8081
   end
 
-  config.vm.define "tietar" do |machine|
+  config.vm.define "vpn" do |machine|
     machine.vm.box = "CentOS6"
     machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
 
