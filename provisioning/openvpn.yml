@@ -1,2 +1,24 @@
 ---
-  
+  - name: rename original (nikhef network) resolv.conf
+    command: creates=/etc/resolv.conf-nikhef
+             mv /etc/resolv.conf /etc/resolv.conf-nikhef
+    sudo: yes
+
+  - name: install OpenVPN and Dnsmasq
+    yum: name=openvpn,dnsmasq
+    sudo: yes
+
+  - name: copy dnsmasq config
+    copy: src=dnsmasq.conf dest=/etc/dnsmasq.conf
+    sudo: yes
+    notify: restart dnsmasq
+
+    #FIXME: openvpn config
+
+  - name: ensure dnsmasq is started
+    service: name=dnsmasq enabled=yes state=started
+    sudo: yes
+
+  - name: ensure openvpn is started
+    service: name=openvpn enabled=yes state=started
+    sudo: yes
