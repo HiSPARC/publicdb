@@ -13,3 +13,10 @@
     - include: fake_datastore.yml
   handlers:
     - include: handlers.yml
+
+- hosts: vpn
+  tasks:
+    - include: openvpn.yml
+    - include: nagios.yml
+  handlers:
+    - include: handlers.yml
