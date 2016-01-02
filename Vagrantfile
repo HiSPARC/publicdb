@@ -8,12 +8,12 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.define "vagrant" do |machine|
     machine.vm.box = "CentOS6"
     machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
-  end
 
-  config.vm.hostname = "vagrant.localdomain"
-  config.vm.network "private_network", ip: "192.168.99.10"
-  config.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
-  config.vm.network "forwarded_port", guest: 80, host: 8080
+    machine.vm.hostname = "vagrant.localdomain"
+    machine.vm.network "private_network", ip: "192.168.99.10"
+    machine.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
+    machine.vm.network "forwarded_port", guest: 80, host: 8080
+  end
 
   config.vm.provider :virtualbox do |vb|
       vb.customize ["modifyvm", :id, "--natdnshostresolver1", "on"]
