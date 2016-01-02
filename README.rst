@@ -24,7 +24,9 @@ Using Vagrant to run inside a virtual machine
 
 We use `Vagrant <http://www.vagrantup.com>`_ to set up a virtual machine
 nearly identical to our production server *Pique*.  The VM runs on
-Virtualbox.  You can download Vagrant and Virtualbox binaries for all
+Virtualbox.  We use multiple VMs for different tasks.  We'll focus on the ``publicdb`` VM.
+
+You can download Vagrant and Virtualbox binaries for all
 major platforms.  On a Mac::
 
    $ brew cask install virtualbox
@@ -46,15 +48,15 @@ Shortcut on a Mac::
 
 Then, navigate to the publicdb repository root and::
 
-    $ vagrant up
+    $ vagrant up publicdb
 
 You can ssh into you box by issuing::
 
-    $ vagrant ssh
+    $ vagrant ssh publicdb
 
 To halt the VM, issue::
 
-    $ vagrant halt
+    $ vagrant halt publicdb
 
 Please consult the `Vagrant documentation
 <http://docs.vagrantup.com/v2/>`_ for further instructions on using
