@@ -43,7 +43,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     ansible.inventory_path = "provisioning/ansible_inventory"
     ansible.playbook = "provisioning/playbook.yml"
     ansible.host_key_checking = false
-    ansible.ask_vault_pass = true
   end
   config.ssh.username = "hisparc"
 end
