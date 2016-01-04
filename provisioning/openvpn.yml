@@ -1,7 +1,7 @@
 ---
-  - name: rename original (nikhef network) resolv.conf
+  - name: copy original (nikhef network) resolv.conf
     command: creates=/etc/resolv.conf-nikhef
-             mv /etc/resolv.conf /etc/resolv.conf-nikhef
+             cp /etc/resolv.conf /etc/resolv.conf-nikhef
     sudo: yes
 
   - name: install openvpn, easy-rsa and dnsmasq
