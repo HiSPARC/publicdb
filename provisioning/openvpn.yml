@@ -4,8 +4,8 @@
              mv /etc/resolv.conf /etc/resolv.conf-nikhef
     sudo: yes
 
-  - name: install OpenVPN and Dnsmasq
-    yum: name=openvpn,dnsmasq
+  - name: install openvpn, easy-rsa and dnsmasq
+    yum: name=openvpn,easy-rsa,dnsmasq
     sudo: yes
 
   - name: copy dnsmasq config
@@ -13,7 +13,15 @@
     sudo: yes
     notify: restart dnsmasq
 
-    #FIXME: openvpn config
+  - name: copy openvpn config
+    copy: src=openvpn/ dest=/etc/openvpn
+    sudo: yes
+    notify: restart openvpn
+
+  - name: ensure ccd directory exists
+    file: path=/etc/openvpn/ccd state=directory
+    sudo: yes
+    notify: restart openvpn
 
   - name: ensure dnsmasq is started
     service: name=dnsmasq enabled=yes state=started
