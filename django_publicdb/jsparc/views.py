@@ -81,13 +81,12 @@ def get_events(coincidence):
     events = []
     for event in coincidence.coincidence.events.all():
         try:
-            source_config = (Summary.objects.filter(station=event.station,
-                                                    num_config__isnull=False,
-                                                    date__lte=event.date)
-                                            .latest())
-            config = (Configuration.objects.filter(source=source_config)
-                                           .latest())
-        except (Summary.DoesNotExist, Configuration.DoesNotExist):
+            config = (Configuration.objects
+                                   .filter(source__station=event.station,
+                                           source__date__lte=event.date)
+                                   .exclude(gps_latitude=0,
+                                            gps_longitude=0).latest())
+        except Configuration.DoesNotExist:
             continue
 
         timestamp = calendar.timegm(datetime.combine(event.date, event.time)
