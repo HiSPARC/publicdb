@@ -4,6 +4,10 @@
              cp /etc/resolv.conf /etc/resolv.conf-nikhef
     sudo: yes
 
+  - name: copy resolv.conf
+    copy: src=resolv.conf dest=/etc/resolv.conf
+    sudo: yes
+
   - name: install openvpn, easy-rsa and dnsmasq
     yum: name=openvpn,easy-rsa,dnsmasq
     sudo: yes
