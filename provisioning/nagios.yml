@@ -1,2 +1,4 @@
 ---
-  
+  - name: install nagios
+    yum: name=nagios
+    sudo: yes
