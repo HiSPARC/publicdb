@@ -39,6 +39,7 @@
 - name: use custom .bashrc
   copy: src=bashrc dest=~/.bashrc backup=yes
 
+# Install mailcap for the mime.types file
 - name: install mailcap
   yum: name=mailcap
   sudo: yes
