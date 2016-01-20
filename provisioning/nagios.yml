@@ -1,6 +1,6 @@
 ---
   - name: install nagios, apache
-    yum: name=nagios,httpd
+    yum: name=nagios,nsca,httpd
     sudo: yes
 
   - name: ensure apache is started
@@ -9,4 +9,8 @@
 
   - name: ensure nagios is started
     service: name=nagios enabled=yes state=started
+    sudo: yes
+
+  - name: ensure nsca is started
+    service: name=nsca enabled=yes state=started
     sudo: yes
