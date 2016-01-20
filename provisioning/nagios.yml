@@ -3,6 +3,26 @@
     yum: name=nagios,nsca,httpd
     sudo: yes
 
+  - name: copy apache nagios config
+    copy: src=nagios/apache-nagios.conf dest=/etc/httpd/conf.d/nagios.conf backup=yes
+    sudo: yes
+    notify: restart apache
+
+  - name: copy nagios cgi config
+    copy: src=nagios/cgi.cfg dest=/etc/nagios backup=yes
+    sudo: yes
+    notify: restart apache
+
+  - name: copy nagios config
+    copy: src=nagios/nagios.cfg dest=/etc/nagios backup=yes
+    sudo: yes
+    notify: restart nagios
+
+  - name: copy nagios commands config
+    copy: src=nagios/commands.cfg dest=/etc/nagios/objects backup=yes
+    sudo: yes
+    notify: restart nagios
+
   - name: ensure apache is started
     service: name=httpd enabled=yes state=started
     sudo: yes

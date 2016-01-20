@@ -19,3 +19,16 @@
 - name: restart openvpn
   service: name=openvpn state=restarted
   sudo: yes
+
+- name: restart apache
+  service: name=httpd state=restarted
+  sudo: yes
+
+- name: restart nagios
+  service: name=nagios state=restarted
+  sudo: yes
+  notify: restart nsca
+
+- name: restart nsca
+  service: name=nsca state=restarted
+  sudo: yes
