@@ -1,4 +1,12 @@
 ---
-  - name: install nagios
-    yum: name=nagios
+  - name: install nagios, apache
+    yum: name=nagios,httpd
+    sudo: yes
+
+  - name: ensure apache is started
+    service: name=httpd enabled=yes state=started
+    sudo: yes
+
+  - name: ensure nagios is started
+    service: name=nagios enabled=yes state=started
     sudo: yes
