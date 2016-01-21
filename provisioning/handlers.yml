@@ -32,3 +32,10 @@
 - name: restart nsca
   service: name=nsca state=restarted
   sudo: yes
+
+- name: restart supervisord
+  service: name=supervisord state=restarted
+  sudo: yes
+
+- name: restart hisparcvpnd
+  supervisorctl: name=hisparcvpnd state=restarted
