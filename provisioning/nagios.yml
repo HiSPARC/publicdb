@@ -28,8 +28,8 @@
     sudo: yes
     notify: restart nagios
 
-  - name: touch nagios hisparc config file
-    file: path=/etc/nagios/objects/hisparc.cfg state=touch
+  - name: copy nagios hisparc config file
+    copy: src=nagios/hisparc.cfg dest=/etc/nagios/objects backup=yes
     sudo: yes
     notify: restart nagios
 
