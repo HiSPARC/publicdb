@@ -13,3 +13,40 @@
 #SECTION ESTABLISHED
 #SECTION RELATED
 SECTION NEW
+
+# Always accept SSH to tietar
+SSH(ACCEPT)    all             $FW
+# Accept SSH from detector vpn to admin vpn
+#SSH(ACCEPT)    det             adm
+
+# Accept ping to firewall and icmp from firewall
+Ping(ACCEPT)   all             $FW
+ACCEPT         $FW             all             icmp
+# Accept ping from admin vpn to detector vpn
+Ping(ACCEPT)   adm             det
+
+#
+# Services running on tietar
+#
+# DNS
+DNS(ACCEPT)    det             $FW
+DNS(ACCEPT)    adm             $FW
+# Web
+Web(ACCEPT)    net             $FW
+# vpn xml-rpc server (allowed from pique)
+ACCEPT         net:pique.nikhef.nl      $FW             tcp     8001
+
+#
+# Nagios traffic
+#
+# NRPE, NSClient running on detector pc's
+ACCEPT         $FW             det     tcp     5666,12489
+# NSCA running on detector pc's
+ACCEPT         det             $FW     tcp     5667
+
+#
+# Admin access to detector pc's
+#
+# VNC
+ACCEPT         adm             det     tcp     5900
+SSH(ACCEPT)    adm             det

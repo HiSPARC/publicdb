@@ -2,3 +2,12 @@
 - name: install shorewall firewall
   yum: name=shorewall
   sudo: yes
+
+- name: copy shorewall config
+  copy: src=vpn-shorewall/ dest=/etc/shorewall
+  sudo: yes
+  notify: restart shorewall
+
+- name: ensure shorewall is started
+  service: name=shorewall enabled=yes state=started
+  sudo: yes

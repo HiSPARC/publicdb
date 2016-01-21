@@ -9,3 +9,9 @@
 ###############################################################################
 #TYPE			ZONE	GATEWAY(S)			GATEWAY
 #								ZONE(S)
+
+# Admin VPN
+openvpnserver          net     0.0.0.0/0
+
+# Detector VPN
+openvpnserver:tcp:443  net     0.0.0.0/0

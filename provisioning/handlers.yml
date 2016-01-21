@@ -39,3 +39,7 @@
 
 - name: restart hisparcvpnd
   supervisorctl: name=hisparcvpnd state=restarted
+
+- name: restart shorewall
+  service: name=shorewall state=restarted
+  sudo: yes
