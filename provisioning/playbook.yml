@@ -7,6 +7,7 @@
 
 - hosts: publicdb:pique.nikhef.nl
   tasks:
+    - include: simple-firewall.yml
     - include: mysqldb.yml
     - include: development.yml
     - include: publicdb.yml
@@ -16,6 +17,7 @@
 
 - hosts: vpn
   tasks:
+    - include: shorewall-firewall.yml
     - include: openvpn.yml
     - include: nagios.yml
     - include: vpn-scripts.yml

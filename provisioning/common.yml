@@ -10,16 +10,6 @@
   failed_when: result.rc >= 2
   notify: reboot
 
-- name: add HTTP access to firewall rules
-  lineinfile: dest=/etc/sysconfig/system-config-firewall
-              regexp='--service=http' line='--service=http'
-              state=present
-  sudo: yes
-
-- name: Compile firewall rules
-  command: lokkit --update
-  sudo: yes
-
 - name: install ACL utilities
   yum: name=acl
   sudo: yes
