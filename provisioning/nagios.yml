@@ -18,6 +18,11 @@
     sudo: yes
     notify: restart nagios
 
+  - name: copy nagios nsca config
+    copy: src=nagios/nsca.cfg dest=/etc/nagios backup=yes
+    sudo: yes
+    notify: restart nagios
+
   - name: copy nagios commands config
     copy: src=nagios/commands.cfg dest=/etc/nagios/objects backup=yes
     sudo: yes
