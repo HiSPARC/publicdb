@@ -20,14 +20,6 @@
   command: lokkit --update
   sudo: yes
 
-- name: Restart firewall (IPv4)
-  service: name=iptables state=restarted enabled=yes
-  sudo: yes
-
-- name: Restart firewall (IPv6)
-  service: name=ip6tables state=restarted enabled=yes
-  sudo: yes
-
 - name: install ACL utilities
   yum: name=acl
   sudo: yes
