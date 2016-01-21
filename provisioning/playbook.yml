@@ -18,5 +18,6 @@
   tasks:
     - include: openvpn.yml
     - include: nagios.yml
+    - include: vpn-scripts.yml
   handlers:
     - include: handlers.yml

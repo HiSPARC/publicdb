@@ -1,0 +1,11 @@
+---
+  - name: copy vpn/publicdb service scripts
+    copy: src=vpn-scripts/ dest=/usr/local/bin mode=755
+    sudo: yes
+
+  - name: add nagios config script to cron
+    cron: name=hisparc-nagios cron_file=hisparc-nagios user=nagios job=/usr/local/bin/hisparc-nagios
+    sudo: yes
+
+  - name: refresh nagios config from publicdb
+    file: path=/tmp/flag_nagios_reload state=touch
