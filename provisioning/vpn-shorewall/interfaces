@@ -11,5 +11,6 @@ FORMAT 2
 ###############################################################################
 #ZONE		INTERFACE		OPTIONS
 net             eth0                    logmartians,nosmurfs,routefilter,tcpflags
+net             eth1                    logmartians,nosmurfs,routefilter,tcpflags
 det             tun1                    logmartians,nosmurfs,routefilter,tcpflags
 adm             tun0                    logmartians,nosmurfs,routefilter,tcpflags
