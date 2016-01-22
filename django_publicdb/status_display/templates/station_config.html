@@ -217,14 +217,9 @@
           {% else %}
             <span class="value bad">&#x2717;</span>
           {% endif %}
-        </div>
-        <div class="keyvalue">
-            <span class="key">Thresholds</span>
-          {% if config.mas_ch1_thres_low == -30.21 and config.mas_ch1_thres_high == -70.11 and config.mas_ch2_thres_low == -30.21 and config.mas_ch2_thres_high == -70.11 and config.slv_ch1_thres_low == -30.21 and config.slv_ch1_thres_high == -70.11 and config.slv_ch2_thres_low == -30.21 and config.slv_ch2_thres_high == -70.11 %}
-            <span class="value good">&#x2713;</span>
-          {% else %}
-            <span class="value bad">&#x2717;</span>
-          {% endif %}
+            <span class="sourceLink">
+                <a href="{% url 'status_display.views.get_trigger_config_source' station.number %}">Source</a>
+            </span>
         </div>
         <div class="keyvalue">
             <span class="key">Trigger window</span>
@@ -236,7 +231,7 @@
         </div>
         <div class="keyvalue">
             <span class="key">Data reduction</span>
-            <span class="value {% if config.reduce_data %}good">&#x2713;{% else %}bad">&#x2717;{% endif %}</span>
+            <span class="value {% if config.reduce_data %}good">On{% else %}bad">Off{% endif %}</span>
         </div>
         <div class="keyvalue">
             <span class="key">Start DAQ mode</span>

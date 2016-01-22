@@ -12,6 +12,7 @@ def status_lists():
              the status the variable name implies.
 
     """
+    return [], [], []
     down = down_list()
     problem = problem_list()
     up = up_list().difference(problem)
