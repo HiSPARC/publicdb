@@ -1,6 +1,6 @@
 ---
   - name: install nagios, apache
-    yum: name=nagios,nagios-plugins-all,nsca,httpd
+    yum: name=nagios,nagios-plugins-all,nagios-plugins-nrpe,nrpe,nsca,httpd
     sudo: yes
 
   - name: copy apache nagios config
@@ -44,6 +44,10 @@
 
   - name: ensure nagios is started
     service: name=nagios enabled=yes state=started
+    sudo: yes
+
+  - name: ensure nrpe is started
+    service: name=nrpe enabled=yes state=started
     sudo: yes
 
   - name: ensure nsca is started

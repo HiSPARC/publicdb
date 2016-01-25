@@ -13,7 +13,7 @@
 - name: install epel-release package
   yum: name=epel-release
   sudo: yes
-  
+
 - name: install ACL utilities
   yum: name=acl
   sudo: yes
@@ -28,4 +28,8 @@
 # Install mailcap for the mime.types file
 - name: install mailcap
   yum: name=mailcap
+  sudo: yes
+
+- name: install troubleshooting tools
+  yum: name=nmap,tcpdump
   sudo: yes

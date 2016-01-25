@@ -12,4 +12,6 @@
 ###############################################################################
 #INTERFACE	HOST(S)			OPTIONS		PROTO	DEST	SOURCE
 #								PORT(S)	PORT(S)
+em1             -                       -               tcp     ssh
 eth0            -                       -               tcp     ssh
+eth1            -                       -               tcp     ssh
