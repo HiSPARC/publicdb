@@ -33,6 +33,11 @@
     sudo: yes
     notify: restart nagios
 
+  - name: copy mpv check script
+    copy: src=nagios/check_pulseheight_mpv.py dest=/usr/lib64/nagios/plugins mode=755
+    sudo: yes
+    notify: restart nagios
+
   - name: ensure apache is started
     service: name=httpd enabled=yes state=started
     sudo: yes
