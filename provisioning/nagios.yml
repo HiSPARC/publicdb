@@ -29,7 +29,7 @@
     notify: restart nagios
 
   - name: copy nagios hisparc config file
-    copy: src=nagios/hisparc.cfg dest=/etc/nagios/objects backup=yes
+    copy: src=nagios/hisparc.cfg dest=/etc/nagios/objects owner=nagios force=no
     sudo: yes
     notify: restart nagios
 

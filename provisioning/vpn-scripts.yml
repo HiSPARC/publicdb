@@ -9,7 +9,12 @@
     sudo: yes
 
   - name: refresh nagios config from publicdb
-    file: path=/tmp/flag_nagios_reload state=touch
+    file: path=/tmp/flag_nagios_reload state=touch owner=nagios
+    sudo: yes
+
+  - name: refresh nagios config from publicdb
+    file: path=/tmp/hash_nagios state=absent
+    sudo: yes
 
   - name: install pip
     yum: name=python-pip
