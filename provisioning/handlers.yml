@@ -19,6 +19,7 @@
 - name: restart openvpn
   service: name=openvpn state=restarted
   sudo: yes
+  notify: restart shorewall
 
 - name: restart apache
   service: name=httpd state=restarted

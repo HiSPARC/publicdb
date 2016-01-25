@@ -15,7 +15,7 @@
   handlers:
     - include: handlers.yml
 
-- hosts: vpn
+- hosts: vpn:tietar.nikhef.nl
   tasks:
     - include: shorewall-firewall.yml
     - include: openvpn.yml

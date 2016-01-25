@@ -10,6 +10,10 @@
   failed_when: result.rc >= 2
   notify: reboot
 
+- name: install epel-release package
+  yum: name=epel-release
+  sudo: yes
+  
 - name: install ACL utilities
   yum: name=acl
   sudo: yes
