@@ -16,6 +16,7 @@ import cStringIO as StringIO
 import zipfile
 import os
 import base64
+import pwd
 
 OPENVPN_DIR = '/etc/openvpn'
 HOSTS_FILE = '/etc/hosts-hisparc'
@@ -82,6 +83,8 @@ def reload_nagios():
 
     with open(FLAG, 'a') as file:
         pass
+    nagios = pwd.getpwnam('nagios')
+    os.chown(FLAG, nagios.pw_uid, nagios.pw_gid)
     return True
 
 
