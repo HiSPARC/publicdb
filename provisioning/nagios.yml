@@ -8,6 +8,16 @@
     sudo: yes
     notify: restart apache
 
+  - name: remove documentroot setting from apache default settings
+    lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^DocumentRoot" state=absent
+    sudo: yes
+    notify: restart apache
+
+  - name: remove scriptalias setting from apache default settings
+    lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^ScriptAlias" state=absent
+    sudo: yes
+    notify: restart apache
+
   - name: copy nagios cgi config
     copy: src=nagios/cgi.cfg dest=/etc/nagios backup=yes
     sudo: yes
