@@ -34,7 +34,7 @@
     notify: restart nagios
 
   - name: copy mpv check script
-    copy: src=nagios/check_pulseheight_mpv.py dest=/usr/lib64/nagios/plugins mode=755
+    copy: src=nagios/check_pulseheight_mpv.py dest=/usr/lib64/nagios/plugins/check_pulseheight_mpv mode=755
     sudo: yes
     notify: restart nagios
 
