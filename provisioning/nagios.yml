@@ -24,7 +24,7 @@
     notify: restart apache
 
   - name: fix cgi_base_url path for nagios
-    replace: dest=/usr/share/nagios/html/config.inc.php regexp="/nagios/cgi-bin/" replace="/cgi-bin/" backup=yes
+    replace: dest=/usr/share/nagios/html/config.inc.php regexp="/nagios/cgi-bin/" replace="/cgi-bin/" backup=yes mode=644
     sudo: yes
     notify: restart nagios
 
