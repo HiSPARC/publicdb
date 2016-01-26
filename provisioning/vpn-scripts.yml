@@ -12,7 +12,7 @@
     file: path=/tmp/flag_nagios_reload state=touch owner=nagios
     sudo: yes
 
-  - name: refresh nagios config from publicdb
+  - name: remove old nagios config hash
     file: path=/tmp/hash_nagios state=absent
     sudo: yes
 
