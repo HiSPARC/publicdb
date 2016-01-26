@@ -11,9 +11,12 @@
     - include: mysqldb.yml
     - include: development.yml
     - include: publicdb.yml
-    - include: fake_datastore.yml
   handlers:
     - include: handlers.yml
+
+- hosts: publicdb
+  tasks:
+    - include: fake_datastore.yml
 
 - hosts: vpn:tietar.nikhef.nl
   tasks:
