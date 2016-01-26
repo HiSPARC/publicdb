@@ -23,6 +23,11 @@
     sudo: yes
     notify: restart apache
 
+  - name: fix cgi_base_url path for nagios
+    replace: dest=/usr/share/nagios/html/config.inc.php regexp="/nagios/cgi-bin/" replace="/cgi-bin/" backup=yes
+    sudo: yes
+    notify: restart apache
+
   - name: copy nagios config
     copy: src=nagios/nagios.cfg dest=/etc/nagios backup=yes
     sudo: yes
