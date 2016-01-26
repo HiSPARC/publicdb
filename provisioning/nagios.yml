@@ -9,12 +9,12 @@
     notify: restart apache
 
   - name: remove documentroot setting from apache default settings
-    lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^DocumentRoot" state=absent
+    replace: dest=/etc/httpd/conf/httpd.conf regexp="^DocumentRoot" replace="#DocumentRoot" backup=yes
     sudo: yes
     notify: restart apache
 
   - name: remove scriptalias setting from apache default settings
-    lineinfile: dest=/etc/httpd/conf/httpd.conf regexp="^ScriptAlias" state=absent
+    replace: dest=/etc/httpd/conf/httpd.conf regexp="^ScriptAlias" replace="#ScriptAlias" backup=yes
     sudo: yes
     notify: restart apache
 
@@ -26,7 +26,7 @@
   - name: fix cgi_base_url path for nagios
     replace: dest=/usr/share/nagios/html/config.inc.php regexp="/nagios/cgi-bin/" replace="/cgi-bin/" backup=yes
     sudo: yes
-    notify: restart apache
+    notify: restart nagios
 
   - name: copy nagios config
     copy: src=nagios/nagios.cfg dest=/etc/nagios backup=yes
