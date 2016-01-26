@@ -26,7 +26,12 @@
   - name: fix cgi_base_url path for nagios
     replace: dest=/usr/share/nagios/html/config.inc.php regexp="/nagios/cgi-bin/" replace="/cgi-bin/" backup=yes mode=644
     sudo: yes
-    notify: restart nagios
+    notify: restart apache
+
+  - name: set correct corewindow for nagios index.php
+    replace: dest=/usr/share/nagios/html/index.php regexp='corewindow="main.php"' replace='corewindow="cgi-bin/status.cgi?hostgroup=all"' backup=yes
+    sudo: yes
+    notify: restart apache
 
   - name: copy nagios config
     copy: src=nagios/nagios.cfg dest=/etc/nagios backup=yes
