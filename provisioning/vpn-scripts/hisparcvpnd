@@ -16,9 +16,10 @@ import cStringIO as StringIO
 import zipfile
 import os
 import base64
+import pwd
 
-OPENVPN_DIR = '/home/david/tmp/openvpn'
-HOSTS_FILE = '/tmp/hosts-hisparc'
+OPENVPN_DIR = '/etc/openvpn'
+HOSTS_FILE = '/etc/hosts-hisparc'
 FLAG = '/tmp/flag_nagios_reload'
 
 
@@ -26,11 +27,11 @@ def create_key(host, type, ip):
     """create keys for a host and set up openvpn"""
 
     if type == 'client':
-        subprocess.check_call(['./create_keys.sh', OPENVPN_DIR, host])
+        subprocess.check_call(['/usr/local/bin/create_keys.sh', OPENVPN_DIR, host])
         with open(os.path.join(OPENVPN_DIR, 'ccd', host), 'w') as file:
             file.write('ifconfig-push %s 255.255.254.0\n' % ip)
     elif type == 'admin':
-        subprocess.check_call(['./create_admin_keys.sh', OPENVPN_DIR, host])
+        subprocess.check_call(['/usr/local/bin/create_admin_keys.sh', OPENVPN_DIR, host])
     else:
         raise Exception('Unknown type %s' % type)
 
@@ -82,6 +83,8 @@ def reload_nagios():
 
     with open(FLAG, 'a') as file:
         pass
+    nagios = pwd.getpwnam('nagios')
+    os.chown(FLAG, nagios.pw_uid, nagios.pw_gid)
     return True
 
 
@@ -91,7 +94,7 @@ if __name__ == '__main__':
         rpc_paths = ('/RPC2',)
 
     # Create server
-    server = SimpleXMLRPCServer(("localhost", 8001),
+    server = SimpleXMLRPCServer(("0.0.0.0", 8001),
                                 requestHandler=RequestHandler)
     server.register_introspection_functions()
 

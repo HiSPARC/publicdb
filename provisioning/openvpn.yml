@@ -1,0 +1,36 @@
+---
+  - name: install openvpn, easy-rsa and dnsmasq
+    yum: name=openvpn,easy-rsa,dnsmasq
+    sudo: yes
+
+  - name: copy dnsmasq config
+    copy: src=dnsmasq.conf dest=/etc/dnsmasq.conf
+    sudo: yes
+    notify: restart dnsmasq
+
+  - name: copy openvpn config
+    copy: src=openvpn/ dest=/etc/openvpn
+    sudo: yes
+    notify: restart openvpn
+
+  - name: ensure ccd directory exists
+    file: path=/etc/openvpn/ccd state=directory
+    sudo: yes
+    notify: restart openvpn
+
+  - name: ensure dnsmasq is started
+    service: name=dnsmasq enabled=yes state=started
+    sudo: yes
+
+  - name: ensure openvpn is started
+    service: name=openvpn enabled=yes state=started
+    sudo: yes
+
+  - name: copy original (nikhef network) resolv.conf
+    command: creates=/etc/resolv.conf-nikhef
+             cp /etc/resolv.conf /etc/resolv.conf-nikhef
+    sudo: yes
+
+  - name: copy resolv.conf
+    copy: src=resolv.conf dest=/etc/resolv.conf
+    sudo: yes

@@ -1,4 +1,25 @@
 ---
+- name: ensure /usr/local/bin is in sudoers
+  lineinfile: dest=/etc/sudoers regexp='secure_path'
+              line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+              state=present
+  sudo: yes
+
+- name: ensure /usr/local/lib is in ld.so.conf
+  lineinfile: dest=/etc/ld.so.conf
+              regexp='/usr/local/lib'
+              line='/usr/local/lib' state=present
+  sudo: yes
+
+- name: ensure local source directory exists
+  file: path=/usr/local/src/hisparc state=directory
+        owner=hisparc group=hisparc mode=2775
+  sudo: yes
+
+- name: set default group write ACLs on /usr/local/src
+  command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
+  sudo: yes
+
 - name: install libraries
   yum: name={{ item }} state=present
   sudo: yes

@@ -45,12 +45,6 @@
       ]
     },
     {
-      "type": "ansible-local",
-      "playbook_file": "local.yml",
-      "playbook_dir": "../../provisioning/",
-      "inventory_file": "local_inventory"
-    },
-    {
       "only": ["virtualbox-iso"],
       "type": "shell",
       "scripts": [

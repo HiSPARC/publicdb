@@ -2,12 +2,28 @@
 - hosts: all
   tasks:
     - include: common.yml
+  handlers:
+    - include: handlers.yml
+
+- hosts: publicdb:pique.nikhef.nl
+  tasks:
+    - include: simple-firewall.yml
     - include: mysqldb.yml
     - include: development.yml
     - include: publicdb.yml
   handlers:
     - include: handlers.yml
 
-- hosts: vagrant
+- hosts: publicdb
   tasks:
     - include: fake_datastore.yml
+
+- hosts: vpn:tietar.nikhef.nl
+  tasks:
+    - include: postfix.yml
+    - include: shorewall-firewall.yml
+    - include: openvpn.yml
+    - include: nagios.yml
+    - include: vpn-scripts.yml
+  handlers:
+    - include: handlers.yml
