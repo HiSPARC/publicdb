@@ -21,3 +21,9 @@ html_directory = no
 manpage_directory = /usr/share/man
 sample_directory = /usr/share/doc/postfix-2.6.6/samples
 readme_directory = /usr/share/doc/postfix-2.6.6/README_FILES
+
+# Changes for HiSPARC servers below this line
+mydomain = nikhef.nl
+luser_relay = $local@nikhef.nl
+mailbox_transport = smtp:smtp.nikhef.nl
+relayhost = [smtp.nikhef.nl]
