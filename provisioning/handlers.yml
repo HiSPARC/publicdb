@@ -17,7 +17,7 @@
   sudo: yes
 
 - name: restart openvpn
-  service: name=openvpn state=restarted
+  service: name=openvpn state=restarted sleep=3
   sudo: yes
   notify: restart shorewall
 
