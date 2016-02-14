@@ -175,7 +175,7 @@ def update_all_histograms():
             perform_update_tasks()
             state.update_last_run = update_last_run
         finally:
-            django.db.close_connection()
+            django.db.close_old_connections()
             state.update_is_running = False
             state.save()
 
@@ -207,7 +207,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
-            django.db.close_connection()
+            django.db.close_old_connections()
             summary.save()
 
         worker_pool.close()
@@ -220,7 +220,7 @@ def update_esd():
                 esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
                                                    node_path)
             summary.needs_update = False
-            django.db.close_connection()
+            django.db.close_old_connections()
             summary.save()
 
 
@@ -241,7 +241,7 @@ def update_coincidences():
 
         for network_summary in results:
             network_summary.needs_update = False
-            django.db.close_connection()
+            django.db.close_old_connections()
             network_summary.save()
 
         worker_pool.close()
@@ -250,12 +250,12 @@ def update_coincidences():
         for network_summary in network_summaries:
             network_summary = search_and_store_coincidences(network_summary)
             network_summary.needs_update = False
-            django.db.close_connection()
+            django.db.close_old_connections()
             network_summary.save()
 
 
 def process_and_store_temporary_esd_for_summary(summary):
-    django.db.close_connection()
+    django.db.close_old_connections()
     tmp_locations = []
     if summary.needs_update_events:
         tmp_locations.append(process_events_and_store_esd(summary))
@@ -270,7 +270,7 @@ def search_and_store_coincidences(network_summary):
     :param network_summary: a NetworkSummary object.
 
     """
-    django.db.close_connection()
+    django.db.close_old_connections()
     if network_summary.needs_update_coincidences:
         search_coincidences_and_store_esd(network_summary)
     return network_summary
@@ -304,7 +304,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
             exec "summary.%s=False" % needs_update_item
-            django.db.close_connection()
+            django.db.close_old_connections()
             summary.save()
         worker_pool.close()
         worker_pool.join()
@@ -312,12 +312,12 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         for summary in summaries:
             perform_certain_tasks(summary)
             exec "summary.%s=False" % needs_update_item
-            django.db.close_connection()
+            django.db.close_old_connections()
             summary.save()
 
 
 def perform_events_tasks(summary):
-    django.db.close_connection()
+    django.db.close_old_connections()
     logger.info("Updating event histograms for %s" % summary)
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
@@ -328,7 +328,7 @@ def perform_events_tasks(summary):
 
 
 def perform_config_tasks(summary):
-    django.db.close_connection()
+    django.db.close_old_connections()
     logger.info("Updating configuration messages for %s" % summary)
     num_config = update_config(summary)
     summary.num_config = num_config
@@ -336,7 +336,7 @@ def perform_config_tasks(summary):
 
 
 def perform_weather_tasks(summary):
-    django.db.close_connection()
+    django.db.close_old_connections()
     logger.info("Updating weather datasets for %s" % summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
@@ -344,7 +344,7 @@ def perform_weather_tasks(summary):
 
 
 def perform_coincidences_tasks(network_summary):
-    django.db.close_connection()
+    django.db.close_old_connections()
     logger.info("Updating coincidence histograms for %s" % network_summary)
     update_coincidencetime_histogram(network_summary)
     update_coincidencenumber_histogram(network_summary)
@@ -525,7 +525,7 @@ def update_config(summary):
                 vars(new_config)[var] = ts
             else:
                 vars(new_config)[var] = config[var]
-        django.db.close_connection()
+        django.db.close_old_connections()
         new_config.save()
 
     num_config = len(configs)
