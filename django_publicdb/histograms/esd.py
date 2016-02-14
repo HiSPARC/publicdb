@@ -56,7 +56,7 @@ def search_coincidences_and_store_in_esd(network_summary):
                                              station_groups, overwrite=True,
                                              progress=False)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
-        coinc.store_coincidences(cluster=cluster)
+        coinc.store_coincidences(station_numbers=station_numbers)
         num_coincidences = len(coinc.coincidences)
 
     return num_coincidences
