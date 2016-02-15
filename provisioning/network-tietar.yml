@@ -1,0 +1,30 @@
+---
+- name: Set static gateway
+  lineinfile: dest=/etc/sysconfig/network regexp=^GATEWAY
+              line=GATEWAY=192.16.192.80
+  sudo: yes
+  notify: reboot
+
+- name: Set static network protocol
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-em1 regexp=^BOOTPROTO
+              line=BOOTPROTO=static
+  sudo: yes
+  notify: reboot
+
+- name: Set static ip address
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-em1 regexp=^IPADDR
+              line=IPADDR=192.16.192.33
+  sudo: yes
+  notify: reboot
+
+- name: Set static netmask
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-em1 regexp=^NETMASK
+              line=NETMASK=255.255.255.0
+  sudo: yes
+  notify: reboot
+
+- name: Enable network adapter on boot
+  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-em1 regexp=^ONBOOT
+              line=ONBOOT=yes
+  sudo: yes
+  notify: reboot

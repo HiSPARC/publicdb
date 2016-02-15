@@ -26,9 +26,12 @@
     service: name=openvpn enabled=yes state=started
     sudo: yes
 
-  - name: copy original (nikhef network) resolv.conf
-    command: creates=/etc/resolv.conf-nikhef
-             cp /etc/resolv.conf /etc/resolv.conf-nikhef
+  - name: create nikhef network resolv.conf
+    lineinfile: create=yes dest=/etc/resolv.conf-nikhef
+                line="nameserver {{ item }}"
+    with_items:
+      - 192.16.199.17
+      - 192.16.185.12
     sudo: yes
 
   - name: copy resolv.conf
