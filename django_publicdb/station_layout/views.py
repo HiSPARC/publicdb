@@ -108,7 +108,12 @@ def review_layout(request, hash):
                                                timestamp__lte=active_date)
                                        .exclude(gps_latitude=0.)).latest()
     except Configuration.DoesNotExist:
-        config = None
+        try:
+            config = (Configuration.objects.filter(source__station=station,
+                                                   timestamp__gte=active_date)
+                                           .exclude(gps_latitude=0.)).earliest()
+        except Configuration.DoesNotExist:
+            config = None
 
     return render(request, 'layout_review.html',
                   {'layout': submitted_layout, 'form': form, 'hash': hash,

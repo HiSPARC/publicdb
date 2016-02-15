@@ -47,16 +47,13 @@ def search_coincidences_and_store_in_esd(network_summary):
                       (station.cluster.main_cluster().lower(), station.number)
                       for station in stations]
 
-    # FIXME: Gets *latest* known positions, which may be wrong.
-    cluster = clusters.HiSPARCStations(station_numbers, allow_missing=True)
-
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
         coinc = coincidences.CoincidencesESD(data, '/coincidences',
                                              station_groups, overwrite=True,
                                              progress=False)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
-        coinc.store_coincidences(cluster=cluster)
+        coinc.store_coincidences(station_numbers=station_numbers)
         num_coincidences = len(coinc.coincidences)
 
     return num_coincidences
@@ -82,7 +79,7 @@ def process_events_and_store_temporary_esd(summary):
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             process = \
                 process_events.ProcessEventsFromSourceWithTriggerOffset(
-                    source_file, tmp_file, source_node, '/')
+                    source_file, tmp_file, source_node, '/', station.number)
             process.process_and_store_results()
             node_path = process.destination._v_pathname
     return tmp_filename, node_path

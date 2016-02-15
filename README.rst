@@ -121,3 +121,5 @@ Also, lock the root account and the user account. First, make sure to add your p
 
    $ sudo passwd -l root
    $ sudo passwd -l hisparc
+
+The *only* way to get into the machine is via SSH, so *don't lock yourself out!* Actually, there is another way. With console access, you can reboot in single user mode.
