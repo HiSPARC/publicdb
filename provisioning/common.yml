@@ -31,5 +31,5 @@
   sudo: yes
 
 - name: install troubleshooting tools
-  yum: name=nmap,tcpdump
+  yum: name=nmap,tcpdump,conntrack-tools
   sudo: yes
