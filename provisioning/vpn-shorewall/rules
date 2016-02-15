@@ -34,7 +34,7 @@ DNS(ACCEPT)    adm             $FW
 # Web
 Web(ACCEPT)    net             $FW
 # vpn xml-rpc server (allowed from pique)
-ACCEPT         net:pique.nikhef.nl      $FW             tcp     8001
+ACCEPT         net:192.16.185.167       $FW             tcp     8001
 
 #
 # Nagios traffic
