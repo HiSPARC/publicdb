@@ -1,4 +1,11 @@
 ---
+- name: add SSH keys for hisparc user
+  authorized_key: user=hisparc key="{{ item }}"
+  with_file:
+    - public_keys/davidf.pub
+    - public_keys/adelaat.pub
+    - public_keys/tond.pub
+
 - name: upgrade all packages
   yum: name=* state=latest
   sudo: yes
