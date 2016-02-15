@@ -20,6 +20,7 @@
 
 - hosts: vpn:tietar.nikhef.nl
   tasks:
+    - include: mitigate-dos.yml
     - include: postfix.yml
     - include: shorewall-firewall.yml
     - include: openvpn.yml
