@@ -279,13 +279,13 @@ def search_and_store_coincidences(network_summary):
 def update_histograms():
     """Update new configs, histograms and datasets"""
 
-    perform_tasks_manager("Summary", "needs_update_config",
+    perform_tasks_manager(Summary, "needs_update_config",
                           perform_config_tasks)
-    perform_tasks_manager("Summary", "needs_update_events",
+    perform_tasks_manager(Summary, "needs_update_events",
                           perform_events_tasks)
-    perform_tasks_manager("Summary", "needs_update_weather",
+    perform_tasks_manager(Summary, "needs_update_weather",
                           perform_weather_tasks)
-    perform_tasks_manager("NetworkSummary", "needs_update_coincidences",
+    perform_tasks_manager(NetworkSummary, "needs_update_coincidences",
                           perform_coincidences_tasks)
 
 
@@ -296,14 +296,14 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     tasks himself or he grabs some workers and let them do it.
 
     """
-    summaries = eval("%s.objects.filter(%s=True, needs_update=False).reverse()"
-                     % (model, needs_update_item))
+    summaries = model.objects.filter(**{needs_update_item: True,
+                                        'needs_update': False}).reverse()
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
         for summary in results:
-            exec "summary.%s=False" % needs_update_item
+            setattr(summary, needs_update_item, False)
             django.db.close_old_connections()
             summary.save()
         worker_pool.close()
@@ -311,7 +311,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     else:
         for summary in summaries:
             perform_certain_tasks(summary)
-            exec "summary.%s=False" % needs_update_item
+            setattr(summary, needs_update_item, False)
             django.db.close_old_connections()
             summary.save()
 
