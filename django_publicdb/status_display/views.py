@@ -711,6 +711,8 @@ def get_station_layout_source(request, station_number):
     layouts = StationLayout.objects.filter(station__number=station_number,
                                            active_date__gte=FIRSTDATE,
                                            active_date__lte=today)
+    if not layouts:
+        raise Http404
 
     for layout in layouts:
         layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
@@ -727,6 +729,9 @@ def get_station_layout_source(request, station_number):
 
 def get_detector_timing_offsets_source(request, station_number):
     data = get_detector_timing_offsets(station_number)
+    if not len(data):
+        raise Http404
+
     response = render(request, 'source_detector_timing_offsets.tsv',
                       {'data': data,
                        'station_number': station_number},
@@ -738,6 +743,15 @@ def get_detector_timing_offsets_source(request, station_number):
 
 
 def get_histogram_source(year, month, day, type, station_number=None):
+    """Get histogram data for a specific date
+
+    :param year,month,day: the date for which to get the histogram data.
+    :param type: the type of histogram to retrieve.
+    :param station_number: if None a NetworkHistogram is looked for, otherwise
+        a DailyHistogram for a specific station is looked for.
+    :return: list of tuples containing (bin, value) pairs.
+
+    """
     date = datetime.date(int(year), int(month), int(day))
     if station_number is None:
         histogram = get_object_or_404(NetworkHistogram,
@@ -756,6 +770,14 @@ def get_histogram_source(year, month, day, type, station_number=None):
 
 
 def get_dataset_source(year, month, day, type, station_number):
+    """Get a dataset for a specific date and station
+
+    :param year,month,day: the date for which to get the dataset.
+    :param type: the type of dataset to retrieve.
+    :param station_number: the station to which the data belongs.
+    :return: list of tuples containing (x, y) pairs.
+
+    """
     date = datetime.date(int(year), int(month), int(day))
     dataset = get_object_or_404(DailyDataset,
                                 source__station__number=int(station_number),
@@ -794,6 +816,9 @@ def get_config_source(station_number, type):
         source__station__number=station_number,
         timestamp__gte=FIRSTDATE,
         timestamp__lte=datetime.date.today()).order_by('timestamp')
+
+    if not configs:
+        raise Http404
 
     data = list(configs.values_list(*fields))
 
