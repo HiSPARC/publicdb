@@ -11,7 +11,7 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
-                      HiSPARCStations)
+                      HiSPARCStations, ReconstructESDEventsFromSource)
 
 from ..inforecords.models import Station
 from . import datastore
@@ -106,6 +106,31 @@ def process_weather_and_store_temporary_esd(summary):
                                                source_node, '/')
             process.process_and_store_results()
             node_path = process.source._v_pathname
+    return tmp_filename, node_path
+
+
+def reconstruct_events_and_store_temporary_esd(summary):
+    """Reconstruct events from datastore and save temporary Event Summary Data
+
+    Events from the ESD are reconstructed and stored in a temporary
+    file.  The temporary file path and node path are returned.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+    station = summary.station
+
+    filepath = datastore.get_data_path(date)
+    source_path = get_station_node_path(station)
+    with tables.open_file(filepath, 'r') as source_file:
+        tmp_filename = create_temporary_file()
+        with tables.open_file(tmp_filename, 'w') as tmp_file:
+            reconstruct = ReconstructESDEventsFromSource(
+                source_file, tmp_file, source_path, '/', station.number)
+            reconstruct.reconstruct_and_store()
+            node_path = reconstruct.reconstructions._v_pathname
     return tmp_filename, node_path
 
 
@@ -324,6 +349,24 @@ def determine_detector_timing_offsets_for_summary(summary):
     return offsets
 
 
+def get_azimuths(tmpfile_path, node_path):
+    """Get all reconstructed azimuths
+
+    Read data from file and return a list of azimuths.
+
+    """
+    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'azimuth'))
+
+
+def get_zeniths(tmpfile_path, node_path):
+    """Get all reconstructed zeniths
+
+    Read data from file and return a list of zeniths.
+
+    """
+    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'zenith'))
+
+
 def get_temperature(summary):
     """Get temperature data
 
@@ -444,4 +487,18 @@ def get_time_series(summary, tablename, quantity):
             data = zip(col1, col2)
             data.sort(key=itemgetter(0))
 
+    return data
+
+
+def get_data_from_path(file_path, node_path, quantity):
+    """Get all reconstructed zeniths
+
+    Read data from file and return a list of values.
+    Only return not-nan values.
+
+    """
+    with tables.open_file(file_path, 'r') as data:
+        node = data.get_node(node_path)
+        data = node.col(quantity)
+    data = data[~np.isnan(data)]
     return data
