@@ -338,7 +338,7 @@ def perform_events_tasks(summary):
     update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
-    if summary.station.stationlayout_set.filter(active_date__lte=summary.date).exists()
+    if summary.station.stationlayout_set.filter(active_date__lte=summary.date).exists():
         tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
         update_azimuth_histogram(summary)
         update_zenith_histogram(summary)

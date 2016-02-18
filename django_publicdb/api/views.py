@@ -739,8 +739,8 @@ def num_events(request, station_number, year=None, month=None, day=None,
     else:
         try:
             date = datetime.date(int(year), int(month), int(day))
-            histogram = histograms.get(source__date=date)
-            num_events = histogram.values[int(hour)]
+            histogram_values = histograms.get(source__date=date).values
+            num_events = histogram_values[int(hour)]
         except DailyHistogram.DoesNotExist:
             num_events = 0
 
