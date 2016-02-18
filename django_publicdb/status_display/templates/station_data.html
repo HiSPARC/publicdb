@@ -134,7 +134,7 @@
             </div>
             <div class="plot" id="az_histogram"></div>
             <script>
-                pi_labels = {yaxis: {axisLabel: "{{ azimuthhistogram.y_label }}"},
+                az_labels = {yaxis: {axisLabel: "{{ azimuthhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ azimuthhistogram.x_label }}"}}
                 $.extend(true, az_options, az_labels)
                 $.plot($("#az_histogram"), [
@@ -155,7 +155,7 @@
             </div>
             <div class="plot" id="ze_histogram"></div>
             <script>
-                pi_labels = {yaxis: {axisLabel: "{{ zenithhistogram.y_label }}"},
+                ze_labels = {yaxis: {axisLabel: "{{ zenithhistogram.y_label }}"},
                              xaxis: {axisLabel: "{{ zenithhistogram.x_label }}"}}
                 $.extend(true, ze_options, ze_labels)
                 $.plot($("#ze_histogram"), [
