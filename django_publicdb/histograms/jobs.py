@@ -510,7 +510,7 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
     zeniths = esd.get_zeniths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(0, 91, 4)
+    bins = range(0, 91, 3)
 
     hist = np.histogram(zeniths, bins=bins)
     hist = hist[0].tolist()
