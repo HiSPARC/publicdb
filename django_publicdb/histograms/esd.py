@@ -122,7 +122,7 @@ def reconstruct_events_and_store_temporary_esd(summary):
     date = summary.date
     station = summary.station
 
-    filepath = datastore.get_data_path(date)
+    filepath = get_esd_data_path(date)
     source_path = get_station_node_path(station)
     with tables.open_file(filepath, 'r') as source_file:
         tmp_filename = create_temporary_file()
