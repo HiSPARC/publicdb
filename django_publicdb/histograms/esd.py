@@ -128,7 +128,8 @@ def reconstruct_events_and_store_temporary_esd(summary):
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             reconstruct = ReconstructESDEventsFromSource(
-                source_file, tmp_file, source_path, '/', station.number)
+                source_file, tmp_file, source_path, '/', station.number,
+                progress=False)
             reconstruct.reconstruct_and_store()
             node_path = reconstruct.reconstructions._v_pathname
     return tmp_filename, node_path
