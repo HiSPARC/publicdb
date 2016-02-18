@@ -340,8 +340,8 @@ def perform_events_tasks(summary):
     update_detector_timing_offsets(summary)
     if summary.station.stationlayout_set.filter(active_date__lte=summary.date).exists():
         tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
-        update_azimuth_histogram(summary)
-        update_zenith_histogram(summary)
+        update_azimuth_histogram(summary, *tmp_location)
+        update_zenith_histogram(summary, *tmp_location)
     else:
         tmp_location = []
     return summary, tmp_location
