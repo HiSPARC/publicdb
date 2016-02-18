@@ -11,7 +11,7 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
-                      HiSPARCStations, ReconstructESDEventsFromSource)
+                      ReconstructESDEventsFromSource)
 
 from ..inforecords.models import Station
 from . import datastore

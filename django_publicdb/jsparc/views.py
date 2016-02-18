@@ -8,7 +8,7 @@ from random import randint
 import numpy as np
 import operator
 
-from ..histograms.models import Configuration, Summary
+from ..histograms.models import Configuration
 from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
                                        Student)
 
