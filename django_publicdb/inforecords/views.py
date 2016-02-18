@@ -68,20 +68,19 @@ def create_nagios_config(request):
 
                 # The following code will check four variables to see if
                 # they exist in the EnabledService instance 'service'.  If
-                # they do, assign the value locally using an exec
-                # statement.  If they don't, assign a value taken from the
-                # MonitorService model associated with the instance.
+                # they do, assign the value locally.  If they don't,
+                # assign a value taken from the MonitorService model
+                # associated with the instance.
+                vars = []
                 for var in ('min_critical', 'max_critical', 'min_warning',
                             'max_warning'):
-                    if eval('service.%s' % var):
-                        exec('%s = service.%s' % (var, var))
+                    if getattr(service, var) is not None:
+                        vars.append(getattr(service, var))
                     else:
-                        exec('%s = service.monitor_service.%s' % (var, var))
+                        vars.append(getattr(service.monitor_service, var))
 
                 # Append the parameters to the check command
-                check_command += ('!%s:%s!%s:%s' %
-                                  (min_warning, max_warning, min_critical,
-                                   max_critical))
+                check_command += ('!%s:%s!%s:%s' % vars)
 
             # Append this service to the hosts service list
             services.append(
