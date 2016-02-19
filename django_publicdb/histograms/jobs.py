@@ -17,6 +17,7 @@ from .models import (GeneratorState, NetworkSummary, Summary,
                      DailyHistogram, NetworkHistogram, DailyDataset,
                      PulseheightFit, DetectorTimingOffset)
 from ..inforecords.models import Station
+from ..station_layout.models import StationLayout
 import datastore
 import esd
 
@@ -338,12 +339,19 @@ def perform_events_tasks(summary):
     update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
-    if summary.station.stationlayout_set.filter(active_date__lte=summary.date).exists():
-        tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
-        update_azimuth_histogram(summary, *tmp_location)
-        update_zenith_histogram(summary, *tmp_location)
-    else:
+    try:
+        layout = summary.station.stationlayout_set.filter(active_date__lte=summary.date).earliest()
+    except StationLayout.DoesNotExist:
+        logger.debug("No station layout available for %s" % summary)
         tmp_location = []
+    else:
+        if layout.detector_3_radius is not None:
+            tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
+            update_azimuth_histogram(summary, *tmp_location)
+            update_zenith_histogram(summary, *tmp_location)
+        else:
+            logger.debug("No reconstructions for 2-detector station %s" % summary)
+            tmp_location = []
     return summary, tmp_location
 
 
