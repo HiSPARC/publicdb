@@ -37,7 +37,7 @@ class StationLayout(models.Model):
     def save(self, *args, **kwargs):
         super(StationLayout, self).save(*args, **kwargs)
         try:
-            next_layout = StationLayout.object.filter(
+            next_layout = StationLayout.objects.filter(
                 station=self.station, active_date__gt=self.active_date).earliest()
             next_date = next_layout.active_date
         except StationLayout.DoesNotExist:
