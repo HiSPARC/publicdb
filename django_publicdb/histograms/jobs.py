@@ -340,7 +340,8 @@ def perform_events_tasks(summary):
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
     try:
-        layout = summary.station.stationlayout_set.filter(active_date__lte=summary.date).earliest()
+        layout = summary.station.stationlayout_set.filter(
+            active_date__lte=summary.date).latest()
     except StationLayout.DoesNotExist:
         logger.debug("No station layout available for %s" % summary)
         tmp_location = []
