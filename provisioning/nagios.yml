@@ -70,6 +70,6 @@
     service: name=nrpe enabled=yes state=started
     sudo: yes
 
-  - name: ensure nsca is started
-    service: name=nsca enabled=yes state=started
+  - name: ensure nsca is stopped
+    service: name=nsca enabled=no state=stopped
     sudo: yes

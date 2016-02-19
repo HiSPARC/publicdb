@@ -32,7 +32,7 @@
 - name: restart nagios
   service: name=nagios state=restarted
   sudo: yes
-  notify: restart nsca
+  # notify: restart nsca
 
 - name: restart nsca
   service: name=nsca state=restarted
