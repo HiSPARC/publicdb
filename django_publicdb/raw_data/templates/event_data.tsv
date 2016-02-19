@@ -18,10 +18,12 @@
 # number_of_mips (4x): estimate for the number of particles in the detector
 # arrival_times (4x):  relative time of arrival of the first particle in the detector [ns]
 # trigger_time:        relative time of the trigger timestamp [ns]
+# azimuth:             reconstructed shower axis azimuth angle [deg]
+# zenith:              reconstructed shower axis zenith angle [deg]
 #
 # Values of -1 for detectors 3 and 4 indicate that the station only has
 # two detectors.  Values of -999 indicate a problem in the analysis of
 # that particular event.  This may be the result from noise in the
-# signal.
+# signal or not enough data for reconstruction.
 #
 #

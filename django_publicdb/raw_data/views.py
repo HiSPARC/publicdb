@@ -13,6 +13,7 @@ import tempfile
 import csv
 import calendar
 import urllib
+from math import degrees, isnan
 
 import dateutil.parser
 
@@ -262,7 +263,7 @@ def generate_events_as_tsv(station, start, end):
     events_returned = False
 
     events = get_events_from_esd_in_range(station, start, end)
-    for event in events:
+    for event, reconstruction in events:
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
         row = [dt.date(), dt.time(),
                event['timestamp'],
@@ -283,7 +284,9 @@ def generate_events_as_tsv(station, start, end):
                clean_floats(event['t2']),
                clean_floats(event['t3']),
                clean_floats(event['t4']),
-               clean_floats(event['t_trigger'])]
+               clean_floats(event['t_trigger']),
+               clean_angles(reconstruction['azimuth']),
+               clean_angles(reconstruction['zenith'])]
         writer.writerow(row)
         yield line_buffer.line
         events_returned = True
@@ -311,9 +314,13 @@ def get_events_from_esd_in_range(station, start, end):
                 station_node = esd.get_station_node(f, station)
                 ts0 = calendar.timegm(t0.utctimetuple())
                 ts1 = calendar.timegm(t1.utctimetuple())
+                try:
+                    reconstructions = station_node.reconstructions
+                except tables.NoSuchNodeError:
+                    reconstructions = FakeReconstructionsTable()
                 for event in station_node.events.where(
                         '(ts0 <= timestamp) & (timestamp < ts1)'):
-                    yield event
+                    yield event, reconstructions[event['event_id']]
         except (IOError, tables.NoSuchNodeError):
             continue
 
@@ -656,6 +663,20 @@ def clean_floats(number, precision=4):
         return round(number, precision)
 
 
+def clean_angles(angle):
+    """Convert radians to degrees, but only if not -999.
+
+    :param angle: a single angle in randians.
+    :return: the angle converted to integer degrees, unless the angle was
+        -999 or nan.
+
+    """
+    if isnan(angle) or int(angle) == -999:
+        return -999
+    else:
+        return int(degrees(angle))
+
+
 def prettyprint_timerange(t0, t1):
     """Pretty print a time range."""
 
@@ -679,3 +700,13 @@ def get_lightning_path(date):
     name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon,
                                               date.tm_mday))
     return name
+
+
+class FakeReconstructionsTable(object):
+
+    """Used as standin for a missing reconstruction table"""
+
+    no_reconstructions = {'azimuth': -999, 'zenith': -999}
+
+    def __getitem__(self, key):
+        return self.no_reconstructions
