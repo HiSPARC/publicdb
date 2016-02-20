@@ -717,30 +717,32 @@ def num_events(request, station_number, year=None, month=None, day=None,
         return HttpResponseNotFound()
 
     histogram_type = HistogramType.objects.get(slug='eventtime')
-
-    histograms = DailyHistogram.objects.filter(source__station=station,
-                                               type=histogram_type)
+    filters = {'type': histogram_type, 'source__station': station}
 
     if not year:
+        # All events
         date = datetime.date.today()
-        start = FIRSTDATE
-        histograms = histograms.filter(source__date__gte=start,
-                                       source__date__lt=date)
+        filters['source__date__gte'] = FIRSTDATE
+        filters['source__date__lt'] = date
     elif not month:
+        # Events in specific year
         date = datetime.date(int(year), 1, 1)
-        histograms = histograms.filter(source__date__year=date.year)
+        filters['source__date__year'] = date.year
     elif not day:
+        # Events in specific month
         date = datetime.date(int(year), int(month), 1)
-        histograms = histograms.filter(source__date__year=date.year,
-                                       source__date__month=date.month)
+        filters['source__date__year'] = date.year
+        filters['source__date__month'] = date.month
     elif not hour:
+        # Events on specific day
         date = datetime.date(int(year), int(month), int(day))
-        histograms = histograms.filter(source__date=date)
+        filters['source__date'] = date
     else:
         try:
             date = datetime.date(int(year), int(month), int(day))
-            histogram = histograms.get(source__date=date)
-            num_events = histogram.values[int(hour)]
+            histogram_values = DailyHistogram.objects.get(source__date=date,
+                                                          **filters).values
+            num_events = histogram_values[int(hour)]
         except DailyHistogram.DoesNotExist:
             num_events = 0
 
@@ -748,6 +750,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
         return HttpResponseNotFound()
 
     if not hour:
+        histograms = DailyHistogram.objects.filter(**filters)
         num_events = sum([sum(histogram.values) for histogram in histograms])
 
     return json_dict(num_events)
