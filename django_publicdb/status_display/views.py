@@ -22,7 +22,7 @@ from ..raw_data.date_generator import daterange
 from .nagios import status_lists, get_status_counts, get_station_status
 
 
-FIRSTDATE = datetime.date(2002, 1, 1)
+FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
 
 

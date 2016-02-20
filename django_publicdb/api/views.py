@@ -16,7 +16,7 @@ from ..station_layout.models import StationLayout
 import datastore
 
 
-FIRSTDATE = datetime.date(2002, 1, 1)
+FIRSTDATE = datetime.date(2004, 1, 1)
 
 
 class Nagios:
