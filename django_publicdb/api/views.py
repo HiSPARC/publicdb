@@ -199,31 +199,31 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
              station that has measured weather data in the given year.
 
     """
-    stations = Station.objects.filter(pc__is_test=False)
+    filters = {'pc__is_test': False}
 
     if type == 'events':
-        stations = stations.filter(summary__num_events__isnull=False)
+        filters['summary__num_events__isnull'] = False
     elif type == 'weather':
-        stations = stations.filter(summary__num_weather__isnull=False)
+        filters['summary__num_weather__isnull'] = False
     else:
         return HttpResponseNotFound()
 
     if not year:
         date = datetime.date.today()
-        stations = stations.filter(summary__date__gte=FIRSTDATE,
-                                   summary__date__lte=date)
+        filters['summary__date__gte'] = FIRSTDATE
+        filters['summary__date__lte'] = date
     elif not month:
         date = datetime.date(int(year), 1, 1)
-        stations = stations.filter(summary__date__year=date.year)
+        filters['summary__date__year'] = date.year
     elif not day:
         date = datetime.date(int(year), int(month), 1)
-        stations = stations.filter(summary__date__year=date.year,
-                                   summary__date__month=date.month)
+        filters['summary__date__year'] = date.year
+        filters['summary__date__month'] = date.month
     else:
         date = datetime.date(int(year), int(month), int(day))
-        stations = stations.filter(summary__date=date)
+        filters['summary__date'] = date
 
-    stations = stations.distinct()
+    stations = Station.objects.filter(**filters).distinct()
 
     if not validate_date(date):
         return HttpResponseNotFound()
