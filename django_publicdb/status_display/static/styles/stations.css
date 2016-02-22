@@ -96,10 +96,10 @@ h1 a:hover {
 .problem {background-color: rgba(255, 215, 0, .5);}
 .problem:hover {background-color: rgba(255, 215, 0, .9);}
 
-.up {background-color: rgba(0, 128, 0, .3);}
-.up:hover {background-color: rgba(0, 128, 0, .8);}
+.up {background-color: rgba(0, 180, 0, .3);}
+.up:hover {background-color: rgba(0, 180, 0, .8);}
 
-.unknown {background-color: rgba(128, 128, 128, .3);}
+.unknown {background-color: rgba(180, 180, 180, .3);}
 .unknown:hover {background-color: rgba(128, 128, 128, .8);}
 
 

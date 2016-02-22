@@ -97,7 +97,7 @@ class CoincidenceDownloadForm(forms.Form):
             else:
                 try:
                     s_numbers = [int(x)
-                                 for x in stations.strip('[]').split(',')]
+                                 for x in stations.strip('[]()').split(',')]
                 except:
                     msg = u'Incorrect station entry.'
                 else:
