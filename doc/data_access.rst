@@ -95,10 +95,11 @@ Now use numpy to convert the data from csv to a numpy array.
                   ('n3', 'float32'), ('n4', 'float32'),
                   ('t1', 'float32'), ('t2', 'float32'),
                   ('t3', 'float32'), ('t4', 'float32'),
-                  ('t_trigger', 'float32')]
+                  ('t_trigger', 'float32'),
+                  ('azimuth', 'int16'), ('zenith', 'int16')]
     >>> a = genfromtxt(StringIO(data), delimiter="\t", dtype=format)
     >>> print a[0]
     (datetime.date(2013, 7, 2), '11:00:02', 1372762802L, 466307811L,
      [78, 798, -1, -1], [535, 10882, -1, -1],
      0.14720000326633453, 3.854599952697754, -1.0, -1.0,
-     345.0, 12.5, -1.0, -1.0, 345.0)
+     345.0, 12.5, -1.0, -1.0, 345.0, -999, -999)
