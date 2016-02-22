@@ -594,7 +594,8 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
                clean_floats(event['t2']),
                clean_floats(event['t3']),
                clean_floats(event['t4']),
-               clean_floats(event['t_trigger'])]
+               clean_floats(event['t_trigger']),
+               -999, -999]
         writer.writerow(row)
         yield line_buffer.line
         coincidences_returned = True
