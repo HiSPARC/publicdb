@@ -17,6 +17,7 @@ from .models import (GeneratorState, NetworkSummary, Summary,
                      DailyHistogram, NetworkHistogram, DailyDataset,
                      PulseheightFit, DetectorTimingOffset)
 from ..inforecords.models import Station
+from ..station_layout.models import StationLayout
 import datastore
 import esd
 
@@ -279,13 +280,13 @@ def search_and_store_coincidences(network_summary):
 def update_histograms():
     """Update new configs, histograms and datasets"""
 
-    perform_tasks_manager("Summary", "needs_update_config",
+    perform_tasks_manager(Summary, "needs_update_config",
                           perform_config_tasks)
-    perform_tasks_manager("Summary", "needs_update_events",
+    perform_tasks_manager(Summary, "needs_update_events",
                           perform_events_tasks)
-    perform_tasks_manager("Summary", "needs_update_weather",
+    perform_tasks_manager(Summary, "needs_update_weather",
                           perform_weather_tasks)
-    perform_tasks_manager("NetworkSummary", "needs_update_coincidences",
+    perform_tasks_manager(NetworkSummary, "needs_update_coincidences",
                           perform_coincidences_tasks)
 
 
@@ -295,23 +296,37 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     Depending on the USE_MULTIPROCESSING flag, the manager either does the
     tasks himself or he grabs some workers and let them do it.
 
+    :param model: the summary model to query
+    :param needs_update_item: the flag which has to be true for summaries to
+        be processed.
+    :param perform_certain_tasks: the function which performs the tasks
+        required for the given flag.
+
     """
-    summaries = eval("%s.objects.filter(%s=True, needs_update=False).reverse()"
-                     % (model, needs_update_item))
+    summaries = model.objects.filter(**{needs_update_item: True,
+                                        'needs_update': False}).reverse()
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
         results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
-        for summary in results:
-            exec "summary.%s=False" % needs_update_item
+        for summary, tmp_location in results:
+            if tmp_location:
+                tmpfile_path, node_path = tmp_location
+                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                                   node_path)
+            setattr(summary, needs_update_item, False)
             django.db.close_old_connections()
             summary.save()
         worker_pool.close()
         worker_pool.join()
     else:
         for summary in summaries:
-            perform_certain_tasks(summary)
-            exec "summary.%s=False" % needs_update_item
+            summary, tmp_location = perform_certain_tasks(summary)
+            if tmp_location:
+                tmpfile_path, node_path = tmp_location
+                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
+                                                   node_path)
+            setattr(summary, needs_update_item, False)
             django.db.close_old_connections()
             summary.save()
 
@@ -324,7 +339,21 @@ def perform_events_tasks(summary):
     update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
-    return summary
+    try:
+        layout = summary.station.stationlayout_set.filter(
+            active_date__lte=summary.date).latest()
+    except StationLayout.DoesNotExist:
+        logger.debug("No station layout available for %s" % summary)
+        tmp_location = []
+    else:
+        if layout.detector_3_radius is not None:
+            tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
+            update_zenith_histogram(summary, *tmp_location)
+            update_azimuth_histogram(summary, *tmp_location)
+        else:
+            logger.debug("No reconstructions for 2-detector station %s" % summary)
+            tmp_location = []
+    return summary, tmp_location
 
 
 def perform_config_tasks(summary):
@@ -332,7 +361,7 @@ def perform_config_tasks(summary):
     logger.info("Updating configuration messages for %s" % summary)
     num_config = update_config(summary)
     summary.num_config = num_config
-    return summary
+    return summary, []
 
 
 def perform_weather_tasks(summary):
@@ -340,7 +369,7 @@ def perform_weather_tasks(summary):
     logger.info("Updating weather datasets for %s" % summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
-    return summary
+    return summary, []
 
 
 def perform_coincidences_tasks(network_summary):
@@ -348,7 +377,7 @@ def perform_coincidences_tasks(network_summary):
     logger.info("Updating coincidence histograms for %s" % network_summary)
     update_coincidencetime_histogram(network_summary)
     update_coincidencenumber_histogram(network_summary)
-    return network_summary
+    return network_summary, []
 
 
 def search_coincidences_and_store_esd(network_summary):
@@ -465,8 +494,36 @@ def update_detector_timing_offsets(summary):
     """Determine detector timing offsets"""
 
     logger.debug("Determining detector timing offsets for %s" % summary)
-    offsets = esd.determine_detector_timing_offsets(summary)
+    offsets = esd.determine_detector_timing_offsets_for_summary(summary)
     save_offsets(summary, offsets)
+
+
+def update_zenith_histogram(summary, tempfile_path, node_path):
+    """Histogram of the reconstructed azimuth"""
+
+    logger.debug("Updating zenith histogram for %s" % summary)
+    zeniths = esd.get_zeniths(tempfile_path, node_path)
+
+    # create bins, don't forget right-most edge
+    bins = range(0, 91, 3)
+
+    hist = np.histogram(zeniths, bins=bins)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'zenith', bins, hist)
+
+
+def update_azimuth_histogram(summary, tempfile_path, node_path):
+    """Histogram of the reconstructed azimuth"""
+
+    logger.debug("Updating azimuth histogram for %s" % summary)
+    azimuths = esd.get_azimuths(tempfile_path, node_path)
+
+    # create bins, don't forget right-most edge
+    bins = range(-180, 181, 12)
+
+    hist = np.histogram(azimuths, bins=bins)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'azimuth', bins, hist)
 
 
 def update_temperature_dataset(summary):

@@ -2,9 +2,11 @@ from django.db import models
 from django.core.mail import send_mail
 
 import os
+from datetime import date
 from textwrap import dedent
 
 from ..inforecords.models import Station
+from ..histograms.models import Summary
 
 
 class StationLayout(models.Model):
@@ -31,6 +33,24 @@ class StationLayout(models.Model):
         unique_together = [('station', 'active_date')]
         ordering = ('station', 'active_date')
         get_latest_by = 'active_date'
+
+    def save(self, *args, **kwargs):
+        super(StationLayout, self).save(*args, **kwargs)
+        try:
+            next_layout = StationLayout.objects.filter(
+                station=self.station, active_date__gt=self.active_date).earliest()
+            next_date = next_layout.active_date
+        except StationLayout.DoesNotExist:
+            next_date = date.today()
+        if self.detector_3_radius is not None:
+            # Only for 4 detector stations
+            summaries = Summary.objects.filter(station=self.station,
+                                               date__gte=self.active_date,
+                                               date__lt=next_date)
+            for summary in summaries:
+                if summary.num_events:
+                    summary.needs_update_events = True
+                    summary.save()
 
 
 class StationLayoutQuarantine(models.Model):

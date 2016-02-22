@@ -59,7 +59,7 @@ def reload_nagios():
 
     print "Signalling reload of nagios"
 
-    with open(FLAG, 'a') as file:
+    with open(FLAG, 'a'):
         pass
     return True
 

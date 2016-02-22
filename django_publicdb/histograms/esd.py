@@ -8,8 +8,10 @@ from operator import itemgetter
 import numpy as np
 import tables
 
-from sapphire.analysis import process_events, coincidences, calibration
-from sapphire import clusters
+from sapphire import (determine_detector_timing_offsets,
+                      ProcessEventsFromSourceWithTriggerOffset,
+                      ProcessWeatherFromSource, CoincidencesESD,
+                      ReconstructESDEventsFromSource)
 
 from ..inforecords.models import Station
 from . import datastore
@@ -49,9 +51,8 @@ def search_coincidences_and_store_in_esd(network_summary):
 
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
-        coinc = coincidences.CoincidencesESD(data, '/coincidences',
-                                             station_groups, overwrite=True,
-                                             progress=False)
+        coinc = CoincidencesESD(data, '/coincidences', station_groups,
+                                overwrite=True, progress=False)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
         coinc.store_coincidences(station_numbers=station_numbers)
         num_coincidences = len(coinc.coincidences)
@@ -77,9 +78,8 @@ def process_events_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process = \
-                process_events.ProcessEventsFromSourceWithTriggerOffset(
-                    source_file, tmp_file, source_node, '/', station.number)
+            process = ProcessEventsFromSourceWithTriggerOffset(
+                source_file, tmp_file, source_node, '/', station.number)
             process.process_and_store_results()
             node_path = process.destination._v_pathname
     return tmp_filename, node_path
@@ -102,10 +102,36 @@ def process_weather_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process = process_events.ProcessWeatherFromSource(
-                source_file, tmp_file, source_node, '/')
+            process = ProcessWeatherFromSource(source_file, tmp_file,
+                                               source_node, '/')
             process.process_and_store_results()
             node_path = process.source._v_pathname
+    return tmp_filename, node_path
+
+
+def reconstruct_events_and_store_temporary_esd(summary):
+    """Reconstruct events from datastore and save temporary Event Summary Data
+
+    Events from the ESD are reconstructed and stored in a temporary
+    file.  The temporary file path and node path are returned.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+    station = summary.station
+
+    filepath = get_esd_data_path(date)
+    source_path = get_station_node_path(station)
+    with tables.open_file(filepath, 'r') as source_file:
+        tmp_filename = create_temporary_file()
+        with tables.open_file(tmp_filename, 'w') as tmp_file:
+            reconstruct = ReconstructESDEventsFromSource(
+                source_file, tmp_file, source_path, '/', station.number,
+                progress=False)
+            reconstruct.reconstruct_and_store()
+            node_path = reconstruct.reconstructions._v_pathname
     return tmp_filename, node_path
 
 
@@ -300,7 +326,7 @@ def get_integrals(summary):
         return integrals.T
 
 
-def determine_detector_timing_offsets(summary):
+def determine_detector_timing_offsets_for_summary(summary):
     """Get all detector timing offsets
 
     :param summary: summary of data source (station and date)
@@ -319,9 +345,27 @@ def determine_detector_timing_offsets(summary):
             logger.error("Cannot find table events for %s", summary)
             offsets = [np.nan, np.nan, np.nan, np.nan]
         else:
-            offsets = calibration.determine_detector_timing_offsets(table)
+            offsets = determine_detector_timing_offsets(table)
 
     return offsets
+
+
+def get_zeniths(tmpfile_path, node_path):
+    """Get all reconstructed zeniths
+
+    Read data from file and return a list of zeniths.
+
+    """
+    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'zenith'))
+
+
+def get_azimuths(tmpfile_path, node_path):
+    """Get all reconstructed azimuths
+
+    Read data from file and return a list of azimuths.
+
+    """
+    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'azimuth'))
 
 
 def get_temperature(summary):
@@ -444,4 +488,18 @@ def get_time_series(summary, tablename, quantity):
             data = zip(col1, col2)
             data.sort(key=itemgetter(0))
 
+    return data
+
+
+def get_data_from_path(file_path, node_path, quantity):
+    """Get reconstructed data
+
+    Read data from file and return a list of values.
+    Only return not-nan values.
+
+    """
+    with tables.open_file(file_path, 'r') as data:
+        node = data.get_node(node_path)
+        data = node.col(quantity)
+    data = data[~np.isnan(data)]
     return data

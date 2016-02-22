@@ -41,7 +41,9 @@
     height: 130px;}
 
 #ph_histogram,
-#pi_histogram {
+#pi_histogram,
+#az_histogram,
+#ze_histogram {
     height: 300px;}
 
 #tr_graph_at,

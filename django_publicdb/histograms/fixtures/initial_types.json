@@ -60,6 +60,30 @@
     }
 },
 {
+    "pk": 6,
+    "model": "histograms.histogramtype",
+    "fields": {
+        "value_axis_title": "Number of reconstructed events",
+        "description": "This histogram will show you the distribution of reconstructed azimuth angles for a given day.",
+        "bin_axis_title": "Azimuth angle (\u00b0)",
+        "has_multiple_datasets": false,
+        "slug": "azimuth",
+        "name": "Azimuth angle distribution histogram"
+    }
+},
+{
+    "pk": 7,
+    "model": "histograms.histogramtype",
+    "fields": {
+        "value_axis_title": "Number of reconstructed events",
+        "description": "This histogram will show you the distribution of reconstructed zenith angles for a given day.",
+        "bin_axis_title": "Zenith angle (\u00b0)",
+        "has_multiple_datasets": false,
+        "slug": "zenith",
+        "name": "Zenith angle distribution histogram"
+    }
+},
+{
     "pk": 1,
     "model": "histograms.datasettype",
     "fields": {

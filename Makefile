@@ -1,4 +1,4 @@
-.PHONY: gh-pages
+.PHONY: gh-pages test
 
 gh-pages:
 ifeq ($(strip $(shell git status --porcelain | wc -l)), 0)
@@ -18,3 +18,6 @@ ifeq ($(strip $(shell git status --porcelain | wc -l)), 0)
 else
 	$(error Working tree is not clean, please commit all changes.)
 endif
+
+test:
+	flake8 --ignore=F841,E128,E501 --exclude=*tests.py,*migrations/ django_publicdb/

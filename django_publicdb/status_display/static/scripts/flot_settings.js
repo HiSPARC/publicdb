@@ -129,6 +129,28 @@ var _pulseintegralhistogram = {
         axisLabel: 'Pulseintegral (mVns)'}
 };
 
+var _zenithhistogram = {
+    yaxis: {
+        axisLabel: 'Number of reconstructed events',
+        min: 0},
+    xaxis: {
+        axisLabel: 'Zenith angle (°)',
+        ticks: [0, 15, 30, 45, 60, 75, 90],
+        min: 0,
+        max: 90}
+};
+
+var _azimuthhistogram = {
+    yaxis: {
+        axisLabel: 'Number of reconstructed events',
+        min: 0},
+    xaxis: {
+        axisLabel: 'Azimuth angle (°)',
+        ticks: [-180, -135, -90, -45, 0, 45, 90, 135, 180],
+        min: -180,
+        max: 180}
+};
+
 var _temperaturedata = {
     series: {
         lines: {
@@ -224,6 +246,8 @@ var cn_options = $.extend(true, {}, _base, _coincidencenumberhistogram);
 var eh_options = $.extend(true, {}, _base, _eventhistogram);
 var ph_options = $.extend(true, {}, _base, _pulseheighthistogram);
 var pi_options = $.extend(true, {}, _base, _pulseintegralhistogram);
+var ze_options = $.extend(true, {}, _base, _zenithhistogram);
+var az_options = $.extend(true, {}, _base, _azimuthhistogram);
 var td_options = $.extend(true, {}, _base, _temperaturedata);
 var bd_options = $.extend(true, {}, _base, _barometerdata);
 var vg_options = $.extend(true, {}, _base, _voltagegraph);

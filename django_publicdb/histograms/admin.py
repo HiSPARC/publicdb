@@ -42,9 +42,10 @@ class NetworkHistogramInline(admin.StackedInline):
 class NetworkSummaryAdmin(admin.ModelAdmin):
     list_display = ('date', 'needs_update', 'needs_update_coincidences',
                     'num_coincidences',)
-    list_filter = ('needs_update_coincidences', 'date')
+    list_filter = ('needs_update', 'needs_update_coincidences', 'date')
     list_editable = ('needs_update', 'needs_update_coincidences')
     inlines = (NetworkHistogramInline,)
+    list_per_page = 200
 
 
 class SummaryAdmin(admin.ModelAdmin):
@@ -52,10 +53,12 @@ class SummaryAdmin(admin.ModelAdmin):
                     'needs_update_events', 'needs_update_config',
                     'needs_update_errors', 'needs_update_weather',
                     'num_events', 'num_config', 'num_errors', 'num_weather')
-    list_filter = ('station', 'needs_update', 'date')
+    list_filter = ('station', 'needs_update', 'needs_update_events',
+                   'needs_update_weather', 'needs_update_config', 'date')
     list_editable = ('needs_update', 'needs_update_events',
                      'needs_update_weather', 'needs_update_config')
     inlines = (DailyHistogramInline,)
+    list_per_page = 200
 
 
 class ConfigurationAdmin(admin.ModelAdmin):
