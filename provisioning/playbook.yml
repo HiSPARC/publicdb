@@ -18,8 +18,15 @@
   tasks:
     - include: fake_datastore.yml
 
+- hosts: tietar.nikhef.nl
+  tasks:
+    - include: network-tietar.yml
+  handlers:
+    - include: handlers.yml
+
 - hosts: vpn:tietar.nikhef.nl
   tasks:
+    - include: mitigate-dos.yml
     - include: postfix.yml
     - include: shorewall-firewall.yml
     - include: openvpn.yml

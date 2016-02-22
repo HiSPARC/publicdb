@@ -1,6 +1,10 @@
 ---
   - name: install nagios, apache
-    yum: name=nagios,nagios-plugins-all,nagios-plugins-nrpe,nrpe,nsca,httpd
+    yum: name=nagios,nagios-plugins-all,nagios-plugins-nrpe,nrpe,httpd
+    sudo: yes
+
+  - name: install older nsca 2.6.2
+    yum: name=http://pkgs.repoforge.org/nagios-nsca/nagios-nsca-2.6-2.el5.rf.x86_64.rpm
     sudo: yes
 
   - name: copy apache nagios config
