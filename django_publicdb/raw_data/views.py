@@ -285,8 +285,8 @@ def generate_events_as_tsv(station, start, end):
                clean_floats(event['t3']),
                clean_floats(event['t4']),
                clean_floats(event['t_trigger']),
-               clean_angles(reconstruction['azimuth']),
-               clean_angles(reconstruction['zenith'])]
+               clean_angles(reconstruction['zenith']),
+               clean_angles(reconstruction['azimuth'])]
         writer.writerow(row)
         yield line_buffer.line
         events_returned = True
@@ -706,7 +706,7 @@ class FakeReconstructionsTable(object):
 
     """Used as standin for a missing reconstruction table"""
 
-    no_reconstructions = {'azimuth': -999, 'zenith': -999}
+    no_reconstructions = {'zenith': -999, 'azimuth': -999}
 
     def __getitem__(self, key):
         return self.no_reconstructions

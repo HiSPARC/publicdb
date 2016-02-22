@@ -125,27 +125,6 @@
         </div>
       {% endif %}
 
-      {% if azimuthhistogram %}
-        <div id="azimuthHistogram" class="histogram">
-            <h3>Azimuth histogram</h3>
-            <div class="sourceLink">
-                <a onclick="downloadGraph('#az_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_azimuth_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
-            </div>
-            <div class="plot" id="az_histogram"></div>
-            <script>
-                az_labels = {yaxis: {axisLabel: "{{ azimuthhistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ azimuthhistogram.x_label }}"}}
-                $.extend(true, az_options, az_labels)
-                $.plot($("#az_histogram"), [
-                  {% for data in azimuthhistogram.data %}
-                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
-                  {% endfor %}
-                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], az_options);
-            </script>
-        </div>
-      {% endif %}
-
       {% if zenithhistogram %}
         <div id="zenithHistogram" class="histogram">
             <h3>Zenith histogram</h3>
@@ -163,6 +142,27 @@
                     {data: {{ data|fix_histogram_data }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ze_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if azimuthhistogram %}
+        <div id="azimuthHistogram" class="histogram">
+            <h3>Azimuth histogram</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#az_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_azimuth_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="az_histogram"></div>
+            <script>
+                az_labels = {yaxis: {axisLabel: "{{ azimuthhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ azimuthhistogram.x_label }}"}}
+                $.extend(true, az_options, az_labels)
+                $.plot($("#az_histogram"), [
+                  {% for data in azimuthhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], az_options);
             </script>
         </div>
       {% endif %}

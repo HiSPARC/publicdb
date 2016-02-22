@@ -350,15 +350,6 @@ def determine_detector_timing_offsets_for_summary(summary):
     return offsets
 
 
-def get_azimuths(tmpfile_path, node_path):
-    """Get all reconstructed azimuths
-
-    Read data from file and return a list of azimuths.
-
-    """
-    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'azimuth'))
-
-
 def get_zeniths(tmpfile_path, node_path):
     """Get all reconstructed zeniths
 
@@ -366,6 +357,15 @@ def get_zeniths(tmpfile_path, node_path):
 
     """
     return np.degrees(get_data_from_path(tmpfile_path, node_path, 'zenith'))
+
+
+def get_azimuths(tmpfile_path, node_path):
+    """Get all reconstructed azimuths
+
+    Read data from file and return a list of azimuths.
+
+    """
+    return np.degrees(get_data_from_path(tmpfile_path, node_path, 'azimuth'))
 
 
 def get_temperature(summary):
@@ -492,7 +492,7 @@ def get_time_series(summary, tablename, quantity):
 
 
 def get_data_from_path(file_path, node_path, quantity):
-    """Get all reconstructed zeniths
+    """Get reconstructed data
 
     Read data from file and return a list of values.
     Only return not-nan values.

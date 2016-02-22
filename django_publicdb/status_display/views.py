@@ -334,8 +334,8 @@ def station_data(request, station_number, year, month, day):
     eventhistogram = create_histogram('eventtime', station, date)
     pulseheighthistogram = create_histogram('pulseheight', station, date)
     pulseintegralhistogram = create_histogram('pulseintegral', station, date)
-    azimuthhistogram = create_histogram('azimuth', station, date)
     zenithhistogram = create_histogram('zenith', station, date)
+    azimuthhistogram = create_histogram('azimuth', station, date)
     barometerdata = plot_dataset('barometer', station, date)
     temperaturedata = plot_dataset('temperature', station, date)
 
@@ -348,8 +348,8 @@ def station_data(request, station_number, year, month, day):
                    'eventhistogram': eventhistogram,
                    'pulseheighthistogram': pulseheighthistogram,
                    'pulseintegralhistogram': pulseintegralhistogram,
-                   'azimuthhistogram': azimuthhistogram,
                    'zenithhistogram': zenithhistogram,
+                   'azimuthhistogram': azimuthhistogram,
                    'barometerdata': barometerdata,
                    'temperaturedata': temperaturedata,
                    'thismonth': thismonth,
@@ -640,19 +640,6 @@ def get_pulseintegral_histogram_source(request, station_number, year, month,
     return response
 
 
-def get_azimuth_histogram_source(request, station_number, year, month, day):
-    data = get_histogram_source(year, month, day, 'azimuth', station_number)
-    response = render(request, 'source_azimuth_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=azimuth-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
-
-
 def get_zenith_histogram_source(request, station_number, year, month, day):
     data = get_histogram_source(year, month, day, 'zenith', station_number)
     response = render(request, 'source_zenith_histogram.tsv',
@@ -662,6 +649,19 @@ def get_zenith_histogram_source(request, station_number, year, month, day):
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=zenith-s%s-%d%02d%02d.tsv' %
+        (station_number, int(year), int(month), int(day)))
+    return response
+
+
+def get_azimuth_histogram_source(request, station_number, year, month, day):
+    data = get_histogram_source(year, month, day, 'azimuth', station_number)
+    response = render(request, 'source_azimuth_histogram.tsv',
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type=MIME_TSV)
+    response['Content-Disposition'] = (
+        'attachment; filename=azimuth-s%s-%d%02d%02d.tsv' %
         (station_number, int(year), int(month), int(day)))
     return response
 
@@ -793,7 +793,7 @@ def get_histogram_source(year, month, day, type, station_number=None):
                                       source__station__number=station_number,
                                       source__date=date,
                                       type__slug=type)
-    if type in ['eventtime', 'azimuth', 'zenith', 'coincidencetime',
+    if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime',
                 'coincidencenumber']:
         return zip(histogram.bins, histogram.values)
     else:

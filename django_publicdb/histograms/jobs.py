@@ -348,8 +348,8 @@ def perform_events_tasks(summary):
     else:
         if layout.detector_3_radius is not None:
             tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
-            update_azimuth_histogram(summary, *tmp_location)
             update_zenith_histogram(summary, *tmp_location)
+            update_azimuth_histogram(summary, *tmp_location)
         else:
             logger.debug("No reconstructions for 2-detector station %s" % summary)
             tmp_location = []
@@ -498,20 +498,6 @@ def update_detector_timing_offsets(summary):
     save_offsets(summary, offsets)
 
 
-def update_azimuth_histogram(summary, tempfile_path, node_path):
-    """Histogram of the reconstructed azimuth"""
-
-    logger.debug("Updating azimuth histogram for %s" % summary)
-    azimuths = esd.get_azimuths(tempfile_path, node_path)
-
-    # create bins, don't forget right-most edge
-    bins = range(-180, 181, 12)
-
-    hist = np.histogram(azimuths, bins=bins)
-    hist = hist[0].tolist()
-    save_histograms(summary, 'azimuth', bins, hist)
-
-
 def update_zenith_histogram(summary, tempfile_path, node_path):
     """Histogram of the reconstructed azimuth"""
 
@@ -524,6 +510,20 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
     hist = np.histogram(zeniths, bins=bins)
     hist = hist[0].tolist()
     save_histograms(summary, 'zenith', bins, hist)
+
+
+def update_azimuth_histogram(summary, tempfile_path, node_path):
+    """Histogram of the reconstructed azimuth"""
+
+    logger.debug("Updating azimuth histogram for %s" % summary)
+    azimuths = esd.get_azimuths(tempfile_path, node_path)
+
+    # create bins, don't forget right-most edge
+    bins = range(-180, 181, 12)
+
+    hist = np.histogram(azimuths, bins=bins)
+    hist = hist[0].tolist()
+    save_histograms(summary, 'azimuth', bins, hist)
 
 
 def update_temperature_dataset(summary):
