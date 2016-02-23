@@ -324,7 +324,7 @@ def get_events_from_esd_in_range(station, start, end):
                     reconstructions_table = station_node.reconstructions
                 except tables.NoSuchNodeError:
                     reconstructions_table = FakeReconstructionsTable()
-                if (end - start).days == 1:
+                if (t1 - t0).days == 1:
                     events = events_table.read()
                     reconstructions = reconstructions_table[events['event_id']]
                 else:
@@ -399,7 +399,7 @@ def get_weather_from_esd_in_range(station, start, end):
         try:
             with tables.open_file(filepath) as f:
                 station_node = esd.get_station_node(f, station)
-                if (end - start).days == 1:
+                if (t1 - t0).days == 1:
                     events = station_node.weather.read()
                 else:
                     ts0 = calendar.timegm(t0.utctimetuple())
