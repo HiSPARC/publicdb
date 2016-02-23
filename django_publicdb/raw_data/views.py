@@ -13,9 +13,10 @@ import tempfile
 import csv
 import calendar
 import urllib
-from math import degrees, isnan
+from cStringIO import StringIO
 
 import dateutil.parser
+from numpy import column_stack, where, degrees, isnan, char
 
 from sapphire.analysis.coincidence_queries import CoincidenceQuery
 
@@ -258,37 +259,40 @@ def generate_events_as_tsv(station, start, end):
 
     yield t.render(c)
 
-    line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     events_returned = False
 
-    events = get_events_from_esd_in_range(station, start, end)
-    for event, reconstruction in events:
-        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
-        row = [dt.date(), dt.time(),
-               event['timestamp'],
-               event['nanoseconds'],
-               event['pulseheights'][0],
-               event['pulseheights'][1],
-               event['pulseheights'][2],
-               event['pulseheights'][3],
-               event['integrals'][0],
-               event['integrals'][1],
-               event['integrals'][2],
-               event['integrals'][3],
-               clean_floats(event['n1']),
-               clean_floats(event['n2']),
-               clean_floats(event['n3']),
-               clean_floats(event['n4']),
-               clean_floats(event['t1']),
-               clean_floats(event['t2']),
-               clean_floats(event['t3']),
-               clean_floats(event['t4']),
-               clean_floats(event['t_trigger']),
-               clean_angles(reconstruction['zenith']),
-               clean_angles(reconstruction['azimuth'])]
-        writer.writerow(row)
-        yield line_buffer.line
+    events_reconstructions = get_events_from_esd_in_range(station, start, end)
+    for events, reconstructions in events_reconstructions:
+        dt = events['timestamp'].astype('datetime64[s]')
+        data = column_stack([
+            dt.astype('datetime64[D]'),
+            [t.time() for t in dt.tolist()],
+            events['timestamp'],
+            events['nanoseconds'],
+            events['pulseheights'][:, 0],
+            events['pulseheights'][:, 1],
+            events['pulseheights'][:, 2],
+            events['pulseheights'][:, 3],
+            events['integrals'][:, 0],
+            events['integrals'][:, 1],
+            events['integrals'][:, 2],
+            events['integrals'][:, 3],
+            clean_float_array(events['n1']),
+            clean_float_array(events['n2']),
+            clean_float_array(events['n3']),
+            clean_float_array(events['n4']),
+            clean_float_array(events['t1']),
+            clean_float_array(events['t2']),
+            clean_float_array(events['t3']),
+            clean_float_array(events['t4']),
+            clean_float_array(events['t_trigger']),
+            clean_angle_array(reconstructions['zenith']),
+            clean_angle_array(reconstructions['azimuth'])
+            ])
+        block_buffer = StringIO()
+        writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
+        writer.writerows(data)
+        yield block_buffer.getvalue()
         events_returned = True
 
     if not events_returned:
@@ -311,18 +315,29 @@ def get_events_from_esd_in_range(station, start, end):
         filepath = esd.get_esd_data_path(t0)
         try:
             with tables.open_file(filepath) as f:
-                station_node = esd.get_station_node(f, station)
-                ts0 = calendar.timegm(t0.utctimetuple())
-                ts1 = calendar.timegm(t1.utctimetuple())
                 try:
-                    reconstructions = station_node.reconstructions
+                    station_node = esd.get_station_node(f, station)
+                    events_table = station_node.events
                 except tables.NoSuchNodeError:
-                    reconstructions = FakeReconstructionsTable()
-                for event in station_node.events.where(
-                        '(ts0 <= timestamp) & (timestamp < ts1)'):
-                    yield event, reconstructions[event['event_id']]
-        except (IOError, tables.NoSuchNodeError):
+                    continue
+                try:
+                    reconstructions_table = station_node.reconstructions
+                except tables.NoSuchNodeError:
+                    reconstructions_table = FakeReconstructionsTable()
+                if (end - start).days == 1:
+                    events = events_table.read()
+                    reconstructions = reconstructions_table[events['event_id']]
+                else:
+                    ts0 = calendar.timegm(t0.utctimetuple())
+                    ts1 = calendar.timegm(t1.utctimetuple())
+                    event_ids = events_table.get_where_list(
+                        '(ts0 <= timestamp) & (timestamp < ts1)')
+                    events = events_table.read_coordinates(event_ids)
+                    reconstructions = reconstructions_table[event_ids]
+        except IOError:
             continue
+        else:
+            yield events, reconstructions
 
 
 def generate_weather_as_tsv(station, start, end):
@@ -655,6 +670,15 @@ def get_coincidence_events(f, coincidence):
         yield number, event
 
 
+def clean_float_array(numbers, precision=5):
+    """Format floating point numbers for data download."""
+
+    if precision < 3:
+        # Unable to preserve -999 if precision less than 3.
+        precision = 3
+    return char.mod('%%.%dg' % precision, numbers)
+
+
 def clean_floats(number, precision=4):
     """Format floating point numbers for data download."""
 
@@ -662,6 +686,18 @@ def clean_floats(number, precision=4):
         return int(number)
     else:
         return round(number, precision)
+
+
+def clean_angle_array(angles):
+    """Convert radians to degrees, but only if not -999.
+
+    :param angle: a single angle in randians.
+    :return: the angle converted to integer degrees, unless the angle was
+        -999 or nan.
+
+    """
+    return where(isnan(angles) | (angles == -999),
+                 -999, degrees(angles)).astype(int)
 
 
 def clean_angles(angle):
@@ -705,9 +741,20 @@ def get_lightning_path(date):
 
 class FakeReconstructionsTable(object):
 
-    """Used as standin for a missing reconstruction table"""
+    """Used as standin for a missing reconstruction table
+
+    Supports indexing with a single or multiple values.
+    It returns a dictionary with either single or a 'column' of values.
+    The length is equal to the length of the input.
+
+    """
 
     no_reconstructions = {'zenith': -999, 'azimuth': -999}
 
     def __getitem__(self, key):
+        if len(key):
+            arr = np.empty(len(key))
+            arr.fill(-999)
+            return {'zenith': arr, 'azimuth': arr}
+
         return self.no_reconstructions
