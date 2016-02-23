@@ -190,6 +190,14 @@ def perform_update_tasks():
     update_histograms()
 
 
+def copy_temporary_and_set_flag(summary, tmp_locations, needs_update_item):
+    for tmpfile_path, node_path in tmp_locations:
+        esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
+    setattr(summary, needs_update_item, False)
+    django.db.close_old_connections()
+    summary.save()
+
+
 def update_esd():
     """Update the ESD for all Summaries with the needs_update flag
 
@@ -204,12 +212,7 @@ def update_esd():
             process_and_store_temporary_esd_for_summary, summaries)
 
         for summary, tmp_locations in results:
-            for tmpfile_path, node_path in tmp_locations:
-                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                                   node_path)
-            summary.needs_update = False
-            django.db.close_old_connections()
-            summary.save()
+            copy_temporary_and_set_flag(summary, tmp_locations, 'needs_update')
 
         worker_pool.close()
         worker_pool.join()
@@ -217,12 +220,7 @@ def update_esd():
         for summary in summaries:
             summary, tmp_locations = \
                 process_and_store_temporary_esd_for_summary(summary)
-            for tmpfile_path, node_path in tmp_locations:
-                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                                   node_path)
-            summary.needs_update = False
-            django.db.close_old_connections()
-            summary.save()
+            copy_temporary_and_set_flag(summary, tmp_locations, 'needs_update')
 
 
 def update_coincidences():
@@ -280,14 +278,14 @@ def search_and_store_coincidences(network_summary):
 def update_histograms():
     """Update new configs, histograms and datasets"""
 
+    perform_tasks_manager(NetworkSummary, "needs_update_coincidences",
+                          perform_coincidences_tasks)
     perform_tasks_manager(Summary, "needs_update_config",
                           perform_config_tasks)
     perform_tasks_manager(Summary, "needs_update_events",
                           perform_events_tasks)
     perform_tasks_manager(Summary, "needs_update_weather",
                           perform_weather_tasks)
-    perform_tasks_manager(NetworkSummary, "needs_update_coincidences",
-                          perform_coincidences_tasks)
 
 
 def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
@@ -308,27 +306,36 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(perform_certain_tasks, summaries)
-        for summary, tmp_location in results:
-            if tmp_location:
-                tmpfile_path, node_path = tmp_location
-                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                                   node_path)
-            setattr(summary, needs_update_item, False)
-            django.db.close_old_connections()
-            summary.save()
+        results = worker_pool.imap(perform_certain_tasks, summaries)
+        current_date = None
+        tmp_results = []
+        for summary, tmp_locations in results:
+            if not tmp_locations:
+                setattr(summary, needs_update_item, False)
+                django.db.close_old_connections()
+                summary.save()
+            else:
+                if current_date is None:
+                    current_date = summary.date
+                if summary.date == current_date:
+                    tmp_results.append((summary, tmp_locations))
+                else:
+                    for summary, tmp_locations in tmp_results:
+                        copy_temporary_and_set_flag(summary, tmp_locations,
+                                                    needs_update_item)
+                    current_date = summary.date
+                    tmp_results = [(summary, tmp_locations)]
+        if len(tmp_results):
+            for summary, tmp_locations in tmp_results:
+                copy_temporary_and_set_flag(summary, tmp_locations,
+                                            needs_update_item)
         worker_pool.close()
         worker_pool.join()
     else:
         for summary in summaries:
-            summary, tmp_location = perform_certain_tasks(summary)
-            if tmp_location:
-                tmpfile_path, node_path = tmp_location
-                esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path,
-                                                   node_path)
-            setattr(summary, needs_update_item, False)
-            django.db.close_old_connections()
-            summary.save()
+            summary, tmp_locations = perform_certain_tasks(summary)
+            copy_temporary_and_set_flag(summary, tmp_locations,
+                                        needs_update_item)
 
 
 def perform_events_tasks(summary):
@@ -339,21 +346,20 @@ def perform_events_tasks(summary):
     update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
+    tmp_locations = []
     try:
         layout = summary.station.stationlayout_set.filter(
             active_date__lte=summary.date).latest()
     except StationLayout.DoesNotExist:
         logger.debug("No station layout available for %s" % summary)
-        tmp_location = []
     else:
         if layout.detector_3_radius is not None:
-            tmp_location = esd.reconstruct_events_and_store_temporary_esd(summary)
-            update_zenith_histogram(summary, *tmp_location)
-            update_azimuth_histogram(summary, *tmp_location)
+            tmp_locations.append(esd.reconstruct_events_and_store_temporary_esd(summary))
+            update_zenith_histogram(summary, *tmp_locations[-1])
+            update_azimuth_histogram(summary, *tmp_locations[-1])
         else:
             logger.debug("No reconstructions for 2-detector station %s" % summary)
-            tmp_location = []
-    return summary, tmp_location
+    return summary, tmp_locations
 
 
 def perform_config_tasks(summary):
