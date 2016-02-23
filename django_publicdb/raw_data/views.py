@@ -677,8 +677,14 @@ def get_coincidence_events(f, coincidence):
 
 
 def clean_float_array(numbers, precision=5):
-    """Format floating point numbers for data download."""
+    """Format floating point numbers for data download.
 
+    :param numbers: array like list of values
+    :param precision: the number of significant numbers, this includes
+                      numbers to the left of the decimal. Must be 3 or higher,
+                      to support -999.
+
+    """
     if precision < 3:
         # Unable to preserve -999 if precision less than 3.
         precision = 3
