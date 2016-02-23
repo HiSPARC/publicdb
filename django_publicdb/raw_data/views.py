@@ -16,7 +16,7 @@ import urllib
 from cStringIO import StringIO
 
 import dateutil.parser
-from numpy import column_stack, where, degrees, isnan, char
+from numpy import column_stack, where, degrees, isnan, char, empty
 
 from sapphire.analysis.coincidence_queries import CoincidenceQuery
 
@@ -753,7 +753,7 @@ class FakeReconstructionsTable(object):
 
     def __getitem__(self, key):
         if len(key):
-            arr = np.empty(len(key))
+            arr = empty(len(key))
             arr.fill(-999)
             return {'zenith': arr, 'azimuth': arr}
 
