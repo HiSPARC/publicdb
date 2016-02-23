@@ -266,7 +266,7 @@ def generate_events_as_tsv(station, start, end):
         dt = events['timestamp'].astype('datetime64[s]')
         data = column_stack([
             dt.astype('datetime64[D]'),
-            [t.time() for t in dt.tolist()],
+            [value.time() for value in dt.tolist()],
             events['timestamp'],
             events['nanoseconds'],
             events['pulseheights'][:, 0],
@@ -287,8 +287,7 @@ def generate_events_as_tsv(station, start, end):
             clean_float_array(events['t4']),
             clean_float_array(events['t_trigger']),
             clean_angle_array(reconstructions['zenith']),
-            clean_angle_array(reconstructions['azimuth'])
-            ])
+            clean_angle_array(reconstructions['azimuth'])])
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
         writer.writerows(data)
@@ -309,7 +308,8 @@ def get_events_from_esd_in_range(station, start, end):
     """
     for t0, t1 in single_day_ranges(start, end):
         try:
-            Summary.objects.get(station=station, date=t0)
+            Summary.objects.get(station=station, date=t0,
+                                num_events__isnull=False)
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
@@ -348,31 +348,33 @@ def generate_weather_as_tsv(station, start, end):
 
     yield t.render(c)
 
-    line_buffer = SingleLineStringIO()
-    writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
     weather_returned = False
 
-    events = get_weather_from_esd_in_range(station, start, end)
-    for event in events:
-        dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
-        row = [dt.date(), dt.time(),
-               event['timestamp'],
-               clean_floats(event['temp_inside'], precision=2),
-               clean_floats(event['temp_outside'], precision=2),
-               event['humidity_inside'],
-               event['humidity_outside'],
-               clean_floats(event['barometer'], precision=2),
-               event['wind_dir'],
-               event['wind_speed'],
-               event['solar_rad'],
-               event['uv'],
-               clean_floats(event['evapotranspiration'], precision=3),
-               clean_floats(event['rain_rate'], precision=2),
-               event['heat_index'],
-               clean_floats(event['dew_point'], precision=2),
-               clean_floats(event['wind_chill'], precision=2)]
-        writer.writerow(row)
-        yield line_buffer.line
+    weather_events = get_weather_from_esd_in_range(station, start, end)
+    for events in weather_events:
+        dt = events['timestamp'].astype('datetime64[s]')
+        data = column_stack([
+            dt.astype('datetime64[D]'),
+            [value.time() for value in dt.tolist()],
+            events['timestamp'],
+            clean_float_array(events['temp_inside']),
+            clean_float_array(events['temp_outside']),
+            events['humidity_inside'],
+            events['humidity_outside'],
+            clean_float_array(events['barometer']),
+            events['wind_dir'],
+            events['wind_speed'],
+            events['solar_rad'],
+            events['uv'],
+            clean_float_array(events['evapotranspiration']),
+            clean_float_array(events['rain_rate']),
+            events['heat_index'],
+            clean_float_array(events['dew_point']),
+            clean_float_array(events['wind_chill'])])
+        block_buffer = StringIO()
+        writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
+        writer.writerows(data)
+        yield block_buffer.getvalue()
         weather_returned = True
 
     if not weather_returned:
@@ -397,13 +399,17 @@ def get_weather_from_esd_in_range(station, start, end):
         try:
             with tables.open_file(filepath) as f:
                 station_node = esd.get_station_node(f, station)
-                ts0 = calendar.timegm(t0.utctimetuple())
-                ts1 = calendar.timegm(t1.utctimetuple())
-                for event in station_node.weather.where(
-                        '(ts0 <= timestamp) & (timestamp < ts1)'):
-                    yield event
+                if (end - start).days == 1:
+                    events = station_node.weather.read()
+                else:
+                    ts0 = calendar.timegm(t0.utctimetuple())
+                    ts1 = calendar.timegm(t1.utctimetuple())
+                    events = station_node.weather.read_where(
+                        '(ts0 <= timestamp) & (timestamp < ts1)')
         except (IOError, tables.NoSuchNodeError):
             continue
+        except:
+            yield events
 
 
 def generate_lightning_as_tsv(lightning_type, start, end):
