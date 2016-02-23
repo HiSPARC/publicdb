@@ -408,7 +408,7 @@ def get_weather_from_esd_in_range(station, start, end):
                         '(ts0 <= timestamp) & (timestamp < ts1)')
         except (IOError, tables.NoSuchNodeError):
             continue
-        except:
+        else:
             yield events
 
 
