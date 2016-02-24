@@ -38,7 +38,8 @@ class StationLayout(models.Model):
         super(StationLayout, self).save(*args, **kwargs)
         try:
             next_layout = StationLayout.objects.filter(
-                station=self.station, active_date__gt=self.active_date).earliest()
+                station=self.station,
+                active_date__gt=self.active_date).earliest()
             next_date = next_layout.active_date
         except StationLayout.DoesNotExist:
             next_date = date.today()

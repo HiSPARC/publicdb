@@ -50,12 +50,18 @@ def man(request):
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
         "station_info": 'station/{station_number}/{year}/{month}/{day}/',
         "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
-        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
+        "has_weather": 'station/{station_number}/weather/'
+                       '{year}/{month}/{day}/',
+        "configuration": 'station/{station_number}/config/'
+                         '{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_number}/num_events/'
+                            '{year}/{month}/{day}/{hour}/',
         "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
-        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
-        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/{year}/{month}/{day}/{number_of_days}/'}
+        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/'
+                           'pulseheight/fit/{year}/{month}/{day}/',
+        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/'
+                             'pulseheight/drift/{year}/{month}/{day}/'
+                             '{number_of_days}/'}
 
     return json_dict(man)
 
@@ -331,7 +337,8 @@ def get_subcluster_dict(cluster=None):
     subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name}
                        for subcluster in subclusters]
     if cluster:
-        subcluster_dict.append({'number': cluster.number, 'name': cluster.name})
+        subcluster_dict.append({'number': cluster.number,
+                                'name': cluster.name})
 
     return sorted(subcluster_dict, key=itemgetter('number'))
 
@@ -383,8 +390,8 @@ def get_pulseheight_drift(request, station_number, plate_number,
 
     try:
         station = Station.objects.get(number=station_number)
-        date_range = (requested_date - datetime.timedelta(days=number_of_days - 1),
-                      requested_date)
+        start = requested_date - datetime.timedelta(days=number_of_days - 1)
+        date_range = (start, requested_date)
         summaries = Summary.objects.filter(station=station,
                                            date__range=date_range)
         fits = PulseheightFit.objects.filter(source__in=summaries,
@@ -401,7 +408,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
     if len(fits) < 14:
         dict.update({"nagios": Nagios.unknown,
                      "error": ("There are less than 14 fits in the requested "
-                               "date range, no drift rate will be calculated.")})
+                               "date range, drift rate won't be calculated.")})
         return json_dict(dict)
 
     try:
@@ -414,7 +421,8 @@ def get_pulseheight_drift(request, station_number, plate_number,
         linear_fit = lambda p, t: p[0] + p[1] * t  # Target function
 
         # Determine the drift by a linear fit
-        errfunc = lambda p, t, y: linear_fit(p, t) - y  # Distance to the target function
+        # Distance to the target function
+        errfunc = lambda p, t, y: linear_fit(p, t) - y
 
         p0 = [1.0, 1.0 / 86400.0]  # Initial guess for the parameters
         p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
@@ -520,9 +528,10 @@ def get_pulseheight_fit(request, station_number, plate_number,
             'day': requested_date.day}
 
     try:
-        fit = PulseheightFit.objects.get(source__station__number=station_number,
-                                         source__date=requested_date,
-                                         plate=plate_number)
+        fit = PulseheightFit.objects.get(
+            source__station__number=station_number,
+            source__date=requested_date,
+            plate=plate_number)
     except Exception, e:
         dict.update({"nagios": Nagios.unknown,
                      "error": "Fit has not been found",
@@ -579,20 +588,20 @@ def get_pulseheight_fit(request, station_number, plate_number,
 
     # Based on MPV and 4*sigma
 
-    threshold = MonitorPulseheightThresholds.objects.get(station__number=station_number,
-                                                         plate=plate_number)
+    threshold = MonitorPulseheightThresholds.objects.get(
+        station__number=station_number, plate=plate_number)
 
     lower_bound = threshold.mpv_mean * (1 - 4 * threshold.mpv_sigma)
     upper_bound = threshold.mpv_mean * (1 + 4 * threshold.mpv_sigma)
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
         dict.update({"nagios": Nagios.critical,
-                     "quality": "Fitted MPV is outside bounds (%.1f;%.1f): %.1f" %
+                     "quality": "MPV fit is outside bounds (%.1f;%.1f): %.1f" %
                                 (lower_bound, upper_bound, fit.fitted_mpv)})
         return json_dict(dict)
 
     dict.update({"nagios": Nagios.ok,
-                 "quality": "Fitted MPV is within bounds (%.1f;%.1f): %.1f" %
+                 "quality": "MPV fit is within bounds (%.1f;%.1f): %.1f" %
                             (lower_bound, upper_bound, fit.fitted_mpv)})
     return json_dict(dict)
 

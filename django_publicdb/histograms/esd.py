@@ -453,7 +453,8 @@ def get_coincidences(network_summary, tablename, quantity):
             coincidences_node = get_coincidences_node(datafile)
             table = datafile.get_node(coincidences_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, network_summary)
+            logger.error("Cannot find table %s for %s", tablename,
+                         network_summary)
             data = None
         else:
             data = table.col(quantity)

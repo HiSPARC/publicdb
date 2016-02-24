@@ -51,12 +51,6 @@ def get_coincidence(request):
         student, is_created = Student.objects.get_or_create(session=session,
                                                             name=student_name)
 
-    ranking = top_lijst(session.slug)
-    try:
-        rank = [x['name'] for x in ranking].index(student_name) + 1
-    except ValueError:
-        rank = None
-
     coincidences = AnalyzedCoincidence.objects.filter(session=session)
     try:
         coincidence = coincidences.filter(student=student,

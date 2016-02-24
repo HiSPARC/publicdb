@@ -109,9 +109,10 @@ def review_layout(request, hash):
                                        .exclude(gps_latitude=0.)).latest()
     except Configuration.DoesNotExist:
         try:
-            config = (Configuration.objects.filter(source__station=station,
-                                                   timestamp__gte=active_date)
-                                           .exclude(gps_latitude=0.)).earliest()
+            configs = (Configuration.objects.filter(source__station=station,
+                                                    timestamp__gte=active_date)
+                                            .exclude(gps_latitude=0.))
+            config = configs.earliest()
         except Configuration.DoesNotExist:
             config = None
 

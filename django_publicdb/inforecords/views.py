@@ -86,7 +86,8 @@ def create_nagios_config(request):
             services.append(
                 {'description': service.monitor_service.description,
                  'check_command': check_command,
-                 'active_checks': service.monitor_service.enable_active_checks})
+                 'active_checks': service.monitor_service.enable_active_checks}
+            )
 
         has_data = station_has_data(host.station)
 
