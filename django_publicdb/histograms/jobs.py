@@ -326,19 +326,20 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         current_date = None
         tmp_results = []
         for summary, tmp_locations in results:
-            if not tmp_locations:
+            if current_date is None:
+                current_date = summary.date
+            if not current_date == summary.date:
+                # Finish delayed store jobs.
+                for summary_res, tmp_locations_res in tmp_results:
+                    copy_temporary_and_set_flag(summary_res, needs_update_item,
+                                                tmp_locations_res)
+                tmp_results = []
+                current_date = summary.date
+            if not len(tmp_locations):
                 copy_temporary_and_set_flag(summary, needs_update_item)
             else:
-                if current_date is None:
-                    current_date = summary.date
-                if summary.date == current_date:
-                    tmp_results.append((summary, tmp_locations))
-                else:
-                    for summary, tmp_locations in tmp_results:
-                        copy_temporary_and_set_flag(summary, needs_update_item,
-                                                    tmp_locations)
-                    current_date = summary.date
-                    tmp_results = [(summary, tmp_locations)]
+                # Delay storing until jobs for day have finished.
+                tmp_results.append((summary, tmp_locations))
         if len(tmp_results):
             for summary, tmp_locations in tmp_results:
                 copy_temporary_and_set_flag(summary, needs_update_item,
