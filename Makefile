@@ -20,4 +20,5 @@ else
 endif
 
 test:
-	flake8 --ignore=F841,E128,E501 --exclude=*tests.py,*migrations/ django_publicdb/
+	flake8 --ignore=Z --exclude=urls.py,tests.py,*migrations/,*raw_data/views.py django_publicdb
+	flake8 --ignore=F841 django_publicdb/raw_data/views.py

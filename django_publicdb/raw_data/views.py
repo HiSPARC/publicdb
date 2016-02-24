@@ -543,8 +543,9 @@ def download_coincidences(request):
         if len(stations) >= 30:
             msg = "To many stations in query, use less than 30."
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
-        if Station.objects.filter(number__in=stations).count() != len(stations):
-            msg = "Not all stations are valid."
+        if (Station.objects.filter(number__in=stations).count() !=
+                len(stations)):
+            msg = "Not all station numbers are valid."
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
@@ -647,7 +648,8 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
                 ts0 = calendar.timegm(t0.utctimetuple())
                 ts1 = calendar.timegm(t1.utctimetuple())
                 if stations:
-                    coincidences = cq.at_least(stations, n, start=ts0, stop=ts1)
+                    coincidences = cq.at_least(stations, n, start=ts0,
+                                               stop=ts1)
                     events = cq.events_from_stations(coincidences, stations, n)
                 else:
                     coincidences = cq.timerange(start=ts0, stop=ts1)

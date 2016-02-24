@@ -10,7 +10,8 @@ from django.conf import settings
 def get_event_traces(station, ext_timestamp, raw=False):
     """Get the traces belonging to a station and a certain timestamp
 
-    :param station: :class:`django_publicdb.inforecords.models.Station` instance
+    :param station: a :class:`django_publicdb.inforecords.models.Station`
+                    instance
     :param ext_timestamp: extended timestamp (nanoseconds since UNIX epoch).
     :param raw: (optional, GET) if present get the raw trace, i.e. without
                 subtracted baseline.
@@ -57,7 +58,6 @@ def get_datastore_file(path):
     """Get the datafile
 
     :param path: path to the desired datafile
-
     :return: handler for the data file
 
     """
@@ -71,7 +71,6 @@ def get_data_path(date):
     Return path to the data file of a particular date
 
     :param date: the date
-
     :return: path to the data file
 
     """

@@ -125,10 +125,11 @@ def validate_request_form(request):
 
     # Check reCaptcha input
     if settings.RECAPTCHA_ENABLED:
-        check_captcha = captcha.submit(request.POST['recaptcha_challenge_field'],
-                                       request.POST['recaptcha_response_field'],
-                                       settings.RECAPTCHA_PRIVATE_KEY,
-                                       request.META['REMOTE_ADDR'])
+        check_captcha = captcha.submit(
+            request.POST['recaptcha_challenge_field'],
+            request.POST['recaptcha_response_field'],
+            settings.RECAPTCHA_PRIVATE_KEY,
+            request.META['REMOTE_ADDR'])
         if not check_captcha.is_valid:
             return request_form(request)
 

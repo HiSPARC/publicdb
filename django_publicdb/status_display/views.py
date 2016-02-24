@@ -216,11 +216,11 @@ def network_coincidences(request, year=None, month=None, day=None):
 
     # Find previous/next dates with data
     try:
-        previous = NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                                 date__gte=FIRSTDATE,
-                                                 date__lt=date).latest().date
+        prev = NetworkSummary.objects.filter(num_coincidences__isnull=False,
+                                             date__gte=FIRSTDATE,
+                                             date__lt=date).latest().date
     except NetworkSummary.DoesNotExist:
-        previous = None
+        prev = None
 
     try:
         next = NetworkSummary.objects.filter(num_coincidences__isnull=False,
@@ -261,7 +261,7 @@ def network_coincidences(request, year=None, month=None, day=None):
                    'month_list': month_list,
                    'year_list': year_list,
                    'current_date': current_date,
-                   'prev': previous,
+                   'prev': prev,
                    'next': next,
                    'link': (year, month, day)})
 
