@@ -12,7 +12,8 @@ import sys
 import os
 import mock
 
-MOCK_MODULES = ['sapphire', 'sapphire.utils', 'sapphire.analysis']
+MOCK_MODULES = ['numpy', 'scipy', 'tables',
+                'sapphire', 'sapphire.utils', 'sapphire.analysis']
 sys.modules.update((name, mock.MagicMock()) for name in MOCK_MODULES)
 
 # The directory that contains settings_develop.py
