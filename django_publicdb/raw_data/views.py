@@ -18,7 +18,7 @@ from cStringIO import StringIO
 import dateutil.parser
 from numpy import column_stack, where, degrees, isnan, char, empty
 
-from sapphire.analysis.coincidence_queries import CoincidenceQuery
+from sapphire import CoincidenceQuery
 
 from ..inforecords.models import Station, Cluster
 from ..histograms.models import Summary, NetworkSummary

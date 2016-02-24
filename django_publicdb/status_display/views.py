@@ -11,7 +11,7 @@ import datetime
 
 from numpy import arange
 
-from sapphire.transformations.clock import datetime_to_gps
+from sapphire.transformations import clock
 
 from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  NetworkHistogram, HistogramType, DatasetType,
@@ -598,7 +598,7 @@ def get_eventtime_histogram_sources(station_number, start, end):
     no_data = [0] * 24
     i = 0
     for date in daterange(start, end):
-        ts = datetime_to_gps(date)
+        ts = clock.datetime_to_gps(date)
         bins.extend(ts + hours)
         if histograms[i].source.date == date:
             values.extend(histograms[i].values)
