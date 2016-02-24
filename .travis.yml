@@ -13,7 +13,7 @@ before_install:
 
 install:
   - conda install --yes pip python=$TRAVIS_PYTHON_VERSION
-  - pip install flake8 sphinx Django>=1.7,<1.8
+  - pip install flake8 sphinx 'Django>=1.7,<1.8'
 
 script:
   - make test
