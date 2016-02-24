@@ -8,7 +8,12 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os
+import sys
+import os
+import mock
+
+MOCK_MODULES = ['sapphire', 'sapphire.utils', 'sapphire.analysis']
+sys.modules.update((name, mock.MagicMock()) for name in MOCK_MODULES)
 
 # The directory that contains settings_develop.py
 sys.path.append(os.path.abspath('../django_publicdb'))
@@ -17,12 +22,6 @@ sys.path.append(os.path.abspath('../django_publicdb'))
 import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_publicdb.settings_develop")
 django.setup()
-
-
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#sys.path.insert(0, os.path.abspath('.'))
 
 # -- General configuration -----------------------------------------------------
 
