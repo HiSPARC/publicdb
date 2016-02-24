@@ -11,7 +11,7 @@
 import sys, os
 
 # The directory that contains settings_develop.py
-sys.path.append('../django_publicdb')
+sys.path.append(os.path.abspath('../django_publicdb'))
 
 # Set up the Django settings/environment
 import django
@@ -121,7 +121,7 @@ html_logo = 'logo/header.png'
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = 'favicon.ico'
+html_favicon = 'logo/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,

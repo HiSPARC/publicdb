@@ -197,9 +197,8 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
     weather data in the given year, month, day or at all.
 
     :param type: data type to check for, either weather or events.
-    :param year, month, day: the date, this has to be within the time
-                             HiSPARC has been operational and can be as
-                             specific as you desire.
+    :param year,month,day: the date, this has to be within the time
+        HiSPARC has been operational and can be as specific as you desire.
 
     :return: list of dictionaries containing the name and number of each
              station that has measured weather data in the given year.
@@ -368,8 +367,9 @@ def get_pulseheight_drift(request, station_number, plate_number,
 
     :param station_number: station number
     :param plate_number: detector number, either 1, 2, 3 or 4.
-    :param year, month, day: date for which to check
-    :param number_of_days: number of days over which to determine drift
+    :param year,month,day: date for which to check.
+    :param number_of_days: number of days over which to determine drift.
+
     """
     station_number = int(station_number)
     plate_number = int(plate_number)
@@ -615,7 +615,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
 
     :param station_number: a stationn number identifier.
     :param type: the data type, either events or weather.
-    :param year, month, day: the date, this has to be within the time
+    :param year,month,day: the date, this has to be within the time
             HiSPARC has been operational and can be as specific as
             you desire.
 
@@ -712,10 +712,8 @@ def num_events(request, station_number, year=None, month=None, day=None,
     month, day or an hour.
 
     :param station_number: a stationn number identifier.
-    :param year, month, day, hour: the date, this has to be within the
-            time HiSPARC has been operational and can be as specific as
-            you desire.
-
+    :param year,month,day,hour: the date, this has to be within the time
+        HiSPARC has been operational and can be as specific as you desire.
     :return: integer containing the total number of events ever recorded by
              the given station.
 
