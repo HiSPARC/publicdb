@@ -5,9 +5,7 @@ from math import sqrt
 import traceback
 
 import numpy
-import scipy
-import scipy.optimize
-import scipy.stats
+from scipy import optimize, stats
 
 from .models import Configuration, PulseheightFit
 from . import esd
@@ -119,6 +117,16 @@ def get_fit_parameters(x, y):
     return (maxX + minX) / 2 + bias, maxX + bias, minX + bias
 
 
+def gauss(x, N, m, s):
+    """Gaussian function for fitting"""
+    return N * stats.norm.pdf(x, m, s)
+
+
+def residual(params, x, y_data):
+    """Residual which is to be minimized"""
+    return y_data - gauss(x, *params)
+
+
 def fit_pulseheight_peak(pulseheights):
     """
         pulseheights  : nparray
@@ -199,21 +207,6 @@ def fit_pulseheight_peak(pulseheights):
 
     # 4. Fit with gauss
 
-    # Fit function
-
-    gauss = lambda x, N, m, s: N * scipy.stats.norm.pdf(x, m, s)
-
-    # Residual which is to be minimized
-
-    def residual(params, x, y_data):
-        constant = params[0]
-        mean = params[1]
-        width = params[2]
-
-        y_model = gauss(x, constant, mean, width)
-
-        return (y_data - y_model)
-
     # Cut our data set
 
     fit_window_pulseheight = []
@@ -236,11 +229,11 @@ def fit_pulseheight_peak(pulseheights):
     initial_width = pulseheightFit.initial_width
 
     try:
-        fitResult = scipy.optimize.curve_fit(gauss,
-                                             fit_window_pulseheight,
-                                             fit_window_occurence,
-                                             [initial_N, initial_mean,
-                                              initial_width])
+        fitResult = optimize.curve_fit(gauss,
+                                       fit_window_pulseheight,
+                                       fit_window_occurence,
+                                       [initial_N, initial_mean,
+                                        initial_width])
     except RuntimeError, exception:
         pulseheightFit.error_type = "RuntimeError"
         pulseheightFit.error_message = exception

@@ -361,6 +361,21 @@ def get_country_dict():
     return sorted(country_dict, key=itemgetter('number'))
 
 
+def linear_fit(p, t):
+    """Simple linear function for fitting"""
+    return p[0] + p[1] * t
+
+
+def errfunc(p, t, y):
+    """Distance to the target function"""
+    return linear_fit(p, t) - y
+
+
+def gauss(x, N, m, s):
+    """Gaussian function for fitting"""
+    return N * stats.norm.pdf(x, m, s)
+
+
 def get_pulseheight_drift(request, station_number, plate_number,
                           year, month, day, number_of_days):
     """Get pulseheight drift
@@ -418,12 +433,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
                                 for fit in fits])
         mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
-        linear_fit = lambda p, t: p[0] + p[1] * t  # Target function
-
         # Determine the drift by a linear fit
-        # Distance to the target function
-        errfunc = lambda p, t, y: linear_fit(p, t) - y
-
         p0 = [1.0, 1.0 / 86400.0]  # Initial guess for the parameters
         p1, success = optimize.leastsq(errfunc, p0, args=(t_array, mpv_array))
 
@@ -435,9 +445,6 @@ def get_pulseheight_drift(request, station_number, plate_number,
 
         for t, mpv in zip(t_array, mpv_array):
             relative_mpv.append(mpv / linear_fit(p1, t))
-
-        # Fit the relative fluctation with a gauss
-        gauss = lambda x, N, m, s: N * stats.norm.pdf(x, m, s)
 
         # x = ADC, y = number of events per dPulseheight
 
