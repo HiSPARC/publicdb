@@ -174,7 +174,9 @@ def download_form(request, station_number=None, start=None, end=None):
             station = get_object_or_404(Station, number=station_number)
         else:
             station = None
-        form = DataDownloadForm(initial={'start': start,
+        form = DataDownloadForm(initial={'station_events': station,
+                                         'station_weather': station,
+                                         'start': start,
                                          'end': end,
                                          'data_type': 'events'})
 
