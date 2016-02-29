@@ -77,3 +77,9 @@
   - name: ensure nsca is started
     service: name=nsca enabled=yes state=started
     sudo: yes
+
+  - name: keep nagios archives in check
+    cron: name=nagios-logs cron_file=hisparc-nagios user=nagios
+          job="/bin/find /var/log/nagios/archives -mtime +90 -exec rm {} \;"
+          special_time=daily
+    sudo: yes
