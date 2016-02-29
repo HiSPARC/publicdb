@@ -298,6 +298,8 @@ def generate_events_as_tsv(station, start, end):
 
     if not events_returned:
         yield "# No events found for the chosen query."
+    else:
+        yield "# Finished downloading."
 
 
 def get_events_from_esd_in_range(station, start, end):
@@ -381,6 +383,8 @@ def generate_weather_as_tsv(station, start, end):
 
     if not weather_returned:
         yield "# No weather data found for the chosen query."
+    else:
+        yield "# Finished downloading."
 
 
 def get_weather_from_esd_in_range(station, start, end):
@@ -445,6 +449,8 @@ def generate_lightning_as_tsv(lightning_type, start, end):
 
     if not lightning_returned:
         yield "# No lightning data found for the chosen query."
+    else:
+        yield "# Finished downloading."
 
 
 def get_lightning_in_range(lightning_type, start, end):
@@ -626,6 +632,8 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
 
     if not coincidences_returned:
         yield "# No coincidences found for the chosen query."
+    else:
+        yield "# Finished downloading."
 
 
 def get_coincidences_from_esd_in_range(start, end, stations, n):
