@@ -6,7 +6,6 @@ from django.conf import settings
 from django.db.models import Q
 
 import os
-import tables
 import datetime
 import urlparse
 import tempfile
@@ -16,6 +15,7 @@ import urllib
 from cStringIO import StringIO
 
 import dateutil.parser
+import tables
 from numpy import column_stack, where, degrees, isnan, char, empty
 
 from sapphire import CoincidenceQuery
