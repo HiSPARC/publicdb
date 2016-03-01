@@ -80,7 +80,7 @@ def create_nagios_config(request):
                         vars.append(getattr(service.monitor_service, var))
 
                 # Append the parameters to the check command
-                check_command += ('!%s:%s!%s:%s' % vars)
+                check_command += ('!%s:%s!%s:%s' % tuple(vars))
 
             # Append this service to the hosts service list
             services.append(
