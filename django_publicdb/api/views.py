@@ -69,7 +69,7 @@ def man(request):
 def station(request, station_number, year=None, month=None, day=None):
     """Get station info
 
-    Retrieve important information about a station. If no date if given
+    Retrieve general information about a station. If no date if given
     the latest valid info will be sent, otherwise the latest on or
     before the given date.
 
@@ -92,18 +92,28 @@ def station(request, station_number, year=None, month=None, day=None):
 
     try:
         station = Station.objects.get(number=station_number)
-        source_events = (Summary.objects.filter(station=station,
-                                                num_events__isnull=False,
-                                                date__lte=date).latest())
-        source_config = (Summary.objects.filter(station=station,
-                                                num_config__isnull=False,
-                                                date__lte=date).latest())
-        config = (Configuration.objects.filter(source=source_config)
-                                       .exclude(gps_latitude=0,
-                                                gps_longitude=0).latest())
-    except (Station.DoesNotExist, Summary.DoesNotExist,
-            Configuration.DoesNotExist):
+    except Station.DoesNotExist:
         return HttpResponseNotFound()
+
+    # Initialize new config with all None values.
+    config = Configuration()
+
+    try:
+        source_configs = Summary.objects.filter(station=station,
+                                                num_config__isnull=False,
+                                                date__lte=date)
+        for source_config in source_configs:
+            try:
+                config = (Configuration.objects.filter(source=source_config)
+                                               .exclude(gps_latitude=0,
+                                                        gps_longitude=0)
+                                               .latest())
+            except Configuration.DoesNotExist:
+                pass
+            else:
+                break
+    except Summary.DoesNotExist:
+        pass
 
     try:
         layout = StationLayout.objects.filter(station=station,
@@ -114,51 +124,37 @@ def station(request, station_number, year=None, month=None, day=None):
 
     is_active = Pc.objects.filter(station=station, is_active=True).exists()
 
-    mpv_fits = []
-
-    for i in range(1, 5):
-        try:
-            mpv = (PulseheightFit.objects.get(source=source_events, plate=i)
-                                         .fitted_mpv)
-        except PulseheightFit.DoesNotExist:
-            mpv_fits.append(None)
-        else:
-            if mpv == 0:
-                mpv_fits.append(None)
-            else:
-                mpv_fits.append(round(mpv))
-
     scintillators = [{'radius': layout.detector_1_radius,
                       'alpha': layout.detector_1_alpha,
                       'height': layout.detector_1_height,
-                      'beta': layout.detector_1_beta,
-                      'mpv': mpv_fits[0]}]
+                      'beta': layout.detector_1_beta}]
     scintillators.append({'radius': layout.detector_2_radius,
                           'alpha': layout.detector_2_alpha,
                           'height': layout.detector_2_height,
-                          'beta': layout.detector_2_beta,
-                          'mpv': mpv_fits[1]})
+                          'beta': layout.detector_2_beta})
 
     if config.slave() != "no slave":
         scintillators.append({'radius': layout.detector_3_radius,
                               'alpha': layout.detector_3_alpha,
                               'height': layout.detector_3_height,
-                              'beta': layout.detector_3_beta,
-                              'mpv': mpv_fits[2]})
+                              'beta': layout.detector_3_beta})
         scintillators.append({'radius': layout.detector_4_radius,
                               'alpha': layout.detector_4_alpha,
                               'height': layout.detector_4_height,
-                              'beta': layout.detector_4_beta,
-                              'mpv': mpv_fits[3]})
+                              'beta': layout.detector_4_beta})
 
     station_info = {'number': station.number,
                     'name': station.name,
                     'subcluster': station.cluster.name,
                     'cluster': station.cluster.main_cluster(),
                     'country': station.cluster.country.name,
-                    'latitude': round(config.gps_latitude, 7),
-                    'longitude': round(config.gps_longitude, 7),
-                    'altitude': round(config.gps_altitude, 2),
+                    'latitude': (round(config.gps_latitude, 7)
+                                 if config.gps_latitude is not None else None),
+                    'longitude': (round(config.gps_longitude, 7)
+                                  if config.gps_longitude is not None
+                                  else None),
+                    'altitude': (round(config.gps_altitude, 2)
+                                 if config.gps_altitude is not None else None),
                     'active': is_active,
                     'scintillators': scintillators}
 
