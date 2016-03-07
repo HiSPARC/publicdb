@@ -101,7 +101,8 @@ def station(request, station_number, year=None, month=None, day=None):
     try:
         source_configs = Summary.objects.filter(station=station,
                                                 num_config__isnull=False,
-                                                date__lte=date)
+                                                date__gte=FIRSTDATE,
+                                                date__lte=date).reverse()
         for source_config in source_configs:
             try:
                 config = (Configuration.objects.filter(source=source_config)
