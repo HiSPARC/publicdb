@@ -767,18 +767,20 @@ class FakeReconstructionsTable(object):
 
     """Used as standin for a missing reconstruction table
 
-    Supports indexing with a single or multiple values.
-    It returns a dictionary with either single or a 'column' of values.
+    Supports indexing with a list of values.
+    It returns a dictionary with 'column' of values.
     The length is equal to the length of the input.
 
     """
 
-    no_reconstructions = {'zenith': -999, 'azimuth': -999}
-
     def __getitem__(self, key):
-        if len(key):
-            arr = empty(len(key))
-            arr.fill(-999)
-            return {'zenith': arr, 'azimuth': arr}
+        """Get a fake 'array' of reconstructions
 
-        return self.no_reconstructions
+        :param key: a list of values (usually row indices).
+        :return: a dictionary with zenith and azimuth as keys
+                 and arrays of -999 with length equal to key as values.
+
+        """
+        arr = empty(len(key))
+        arr.fill(-999)
+        return {'zenith': arr, 'azimuth': arr}
