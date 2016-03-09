@@ -6,8 +6,6 @@ import base64
 import re
 import ast
 
-from ..inforecords.models import Station
-
 
 class SerializedDataField(models.Field):
     # This makes sure that to_python() will be called when objects are
@@ -45,7 +43,7 @@ class NetworkSummary(models.Model):
 
 
 class Summary(models.Model):
-    station = models.ForeignKey(Station)
+    station = models.ForeignKey('inforecords.Station')
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
