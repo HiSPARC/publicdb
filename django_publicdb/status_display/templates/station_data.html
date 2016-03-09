@@ -24,18 +24,18 @@
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
     </script><![endif]-->
     <script>
-      {% if config %}
+      {% if location.latitude and location.longitude %}
         $(document).ready(function() {
             var map = createMap("stationMap");
             var style = createStyle(map);
 
-            map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
+            map.setCenter(new OpenLayers.LonLat({{ location.longitude }}, {{ location.latitude }})
                                         .transform(fromProjection, toProjection), 16);
 
             var stationLayer = new OpenLayers.Layer.Vector("stations", {styleMap: new OpenLayers.StyleMap(style)});
 
             var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                new OpenLayers.Geometry.Point({{ location.longitude }}, {{ location.latitude }})
                                                        .transform(fromProjection, toProjection),
                                {id: "", // no label, normally {id: {{ station.number }},
                                 name: "{{ station.name }}",
@@ -292,9 +292,13 @@
     {% endif %}
     <div id="stationPosition">
         <div class="sectionTitle">Position</div>
-        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude|floatformat:7 }}°</span></div>
-        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude|floatformat:7 }}°</span></div>
-        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude|floatformat:2 }} m</span></div>
+          {% if location.latitude and location.longitude %}
+            <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ location.latitude }}°</span></div>
+            <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ location.longitude }}°</span></div>
+            <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ location.altitude }} m</span></div>
+          {% else %}
+            <div class="keyvalue"><span class="key">Unknown!</span></span></div>
+          {% endif %}
         <div id="stationMap"></div>
     </div>
   {% endif %}

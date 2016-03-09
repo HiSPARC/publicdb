@@ -311,6 +311,8 @@ def station_data(request, station_number, year, month, day):
         config = None
         has_slave = False
 
+    location = station.latest_location(date=date)
+
     has_config = station_has_config(station)
 
     try:
@@ -338,6 +340,7 @@ def station_data(request, station_number, year, month, day):
                    'date': date,
                    'tomorrow': date + datetime.timedelta(days=1),
                    'config': config,
+                   'location': location,
                    'has_slave': has_slave,
                    'eventhistogram': eventhistogram,
                    'pulseheighthistogram': pulseheighthistogram,
