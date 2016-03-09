@@ -16,13 +16,7 @@ def station_on_map(request, station_number):
     today = datetime.datetime.utcnow()
 
     station = get_object_or_404(Station, number=station_number)
-    try:
-        source = (Summary.objects.filter(station=station,
-                                         num_config__isnull=False,
-                                         date__lte=today).latest())
-        center = (Configuration.objects.filter(source=source).latest())
-    except (Summary.DoesNotExist, Configuration.DoesNotExist):
-        raise Http404
+    center = station.latest_location()
 
     subclusters = []
     for subcluster in Cluster.objects.all():
@@ -32,21 +26,14 @@ def station_on_map(request, station_number):
                                        .filter(cluster=subcluster,
                                                pc__is_active=True,
                                                pc__is_test=False)):
-            try:
-                source = (Summary.objects.filter(station=station,
-                                                 num_config__isnull=False,
-                                                 date__lte=today).latest())
-                config = (Configuration.objects.filter(source=source).latest())
-            except (Summary.DoesNotExist, Configuration.DoesNotExist):
-                continue
+            location = station.latest_location()
             status = get_station_status(station.number, down, problem, up)
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'cluster': station.cluster,
-                             'status': status,
-                             'longitude': config.gps_longitude,
-                             'latitude': config.gps_latitude,
-                             'altitude': config.gps_altitude})
+            station_data = {'number': station.number,
+                            'name': station.name,
+                            'cluster': station.cluster,
+                            'status': status}
+            station_data.update(location)
+            stations.append(station_data)
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
@@ -91,21 +78,14 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
                                                pc__is_test=False)):
-            try:
-                source = (Summary.objects.filter(station=station,
-                                                 num_config__isnull=False,
-                                                 date__lte=today).latest())
-                config = (Configuration.objects.filter(source=source).latest())
-            except (Summary.DoesNotExist, Configuration.DoesNotExist):
-                continue
+            location = station.latest_location()
             status = get_station_status(station.number, down, problem, up)
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'cluster': station.cluster,
-                             'status': status,
-                             'longitude': config.gps_longitude,
-                             'latitude': config.gps_latitude,
-                             'altitude': config.gps_altitude})
+            station_data = {'number': station.number,
+                            'name': station.name,
+                            'cluster': station.cluster,
+                            'status': status}
+            station_data.update(location)
+            stations.append(station_data)
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 

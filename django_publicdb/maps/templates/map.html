@@ -26,7 +26,7 @@
             var style = createStyle(map);
 
             {% if center %}
-                map.setCenter(new OpenLayers.LonLat({{ center.gps_longitude }}, {{ center.gps_latitude }}).transform(fromProjection, toProjection), 17);
+                map.setCenter(new OpenLayers.LonLat({{ center.longitude }}, {{ center.latitude }}).transform(fromProjection, toProjection), 17);
             {% else %}
                 map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
             {% endif %}
