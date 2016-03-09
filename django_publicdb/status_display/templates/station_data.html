@@ -296,10 +296,10 @@
             <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ location.latitude }}°</span></div>
             <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ location.longitude }}°</span></div>
             <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ location.altitude }} m</span></div>
+            <div id="stationMap"></div>
           {% else %}
-            <div class="keyvalue"><span class="key">Unknown!</span></span></div>
+            <div class="keyvalue"><span class="key">Unknown!</span></div>
           {% endif %}
-        <div id="stationMap"></div>
     </div>
   {% endif %}
 {% endblock %}
