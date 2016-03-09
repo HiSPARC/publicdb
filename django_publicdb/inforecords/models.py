@@ -9,6 +9,11 @@ from django.conf import settings
 
 import datetime
 
+from ..histograms.models import Configuration, Summary
+
+
+FIRSTDATE = datetime.date(2004, 1, 1)
+
 
 class Profession(models.Model):
     description = models.CharField(max_length=40, unique=True)
@@ -218,20 +223,65 @@ class Station(models.Model):
         reload_datastore()
 
     def number_of_detectors(self):
-        from ..histograms.models import Configuration
+        """Get number of detectors, based on presence of Slave electronics
 
+        Returns 4 if no config is present to be on the safe side.
+
+        """
         n_detectors = 0
         today = datetime.datetime.utcnow()
 
-        config = (Configuration.objects.filter(source__station=self,
-                                               timestamp__lte=today).latest())
-
-        if config.slave() == 'no slave':
-            n_detectors = 2
-        else:
+        try:
+            config = (Configuration.objects.filter(source__station=self,
+                                                   timestamp__lte=today)
+                                           .latest())
+        except Configuration.DoesNotExist:
             n_detectors = 4
+        else:
+            if config.slave() == 'no slave':
+                n_detectors = 2
+            else:
+                n_detectors = 4
 
         return n_detectors
+
+    def latest_location(self, date=None):
+        """Get latest valid station location
+
+        Locations of (0, 0, 0) are excluded. If no (valid) location is
+        available the coordinates returned are None.
+
+        """
+        if date is None:
+            date = datetime.date.today()
+
+        # Initialize new config with all None values.
+        config = Configuration()
+
+        try:
+            summaries = Summary.objects.filter(station=self,
+                                               num_config__isnull=False,
+                                               date__gte=FIRSTDATE,
+                                               date__lte=date).reverse()
+            for summary in summaries:
+                try:
+                    config = (Configuration.objects.filter(source=summary)
+                                                   .exclude(gps_latitude=0,
+                                                            gps_longitude=0)
+                                                   .latest())
+                except Configuration.DoesNotExist:
+                    pass
+                else:
+                    break
+        except Summary.DoesNotExist:
+            pass
+
+        return {'latitude': (round(config.gps_latitude, 7)
+                             if config.gps_latitude is not None else None),
+                'longitude': (round(config.gps_longitude, 7)
+                              if config.gps_longitude is not None else None),
+                'altitude': (round(config.gps_altitude, 2)
+                             if config.gps_altitude is not None else None),}
 
     class Meta:
         ordering = ('number',)

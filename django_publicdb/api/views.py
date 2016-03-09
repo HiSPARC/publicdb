@@ -79,8 +79,8 @@ def station(request, station_number, year=None, month=None, day=None):
     :param day: the day part of the date.
 
     :return: dictionary containing info about the station. Most importantly,
-             this contains information about the position of the station,
-             including the position of the individual scintillators.
+             this contains information about the location of the station GPS
+             and the relative locations of the individual scintillators.
 
     """
     if year and month and day:
@@ -95,26 +95,7 @@ def station(request, station_number, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    # Initialize new config with all None values.
-    config = Configuration()
-
-    try:
-        source_configs = Summary.objects.filter(station=station,
-                                                num_config__isnull=False,
-                                                date__gte=FIRSTDATE,
-                                                date__lte=date).reverse()
-        for source_config in source_configs:
-            try:
-                config = (Configuration.objects.filter(source=source_config)
-                                               .exclude(gps_latitude=0,
-                                                        gps_longitude=0)
-                                               .latest())
-            except Configuration.DoesNotExist:
-                pass
-            else:
-                break
-    except Summary.DoesNotExist:
-        pass
+    location = station.latest_location(date)
 
     try:
         layout = StationLayout.objects.filter(station=station,
@@ -134,7 +115,7 @@ def station(request, station_number, year=None, month=None, day=None):
                           'height': layout.detector_2_height,
                           'beta': layout.detector_2_beta})
 
-    if config.slave() != "no slave":
+    if station.number_of_detectors() == 4:
         scintillators.append({'radius': layout.detector_3_radius,
                               'alpha': layout.detector_3_alpha,
                               'height': layout.detector_3_height,
@@ -149,15 +130,9 @@ def station(request, station_number, year=None, month=None, day=None):
                     'subcluster': station.cluster.name,
                     'cluster': station.cluster.main_cluster(),
                     'country': station.cluster.country.name,
-                    'latitude': (round(config.gps_latitude, 7)
-                                 if config.gps_latitude is not None else None),
-                    'longitude': (round(config.gps_longitude, 7)
-                                  if config.gps_longitude is not None
-                                  else None),
-                    'altitude': (round(config.gps_altitude, 2)
-                                 if config.gps_altitude is not None else None),
                     'active': is_active,
                     'scintillators': scintillators}
+    station_info.update(location)
 
     return json_dict(station_info)
 
