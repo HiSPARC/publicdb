@@ -11,19 +11,20 @@
     <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
     <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
     <script>
-      {% if config %}
+      {% if lla %}
         $(document).ready(function() {
             var map = createMap("gpsMap");
             var style = createStyle(map);
-
-            map.setCenter(new OpenLayers.LonLat({{ config.gps_longitude }}, {{ config.gps_latitude }})
+            // OpenLayers uses Long/Lat order.
+            map.setCenter(new OpenLayers.LonLat({{ lla.1 }}, {{ lla.0 }})
                                         .transform(fromProjection, toProjection), 16);
 
             var gpsLayer = new OpenLayers.Layer.Vector("gps", {styleMap: new OpenLayers.StyleMap(style)});
 
             {% for gps in gpstrack %}
                 var feature = new OpenLayers.Feature.Vector(
-                                    new OpenLayers.Geometry.Point{{ gps }}.transform(fromProjection, toProjection),
+                                    new OpenLayers.Geometry.Point({{ gps.1 }}, {{ gps.0 }})
+                                                           .transform(fromProjection, toProjection),
                                    {id: "", // no label, normally {id: {{ station.number }},
                                     name: "{{ station.name }}",
                                     status: "gpsold"});
@@ -31,7 +32,7 @@
             {% endfor %}
 
             var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ config.gps_longitude }}, {{ config.gps_latitude }})
+                                new OpenLayers.Geometry.Point({{ lla.1 }}, {{ lla.0 }})
                                                        .transform(fromProjection, toProjection),
                                {id: "", // no label, normally {id: {{ station.number }},
                                 name: "{{ station.name }}",
@@ -241,11 +242,15 @@
     </div>
     <div id="stationPosition">
         <div class="sectionTitle">Position</div>
-        <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ config.gps_latitude|floatformat:7 }}°</span></div>
-        <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ config.gps_longitude|floatformat:7 }}°</span></div>
-        <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ config.gps_altitude|floatformat:2 }} m</span></div>
-        <div class="keyvalue"><span class="key gpsBall curr"></span><span class="value">Current position</span></div>
-        <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Old positions</span></div>
+          {% if lla %}
+            <div class="keyvalue"><span class="key">Latitude</span><span class="value">{{ lla.0|floatformat:7 }}°</span></div>
+            <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ lla.1|floatformat:7 }}°</span></div>
+            <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ lla.2|floatformat:2 }} m</span></div>
+            <div class="keyvalue"><span class="key gpsBall curr"></span><span class="value">Current position</span></div>
+            <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Old positions</span></div>
+          {% else %}
+            <div class="keyvalue"><span class="key">Unknown!</span></span></div>
+          {% endif %}
     </div>
   {% endif %}
 {% endblock %}

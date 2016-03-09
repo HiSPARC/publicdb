@@ -159,23 +159,17 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
                                                pc__is_test=False)):
-            try:
-                source = (Summary.objects.filter(station=station,
-                                                 num_config__isnull=False,
-                                                 date__lte=today).latest())
-                config = (Configuration.objects.filter(source=source).latest())
-            except (Summary.DoesNotExist, Configuration.DoesNotExist):
-                continue
+
             link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
-            stations.append({'number': station.number,
-                             'name': station.name,
-                             'cluster': station.cluster,
-                             'link': link,
-                             'status': status,
-                             'longitude': config.gps_longitude,
-                             'latitude': config.gps_latitude,
-                             'altitude': config.gps_altitude})
+            location = station.latest_location()
+            station_data = {'number': station.number,
+                            'name': station.name,
+                            'cluster': station.cluster,
+                            'link': link,
+                            'status': status}
+            station_data.update(location)
+            stations.append(station_data)
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
@@ -406,11 +400,19 @@ def station_config(request, station_number):
     else:
         has_slave = True
 
+    gpslocations = get_gpslocations(configs)
+
+    # Get latest valid location
+    try:
+        lla = gpslocations[-1]
+    except IndexError:
+        lla = None
+
     voltagegraph = plot_config('voltage', configs)
     currentgraph = plot_config('current', configs)
     timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
-    gpstrack = get_gpspositions(configs)
+    gpstrack = set(gpslocations)
     layout = StationLayout.objects.filter(station=station,
                                           active_date__gte=FIRSTDATE,
                                           active_date__lte=today).last()
@@ -418,6 +420,7 @@ def station_config(request, station_number):
     return render(request, 'station_config.html',
                   {'station': station,
                    'config': config,
+                   'lla': lla,
                    'voltagegraph': voltagegraph,
                    'currentgraph': currentgraph,
                    'timingoffsetgraph': timingoffsetgraph,
@@ -963,12 +966,13 @@ def get_detector_timing_offsets(station_number):
     return data
 
 
-def get_gpspositions(configs):
-    """Get all unique gps positions from the configs"""
+def get_gpslocations(configs):
+    """Get all valid GPS locations from the configs"""
 
-    gps = [(config.gps_longitude, config.gps_latitude) for config in configs
-           if config.gps_longitude != 0. and config.gps_latitude != 0.]
-    return set(gps)
+    gps = [(config.gps_latitude, config.gps_longitude, config.gps_altitude)
+           for config in configs
+           if config.gps_latitude != 0. and config.gps_longitude != 0.]
+    return gps
 
 
 def create_plot_object(x_values, y_series, x_label, y_label):

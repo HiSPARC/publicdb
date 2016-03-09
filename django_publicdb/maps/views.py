@@ -1,9 +1,6 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import Http404
 
-import datetime
-
-from ..histograms.models import Configuration, Summary
 from ..inforecords.models import Station, Cluster, Country
 from ..status_display.nagios import status_lists, get_station_status
 
@@ -13,10 +10,11 @@ def station_on_map(request, station_number):
 
     station_number = int(station_number)
     down, problem, up = status_lists()
-    today = datetime.datetime.utcnow()
 
     station = get_object_or_404(Station, number=station_number)
     center = station.latest_location()
+    if center['latitude'] is None and center['longitude'] is None:
+        raise Http404
 
     subclusters = []
     for subcluster in Cluster.objects.all():
@@ -46,7 +44,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
     down, problem, up = status_lists()
-    today = datetime.datetime.utcnow()
 
     if country:
         get_object_or_404(Country, name=country)

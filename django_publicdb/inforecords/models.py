@@ -281,7 +281,7 @@ class Station(models.Model):
                 'longitude': (round(config.gps_longitude, 7)
                               if config.gps_longitude is not None else None),
                 'altitude': (round(config.gps_altitude, 2)
-                             if config.gps_altitude is not None else None),}
+                             if config.gps_altitude is not None else None)}
 
     class Meta:
         ordering = ('number',)
