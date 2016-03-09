@@ -265,6 +265,8 @@ def generate_events_as_tsv(station, start, end):
 
     events_reconstructions = get_events_from_esd_in_range(station, start, end)
     for events, reconstructions in events_reconstructions:
+        if not len(events):
+            continue
         dt = events['timestamp'].astype('datetime64[s]')
         data = column_stack([
             dt.astype('datetime64[D]'),
