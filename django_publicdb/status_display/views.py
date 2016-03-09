@@ -127,7 +127,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
-    today = datetime.datetime.utcnow()
 
     if country:
         get_object_or_404(Country, name=country)
