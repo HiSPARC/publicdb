@@ -1,7 +1,11 @@
 User-agent: *
 Disallow: /api/*
+Disallow: /show/stations_on_map/*/
 Disallow: /show/stations/*/*/*/
+Disallow: /show/stations/*/status/
+Disallow: /show/network/*/*/
 Disallow: /show/source/
+Disallow: /maps/
 Disallow: /analysis-session/
 Disallow: /software-updates/
 Disallow: /config/
