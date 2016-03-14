@@ -8,6 +8,8 @@ from operator import itemgetter
 from itertools import izip
 import calendar
 import datetime
+from cStringIO import StringIO
+import csv
 
 from numpy import arange
 
@@ -579,8 +581,14 @@ def get_eventtime_source(request, station_number, start=None, end=None):
             raise Http404
 
     data = get_eventtime_histogram_sources(station_number, start, end)
+
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
+    writer.writerows(data)
+    tsvdata = buffer.getvalue()
+
     response = render(request, 'source_eventtime.tsv',
-                      {'data': data,
+                      {'tsvdata': tsvdata,
                        'start': start,
                        'end': end,
                        'station_number': station_number},
