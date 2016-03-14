@@ -585,7 +585,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     buffer = StringIO()
     writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
     writer.writerows(data)
-    tsvdata = buffer.getvalue()
+    tsvdata = buffer.getvalue().strip('\n')
 
     response = render(request, 'source_eventtime.tsv',
                       {'tsvdata': tsvdata,
@@ -775,8 +775,13 @@ def get_detector_timing_offsets_source(request, station_number):
     if not len(data):
         raise Http404
 
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
+    writer.writerows(data)
+    tsvdata = buffer.getvalue().strip('\n')
+
     response = render(request, 'source_detector_timing_offsets.tsv',
-                      {'data': data,
+                      {'tsvdata': tsvdata,
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
