@@ -5,11 +5,13 @@ from django.db.models import Q
 
 from collections import OrderedDict
 from operator import itemgetter
-from itertools import izip
+from itertools import izip, groupby
 import calendar
 import datetime
+from cStringIO import StringIO
+import csv
 
-from numpy import arange
+from numpy import arange, nan
 
 from sapphire.transformations import clock
 
@@ -579,8 +581,14 @@ def get_eventtime_source(request, station_number, start=None, end=None):
             raise Http404
 
     data = get_eventtime_histogram_sources(station_number, start, end)
+
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
+    writer.writerows(data)
+    tsvdata = buffer.getvalue().strip('\n')
+
     response = render(request, 'source_eventtime.tsv',
-                      {'data': data,
+                      {'tsvdata': tsvdata,
                        'start': start,
                        'end': end,
                        'station_number': station_number},
@@ -767,8 +775,20 @@ def get_detector_timing_offsets_source(request, station_number):
     if not len(data):
         raise Http404
 
+    data = [next(rows)
+            for _, rows in groupby(data, key=itemgetter(1, 2, 3, 4))]
+
+    data = [(calendar.timegm(r[0].timetuple()), none_to_nan(r[1]),
+             none_to_nan(r[2]), none_to_nan(r[3]), none_to_nan(r[4]))
+            for r in data]
+
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
+    writer.writerows(data)
+    tsvdata = buffer.getvalue().strip('\n')
+
     response = render(request, 'source_detector_timing_offsets.tsv',
-                      {'data': data,
+                      {'tsvdata': tsvdata,
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
@@ -944,6 +964,7 @@ def plot_timing_offsets(station_number):
     """Create a plot object from station configs"""
 
     data = get_detector_timing_offsets(station_number)
+    data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
     data = zip(*data)
 
     timestamps = data[0]
@@ -964,7 +985,6 @@ def get_detector_timing_offsets(station_number):
 
     data = offsets.values_list('source__date', 'offset_1', 'offset_2',
                                'offset_3', 'offset_4')
-    data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
     return data
 
 
@@ -1171,6 +1191,13 @@ def station_has_data(station):
                                       date__lte=datetime.date.today()).exists()
 
     return has_data
+
+
+def none_to_nan(x):
+    if x is None:
+        return nan
+    else:
+        return x
 
 
 def help(request):

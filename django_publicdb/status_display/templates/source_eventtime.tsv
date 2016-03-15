@@ -17,5 +17,4 @@
 #
 #
 # timestamp	value
-{% for row in data %}{{ row.0 }}	{{ row.1 }}
-{% endfor %}
+{{ tsvdata }}

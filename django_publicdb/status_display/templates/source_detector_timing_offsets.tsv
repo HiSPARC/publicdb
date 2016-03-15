@@ -12,5 +12,4 @@
 #
 #
 # timestamp	scint1	scint2	scint3	scint4
-{% for row in data %}{% ifchanged row.1 %}{{ row.0 }}{% for value in row.1 %}	{{ value|none_to_nan|floatformat:2 }}{% endfor %}
-{% endifchanged %}{% endfor %}
+{{ tsvdata }}
