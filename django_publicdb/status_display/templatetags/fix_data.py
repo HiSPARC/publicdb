@@ -93,7 +93,7 @@ def none_to_nan(value):
 def mv_to_adc(value):
     """Convert mv_to_adc"""
 
-    if value >= 0:
+    if value > 0:
         if int(value) == value:
             return int(value)
         else:
