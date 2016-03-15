@@ -32,16 +32,18 @@ class Contact(models.Model):
                                            related_name='contacts')
 
     def __unicode__(self):
-        return "%s %s %s %s" % (self.title, self.first_name,
-                                self.prefix_surname, self.surname)
+        return (("%s %s %s %s" % (self.title, self.first_name,
+                                  self.prefix_surname, self.surname))
+                .replace('  ', ' ').strip(' '))
 
     def email_work(self):
         return self.contactinformation.email_work
     email_work = property(email_work)
 
     def name(self):
-        return "%s %s %s %s" % (self.title, self.first_name,
-                                self.prefix_surname, self.surname)
+        return (("%s %s %s %s" % (self.title, self.first_name,
+                                  self.prefix_surname, self.surname))
+                .replace('  ', ' ').strip(' '))
     name = property(name)
 
     def save(self, *args, **kwargs):
