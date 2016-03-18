@@ -13,7 +13,8 @@ class StationLayoutQuarantineForm(forms.Form):
 
     station = forms.ModelChoiceField(
         queryset=Station.objects.filter(pc__is_test=False))
-    active_date = forms.DateTimeField(help_text="e.g. '2010-5-17 12:45'.")
+    active_date = forms.DateTimeField(help_text="Date the detectors were "
+        "placed in this configuration, e.g. '2010-5-17 12:45'.")
 
     # Master detectors
     detector_1_radius = forms.FloatField(min_value=-60, max_value=60)

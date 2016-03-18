@@ -35,12 +35,14 @@
             {{ form.station }}
         </p>
         <p>
-            Number of detectors: <input name="n" type="radio" value="2"> 2 <input name="n" type="radio" value="4" checked> 4
+            Number of detectors:
+            <input name="n" type="radio" value="2"> 2
+            <input name="n" type="radio" value="4" checked> 4
         </p>
         <p>
             {{ form.active_date.error }}
             {{ form.active_date.label_tag }}
-            {{ form.active_date }}
+            {{ form.active_date }}<br>
             <span class="helptext">{{ form.active_date.help_text }}</span>
         </p>
         <table>
