@@ -50,13 +50,14 @@ Submitting the measurements
 ---------------------------
 
 New layouts can be submitted via the `layout submit form
-<http://data.hisparc.nl/layout/submit/>`_. The submitted measurements
-will be reviewed before they are accepted and stored in the database.
+<http://data.hisparc.nl/layout/submit/>`_. A verification e-mail will be sent
+to the submitter. The submitted measurements will be reviewed before they are
+made available on the website and via the API.
 
 
 Accessing the data
 ------------------
 
-If you are analysing data or are making a schematic drawing of the
-station layout you can access the detector coordinates via the
-:doc:`API <api_tutorial>`.
+The detector coordinates can be accessed via the :doc:`API <api_tutorial>`.
+These can, for example, be used when analysing data or when making a schematic
+drawing of the station layout.
