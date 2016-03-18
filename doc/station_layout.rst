@@ -20,7 +20,7 @@ The coordinate system we have chosen for describing the position of
 detectors is illustrated in the following figure.
 
 .. image:: images/coordinate_system.png
-   :width: 314px
+   :width: 313px
 
 For each detector 3 (or 4) coordinates need to be determined:
 
