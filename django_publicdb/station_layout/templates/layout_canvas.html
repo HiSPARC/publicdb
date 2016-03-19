@@ -20,6 +20,8 @@
         */
         var detector_width = .5;
         var detector_length = 1;
+        var pmt_width = 0.04;
+        var pmt_length = 0.2;
 
         ctx.lineWidth = 1;  
         ctx.rotate(radians(alpha));
@@ -29,6 +31,17 @@
         ctx.fillStyle = color;
         ctx.fillRect(-detector_width / 2, -detector_length / 2,
                      detector_width, detector_length);
+        ctx.lineWidth = 0.04;
+        ctx.strokeRect(-detector_width / 2, -detector_length / 2,
+                       detector_width, detector_length);
+        // Lightguide and PMT
+        ctx.moveTo(detector_width / 2, detector_length / 2);
+        ctx.lineTo(pmt_width / 2, detector_length);
+        ctx.lineTo(pmt_width / 2, detector_length + pmt_length);
+        ctx.lineTo(-pmt_width / 2, detector_length + pmt_length);
+        ctx.lineTo(-pmt_width / 2, detector_length);
+        ctx.lineTo(-detector_width / 2, detector_length / 2);
+        ctx.stroke();
         ctx.restore();
         ctx.save();}
 
@@ -36,7 +49,7 @@
         /* Calculate the bounding box to contain the detectors and gps
         */
         var min_x = -2, max_x = 2, min_y = -2, max_y = 2;
-        var margin = 1;  // To ensure the detectors will fit
+        var margin = 1.3;  // To ensure the detectors will fit
         for (var i = 0; i < r.length; i++) {
             x = Math.sin(radians(alpha[i])) * r[i];
             min_x = Math.min(x, min_x);
@@ -63,7 +76,7 @@
 
         */
         clear_canvas(ctx);
-        var colors = ['black', 'red', 'green', 'blue'];
+        var colors = ['black', 'Crimson', 'ForestGreen', 'DodgerBlue'];
         var bounds = calculate_bounds(r, alpha);
         var station_width = bounds[1] - bounds[0];
         var station_height = bounds[3] - bounds[2];
