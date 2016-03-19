@@ -10,6 +10,7 @@
     function draw_gps(ctx) {
         var size = .15;
         ctx.fillStyle = 'darkgray';
+        ctx.lineWidth = 0;
         ctx.beginPath();
         ctx.arc(0, 0, size, 0, Math.PI*2, true); 
         ctx.closePath();
@@ -23,7 +24,6 @@
         var pmt_width = 0.04;
         var pmt_length = 0.2;
 
-        ctx.lineWidth = 1;  
         ctx.rotate(radians(alpha));
         ctx.translate(0, -r);  // positive y is down on canvas
         ctx.rotate(-radians(alpha));
@@ -35,12 +35,13 @@
         ctx.strokeRect(-detector_width / 2, -detector_length / 2,
                        detector_width, detector_length);
         // Lightguide and PMT
-        ctx.moveTo(detector_width / 2, detector_length / 2);
-        ctx.lineTo(pmt_width / 2, detector_length);
-        ctx.lineTo(pmt_width / 2, detector_length + pmt_length);
-        ctx.lineTo(-pmt_width / 2, detector_length + pmt_length);
-        ctx.lineTo(-pmt_width / 2, detector_length);
-        ctx.lineTo(-detector_width / 2, detector_length / 2);
+        ctx.beginPath();
+        ctx.moveTo(detector_width / 2, -detector_length / 2);
+        ctx.lineTo(pmt_width / 2, -detector_length);
+        ctx.lineTo(pmt_width / 2, -(detector_length + pmt_length));
+        ctx.lineTo(-pmt_width / 2, -(detector_length + pmt_length));
+        ctx.lineTo(-pmt_width / 2, -detector_length);
+        ctx.lineTo(-detector_width / 2, -detector_length / 2);
         ctx.stroke();
         ctx.restore();
         ctx.save();}
