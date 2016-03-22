@@ -36,6 +36,7 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/trigger/(?P<station_number>\d+)/$', 'get_trigger_config_source'),
     (r'^source/layout/(?P<station_number>\d+)/$', 'get_station_layout_source'),
     (r'^source/detector_timing_offsets/(?P<station_number>\d+)/$', 'get_detector_timing_offsets_source'),
+    (r'^source/station_timing_offsets/(?P<station_number1>\d+)/(?P<station_number2>\d+)/', 'get_station_timing_offsets_source'),
 
     (r'^help/$', 'help'),
 )

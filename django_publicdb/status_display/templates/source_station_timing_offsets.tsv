@@ -1,0 +1,16 @@
+# HiSPARC station timing offsets
+#
+# Stations {{ station_number1 }} and {{ station_number2 }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# This data contains the following columns:
+#
+# timestamp: time of offset calibration in seconds after 1970-1-1 [UNIX timestamp]
+# offset:    station timing offsets [ns]
+# rchi2:     reduced chi squared
+#
+#
+# timestamp	offset	rchi2
+{{ tsvdata }}

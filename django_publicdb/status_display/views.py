@@ -797,6 +797,30 @@ def get_detector_timing_offsets_source(request, station_number):
     return response
 
 
+def get_station_timing_offsets_source(request, station_number1,
+                                      station_number2):
+    station_number1 = int(station_number1)
+    station_number2 = int(station_number2)
+
+    if station_number1 >= station_number2:
+        raise Http404
+
+    # Not implemented yet, for now raise 404.
+    raise Http404
+
+    tsvdata = ''
+
+    response = render(request, 'source_station_timing_offsets.tsv',
+                      {'tsvdata': tsvdata,
+                       'station_number1': station_number1,
+                       'station_number2': station_number2},
+                      content_type=MIME_TSV)
+    response['Content-Disposition'] = (
+        'attachment; filename=station_timing_offsets-s%d-s%d.tsv' %
+        (station_number1, station_number2))
+    return response
+
+
 def get_histogram_source(year, month, day, type, station_number=None):
     """Get histogram data for a specific date
 
