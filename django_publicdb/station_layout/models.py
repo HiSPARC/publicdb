@@ -127,7 +127,9 @@ class StationLayoutQuarantine(models.Model):
             The HiSPARC Team''' %
             (self.station, self.hash_review))
         sender = 'info@hisparc.nl'
-        send_mail(subject, message, sender, ['beheer@hisparc.nl'],
+        send_mail(subject, message, sender, ['nieks@nikhef.nl'],
+                  # Later change this back to the beheer account:
+                  # ['beheer@hisparc.nl'],
                   fail_silently=False)
 
     def sendmail_accepted(self):
