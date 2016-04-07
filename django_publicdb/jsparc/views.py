@@ -25,6 +25,8 @@ def get_coincidence(request):
         coincidences = AnalyzedCoincidence.objects.filter(
             session__ends__gt=today)
         count = coincidences.count()
+        if not count:
+            return error_json(404, 'No coincidences available.')
         random_index = randint(0, count - 1)
         coincidence = coincidences[random_index]
         events = get_events(coincidence)
