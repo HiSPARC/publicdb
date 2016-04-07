@@ -7,7 +7,7 @@ from .models import (AnalysisSession, AnalyzedCoincidence, Student,
 class AnalysisSessionAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     exclude = ('hash',)
-    list_display = ('title', 'slug', 'hash', 'starts', 'ends', 'in_progress')
+    list_display = ('title', 'slug', 'pin', 'starts', 'ends', 'in_progress')
 
 
 class AnalyzedCoincidenceAdmin(admin.ModelAdmin):
@@ -23,7 +23,9 @@ class StudentAdmin(admin.ModelAdmin):
 
 
 class SessionRequestAdmin(admin.ModelAdmin):
-    list_display = ('cluster', 'school', 'name', 'start_date')
+    list_display = ('cluster', 'school', 'name', 'start_date',
+                    'events_created')
+    list_filter = ('cluster', 'start_date')
 
 
 admin.site.register(AnalysisSession, AnalysisSessionAdmin)
