@@ -13,9 +13,12 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
-                      ReconstructESDEventsFromSource)
+                      ReconstructESDEventsFromSource, CoincidenceQuery)
+from sapphire.analysis.event_utils import station_arrival_time
+from sapphire.storage import TimeDelta
 
 from ..inforecords.models import Station
+from .models import DetectorTimingOffset
 from . import datastore
 
 from django.conf import settings
@@ -84,6 +87,18 @@ def determine_time_delta_and_store_in_esd(network_summary):
         pairs = {(s_numbers[s1], s_numbers[s2])
                  for c_idx in c_index
                  for s1, s2 in itertools.combinations(sorted(c_idx[:, 0]), 2)}
+
+        cq = CoincidenceQuery(data)
+        previous_ets = 0
+        for ref_station, station in pairs:
+            ref_detector_offsets = get_detector_offsets(ref_station, date)
+            detector_offsets = get_detector_offsets(station, date)
+            coincidences = cq.all([ref_station, station], iterator=True)
+            coincidence_events = cq.events_from_stations(coins, stations)
+            ets, dt = determine_time_differences(coin_events, ref_station,
+                                                 station, ref_detector_offsets,
+                                                 detector_offsets)
+            store_dt(data, ref_station, station, ets, dt)
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -530,3 +545,74 @@ def get_data_from_path(file_path, node_path, quantity):
         data = node.col(quantity)
     data = data[~np.isnan(data)]
     return data
+
+
+def determine_time_differences(coin_events, ref_station, station,
+                               ref_detector_offsets, detector_offsets):
+    """Determine the arrival time differences between two stations.
+
+    :param coin_events: coincidence events.
+    :param ref_station,station: station numbers.
+    :param ref_detector_offsets,detector_offsets: detector timing offset list.
+    :return: extended timestamp of the first event and time difference,
+             t - t_ref. Not corrected for altitude differences.
+
+    """
+    dt = []
+    ets = []
+    previous_ets = 0
+    for events in coin_events:
+        ref_ets = events[0][1]['ext_timestamp']
+        ref_ts = ref_ets / int(1e9)
+        # Filter coincidence which is subset of previous coincidence
+        if previous_ets == ref_ets:
+            continue
+        else:
+            previous_ets = ref_ets
+        # Filter for possibility of same station twice in coincidence
+        if len(events) is not 2:
+            continue
+        if events[0][0] == ref_station:
+            ref_id = 0
+            id = 1
+        else:
+            ref_id = 1
+            id = 0
+        ref_t = station_arrival_time(events[ref_id][1], ref_ets, [0, 1, 2, 3],
+                                     ref_d_off)
+        t = station_arrival_time(events[id][1], ref_ets, [0, 1, 2, 3],
+                                 d_off)
+        if isnan(t) or isnan(ref_t):
+            continue
+        dt.append(t - ref_t)
+        ets.append(ref_ets)
+    return ets, dt
+
+
+def store_time_deltas(data, ref_station, station, ext_timestamps, time_deltas):
+    """Store determined dt values"""
+
+    table_path = '/time_deltas/station_%d/station_%d' % (ref_station, station)
+    try:
+        dt_table = data.get_node(table_path, 'time_deltas')
+        dt_table.remove()
+    except tables.NoSuchNodeError:
+        pass
+    timestamps = [int(ets) / int(1e9) for ets in ext_timestamps]
+    nanoseconds = [int(ets) - ((int(ets) / int(1e9)) * int(1e9))
+                   for ets in ext_timestamps]
+    table = data.create_table(table_path, 'time_deltas', TimeDelta,
+                              createparents=True)
+    table.modify_column(column=ext_timestamps, colname='ext_timestamp')
+    table.modify_column(column=timestamps, colname='timestamp')
+    table.modify_column(column=nanoseconds, colname='nanoseconds')
+    table.modify_column(column=delta, colname='time_deltas')
+    table.flush()
+
+
+def get_detector_offsets(station, date):
+    """Get detector offsets for a station on a specific date"""
+
+    do = DetectorTimingOffset.objects.get(source__station=station,
+                                          source__date=date)
+    return [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
