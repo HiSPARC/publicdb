@@ -81,7 +81,7 @@ def determine_time_delta_and_store_in_esd(network_summary):
         s_index = data.root.coincidences.s_index
         re_number = re.compile('[0-9]+$')
         s_numbers = [int(re_number.search(s_path).group())
-                          for s_path in s_index]
+                     for s_path in s_index]
 
         c_index = data.root.coincidences.c_index
         pairs = {(s_numbers[s1], s_numbers[s2])
@@ -89,16 +89,16 @@ def determine_time_delta_and_store_in_esd(network_summary):
                  for s1, s2 in itertools.combinations(sorted(c_idx[:, 0]), 2)}
 
         cq = CoincidenceQuery(data)
-        previous_ets = 0
         for ref_station, station in pairs:
             ref_detector_offsets = get_detector_offsets(ref_station, date)
             detector_offsets = get_detector_offsets(station, date)
             coincidences = cq.all([ref_station, station], iterator=True)
-            coincidence_events = cq.events_from_stations(coins, stations)
+            coin_events = cq.events_from_stations(coincidences,
+                                                  [ref_station, station])
             ets, dt = determine_time_differences(coin_events, ref_station,
                                                  station, ref_detector_offsets,
                                                  detector_offsets)
-            store_dt(data, ref_station, station, ets, dt)
+            store_time_deltas(data, ref_station, station, ets, dt)
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -563,7 +563,6 @@ def determine_time_differences(coin_events, ref_station, station,
     previous_ets = 0
     for events in coin_events:
         ref_ets = events[0][1]['ext_timestamp']
-        ref_ts = ref_ets / int(1e9)
         # Filter coincidence which is subset of previous coincidence
         if previous_ets == ref_ets:
             continue
@@ -579,10 +578,10 @@ def determine_time_differences(coin_events, ref_station, station,
             ref_id = 1
             id = 0
         ref_t = station_arrival_time(events[ref_id][1], ref_ets, [0, 1, 2, 3],
-                                     ref_d_off)
+                                     ref_detector_offsets)
         t = station_arrival_time(events[id][1], ref_ets, [0, 1, 2, 3],
-                                 d_off)
-        if isnan(t) or isnan(ref_t):
+                                 detector_offsets)
+        if np.isnan(t) or np.isnan(ref_t):
             continue
         dt.append(t - ref_t)
         ets.append(ref_ets)
@@ -606,7 +605,7 @@ def store_time_deltas(data, ref_station, station, ext_timestamps, time_deltas):
     table.modify_column(column=ext_timestamps, colname='ext_timestamp')
     table.modify_column(column=timestamps, colname='timestamp')
     table.modify_column(column=nanoseconds, colname='nanoseconds')
-    table.modify_column(column=delta, colname='time_deltas')
+    table.modify_column(column=time_deltas, colname='time_deltas')
     table.flush()
 
 
