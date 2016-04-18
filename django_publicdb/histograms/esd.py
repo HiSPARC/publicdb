@@ -4,6 +4,8 @@ import os.path
 import tempfile
 import logging
 from operator import itemgetter
+import itertools
+import re
 
 import numpy as np
 import tables
@@ -58,6 +60,30 @@ def search_coincidences_and_store_in_esd(network_summary):
         num_coincidences = len(coinc.coincidences)
 
     return num_coincidences
+
+
+def determine_time_delta_and_store_in_esd(network_summary):
+    """Determine arrival time difference for station pairs in coincidences
+
+    For all station pairs in coincidences determine the arrival time
+    difference.
+
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
+
+    """
+    date = network_summary.date
+    filepath = get_esd_data_path(date)
+    with tables.open_file(filepath, 'a') as data:
+        s_index = data.root.coincidences.s_index
+        re_number = re.compile('[0-9]+$')
+        s_numbers = [int(re_number.search(s_path).group())
+                          for s_path in s_index]
+
+        c_index = data.root.coincidences.c_index
+        pairs = {(s_numbers[s1], s_numbers[s2])
+                 for c_idx in c_index
+                 for s1, s2 in itertools.combinations(sorted(c_idx[:, 0]), 2)}
 
 
 def process_events_and_store_temporary_esd(summary):
