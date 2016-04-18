@@ -14,6 +14,7 @@ import mock
 
 MOCK_MODULES = ['numpy', 'scipy', 'tables',
                 'sapphire', 'sapphire.utils', 'sapphire.analysis',
+                'sapphire.analysis.event_utils', 'sapphire.storage',
                 'sapphire.transformations']
 sys.modules.update((name, mock.MagicMock()) for name in MOCK_MODULES)
 
