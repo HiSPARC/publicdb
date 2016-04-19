@@ -366,3 +366,18 @@ class DetectorTimingOffset(models.Model):
 
     class Meta:
         ordering = ('source',)
+
+
+class StationTimingOffset(models.Model):
+    ref_source = models.ForeignKey('Summary')
+    source = models.ForeignKey('Summary')
+    offset = models.FloatField(blank=True, null=True)
+
+    def clean(self):
+        if self.ref_source.station == self.source.station:
+            raise ValidationError("The stations may not be the same")
+        if self.ref_source.date != self.source.date:
+            raise ValidationError("The summary dates should be the same")
+
+    class Meta:
+        ordering = ('ref_source',)
