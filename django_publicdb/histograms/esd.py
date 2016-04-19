@@ -98,7 +98,8 @@ def determine_time_delta_and_store_in_esd(network_summary):
             ets, dt = determine_time_differences(coin_events, ref_station,
                                                  station, ref_detector_offsets,
                                                  detector_offsets)
-            store_time_deltas(data, ref_station, station, ets, dt)
+            if len(ets):
+                store_time_deltas(data, ref_station, station, ets, dt)
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -597,15 +598,11 @@ def store_time_deltas(data, ref_station, station, ext_timestamps, time_deltas):
         dt_table.remove()
     except tables.NoSuchNodeError:
         pass
-    timestamps = [int(ets) / int(1e9) for ets in ext_timestamps]
-    nanoseconds = [int(ets) - ((int(ets) / int(1e9)) * int(1e9))
-                   for ets in ext_timestamps]
+    delta_data = [(ets, int(ets) / int(1e9), int(ets) % int(1e9), time_delta)
+                  for ets, time_delta in zip(ext_timestamps, time_deltas)]
     table = data.create_table(table_path, 'time_deltas', TimeDelta,
-                              createparents=True)
-    table.modify_column(column=ext_timestamps, colname='ext_timestamp')
-    table.modify_column(column=timestamps, colname='timestamp')
-    table.modify_column(column=nanoseconds, colname='nanoseconds')
-    table.modify_column(column=time_deltas, colname='time_deltas')
+                              createparents=True, expectedrows=len(delta_data))
+    table.append(delta_data)
     table.flush()
 
 
