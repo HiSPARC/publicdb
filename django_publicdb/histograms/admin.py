@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (GeneratorState, NetworkHistogram, DailyHistogram,
                      DailyDataset, NetworkSummary, Summary, Configuration,
                      PulseheightFit, HistogramType, DatasetType,
-                     DetectorTimingOffset)
+                     DetectorTimingOffset, StationTimingOffset)
 
 
 class GeneratorStateAdmin(admin.ModelAdmin):
