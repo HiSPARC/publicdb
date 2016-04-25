@@ -14,6 +14,8 @@ from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
                       ReconstructESDEventsFromSource, CoincidenceQuery)
+from sapphire.analysis.calibration import (DetermineStationTimingOffsets,
+                                           datetime_range)
 from sapphire.analysis.event_utils import station_arrival_time
 from sapphire.storage import TimeDelta
 
@@ -534,6 +536,34 @@ def get_time_series(summary, tablename, quantity):
     return data
 
 
+def get_timedeltas(date, ref_station, station):
+    """Get timedeltas for a specific date
+
+    Read timedelta's from ESD file, if data exists.
+    :param date: date for which to get timedelta's
+    :return: numpy.array of timedeltas
+
+    """
+    path = get_esd_data_path(date)
+    try:
+        with tables.open_file(path, 'r') as datafile:
+            try:
+                table_path = '/time_deltas/station_%d/station_%d' % \
+                    (ref_station, station)
+                tablename = 'time_deltas'
+                table = datafile.get_node(table_path, tablename)
+            except tables.NoSuchNodeError:
+                logger.error("Cannot find table %s %s for %s", table_path,
+                             tablename, date)
+                data = None
+            else:
+                data = table.col('delta')
+    except IOError:
+        logger.error("ESD file %s does not exists", path)
+        return None
+    return data
+
+
 def get_data_from_path(file_path, node_path, quantity):
     """Get reconstructed data
 
@@ -612,3 +642,13 @@ def get_detector_offsets(station, date):
     do = DetectorTimingOffset.objects.get(source__station=station,
                                           source__date=date)
     return [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
+
+
+class StationTimingOffsetsESD(DetermineStationTimingOffsets):
+    def read_dt(self, station, ref_station, start, end):
+        dt = []
+        for date, _ in datetime_range(start, end):
+            data = get_timedeltas(date, ref_station, station)
+            if data is not None:
+                dt.extend(data)
+        return dt
