@@ -304,7 +304,7 @@ def station_data(request, station_number, year, month, day):
                                          date__lte=date)
                                  .latest())
         config = Configuration.objects.filter(source=source).latest()
-        if config.slv_version.count(' 0') == 2:
+        if config.slave() == -1:
             has_slave = False
         else:
             has_slave = True
@@ -399,7 +399,7 @@ def station_config(request, station_number):
     has_data = station_has_data(station)
 
     config = configs[-1]
-    if config.slv_version.count(' 0') == 2:
+    if config.slave() == -1:
         has_slave = False
     else:
         has_slave = True
@@ -705,6 +705,17 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
     return response
 
 
+def get_electronics_config_source(request, station_number):
+    data = get_config_source(station_number, 'electronics')
+    response = render(request, 'source_electronics_config.tsv',
+                      {'data': data,
+                       'station_number': station_number},
+                      content_type=MIME_TSV)
+    response['Content-Disposition'] = (
+        'attachment; filename=electronics-s%s.tsv' % station_number)
+    return response
+
+
 def get_voltage_config_source(request, station_number):
     data = get_config_source(station_number, 'voltage')
     response = render(request, 'source_voltage_config.tsv',
@@ -900,7 +911,12 @@ def get_config_source(station_number, type):
     if not configs:
         raise Http404
 
-    data = list(configs.values_list(*fields))
+    if type == 'electronics':
+        data = list((config.timestamp, config.master(), config.slave(),
+                     config.master_fpga(), config.slave_fpga())
+                    for config in configs)
+    else:
+        data = list(configs.values_list(*fields))
 
     return data
 
