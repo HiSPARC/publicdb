@@ -529,15 +529,14 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
 
 
 def get_specific_network_histogram_source(request, year, month, day, type):
-    data = get_histogram_source(year, month, day, type, station_number)
+    data = get_histogram_source(year, month, day, type)
     response = render(request, 'source_%s_histogram.tsv' % type,
                       {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
+                       'date': '-'.join((year, month, day))},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=%s-network-%d%02d%02d.tsv' %
-        (type, station_number, int(year), int(month), int(day)))
+        (type, int(year), int(month), int(day)))
     return response
 
 
@@ -650,16 +649,17 @@ def get_eventtime_histogram_sources(station_number, start, end):
 
 
 def get_barometer_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(station_number, year, month, day,
-                                       'barometer')
+    return get_specific_dataset_source(request, station_number, year, month,
+                                       day, 'barometer')
 
 
 def get_temperature_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(station_number, year, month, day,
-                                       'temperature')
+    return get_specific_dataset_source(request, station_number, year, month,
+                                       day, 'temperature')
 
 
-def get_specific_dataset_source(station_number, year, month, day, type):
+def get_specific_dataset_source(request, station_number, year, month, day,
+                                type):
     data = get_dataset_source(year, month, day, type, station_number)
     response = render(request, 'source_%s_dataset.tsv' % type,
                       {'data': data,
@@ -673,26 +673,26 @@ def get_specific_dataset_source(station_number, year, month, day, type):
 
 
 def get_electronics_config_source(request, station_number):
-    return get_specific_config_source(station_number, 'electronics')
+    return get_specific_config_source(request, station_number, 'electronics')
 
 
 def get_voltage_config_source(request, station_number):
-    return get_specific_config_source(station_number, 'voltage')
+    return get_specific_config_source(request, station_number, 'voltage')
 
 
 def get_current_config_source(request, station_number):
-    return get_specific_config_source(station_number, 'current')
+    return get_specific_config_source(request, station_number, 'current')
 
 
 def get_gps_config_source(request, station_number):
-    return get_specific_config_source(station_number, 'gps')
+    return get_specific_config_source(request, station_number, 'gps')
 
 
 def get_trigger_config_source(request, station_number):
-    return get_specific_config_source(station_number, 'trigger')
+    return get_specific_config_source(request, station_number, 'trigger')
 
 
-def get_specific_config_source(station_number, type):
+def get_specific_config_source(request, station_number, type):
     data = get_config_source(station_number, type)
     response = render(request, 'source_%s_config.tsv' % type,
                       {'data': data,
