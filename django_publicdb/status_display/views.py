@@ -706,57 +706,33 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
 
 
 def get_electronics_config_source(request, station_number):
-    data = get_config_source(station_number, 'electronics')
-    response = render(request, 'source_electronics_config.tsv',
-                      {'data': data,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=electronics-s%s.tsv' % station_number)
-    return response
+    return get_specific_config_source(station_number, 'electronics')
 
 
 def get_voltage_config_source(request, station_number):
-    data = get_config_source(station_number, 'voltage')
-    response = render(request, 'source_voltage_config.tsv',
-                      {'data': data,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=voltage-s%s.tsv' % station_number)
-    return response
+    return get_specific_config_source(station_number, 'voltage')
 
 
 def get_current_config_source(request, station_number):
-    data = get_config_source(station_number, 'current')
-    response = render(request, 'source_current_config.tsv',
-                      {'data': data,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=current-s%s.tsv' % station_number)
-    return response
+    return get_specific_config_source(station_number, 'current')
 
 
 def get_gps_config_source(request, station_number):
-    data = get_config_source(station_number, 'gps')
-    response = render(request, 'source_gps_config.tsv',
-                      {'data': data,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=gps-s%s.tsv' % station_number)
-    return response
+    return get_specific_config_source(station_number, 'gps')
 
 
 def get_trigger_config_source(request, station_number):
-    data = get_config_source(station_number, 'trigger')
-    response = render(request, 'source_trigger_config.tsv',
+    return get_specific_config_source(station_number, 'trigger')
+
+
+def get_specific_config_source(station_number, type):
+    data = get_config_source(station_number, type)
+    response = render(request, 'source_%s_config.tsv' % type,
                       {'data': data,
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
-        'attachment; filename=trigger-s%s.tsv' % station_number)
+        'attachment; filename=%s-s%s.tsv' % (type, station_number))
     return response
 
 
