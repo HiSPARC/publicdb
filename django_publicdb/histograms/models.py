@@ -176,10 +176,10 @@ class Configuration(models.Model):
     slave.admin_order_field = 'slv_version'
 
     def master_fpga(self):
-        return extract_fpga_version(self.mas_version)
+        return self.extract_fpga_version(self.mas_version)
 
     def slave_fpga(self):
-        return extract_fpga_version(self.slv_version)
+        return self.extract_fpga_version(self.slv_version)
 
     def extract_hardware_serial(self, electronics_version):
         """Extract electronics hardware serial number from version string
