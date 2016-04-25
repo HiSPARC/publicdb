@@ -519,41 +519,67 @@ def station(request, station_number):
 
 
 def get_coincidencetime_histogram_source(request, year, month, day):
-    data = get_histogram_source(year, month, day, 'coincidencetime')
-    response = render(request, 'source_coincidencetime_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day))},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=coincidencetime-network-%d%02d%02d.tsv' %
-        (int(year), int(month), int(day)))
-    return response
+    return get_specific_network_histogram_source(year, month, day,
+                                                 'coincidencetime')
 
 
 def get_coincidencenumber_histogram_source(request, year, month, day):
-    data = get_histogram_source(year, month, day, 'coincidencenumber')
-    response = render(request, 'source_coincidencenumber_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day))},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=coincidencenumber-network-%d%02d%02d.tsv' %
-        (int(year), int(month), int(day)))
-    return response
+    return get_specific_network_histogram_source(year, month, day,
+                                                 'coincidencenumber')
 
 
-def get_eventtime_histogram_source(request, station_number, year, month, day):
-    """Get all eventtime histograms for a specific date"""
-
-    data = get_histogram_source(year, month, day, 'eventtime', station_number)
-    response = render(request, 'source_eventtime_histogram.tsv',
+def get_specific_network_histogram_source(request, year, month, day, type):
+    data = get_histogram_source(year, month, day, type, station_number)
+    response = render(request, 'source_%s_histogram.tsv' % type,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
-        'attachment; filename=eventtime-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
+        'attachment; filename=%s-network-%d%02d%02d.tsv' %
+        (type, station_number, int(year), int(month), int(day)))
+    return response
+
+
+def get_eventtime_histogram_source(request, station_number, year, month, day):
+    """Get eventtime histogram for a specific date"""
+    return get_specific_histogram_source(station_number, year, month, day,
+                                         'eventtime')
+
+
+def get_pulseheight_histogram_source(request, station_number, year, month,
+                                     day):
+    return get_specific_histogram_source(station_number, year, month, day,
+                                         'pulseheight')
+
+
+def get_pulseintegral_histogram_source(request, station_number, year, month,
+                                       day):
+    return get_specific_histogram_source(station_number, year, month, day,
+                                         'pulseintegral')
+
+
+def get_zenith_histogram_source(request, station_number, year, month, day):
+    return get_specific_histogram_source(station_number, year, month, day,
+                                         'zenith')
+
+
+def get_azimuth_histogram_source(request, station_number, year, month, day):
+    return get_specific_histogram_source(station_number, year, month, day,
+                                         'azimuth')
+
+
+def get_specific_histogram_source(request, station_number, year, month, day,
+                                  type):
+    data = get_histogram_source(year, month, day, type, station_number)
+    response = render(request, 'source_%s_histogram.tsv' % type,
+                      {'data': data,
+                       'date': '-'.join((year, month, day)),
+                       'station_number': station_number},
+                      content_type=MIME_TSV)
+    response['Content-Disposition'] = (
+        'attachment; filename=%s-s%s-%d%02d%02d.tsv' %
+        (type, station_number, int(year), int(month), int(day)))
     return response
 
 
@@ -623,85 +649,26 @@ def get_eventtime_histogram_sources(station_number, start, end):
     return izip(bins, values)
 
 
-def get_pulseheight_histogram_source(request, station_number, year, month,
-                                     day):
-    data = get_histogram_source(year, month, day, 'pulseheight',
-                                station_number)
-    response = render(request, 'source_pulseheight_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=pulseheight-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
-
-
-def get_pulseintegral_histogram_source(request, station_number, year, month,
-                                       day):
-    data = get_histogram_source(year, month, day, 'pulseintegral',
-                                station_number)
-    response = render(request, 'source_pulseintegral_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=pulseintegral-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
-
-
-def get_zenith_histogram_source(request, station_number, year, month, day):
-    data = get_histogram_source(year, month, day, 'zenith', station_number)
-    response = render(request, 'source_zenith_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=zenith-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
-
-
-def get_azimuth_histogram_source(request, station_number, year, month, day):
-    data = get_histogram_source(year, month, day, 'azimuth', station_number)
-    response = render(request, 'source_azimuth_histogram.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=azimuth-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
-
-
 def get_barometer_dataset_source(request, station_number, year, month, day):
-    data = get_dataset_source(year, month, day, 'barometer', station_number)
-    response = render(request, 'source_barometer_dataset.tsv',
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=barometer-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
-    return response
+    return get_specific_dataset_source(station_number, year, month, day,
+                                       'barometer')
 
 
 def get_temperature_dataset_source(request, station_number, year, month, day):
-    data = get_dataset_source(year, month, day, 'temperature', station_number)
-    response = render(request, 'source_temperature_dataset.tsv',
+    return get_specific_dataset_source(station_number, year, month, day,
+                                       'temperature')
+
+
+def get_specific_dataset_source(station_number, year, month, day, type):
+    data = get_dataset_source(year, month, day, type, station_number)
+    response = render(request, 'source_%s_dataset.tsv' % type,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
-        'attachment; filename=temperature-s%s-%d%02d%02d.tsv' %
-        (station_number, int(year), int(month), int(day)))
+        'attachment; filename=%s-s%s-%d%02d%02d.tsv' %
+        (type, station_number, int(year), int(month), int(day)))
     return response
 
 
