@@ -542,30 +542,30 @@ def get_specific_network_histogram_source(request, year, month, day, type):
 
 def get_eventtime_histogram_source(request, station_number, year, month, day):
     """Get eventtime histogram for a specific date"""
-    return get_specific_histogram_source(station_number, year, month, day,
-                                         'eventtime')
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'eventtime')
 
 
 def get_pulseheight_histogram_source(request, station_number, year, month,
                                      day):
-    return get_specific_histogram_source(station_number, year, month, day,
-                                         'pulseheight')
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'pulseheight')
 
 
 def get_pulseintegral_histogram_source(request, station_number, year, month,
                                        day):
-    return get_specific_histogram_source(station_number, year, month, day,
-                                         'pulseintegral')
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'pulseintegral')
 
 
 def get_zenith_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(station_number, year, month, day,
-                                         'zenith')
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'zenith')
 
 
 def get_azimuth_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(station_number, year, month, day,
-                                         'azimuth')
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'azimuth')
 
 
 def get_specific_histogram_source(request, station_number, year, month, day,
