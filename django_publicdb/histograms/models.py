@@ -167,15 +167,17 @@ class Configuration(models.Model):
         return self.source.station.number
     station.admin_order_field = 'source__station__number'
 
-    @property
-    def master(self):
+    def _master(self):
         return self.extract_hardware_serial(self.mas_version)
-    master.admin_order_field = 'mas_version'
+    _master.admin_order_field = 'mas_version'
 
-    @property
-    def slave(self):
+    master = property(_master)
+
+    def _slave(self):
         return self.extract_hardware_serial(self.slv_version)
-    slave.admin_order_field = 'slv_version'
+    _slave.admin_order_field = 'slv_version'
+
+    slave = property(_slave)
 
     @property
     def master_fpga(self):
