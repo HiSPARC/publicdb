@@ -549,15 +549,16 @@ def update_detector_timing_offsets(summary):
 def update_station_timing_offsets(network_summary):
     """Determine which station timing offsets need updating and update"""
 
-    logger.debug("Determining update of station offsets"
+    logger.debug("Determining update of station offsets "
                  "for %s" % network_summary)
-    date = network_summary.date
+    summary_date = network_summary.date
 
     stations = esd.get_station_numbers_from_esd_coincidences(network_summary)
     off = esd.DetermineStationTimingOffsetsESD(stations)
 
     for ref_sn, sn in off.get_station_pairs_within_max_distance():
-        left, right = off.determine_first_and_last_date(date, ref_sn, sn)
+        left, right = off.determine_first_and_last_date(summary_date,
+                                                        sn, ref_sn)
         for date, _ in datetime_range(left, right):
             ref_summary = get_summary(date, ref_sn)
             if ref_summary is None:
@@ -568,7 +569,8 @@ def update_station_timing_offsets(network_summary):
 
             logger.debug("Determining station offset for %s"
                          " ref %s at %s" % (summary, ref_summary, date))
-            offset, rchi2 = off.determine_station_offset(date, sn, ref_sn)
+            offset, rchi2 = off.determine_station_timing_offset(date, sn,
+                                                                ref_sn)
             save_station_offset(ref_summary, summary, offset, rchi2)
 
 
