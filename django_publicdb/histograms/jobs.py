@@ -9,13 +9,15 @@ import logging
 import multiprocessing
 
 from sapphire.utils import round_in_base
+from sapphire.analysis.calibration import datetime_range
 import numpy as np
 
 import django.db
 from .models import (GeneratorState, NetworkSummary, Summary,
                      Configuration, HistogramType, DatasetType,
                      DailyHistogram, NetworkHistogram, DailyDataset,
-                     PulseheightFit, DetectorTimingOffset)
+                     PulseheightFit, DetectorTimingOffset,
+                     StationTimingOffset)
 from ..inforecords.models import Station
 from ..station_layout.models import StationLayout
 import datastore
@@ -411,6 +413,7 @@ def perform_coincidences_tasks(network_summary):
     logger.info("Updating coincidence histograms for %s" % network_summary)
     update_coincidencetime_histogram(network_summary)
     update_coincidencenumber_histogram(network_summary)
+    update_station_timing_offsets(network_summary)
     return network_summary, []
 
 
@@ -541,6 +544,32 @@ def update_detector_timing_offsets(summary):
     logger.debug("Determining detector timing offsets for %s" % summary)
     offsets = esd.determine_detector_timing_offsets_for_summary(summary)
     save_offsets(summary, offsets)
+
+
+def update_station_timing_offsets(network_summary):
+    """Determine which station timing offsets need updating and update"""
+
+    logger.debug("Determining update of station offsets"
+                 "for %s" % network_summary)
+    date = network_summary.date
+
+    stations = esd.get_station_numbers_from_esd_coincidences(network_summary)
+    off = esd.DetermineStationTimingOffsetsESD(stations)
+
+    for ref_sn, sn in off.get_station_pairs_within_max_distance():
+        left, right = off.determine_first_and_last_date(date, ref_sn, sn)
+        for date, _ in datetime_range(left, right):
+            ref_summary = get_summary(date, ref_sn)
+            if ref_summary is None:
+                continue
+            summary = get_summary(date, sn)
+            if summary is None:
+                continue
+
+            logger.debug("Determining station offsets"
+                         " for %s ref %s" % (summary, ref_summary))
+            offset, rchi2 = off.determine_station_offset(date, sn, ref_sn)
+            save_station_offset(ref_summary, summary, offset, rchi2)
 
 
 def update_zenith_histogram(summary, tempfile_path, node_path):
@@ -715,5 +744,38 @@ def save_offsets(summary, offsets):
     logger.debug("Saved succesfully")
 
 
+def save_station_offset(ref_summary, summary, offset, rchi2):
+    """Store the station timing offset in database
+
+    :param summary: summary of station (station and date)
+    :param ref_summary: summary of reference station (station and date)
+    :param offset: station timing offset
+    :param rchi2: reduced chi squared parameter of the fit
+
+    """
+    logger.debug("Saving station offsets for %s ref %s" % (summary,
+                                                           ref_summary))
+    field = {}
+    if not np.isnan(offset):
+        field['offset'] = offset
+        field['rchi2'] = rchi2
+    else:
+        field['offset'] = None
+        field['rchi2'] = None
+
+    StationTimingOffset.objects.update_or_create(source=summary,
+                                                 ref_source=ref_summary,
+                                                 defaults=field)
+    logger.debug("Saved succesfully")
+
+
 def get_station_cluster_number(station):
     return station.cluster.main_cluster(), station.number
+
+
+def get_summary(date, station_number):
+    """Get summury for date and station_number"""
+    try:
+        return Summary.objects.get(station__number=station_number, date=date)
+    except:
+        return None
