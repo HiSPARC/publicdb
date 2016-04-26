@@ -304,7 +304,7 @@ def station_data(request, station_number, year, month, day):
                                          date__lte=date)
                                  .latest())
         config = Configuration.objects.filter(source=source).latest()
-        if config.slave() == -1:
+        if config.slave == -1:
             has_slave = False
         else:
             has_slave = True
@@ -399,7 +399,7 @@ def station_config(request, station_number):
     has_data = station_has_data(station)
 
     config = configs[-1]
-    if config.slave() == -1:
+    if config.slave == -1:
         has_slave = False
     else:
         has_slave = True
@@ -858,8 +858,8 @@ def get_config_source(station_number, type):
         raise Http404
 
     if type == 'electronics':
-        data = list((config.timestamp, config.master(), config.slave(),
-                     config.master_fpga(), config.slave_fpga())
+        data = list((config.timestamp, config.master, config.slave,
+                     config.master_fpga, config.slave_fpga)
                     for config in configs)
     else:
         data = list(configs.values_list(*fields))
