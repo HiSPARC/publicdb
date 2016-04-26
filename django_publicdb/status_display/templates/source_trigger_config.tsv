@@ -7,13 +7,14 @@
 #
 # This data contains the following columns:
 #
-# timestamp:  time of configuration in seconds after 1970-1-1 [UNIX timestamp]
+# timestamp: time of configuration in seconds after 1970-1-1 [UNIX timestamp]
 # low threshold (4x): value of the low threshold [ADC]
 # high threshold (4x): value of the high threshold [ADC]
 # low: number of low signals required for trigger
 # high: number of high signals required for trigger
 # and_or: boolean indicating how low and high are combined either and (false, 0) or or (true, 1).
 # external: 0 = no external. 1 = combined normal and external. 2 = only external
+#
 #
 {% for row in data %}{% ifchanged row|slice:"1:" %}{{ row.0|date:"U" }}{% for value in row|slice:"1:9" %}	{{ value|mv_to_adc }}{% endfor %}	{{ row.9 }}	{{ row.10 }}	{{ row.11|yesno:'1,0' }}	{{ row.12 }}
 {% endifchanged %}{% endfor %}

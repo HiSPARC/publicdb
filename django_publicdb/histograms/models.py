@@ -168,33 +168,56 @@ class Configuration(models.Model):
     station.admin_order_field = 'source__station__number'
 
     def master(self):
-        result = re.search(r'\d+', self.mas_version)
-        if result is None:
-            master = 'no master'
-        else:
-            master = result.group()
-        return master
+        return self.extract_hardware_serial(self.mas_version)
     master.admin_order_field = 'mas_version'
 
     def slave(self):
-        result = re.search(r'\d+', self.slv_version)
-        if result is None:
-            slave = 'no slave'
-        else:
-            slave = result.group()
-            if slave == '0':
-                slave = 'no slave'
-        return slave
+        return self.extract_hardware_serial(self.slv_version)
     slave.admin_order_field = 'slv_version'
 
     def master_fpga(self):
-        master_fpga = re.findall(r'\d+', self.mas_version)[1]
-        return master_fpga
+        return self.extract_fpga_version(self.mas_version)
 
     def slave_fpga(self):
-        slave_fpga = re.findall(r'\d+', self.slv_version)[1]
+        return self.extract_fpga_version(self.slv_version)
 
-        return slave_fpga
+    def extract_hardware_serial(self, electronics_version):
+        """Extract electronics hardware serial number from version string
+
+        For example from `Hardware: 32 FPGA: 15' the integer 32 is extracted.
+        If the number is not found or 0 the returned value is -1.
+
+        :param electronics_version: version string from the configuration.
+        :return: extracted hardware serial as integer, -1 is not found.
+
+        """
+        result = re.search(r'\d+', electronics_version)
+        if result is None:
+            serial = -1
+        else:
+            serial = int(result.group())
+            if serial == 0:
+                serial = -1
+        return serial
+
+    def extract_fpga_version(self, electronics_version):
+        """Extract electronics hardware serial number from version string
+
+        For example from `Hardware: 32 FPGA: 15' the integer 15 is extracted.
+        If the number is not found or 0 the returned value is -1.
+
+        :param electronics_version: version string from the configuration.
+        :return: extracted FPGA version as integer, -1 is not found.
+
+        """
+        try:
+            version = int(re.findall(r'\d+', electronics_version)[1])
+        except IndexError:
+            version = -1
+        else:
+            if version == 0:
+                version = -1
+        return version
 
 
 class NetworkHistogram(models.Model):

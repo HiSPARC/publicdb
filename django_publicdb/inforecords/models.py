@@ -240,7 +240,7 @@ class Station(models.Model):
         except Configuration.DoesNotExist:
             n_detectors = 4
         else:
-            if config.slave() == 'no slave':
+            if config.slave() == -1:
                 n_detectors = 2
             else:
                 n_detectors = 4
