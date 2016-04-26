@@ -844,6 +844,8 @@ def get_config_source(station_number, type):
                       for i in ['mas', 'slv'] for j in [1, 2])
         fields.extend(['trig_low_signals', 'trig_high_signals', 'trig_and_or',
                        'trig_external'])
+    elif type == 'electronics':
+        pass
     else:
         return None
 
