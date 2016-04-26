@@ -519,12 +519,12 @@ def station(request, station_number):
 
 
 def get_coincidencetime_histogram_source(request, year, month, day):
-    return get_specific_network_histogram_source(year, month, day,
+    return get_specific_network_histogram_source(request, year, month, day,
                                                  'coincidencetime')
 
 
 def get_coincidencenumber_histogram_source(request, year, month, day):
-    return get_specific_network_histogram_source(year, month, day,
+    return get_specific_network_histogram_source(request, year, month, day,
                                                  'coincidencenumber')
 
 
