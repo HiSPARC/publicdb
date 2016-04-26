@@ -214,6 +214,9 @@ class Configuration(models.Model):
             version = int(re.findall(r'\d+', electronics_version)[1])
         except IndexError:
             version = -1
+        else:
+            if version == 0:
+                version = -1
         return version
 
 
