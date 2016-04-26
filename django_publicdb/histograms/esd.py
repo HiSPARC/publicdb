@@ -578,6 +578,19 @@ def get_data_from_path(file_path, node_path, quantity):
     return data
 
 
+def get_station_numbers_from_esd_coincidences(network_summary):
+    """Get the station numbers in a coincidence file"""
+
+    date = network_summary.date
+    filepath = get_esd_data_path(date)
+    with tables.open_file(filepath, 'r') as data:
+        s_index = data.root.coincidences.s_index
+        re_number = re.compile('[0-9]+$')
+        s_numbers = [int(re_number.search(s_path).group())
+                     for s_path in s_index]
+    return s_numbers
+
+
 def determine_time_differences(coin_events, ref_station, station,
                                ref_detector_offsets, detector_offsets):
     """Determine the arrival time differences between two stations.
@@ -644,7 +657,7 @@ def get_detector_offsets(station, date):
     return [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
 
 
-class StationTimingOffsetsESD(DetermineStationTimingOffsets):
+class DetermineStationTimingOffsetsESD(DetermineStationTimingOffsets):
     def read_dt(self, station, ref_station, start, end):
         dt = []
         for date, _ in datetime_range(start, end):
