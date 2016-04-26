@@ -1,4 +1,4 @@
-{% load fix_data %}# HiSPARC electronics settings
+# HiSPARC electronics settings
 #
 # Station: {{ station_number }}
 #
