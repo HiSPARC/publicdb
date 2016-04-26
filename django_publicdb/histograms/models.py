@@ -370,8 +370,8 @@ class DetectorTimingOffset(models.Model):
 
 
 class StationTimingOffset(models.Model):
-    ref_source = models.ForeignKey('Summary')
-    source = models.ForeignKey('Summary')
+    ref_source = models.ForeignKey('Summary', related_name='ref_source')
+    source = models.ForeignKey('Summary', related_name='source')
     offset = models.FloatField(blank=True, null=True)
     rchi2 = models.FloatField(blank=True, null=True)
 
