@@ -566,8 +566,8 @@ def update_station_timing_offsets(network_summary):
             if summary is None:
                 continue
 
-            logger.debug("Determining station offsets"
-                         " for %s ref %s" % (summary, ref_summary))
+            logger.debug("Determining station offset for %s"
+                         " ref %s at %s" % (summary, ref_summary, date))
             offset, rchi2 = off.determine_station_offset(date, sn, ref_sn)
             save_station_offset(ref_summary, summary, offset, rchi2)
 
@@ -753,8 +753,8 @@ def save_station_offset(ref_summary, summary, offset, rchi2):
     :param rchi2: reduced chi squared parameter of the fit
 
     """
-    logger.debug("Saving station offsets for %s ref %s" % (summary,
-                                                           ref_summary))
+    logger.debug("Saving station offset for %s ref %s" % (summary,
+                                                          ref_summary))
     field = {}
     if not np.isnan(offset):
         field['offset'] = offset
