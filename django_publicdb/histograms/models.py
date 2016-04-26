@@ -373,6 +373,7 @@ class StationTimingOffset(models.Model):
     ref_source = models.ForeignKey('Summary')
     source = models.ForeignKey('Summary')
     offset = models.FloatField(blank=True, null=True)
+    rchi2 = models.FloatField(blank=True, null=True)
 
     def clean(self):
         if self.ref_source.station == self.source.station:
