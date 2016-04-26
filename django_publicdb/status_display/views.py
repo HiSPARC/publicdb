@@ -800,6 +800,7 @@ def get_histogram_source(year, month, day, type, station_number=None):
                 'coincidencenumber']:
         return zip(histogram.bins, histogram.values)
     else:
+        # Multiple value columns
         return zip(histogram.bins, *histogram.values)
 
 
