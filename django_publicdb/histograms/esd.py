@@ -559,7 +559,7 @@ def get_timedeltas(date, ref_station, station):
             else:
                 data = table.col('delta')
     except IOError:
-        logger.error("ESD file %s does not exists", path)
+        logger.debug("ESD file %s does not exists", path)
         return None
     return data
 
