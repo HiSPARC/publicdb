@@ -531,8 +531,10 @@ def get_data_from_path(file_path, node_path, quantity):
 def get_offset_function(station, date):
     """Get detector offsets for a station on a specific date as a function"""
 
+    offsets = get_detector_offsets(station, date)
+
     def detector_timing_offset(ts):
-        return get_detector_offsets(station, date)
+        return offsets
 
     return detector_timing_offset
 
