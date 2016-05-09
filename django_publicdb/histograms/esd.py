@@ -553,7 +553,7 @@ def get_timedeltas(date, ref_station, station):
                 tablename = 'time_deltas'
                 table = datafile.get_node(table_path, tablename)
             except tables.NoSuchNodeError:
-                logger.error("Cannot find table %s %s for %s", table_path,
+                logger.debug("Cannot find table %s %s for %s", table_path,
                              tablename, date)
                 data = None
             else:
