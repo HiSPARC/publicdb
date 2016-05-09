@@ -184,6 +184,16 @@ def update_all_histograms():
 
 
 def perform_update_tasks():
+    """Perform the update tasks in specific order
+
+    - First update ESD, which processes and stores events and weather data.
+    - Then update the histograms to determine detector offsets, perform
+      event reconstructions, and create the station data histograms.
+    - Then search coincidences in the ESD data and determine the time deltas
+      (which require the detector offsets).
+    - Finally create the histograms for the coincidences.
+
+    """
     update_esd()
     update_histograms()
     update_coincidences()
@@ -288,6 +298,7 @@ def search_and_store_coincidences(network_summary):
     django.db.close_old_connections()
     if network_summary.needs_update_coincidences:
         search_coincidences_and_store_esd(network_summary)
+        determine_time_delta_and_store_esd(network_summary)
     return network_summary
 
 
@@ -404,6 +415,8 @@ def perform_coincidences_tasks(network_summary):
 
 
 def search_coincidences_and_store_esd(network_summary):
+    """Search and store coincidences, and store the number of coincidences"""
+
     logger.info("Processing coincidences and storing ESD for %s" %
                 network_summary)
     t0 = time.time()
@@ -411,6 +424,15 @@ def search_coincidences_and_store_esd(network_summary):
         esd.search_coincidences_and_store_in_esd(network_summary)
     t1 = time.time()
     network_summary.num_coincidences = num_coincidences
+    logger.debug("Processing took %.1f s." % (t1 - t0))
+
+
+def determine_time_delta_and_store_esd(network_summary):
+    logger.info("Processing time deltas and storing ESD for %s" %
+                network_summary)
+    t0 = time.time()
+    esd.determine_time_delta_and_store_in_esd(network_summary)
+    t1 = time.time()
     logger.debug("Processing took %.1f s." % (t1 - t0))
 
 

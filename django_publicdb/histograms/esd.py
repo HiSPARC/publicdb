@@ -11,9 +11,10 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
-                      ReconstructESDEventsFromSource)
+                      ReconstructESDEventsFromSource, ProcessTimeDeltas)
 
 from ..inforecords.models import Station
+from .models import DetectorTimingOffset
 from . import datastore
 
 from django.conf import settings
@@ -58,6 +59,27 @@ def search_coincidences_and_store_in_esd(network_summary):
         num_coincidences = len(coinc.coincidences)
 
     return num_coincidences
+
+
+def determine_time_delta_and_store_in_esd(network_summary):
+    """Determine arrival time difference for station pairs in coincidences
+
+    For all station pairs in coincidences determine the arrival time
+    difference.
+
+    :param network_summary: summary of data source (station and date)
+    :type network_summary: histograms.models.NetworkSummary instance
+
+    """
+    date = network_summary.date
+    filepath = get_esd_data_path(date)
+    with tables.open_file(filepath, 'a') as data:
+        td = ProcessTimeDeltas(data, progress=False)
+        td.find_station_pairs()
+        station_numbers = {station for pair in td.pairs for station in pair}
+        td.detector_timing_offsets = {sn: get_offset_function(sn, date)
+                                      for sn in station_numbers}
+        td.determine_and_store_time_deltas_for_pairs()
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -504,3 +526,23 @@ def get_data_from_path(file_path, node_path, quantity):
         data = node.col(quantity)
     data = data[~np.isnan(data)]
     return data
+
+
+def get_offset_function(station, date):
+    """Get detector offsets for a station on a specific date as a function"""
+
+    offsets = get_detector_offsets(station, date)
+
+    def detector_timing_offset(ts):
+        return offsets
+
+    return detector_timing_offset
+
+
+def get_detector_offsets(station, date):
+    """Get detector offsets for a station on a specific date"""
+
+    do = DetectorTimingOffset.objects.get(source__station__number=station,
+                                          source__date=date)
+    offsets = [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
+    return [o if o is not None else np.nan for o in offsets]
