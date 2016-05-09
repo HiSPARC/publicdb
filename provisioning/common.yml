@@ -2,6 +2,7 @@
 - name: add SSH keys for hisparc user
   authorized_key: user=hisparc key="{{ item }}"
   with_file:
+    - public_keys/tkooij.pub
     - public_keys/davidf.pub
     - public_keys/adelaat.pub
     - public_keys/tond.pub

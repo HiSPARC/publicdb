@@ -115,3 +115,9 @@
         state=present user=hisparc
         job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
   sudo: yes
+
+- name: enable cron job for backingup publicdb database
+  cron: name="Publicdb dump" cron_file=hisparc hour=1 minute=0
+        state=present user=hisparc
+        job="mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; mysqldump publicdb > /mysqldumps/publicdb_dump.sql"
+  sudo: yes

@@ -30,6 +30,8 @@ urlpatterns = patterns('django_publicdb.status_display.views',
     (r'^source/azimuth/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_azimuth_histogram_source'),
     (r'^source/barometer/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_barometer_dataset_source'),
     (r'^source/temperature/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', 'get_temperature_dataset_source'),
+
+    (r'^source/electronics/(?P<station_number>\d+)/$', 'get_electronics_config_source'),
     (r'^source/voltage/(?P<station_number>\d+)/$', 'get_voltage_config_source'),
     (r'^source/current/(?P<station_number>\d+)/$', 'get_current_config_source'),
     (r'^source/gps/(?P<station_number>\d+)/$', 'get_gps_config_source'),

@@ -278,14 +278,16 @@
   {% if config %}
     <div id="master">
         <div class="sectionTitle">Master</div>
-        <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.mas_version }}</span></div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.master }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
     </div>
     {% if has_slave %}
     <div id="slave">
         <div class="sectionTitle">Slave</div>
-        <div class="keyvalue"><span class="key">Version</span><span class="value">{{ config.slv_version }}</span></div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.slave }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
     </div>
