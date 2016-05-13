@@ -658,7 +658,18 @@ def get_detector_offsets(station, date):
 
 
 class DetermineStationTimingOffsetsESD(DetermineStationTimingOffsets):
+
+    """Modified to work for the public database
+
+    In the ESD the data is separated by date. To collect enough data to
+    determine the offset multiple files may need to be opened. In order to
+    facilitate this the method to collect the deltas is overwritten.
+
+    """
+
     def read_dt(self, station, ref_station, start, end):
+        """Overwrite how time deltas are read"""
+
         dt = []
         for date, _ in datetime_range(start, end):
             data = get_timedeltas(date, ref_station, station)
