@@ -4,8 +4,6 @@ import os.path
 import tempfile
 import logging
 from operator import itemgetter
-import itertools
-import re
 
 import numpy as np
 import tables
@@ -13,11 +11,9 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
-                      ReconstructESDEventsFromSource, CoincidenceQuery)
+                      ReconstructESDEventsFromSource, ProcessTimeDeltas)
 from sapphire.analysis.calibration import (DetermineStationTimingOffsets,
                                            datetime_range)
-from sapphire.analysis.event_utils import station_arrival_time
-from sapphire.storage import TimeDelta
 
 from ..inforecords.models import Station
 from .models import DetectorTimingOffset
@@ -80,28 +76,12 @@ def determine_time_delta_and_store_in_esd(network_summary):
     date = network_summary.date
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
-        s_index = data.root.coincidences.s_index
-        re_number = re.compile('[0-9]+$')
-        s_numbers = [int(re_number.search(s_path).group())
-                     for s_path in s_index]
-
-        c_index = data.root.coincidences.c_index
-        pairs = {(s_numbers[s1], s_numbers[s2])
-                 for c_idx in c_index
-                 for s1, s2 in itertools.combinations(sorted(c_idx[:, 0]), 2)}
-
-        cq = CoincidenceQuery(data)
-        for ref_station, station in pairs:
-            ref_detector_offsets = get_detector_offsets(ref_station, date)
-            detector_offsets = get_detector_offsets(station, date)
-            coincidences = cq.all([ref_station, station], iterator=True)
-            coin_events = cq.events_from_stations(coincidences,
-                                                  [ref_station, station])
-            ets, dt = determine_time_differences(coin_events, ref_station,
-                                                 station, ref_detector_offsets,
-                                                 detector_offsets)
-            if len(ets):
-                store_time_deltas(data, ref_station, station, ets, dt)
+        td = ProcessTimeDeltas(data, progress=False)
+        td.find_station_pairs()
+        station_numbers = {station for pair in td.pairs for station in pair}
+        td.detector_timing_offsets = {sn: get_offset_function(sn, date)
+                                      for sn in station_numbers}
+        td.determine_and_store_time_deltas_for_pairs()
 
 
 def process_events_and_store_temporary_esd(summary):
@@ -578,75 +558,15 @@ def get_data_from_path(file_path, node_path, quantity):
     return data
 
 
-def get_station_numbers_from_esd_coincidences(network_summary):
-    """Get the station numbers in a coincidence file"""
+def get_offset_function(station, date):
+    """Get detector offsets for a station on a specific date as a function"""
 
-    date = network_summary.date
-    filepath = get_esd_data_path(date)
-    with tables.open_file(filepath, 'r') as data:
-        s_index = data.root.coincidences.s_index
-        re_number = re.compile('[0-9]+$')
-        s_numbers = [int(re_number.search(s_path).group())
-                     for s_path in s_index]
-    return s_numbers
+    offsets = get_detector_offsets(station, date)
 
+    def detector_timing_offset(ts):
+        return offsets
 
-def determine_time_differences(coin_events, ref_station, station,
-                               ref_detector_offsets, detector_offsets):
-    """Determine the arrival time differences between two stations.
-
-    :param coin_events: coincidence events.
-    :param ref_station,station: station numbers.
-    :param ref_detector_offsets,detector_offsets: detector timing offset list.
-    :return: extended timestamp of the first event and time difference,
-             t - t_ref. Not corrected for altitude differences.
-
-    """
-    dt = []
-    ets = []
-    previous_ets = 0
-    for events in coin_events:
-        ref_ets = events[0][1]['ext_timestamp']
-        # Filter coincidence which is subset of previous coincidence
-        if previous_ets == ref_ets:
-            continue
-        else:
-            previous_ets = ref_ets
-        # Filter for possibility of same station twice in coincidence
-        if len(events) is not 2:
-            continue
-        if events[0][0] == ref_station:
-            ref_id = 0
-            id = 1
-        else:
-            ref_id = 1
-            id = 0
-        ref_t = station_arrival_time(events[ref_id][1], ref_ets, [0, 1, 2, 3],
-                                     ref_detector_offsets)
-        t = station_arrival_time(events[id][1], ref_ets, [0, 1, 2, 3],
-                                 detector_offsets)
-        if np.isnan(t) or np.isnan(ref_t):
-            continue
-        dt.append(t - ref_t)
-        ets.append(ref_ets)
-    return ets, dt
-
-
-def store_time_deltas(data, ref_station, station, ext_timestamps, time_deltas):
-    """Store determined dt values"""
-
-    table_path = '/time_deltas/station_%d/station_%d' % (ref_station, station)
-    try:
-        dt_table = data.get_node(table_path, 'time_deltas')
-        dt_table.remove()
-    except tables.NoSuchNodeError:
-        pass
-    delta_data = [(ets, int(ets) / int(1e9), int(ets) % int(1e9), time_delta)
-                  for ets, time_delta in zip(ext_timestamps, time_deltas)]
-    table = data.create_table(table_path, 'time_deltas', TimeDelta,
-                              createparents=True, expectedrows=len(delta_data))
-    table.append(delta_data)
-    table.flush()
+    return detector_timing_offset
 
 
 def get_detector_offsets(station, date):
@@ -654,7 +574,8 @@ def get_detector_offsets(station, date):
 
     do = DetectorTimingOffset.objects.get(source__station__number=station,
                                           source__date=date)
-    return [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
+    offsets = [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
+    return [o if o is not None else np.nan for o in offsets]
 
 
 class DetermineStationTimingOffsetsESD(DetermineStationTimingOffsets):

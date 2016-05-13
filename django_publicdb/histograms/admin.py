@@ -46,6 +46,27 @@ class NetworkSummaryAdmin(admin.ModelAdmin):
     list_editable = ('needs_update', 'needs_update_coincidences')
     inlines = (NetworkHistogramInline,)
     list_per_page = 200
+    actions = ['unset_update_flag', 'unset_coincidences_flag',
+               'set_update_flag', 'set_coincidences_flag']
+
+    def unset_update_flag(self, request, qs):
+        qs.update(needs_update=False)
+    unset_update_flag.short_description = "Unset needs_update"
+
+    def unset_coincidences_flag(self, request, qs):
+        qs.update(needs_update_coincidences=False)
+    unset_coincidences_flag.short_description = ("Unset "
+                                                 "needs_update_coincidences")
+
+    def set_update_flag(self, request, qs):
+        qs.update(needs_update=True)
+    set_update_flag.short_description = "Set needs_update"
+
+    def set_coincidences_flag(self, request, qs):
+        """Only set flags if num coincidences is not null"""
+        (qs.filter(num_coincidences__isnull=False)
+           .update(needs_update_coincidences=True))
+    set_coincidences_flag.short_description = "Set needs_update_coincidences"
 
 
 class SummaryAdmin(admin.ModelAdmin):
@@ -59,6 +80,34 @@ class SummaryAdmin(admin.ModelAdmin):
                      'needs_update_weather', 'needs_update_config')
     inlines = (DailyHistogramInline,)
     list_per_page = 200
+    actions = ['unset_update_flag', 'unset_events_flag', 'unset_config_flag',
+               'set_update_flag', 'set_events_flag', 'set_config_flag']
+
+    def unset_update_flag(self, request, qs):
+        qs.update(needs_update=False)
+    unset_update_flag.short_description = "Unset needs_update"
+
+    def unset_events_flag(self, request, qs):
+        qs.update(needs_update_events=False)
+    unset_events_flag.short_description = "Unset needs_update_events"
+
+    def unset_config_flag(self, request, qs):
+        qs.update(needs_update_config=False)
+    unset_config_flag.short_description = "Unset needs_update_config"
+
+    def set_update_flag(self, request, qs):
+        qs.update(needs_update=True)
+    set_update_flag.short_description = "Set needs_update"
+
+    def set_events_flag(self, request, qs):
+        """Only set flags if num events is not null"""
+        qs.filter(num_events__isnull=False).update(needs_update_events=True)
+    set_events_flag.short_description = "Set needs_update_events"
+
+    def set_config_flag(self, request, qs):
+        """Only set flags if num config is not null"""
+        qs.filter(num_config__isnull=False).update(needs_update_config=True)
+    set_config_flag.short_description = "Set needs_update_config"
 
 
 class ConfigurationAdmin(admin.ModelAdmin):

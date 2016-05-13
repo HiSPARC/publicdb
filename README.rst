@@ -2,6 +2,12 @@ HiSPARC Public Database README
 ==============================
 
 
+.. image:: http://img.shields.io/badge/license-GPLv3-blue.svg
+   :target: https://github.com/HiSPARC/publicdb/blob/master/LICENSE
+.. image:: http://img.shields.io/travis/HiSPARC/publicdb/master.svg
+   :target: https://travis-ci.org/HiSPARC/publicdb
+
+
 Overview
 --------
 
