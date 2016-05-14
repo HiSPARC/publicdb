@@ -3,6 +3,7 @@
 import os.path
 import tempfile
 import logging
+import re
 from operator import itemgetter
 
 import numpy as np
