@@ -578,6 +578,19 @@ def get_detector_offsets(station, date):
     return [o if o is not None else np.nan for o in offsets]
 
 
+def get_station_numbers_from_esd_coincidences(network_summary):
+    """Get the station numbers in a coincidence file"""
+
+    date = network_summary.date
+    filepath = get_esd_data_path(date)
+    with tables.open_file(filepath, 'r') as data:
+        s_index = data.root.coincidences.s_index
+        re_number = re.compile('[0-9]+$')
+        s_numbers = [int(re_number.search(s_path).group())
+                     for s_path in s_index]
+    return s_numbers
+
+
 class DetermineStationTimingOffsetsESD(DetermineStationTimingOffsets):
 
     """Modified to work for the public database
