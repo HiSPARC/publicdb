@@ -130,7 +130,7 @@ class DetectorTimingOffsetAdmin(admin.ModelAdmin):
 
 class StationTimingOffsetAdmin(admin.ModelAdmin):
     list_display = ('ref_source', 'source', 'offset')
-    list_filter = ('ref_source__station__number', 'source__station__number')
+    list_filter = ('ref_source__station__number', 'source__station__number', 'ref_source__date')
     raw_id_fields = ('ref_source', 'source')
 
 
