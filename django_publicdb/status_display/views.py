@@ -989,7 +989,7 @@ def get_detector_timing_offsets(station_number):
 
 def get_station_timing_offsets(ref_station_number, station_number):
     offsets = StationTimingOffset.objects.filter(
-        ref_source__number=ref_station_number,
+        ref_source__station__number=ref_station_number,
         source__station__number=station_number,
         source__date__gte=FIRSTDATE,
         source__date__lte=datetime.date.today())
