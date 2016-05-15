@@ -17,7 +17,8 @@ from sapphire.transformations import clock
 
 from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
                                  NetworkHistogram, HistogramType, DatasetType,
-                                 DetectorTimingOffset, Summary, NetworkSummary)
+                                 DetectorTimingOffset, StationTimingOffset,
+                                 Summary, NetworkSummary)
 from ..inforecords.models import Pc, Station, Cluster, Country
 from ..station_layout.models import StationLayout
 from ..raw_data.date_generator import daterange
@@ -751,27 +752,39 @@ def get_detector_timing_offsets_source(request, station_number):
     return response
 
 
-def get_station_timing_offsets_source(request, station_number1,
-                                      station_number2):
-    station_number1 = int(station_number1)
-    station_number2 = int(station_number2)
+def get_station_timing_offsets_source(request, ref_station_number,
+                                      station_number):
+    ref_station_number = int(ref_station_number)
+    station_number = int(station_number)
 
-    if station_number1 >= station_number2:
+    if ref_station_number >= station_number:
         raise Http404
 
-    # Not implemented yet, for now raise 404.
-    raise Http404
+    data = get_station_timing_offsets(ref_station_number, station_number)
 
-    tsvdata = ''
+    if not len(data):
+        raise Http404
+
+    data = [next(rows)
+            for _, rows in groupby(data, key=itemgetter(1))]
+
+    data = [(calendar.timegm(r[0].timetuple()), none_to_nan(r[1]),
+             none_to_nan(r[2]))
+            for r in data]
+
+    buffer = StringIO()
+    writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
+    writer.writerows(data)
+    tsvdata = buffer.getvalue().strip('\n')
 
     response = render(request, 'source_station_timing_offsets.tsv',
                       {'tsvdata': tsvdata,
-                       'station_number1': station_number1,
-                       'station_number2': station_number2},
+                       'ref_station_number': ref_station_number,
+                       'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
         'attachment; filename=station_timing_offsets-s%d-s%d.tsv' %
-        (station_number1, station_number2))
+        (ref_station_number, station_number))
     return response
 
 
@@ -971,6 +984,17 @@ def get_detector_timing_offsets(station_number):
 
     data = offsets.values_list('source__date', 'offset_1', 'offset_2',
                                'offset_3', 'offset_4')
+    return data
+
+
+def get_station_timing_offsets(ref_station_number, station_number):
+    offsets = StationTimingOffset.objects.filter(
+        ref_source__number=ref_station_number,
+        source__station__number=station_number,
+        source__date__gte=FIRSTDATE,
+        source__date__lte=datetime.date.today())
+
+    data = offsets.values_list('source__date', 'offset', 'rchi2')
     return data
 
 
