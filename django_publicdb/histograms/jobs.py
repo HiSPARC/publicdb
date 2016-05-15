@@ -759,8 +759,8 @@ def save_station_offset(ref_summary, summary, offset, rchi2):
                                                           ref_summary))
     field = {}
     if not np.isnan(offset):
-        field['offset'] = offset
-        field['rchi2'] = rchi2
+        field['offset'] = round(offset, 1)
+        field['rchi2'] = round(rchi2, 2)
     else:
         field['offset'] = None
         field['rchi2'] = None
