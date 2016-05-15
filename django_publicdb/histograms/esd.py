@@ -3,6 +3,7 @@
 import os.path
 import tempfile
 import logging
+import re
 from operator import itemgetter
 
 import numpy as np
@@ -12,6 +13,8 @@ from sapphire import (determine_detector_timing_offsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
                       ReconstructESDEventsFromSource, ProcessTimeDeltas)
+from sapphire.analysis.calibration import (DetermineStationTimingOffsets,
+                                           datetime_range)
 
 from ..inforecords.models import Station
 from .models import DetectorTimingOffset
@@ -514,6 +517,34 @@ def get_time_series(summary, tablename, quantity):
     return data
 
 
+def get_timedeltas(date, ref_station, station):
+    """Get timedeltas for a specific date
+
+    Read timedelta's from ESD file, if data exists.
+    :param date: date for which to get timedelta's
+    :return: numpy.array of timedeltas
+
+    """
+    path = get_esd_data_path(date)
+    try:
+        with tables.open_file(path, 'r') as datafile:
+            try:
+                table_path = '/time_deltas/station_%d/station_%d' % \
+                    (ref_station, station)
+                tablename = 'time_deltas'
+                table = datafile.get_node(table_path, tablename)
+            except tables.NoSuchNodeError:
+                logger.debug("Cannot find table %s %s for %s", table_path,
+                             tablename, date)
+                data = None
+            else:
+                data = table.col('delta')
+    except IOError:
+        logger.debug("ESD file %s does not exists", path)
+        return None
+    return data
+
+
 def get_data_from_path(file_path, node_path, quantity):
     """Get reconstructed data
 
@@ -546,3 +577,37 @@ def get_detector_offsets(station, date):
                                           source__date=date)
     offsets = [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
     return [o if o is not None else np.nan for o in offsets]
+
+
+def get_station_numbers_from_esd_coincidences(network_summary):
+    """Get the station numbers in a coincidence file"""
+
+    date = network_summary.date
+    filepath = get_esd_data_path(date)
+    with tables.open_file(filepath, 'r') as data:
+        s_index = data.root.coincidences.s_index
+        re_number = re.compile('[0-9]+$')
+        s_numbers = [int(re_number.search(s_path).group())
+                     for s_path in s_index]
+    return s_numbers
+
+
+class DetermineStationTimingOffsetsESD(DetermineStationTimingOffsets):
+
+    """Modified to work for the public database
+
+    In the ESD the data is separated by date. To collect enough data to
+    determine the offset multiple files may need to be opened. In order to
+    facilitate this the method to collect the deltas is overwritten.
+
+    """
+
+    def read_dt(self, station, ref_station, start, end):
+        """Overwrite how time deltas are read"""
+
+        dt = []
+        for date, _ in datetime_range(start, end):
+            data = get_timedeltas(date, ref_station, station)
+            if data is not None:
+                dt.extend(data)
+        return dt

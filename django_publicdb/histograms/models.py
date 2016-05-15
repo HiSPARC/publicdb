@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 
 import zlib
 import cPickle as pickle
@@ -395,3 +396,19 @@ class DetectorTimingOffset(models.Model):
 
     class Meta:
         ordering = ('source',)
+
+
+class StationTimingOffset(models.Model):
+    ref_source = models.ForeignKey('Summary', related_name='ref_source')
+    source = models.ForeignKey('Summary', related_name='source')
+    offset = models.FloatField(blank=True, null=True)
+    rchi2 = models.FloatField(blank=True, null=True)
+
+    def clean(self):
+        if self.ref_source.station == self.source.station:
+            raise ValidationError("The stations may not be the same")
+        if self.ref_source.date != self.source.date:
+            raise ValidationError("The summary dates should be the same")
+
+    class Meta:
+        ordering = ('ref_source',)

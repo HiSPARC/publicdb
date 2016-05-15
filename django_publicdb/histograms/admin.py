@@ -3,7 +3,7 @@ from django.contrib import admin
 from .models import (GeneratorState, NetworkHistogram, DailyHistogram,
                      DailyDataset, NetworkSummary, Summary, Configuration,
                      PulseheightFit, HistogramType, DatasetType,
-                     DetectorTimingOffset)
+                     DetectorTimingOffset, StationTimingOffset)
 
 
 class GeneratorStateAdmin(admin.ModelAdmin):
@@ -128,6 +128,13 @@ class DetectorTimingOffsetAdmin(admin.ModelAdmin):
     raw_id_fields = ('source',)
 
 
+class StationTimingOffsetAdmin(admin.ModelAdmin):
+    list_display = ('ref_source', 'source', 'offset')
+    list_filter = ('ref_source__station__number', 'source__station__number',
+                   'ref_source__date')
+    raw_id_fields = ('ref_source', 'source')
+
+
 admin.site.register(GeneratorState, GeneratorStateAdmin)
 admin.site.register(NetworkHistogram, NetworkHistogramAdmin)
 admin.site.register(DailyHistogram, DailyHistogramAdmin)
@@ -139,3 +146,4 @@ admin.site.register(PulseheightFit, PulseheightFitAdmin)
 admin.site.register(HistogramType)
 admin.site.register(DatasetType)
 admin.site.register(DetectorTimingOffset, DetectorTimingOffsetAdmin)
+admin.site.register(StationTimingOffset, StationTimingOffsetAdmin)
