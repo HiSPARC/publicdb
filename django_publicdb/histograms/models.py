@@ -411,4 +411,5 @@ class StationTimingOffset(models.Model):
             raise ValidationError("The summary dates should be the same")
 
     class Meta:
+        unique_together = ('ref_source', 'source')
         ordering = ('ref_source',)
