@@ -556,6 +556,7 @@ def update_station_timing_offsets(network_summary):
     off = esd.DetermineStationTimingOffsetsESD(stations)
 
     for ref_sn, sn in off.get_station_pairs_within_max_distance():
+        cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date,
                                                         sn, ref_sn)
         for date, _ in datetime_range(left, right):
@@ -565,11 +566,15 @@ def update_station_timing_offsets(network_summary):
             summary = get_summary_or_none(date, sn)
             if summary is None:
                 continue
-
-            logger.debug("Determining station offset for %s"
-                         " ref %s at %s" % (summary, ref_summary, date))
-            offset, rchi2 = off.determine_station_timing_offset(date, sn,
-                                                                ref_sn)
+            if date in cuts:
+                logger.debug("Setting offset for config cut to nan for %s"
+                             " ref %s at %s" % (summary, ref_summary, date))
+                offset, rchi2 = np.nan, np.nan
+            else:
+                logger.debug("Determining station offset for %s"
+                             " ref %s at %s" % (summary, ref_summary, date))
+                offset, rchi2 = off.determine_station_timing_offset(date, sn,
+                                                                    ref_sn)
             save_station_offset(ref_summary, summary, offset, rchi2)
 
 
