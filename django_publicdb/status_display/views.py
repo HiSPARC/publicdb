@@ -994,7 +994,7 @@ def get_station_timing_offsets(ref_station_number, station_number):
         source__date__gte=FIRSTDATE,
         source__date__lte=datetime.date.today())
 
-    data = offsets.values_list('source__date', 'offset', 'rchi2')
+    data = offsets.values_list('source__date', 'offset', 'error')
     return data
 
 

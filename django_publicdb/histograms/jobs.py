@@ -569,13 +569,13 @@ def update_station_timing_offsets(network_summary):
             if date in cuts:
                 logger.debug("Setting offset for config cut to nan for %s"
                              " ref %s at %s" % (summary, ref_summary, date))
-                offset, rchi2 = np.nan, np.nan
+                offset, error = np.nan, np.nan
             else:
                 logger.debug("Determining station offset for %s"
                              " ref %s at %s" % (summary, ref_summary, date))
-                offset, rchi2 = off.determine_station_timing_offset(date, sn,
+                offset, error = off.determine_station_timing_offset(date, sn,
                                                                     ref_sn)
-            save_station_offset(ref_summary, summary, offset, rchi2)
+            save_station_offset(ref_summary, summary, offset, error)
 
 
 def update_zenith_histogram(summary, tempfile_path, node_path):
@@ -750,13 +750,13 @@ def save_offsets(summary, offsets):
     logger.debug("Saved succesfully")
 
 
-def save_station_offset(ref_summary, summary, offset, rchi2):
+def save_station_offset(ref_summary, summary, offset, error):
     """Store the station timing offset in database
 
     :param summary: summary of station (station and date)
     :param ref_summary: summary of reference station (station and date)
     :param offset: station timing offset
-    :param rchi2: reduced chi squared parameter of the fit
+    :param error: error of the offset
 
     """
     logger.debug("Saving station offset for %s ref %s" % (summary,
@@ -764,10 +764,10 @@ def save_station_offset(ref_summary, summary, offset, rchi2):
     field = {}
     if not np.isnan(offset):
         field['offset'] = round(offset, 1)
-        field['rchi2'] = round(rchi2, 2)
+        field['error'] = round(error, 2)
     else:
         field['offset'] = None
-        field['rchi2'] = None
+        field['error'] = None
 
     StationTimingOffset.objects.update_or_create(source=summary,
                                                  ref_source=ref_summary,
