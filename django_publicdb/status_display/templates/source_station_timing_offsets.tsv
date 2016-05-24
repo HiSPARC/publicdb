@@ -9,8 +9,8 @@
 #
 # timestamp: time of offset calibration in seconds after 1970-1-1 [UNIX timestamp]
 # offset:    station timing offsets [ns]
-# rchi2:     reduced chi squared
+# error:     offset errors [ns]
 #
 #
-# timestamp	offset	rchi2
+# timestamp	offset	error
 {{ tsvdata }}
