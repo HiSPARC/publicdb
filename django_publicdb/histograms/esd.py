@@ -10,11 +10,11 @@ import numpy as np
 import tables
 
 from sapphire import (determine_detector_timing_offsets,
+                      DetermineStationTimingOffsets,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
                       ReconstructESDEventsFromSource, ProcessTimeDeltas)
-from sapphire.analysis.calibration import (DetermineStationTimingOffsets,
-                                           datetime_range)
+from sapphire.analysis.calibration import datetime_range
 
 from ..inforecords.models import Station
 from .models import DetectorTimingOffset
