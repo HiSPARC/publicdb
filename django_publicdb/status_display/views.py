@@ -769,7 +769,7 @@ def get_station_timing_offsets_source(request, ref_station_number,
         except Station.DoesNotExist:
             raise Http404
         else:
-            # For existing pair without offsets return offset 0 with large error
+            # For existing pair without offsets return offset 0 and large error
             data = [(FIRSTDATE, 0., 100.)]
 
     data = [next(rows)
