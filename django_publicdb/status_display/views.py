@@ -763,7 +763,14 @@ def get_station_timing_offsets_source(request, ref_station_number,
     data = get_station_timing_offsets(ref_station_number, station_number)
 
     if not len(data):
-        raise Http404
+        try:
+            Station.objects.get(number=ref_station_number)
+            Station.objects.get(number=station_number)
+        except Station.DoesNotExist:
+            raise Http404
+        else:
+            # For existing pair without offsets return offset 0 with large error
+            data = [(FIRSTDATE, 0., 100.)]
 
     data = [next(rows)
             for _, rows in groupby(data, key=itemgetter(1))]
