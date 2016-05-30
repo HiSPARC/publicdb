@@ -995,6 +995,12 @@ def get_detector_timing_offsets(station_number):
 
 
 def get_station_timing_offsets(ref_station_number, station_number):
+    """Get all station timing offsets for a station pair
+
+    :param ref_station_number,station_number: station numbers.
+    :return: list of tuples with date, offset, and error.
+
+    """
     offsets = StationTimingOffset.objects.filter(
         ref_source__station__number=ref_station_number,
         source__station__number=station_number,
