@@ -724,6 +724,8 @@ def num_events(request, station_number, year=None, month=None, day=None,
         date = datetime.date(int(year), int(month), int(day))
         filters['source__date'] = date
     else:
+        if not 0 <= int(hour) <= 23:
+            return HttpResponseNotFound()
         try:
             date = datetime.date(int(year), int(month), int(day))
             histogram_values = DailyHistogram.objects.get(source__date=date,
