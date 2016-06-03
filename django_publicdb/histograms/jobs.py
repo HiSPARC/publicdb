@@ -553,9 +553,9 @@ def update_station_timing_offsets(network_summary):
     summary_date = network_summary.date
 
     stations = esd.get_station_numbers_from_esd_coincidences(network_summary)
-    off = esd.DetermineStationTimingOffsetsESD(stations)
 
     for ref_sn, sn in off.get_station_pairs_within_max_distance():
+        off = esd.DetermineStationTimingOffsetsESD([ref_sn, sn])
         cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date,
                                                         sn, ref_sn)
