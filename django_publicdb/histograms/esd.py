@@ -10,7 +10,7 @@ import numpy as np
 import tables
 
 from sapphire import (determine_detector_timing_offsets,
-                      DetermineStationTimingOffsets, HiSPARCStation,
+                      DetermineStationTimingOffsets, HiSPARCStations,
                       ProcessEventsFromSourceWithTriggerOffset,
                       ProcessWeatherFromSource, CoincidencesESD,
                       ReconstructESDEventsFromSource, ProcessTimeDeltas)
@@ -370,7 +370,7 @@ def determine_detector_timing_offsets_for_summary(summary):
             logger.error("Cannot find table events for %s", summary)
             offsets = [np.nan, np.nan, np.nan, np.nan]
         else:
-            station = HiSPARCStation([station.number]).stations[0]
+            station = HiSPARCStations([station.number]).stations[0]
             offsets = determine_detector_timing_offsets(table, station)
 
     return offsets
