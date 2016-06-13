@@ -769,8 +769,9 @@ def get_station_timing_offsets_source(request, ref_station_number,
         except Station.DoesNotExist:
             raise Http404
         else:
-            # For existing pair without offsets return offset 0 and large error
-            data = [(FIRSTDATE, 0., 100.)]
+            # For existing pair without offsets return (nan, nan),
+            # to be handled by analysis software.
+            data = [(FIRSTDATE, nan, nan)]
 
     data = [next(rows)
             for _, rows in groupby(data, key=itemgetter(1))]
