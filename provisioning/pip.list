@@ -5,4 +5,4 @@ Django>=1.7,<1.8
 recaptcha-client
 python-dateutil
 
-hisparc-sapphire>=0.15,<0.16
+hisparc-sapphire>=1.0,<1.1
