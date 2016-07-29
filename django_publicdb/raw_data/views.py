@@ -546,7 +546,7 @@ def download_coincidences(request):
         return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
     elif stations:
         stations = [int(number)
-                    for number in stations.strip('[]()').split(',')]
+                    for number in stations.strip('[](),').split(',')]
         if len(stations) < n:
             msg = "To few stations in query, give at least n."
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
