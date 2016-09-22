@@ -6,6 +6,7 @@
     - public_keys/davidf.pub
     - public_keys/adelaat.pub
     - public_keys/tond.pub
+    - public_keys/kaspervd.pub
 
 - name: upgrade all packages
   yum: name=* state=latest
