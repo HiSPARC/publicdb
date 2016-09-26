@@ -1,0 +1,5 @@
+pique.nikhef.nl ansible_ssh_host=localhost ansible_ssh_port=2202
+tietar.nikhef.nl ansible_ssh_host=localhost ansible_ssh_port=2201
+
+[all:vars]
+ansible_ssh_user=hisparc
