@@ -160,7 +160,7 @@ Local port  Remote host  Remote port
 2203        frome        22
 ==========  ===========  ===========
 
-If you're using some unix-style OS, like Linux, OS X or MacOS, you can use the provided setup-tunnel.sh like so::
+If you're using some unix-style OS, like Linux, OS X or macOS, you can use the provided setup-tunnel.sh like so::
 
    $ sh provisioning/setup-tunnel.sh <nikhef_username>
 
@@ -168,7 +168,7 @@ For example::
 
    $ sh provisioning/setup-tunnel.sh davidf
 
-If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
+You can also use an application like *SSH Tunnel* by Codinn. If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
 
 Once you have everything up and running, you have to use a different Ansible inventory file. That is needed to tell Ansible to use the tunnels, and not a direct connection. One is provided, so you can run::
 
