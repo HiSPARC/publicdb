@@ -168,7 +168,9 @@ For example::
 
    $ sh provisioning/setup-tunnel.sh davidf
 
-You can also use an application like *SSH Tunnel* by Codinn. If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
+You can also use an application like *SSH Tunnel Manager* by Tynsoe or *SSH Tunnel* by Codinn.
+
+If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
 
 Once you have everything up and running, you have to use a different Ansible inventory file. That is needed to tell Ansible to use the tunnels, and not a direct connection. One is provided, so you can run::
 
