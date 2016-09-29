@@ -52,6 +52,7 @@
     sudo: yes
     notify: restart nagios
 
+  # This is only an initial configuration. On changes, the config is retrieved from Pique. So force=no, and backup is unnecessary.
   - name: copy nagios hisparc config file
     copy: src=nagios/hisparc.cfg dest=/etc/nagios/objects owner=nagios force=no
     sudo: yes

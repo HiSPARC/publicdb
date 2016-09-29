@@ -4,12 +4,12 @@
     sudo: yes
 
   - name: copy dnsmasq config
-    copy: src=dnsmasq.conf dest=/etc/dnsmasq.conf
+    copy: src=dnsmasq.conf dest=/etc/dnsmasq.conf backup=yes
     sudo: yes
     notify: restart dnsmasq
 
   - name: copy openvpn config
-    copy: src=openvpn/ dest=/etc/openvpn
+    copy: src=openvpn/ dest=/etc/openvpn backup=yes
     sudo: yes
     notify: restart openvpn
 
@@ -35,5 +35,5 @@
     sudo: yes
 
   - name: copy resolv.conf
-    copy: src=resolv.conf dest=/etc/resolv.conf
+    copy: src=resolv.conf dest=/etc/resolv.conf backup=yes
     sudo: yes
