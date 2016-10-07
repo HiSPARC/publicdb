@@ -20,8 +20,8 @@
     },
     {
       "type": "null",
-      "host": "127.0.0.1",
-      "port": 2022,
+      "ssh_host": "127.0.0.1",
+      "ssh_port": 2022,
       "ssh_username": "hisparc",
       "ssh_private_key_file": "../../.vagrant/machines/vagrant/virtualbox/private_key"
     }
