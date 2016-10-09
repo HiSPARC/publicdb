@@ -16,14 +16,8 @@
       "shutdown_command": "echo '!Usr4hisp' | sudo -S shutdown -P now",
 
       "ssh_username": "hisparc",
-      "ssh_password": "!Usr4hisp"
-    },
-    {
-      "type": "null",
-      "ssh_host": "127.0.0.1",
-      "ssh_port": 2022,
-      "ssh_username": "hisparc",
-      "ssh_private_key_file": "../../.vagrant/machines/vagrant/virtualbox/private_key"
+      "ssh_password": "!Usr4hisp",
+      "ssh_wait_timeout": "10000s"
     }
   ],
   "provisioners": [
