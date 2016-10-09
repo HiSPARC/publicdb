@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}HiSPARC | Station layout submit form{% endblock %}
 
 {% block head_styles %}
-<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/submit_form.css">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/submit_form.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -17,7 +19,7 @@
             ➔ Documentation</a><br><br>
         <img width="313" height="250"
              title="HiSPARC station layout coordinate system"
-             src="{{ STATIC_URL }}images/coordinate_system.png">
+             src="{% static 'images/coordinate_system.png' %}">
     </div>
 
     <form action="{% url 'django_publicdb.station_layout.views.validate_layout_submit' %}" method="post">

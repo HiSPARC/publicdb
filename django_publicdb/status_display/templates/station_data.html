@@ -2,6 +2,7 @@
 
 {% load url from future %}
 {% load fix_data %}
+{% load static %}
 
 {% block current_data %}currentPage{% endblock %}
 {% block current_date %}{% url 'status_display.views.network_coincidences' date.year date.month date.day %}{% endblock %}
@@ -17,8 +18,8 @@
 {% endblock %}
 
 {% block head %}
-    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script src="{% static 'scripts/flot_settings.js' %}"></script>
+    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <!--[if lte IE 8]><script>
         var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});

@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% load url from future %}
+{% load static %}
 
 {% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/stations.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/stations.css' %}">
 {% endblock %}
 
 {% block content %}

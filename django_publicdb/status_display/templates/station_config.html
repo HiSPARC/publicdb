@@ -2,14 +2,15 @@
 
 {% load url from future %}
 {% load fix_data %}
+{% load static %}
 
 {% block current_config %}currentPage{% endblock %}
 
 {% block title %}{{ block.super }} - Configuration{% endblock %}
 
 {% block head %}
-    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
-    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script src="{% static 'scripts/flot_settings.js' %}"></script>
+    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <script>
       {% if lla %}
         $(document).ready(function() {

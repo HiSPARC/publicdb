@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
 {% load url from future %}
+{% load static %}
 
 {% block title %}HiSPARC Public Database - Help{% endblock %}
 
 {% block head_styles %}
-    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/station_page.css">
+    <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/station_page.css' %}">
 {% endblock %}
 
 {% block head %}
-    <script src="{{ STATIC_URL }}scripts/flot_settings.js"></script>
+    <script src="{% static 'scripts/flot_settings.js' %}"></script>
     <script>
         function downloadGraph(target) {
             var dataurl = $(target + ' .flot-base')[0].toDataURL();

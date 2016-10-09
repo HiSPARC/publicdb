@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 
+{% load static %}
+
 {% block title %}jSparc | Session request{% endblock %}
 
 {% block head_styles %}
-<link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/request_form.css">
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/request_form.css' %}">
 {% endblock %}
 
 

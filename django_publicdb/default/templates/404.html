@@ -1,5 +1,7 @@
 {% extends 'base.html' %}
 
+{% load static %}
+
 {% block title %}
     404 - Page not Found
 {% endblock %}
@@ -10,12 +12,14 @@
         width: 600px;
         height: 413px;
         margin: 0 auto;
-        background: white url('{{ STATIC_URL }}404.png') center no-repeat;}
+        background: white url("{% static '404.png' %}") center no-repeat;}
+
     #help {
         width: 600px;
         margin: 0 auto;
         text-align: center;
         font-size: 11pt;}
+
     a {
         color: #25B;
         text-decoration: none;}
@@ -23,7 +27,6 @@
 {% endblock %}
 
 {% block content %}
-
 <div id="notfound"></div>
 
 <div id="help">

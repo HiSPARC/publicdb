@@ -2,11 +2,12 @@
 
 {% load url from future %}
 {% load fix_strings %}
+{% load static %}
 
 {% block current_map %}currentPage{% endblock %}
 
 {% block head %}
-    <script src="{{ STATIC_URL }}scripts/OpenLayersHisparcMap.js"></script>
+    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <script>
         var stationlink;
         var clusterlink;
