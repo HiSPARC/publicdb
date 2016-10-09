@@ -12,7 +12,11 @@
   sudo: yes
 
 - name: update MySQL root password for all accounts
-  mysql_user: name=root host={{ item }} password={{ mysql_root_password }}
+  mysql_user: name=root
+              host={{ item }}
+              password={{ mysql_root_password }}
+              login_user=root
+              login_password=""
   with_items:
     - "{{ ansible_fqdn }}"
     - "{{ ansible_hostname }}"
