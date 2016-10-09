@@ -1,0 +1,7 @@
+@font-face {
+    font-family: 'NixieOne-Regular';
+    src: url('nixieone-regular.woff2') format('woff2'),
+         url('nixieone-regular.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
