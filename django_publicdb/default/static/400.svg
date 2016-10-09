@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 20.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 480 330" style="enable-background:new 0 0 480 330;" xml:space="preserve">
+<style type="text/css">
+	.st0{font-family:'NixieOne-Regular';}
+	.st1{font-size:60.6971px;}
+	.st2{font-size:144.4171px;}
+	.st3{fill:none;stroke:#000000;stroke-width:0.8;stroke-miterlimit:10;}
+	.st4{fill:none;stroke:#000000;stroke-width:0.8;stroke-linecap:round;stroke-miterlimit:10;}
+</style>
+<text transform="matrix(1 0 0 1 52.6006 291.0605)" class="st0 st1">Bad Request</text>
+<text transform="matrix(1 0 0 1 70.5107 205.9482)" class="st0 st2">4 0 0</text>
+<g id="Shower">
+	<line class="st3" x1="467" y1="8.7" x2="392.2" y2="109"/>
+	<line class="st4" x1="447.8" y1="34.4" x2="472.2" y2="16.9"/>
+	<line class="st4" x1="427.3" y1="61.9" x2="424.9" y2="28.2"/>
+	<line class="st4" x1="411.5" y1="83.1" x2="465.7" y2="58.1"/>
+</g>
+</svg>
