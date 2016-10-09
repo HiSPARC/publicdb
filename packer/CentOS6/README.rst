@@ -1,4 +1,4 @@
-Note to future self: unfortunately, packer does not support comments in templates as JSON does not understand comments. The following was cut from the template:
+Note to future self: unfortunately, packer does not support comments in templates as JSON does not understand comments. The following was cut from the template::
 
     {
       "type": "ansible-local",
