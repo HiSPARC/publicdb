@@ -806,7 +806,11 @@ def get_histogram_source(year, month, day, type, station_number=None):
     :return: list of tuples containing (bin, value) pairs.
 
     """
-    date = datetime.date(int(year), int(month), int(day))
+    try:
+        date = datetime.date(int(year), int(month), int(day))
+    except ValueError:
+        raise Http404
+
     if station_number is None:
         histogram = get_object_or_404(NetworkHistogram,
                                       source__date=date,
@@ -834,7 +838,11 @@ def get_dataset_source(year, month, day, type, station_number):
     :return: list of tuples containing (x, y) pairs.
 
     """
-    date = datetime.date(int(year), int(month), int(day))
+    try:
+        date = datetime.date(int(year), int(month), int(day))
+    except ValueError:
+        raise Http404
+
     dataset = get_object_or_404(DailyDataset,
                                 source__station__number=int(station_number),
                                 source__date=date,
