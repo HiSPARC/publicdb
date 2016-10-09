@@ -527,9 +527,9 @@ def download_coincidences(request):
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        msg = ("Incorrect optional parameters (start [datetime], "
-               "end [datetime])")
-        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+        error_msg = ("Incorrect optional parameters (start [datetime], "
+                     "end [datetime])")
+        return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
     n = int(request.GET.get('n', '2'))
 
@@ -541,31 +541,33 @@ def download_coincidences(request):
     if cluster == 'None':
         cluster = None
 
+    error_msg = None
     if stations and cluster:
-        msg = "Both stations and cluster are defined."
-        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+        error_msg = "Both stations and cluster are defined."
     elif stations:
-        stations = [int(number)
-                    for number in stations.strip('[](),').split(',')]
+        try:
+            stations = [int(number.strip('"\' '))
+                        for number in stations.strip('[](), ').split(',')]
+        except ValueError:
+            error_msg = "Unable to parse station numbers."
         if len(stations) < n:
-            msg = "To few stations in query, give at least n."
-            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+            error_msg = "To few stations in query, give at least n."
         if len(stations) >= 30:
-            msg = "To many stations in query, use less than 30."
-            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+            error_msg = "To many stations in query, use less than 30."
         if (Station.objects.filter(number__in=stations).count() !=
                 len(stations)):
-            msg = "Not all station numbers are valid."
-            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+            error_msg = "Not all station numbers are valid."
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
         stations = (Station.objects.filter(Q(cluster__parent=cluster) |
                                            Q(cluster=cluster))
                                    .values_list('number', flat=True))
         if len(stations) >= 30:
-            msg = ("To many stations in this cluster, "
-                   "manually select a subset of stations.")
-            return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
+            error_msg = ("To many stations in this cluster, "
+                         "manually select a subset of stations.")
+
+    if error_msg is not None:
+        return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
     download = request.GET.get('download', False)
     if download in ['true', 'True']:
