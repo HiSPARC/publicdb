@@ -1,7 +1,7 @@
 ---
 - name: install MySQL server and development libraries
   yum: name={{ item }} state=present
-  sudo: yes
+  become: true
   with_items:
     - mysql-server
     - mysql-devel
@@ -9,7 +9,7 @@
 
 - name: start MySQL server now and on boot
   service: name=mysqld state=started enabled=yes
-  sudo: yes
+  become: true
 
 - name: update MySQL root password for all accounts
   mysql_user: name=root

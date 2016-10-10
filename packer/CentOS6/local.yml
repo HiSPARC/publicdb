@@ -2,6 +2,6 @@
   tasks:
     - name: set hostname to vagrant
       hostname: name=vagrant.localdomain
-      sudo: yes
+      become: yes
 
 - include: playbook.yml

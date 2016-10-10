@@ -7,11 +7,11 @@
     - [[ IPADDR, 192.16.192.33 ]]
     - [[ NETMASK, 255.255.255.0 ]]
     - [[ ONBOOT, 'yes' ]]
-  sudo: yes
+  become: true
   notify: reboot
 
 - name: Set static gateway
   lineinfile: dest=/etc/sysconfig/network regexp=^GATEWAY
               line=GATEWAY=192.16.192.80
-  sudo: yes
+  become: true
   notify: reboot

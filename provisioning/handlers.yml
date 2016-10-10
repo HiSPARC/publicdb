@@ -6,7 +6,7 @@
   poll: 0
   ignore_errors: true
   notify: wait for server to come back
-  sudo: yes
+  become: true
 
 - name: wait for server to come back
   local_action: wait_for host={{ ansible_ssh_host | default(inventory_hostname) }}
@@ -14,37 +14,37 @@
 
 - name: restart postfix
   service: name=postfix state=restarted
-  sudo: yes
+  become: true
 
 - name: restart dnsmasq
   service: name=dnsmasq state=restarted
-  sudo: yes
+  become: true
 
 - name: restart openvpn
   service: name=openvpn state=restarted sleep=3
-  sudo: yes
+  become: true
   notify: restart shorewall
 
 - name: restart apache
   service: name=httpd state=restarted
-  sudo: yes
+  become: true
 
 - name: restart nagios
   service: name=nagios state=restarted
-  sudo: yes
+  become: true
   # notify: restart nsca
 
 - name: restart nsca
   service: name=nsca state=restarted
-  sudo: yes
+  become: true
 
 - name: restart supervisord
   service: name=supervisord state=restarted
-  sudo: yes
+  become: true
 
 - name: restart hisparcvpnd
   supervisorctl: name=hisparcvpnd state=restarted
 
 - name: restart shorewall
   service: name=shorewall state=restarted
-  sudo: yes
+  become: true

@@ -3,8 +3,8 @@
   lineinfile: dest=/etc/sysconfig/system-config-firewall
               regexp='--service=http' line='--service=http'
               state=present
-  sudo: yes
+  become: true
 
 - name: Compile firewall rules
   command: lokkit --update
-  sudo: yes
+  become: true

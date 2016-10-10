@@ -3,26 +3,26 @@
   lineinfile: dest=/etc/sudoers regexp='secure_path'
               line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
               state=present
-  sudo: yes
+  become: true
 
 - name: ensure /usr/local/lib is in ld.so.conf
   lineinfile: dest=/etc/ld.so.conf
               regexp='/usr/local/lib'
               line='/usr/local/lib' state=present
-  sudo: yes
+  become: true
 
 - name: ensure local source directory exists
   file: path=/usr/local/src/hisparc state=directory
         owner=hisparc group=hisparc mode=2775
-  sudo: yes
+  become: true
 
 - name: set default group write ACLs on /usr/local/src
   command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
-  sudo: yes
+  become: true
 
 - name: install libraries
   yum: name={{ item }} state=present
-  sudo: yes
+  become: true
   with_items:
     - gcc
     - bzip2
@@ -41,17 +41,17 @@
 - name: install miniconda
   command: creates=/opt/miniconda
            /bin/sh /usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh -b -p /opt/miniconda
-  sudo: yes
+  become: true
 
 - name: ensure miniconda is in path
   lineinfile: dest=/etc/profile.d/path.sh create=yes mode=0644
               regexp='miniconda' line='PATH=/opt/miniconda/bin:$PATH'
-  sudo: yes
+  become: true
 
 - name: install pip
   command: /opt/miniconda/bin/conda install pip --yes
-  sudo: yes
+  become: true
 
 - name: install git
   yum: name=git state=present
-  sudo: yes
+  become: true

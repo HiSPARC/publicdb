@@ -10,7 +10,7 @@
 
 - name: upgrade all packages
   yum: name=* state=latest
-  sudo: yes
+  become: true
 
 - name: flag a reboot if necessary
   script: flag_reboot.sh
@@ -21,15 +21,15 @@
 
 - name: install epel-release package
   yum: name=epel-release
-  sudo: yes
+  become: true
 
 - name: install ACL utilities
   yum: name=acl
-  sudo: yes
+  become: true
 
 - name: install screen
   yum: name=screen
-  sudo: yes
+  become: true
 
 - name: use custom .bashrc
   copy: src=bashrc dest=~/.bashrc backup=yes
@@ -37,8 +37,8 @@
 # Install mailcap for the mime.types file
 - name: install mailcap
   yum: name=mailcap
-  sudo: yes
+  become: true
 
 - name: install troubleshooting tools
   yum: name=nmap,tcpdump,conntrack-tools
-  sudo: yes
+  become: true

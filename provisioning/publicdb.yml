@@ -1,20 +1,20 @@
 - name: ensure /srv directory exists
   file: path=/srv state=directory
-  sudo: yes
+  become: true
 
 - name: ensure /srv/publicdb directory exists
   file: path=/srv/publicdb state=directory
         owner=hisparc group=hisparc mode=2775
-  sudo: yes
+  become: true
 
 - name: ensure /var/log/hisparc-update.log exists
   file: path=/var/log/hisparc-update.log state=touch
         owner=hisparc group=hisparc mode=644
-  sudo: yes
+  become: true
 
 - name: set default group write ACLs on /srv/publicdb
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
-  sudo: yes
+  become: true
 
 - name: checkout publicdb in /srv/publicdb/www
   git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
@@ -76,21 +76,21 @@
 
 - name: install supervisor daemon
   pip: name=supervisor
-  sudo: yes
+  become: true
 
 - name: copy supervisord init script
   copy: src=init-supervisord dest=/etc/init.d/supervisord backup=yes
         owner=root group=root mode=0755
-  sudo: yes
+  become: true
 
 - name: copy supervisord.conf
   copy: src=supervisord.conf dest=/etc/supervisord.conf backup=yes
         owner=root group=root mode=0644
-  sudo: yes
+  become: true
 
 - name: start supervisord now and on boot
   service: name=supervisord state=started enabled=yes
-  sudo: yes
+  become: true
 
 - name: restart uWSGI
   supervisorctl: name=uwsgi state=restarted
@@ -100,23 +100,23 @@
   cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0
         state=present user=hisparc
         job="/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
-  sudo: yes
+  become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files
   cron: name="clean downloaded data" cron_file=hisparc special_time=daily
         state=present user=root
         job="find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
-  sudo: yes
+  become: true
 
 - name: enable cron job for creating analysis sessions
   cron: name="create confirmed sessions" cron_file=hisparc
         minute=* hour=* day=* month=* weekday=*
         state=present user=hisparc
         job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
-  sudo: yes
+  become: true
 
 - name: enable cron job for backingup publicdb database
   cron: name="Publicdb dump" cron_file=hisparc hour=1 minute=0
         state=present user=hisparc
         job="mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; mysqldump publicdb > /mysqldumps/publicdb_dump.sql"
-  sudo: yes
+  become: true
