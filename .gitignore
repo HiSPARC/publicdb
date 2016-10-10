@@ -32,4 +32,8 @@ Thumbs.db
 .vagrant
 vagrant_ansible_inventory_default
 
+# Ansible
+*.retry
+
+# Other
 .remote-sync.json
