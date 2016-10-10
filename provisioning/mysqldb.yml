@@ -16,7 +16,8 @@
               host={{ item }}
               password={{ mysql_root_password }}
               login_user=root
-              login_password=""
+              login_password={{ mysql_root_password }}
+              check_implicit_admin=yes
   with_items:
     - "{{ ansible_fqdn }}"
     - "{{ ansible_hostname }}"
