@@ -69,8 +69,7 @@
 
 - name: collect static files of Django apps
   shell: chdir=/srv/publicdb/www/django_publicdb
-         yes 'yes' |
-         /srv/publicdb/publicdb_env/bin/python manage.py collectstatic
+         /srv/publicdb/publicdb_env/bin/python manage.py collectstatic --noinput
 
 - name: copy uwsgi.ini
   copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
