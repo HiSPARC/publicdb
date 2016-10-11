@@ -18,7 +18,6 @@
 
 {% block head %}
     <script src="{% static 'scripts/flot_settings.js' %}"></script>
-    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <!--[if lte IE 8]><script>
         var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
         var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
@@ -27,27 +26,14 @@
       {% if location.latitude and location.longitude %}
         $(document).ready(function() {
             var map = createMap("stationMap");
-            var style = createStyle(map);
 
-            map.setCenter(new OpenLayers.LonLat({{ location.longitude }}, {{ location.latitude }})
-                                        .transform(fromProjection, toProjection), 16);
+            var station = L.circleMarker(L.latLng({{ location.latitude }}, {{ location.longitude }}),
+                                         $.extend({}, pointStyle, {color: statusColors.unknown}));
+            station.bindTooltip('{{ station.number }}', {direction: 'top'}).openTooltip();
+            station.addTo(map);
 
-            var stationLayer = new OpenLayers.Layer.Vector("stations", {styleMap: new OpenLayers.StyleMap(style)});
-
-            var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ location.longitude }}, {{ location.latitude }})
-                                                       .transform(fromProjection, toProjection),
-                               {id: "", // no label, normally {id: {{ station.number }},
-                                name: "{{ station.name }}",
-                                status: "unknown"}); // blue
-            stationLayer.addFeatures(feature);
-
-            map.addLayer(stationLayer);
-
-            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
-
+            map.setView(L.latLng({{ location.latitude }}, {{ location.longitude }}), 16);
         });
-
       {% endif %}
 
         function downloadGraph(target) {

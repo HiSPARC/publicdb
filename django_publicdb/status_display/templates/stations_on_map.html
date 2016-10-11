@@ -6,81 +6,47 @@
 {% block current_map %}currentPage{% endblock %}
 
 {% block head %}
-    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <script>
-        var stationlink;
-        var clusterlink;
         $(document).ready(function() {
-            stationlink = $('#stationLink');
-            clusterlink = $('#clusterLink');
-
             var map = createMap("stationMap");
-            var style = createStyle(map);
 
-            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+            {% if center %}
+                map.setView(L.latLng({{ center.latitude }}, {{ center.longitude }}), 17);
+            {% endif %}
+
+            var station;
             {% for subcluster in subclusters %}
-                var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                var {{ subcluster.name|slugify|remove_hyphens }} = L.featureGroup();
                     {% for station in subcluster.stations %}
                         {% if station.longitude and station.latitude %}
-                            var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
-                                                       .transform(fromProjection, toProjection),
-                                {id: {{ station.number }},
-                                 name: "{{ station.name }}",
-                                 subcluster: "{{ station.cluster }}",
-                                 cluster: "{{ station.cluster.parent }}",
-                                 country: "{{ station.cluster.country }}",
-                                 link: {{ station.link|lower }},
-                                 status: "{{ station.status }}"});
-                            {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                            station = L.circleMarker(
+                                L.latLng({{ station.latitude }}, {{ station.longitude }}),
+                                $.extend({}, pointStyle, {color: statusColors.{{ station.status }}})
+                            );
+                            station.bindTooltip("{{ station.number }}", {direction: 'top'})
+                                   .bindPopup("Station: <a href='{% url 'status_display.views.station' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
+                                              "Cluster: {{ station.cluster }}");
+                            {{ subcluster.name|slugify|remove_hyphens }}.addLayer(
+                                station
+                            );
                         {% endif %}
                     {% endfor %}
-                map.addLayer({{ subcluster.name|slugify|remove_hyphens }});
+                {{ subcluster.name|slugify|remove_hyphens }}.addTo(map);
             {% endfor %}
             // Zoom to fit cluster
             {% if focus %}
                 {% for layer in focus %}
                     {% if forloop.first %}
-                        var bounds = {{ layer|slugify|remove_hyphens }}.getDataExtent();
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getBounds();
                     {% else %}
-                        bounds.extend({{ layer|slugify|remove_hyphens }}.getDataExtent());
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getBounds());
                     {% endif %}
                 {% endfor %}
                 if (bounds) {
-                    map.zoomToExtent(bounds);
-                    map.zoomTo(Math.floor(map.getZoom()));}
+                    map.fitBounds(bounds, {padding: boundsPadding});
+                }
             {% endif %}
-            var selectControl = new OpenLayers.Control.SelectFeature(
-                [{% for subcluster in subclusters %}
-                    {{ subcluster.name|slugify|remove_hyphens }}{% if not forloop.last %},{% endif %}
-                 {% endfor %}],
-                {clickout: true, hover: false});
-            map.addControl(selectControl);
-            selectControl.activate();
-            {% for subcluster in subclusters %}
-                {{ subcluster.name|slugify|remove_hyphens }}.events.on({
-                    "featureselected": function(e) {showStationInfo(e);}});
-            {% endfor %}
         });
-
-        function showStationInfo(e) {
-            var attr = e.feature.attributes
-            // Do not link to data if attr.link is false
-            if(attr.link) {
-                stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
-                            "<a href='{% url 'status_display.views.stations' %}" + attr.id + "'>" + attr.name + " (" + attr.id + ")</a>");}
-            else {stationLink("<a href='{% url 'status_display.views.stations' %}" + attr.id + "/status'><span class='statusBall " + attr.status + "'></span></a> " +
-                              attr.name + " (" + attr.id + ")");}
-
-            if (attr.cluster == "None") {cluster = attr.subcluster}
-            else {cluster = attr.cluster}
-            clusterLink("<a href='{% url 'status_display.views.stations_on_map' %}" + attr.country + '/' + cluster + '/' + attr.subcluster + "'> " + attr.subcluster + " (" +  cluster + ")</a>");}
-
-        function stationLink(text) {
-            stationlink.html(text);}
-
-        function clusterLink(text) {
-            clusterlink.html(text);}
     </script>
 {% endblock %}
 
@@ -90,16 +56,4 @@
 
 {% block map %}
     <div id="stationMap"></div>
-{% endblock %}
-
-{% block extra %}
-    <div class="sectionTitle">Selected Station</div>
-    <div class="keyvalue">
-        <span class="key">Station</span><br>
-        <span class="value" id="stationLink"><span class="statusBall"></span> None</span>
-    </div>
-    <div class="keyvalue">
-        <span class="key">Cluster</span><br>
-        <span class="value" id="clusterLink">None</span>
-    </div>
 {% endblock %}
