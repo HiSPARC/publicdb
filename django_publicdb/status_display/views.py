@@ -982,6 +982,9 @@ def plot_timing_offsets(station_number):
     data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
     data = zip(*data)
 
+    if not data:
+        return None
+
     timestamps = data[0]
     values = zip(*data[1])
 
