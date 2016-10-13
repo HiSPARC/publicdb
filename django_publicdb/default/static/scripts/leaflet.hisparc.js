@@ -19,6 +19,17 @@ function createMap(name) {
     }).addTo(map);
     L.control.scale({imperial: false}).addTo(map);
 
+    map.on('zoomend', function(e) {
+        var currentZoom = map.getZoom(),
+            markerRadius = 0.6 * Math.pow(currentZoom, 0.9);
+        map.eachLayer(function(layer) {
+            if ('setStyle' in layer) {
+                layer.setStyle({radius: markerRadius})
+            }
+        });
+    });
+
+
     return map;
 }
 
