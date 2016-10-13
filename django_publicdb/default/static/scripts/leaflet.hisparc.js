@@ -7,7 +7,12 @@ function createMap(name) {
         zoomDelta: 0.4
     });
 
-    L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
+    var tile_url = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png';
+    if (L.retina) {
+        tile_url = 'http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}@2x.png';
+    }
+
+    L.tileLayer(tile_url, {
         attribution: '<a href="http://data.hisparc.nl/" title="HiSPARC data">HiSPARC</a><br>' +
                      '<a href="http://openstreetmap.org/copyright" title="© OpenStreetMap contributors">OSM</a> | ' +
                      '<a href="https://carto.com/attributions" title="© CARTO Positron">CARTO</a>'
