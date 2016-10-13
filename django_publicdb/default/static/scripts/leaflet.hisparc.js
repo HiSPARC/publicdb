@@ -21,14 +21,13 @@ function createMap(name) {
 
     map.on('zoomend', function(e) {
         var currentZoom = map.getZoom(),
-            markerRadius = 0.6 * Math.pow(currentZoom, 0.9);
+            markerRadius = 0.8 * Math.pow(currentZoom, 0.88);
         map.eachLayer(function(layer) {
             if ('setStyle' in layer) {
                 layer.setStyle({radius: markerRadius})
             }
         });
     });
-
 
     return map;
 }
