@@ -13,30 +13,23 @@
 {% block head %}
     <meta http-equiv="refresh" content="60">
     <script src="{% static 'scripts/flot_settings_results.js' %}"></script>
-    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <script>
       {% if core_map %}
         $(document).ready(function() {
             var map = createMap("coreMap");
-            var style = createStyle(map);
 
-            map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
-
-            var coreLayer = new OpenLayers.Layer.Vector("cores", {styleMap: new OpenLayers.StyleMap(style)});
-
+            var cores = L.featureGroup()
             {% for core in core_map %}
-                var feature = new OpenLayers.Feature.Vector(
-                    new OpenLayers.Geometry.Point{{ core }}.transform(fromProjection, toProjection),
-                    {id: "", status: "gpsold"});
-                coreLayer.addFeatures(feature);
+                cores.addLayer(
+                    L.circleMarker(
+                        L.latLng({{ core.0 }}, {{ core.1 }})
+                    )
+                );
             {% endfor %}
+            cores.setStyle($.extend({}, pointStyle, {color: statusColors.gpsold}));
+            cores.addTo(map);
 
-            map.addLayer(coreLayer);
-
-            var bounds = coreLayer.getDataExtent();
-            map.zoomToExtent(bounds);
-
-            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+            map.fitBounds(cores.getBounds(), {padding: boundsPadding});
         });
       {% endif %}
     </script>

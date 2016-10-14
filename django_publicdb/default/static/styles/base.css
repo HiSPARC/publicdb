@@ -32,3 +32,9 @@ a {
 
 .reference {
     font-size: 8pt;}
+
+/* Increase CARTO map tile contrast in Leaflet maps */
+img.leaflet-tile {
+    filter: brightness(.75) contrast(2);
+    -webkit-filter: brightness(.75) contrast(2);
+}

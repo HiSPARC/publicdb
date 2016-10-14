@@ -9,56 +9,58 @@
     <meta charset="utf-8">
     <title>HiSPARC Station map</title>
     <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/base.css' %}">
-    <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/OpenLayers-2.12.css' %}">
-    <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/map_controls.css' %}">
+    <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/leaflet.css' %}">
     <link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/maps.css' %}">
     <script src="{% static 'scripts/jquery-1.8.2.min.js' %}"></script>
     <script src="{% static 'scripts/jquery.flot-0.8a.min.js' %}"></script>
     <script src="{% static 'scripts/jquery.flot.axislabels.min.js' %}"></script>
     <script src="{% static 'scripts/jquery.flot.time.js' %}"></script>
-    <script src="{% static 'scripts/OpenLayers-2.13b.min.js' %}"></script>
-    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
+    <script src="{% static 'scripts/leaflet.js' %}"></script>
+    <script src="{% static 'scripts/leaflet.hisparc.js' %}"></script>
     <!--[if lte IE 8]><script src="{% static 'scripts/excanvas.min.js' %}"></script><![endif]-->
     <script>
         $(document).ready(function() {
             var map = createMap("map");
-            var style = createStyle(map);
 
             {% if center %}
-                map.setCenter(new OpenLayers.LonLat({{ center.longitude }}, {{ center.latitude }}).transform(fromProjection, toProjection), 17);
-            {% else %}
-                map.setCenter(new OpenLayers.LonLat(4.950, 52.355).transform(fromProjection, toProjection), 5);
+                map.setView(L.latLng({{ center.latitude }}, {{ center.longitude }}), 17);
             {% endif %}
 
+            var station;
             {% for subcluster in subclusters %}
-                var {{ subcluster.name|slugify|remove_hyphens }} = new OpenLayers.Layer.Vector("{{ subcluster.name }}", {styleMap: new OpenLayers.StyleMap(style)});
+                var {{ subcluster.name|slugify|remove_hyphens }} = L.featureGroup();
                     {% for station in subcluster.stations %}
                         {% if station.longitude and station.latitude %}
-                            var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ station.longitude }}, {{ station.latitude }})
-                                                       .transform(fromProjection, toProjection),
-                                {id: {{ station.number }},
-                                 name: "{{ station.name }}",
-                                 subcluster: "{{ station.cluster }}",
-                                 cluster: "{{ station.cluster.parent }}",
-                                 status: "{{ station.status }}"});
-                            {{ subcluster.name|slugify|remove_hyphens }}.addFeatures(feature);
+                            station = L.circleMarker(
+                                L.latLng({{ station.latitude }}, {{ station.longitude }}),
+                                $.extend({}, pointStyle, {color: statusColors.{{ station.status }}})
+                            );
+                            station.bindTooltip("{{ station.number }}", {direction: 'top'})
+                                {% if station.link %}
+                                   .bindPopup("Station: <a href='{% url 'status_display.views.station' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
+                                {% else %}
+                                   .bindPopup("Station: {{ station.number }} - {{ station.name }}<br>" +
+                                {% endif %}
+                                              "Cluster: {{ station.cluster }}");
+                            {{ subcluster.name|slugify|remove_hyphens }}.addLayer(
+                                station
+                            );
                         {% endif %}
                     {% endfor %}
-                map.addLayer({{ subcluster.name|slugify|remove_hyphens }});
+                {{ subcluster.name|slugify|remove_hyphens }}.addTo(map);
             {% endfor %}
             // Zoom to fit cluster
             {% if focus %}
                 {% for layer in focus %}
                     {% if forloop.first %}
-                        var bounds = {{ layer|slugify|remove_hyphens }}.getDataExtent();
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getBounds();
                     {% else %}
-                        bounds.extend({{ layer|slugify|remove_hyphens }}.getDataExtent());
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getBounds());
                     {% endif %}
                 {% endfor %}
                 if (bounds) {
-                    map.zoomToExtent(bounds);
-                    map.zoomTo(Math.floor(map.getZoom()));}
+                    map.fitBounds(bounds, {padding: boundsPadding});
+                }
             {% endif %}
         });
     </script>

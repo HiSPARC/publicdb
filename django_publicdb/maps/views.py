@@ -3,11 +3,13 @@ from django.http import Http404
 
 from ..inforecords.models import Station, Cluster, Country
 from ..status_display.nagios import status_lists, get_station_status
+from ..status_display.views import stations_with_data
 
 
 def station_on_map(request, station_number):
     """Zoom in on a specific station on a map"""
 
+    data_stations = stations_with_data()
     station_number = int(station_number)
     down, problem, up = status_lists()
 
@@ -22,13 +24,14 @@ def station_on_map(request, station_number):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_active=True,
                                                pc__is_test=False)):
-            location = station.latest_location()
+            link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
+            location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
                             'cluster': station.cluster,
+                            'link': link,
                             'status': status}
             station_data.update(location)
             stations.append(station_data)
@@ -43,6 +46,7 @@ def station_on_map(request, station_number):
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
+    data_stations = stations_with_data()
     down, problem, up = status_lists()
 
     if country:
@@ -75,11 +79,13 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
                                                pc__is_test=False)):
-            location = station.latest_location()
+            link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
+            location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
                             'cluster': station.cluster,
+                            'link': link,
                             'status': status}
             station_data.update(location)
             stations.append(station_data)

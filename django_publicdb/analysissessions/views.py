@@ -54,7 +54,7 @@ def create_energy_histogram(slug, coincidences):
 def get_cores(slug, coincidences):
     """Create data to plot on map"""
 
-    cores = [(c.core_position_x, c.core_position_y) for c in coincidences]
+    cores = [(c.core_position_y, c.core_position_x) for c in coincidences]
 
     return cores
 

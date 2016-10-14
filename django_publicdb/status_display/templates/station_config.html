@@ -9,42 +9,31 @@
 
 {% block head %}
     <script src="{% static 'scripts/flot_settings.js' %}"></script>
-    <script src="{% static 'scripts/OpenLayersHisparcMap.js' %}"></script>
     <script>
       {% if lla %}
         $(document).ready(function() {
             var map = createMap("gpsMap");
-            var style = createStyle(map);
-            // OpenLayers uses Long/Lat order.
-            map.setCenter(new OpenLayers.LonLat({{ lla.1 }}, {{ lla.0 }})
-                                        .transform(fromProjection, toProjection), 16);
 
-            var gpsLayer = new OpenLayers.Layer.Vector("gps", {styleMap: new OpenLayers.StyleMap(style)});
-
+            var gps_track = L.featureGroup()
             {% for gps in gpstrack %}
-                var feature = new OpenLayers.Feature.Vector(
-                                    new OpenLayers.Geometry.Point({{ gps.1 }}, {{ gps.0 }})
-                                                           .transform(fromProjection, toProjection),
-                                   {id: "", // no label, normally {id: {{ station.number }},
-                                    name: "{{ station.name }}",
-                                    status: "gpsold"});
-                gpsLayer.addFeatures(feature);
+                gps_track.addLayer(
+                    L.circleMarker(
+                        L.latLng({{ gps.0 }}, {{ gps.1 }})
+                    )
+                );
             {% endfor %}
+            gps_track.setStyle($.extend({}, pointStyle, {color: statusColors.gpsold}));
+            gps_track.bindTooltip('Previous position', {direction: 'top'})
+            gps_track.addTo(map);
 
-            var feature = new OpenLayers.Feature.Vector(
-                                new OpenLayers.Geometry.Point({{ lla.1 }}, {{ lla.0 }})
-                                                       .transform(fromProjection, toProjection),
-                               {id: "", // no label, normally {id: {{ station.number }},
-                                name: "{{ station.name }}",
-                                status: "gpsnew"});
-            gpsLayer.addFeatures(feature);
+            var current_position = L.circleMarker(
+                L.latLng({{ lla.0 }}, {{ lla.1 }}),
+                $.extend({}, pointStyle, {color: statusColors.gpsnew})
+            );
+            current_position.bindTooltip('Current position', {direction: 'top'});
+            current_position.addTo(map);
 
-            map.addLayer(gpsLayer);
-
-            var bounds = gpsLayer.getDataExtent();
-            map.zoomToExtent(bounds);
-
-            var layer_style = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+            map.fitBounds(gps_track.getBounds(), {padding: boundsPadding});
         });
       {% endif %}
 
@@ -256,7 +245,7 @@
             <div class="keyvalue"><span class="key">Longitude</span><span class="value">{{ lla.1|floatformat:7 }}°</span></div>
             <div class="keyvalue"><span class="key">Altitude</span><span class="value">{{ lla.2|floatformat:2 }} m</span></div>
             <div class="keyvalue"><span class="key gpsBall curr"></span><span class="value">Current position</span></div>
-            <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Old positions</span></div>
+            <div class="keyvalue"><span class="key gpsBall old"></span><span class="value">Previous positions</span></div>
           {% else %}
             <div class="keyvalue"><span class="key">Unknown!</span></div>
           {% endif %}
