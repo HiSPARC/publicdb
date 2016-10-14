@@ -36,7 +36,11 @@
                                 $.extend({}, pointStyle, {color: statusColors.{{ station.status }}})
                             );
                             station.bindTooltip("{{ station.number }}", {direction: 'top'})
+                                {% if station.link %}
                                    .bindPopup("Station: <a href='{% url 'status_display.views.station' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
+                                {% else %}
+                                   .bindPopup("Station: {{ station.number }} - {{ station.name }}<br>" +
+                                {% endif %}
                                               "Cluster: {{ station.cluster }}");
                             {{ subcluster.name|slugify|remove_hyphens }}.addLayer(
                                 station
