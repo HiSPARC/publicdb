@@ -10,48 +10,36 @@ database. The GPS positions can be found on the data pages of stations,
 via the API (:doc:`api`) and in the raw data.
 
 
-OpenStreetMap
--------------
+Map
+---
 
-Using the free `OpenStreetMap <http://www.openstreetmap.org>`_ service
-and the `OpenLayers <http://openlayers.org>`_ library we are able to
-visualize the detector network by showing the locations of the stations
-on a map.
+Using the `Leafet <http://leafletjs.com>`_ library with `CARTO
+<https://carto.com>`_ maps tiles (based on `OpenStreetMap
+<http://www.openstreetmap.org>`_ data) we are able to visualize the
+detector network by showing the locations of the stations on a map.
 
 Here is an overview of the network: `Stations on map
 <http://data.hisparc.nl/show/stations_on_map/>`_
 
 
-Controls
-^^^^^^^^
+Station info
+^^^^^^^^^^^^
 
-To keep the map clean we do not show any controls on the map. However,
-navigation is very intuitive and similar to what you may be familiar
-with from other map services. The controls are as follows:
-
-- Zooming
-    - Double click on a location you want to zoom in on
-    - Scroll with your mouse or trackpad to zoom in and out
-- Moving
-    - Click and drag the map to move it around
-    
-.. note::
-
-    When you zoom in far enough the station numbers will be
-    shown above the station indicators.
+When you click on a station marker a popup will show information about
+that station, its name and cluster. If the station has data the name of
+the station will be a link to its data page.
 
 
 Status
 ^^^^^^
 
 The stations on the map can have one of 4 colors to indicate the current
-status of that station. The status is retrieved from the `HiSPARC
-Monitoring System <http://vpn.hisparc.nl/>`_ when the page loads.
+status of that station.
 
 - Green: when a station is operating properly
 - Yellow: it is responding to the server but has a problem
 - Red: it is completely unresponsive (offline)
-- Blue: it is is no longer active or the status can't be determined.
+- Gray: it is is no longer active or the status can't be determined.
 
 
 Embedding
@@ -95,7 +83,7 @@ such that all stations fit in the window. But you can also focus on a
 specific region or station. Several levels of regions are possible::
 
     http://data.hisparc.nl/maps/[Country]/[Cluster]/[Subcluster]/
-    http://data.hisparc.nl/maps/[Station id]/
+    http://data.hisparc.nl/maps/[Station number]/
 
 An overview of countries, clusters and subclusters can be found on
 http://data.hisparc.nl/ . First you can choose to focus on a Country:
