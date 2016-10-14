@@ -10,6 +10,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
+    ('Kasper van Dam', 'kaspervd@nikhef.nl'),
     ('Arne de Laat', 'adelaat@nikhef.nl'),
 )
 
