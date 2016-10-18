@@ -1,8 +1,15 @@
 
 function createMap(name) {
+    /* Create a Leaflet map in the div with the given name
+    
+    A reference to the created map is returned.
+    Use this to add markers and other features to the map.
+
+    Do not forget to set the map center and zoom level,
+    either directly or by using the fitBounds method.
+    
+    */
     var map = L.map(name, {
-        center: L.latLng(52.3559, 4.951),
-        zoom: 5,
         zoomSnap: 0.2,
         zoomDelta: 0.4
     });
@@ -32,6 +39,7 @@ function createMap(name) {
     return map;
 }
 
+// Use these colors to style markers depending on the station status
 var statusColors = {
     down: 'red',
     problem: 'gold',
@@ -41,10 +49,12 @@ var statusColors = {
     gpsnew: '#2A7AE2'
 };
 
+// Use as default circleMarker style
 var pointStyle = {
     radius: 7,
     weight: 1.5,
     fillOpacity: 0.6
 };
 
+// Use as padding when using fitBounds
 var boundsPadding = [15, 15];
