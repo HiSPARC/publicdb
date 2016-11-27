@@ -117,36 +117,35 @@ class SessionRequest(models.Model):
         return [self.sid, self.pin]
 
     def find_coincidence(self, date, session):
-        file = date.strftime('%Y_%-m_%-d.h5')
-        datastore_path = os.path.join(settings.DATASTORE_PATH,
-                                      date.strftime('%Y/%-m'), file)
-        data = tables.open_file(datastore_path, 'r')
+        filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+        datastore_path = os.path.join(settings.DATASTORE_PATH, filepath)
         ndups = 0
         nvalid = 0
-        try:
-            stations = self.get_stations_for_session(data)
-        except Exception, msg:
-            print "Error in get_stations_for_session(data)"
-            print "Error:", msg
-            data.close()
+        if not os.path.isfile(datastore_path):
             return nvalid
+        with tables.open_file(datastore_path, 'r') as data:
+            try:
+                stations = self.get_stations_for_session(data)
+            except Exception, msg:
+                print "Error in get_stations_for_session(data)"
+                print "Error:", msg
+                return nvalid
 
-        coinc = coincidences.Coincidences(data, None, stations, progress=False)
-        c_list, timestamps = coinc._search_coincidences()
-        for coincidence in c_list:
-            if len(coincidence) >= 3:
-                event_list = coincidences.get_events(data, stations,
-                                                     coincidence, timestamps)
-                station_list = [x[0] for x in event_list]
-                if len(set(station_list)) == len(station_list):
-                    self.save_coincidence(event_list, session)
-                    nvalid += 1
-                else:
-                    ndups += 1
+            coinc = coincidences.Coincidences(data, None, stations, progress=False)
+            c_list, timestamps = coinc._search_coincidences()
+            for coincidence in c_list:
+                if len(coincidence) >= 3:
+                    event_list = coincidences.get_events(data, stations,
+                                                         coincidence, timestamps)
+                    station_list = [x[0] for x in event_list]
+                    if len(set(station_list)) == len(station_list):
+                        self.save_coincidence(event_list, session)
+                        nvalid += 1
+                    else:
+                        ndups += 1
         if ndups:
             print '%d duplicate stations dropped' % ndups
         print "Succesfully stored %d coincidences" % nvalid
-        data.close()
         return nvalid
 
     def get_stations_for_session(self, data):
