@@ -131,12 +131,13 @@ class SessionRequest(models.Model):
                 print "Error:", msg
                 return nvalid
 
-            coinc = coincidences.Coincidences(data, None, stations, progress=False)
+            coinc = coincidences.Coincidences(
+                data, None, stations, progress=False)
             c_list, timestamps = coinc._search_coincidences()
             for coincidence in c_list:
                 if len(coincidence) >= 3:
-                    event_list = coincidences.get_events(data, stations,
-                                                         coincidence, timestamps)
+                    event_list = coincidences.get_events(
+                        data, stations, coincidence, timestamps)
                     station_list = [x[0] for x in event_list]
                     if len(set(station_list)) == len(station_list):
                         self.save_coincidence(event_list, session)
