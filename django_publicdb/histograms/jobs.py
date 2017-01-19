@@ -39,7 +39,7 @@ INTERVAL_TEMP = 150
 INTERVAL_BARO = 150
 
 # Tables supported by this code
-SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather', 'singles']
 # Tables that initiate network updates
 NETWORK_TABLES = {'events': 'coincidences'}
 # Tables ignored by this code (unsupported tables not listed here will
@@ -49,7 +49,7 @@ IGNORE_TABLES = ['blobs']
 # check.  For events, for example, the histograms are recreated.  For
 # configs, this is not possible.  The previous number of configs is used
 # to select only new ones during the update.
-RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
+RECORD_EARLY_NUM_EVENTS = ['events', 'weather', 'singles']
 
 
 def check_for_updates():
@@ -187,7 +187,8 @@ def update_all_histograms():
 def perform_update_tasks():
     """Perform the update tasks in specific order
 
-    - First update ESD, which processes and stores events and weather data.
+    - First update ESD, which processes and stores events, weather and singles
+      data.
     - Then update the histograms to determine detector offsets, perform
       event reconstructions, and create the station data histograms.
     - Then search coincidences in the ESD data and determine the time deltas
@@ -275,7 +276,8 @@ def update_coincidences():
 
 
 def process_and_store_temporary_esd_for_summary(summary):
-    """Process events and weather from raw data and store in temporary file
+    """Process events, weather and singles from raw data and store in
+    temporary file
 
     :param summary: Summary object for data will be processed if the
         corresponding flags are set.
@@ -287,6 +289,8 @@ def process_and_store_temporary_esd_for_summary(summary):
         tmp_locations.append(process_events_and_store_esd(summary))
     if summary.needs_update_weather:
         tmp_locations.append(process_weather_and_store_esd(summary))
+    if summary.needs_update_singles:
+        tmp_locations.append(process_singles_and_store_esd(summary))
     return summary, tmp_locations
 
 
@@ -314,6 +318,8 @@ def update_histograms():
                           perform_events_tasks)
     perform_tasks_manager(Summary, "needs_update_weather",
                           perform_weather_tasks)
+    perform_tasks_manager(Summary, "needs_update_singles",
+                          perform_singles_tasks)
 
 
 def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
@@ -407,6 +413,12 @@ def perform_weather_tasks(summary):
     return summary, []
 
 
+def perform_singles_tasks(summary):
+    django.db.close_old_connections()
+    logger.info("Updating singles datasets for %s" % summary)
+    return summary, []
+
+
 def perform_coincidences_tasks(network_summary):
     django.db.close_old_connections()
     logger.info("Updating coincidence histograms for %s" % network_summary)
@@ -452,6 +464,13 @@ def process_weather_and_store_esd(summary):
     logger.info("Processing weather and storing ESD for %s" % summary)
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
+    return tmpfile_path, node_path
+
+
+def process_singles_and_store_esd(summary):
+    logger.info("Processing singles and storing ESD for %s" % summary)
+    tmpfile_path, node_path = \
+        esd.process_singles_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
 
 
