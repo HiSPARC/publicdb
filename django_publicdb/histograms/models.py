@@ -50,11 +50,13 @@ class Summary(models.Model):
     num_config = models.IntegerField(blank=True, null=True)
     num_errors = models.IntegerField(blank=True, null=True)
     num_weather = models.IntegerField(blank=True, null=True)
+    num_singles = models.IntegerField(blank=True, null=True)
     needs_update = models.BooleanField(default=False)
     needs_update_events = models.BooleanField(default=False)
     needs_update_config = models.BooleanField(default=False)
     needs_update_errors = models.BooleanField(default=False)
     needs_update_weather = models.BooleanField(default=False)
+    needs_update_singles = models.BooleanField(default=False)
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
