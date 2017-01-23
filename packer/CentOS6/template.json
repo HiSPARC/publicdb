@@ -6,7 +6,6 @@
       "iso_url": "http://ftp.tudelft.nl/centos.org/6/isos/x86_64/CentOS-6.8-x86_64-netinstall.iso",
       "iso_checksum": "22bd9300735ff092cc0c8cdd1bc8e9e600af124e",
       "iso_checksum_type": "sha1",
-      "ssh_pty" : "true",
 
       "disk_size": 10240,
 
@@ -18,7 +17,8 @@
 
       "ssh_username": "hisparc",
       "ssh_password": "!Usr4hisp",
-      "ssh_wait_timeout": "10000s"
+      "ssh_wait_timeout": "10000s",
+      "ssh_pty" : "true"
     }
   ],
   "provisioners": [
