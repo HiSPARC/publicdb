@@ -190,3 +190,32 @@ Once you have everything up and running, you have to use a different Ansible inv
    $ ansible-playbook provisioning/playbook.yml -i provisioning/ansible_inventory_tunnel -l tietar.nikhef.nl
 
 If you want to provision all servers at once, you can leave off the ``-l`` option.
+
+Provisioning using a Windows host
+---------------------------------
+
+Ansible does not support windows as a host (control machine). By using the ``ansible_local`` provisioner, setting up
+a test VM on Windows is possible.
+
+All scripts that are passed to ``/bin/bash`` on the target CentOS6 machine will fail miserably when carriage returns
+(CR, ^M, 0x0D) are present. This will cause all sorts of strange, hard to track down, errors. Make sure all files have
+unix-like line-endings (LF not CRLF)::
+
+   $ git config --global core.autocrlf "input"
+   $ git clone git@github.com:HiSPARC/publicdb.git
+
+Check ``packer/CentOS6/http/ks.cfg`` and ``provisioning/*sh`` for carriage returns. 
+
+Build the base box using packer.
+
+Change provisioner ``ansible`` to ``ansible_local`` in ``Vagrantfile``. Move ``host_key_checking = False`` to ``ansible.cfg``.
+Change the ``publicdb`` line in ``provisioning ansible_inventory`` to ``publicdb ansible_connection=local``. 
+
+Now add the VM::
+
+   $ vagrant up publicdb
+   
+Provisioning will stop at the reboot after upgrading packages. Edit ``common.yml`` to start after the reboot
+(remove everything above the reboot step) and::
+
+   $ vagrant up publicdb --provision
