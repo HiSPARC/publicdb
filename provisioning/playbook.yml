@@ -34,3 +34,10 @@
     - include: vpn-scripts.yml
   handlers:
     - include: handlers.yml
+
+- hosts: datastore
+  tasks:
+   - include: simple-firewall.yml
+   - include: development.yml
+  handlers:
+   - include: handlers.yml
