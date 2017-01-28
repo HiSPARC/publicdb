@@ -11,12 +11,16 @@
   command: /usr/bin/setfacl -m d:g::rwx /srv/datastore
   become: true
 
-- name: checkout datastore in /srv/datastore/www
-  git: repo=https://github.com/HiSPARC/datastore.git dest=/srv/datastore/www
+- name: ensure /var/log/hisparc directory exists
+  file: path=/var/log/hisparc state=directory group=hisparc mode=775
+  become: true
+
+- name: checkout datastore in /srv/datastore/code
+  git: repo=https://github.com/HiSPARC/datastore.git dest=/srv/datastore/code
        update=yes force=no
 
 - name: remove compiled python code
-  command: find /srv/datastore/www -name *.pyc -delete
+  command: find /srv/datastore/code -name *.pyc -delete
 
 - name: Copy conda requirements files
   copy: src=conda-datastore.list dest=/home/{{ ansible_user_id }}/
@@ -37,8 +41,14 @@
   command: /srv/datastore/datastore_env/bin/pip install
            -r /home/{{ ansible_user_id }}/pip-datastore.list
 
+- name: copy datastore.wsgi
+  copy: src=datastore.wsgi dest=/srv/datastore backup=yes
+
+- name: copy datastore.ini
+  copy: src=config-datastore.ini dest=/srv/datastore/config.ini backup=yes
+
 - name: copy uwsgi.ini
-  copy: src=uwsgi-datastore.ini dest=/srv/datastore/www/uwsgi.ini backup=yes
+  copy: src=uwsgi-datastore.ini dest=/srv/datastore/uwsgi.ini backup=yes
 
 - name: install supervisor daemon
   pip: name=supervisor
