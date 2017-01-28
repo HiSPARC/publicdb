@@ -39,5 +39,6 @@
   tasks:
    - include: simple-firewall.yml
    - include: development.yml
+   - include: datastore.yml
   handlers:
    - include: handlers.yml
