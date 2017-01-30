@@ -334,6 +334,10 @@ def station_data(request, station_number, year, month, day):
     pulseintegralhistogram = create_histogram('pulseintegral', station, date)
     zenithhistogram = create_histogram('zenith', station, date)
     azimuthhistogram = create_histogram('azimuth', station, date)
+    singleslowhistogram = create_histogram('singleslow', station, date)
+    singleshighhistogram = create_histogram('singleshigh', station, date)
+    singlesratelowdata = plot_dataset('singlesratelow', station, date)
+    singlesratehighdata = plot_dataset('singlesratehigh', station, date)
     barometerdata = plot_dataset('barometer', station, date)
     temperaturedata = plot_dataset('temperature', station, date)
 
@@ -349,6 +353,10 @@ def station_data(request, station_number, year, month, day):
                    'pulseintegralhistogram': pulseintegralhistogram,
                    'zenithhistogram': zenithhistogram,
                    'azimuthhistogram': azimuthhistogram,
+                   'singleslowhistogram': singleslowhistogram,
+                   'singleshighhistogram': singleshighhistogram,
+                   'singlesratelowdata': singlesratelowdata,
+                   'singlesratehighdata': singlesratehighdata,
                    'barometerdata': barometerdata,
                    'temperaturedata': temperaturedata,
                    'thismonth': thismonth,
@@ -569,6 +577,16 @@ def get_azimuth_histogram_source(request, station_number, year, month, day):
                                          day, 'azimuth')
 
 
+def get_singlesratelow_histogram_source(request, station_number, year, month,
+                                        day):
+    pass
+
+
+def get_singlesratehigh_histogram_source(request, station_number, year, month,
+                                         day):
+    pass
+
+
 def get_specific_histogram_source(request, station_number, year, month, day,
                                   type):
     data = get_histogram_source(year, month, day, type, station_number)
@@ -657,6 +675,15 @@ def get_barometer_dataset_source(request, station_number, year, month, day):
 def get_temperature_dataset_source(request, station_number, year, month, day):
     return get_specific_dataset_source(request, station_number, year, month,
                                        day, 'temperature')
+
+
+def get_singlesratelow_dataset_source(request, station_number, year, month,
+                                      day):
+    pass
+
+def get_singlesratehigh_dataset_source(request, station_number, year, month,
+                                        day):
+    pass
 
 
 def get_specific_dataset_source(request, station_number, year, month, day,

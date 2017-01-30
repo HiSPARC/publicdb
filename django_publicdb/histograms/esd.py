@@ -490,6 +490,44 @@ def get_data(summary, tablename, quantity):
     return data
 
 
+def get_table(summary, tablename):
+    """Get entire table from the datastore as in memory numpy.rec_array
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param tablename: table name (e.g. 'events', 'weather', ...)
+
+    """
+    date = summary.date
+    station = summary.station
+
+    path = get_esd_data_path(date)
+    with tables.open_file(path, 'r') as datafile:
+        try:
+            station_node = get_station_node(datafile, station)
+            table = datafile.get_node(station_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename, summary)
+            return None
+
+        return table.read()
+
+
+def get_singles(summary):
+    """Get singles data for summary
+
+    :param summary: summary of data source (station and date)
+    """
+    data = get_table(summary, 'singles')
+
+    high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'],
+                     data['slv_ch1_high'], data['slv_ch2_high']))
+    low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'],
+                    data['slv_ch1_low'], data['slv_ch2_low']))
+
+    return high, low
+
+
 def get_coincidences(network_summary, tablename, quantity):
     """Get data from the datastore from a table of a specific quantity
 

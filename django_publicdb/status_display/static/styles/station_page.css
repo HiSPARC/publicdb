@@ -25,6 +25,8 @@
     width: 850px;
     height: 600px;}
 
+#srl_histogram,
+#srh_histogram,
 #ct_histogram,
 #cn_histogram {
     height: 250px;}
@@ -42,6 +44,8 @@
 
 #ph_histogram,
 #pi_histogram,
+#sl_histogram,
+#sh_histogram,
 #az_histogram,
 #ze_histogram {
     height: 300px;}

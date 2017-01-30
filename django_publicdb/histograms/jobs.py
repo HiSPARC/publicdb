@@ -7,6 +7,7 @@ import time
 import calendar
 import logging
 import multiprocessing
+import warnings
 
 import numpy as np
 
@@ -33,6 +34,12 @@ MAX_PH = 2500
 BIN_PH_NUM = 250  # bin width = 10 mV
 MAX_IN = 62500
 BIN_IN_NUM = 250  # bin width = 250 mVns
+MAX_SINGLES_LOW = 1000
+BIN_SINGLES_LOW_NUM = 100  # bin width = 10
+MAX_SINGLES_HIGH = 300
+BIN_SINGLES_HIGH_NUM = 100  # bin width = 3
+
+BIN_SINGLES_RATE = 150  # seconds
 
 # Parameters for the datasets, interval in seconds
 INTERVAL_TEMP = 150
@@ -416,6 +423,8 @@ def perform_weather_tasks(summary):
 def perform_singles_tasks(summary):
     django.db.close_old_connections()
     logger.info("Updating singles datasets for %s" % summary)
+    update_singles_histogram(summary)
+    update_singles_rate_dataset(summary)
     return summary, []
 
 
@@ -556,6 +565,63 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 
+def update_singles_histogram(summary):
+    """Histograms of singles data for each detector individually"""
+
+    logger.debug("Updating singles histograms for %s" % summary)
+    high, low = esd.get_singles(summary)
+
+    bins, histograms = create_histogram(low, MAX_SINGLES_LOW,
+                                        BIN_SINGLES_LOW_NUM)
+    save_histograms(summary, 'singleslow', bins, histograms)
+
+    bins, histograms = create_histogram(high, MAX_SINGLES_HIGH,
+                                        BIN_SINGLES_HIGH_NUM)
+    save_histograms(summary, 'singleshigh', bins, histograms)
+
+
+def update_singles_rate_dataset(summary):
+    """Singles rate for each detector individually"""
+
+    def hist_column(col, bin_idxs):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            data = np.nan_to_num([np.nanmean(col[bin_idxs[i-1]:bin_idxs[i]])
+                                 for i in range(1, len(bins))])
+        return data
+
+    logger.debug("Updating singles rate datasets for %s" % summary)
+    singles = esd.get_table(summary, 'singles')
+
+    # timestamp at midnight (start of day) of date
+    start = calendar.timegm(summary.date.timetuple())
+
+    # create bins, don't forget right-most edge
+    n_bins = 24 * 3600 // BIN_SINGLES_RATE
+    bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins+1)]
+
+    bin_idxs = [np.searchsorted(singles['timestamp'], bins[i])
+                for i in range(len(bins))]
+
+    histograms = [hist_column(singles['mas_ch1_low'], bin_idxs),
+                  hist_column(singles['mas_ch2_low'], bin_idxs),
+                  hist_column(singles['slv_ch1_low'], bin_idxs),
+                  hist_column(singles['slv_ch2_low'], bin_idxs)
+                  ]
+
+    histograms = [x.tolist() for x in histograms]
+    save_dataset(summary, 'singlesratelow', bins, histograms)
+
+    histograms = [hist_column(singles['mas_ch1_high'], bin_idxs),
+                  hist_column(singles['mas_ch2_high'], bin_idxs),
+                  hist_column(singles['slv_ch1_high'], bin_idxs),
+                  hist_column(singles['slv_ch2_high'], bin_idxs)
+                  ]
+
+    histograms = [x.tolist() for x in histograms]
+    save_dataset(summary, 'singlesratehigh', bins, histograms)
+
+
 def update_detector_timing_offsets(summary):
     """Determine detector timing offsets"""
 
@@ -637,7 +703,7 @@ def update_temperature_dataset(summary):
     temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
-        save_dataset(summary, 'temperature', temperature)
+        save_dataset(summary, 'temperature', *temperature)
 
 
 def update_barometer_dataset(summary):
@@ -649,7 +715,7 @@ def update_barometer_dataset(summary):
     barometer = [(x, y) for x, y in barometer if y not in ERR]
     if barometer != []:
         barometer = shrink_dataset(barometer, INTERVAL_BARO)
-        save_dataset(summary, 'barometer', barometer)
+        save_dataset(summary, 'barometer', *barometer)
 
 
 def shrink_dataset(dataset, interval):
@@ -729,11 +795,10 @@ def save_network_histograms(network_summary, slug, bins, values):
     logger.debug("Saved succesfully")
 
 
-def save_dataset(summary, slug, data):
+def save_dataset(summary, slug, x, y):
     """Store the data in database"""
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
-    x, y = zip(*data)
     dataset = {'x': x, 'y': y}
     DailyDataset.objects.update_or_create(source=summary, type=type,
                                           defaults=dataset)
