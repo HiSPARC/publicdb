@@ -1,0 +1,225 @@
+* {
+    margin: 0;
+    padding: 0;}
+
+/* Header */
+
+html {
+    border: 1px solid black;
+    background: white;}
+
+body {
+    margin: 9px;
+    font-size: 100%;}
+
+#container {
+    overflow: hidden;
+    margin: auto;
+    width: 1900px;
+    height: 1060px;}
+
+#pageHeader {
+    background: url(../header.png) top right no-repeat;
+    height: 63px;
+    width: 200px;
+    margin: 0;
+    padding: 0;
+    left: 1700px;
+    display: inline-block;
+    position: relative;}
+
+#header * {
+    margin: 0;
+    padding: 0;}
+
+#header {
+    margin-bottom: 15px;}
+
+#header h2 {
+    text-align: center;
+    font-size: 200%;}
+
+#date {
+    font-weight: normal;
+    font-size: 100%;
+    margin-top: 5px;}
+
+#fullscreen {
+    padding: 0px 15px;
+    visibility: hidden;
+    font-size: 80%;
+    text-align: right;}
+
+/* Areas */
+
+.clearer {
+    margin: 0;
+    padding: 0;
+    width: 0;
+    height: 0;
+    clear: both;}
+
+#traces {
+    float: left;
+    width: 1000px;}
+
+#info {
+    float: left;
+    width: 1000px;}
+
+#data {
+    float: right;
+    width: 800px;}
+
+#reconstruction {
+    float: right;
+    width: 800px;}
+
+#location {
+    float: right;
+    width: 800px;
+    height: 350px;}
+
+#map{
+    width: 750px;
+    height: 300px;}
+
+/* Text */
+
+h3 {
+    font-size: 180%;
+    text-align: center;
+    display: block;
+    clear: both;
+    margin-top: 0.7em;
+    margin-bottom: 0.4em;}
+
+a:hover {
+    color: #005;
+    text-decoration: underline;}
+
+a {
+    font-weight: bold;
+    border-radius: 3px;
+    color: #25B;
+    text-decoration: none;}
+
+.sectionTitle {
+    margin-top: 0.75em;
+    font-size: 150%;
+    font-weight: bold;}
+
+.keyvalue {
+    font-size: 120%;
+    margin-top: 5px;
+    margin-bottom: 5px;}
+
+.location {
+    font-size: 120%;
+    margin-top: 5px;
+    margin-left: 25px;
+    display: inline-block;}
+
+.key {
+    font-weight: bold;
+    margin-right: 10px;}
+
+.value {
+    margin-right: 2px;}
+
+
+/* Layout */
+
+#station-layout {
+    overflow: hidden;
+    width: 100%;
+    height: 300px;
+    position: relative;}
+
+.center {
+    top: 50%;
+    left: 50%;
+    position: absolute;}
+    
+#gps {
+    background-color: black;
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    margin-top: -10px; 
+    margin-left: -10px;}
+
+.scintillator {
+    width: 50px;
+    height: 100px;
+    margin-top: -50px; 
+    margin-left: -25px;
+    border-radius: 1px 1px 0 0;
+    background-color: #CCD;}
+
+.scintillator:after {
+    content: "";
+    width: 0;
+    height: 0;
+    position: absolute;
+    margin: -60px 0 0 0;
+    border-bottom: 61px solid #CDD;
+    border-right: 26px solid rgba(0, 0, 0, 0);
+    border-left: 26px solid rgba(0, 0, 0, 0);
+    z-index: -1;}
+
+
+/* Graphs */
+
+#tr_graph {
+    overflow: hidden;
+    height: 450px;}
+
+.plot {
+    display: block;
+    clear: both;}
+
+.x2Axis .tickLabel {
+    display: none;}
+
+.y2Axis .tickLabel {
+    display: none;}
+
+.sourceLink {
+    float: right;
+    position: relative;
+    right: 15px;
+    font-size: 80%;
+    margin: 0;
+    padding: 0;}
+
+.sourceLink a {
+    padding: 3px;
+    cursor: pointer;}
+
+/* Legend */
+.ch1 {color: #222;}
+.ch2 {color: #D22;}
+.ch3 {color: #1C2;}
+.ch4 {color: #1CC;}
+
+.olControlAttribution {
+    position: absolute !important;
+    font-size: 60% !important;
+    bottom: 0 !important;
+    right: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 5 0 0 0 !important;}
+
+.olControlScaleLine {
+    position: absolute !important;
+    font-size: 60% !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    background: rgba(255,255,255,0.7);
+    font-family: Arial !important;
+    padding: 2px 4px !important;
+    border-radius: 0 5px 0 0 !important;}
+

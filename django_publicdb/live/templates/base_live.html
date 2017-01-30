@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% load url from future %}
+
+{% block head_styles %}
+    <link rel="stylesheet" type="text/css" media="all" href="{{ STATIC_URL }}styles/live.css" />
+{% endblock %}
+
+{% block title %}
+    HiSPARC Station: {{ station.number }} - {{ station.name }}
+{% endblock %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>{% block header %}Station: {{ station.number }} &mdash; {{ station.name }}{% endblock %}</h2>
+    </div>
+    
+    {% block data %}
+    {% endblock %}
+
+{% endblock %}
