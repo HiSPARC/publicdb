@@ -1,8 +1,0 @@
-- name: ensure /databases directory exists
-  file: path=/databases state=directory
-  become: true
-
-- name: ensure /databases/frome directory exists
-  file: path=/databases/frome state=directory
-        owner=hisparc group=hisparc mode=2775
-  become: true

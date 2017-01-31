@@ -14,10 +14,6 @@
   handlers:
     - include: handlers.yml
 
-- hosts: publicdb
-  tasks:
-    - include: fake_datastore.yml
-
 - hosts: tietar.nikhef.nl
   tasks:
     - include: network-tietar.yml
@@ -42,3 +38,7 @@
    - include: datastore.yml
   handlers:
    - include: handlers.yml
+
+- hosts: publicdb:datastore
+  tasks:
+    - include: datastore_paths.yml
