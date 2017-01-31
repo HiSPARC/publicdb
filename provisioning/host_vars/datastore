@@ -1,0 +1,4 @@
+---
+datastore_config_url: http://192.168.99.11/config/datastore
+datastore_host: 192.168.99.13
+datastore_port: 8001

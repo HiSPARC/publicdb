@@ -49,6 +49,10 @@
 - name: copy writer_app.py
   copy: src=writer_app.py dest=/srv/datastore backup=yes
 
+- name: copy datastore config server
+  template: src=datastore-config-server.py dest=/srv/datastore/
+  notify: restart uWSGI
+
 - name: copy datastore.ini
   copy: src=config-datastore.ini dest=/srv/datastore/config.ini backup=yes
   notify: restart uWSGI
@@ -71,7 +75,6 @@
         owner=root group=root mode=0644
   become: true
   notify: restart supervisord
-  tags: temp
 
 - name: start supervisord now and on boot
   service: name=supervisord state=started enabled=yes
