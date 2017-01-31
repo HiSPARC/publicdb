@@ -18,6 +18,7 @@
 - name: checkout datastore in /srv/datastore/code
   git: repo=https://github.com/HiSPARC/datastore.git dest=/srv/datastore/code
        update=yes force=no
+  notify: restart uWSGI
 
 - name: remove compiled python code
   command: find /srv/datastore/code -name *.pyc -delete
@@ -43,12 +44,18 @@
 
 - name: copy datastore.wsgi
   copy: src=datastore.wsgi dest=/srv/datastore backup=yes
+  notify: restart uWSGI
+
+- name: copy writer_app.py
+  copy: src=writer_app.py dest=/srv/datastore backup=yes
 
 - name: copy datastore.ini
   copy: src=config-datastore.ini dest=/srv/datastore/config.ini backup=yes
+  notify: restart uWSGI
 
 - name: copy uwsgi.ini
   copy: src=uwsgi-datastore.ini dest=/srv/datastore/uwsgi.ini backup=yes
+  notify: restart uWSGI
 
 - name: install supervisor daemon
   pip: name=supervisor
@@ -63,11 +70,9 @@
   copy: src=supervisord-datastore.conf dest=/etc/supervisord.conf backup=yes
         owner=root group=root mode=0644
   become: true
+  notify: restart supervisord
+  tags: temp
 
 - name: start supervisord now and on boot
   service: name=supervisord state=started enabled=yes
   become: true
-
-- name: restart uWSGI
-  supervisorctl: name=uwsgi state=restarted
-                 supervisorctl_path=/opt/miniconda/bin/supervisorctl

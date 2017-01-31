@@ -29,6 +29,10 @@
   service: name=httpd state=restarted
   become: true
 
+- name: restart uWSGI
+  supervisorctl: name=uwsgi state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+
 - name: restart nagios
   service: name=nagios state=restarted
   become: true
