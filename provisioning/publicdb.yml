@@ -19,6 +19,7 @@
 - name: checkout publicdb in /srv/publicdb/www
   git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
        update=yes force=no
+  notify: restart uWSGI
 
 - name: remove compiled python code
   command: find /srv/publicdb/www -name *.pyc -delete
@@ -60,8 +61,10 @@
               priv=publicdb.*:ALL state=present
 
 - name: copy Django settings file
-  copy: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
-        backup=yes force=no
+  template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
+        backup=yes
+  tags: temp
+  notify: restart uWSGI
 
 - name: migrate Django apps
   shell: chdir=/srv/publicdb/www/django_publicdb
@@ -73,6 +76,7 @@
 
 - name: copy uwsgi.ini
   copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
+  notify: restart uWSGI
 
 - name: install supervisor daemon
   pip: name=supervisor
