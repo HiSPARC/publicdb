@@ -14,10 +14,12 @@ from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import urllib2
 import hashlib
 import subprocess
+import os
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/databases/frome/station_list.csv'
 CFG_URL = '{{ datastore_config_url }}'
+RELOAD_PATH = '/tmp/uwsgi-reload.me'
 
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
@@ -38,7 +40,8 @@ def reload_datastore():
             file.write(datastore_cfg)
 
         # reload uWSGI
-        open('/tmp/uwsgi-reload.me', 'a').close()
+        with open(RELOAD_PATH, 'a'):
+            os.utime(RELOAD_PATH, None)
 
         with open(HASH, 'w') as file:
             file.write(new_hash)
