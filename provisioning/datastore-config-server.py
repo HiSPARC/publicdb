@@ -37,7 +37,8 @@ def reload_datastore():
         with open(DATASTORE_CFG, 'w') as file:
             file.write(datastore_cfg)
 
-        subprocess.check_call(['/sbin/service', 'httpd', 'reload'])
+        # reload uWSGI
+        open('/tmp/uwsgi-reload.me', 'a').close()
 
         with open(HASH, 'w') as file:
             file.write(new_hash)

@@ -51,7 +51,7 @@
 
 - name: copy datastore config server
   template: src=datastore-config-server.py dest=/srv/datastore/
-  notify: restart uWSGI
+  notify: restart datastore config server
 
 - name: copy datastore.ini
   copy: src=config-datastore.ini dest=/srv/datastore/config.ini backup=yes

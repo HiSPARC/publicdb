@@ -33,6 +33,10 @@
   supervisorctl: name=uwsgi state=restarted
                  supervisorctl_path=/opt/miniconda/bin/supervisorctl
 
+- name: restart datastore config server
+  supervisorctl: name=datastore-config-server state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+
 - name: restart nagios
   service: name=nagios state=restarted
   become: true
