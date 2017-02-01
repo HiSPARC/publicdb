@@ -52,3 +52,7 @@
 - name: restart shorewall
   service: name=shorewall state=restarted
   become: true
+
+- name: compile firewall rules
+  command: lokkit --update
+  become: true

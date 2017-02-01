@@ -4,7 +4,4 @@
               regexp='--service=http' line='--service=http'
               state=present
   become: true
-
-- name: Compile firewall rules
-  command: lokkit --update
-  become: true
+  notify: compile firewall rules

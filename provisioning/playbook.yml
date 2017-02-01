@@ -33,7 +33,7 @@
 
 - hosts: datastore
   tasks:
-   - include: simple-firewall.yml
+   - include: simple-firewall-datastore.yml
    - include: development.yml
    - include: datastore.yml
   handlers:
