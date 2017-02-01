@@ -297,17 +297,15 @@ class Country(models.Model):
         return self.name
 
     def clean(self):
-        if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
-
-    def save(self, *args, **kwargs):
         if self.number is None:
             if Country.objects.count() > 0:
                 countrymax = Country.objects.aggregate(Max('number'))
                 self.number = countrymax['number__max'] + 10000
             else:
                 self.number = 0
-        super(Country, self).save(*args, **kwargs)
+
+        if self.number % 10000:
+            raise ValidationError("Country number must be multiple of 10000")
 
     def last_cluster_number(self):
         clusters = self.clusters.filter(parent=None)
