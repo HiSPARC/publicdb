@@ -63,7 +63,6 @@
 - name: copy Django settings file
   template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
         backup=yes
-  tags: temp
   notify: restart uWSGI
 
 - name: migrate Django apps
