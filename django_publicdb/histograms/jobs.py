@@ -703,7 +703,7 @@ def update_temperature_dataset(summary):
     temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
-        save_dataset(summary, 'temperature', *temperature)
+        save_dataset(summary, 'temperature', *zip(*temperature))
 
 
 def update_barometer_dataset(summary):
@@ -715,7 +715,7 @@ def update_barometer_dataset(summary):
     barometer = [(x, y) for x, y in barometer if y not in ERR]
     if barometer != []:
         barometer = shrink_dataset(barometer, INTERVAL_BARO)
-        save_dataset(summary, 'barometer', *barometer)
+        save_dataset(summary, 'barometer', *zip(*barometer))
 
 
 def shrink_dataset(dataset, interval):
