@@ -10,6 +10,7 @@ urlpatterns = patterns('django_publicdb.raw_data',
     (r'^rpc$', 'views.call_xmlrpc'),
     (r'^(?P<station_number>\d+)/events/$', 'views.download_data', {'data_type': 'events'}),
     (r'^(?P<station_number>\d+)/weather/$', 'views.download_data', {'data_type': 'weather'}),
+    (r'^(?P<station_number>\d+)/singles/$', 'views.download_data', {'data_type': 'singles'}),
     (r'^knmi/lightning/(?P<lightning_type>\d+)/$', 'views.download_data', {'data_type': 'lightning'}),
     (r'^network/coincidences/$', 'views.download_coincidences'),
 )

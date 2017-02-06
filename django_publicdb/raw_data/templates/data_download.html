@@ -22,23 +22,38 @@ HiSPARC data download form
         if ($('[name=data_type]:checked').val() == 'events') {
             $('[for=id_station_events]').show();
             $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').hide();
             $('[for=id_lightning_type]').hide();
             $('#id_station_events').show();
             $('#id_station_weather').hide();
+            $('#id_station_singles').hide();
             $('#id_lightning_type').hide();}
         else if ($('[name=data_type]:checked').val() == 'weather') {
             $('[for=id_station_events]').hide();
             $('[for=id_station_weather]').show();
+            $('[for=id_station_singles]').hide();
             $('[for=id_lightning_type]').hide();
             $('#id_station_events').hide();
             $('#id_station_weather').show();
+            $('#id_station_singles').hide();
+            $('#id_lightning_type').hide();}
+        else if ($('[name=data_type]:checked').val() == 'singles') {
+            $('[for=id_station_events]').hide();
+            $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').show();
+            $('[for=id_lightning_type]').hide();
+            $('#id_station_events').hide();
+            $('#id_station_weather').hide();
+            $('#id_station_singles').show();
             $('#id_lightning_type').hide();}
         else if ($('[name=data_type]:checked').val() == 'lightning') {
             $('[for=id_station_events]').hide();
             $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').hide();
             $('[for=id_lightning_type]').show();
             $('#id_station_events').hide();
             $('#id_station_weather').hide();
+            $('#id_station_singles').hide();
             $('#id_lightning_type').show();}
     };
 </script>
