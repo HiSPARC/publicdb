@@ -579,12 +579,16 @@ def get_azimuth_histogram_source(request, station_number, year, month, day):
 
 def get_singlesratelow_histogram_source(request, station_number, year, month,
                                         day):
-    pass
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'singleslow')
+
 
 
 def get_singlesratehigh_histogram_source(request, station_number, year, month,
                                          day):
-    pass
+    return get_specific_histogram_source(request, station_number, year, month,
+                                         day, 'singleshigh')
+
 
 
 def get_specific_histogram_source(request, station_number, year, month, day,
@@ -679,11 +683,14 @@ def get_temperature_dataset_source(request, station_number, year, month, day):
 
 def get_singlesratelow_dataset_source(request, station_number, year, month,
                                       day):
-    pass
+    return get_specific_dataset_source(request, station_number, year, month,
+                                       day, 'singlesratelow')
+
 
 def get_singlesratehigh_dataset_source(request, station_number, year, month,
                                         day):
-    pass
+    return get_specific_dataset_source(request, station_number, year, month,
+                                       day, 'singlesratehigh')
 
 
 def get_specific_dataset_source(request, station_number, year, month, day,
@@ -874,7 +881,12 @@ def get_dataset_source(year, month, day, type, station_number):
                                 source__station__number=int(station_number),
                                 source__date=date,
                                 type__slug=type)
-    return zip(dataset.x, dataset.y)
+    if type in ['barometer', 'temperature']:
+        return zip(dataset.x, dataset.y)
+    else:
+        # Multiple value columns
+        return zip(dataset.x, *dataset.y)
+
 
 
 def get_config_source(station_number, type):
