@@ -1,3 +1,6 @@
+- name: use custom .bashrc
+  copy: src=bashrc dest=~/.bashrc backup=yes
+
 - name: ensure /srv directory exists
   file: path=/srv state=directory
   become: true
