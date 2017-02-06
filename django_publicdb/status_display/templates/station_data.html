@@ -113,7 +113,7 @@
 
       {% if singlesratelowdata %}
         <div id="singlesratelowData" class="histogram">
-            <h3>Singles (singles per second above low threshold)</h3>
+            <h3>Singles (per second above low threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sd_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_singlesratelow_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
@@ -134,7 +134,7 @@
 
       {% if singlesratehighdata %}
         <div id="singlesratehighData" class="histogram">
-            <h3>Singles (singles per second above high threshold)</h3>
+            <h3>Singles (per second above high threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#srh_histogram')">Image</a> |
                 <a href="{% url 'status_display.views.get_singlesratehigh_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
