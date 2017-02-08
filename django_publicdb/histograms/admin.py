@@ -70,14 +70,17 @@ class NetworkSummaryAdmin(admin.ModelAdmin):
 
 
 class SummaryAdmin(admin.ModelAdmin):
-    list_display = ('station', 'date', 'needs_update',
-                    'needs_update_events', 'needs_update_config',
-                    'needs_update_errors', 'needs_update_weather',
-                    'num_events', 'num_config', 'num_errors', 'num_weather')
+    list_display = ('station', 'date', 'num_events', 'num_config',
+                    'num_errors', 'num_weather', 'num_singles',
+                    'needs_update', 'needs_update_events',
+                    'needs_update_config', 'needs_update_errors',
+                    'needs_update_weather', 'needs_update_singles')
     list_filter = ('station', 'needs_update', 'needs_update_events',
-                   'needs_update_weather', 'needs_update_config', 'date')
+                   'needs_update_weather', 'needs_update_singles',
+                   'needs_update_config', 'date')
     list_editable = ('needs_update', 'needs_update_events',
-                     'needs_update_weather', 'needs_update_config')
+                     'needs_update_weather', 'needs_update_singles',
+                     'needs_update_config')
     inlines = (DailyHistogramInline,)
     list_per_page = 200
     actions = ['unset_update_flag', 'unset_events_flag', 'unset_config_flag',
