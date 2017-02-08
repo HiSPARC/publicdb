@@ -605,7 +605,7 @@ def update_singles_rate_dataset(summary):
     rates = [col.tolist() for col in rates]
     save_dataset(summary, 'singlesratelow', bins, rates)
 
-    rates = np.stack([shrink(col, bin_idxs) for col in low])
+    rates = np.stack([shrink(col, bin_idxs) for col in high])
     rates = [x.tolist() for x in rates]
     save_dataset(summary, 'singlesratehigh', bins, rates)
 
