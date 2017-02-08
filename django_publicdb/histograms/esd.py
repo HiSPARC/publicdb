@@ -520,12 +520,17 @@ def get_singles(summary):
     """
     data = get_table(summary, 'singles')
 
-    high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'],
-                     data['slv_ch1_high'], data['slv_ch2_high']))
-    low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'],
-                    data['slv_ch1_low'], data['slv_ch2_low']))
+    n_detectors = summary.station.number_of_detectors()
+    if n_detectors == 4:
+        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'],
+                         data['slv_ch1_high'], data['slv_ch2_high']))
+        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'],
+                        data['slv_ch1_low'], data['slv_ch2_low']))
+    else:
+        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high']))
+        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low']))
 
-    return high, low
+    return data['timestamp'], high, low
 
 
 def get_coincidences(network_summary, tablename, quantity):

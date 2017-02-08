@@ -569,7 +569,7 @@ def update_singles_histogram(summary):
     """Histograms of singles data for each detector individually"""
 
     logger.debug("Updating singles histograms for %s" % summary)
-    high, low = esd.get_singles(summary)
+    _, high, low = esd.get_singles(summary)
 
     bins, histograms = create_histogram(low, MAX_SINGLES_LOW,
                                         BIN_SINGLES_LOW_NUM)
@@ -583,15 +583,15 @@ def update_singles_histogram(summary):
 def update_singles_rate_dataset(summary):
     """Singles rate for each detector individually"""
 
-    def hist_column(col, bin_idxs):
-        with warnings.catch_warnings():
+    def shrink(col, bin_idxs):
+        with warnings.catch_warnings():  # suppress "Mean of empty slice"
             warnings.simplefilter("ignore", category=RuntimeWarning)
             data = np.nan_to_num([np.nanmean(col[bin_idxs[i-1]:bin_idxs[i]])
                                  for i in range(1, len(bins))])
         return data
 
     logger.debug("Updating singles rate datasets for %s" % summary)
-    singles = esd.get_table(summary, 'singles')
+    ts, high, low = esd.get_singles(summary)
 
     # timestamp at midnight (start of day) of date
     start = calendar.timegm(summary.date.timetuple())
@@ -599,27 +599,15 @@ def update_singles_rate_dataset(summary):
     # create bins, don't forget right-most edge
     n_bins = 24 * 3600 // BIN_SINGLES_RATE
     bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins+1)]
+    bin_idxs = [np.searchsorted(ts, bins[i]) for i in range(len(bins))]
 
-    bin_idxs = [np.searchsorted(singles['timestamp'], bins[i])
-                for i in range(len(bins))]
+    rates = [shrink(col, bin_idxs) for col in low]
+    rates = [col.tolist() for col in rates]
+    save_dataset(summary, 'singlesratelow', bins, rates)
 
-    histograms = [hist_column(singles['mas_ch1_low'], bin_idxs),
-                  hist_column(singles['mas_ch2_low'], bin_idxs),
-                  hist_column(singles['slv_ch1_low'], bin_idxs),
-                  hist_column(singles['slv_ch2_low'], bin_idxs)
-                  ]
-
-    histograms = [x.tolist() for x in histograms]
-    save_dataset(summary, 'singlesratelow', bins, histograms)
-
-    histograms = [hist_column(singles['mas_ch1_high'], bin_idxs),
-                  hist_column(singles['mas_ch2_high'], bin_idxs),
-                  hist_column(singles['slv_ch1_high'], bin_idxs),
-                  hist_column(singles['slv_ch2_high'], bin_idxs)
-                  ]
-
-    histograms = [x.tolist() for x in histograms]
-    save_dataset(summary, 'singlesratehigh', bins, histograms)
+    rates = np.stack([shrink(col, bin_idxs) for col in low])
+    rates = [x.tolist() for x in rates]
+    save_dataset(summary, 'singlesratehigh', bins, rates)
 
 
 def update_detector_timing_offsets(summary):
