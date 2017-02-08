@@ -17,7 +17,8 @@
 
       "ssh_username": "hisparc",
       "ssh_password": "!Usr4hisp",
-      "ssh_wait_timeout": "10000s"
+      "ssh_wait_timeout": "10000s",
+      "ssh_pty" : "true"
     }
   ],
   "provisioners": [
