@@ -1,0 +1,26 @@
+# Event Summary Data - Singles
+#
+# Station: ({{ station.number }}) {{ station.name }}
+#
+# Data taken from {{ start|date:"Y-m-d H:i:s" }} to {{ end|date:"Y-m-d H:i:s" }}
+#
+# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+#
+# This data contains the following columns:
+#
+# date:                 time of event [GPS calendar date]
+# time:                 time of event [GPS time of day]
+# timestamp:            time of event [UNIX timestamp]
+# mas_ch1_low           singles rate master channel 1 above low threshold
+# mas_ch1_high          singles rate master channel 1 above high threshold
+# mas_ch2_low           singles rate master channel 2 above low threshold
+# mas_ch2_high          singles rate master channel 2  above high threshold
+# slv_ch1_low           singles rate slave channel 1 above low threshold
+# slv_ch1_high          singles rate slave channel 1 above high threshold
+# slv_ch2_low           singles rate slave channel 2 above low threshold
+# slv_ch2_high          singles rate slave channel 2 above high threshold
+# Values of -1 or -999 indicate a problem in that measurement or
+# the absence of that sensor.
+#
+#

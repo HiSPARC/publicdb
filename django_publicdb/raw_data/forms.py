@@ -5,7 +5,9 @@ from ..inforecords.models import Station, Cluster
 
 TYPES = [('events', 'Events'),
          ('weather', 'Weather'),
-         ('lightning', ' Lightning')]
+         ('lightning', 'Lightning'),
+         ('singles', 'Singles')]
+
 LGT_TYPES = [('0', 'Single-point'),
              ('1', 'Cloud-cloud'),
              ('2', 'Cloud-cloud mid'),
@@ -27,6 +29,9 @@ class DataDownloadForm(forms.Form):
         empty_label='---------', required=False)
     lightning_type = forms.ChoiceField(choices=LGT_TYPES, initial=4,
                                        required=False)
+    station_singles = forms.ModelChoiceField(
+        Station.objects.filter(summary__num_singles__isnull=False).distinct(),
+        empty_label='---------', required=False)
     start = forms.DateTimeField(help_text="e.g. '2013-5-17', or "
                                           "'2013-5-17 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2013-5-18', or "
@@ -41,6 +46,7 @@ class DataDownloadForm(forms.Form):
         if data_type == 'events':
             del cleaned_data["station_weather"]
             del cleaned_data["lightning_type"]
+            del cleaned_data["station_singles"]
             station = cleaned_data.get('station_events')
             if not station:
                 self.add_error("station_events", u'Choose a station')
@@ -49,14 +55,25 @@ class DataDownloadForm(forms.Form):
         elif data_type == 'weather':
             del cleaned_data["station_events"]
             del cleaned_data["lightning_type"]
+            del cleaned_data["station_singles"]
             station = cleaned_data.get('station_weather')
             if not station:
                 self.add_error("station_weather", u'Choose a station')
             else:
                 cleaned_data["station"] = station
+        elif data_type == 'singles':
+            del cleaned_data["station_events"]
+            del cleaned_data["station_weather"]
+            del cleaned_data["lightning_type"]
+            station = cleaned_data.get('station_singles')
+            if not station:
+                self.add_error("station_events", u'Choose a station')
+            else:
+                cleaned_data["station"] = station
         elif data_type == 'lightning':
             del cleaned_data["station_events"]
             del cleaned_data["station_weather"]
+            del cleaned_data["station_singles"]
         return cleaned_data
 
 

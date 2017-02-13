@@ -189,6 +189,38 @@ var _barometerdata = {
         max: 24}
 };
 
+var _singleslowhistogram = {
+    yaxis: {
+        axisLabel: 'Counts',
+        min: 0},
+    xaxis: {
+        min: 0,
+        max: 1000,
+        axisLabel: 'Singles rate (Hz)'}
+};
+
+var _singleshighhistogram = {
+    yaxis: {
+        axisLabel: 'Counts',
+        min: 0},
+    xaxis: {
+        min: 0,
+        max: 300,
+        axisLabel: 'Singles rate (Hz)'}
+};
+
+var _singlesdata = {
+    yaxis: {
+        axisLabel: 'Singles rate (Hz)',
+        min: 0},
+    xaxis: {
+        axisLabel: 'Hour of day (GPS)',
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
+        max: 24
+      }
+};
+
 var _voltagegraph = {
     xaxis: {
         axisLabel: 'Date',
@@ -248,6 +280,10 @@ var ph_options = $.extend(true, {}, _base, _pulseheighthistogram);
 var pi_options = $.extend(true, {}, _base, _pulseintegralhistogram);
 var ze_options = $.extend(true, {}, _base, _zenithhistogram);
 var az_options = $.extend(true, {}, _base, _azimuthhistogram);
+var sl_options = $.extend(true, {}, _base, _singleslowhistogram);
+var sh_options = $.extend(true, {}, _base, _singleshighhistogram);
+var srl_options = $.extend(true, {}, _base, _singlesdata);
+var srh_options = $.extend(true, {}, _base, _singlesdata);
 var td_options = $.extend(true, {}, _base, _temperaturedata);
 var bd_options = $.extend(true, {}, _base, _barometerdata);
 var vg_options = $.extend(true, {}, _base, _voltagegraph);

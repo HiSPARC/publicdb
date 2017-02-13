@@ -84,6 +84,30 @@
     }
 },
 {
+    "pk": 8,
+    "model": "histograms.histogramtype",
+    "fields": {
+        "value_axis_title": "Count",
+        "description": "This histogram will show you the distribution of the number of singles above the low threshold for a given day.",
+        "bin_axis_title": "Singles rate (Hz)",
+        "has_multiple_datasets": true,
+        "slug": "singleslow",
+        "name": "Singles above low threshold histogram"
+    }
+},
+{
+    "pk": 9,
+    "model": "histograms.histogramtype",
+    "fields": {
+        "value_axis_title": "Count",
+        "description": "This histogram will show you the distribution of the number of singles above the high threshold for a given day.",
+        "bin_axis_title": "Singles rate (Hz)",
+        "has_multiple_datasets": true,
+        "slug": "singleshigh",
+        "name": "Singles above high threshold histogram"
+    }
+},
+{
     "pk": 1,
     "model": "histograms.datasettype",
     "fields": {
@@ -104,5 +128,26 @@
         "name": "Barometer",
         "slug": "barometer"
     }
-}
-]
+},
+{
+    "pk": 3,
+    "model": "histograms.datasettype",
+    "fields": {
+        "description": "Singles rate (low threshold)",
+        "x_axis_title": "Hour of day (GPS)",
+        "y_axis_title": "Singles rate (Hz)",
+        "name": "SinglesrateLow",
+        "slug": "singlesratelow"
+    }
+},
+{
+    "pk": 4,
+    "model": "histograms.datasettype",
+    "fields": {
+        "description": "Singles rate (high threshold)",
+        "x_axis_title": "Hour of day (GPS)",
+        "y_axis_title": "Singles rate (Hz)",
+        "name": "SinglesrateHigh",
+        "slug": "singlesratehigh"
+    }
+}]
