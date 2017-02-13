@@ -586,7 +586,7 @@ def update_singles_rate_dataset(summary):
     def shrink(col, bin_idxs):
         with warnings.catch_warnings():  # suppress "Mean of empty slice"
             warnings.simplefilter("ignore", category=RuntimeWarning)
-            data = np.nan_to_num([np.nanmean(col[bin_idxs[i-1]:bin_idxs[i]])
+            data = np.nan_to_num([np.nanmean(col[bin_idxs[i - 1]:bin_idxs[i]])
                                  for i in range(1, len(bins))])
         return data
 
@@ -598,7 +598,7 @@ def update_singles_rate_dataset(summary):
 
     # create bins, don't forget right-most edge
     n_bins = 24 * 3600 // BIN_SINGLES_RATE
-    bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins+1)]
+    bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins + 1)]
     bin_idxs = [np.searchsorted(ts, bins[i]) for i in range(len(bins))]
 
     rates = [shrink(col, bin_idxs) for col in low]

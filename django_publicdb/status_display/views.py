@@ -583,12 +583,10 @@ def get_singlesratelow_histogram_source(request, station_number, year, month,
                                          day, 'singleslow')
 
 
-
 def get_singlesratehigh_histogram_source(request, station_number, year, month,
                                          day):
     return get_specific_histogram_source(request, station_number, year, month,
                                          day, 'singleshigh')
-
 
 
 def get_specific_histogram_source(request, station_number, year, month, day,
@@ -688,7 +686,7 @@ def get_singlesratelow_dataset_source(request, station_number, year, month,
 
 
 def get_singlesratehigh_dataset_source(request, station_number, year, month,
-                                        day):
+                                       day):
     return get_specific_dataset_source(request, station_number, year, month,
                                        day, 'singlesratehigh')
 
@@ -886,7 +884,6 @@ def get_dataset_source(year, month, day, type, station_number):
     else:
         # Multiple value columns
         return zip(dataset.x, *dataset.y)
-
 
 
 def get_config_source(station_number, type):
