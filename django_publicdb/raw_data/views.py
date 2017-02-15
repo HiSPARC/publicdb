@@ -472,7 +472,7 @@ def get_singles_from_esd_in_range(station, start, end):
     for t0, t1 in single_day_ranges(start, end):
         try:
             Summary.objects.get(station=station, date=t0,
-                                num_weather__isnull=False)
+                                num_singles__isnull=False)
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
