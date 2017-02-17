@@ -49,7 +49,7 @@
   become: true
 
 - name: install pip
-  command: /opt/miniconda/bin/conda install pip --yes
+  command: /opt/miniconda/bin/conda install pip conda=4.3.9 --yes
   become: true
 
 - name: install git
