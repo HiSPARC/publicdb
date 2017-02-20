@@ -352,8 +352,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
-        <div class="keyvalue"><span class="key ch1">Ch1 Thresholds:</span><span class="value">{{ config.mas_ch1_thres_low |floatformat:0 }} ADC {{ config.mas_ch1_thres_high |floatformat:0 }} ADC</span></div>
-        <div class="keyvalue"><span class="key ch2">Ch2 Thresholds:</span><span class="value">{{ config.mas_ch2_thres_low |floatformat:0 }} ADC {{ config.mas_ch2_thres_high |floatformat:0 }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch1">Ch1 Thresholds</span><span class="value">{{ config.mas_ch1_thres_low|mv_to_adc|floatformat:0 }} ADC {{ config.mas_ch1_thres_high|mv_to_adc|floatformat:0 }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch2">Ch2 Thresholds</span><span class="value">{{ config.mas_ch2_thres_low|mv_to_adc|floatformat:0 }} ADC {{ config.mas_ch2_thres_high|mv_to_adc|floatformat:0 }} ADC</span></div>
     </div>
     {% if has_slave %}
     <div id="slave">
@@ -362,8 +362,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
-        <div class="keyvalue"><span class="key ch3">Ch3 Thresholds:</span><span class="value">{{ config.slv_ch1_thres_low |floatformat:0 }} ADC {{ config.slv_ch1_thres_high |floatformat:0 }} ADC</span></div>
-        <div class="keyvalue"><span class="key ch4">Ch4 Thresholds:</span><span class="value">{{ config.slv_ch2_thres_low |floatformat:0 }} ADC {{ config.slv_ch2_thres_high |floatformat:0 }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch3">Ch3 Thresholds</span><span class="value">{{ config.slv_ch1_thres_low|mv_to_adc|floatformat:0 }} ADC {{ config.slv_ch1_thres_high|mv_to_adc|floatformat:0 }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch4">Ch4 Thresholds</span><span class="value">{{ config.slv_ch2_thres_low|mv_to_adc|floatformat:0 }} ADC {{ config.slv_ch2_thres_high|mv_to_adc|floatformat:0 }} ADC</span></div>
     </div>
     {% endif %}
     <div id="stationPosition">

@@ -91,7 +91,19 @@ def none_to_nan(value):
 
 @register.filter
 def mv_to_adc(value):
-    """Convert mv_to_adc"""
+    """Convert mv_to_adc
+
+    Old DAQ HiSPARC II+III => ADC = mV/-0.57 + 200
+    New DAQ HiSPARC III => ADC = mV/-0.584 + 30
+
+    Old versions of the DAQ report thresholds in mV. For both
+    HiSPARC II and III the baseline is 200 with the old DAQ.
+
+    For new versions of the DAQ the bundled hisparc-monitor
+    converts the threshold to ADC using the appropriate transformation.
+
+    If value < 0: Assume mV and convert to ADC assume baseline 200.
+    """
 
     if value > 0:
         if int(value) == value:
