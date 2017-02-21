@@ -8,10 +8,10 @@
 #
 # This data contains the following columns:
 #
-# timestamp: time of measurement in seconds after 1970-1-1 [UNIX timestamp]
-# value:     temperature outside [deg C]
+# timestamp:  time of measurement in seconds after 1970-1-1 [UNIX timestamp]
+# scint (4x): singles rate [Hz]
 #
 #
-# timestamp	value
+# timestamp	scint1	scint2	scint3	scint4
 {% for row in data %}{{ row.0 }}	{{ row.1 }}	{{ row.2 }}	{{ row.3 }}	{{ row.4 }}
 {% endfor %}
