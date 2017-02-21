@@ -15,21 +15,28 @@
             var map = createMap("gpsMap");
 
             var gps_track = L.featureGroup();
+
             {% for gps in gpstrack %}
                 gps_track.addLayer(
                     L.circleMarker(
-                        L.latLng({{ gps.0 }}, {{ gps.1 }})
+                        L.latLng({{ gps.0 }}, {{ gps.1 }}))
                     )
                 );
             {% endfor %}
+
             gps_track.setStyle($.extend({}, pointStyle, {color: statusColors.gpsold}));
             gps_track.bindTooltip('Previous position', {direction: 'top'});
             gps_track.addTo(map);
 
-            var current_position = L.circleMarker(
-                L.latLng({{ lla.0 }}, {{ lla.1 }}),
-                $.extend({}, pointStyle, {color: statusColors.gpsnew})
+            var current_position = L.featureGroup();
+
+            current_position.addLayer(
+                L.circleMarker(
+                    L.latLng({{ lla.0 }}, {{ lla.1 }}),
+                    $.extend({}, pointStyle, {color: statusColors.gpsnew})
+                )
             );
+
             current_position.bindTooltip('Current position', {direction: 'top'});
             current_position.addTo(map);
 
