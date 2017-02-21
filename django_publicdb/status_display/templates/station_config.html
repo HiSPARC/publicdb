@@ -23,7 +23,7 @@
                 );
             {% endfor %}
             gps_track.setStyle($.extend({}, pointStyle, {color: statusColors.gpsold}));
-            gps_track.bindTooltip('Previous position', {direction: 'top'})
+            gps_track.bindTooltip('Previous position', {direction: 'top'});
             gps_track.addTo(map);
 
             var current_position = L.circleMarker(
