@@ -13,5 +13,5 @@
 #
 #
 # timestamp	scint1	scint2	scint3	scint4
-{% for row in data %}{{ row.0 }}	{{ row.1 }}	{{ row.2 }}	{{ row.3 }}	{{ row.4 }}
+{% for row in data %}{{ row.0 }}	{{ row.1|floatformat:0 }}	{{ row.2|floatformat:0 }}	{{ row.3|floatformat:0 }}	{{ row.4|floatformat:0 }}
 {% endfor %}
