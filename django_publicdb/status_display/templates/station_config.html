@@ -19,7 +19,7 @@
             {% for gps in gpstrack %}
                 gps_track.addLayer(
                     L.circleMarker(
-                        L.latLng({{ gps.0 }}, {{ gps.1 }}))
+                        L.latLng({{ gps.0 }}, {{ gps.1 }})
                     )
                 );
             {% endfor %}
