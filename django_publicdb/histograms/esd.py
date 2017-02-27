@@ -12,8 +12,9 @@ import tables
 from sapphire import (determine_detector_timing_offsets,
                       DetermineStationTimingOffsets, HiSPARCStations,
                       ProcessEventsFromSourceWithTriggerOffset,
-                      ProcessWeatherFromSource, CoincidencesESD,
-                      ReconstructESDEventsFromSource, ProcessTimeDeltas)
+                      ProcessWeatherFromSource, ProcessSinglesFromSource,
+                      CoincidencesESD, ReconstructESDEventsFromSource,
+                      ProcessTimeDeltas)
 from sapphire.analysis.calibration import datetime_range
 
 from ..inforecords.models import Station
@@ -113,7 +114,7 @@ def process_events_and_store_temporary_esd(summary):
 def process_weather_and_store_temporary_esd(summary):
     """Process weather events from datastore and save temporary ESD
 
-    Currently, this is basically a no-op.
+    Weather data is sorted and duplicates are removed.
 
     :param summary: summary of data source (station and date)
     :type summary: histograms.models.Summary instance
@@ -128,6 +129,30 @@ def process_weather_and_store_temporary_esd(summary):
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             process = ProcessWeatherFromSource(source_file, tmp_file,
+                                               source_node, '/')
+            process.process_and_store_results()
+            node_path = process.source._v_pathname
+    return tmp_filename, node_path
+
+
+def process_singles_and_store_temporary_esd(summary):
+    """Process singles events from datastore and save temporary ESD
+
+    Singles data is sorted and duplicates are removed.
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    date = summary.date
+    station = summary.station
+
+    filepath = datastore.get_data_path(date)
+    with tables.open_file(filepath, 'r') as source_file:
+        source_node = get_station_node(source_file, station)
+        tmp_filename = create_temporary_file()
+        with tables.open_file(tmp_filename, 'w') as tmp_file:
+            process = ProcessSinglesFromSource(source_file, tmp_file,
                                                source_node, '/')
             process.process_and_store_results()
             node_path = process.source._v_pathname
@@ -463,6 +488,49 @@ def get_data(summary, tablename, quantity):
             data = table.col(quantity)
 
     return data
+
+
+def get_table(summary, tablename):
+    """Get entire table from the datastore as in memory numpy.rec_array
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+    :param tablename: table name (e.g. 'events', 'weather', ...)
+
+    """
+    date = summary.date
+    station = summary.station
+
+    path = get_esd_data_path(date)
+    with tables.open_file(path, 'r') as datafile:
+        try:
+            station_node = get_station_node(datafile, station)
+            table = datafile.get_node(station_node, tablename)
+        except tables.NoSuchNodeError:
+            logger.error("Cannot find table %s for %s", tablename, summary)
+            return None
+
+        return table.read()
+
+
+def get_singles(summary):
+    """Get singles data for summary
+
+    :param summary: summary of data source (station and date)
+    """
+    data = get_table(summary, 'singles')
+
+    n_detectors = summary.station.number_of_detectors()
+    if n_detectors == 4:
+        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'],
+                         data['slv_ch1_high'], data['slv_ch2_high']))
+        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'],
+                        data['slv_ch1_low'], data['slv_ch2_low']))
+    else:
+        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high']))
+        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low']))
+
+    return data['timestamp'], high, low
 
 
 def get_coincidences(network_summary, tablename, quantity):

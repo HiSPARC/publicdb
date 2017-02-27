@@ -7,6 +7,7 @@ import time
 import calendar
 import logging
 import multiprocessing
+import warnings
 
 import numpy as np
 
@@ -33,13 +34,19 @@ MAX_PH = 2500
 BIN_PH_NUM = 250  # bin width = 10 mV
 MAX_IN = 62500
 BIN_IN_NUM = 250  # bin width = 250 mVns
+MAX_SINGLES_LOW = 1000
+BIN_SINGLES_LOW_NUM = 100  # bin width = 10
+MAX_SINGLES_HIGH = 300
+BIN_SINGLES_HIGH_NUM = 100  # bin width = 3
+
+BIN_SINGLES_RATE = 150  # seconds
 
 # Parameters for the datasets, interval in seconds
 INTERVAL_TEMP = 150
 INTERVAL_BARO = 150
 
 # Tables supported by this code
-SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather']
+SUPPORTED_TABLES = ['events', 'config', 'errors', 'weather', 'singles']
 # Tables that initiate network updates
 NETWORK_TABLES = {'events': 'coincidences'}
 # Tables ignored by this code (unsupported tables not listed here will
@@ -49,7 +56,7 @@ IGNORE_TABLES = ['blobs']
 # check.  For events, for example, the histograms are recreated.  For
 # configs, this is not possible.  The previous number of configs is used
 # to select only new ones during the update.
-RECORD_EARLY_NUM_EVENTS = ['events', 'weather']
+RECORD_EARLY_NUM_EVENTS = ['events', 'weather', 'singles']
 
 
 def check_for_updates():
@@ -187,7 +194,8 @@ def update_all_histograms():
 def perform_update_tasks():
     """Perform the update tasks in specific order
 
-    - First update ESD, which processes and stores events and weather data.
+    - First update ESD, which processes and stores events, weather and singles
+      data.
     - Then update the histograms to determine detector offsets, perform
       event reconstructions, and create the station data histograms.
     - Then search coincidences in the ESD data and determine the time deltas
@@ -275,7 +283,8 @@ def update_coincidences():
 
 
 def process_and_store_temporary_esd_for_summary(summary):
-    """Process events and weather from raw data and store in temporary file
+    """Process events, weather and singles from raw data and store in
+    temporary file
 
     :param summary: Summary object for data will be processed if the
         corresponding flags are set.
@@ -287,6 +296,8 @@ def process_and_store_temporary_esd_for_summary(summary):
         tmp_locations.append(process_events_and_store_esd(summary))
     if summary.needs_update_weather:
         tmp_locations.append(process_weather_and_store_esd(summary))
+    if summary.needs_update_singles:
+        tmp_locations.append(process_singles_and_store_esd(summary))
     return summary, tmp_locations
 
 
@@ -314,6 +325,8 @@ def update_histograms():
                           perform_events_tasks)
     perform_tasks_manager(Summary, "needs_update_weather",
                           perform_weather_tasks)
+    perform_tasks_manager(Summary, "needs_update_singles",
+                          perform_singles_tasks)
 
 
 def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
@@ -407,6 +420,14 @@ def perform_weather_tasks(summary):
     return summary, []
 
 
+def perform_singles_tasks(summary):
+    django.db.close_old_connections()
+    logger.info("Updating singles datasets for %s" % summary)
+    update_singles_histogram(summary)
+    update_singles_rate_dataset(summary)
+    return summary, []
+
+
 def perform_coincidences_tasks(network_summary):
     django.db.close_old_connections()
     logger.info("Updating coincidence histograms for %s" % network_summary)
@@ -452,6 +473,13 @@ def process_weather_and_store_esd(summary):
     logger.info("Processing weather and storing ESD for %s" % summary)
     tmpfile_path, node_path = \
         esd.process_weather_and_store_temporary_esd(summary)
+    return tmpfile_path, node_path
+
+
+def process_singles_and_store_esd(summary):
+    logger.info("Processing singles and storing ESD for %s" % summary)
+    tmpfile_path, node_path = \
+        esd.process_singles_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
 
 
@@ -537,6 +565,51 @@ def update_pulseintegral_histogram(summary):
     save_histograms(summary, 'pulseintegral', bins, histograms)
 
 
+def update_singles_histogram(summary):
+    """Histograms of singles data for each detector individually"""
+
+    logger.debug("Updating singles histograms for %s" % summary)
+    _, high, low = esd.get_singles(summary)
+
+    bins, histograms = create_histogram(low, MAX_SINGLES_LOW,
+                                        BIN_SINGLES_LOW_NUM)
+    save_histograms(summary, 'singleslow', bins, histograms)
+
+    bins, histograms = create_histogram(high, MAX_SINGLES_HIGH,
+                                        BIN_SINGLES_HIGH_NUM)
+    save_histograms(summary, 'singleshigh', bins, histograms)
+
+
+def update_singles_rate_dataset(summary):
+    """Singles rate for each detector individually"""
+
+    def shrink(col, bin_idxs):
+        with warnings.catch_warnings():  # suppress "Mean of empty slice"
+            warnings.simplefilter("ignore", category=RuntimeWarning)
+            data = np.nan_to_num([np.nanmean(col[bin_idxs[i - 1]:bin_idxs[i]])
+                                 for i in range(1, len(bins))])
+        return data
+
+    logger.debug("Updating singles rate datasets for %s" % summary)
+    ts, high, low = esd.get_singles(summary)
+
+    # timestamp at midnight (start of day) of date
+    start = calendar.timegm(summary.date.timetuple())
+
+    # create bins, don't forget right-most edge
+    n_bins = 24 * 3600 // BIN_SINGLES_RATE
+    bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins + 1)]
+    bin_idxs = [np.searchsorted(ts, bins[i]) for i in range(len(bins))]
+
+    rates = [shrink(col, bin_idxs) for col in low]
+    rates = [col.tolist() for col in rates]
+    save_dataset(summary, 'singlesratelow', bins, rates)
+
+    rates = [shrink(col, bin_idxs) for col in high]
+    rates = [col.tolist() for col in rates]
+    save_dataset(summary, 'singlesratehigh', bins, rates)
+
+
 def update_detector_timing_offsets(summary):
     """Determine detector timing offsets"""
 
@@ -618,7 +691,7 @@ def update_temperature_dataset(summary):
     temperature = [(x, y) for x, y in temperature if y not in ERR]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
-        save_dataset(summary, 'temperature', temperature)
+        save_dataset(summary, 'temperature', *zip(*temperature))
 
 
 def update_barometer_dataset(summary):
@@ -630,7 +703,7 @@ def update_barometer_dataset(summary):
     barometer = [(x, y) for x, y in barometer if y not in ERR]
     if barometer != []:
         barometer = shrink_dataset(barometer, INTERVAL_BARO)
-        save_dataset(summary, 'barometer', barometer)
+        save_dataset(summary, 'barometer', *zip(*barometer))
 
 
 def shrink_dataset(dataset, interval):
@@ -710,11 +783,10 @@ def save_network_histograms(network_summary, slug, bins, values):
     logger.debug("Saved succesfully")
 
 
-def save_dataset(summary, slug, data):
+def save_dataset(summary, slug, x, y):
     """Store the data in database"""
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
-    x, y = zip(*data)
     dataset = {'x': x, 'y': y}
     DailyDataset.objects.update_or_create(source=summary, type=type,
                                           defaults=dataset)

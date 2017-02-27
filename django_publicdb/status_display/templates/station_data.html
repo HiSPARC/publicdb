@@ -111,6 +111,90 @@
         </div>
       {% endif %}
 
+      {% if singlesratelowdata %}
+        <div id="singlesratelowData" class="histogram">
+            <h3>Singles (per second above low threshold)</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#sd_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_singlesratelow_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="srl_histogram"></div>
+            <script>
+                srl_labels = {yaxis: {axisLabel: "{{ singlesratelowdata.y_label }}"},
+                             xaxis: {axisLabel: "{{ singlesratelowdata.x_label }}"}}
+                $.extend(true, srl_options, srl_labels)
+                $.plot($("#srl_histogram"), [
+                  {% for data in singlesratelowdata.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], srl_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if singlesratehighdata %}
+        <div id="singlesratehighData" class="histogram">
+            <h3>Singles (per second above high threshold)</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#srh_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_singlesratehigh_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="srh_histogram"></div>
+            <script>
+                srh_labels = {yaxis: {axisLabel: "{{ singlesratehighdata.y_label }}"},
+                             xaxis: {axisLabel: "{{ singlesratehighdata.x_label }}"}}
+                $.extend(true, srh_options, srh_labels)
+                $.plot($("#srh_histogram"), [
+                  {% for data in singlesratehighdata.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], srh_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if singleslowhistogram %}
+        <div id="singleslowHistogram" class="histogram">
+            <h3>Singles rate histogram (singles above low threshold)</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#sl_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_singlesratelow_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="sl_histogram"></div>
+            <script>
+                sl_labels = {yaxis: {axisLabel: "{{ singleslowhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ singleslowhistogram.x_label }}"}}
+                $.extend(true, sl_options, sl_labels)
+                $.plot($("#sl_histogram"), [
+                  {% for data in singleslowhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], sl_options);
+            </script>
+        </div>
+      {% endif %}
+
+      {% if singleshighhistogram %}
+        <div id="singleshighHistogram" class="histogram">
+            <h3>Singles rate histogram (singles above high threshold)</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#sh_histogram')">Image</a> |
+                <a href="{% url 'status_display.views.get_singlesratehigh_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="sh_histogram"></div>
+            <script>
+                sh_labels = {yaxis: {axisLabel: "{{ singleshighhistogram.y_label }}"},
+                             xaxis: {axisLabel: "{{ singleshighhistogram.x_label }}"}}
+                $.extend(true, sh_options, sh_labels)
+                $.plot($("#sh_histogram"), [
+                  {% for data in singleshighhistogram.data %}
+                    {data: {{ data|fix_histogram_data }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], sh_options);
+            </script>
+        </div>
+      {% endif %}
+
       {% if zenithhistogram %}
         <div id="zenithHistogram" class="histogram">
             <h3>Zenith histogram</h3>
@@ -268,6 +352,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch1">Ch1 Thresholds</span><span class="value">{{ config.mas_ch1_thres_low|mv_to_adc }} ADC {{ config.mas_ch1_thres_high|mv_to_adc }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch2">Ch2 Thresholds</span><span class="value">{{ config.mas_ch2_thres_low|mv_to_adc }} ADC {{ config.mas_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
     {% if has_slave %}
     <div id="slave">
@@ -276,6 +362,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch3">Ch3 Thresholds</span><span class="value">{{ config.slv_ch1_thres_low|mv_to_adc }} ADC {{ config.slv_ch1_thres_high|mv_to_adc }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch4">Ch4 Thresholds</span><span class="value">{{ config.slv_ch2_thres_low|mv_to_adc }} ADC {{ config.slv_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
     {% endif %}
     <div id="stationPosition">

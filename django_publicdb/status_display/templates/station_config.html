@@ -15,6 +15,7 @@
             var map = createMap("gpsMap");
 
             var gps_track = L.featureGroup();
+
             {% for gps in gpstrack %}
                 gps_track.addLayer(
                     L.circleMarker(
@@ -22,14 +23,20 @@
                     )
                 );
             {% endfor %}
+
             gps_track.setStyle($.extend({}, pointStyle, {color: statusColors.gpsold}));
-            gps_track.bindTooltip('Previous position', {direction: 'top'})
+            gps_track.bindTooltip('Previous position', {direction: 'top'});
             gps_track.addTo(map);
 
-            var current_position = L.circleMarker(
-                L.latLng({{ lla.0 }}, {{ lla.1 }}),
-                $.extend({}, pointStyle, {color: statusColors.gpsnew})
+            var current_position = L.featureGroup();
+
+            current_position.addLayer(
+                L.circleMarker(
+                    L.latLng({{ lla.0 }}, {{ lla.1 }}),
+                    $.extend({}, pointStyle, {color: statusColors.gpsnew})
+                )
             );
+
             current_position.bindTooltip('Current position', {direction: 'top'});
             current_position.addTo(map);
 
@@ -195,6 +202,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch1">Ch1 Threshold</span><span class="value">{{ config.mas_ch1_thres_low|mv_to_adc }} ADC {{ config.mas_ch1_thres_high|mv_to_adc }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch2">Ch2 Threshold</span><span class="value">{{ config.mas_ch2_thres_low|mv_to_adc }} ADC {{ config.mas_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
     {% if has_slave %}
     <div id="slave">
@@ -203,6 +212,8 @@
         <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
+        <div class="keyvalue"><span class="key ch3">Ch3 Threshold</span><span class="value">{{ config.slv_ch1_thres_low|mv_to_adc }} ADC {{ config.slv_ch1_thres_high|mv_to_adc }} ADC</span></div>
+        <div class="keyvalue"><span class="key ch4">Ch4 Threshold</span><span class="value">{{ config.slv_ch2_thres_low|mv_to_adc }} ADC {{ config.slv_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
     {% endif %}
     <div id="settings">

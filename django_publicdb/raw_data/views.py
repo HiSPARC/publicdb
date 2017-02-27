@@ -176,6 +176,7 @@ def download_form(request, station_number=None, start=None, end=None):
             station = None
         form = DataDownloadForm(initial={'station_events': station,
                                          'station_weather': station,
+                                         'station_singles': station,
                                          'start': start,
                                          'end': end,
                                          'data_type': 'events'})
@@ -198,7 +199,7 @@ def download_data(request, data_type='events', station_number=None,
     :param download: (optional, GET) download the tsv
 
     """
-    if data_type in ['events', 'weather']:
+    if data_type in ['events', 'weather', 'singles']:
         station_number = int(station_number)
         station = get_object_or_404(Station, number=station_number)
 
@@ -233,6 +234,9 @@ def download_data(request, data_type='events', station_number=None,
     elif data_type == 'weather':
         tsv_output = generate_weather_as_tsv(station, start, end)
         filename = 'weather-s%d-%s.tsv' % (station_number, timerange_string)
+    elif data_type == 'singles':
+        tsv_output = generate_singles_as_tsv(station, start, end)
+        filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'lightning':
         lightning_type = int(lightning_type)
         if lightning_type not in range(6):
@@ -413,6 +417,74 @@ def get_weather_from_esd_in_range(station, start, end):
                     ts0 = calendar.timegm(t0.utctimetuple())
                     ts1 = calendar.timegm(t1.utctimetuple())
                     events = station_node.weather.read_where(
+                        '(ts0 <= timestamp) & (timestamp < ts1)')
+        except (IOError, tables.NoSuchNodeError):
+            continue
+        else:
+            yield events
+
+
+def generate_singles_as_tsv(station, start, end):
+    """Render TSV output as an iterator."""
+
+    t = loader.get_template('singles_data.tsv')
+    c = Context({'station': station, 'start': start, 'end': end})
+
+    yield t.render(c)
+
+    singles_returned = False
+
+    singles_events = get_singles_from_esd_in_range(station, start, end)
+    for events in singles_events:
+        dt = events['timestamp'].astype('datetime64[s]')
+        data = column_stack([
+            dt.astype('datetime64[D]'),
+            [value.time() for value in dt.tolist()],
+            events['timestamp'],
+            events['mas_ch1_low'],
+            events['mas_ch1_high'],
+            events['mas_ch2_low'],
+            events['mas_ch2_high'],
+            events['slv_ch1_low'],
+            events['slv_ch1_high'],
+            events['slv_ch2_low'],
+            events['slv_ch2_high']])
+        block_buffer = StringIO()
+        writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
+        writer.writerows(data)
+        yield block_buffer.getvalue()
+        singles_returned = True
+
+    if not singles_returned:
+        yield "# No singles data found for the chosen query."
+    else:
+        yield "# Finished downloading."
+
+
+def get_singles_from_esd_in_range(station, start, end):
+    """Get singles from ESD in time range.
+
+    :param station: Station object
+    :param start: start of datetime range
+    :param end: end of datetime range
+
+    """
+    for t0, t1 in single_day_ranges(start, end):
+        try:
+            Summary.objects.get(station=station, date=t0,
+                                num_singles__isnull=False)
+        except Summary.DoesNotExist:
+            continue
+        filepath = esd.get_esd_data_path(t0)
+        try:
+            with tables.open_file(filepath) as f:
+                station_node = esd.get_station_node(f, station)
+                if (t1 - t0).days == 1:
+                    events = station_node.singles.read()
+                else:
+                    ts0 = calendar.timegm(t0.utctimetuple())
+                    ts1 = calendar.timegm(t1.utctimetuple())
+                    events = station_node.singles.read_where(
                         '(ts0 <= timestamp) & (timestamp < ts1)')
         except (IOError, tables.NoSuchNodeError):
             continue

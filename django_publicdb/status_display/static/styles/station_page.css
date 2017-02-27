@@ -40,8 +40,12 @@
 #ag_histogram {
     height: 130px;}
 
+#srl_histogram,
+#srh_histogram,
 #ph_histogram,
 #pi_histogram,
+#sl_histogram,
+#sh_histogram,
 #az_histogram,
 #ze_histogram {
     height: 300px;}
