@@ -126,6 +126,12 @@ class Cluster(models.Model):
         return self.name
 
     def clean(self):
+        if self.number is None:
+            if self.parent is None:
+                self.number = self.country.last_cluster_number() + 1000
+            else:
+                self.number = self.parent.last_cluster_number() + 100
+
         if self.parent is None:
             if self.number % 1000:
                 raise ValidationError("Cluster number must be multiple of "
@@ -148,11 +154,6 @@ class Cluster(models.Model):
                                        self.parent.number + 1000))
 
     def save(self, *args, **kwargs):
-        if self.number is None:
-            if self.parent is None:
-                self.number = self.country.last_cluster_number() + 1000
-            else:
-                self.number = self.parent.last_cluster_number() + 100
         super(Cluster, self).save(*args, **kwargs)
         reload_datastore()
 
@@ -297,17 +298,15 @@ class Country(models.Model):
         return self.name
 
     def clean(self):
-        if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
-
-    def save(self, *args, **kwargs):
         if self.number is None:
             if Country.objects.count() > 0:
                 countrymax = Country.objects.aggregate(Max('number'))
                 self.number = countrymax['number__max'] + 10000
             else:
                 self.number = 0
-        super(Country, self).save(*args, **kwargs)
+
+        if self.number % 10000:
+            raise ValidationError("Country number must be multiple of 10000")
 
     def last_cluster_number(self):
         clusters = self.clusters.filter(parent=None)

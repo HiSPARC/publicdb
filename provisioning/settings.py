@@ -5,8 +5,7 @@ import os.path
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 
-# For production: set DEBUG to False !!!
-DEBUG = True
+DEBUG = {{ debug }}
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
@@ -22,14 +21,13 @@ DATABASES = {
         'NAME': 'publicdb',
         'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
         'USER': 'hisparc',
-        'PASSWORD': 'Data4user!',
+        'PASSWORD': '{{ mysql_password }}',
         'HOST': '127.0.0.1',
         'PORT': '',
     }
 }
 
-# Path settings
-# DEV_ONLY
+## Path settings
 
 # Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = '/databases/frome'
@@ -39,20 +37,20 @@ TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 ESD_PATH = '/srv/publicdb/www/esd'
 
 # Path of the mounted KNMI Lightning data root folder
-LGT_PATH = '/srv/publicdb/www/knmi_lightning'
+LGT_PATH = '/databases/knmi_lightning'
 
 # VPN and datastore XML-RPC Proxies
-VPN_PROXY = 'http://localhost:8001'
-DATASTORE_PROXY = 'http://localhost:8002'
+VPN_PROXY = '{{ vpn_proxy }}'
+DATASTORE_PROXY = '{{ datastore_proxy }}'
 
 # VPN and datastore host names
-VPN_HOST = 'localhost'
-DATASTORE_HOST = 'localhost'
+VPN_HOST = '{{ vpn_host }}'
+DATASTORE_HOST = '{{ datastore_host }}'
 
 # reCAPTCHA settings
-RECAPTCHA_ENABLED = False
-RECAPTCHA_PUB_KEY = 'foobar'
-RECAPTCHA_PRIVATE_KEY = 'foobaz'
+RECAPTCHA_ENABLED = {{ recaptcha_enabled }}
+RECAPTCHA_PUB_KEY = '{{ recaptcha_pub_key }}'
+RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -63,11 +61,9 @@ RECAPTCHA_PRIVATE_KEY = 'foobaz'
 USE_MULTIPROCESSING = True
 
 # E-mail settings
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-# For production
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.nikhef.nl'
-# EMAIL_PORT = 25
+EMAIL_BACKEND = '{{ email_backend }}'
+EMAIL_HOST = '{{ email_host }}'
+EMAIL_PORT = {{ email_port }}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -94,7 +90,7 @@ MEDIA_ROOT = '/srv/publicdb/media/'
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = '{{ media_url }}'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -104,7 +100,7 @@ STATIC_ROOT = '/srv/publicdb/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/media/static/'
+STATIC_URL = '{{ static_url }}'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -123,7 +119,7 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 # DEV_ONLY
-SECRET_KEY = '7f69c4q0%&uthoar406i*bcbeq6+j!ttphnjor_ctsauxj*z*y'
+SECRET_KEY = '{{ secret_key }}'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -206,6 +202,10 @@ LOGGING = {
             'handlers': ['mail_admins'],
             'level': 'ERROR',
             'propagate': True,
+        },
+        'django.security.DisallowedHost': {
+            'handlers': ['null_handler'],
+            'propagate': False,
         },
         'django.db.backends': {
             'handlers': ['null_handler'],

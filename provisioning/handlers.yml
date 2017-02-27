@@ -29,6 +29,14 @@
   service: name=httpd state=restarted
   become: true
 
+- name: restart uWSGI
+  supervisorctl: name=uwsgi state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+
+- name: restart datastore config server
+  supervisorctl: name=datastore-config-server state=restarted
+                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+
 - name: restart nagios
   service: name=nagios state=restarted
   become: true
@@ -47,4 +55,8 @@
 
 - name: restart shorewall
   service: name=shorewall state=restarted
+  become: true
+
+- name: compile firewall rules
+  command: lokkit --update
   become: true
