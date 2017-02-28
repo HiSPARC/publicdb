@@ -1,6 +1,14 @@
 ---
-- name: install shorewall firewall
-  yum: name=shorewall
+- name: ensure local source directory exists
+  file: path=/usr/local/src/hisparc state=directory
+        owner=hisparc group=hisparc mode=2775
+  become: true
+
+- name: download shorewall rpm
+  get_url: url=http://france.shorewall.net/pub/CURRENT_STABLE_VERSION_IS_5.0/shorewall-5.0.15/shorewall-5.0.15-3.src.rpm dest=/usr/local/src/hisparc
+
+- name: install shorewall rpm
+  yum: name=/usr/local/src/hisparc/shorewall-5.0.15-3.src.rpm
   become: true
 
 - name: copy shorewall config
