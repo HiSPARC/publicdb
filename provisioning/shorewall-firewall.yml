@@ -7,15 +7,18 @@
 - name: install shorewall core rpm
   yum: name={{ item }} state=present
   with_items:
-      - http://france.shorewall.net/pub/CURRENT_STABLE_VERSION_IS_5.0/shorewall-5.0.15/shorewall-core-5.0.15-3.noarch.rpm
-      - http://france.shorewall.net/pub/CURRENT_STABLE_VERSION_IS_5.0/shorewall-5.0.15/shorewall-5.0.15-3.noarch.rpm
-      - http://france.shorewall.net/pub/CURRENT_STABLE_VERSION_IS_5.0/shorewall-5.0.15/shorewall-init-5.0.15-3.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-core-5.1.1.0-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-5.1.1.0-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-init-5.1.1.0-1.el5.noarch.rpm
   become: true
 
 - name: copy shorewall config
   copy: src=vpn-shorewall/ dest=/etc/shorewall backup=yes
   become: true
   notify: restart shorewall
+
+- name: update shorewall
+  command: sudo shorewall update
 
 - name: ensure shorewall is started
   service: name=shorewall enabled=yes state=started
