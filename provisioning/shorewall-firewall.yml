@@ -18,7 +18,8 @@
   notify: restart shorewall
 
 - name: update shorewall
-  command: sudo shorewall update
+  command: shorewall update
+  become: true
 
 - name: ensure shorewall is started
   service: name=shorewall enabled=yes state=started
