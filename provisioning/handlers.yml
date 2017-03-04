@@ -60,3 +60,7 @@
 - name: compile firewall rules
   command: lokkit --update
   become: true
+
+- name: copy resolv.conf
+  copy: src=resolv.conf dest=/etc/resolv.conf backup=yes
+  become: true

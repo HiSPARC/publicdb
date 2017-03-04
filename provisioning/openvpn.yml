@@ -34,6 +34,6 @@
       - 192.16.185.12
     become: true
 
-  - name: copy resolv.conf
-    copy: src=resolv.conf dest=/etc/resolv.conf backup=yes
-    become: true
+  - name: copy resolv.conf in handlers.yml after provisioning is finished
+    command: /bin/true
+    notify: copy resolv.conf
