@@ -1,0 +1,14 @@
+# these tasks must be run at the end of provisioning, because they will
+#  break DNS lookups during provisioning.
+---
+  - name: create nikhef network resolv.conf
+    lineinfile: create=yes dest=/etc/resolv.conf-nikhef
+                line="nameserver {{ item }}"
+    with_items:
+      - 192.16.199.17
+      - 192.16.185.12
+    become: true
+
+  - name: copy resolv.conf
+    copy: src=resolv.conf dest=/etc/resolv.conf backup=yes
+    become: true

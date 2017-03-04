@@ -25,15 +25,3 @@
   - name: ensure openvpn is started
     service: name=openvpn enabled=yes state=started
     become: true
-
-  - name: create nikhef network resolv.conf
-    lineinfile: create=yes dest=/etc/resolv.conf-nikhef
-                line="nameserver {{ item }}"
-    with_items:
-      - 192.16.199.17
-      - 192.16.185.12
-    become: true
-
-  - name: copy resolv.conf in handlers.yml after provisioning is finished
-    command: /bin/true
-    notify: copy resolv.conf

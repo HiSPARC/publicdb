@@ -30,6 +30,8 @@
     - include: vpn-scripts.yml
   handlers:
     - include: handlers.yml
+  post_tasks:
+    - include: set-dns.yml
 
 - hosts: publicdb:datastore
   tasks:
