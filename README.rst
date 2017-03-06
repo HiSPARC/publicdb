@@ -214,10 +214,7 @@ Now add the VM::
 
    $ vagrant up publicdb
 
-Provisioning might stop if the kernel of the guest VM is upgraded, becaue
+Provisioning might stop if the kernel of the guest VM is upgraded, because
 this will trigger a reboot. Reload and restart provisioning::
 
    $ vagrant reload publicdb --provision
-
-The publicdb and datastore VMs build succesfully using ansible_local.
-Provisioning of the vpn VM is currently not possible using Windows.
