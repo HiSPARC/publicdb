@@ -35,7 +35,7 @@
 - name: create conda environment
   shell: creates=/srv/datastore/datastore_env
          yes | /opt/miniconda/bin/conda create
-         -p /srv/datastore/datastore_env python --yes
+         -p /srv/datastore/datastore_env python=3.6 --yes
 
 - name: install conda packages in conda environment
   command: /opt/miniconda/bin/conda install -p /srv/datastore/datastore_env
