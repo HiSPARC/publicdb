@@ -7,9 +7,9 @@
 - name: install shorewall core rpm
   yum: name={{ item }} state=present
   with_items:
-      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-core-5.1.1.0-1.el5.noarch.rpm
-      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-5.1.1.0-1.el5.noarch.rpm
-      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-init-5.1.1.0-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-core-5.1.2.3-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-5.1.2.3-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-init-5.1.2.3-1.el5.noarch.rpm
   become: true
 
 - name: copy shorewall config
