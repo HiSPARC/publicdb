@@ -12,3 +12,14 @@
   - name: copy resolv.conf
     copy: src=resolv.conf dest=/etc/resolv.conf backup=yes
     become: true
+
+  # this will make sure NetworkManager does not interfere with dnsmasq
+  # without these options it will overwrite /etc/resolv.conf when using DHCP.
+  - name: Configure network interface to use dnsmasq
+    blockinfile:
+      dest: /etc/sysconfig/network-scripts/ifcfg-{{ ansible_default_ipv4.interface }}
+      block: |
+        PEERDNS=no
+        DNS1=127.0.0.1
+        DOMAIN=nikhef.nl his
+    become: true
