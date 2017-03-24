@@ -57,23 +57,33 @@
            -r /home/{{ ansible_user_id }}/pip.list
 
 - name: setup the publicdb database in PostgreSQL
+  become: true
+  become_user: postgres
   postgresql_db:
     name: "{{ psql_database_name }}"
     encoding: UTF-8
     state: present
 
 - name: add hisparc user to the publicdb database
+  become: true
+  become_user: postgres
   postgresql_user:
     db: "{{ psql_database_name }}"
     name: hisparc
     password: "{{ psql_password }}"
     priv: ALL
+
+- name: ensure hisparc user has no unnecessary privileges
+  become: true
+  become_user: postgres
+  postgresql_user:
+    name: hisparc
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: copy .pgpass file with login credentials
   template:
-    src: pgpass.j2
-    dest: "/home/{{ ansible_user_id }}/.pgpass"
+    src: pgpass.conf
+    dest: "~/.pgpass"
     mode: 0600
 
 - name: copy Django settings file

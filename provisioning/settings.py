@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 # Django settings for django_publicdb project.
 
 import os.path
@@ -22,8 +23,8 @@ DATABASES = {
         'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
         'USER': 'hisparc',
         'PASSWORD': '{{ psql_password }}',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
+        'HOST': '',
+        'PORT': '',
     }
 }
 

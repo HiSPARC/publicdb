@@ -17,10 +17,20 @@
     state: present
   become: true
 
-- name: Initiate database
+- name: initiate database
   command: service postgresql-9.6 initdb
   args:
     creates: /var/lib/pgsql/9.6/data/postgresql.conf
+  become: true
+
+- name: copy PostgreSQL authentication config file
+  become: true
+  become_user: postgres
+  template:
+    src: pg_hba.conf
+    dest: /var/lib/pgsql/9.6/data/pg_hba.conf
+    mode: 0600
+  notify: restart postgresql
 
 - name: start PostgreSQL server now and on boot
   service:
