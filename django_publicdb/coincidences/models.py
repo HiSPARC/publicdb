@@ -35,10 +35,10 @@ class SerializedDataField(models.Field):
         #    string instead of a JSON array
 
         if value[0] == '[' and value[-1] == ']':
-            returnValue = json.loads(value)
+            return_value = json.loads(value)
 
-            if isinstance(returnValue, list):
-                return returnValue
+            if isinstance(return_value, list):
+                return return_value
 
             return []
 
@@ -69,11 +69,11 @@ class SerializedDataField(models.Field):
 
     def value_to_string(self, obj):
 
-        HUMAN_READABLE_OUTPUT = False
+        human_readable_output = False
 
         value = self._get_val_from_obj(obj)
 
-        if HUMAN_READABLE_OUTPUT:
+        if human_readable_output:
             return value
 
         return self.get_prep_value(value)

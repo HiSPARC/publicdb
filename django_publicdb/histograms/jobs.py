@@ -687,8 +687,8 @@ def update_temperature_dataset(summary):
 
     logger.debug("Updating temperature dataset for %s" % summary)
     temperature = esd.get_temperature(summary)
-    ERR = [-999, -2 ** 15]
-    temperature = [(x, y) for x, y in temperature if y not in ERR]
+    error_values = [-999, -2 ** 15]
+    temperature = [(x, y) for x, y in temperature if y not in error_values]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
         save_dataset(summary, 'temperature', *zip(*temperature))
@@ -699,8 +699,8 @@ def update_barometer_dataset(summary):
 
     logger.debug("Updating barometer dataset for %s" % summary)
     barometer = esd.get_barometer(summary)
-    ERR = [-999]
-    barometer = [(x, y) for x, y in barometer if y not in ERR]
+    error_values = [-999]
+    barometer = [(x, y) for x, y in barometer if y not in error_values]
     if barometer != []:
         barometer = shrink_dataset(barometer, INTERVAL_BARO)
         save_dataset(summary, 'barometer', *zip(*barometer))

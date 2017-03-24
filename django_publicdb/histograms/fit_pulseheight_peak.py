@@ -14,29 +14,29 @@ from . import esd
 logger = logging.getLogger('histograms.fit_pulseheight_peak')
 
 
-def find_bin_next_minimum(y, startBin):
+def find_bin_next_minimum(y, start_bin):
 
-    minY = y[startBin]
+    min_y = y[start_bin]
 
-    for i in range(startBin, len(y) + 1):
-        currentY = y[i]
-        # logger.debug("Bin %i: %s" % (i, currentY))
-        if currentY < minY:
-            minY = y[i]
-        if currentY > minY:
+    for i in range(start_bin, len(y) + 1):
+        current_y = y[i]
+        # logger.debug("Bin %i: %s" % (i, current_y))
+        if current_y < min_y:
+            min_y = y[i]
+        if current_y > min_y:
             return i - 1
 
 
-def find_bin_next_maximum(y, startBin):
+def find_bin_next_maximum(y, start_bin):
 
-    maxY = y[startBin]
+    max_y = y[start_bin]
 
-    for i in range(startBin, len(y) + 1):
-        currentY = y[i]
-        # logger.debug("Bin %i: %s" % (i, currentY))
-        if currentY > maxY:
-            maxY = y[i]
-        if currentY < maxY:
+    for i in range(start_bin, len(y) + 1):
+        current_y = y[i]
+        # logger.debug("Bin %i: %s" % (i, current_y))
+        if current_y > max_y:
+            max_y = y[i]
+        if current_y < max_y:
             return i - 1
 
 
@@ -103,23 +103,23 @@ def get_fit_parameters(x, y):
 
     # Find approx max using the derivative
 
-    binMinimum = find_bin_next_minimum(y_diff_smoothed, 0)
-    binMaximum = find_bin_next_maximum(y_diff_smoothed, binMinimum)
-    binMinimum = find_bin_next_minimum(y_diff_smoothed, binMaximum)
+    bin_minimum = find_bin_next_minimum(y_diff_smoothed, 0)
+    bin_maximum = find_bin_next_maximum(y_diff_smoothed, bin_minimum)
+    bin_minimum = find_bin_next_minimum(y_diff_smoothed, bin_maximum)
 
-    maxX = x_rebinned[binMaximum]
-    minX = x_rebinned[binMinimum]
+    max_x = x_rebinned[bin_maximum]
+    min_x = x_rebinned[bin_minimum]
 
-    # logger.debug("Approx maximum is at %s" % ((maxX + minX) / 2))
+    # logger.debug("Approx maximum is at %s" % ((max_x + min_x) / 2))
 
-    # Return fit peak, fit range minimum = maxX, fit range maximum = minX
+    # Return fit peak, fit range minimum = max_x, fit range maximum = min_x
 
-    return (maxX + minX) / 2 + bias, maxX + bias, minX + bias
+    return (max_x + min_x) / 2 + bias, max_x + bias, min_x + bias
 
 
-def gauss(x, N, m, s):
+def gauss(x, n, m, s):
     """Gaussian function for fitting"""
-    return N * stats.norm.pdf(x, m, s)
+    return n * stats.norm.pdf(x, m, s)
 
 
 def residual(params, x, y_data):
@@ -143,23 +143,18 @@ def fit_pulseheight_peak(pulseheights):
 
     # 1. Initialize work space
 
-    phMin = 50  # ADC
-    phMax = 1550  # ADC
+    ph_min = 50  # ADC
+    ph_max = 1550  # ADC
 
-    pulseheightFit = PulseheightFit(initial_mpv=0,
-                                    initial_width=0,
-                                    fitted_mpv=0,
-                                    fitted_mpv_error=0,
-                                    fitted_width=0,
-                                    fitted_width_error=0,
-                                    degrees_of_freedom=0,
-                                    chi_square_reduced=0,
-                                    error_type="",
-                                    error_message="")
+    pulseheight_fit = PulseheightFit(
+        initial_mpv=0, initial_width=0, fitted_mpv=0,
+        fitted_mpv_error=0, fitted_width=0, fitted_width_error=0,
+        degrees_of_freedom=0, chi_square_reduced=0,
+        error_type="", error_message="")
 
     # 2. Make histogram: occurence of dPulseheight vs pulseheight
 
-    bins = numpy.arange(phMin, phMax, 10)
+    bins = numpy.arange(ph_min, ph_max, 10)
 
     occurence, bins = numpy.histogram(pulseheights, bins=bins)
     pulseheight = (bins[:-1] + bins[1:]) / 2
@@ -169,16 +164,16 @@ def fit_pulseheight_peak(pulseheights):
     sum = occurence.sum()
 
     if sum < 100:
-        pulseheightFit.error_message = ("Sum is less than 100 ADC. Dataset "
-                                        "is probably empty")
-        return pulseheightFit
+        pulseheight_fit.error_message = ("Sum is less than 100 ADC. Dataset "
+                                         "is probably empty")
+        return pulseheight_fit
 
     average_pulseheight = (pulseheight * occurence).sum() / occurence.sum()
 
     if average_pulseheight < 100:
-        pulseheightFit.error_message = ("Average pulseheight is less than "
-                                        "100 ADC")
-        return pulseheightFit
+        pulseheight_fit.error_message = ("Average pulseheight is less than "
+                                         "100 ADC")
+        return pulseheight_fit
 
     # 3. Get initial fit parameters for gauss: mean and width
 
@@ -188,22 +183,22 @@ def fit_pulseheight_peak(pulseheights):
         # logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
         #              (initial_mpv, minRange, maxRange))
     except Exception, e:
-        pulseheightFit.error_type = "Exception"
-        pulseheightFit.error_message = ("Unable to find initial fit "
-                                        "parameters: %s" % e)
-        return pulseheightFit
+        pulseheight_fit.error_type = "Exception"
+        pulseheight_fit.error_message = ("Unable to find initial fit "
+                                         "parameters: %s" % e)
+        return pulseheight_fit
 
-    pulseheightFit.initial_mpv = initial_mpv
-    pulseheightFit.initial_width = initial_mpv - minRange
+    pulseheight_fit.initial_mpv = initial_mpv
+    pulseheight_fit.initial_width = initial_mpv - minRange
 
     # Check the width. More than 40 ADC is nice, just to be able to have a fit
     # at all.
 
-    if pulseheightFit.initial_width <= 40.0:
-        pulseheightFit.error_message = ("Initial width is less than or equal "
-                                        "to 40 ADC. It should be more than "
-                                        "that for a good fit")
-        return pulseheightFit
+    if pulseheight_fit.initial_width <= 40.0:
+        pulseheight_fit.error_message = ("Initial width is less than or equal "
+                                         "to 40 ADC. It should be more than "
+                                         "that for a good fit")
+        return pulseheight_fit
 
     # 4. Fit with gauss
 
@@ -217,35 +212,35 @@ def fit_pulseheight_peak(pulseheights):
             fit_window_occurence.append(occurence[i])
 
     if 0 in fit_window_occurence:
-        pulseheightFit.error_message = (
+        pulseheight_fit.error_message = (
             "There is an empty bin in the fit range. This is probably because "
             "the fit occurs somewhere in the tail of the histogram.")
-        return pulseheightFit
+        return pulseheight_fit
 
     # Initial parameter values
 
-    initial_N = 16
-    initial_mean = pulseheightFit.initial_mpv
-    initial_width = pulseheightFit.initial_width
+    initial_n = 16
+    initial_mean = pulseheight_fit.initial_mpv
+    initial_width = pulseheight_fit.initial_width
 
     try:
-        fitResult = optimize.curve_fit(gauss,
-                                       fit_window_pulseheight,
-                                       fit_window_occurence,
-                                       [initial_N, initial_mean,
-                                        initial_width])
+        fit_result = optimize.curve_fit(gauss,
+                                        fit_window_pulseheight,
+                                        fit_window_occurence,
+                                        [initial_n, initial_mean,
+                                         initial_width])
     except RuntimeError, exception:
-        pulseheightFit.error_type = "RuntimeError"
-        pulseheightFit.error_message = exception
-        return pulseheightFit
+        pulseheight_fit.error_type = "RuntimeError"
+        pulseheight_fit.error_message = exception
+        return pulseheight_fit
 
-    fitParameters = fitResult[0]
-    fitCovariance = fitResult[1]
+    fit_parameters = fit_result[0]
+    fit_covariance = fit_result[1]
 
-    if numpy.isinf(fitCovariance).any():
-        pulseheightFit.error_message = \
+    if numpy.isinf(fit_covariance).any():
+        pulseheight_fit.error_message = \
             "Unable to calculate the covariance matrix."
-        fitCovariance = numpy.zeros((3, 3))
+        fit_covariance = numpy.zeros((3, 3))
 
     # 5. Calculate the Chi2
 
@@ -254,32 +249,32 @@ def fit_pulseheight_peak(pulseheights):
     # Sigma^2 for a poisson process is the same as the number of
     # events in the bin
 
-    chiSquare = (residual(fitParameters, fit_window_pulseheight,
-                          fit_window_occurence) ** 2 /
-                 fit_window_occurence).sum()
+    chi_square = (residual(fit_parameters, fit_window_pulseheight,
+                           fit_window_occurence) ** 2 /
+                  fit_window_occurence).sum()
 
-    pulseheightFit.degrees_of_freedom = (len(fit_window_occurence) -
-                                         len(fitParameters))
-    pulseheightFit.chi_square_reduced = (chiSquare /
-                                         pulseheightFit.degrees_of_freedom)
+    pulseheight_fit.degrees_of_freedom = (len(fit_window_occurence) -
+                                          len(fit_parameters))
+    pulseheight_fit.chi_square_reduced = (chi_square /
+                                          pulseheight_fit.degrees_of_freedom)
 
     # 6. Return
 
-    pulseheightFit.fitted_mpv = fitParameters[1]
-    pulseheightFit.fitted_mpv_error = sqrt(fitCovariance[1, 1])
-    pulseheightFit.fitted_width = fitParameters[2]
-    pulseheightFit.fitted_width_error = sqrt(fitCovariance[2, 2])
+    pulseheight_fit.fitted_mpv = fit_parameters[1]
+    pulseheight_fit.fitted_mpv_error = sqrt(fit_covariance[1, 1])
+    pulseheight_fit.fitted_width = fit_parameters[2]
+    pulseheight_fit.fitted_width_error = sqrt(fit_covariance[2, 2])
 
     logger.debug("Fit result: peak %.1f +- %.1f, width %.1f +- %.1f" %
-                 (fitParameters[1], sqrt(fitCovariance[1, 1]),
-                  fitParameters[2], sqrt(fitCovariance[2, 2])))
-    # logger.debug("Chi square: %.3f" % chiSquare)
+                 (fit_parameters[1], sqrt(fit_covariance[1, 1]),
+                  fit_parameters[2], sqrt(fit_covariance[2, 2])))
+    # logger.debug("Chi square: %.3f" % chi_square)
     # logger.debug("Degrees of freedom: %d" %
-    #              pulseheightFit.degrees_of_freedom)
+    #              pulseheight_fit.degrees_of_freedom)
     # logger.debug("Reduced chi square: %.1f" %
-    #              pulseheightFit.chi_square_reduced)
+    #              pulseheight_fit.chi_square_reduced)
 
-    return pulseheightFit
+    return pulseheight_fit
 
 
 def get_pulseheight_fits(summary):

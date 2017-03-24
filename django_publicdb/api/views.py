@@ -343,9 +343,9 @@ def errfunc(p, t, y):
     return linear_fit(p, t) - y
 
 
-def gauss(x, N, m, s):
+def gauss(x, n, m, s):
     """Gaussian function for fitting"""
-    return N * stats.norm.pdf(x, m, s)
+    return n * stats.norm.pdf(x, m, s)
 
 
 def get_pulseheight_drift(request, station_number, plate_number,
@@ -424,11 +424,11 @@ def get_pulseheight_drift(request, station_number, plate_number,
         y, bins = numpy.histogram(relative_mpv, bins=bins)
         x = (bins[:-1] + bins[1:]) / 2
 
-        initial_N = 16
+        initial_n = 16
         initial_mean = 1
         initial_width = 0.03
 
-        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_N,
+        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_n,
                                                          initial_mean,
                                                          initial_width))
 
