@@ -56,12 +56,25 @@
   command: /srv/publicdb/publicdb_env/bin/pip install
            -r /home/{{ ansible_user_id }}/pip.list
 
-- name: set up MySQL database
-  mysql_db: name=publicdb state=present
+- name: setup the publicdb database in PostgreSQL
+  postgresql_db:
+    name: "{{ psql_database_name }}"
+    encoding: UTF-8
+    state: present
 
-- name: set up MySQL user
-  mysql_user: name=hisparc password={{ mysql_password }}
-              priv=publicdb.*:ALL state=present
+- name: add hisparc user to the publicdb database
+  postgresql_user:
+    db: "{{ psql_database_name }}"
+    name: hisparc
+    password: "{{ psql_password }}"
+    priv: ALL
+    role_attr_flags: NOSUPERUSER,NOCREATEDB
+
+- name: copy .pgpass file with login credentials
+  template:
+    src: pgpass.j2
+    dest: "/home/{{ ansible_user_id }}/.pgpass"
+    mode: 0600
 
 - name: copy Django settings file
   template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
@@ -121,8 +134,14 @@
         job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
   become: true
 
-- name: enable cron job for backingup publicdb database
+- name: enable cron job for daily backup of publicdb database
   cron: name="Publicdb dump" cron_file=hisparc hour=1 minute=0
         state=present user=hisparc
-        job="mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; mysqldump publicdb > /mysqldumps/publicdb_dump.sql"
+        job="if [ -f "/mysqldumps/publicdb_dump.sql" ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump publicdb > /mysqldumps/publicdb_dump.sql"
+  become: true
+
+- name: enable cron job for monthly backup of publicdb database
+  cron: name="Publicdb dump" cron_file=hisparc day=1 hour=20 minute=0
+        state=present user=hisparc
+        job="if [ -f "/mysqldumps/publicdb_dump_this_month.sql" ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump publicdb > /mysqldumps/publicdb_dump_this_month.sql"
   become: true

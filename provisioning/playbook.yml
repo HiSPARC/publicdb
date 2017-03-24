@@ -8,7 +8,7 @@
 - hosts: publicdb:pique.nikhef.nl
   tasks:
     - include: simple-firewall.yml
-    - include: mysqldb.yml
+    - include: postgresql.yml
     - include: development.yml
     - include: publicdb.yml
   handlers:

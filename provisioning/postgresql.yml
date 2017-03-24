@@ -1,0 +1,30 @@
+---
+- name: install the PostgreSQL rpm from a remote repo
+  yum:
+    name: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+    state: present
+  become: true
+
+- name: install the PostgreSQL server
+  yum:
+    name: postgresql96-server
+    state: present
+  become: true
+
+- name: install the Python package to interface with the PostgreSQL server
+  yum:
+    name: python-psycopg2
+    state: present
+  become: true
+
+- name: Initiate database
+  command: service postgresql-9.6 initdb
+  args:
+    creates: /var/lib/pgsql/9.6/data/postgresql.conf
+
+- name: start PostgreSQL server now and on boot
+  service:
+    name: postgresql-9.6
+    state: started
+    enabled: yes
+  become: true
