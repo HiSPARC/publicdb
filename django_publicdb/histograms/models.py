@@ -14,7 +14,7 @@ class SerializedDataField(models.Field):
     __metaclass__ = models.SubfieldBase
 
     def db_type(self, connection):
-        return 'LONGBLOB'
+        return 'BYTEA'
 
     def to_python(self, value):
         try:
