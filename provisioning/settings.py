@@ -21,7 +21,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '{{ psql_database_name }}',
         'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
-        'USER': 'hisparc',
+        'USER': '{{ psql_user }}',
         'PASSWORD': '{{ psql_password }}',
         'HOST': '',
         'PORT': '',
