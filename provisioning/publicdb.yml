@@ -80,12 +80,6 @@
     name: hisparc
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
-- name: copy .pgpass file with login credentials
-  template:
-    src: pgpass.conf
-    dest: "~/.pgpass"
-    mode: 0600
-
 - name: copy Django settings file
   template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
         backup=yes
