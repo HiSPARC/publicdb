@@ -22,7 +22,7 @@ DATABASES = {
         'NAME': '{{ psql_database_name }}',
         'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
         'USER': '{{ psql_user }}',
-        'PASSWORD': '{{ psql_password }}',
+        'PASSWORD': '',
         'HOST': '',
         'PORT': '',
     }

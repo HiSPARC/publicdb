@@ -3,7 +3,6 @@ debug: True
 
 psql_database_name: publicdb
 psql_user: "{{ ansible_ssh_user }}"
-psql_password: Data4user!
 
 vpn_host: 192.168.99.12
 vpn_proxy: http://192.168.99.12:8001

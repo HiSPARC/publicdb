@@ -70,7 +70,6 @@
   postgresql_user:
     db: "{{ psql_database_name }}"
     name: hisparc
-    password: "{{ psql_password }}"
     priv: ALL
 
 - name: ensure hisparc user has no unnecessary privileges
