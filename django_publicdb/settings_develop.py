@@ -159,7 +159,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'django.contrib.admindocs',
     'django_publicdb.inforecords',
     'django_publicdb.voorraad',
     'django_publicdb.histograms',
