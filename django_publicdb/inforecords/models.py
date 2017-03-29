@@ -320,60 +320,6 @@ class Country(models.Model):
         verbose_name_plural = "Countries"
 
 
-class ElectronicsType(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-
-    def __unicode__(self):
-        return self.description
-
-    class Meta:
-        verbose_name_plural = 'Electronics Type'
-        ordering = ('description',)
-
-
-class ElectronicsStatus(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-
-    def __unicode__(self):
-        return self.description
-
-    class Meta:
-        verbose_name_plural = 'Electronics Status'
-
-
-class ElectronicsBatch(models.Model):
-    type = models.ForeignKey(ElectronicsType)
-    number = models.IntegerField(unique=True)
-    notes = models.TextField()
-
-    def __unicode__(self):
-        return '%s: %s' % (self.type, self.number)
-
-    class Meta:
-        verbose_name_plural = 'Electronics Batch'
-        ordering = ('type', 'number')
-
-
-class Electronics(models.Model):
-    station = models.ForeignKey(Station)
-    type = models.ForeignKey(ElectronicsType)
-    status = models.ForeignKey(ElectronicsStatus)
-    startdate = models.DateField()
-    enddate = models.DateField(null=True, blank=True)
-    batch = models.ForeignKey(ElectronicsBatch)
-    serial = models.IntegerField()
-    is_master = models.BooleanField()
-    has_gps = models.BooleanField()
-    notes = models.TextField(null=True, blank=True)
-
-    def __unicode__(self):
-        return '%s / %s' % (self.batch, self.serial)
-
-    class Meta:
-        verbose_name_plural = 'Electronics'
-        ordering = ('batch', 'serial')
-
-
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20)
