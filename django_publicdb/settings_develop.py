@@ -160,7 +160,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'django.contrib.admin',
     'django_publicdb.inforecords',
-    'django_publicdb.voorraad',
     'django_publicdb.histograms',
     'django_publicdb.coincidences',
     'django_publicdb.status_display',
