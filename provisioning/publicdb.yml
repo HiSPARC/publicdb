@@ -140,11 +140,11 @@
 - name: enable cron job for daily backup of publicdb database
   cron: name="Publicdb dump" cron_file=hisparc hour=1 minute=0
         state=present user=hisparc
-        job="if [ -f "/mysqldumps/publicdb_dump.sql" ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump publicdb > /mysqldumps/publicdb_dump.sql"
+        job="if [ -f "/mysqldumps/publicdb_dump.sql" ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump.sql"
   become: true
 
 - name: enable cron job for monthly backup of publicdb database
   cron: name="Publicdb dump" cron_file=hisparc day=1 hour=20 minute=0
         state=present user=hisparc
-        job="if [ -f "/mysqldumps/publicdb_dump_this_month.sql" ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump publicdb > /mysqldumps/publicdb_dump_this_month.sql"
+        job="if [ -f "/mysqldumps/publicdb_dump_this_month.sql" ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump_this_month.sql"
   become: true
