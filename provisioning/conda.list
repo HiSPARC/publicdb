@@ -2,4 +2,4 @@ pip
 ipython
 pytables
 scipy
-mysql-python
+psycopg2

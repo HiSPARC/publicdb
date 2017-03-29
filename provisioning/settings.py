@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 # Django settings for django_publicdb project.
 
 import os.path
@@ -17,12 +18,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'publicdb',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '{{ psql_database_name }}',
         'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
-        'USER': 'hisparc',
-        'PASSWORD': '{{ mysql_password }}',
-        'HOST': '127.0.0.1',
+        'USER': '{{ psql_user }}',
+        'PASSWORD': '',
+        'HOST': '',
         'PORT': '',
     }
 }
