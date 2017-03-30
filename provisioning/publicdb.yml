@@ -119,32 +119,59 @@
                  supervisorctl_path=/opt/miniconda/bin/supervisorctl
 
 - name: enable cron job for updating histograms and ESD
-  cron: name="HiSPARC update" cron_file=hisparc hour=4 minute=0
-        state=present user=hisparc
-        job="/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+  cron:
+    name: "HiSPARC update"
+    cron_file: hisparc
+    minute: 0
+    hour: 4
+    state: present
+    user: hisparc
+    job: "/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files
-  cron: name="clean downloaded data" cron_file=hisparc special_time=daily
-        state=present user=root
-        job="find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
+  cron:
+    name: "clean downloaded data"
+    cron_file: hisparc
+    special_time: daily
+    state: present
+    user: root
+    job: "find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
   become: true
 
 - name: enable cron job for creating analysis sessions
-  cron: name="create confirmed sessions" cron_file=hisparc
-        minute=* hour=* day=* month=* weekday=*
-        state=present user=hisparc
-        job="curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
+  cron:
+    name: "create confirmed sessions"
+    cron_file: hisparc
+    minute: *
+    hour: *
+    day: *
+    month: *
+    weekday: *
+    state: present
+    user: hisparc
+    job: "curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
   become: true
 
 - name: enable cron job for daily backup of publicdb database
-  cron: name="Publicdb dump" cron_file=hisparc hour=1 minute=0
-        state=present user=hisparc
-        job="if [ -f "/mysqldumps/publicdb_dump.sql" ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump.sql"
+  cron:
+    name: "Publicdb dump"
+    cron_file: hisparc
+    minute: 0
+    hour: 1
+    state: present
+    user: hisparc
+    job: "if [ -f '/mysqldumps/publicdb_dump.sql' ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump.sql"
   become: true
 
 - name: enable cron job for monthly backup of publicdb database
-  cron: name="Publicdb dump" cron_file=hisparc day=1 hour=20 minute=0
-        state=present user=hisparc
-        job="if [ -f "/mysqldumps/publicdb_dump_this_month.sql" ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump_this_month.sql"
+  cron:
+    name: "Monthly publicdb dump"
+    cron_file: hisparc
+    minute: 0
+    hour: 20
+    day: 1
+    state: present
+    user: hisparc
+    job: "if [ -f '/mysqldumps/publicdb_dump_this_month.sql' ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump_this_month.sql"
   become: true
