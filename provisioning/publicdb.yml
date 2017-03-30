@@ -143,11 +143,7 @@
   cron:
     name: "create confirmed sessions"
     cron_file: hisparc
-    minute: *
-    hour: *
-    day: *
-    month: *
-    weekday: *
+    minute: "*/2"
     state: present
     user: hisparc
     job: "curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
