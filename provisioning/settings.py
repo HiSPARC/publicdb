@@ -7,7 +7,6 @@ dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 
 DEBUG = {{ debug }}
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     ('Kasper van Dam', 'kaspervd@nikhef.nl'),
@@ -122,11 +121,15 @@ STATICFILES_FINDERS = (
 # DEV_ONLY
 SECRET_KEY = '{{ secret_key }}'
 
-# List of callables that know how to import templates from various sources.
-TEMPLATE_LOADERS = (
-    'django.template.loaders.filesystem.Loader',
-    'django.template.loaders.app_directories.Loader',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'debug': DEBUG,
+        },
+    },
+]
 
 MIDDLEWARE_CLASSES = (
     # 'django.middleware.gzip.GZipMiddleware',
@@ -144,12 +147,6 @@ ROOT_URLCONF = 'django_publicdb.urls'
 ALLOWED_HOSTS = [
     'data.hisparc.nl',
 ]
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
 
 INSTALLED_APPS = (
     'django.contrib.auth',
