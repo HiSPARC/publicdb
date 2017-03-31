@@ -1,8 +1,9 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('django_publicdb.updates.views',
-    (r'^installer/latest/$', 'get_latest_installer'),
-    (r'^(?P<queue>\w+)/check$', 'update_check_querystring'),
-    (r'^(?P<queue>\w+)/check/(?P<admin_version>\d+)/(?P<user_version>\d+)/$',
-     'update_check'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^installer/latest/$', views.get_latest_installer),
+    url(r'^(?P<queue>\w+)/check$', views.update_check_querystring),
+    url(r'^(?P<queue>\w+)/check/(?P<admin_version>\d+)/(?P<user_version>\d+)/$', views.update_check),
+]

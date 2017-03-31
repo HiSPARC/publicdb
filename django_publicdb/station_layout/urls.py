@@ -1,9 +1,11 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('django_publicdb.station_layout.views',
-    (r'^submit/$', 'layout_submit'),
-    (r'^submit/validate/$', 'validate_layout_submit'),
-    (r'^confirm/(?P<hash>\w{32})/$', 'confirmed_layout'),
-    (r'^review/(?P<hash>\w{32})/$', 'review_layout'),
-    (r'^review/(?P<hash>\w{32})/validate/$', 'validate_review_layout'),
+from . import views
+
+urlpatterns = [
+    url(r'^submit/$', views.layout_submit),
+    url(r'^submit/validate/$', views.validate_layout_submit),
+    url(r'^confirm/(?P<hash>\w{32})/$', views.confirmed_layout),
+    url(r'^review/(?P<hash>\w{32})/$', views.review_layout),
+    url(r'^review/(?P<hash>\w{32})/validate/$', views.validate_review_layout),
 )

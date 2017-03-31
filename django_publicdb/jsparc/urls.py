@@ -1,6 +1,8 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('django_publicdb.jsparc.views',
-    (r'^get_coincidence/$', 'get_coincidence'),
-    (r'^result/$', 'result'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^get_coincidence/$', views.get_coincidence),
+    url(r'^result/$', views.result),
+]

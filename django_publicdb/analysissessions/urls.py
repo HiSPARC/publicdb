@@ -1,10 +1,12 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('django_publicdb.analysissessions.views',
-    (r'^(?P<slug>[\w-]+)/data/$', 'data_display'),
+from . import views
 
-    (r'^request/$', 'request_form'),
-    (r'^request/validate$', 'validate_request_form'),
-    (r'^request/(\w{20})/$', 'confirm_request'),
-    (r'^request/create', 'create_session')
-)
+urlpatterns = [
+    (r'^(?P<slug>[\w-]+)/data/$', views.data_display),
+
+    (r'^request/$', views.request_form),
+    (r'^request/validate$', views.validate_request_form),
+    (r'^request/(\w{20})/$', views.confirm_request),
+    (r'^request/create', views.create_session),
+]

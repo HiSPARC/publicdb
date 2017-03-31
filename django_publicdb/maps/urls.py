@@ -1,9 +1,11 @@
-from django.conf.urls import patterns
+from django.conf.urls import url
 
-urlpatterns = patterns('django_publicdb.maps.views',
-    (r'^$', 'stations_on_map'),
-    (r'^(?P<station_number>\d+)/$', 'station_on_map'),
-    (r'^(?P<country>[a-zA-Z \-]+)/$', 'stations_on_map'),
-    (r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', 'stations_on_map'),
-    (r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', 'stations_on_map'),
-)
+from . import views
+
+urlpatterns = [
+    url(r'^$', views.stations_on_map),
+    url(r'^(?P<station_number>\d+)/$', views.station_on_map),
+    url(r'^(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map),
+    url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', views.stations_on_map),
+    url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', views.stations_on_map),
+]
