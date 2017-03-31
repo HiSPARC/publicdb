@@ -148,6 +148,13 @@ ALLOWED_HOSTS = [
     'data.hisparc.nl',
 ]
 
+if DEBUG:
+    ALLOWED_HOSTS += [
+        '127.0.0.1',
+        'localhost',
+        '[::1]',
+    ]
+
 INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
