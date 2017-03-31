@@ -4,7 +4,7 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='download')),
+    url(r'^$', RedirectView.as_view(url='download', permanent=False)),
     url(r'^download/$', views.download_form),
     url(r'^download/(?P<station_number>\d+)/(?P<start>[^/]+)/(?P<end>[^/]+)/$', views.download_form),
     url(r'^download/coincidences/$', views.coincidences_download_form),
