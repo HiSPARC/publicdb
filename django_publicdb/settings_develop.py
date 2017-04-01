@@ -16,13 +16,10 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        # DF: relative path, just for running test server!
         'NAME': os.path.join(publicdb_path, 'public.db'),
-        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
-        'USER': '',  # Not used with sqlite3.
-        'PASSWORD': '',  # Not used with sqlite3.
-        'HOST': '',  # Empty string for localhost. Not used with sqlite3.
-        'PORT': '',  # Empty string for default. Not used with sqlite3.
+        'TEST': {
+            'NAME': os.path.join(publicdb_path, 'public_test.db'),
+        },
     }
 }
 

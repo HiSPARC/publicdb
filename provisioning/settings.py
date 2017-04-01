@@ -19,11 +19,14 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': '{{ psql_database_name }}',
-        'TEST_NAME': os.path.join(publicdb_path, 'public_test.db'),
         'USER': '{{ psql_user }}',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '',
+        'TEST': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(publicdb_path, 'public_test.db'),
+        },
     }
 }
 
