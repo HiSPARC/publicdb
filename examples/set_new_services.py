@@ -3,10 +3,9 @@ import os
 from optparse import OptionParser
 
 sys.path.append('../')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'publicdb.settings'
 
-from django_publicdb.inforecords.models import (Pc, MonitorService,
-                                                EnabledService)
+from publicdb.inforecords.models import Pc, MonitorService, EnabledService
 
 if __name__ == '__main__':
     parser = OptionParser()

@@ -1,7 +1,7 @@
 Status Display Reference
 ========================
 
-.. automodule:: django_publicdb.status_display
+.. automodule:: publicdb.status_display
    :members:
    :undoc-members:
 

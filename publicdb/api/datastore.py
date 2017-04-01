@@ -10,7 +10,7 @@ from django.conf import settings
 def get_event_traces(station, ext_timestamp, raw=False):
     """Get the traces belonging to a station and a certain timestamp
 
-    :param station: a :class:`django_publicdb.inforecords.models.Station`
+    :param station: a :class:`publicdb.inforecords.models.Station`
                     instance
     :param ext_timestamp: extended timestamp (nanoseconds since UNIX epoch).
     :param raw: (optional, GET) if present get the raw trace, i.e. without

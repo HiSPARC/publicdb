@@ -20,11 +20,11 @@ MOCK_MODULES = ['numpy', 'scipy', 'tables',
 sys.modules.update((name, mock.MagicMock()) for name in MOCK_MODULES)
 
 # The directory that contains settings_develop.py
-sys.path.append(os.path.abspath('../django_publicdb'))
+sys.path.append(os.path.abspath('../publicdb'))
 
 # Set up the Django settings/environment
 import django
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "django_publicdb.settings_develop")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "publicdb.settings_develop")
 django.setup()
 
 # -- General configuration -----------------------------------------------------

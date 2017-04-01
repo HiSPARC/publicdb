@@ -115,7 +115,7 @@ Short story
 2. Define a class inherited from django.test.TestCase.
 3. Define a test method with a name starting with "test".
 
-For example a test in the file "publicdb/django_publicdb/dummy/tests.py"::
+For example a test in the file "publicdb/publicdb/dummy/tests.py"::
 
     from django.test import TestCase
 

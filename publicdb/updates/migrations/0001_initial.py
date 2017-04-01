@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django_publicdb.updates.models
+import publicdb.updates.models
 
 
 class Migration(migrations.Migration):
@@ -16,7 +16,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('version', models.PositiveSmallIntegerField()),
-                ('update', models.FileField(upload_to=django_publicdb.updates.models.upload_queue)),
+                ('update', models.FileField(upload_to=publicdb.updates.models.upload_queue)),
             ],
             options={
                 'ordering': ('version',),
@@ -28,7 +28,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('version', models.CharField(max_length=5)),
-                ('installer', models.FileField(upload_to=django_publicdb.updates.models.upload_queue)),
+                ('installer', models.FileField(upload_to=publicdb.updates.models.upload_queue)),
             ],
             options={
                 'ordering': ('version',),
@@ -50,7 +50,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('version', models.PositiveSmallIntegerField()),
-                ('update', models.FileField(upload_to=django_publicdb.updates.models.upload_queue)),
+                ('update', models.FileField(upload_to=publicdb.updates.models.upload_queue)),
                 ('queue', models.ForeignKey(to='updates.UpdateQueue')),
             ],
             options={

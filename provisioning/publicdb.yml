@@ -80,16 +80,16 @@
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: copy Django settings file
-  template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
+  template: src=settings.py dest=/srv/publicdb/www/publicdb/settings.py
         backup=yes
   notify: restart uWSGI
 
 - name: migrate Django apps
-  shell: chdir=/srv/publicdb/www/django_publicdb
+  shell: chdir=/srv/publicdb/www/publicdb
          yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
 
 - name: collect static files of Django apps
-  shell: chdir=/srv/publicdb/www/django_publicdb
+  shell: chdir=/srv/publicdb/www/publicdb
          /srv/publicdb/publicdb_env/bin/python manage.py collectstatic --noinput
 
 - name: copy uwsgi.ini

@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django_publicdb.histograms.models
+import publicdb.histograms.models
 
 
 class Migration(migrations.Migration):
@@ -111,8 +111,8 @@ class Migration(migrations.Migration):
             name='DailyDataset',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('x', django_publicdb.histograms.models.SerializedDataField()),
-                ('y', django_publicdb.histograms.models.SerializedDataField()),
+                ('x', publicdb.histograms.models.SerializedDataField()),
+                ('y', publicdb.histograms.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),
@@ -123,8 +123,8 @@ class Migration(migrations.Migration):
             name='DailyHistogram',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bins', django_publicdb.histograms.models.SerializedDataField()),
-                ('values', django_publicdb.histograms.models.SerializedDataField()),
+                ('bins', publicdb.histograms.models.SerializedDataField()),
+                ('values', publicdb.histograms.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),
@@ -190,8 +190,8 @@ class Migration(migrations.Migration):
             name='NetworkHistogram',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bins', django_publicdb.histograms.models.SerializedDataField()),
-                ('values', django_publicdb.histograms.models.SerializedDataField()),
+                ('bins', publicdb.histograms.models.SerializedDataField()),
+                ('values', publicdb.histograms.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),

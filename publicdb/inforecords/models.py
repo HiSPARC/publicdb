@@ -347,7 +347,7 @@ class Pc(models.Model):
 
     def keys(self):
         return ("<a href=%s>Certificate %s</a>" %
-                (reverse('django_publicdb.inforecords.views.keys',
+                (reverse('publicdb.inforecords.views.keys',
                          args=[self.name]),
                  self.name))
 

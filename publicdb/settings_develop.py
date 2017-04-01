@@ -1,4 +1,4 @@
-# Django settings for django_publicdb project.
+# Django settings for publicdb project.
 
 import os.path
 
@@ -142,7 +142,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'django_publicdb.urls'
+ROOT_URLCONF = 'publicdb.urls'
 
 ALLOWED_HOSTS = [
     'data.hisparc.nl',
@@ -162,18 +162,18 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
-    'django_publicdb.inforecords',
-    'django_publicdb.histograms',
-    'django_publicdb.coincidences',
-    'django_publicdb.status_display',
-    'django_publicdb.analysissessions',
-    'django_publicdb.updates',
-    'django_publicdb.raw_data',
-    'django_publicdb.api',
-    'django_publicdb.maps',
-    'django_publicdb.jsparc',
-    'django_publicdb.station_layout',
-    'django_publicdb.default',
+    'publicdb.inforecords',
+    'publicdb.histograms',
+    'publicdb.coincidences',
+    'publicdb.status_display',
+    'publicdb.analysissessions',
+    'publicdb.updates',
+    'publicdb.raw_data',
+    'publicdb.api',
+    'publicdb.maps',
+    'publicdb.jsparc',
+    'publicdb.station_layout',
+    'publicdb.default',
 )
 
 # A sample logging configuration. The only tangible logging

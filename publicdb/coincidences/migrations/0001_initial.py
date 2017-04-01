@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models, migrations
-import django_publicdb.coincidences.models
+import publicdb.coincidences.models
 
 
 class Migration(migrations.Migration):
@@ -32,9 +32,9 @@ class Migration(migrations.Migration):
                 ('date', models.DateField()),
                 ('time', models.TimeField()),
                 ('nanoseconds', models.IntegerField()),
-                ('pulseheights', django_publicdb.coincidences.models.SerializedDataField()),
-                ('integrals', django_publicdb.coincidences.models.SerializedDataField()),
-                ('traces', django_publicdb.coincidences.models.SerializedDataField()),
+                ('pulseheights', publicdb.coincidences.models.SerializedDataField()),
+                ('integrals', publicdb.coincidences.models.SerializedDataField()),
+                ('traces', publicdb.coincidences.models.SerializedDataField()),
                 ('station', models.ForeignKey(to='inforecords.Station')),
             ],
             options={

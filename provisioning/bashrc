@@ -12,7 +12,7 @@ alias envpub='source activate /srv/publicdb/publicdb_env'
 # Go to publicdb repository
 alias cdpub='cd /srv/publicdb/www'
 # Collect static files, and reload uwsgi
-alias collectreload='envpub && cdpub && cd django_publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
+alias collectreload='envpub && cdpub && cd publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
 # Perform the daily hisparc-update task
 alias uphis='envpub && cdpub && python scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1'

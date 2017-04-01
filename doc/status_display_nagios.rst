@@ -1,7 +1,7 @@
 Nagios Status Reference
 =======================
 
-.. automodule:: django_publicdb.status_display.nagios
+.. automodule:: publicdb.status_display.nagios
    :members:
    :undoc-members:
 
