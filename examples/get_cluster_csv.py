@@ -3,7 +3,7 @@ import os
 import csv
 
 sys.path.append('../')
-os.environ['DJANGO_SETTINGS_MODULE'] = 'controlpanel.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'publicdb.settings'
 
 from controlpanel.inforecords.models import Cluster, Station
 

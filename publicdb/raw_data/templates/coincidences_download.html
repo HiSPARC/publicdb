@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+HiSPARC coincidences download form
+{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/download_form.css' %}">
+{% endblock %}
+
+{% block head %}
+<script>
+    $(document).ready(function () {
+        disable_stuff()
+        // Show fields depending on filter choice
+        $('[name=filter_by]').change(function() {disable_stuff()})
+    });
+
+    function disable_stuff() {
+        if ($('[name=filter_by]:checked').val() == 'stations') {
+            $('#id_cluster').prop("disabled", true);
+            $('#id_stations').prop("disabled", false);}
+        else if ($('[name=filter_by]:checked').val() == 'cluster') {
+            $('#id_cluster').prop("disabled", false);
+            $('#id_stations').prop("disabled", true);}
+        else {
+            $('#id_cluster').prop("disabled", true);
+            $('#id_stations').prop("disabled", true);}
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div id="header"><h2>Coincidences download form</h2></div>
+
+<form action="{% url 'raw_data.views.coincidences_download_form' %}" method="get">
+    <p>
+        {{ form.filter_by.errors }}
+        {{ form.cluster.errors }}
+        {{ form.stations.errors }}
+        {{ form.filter_by.label_tag }}
+    </p>
+    <ul>
+        <li>{{ form.filter_by.0 }}</li>
+        <li>
+            {{ form.filter_by.1 }}:
+            {{ form.cluster }}
+            <span class="helptext">{{ form.cluster.help_text }}</span>
+        </li>
+        <li>
+            {{ form.filter_by.2 }}:
+            {{ form.stations }}
+            <span class="helptext">{{ form.stations.help_text }}</span>
+        </li>
+    </ul>
+    <p>
+        {{ form.start.errors }}
+        {{ form.start.label_tag }}
+        {{ form.start }}
+        <span class="helptext">{{ form.start.help_text }}</span>
+    </p>
+    <p>
+        {{ form.end.errors }}
+        {{ form.end.label_tag }}
+        {{ form.end }}
+        <span class="helptext">{{ form.end.help_text }}</span>
+    </p>
+    <p>
+        {{ form.n.errors }}
+        {{ form.n.label_tag }}
+        {{ form.n }}
+        <span class="helptext">{{ form.n.help_text }}</span>
+    </p>
+    <p>
+        {{ form.download.errors }}
+        {{ form.download.label_tag }}
+        {{ form.download }}
+        <span class="helptext">{{ form.download.help_text }}</span>
+    </p>
+
+    <input type="submit" value="Submit">
+</form>
+
+<p class="small">
+    <a href="{% url 'raw_data.views.download_form' %}">
+        Switch to station data download form
+    </a>
+</p>
+
+{% endblock %}

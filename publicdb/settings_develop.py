@@ -1,4 +1,3 @@
-# {{ ansible_managed }}
 # Django settings for publicdb project.
 
 import os.path
@@ -6,54 +5,52 @@ import os.path
 dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 
-DEBUG = {{ debug }}
+DEBUG = True
 
 ADMINS = (
-    ('Kasper van Dam', 'kaspervd@nikhef.nl'),
-    ('Arne de Laat', 'adelaat@nikhef.nl'),
+    # ('Your Name', 'your_email@domain.com'),
 )
 
 MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': '{{ psql_database_name }}',
-        'USER': '{{ psql_user }}',
-        'PASSWORD': '',
-        'HOST': '',
-        'PORT': '',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(publicdb_path, 'public.db'),
         'TEST': {
-            'ENGINE': 'django.db.backends.sqlite3',
             'NAME': os.path.join(publicdb_path, 'public_test.db'),
         },
     }
 }
 
-## Path settings
+# Path settings
+# DEV_ONLY
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '/databases/frome'
+DATASTORE_PATH = os.path.join(publicdb_path, 'datastore')
 TEST_DATASTORE_PATH = os.path.join(publicdb_path, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
-ESD_PATH = '/srv/publicdb/www/esd'
+ESD_PATH = os.path.join(publicdb_path, 'esd')
 
 # Path of the mounted KNMI Lightning data root folder
-LGT_PATH = '/databases/knmi_lightning'
+LGT_PATH = os.path.join(publicdb_path, 'knmi_lightning')
 
 # VPN and datastore XML-RPC Proxies
-VPN_PROXY = '{{ vpn_proxy }}'
-DATASTORE_PROXY = '{{ datastore_proxy }}'
+VPN_PROXY = 'http://localhost:8001'
+DATASTORE_PROXY = 'http://localhost:8002'
 
 # VPN and datastore host names
-VPN_HOST = '{{ vpn_host }}'
-DATASTORE_HOST = '{{ datastore_host }}'
+VPN_HOST = 'localhost'
+DATASTORE_HOST = 'localhost'
+
+# Webserver of the publicdb where Nagios will retrieve active check results
+PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
 
 # reCAPTCHA settings
-RECAPTCHA_ENABLED = {{ recaptcha_enabled }}
-RECAPTCHA_PUB_KEY = '{{ recaptcha_pub_key }}'
-RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
+RECAPTCHA_ENABLED = False
+RECAPTCHA_PUB_KEY = 'foobar'
+RECAPTCHA_PRIVATE_KEY = 'foobaz'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -61,12 +58,10 @@ RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
 # Also, sqlite3 is single threaded. So when multi processing is used
 # together with sqlite3, you might get the message "database is locked".
 
-USE_MULTIPROCESSING = True
+USE_MULTIPROCESSING = False
 
 # E-mail settings
-EMAIL_BACKEND = '{{ email_backend }}'
-EMAIL_HOST = '{{ email_host }}'
-EMAIL_PORT = {{ email_port }}
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -83,17 +78,17 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = False
+USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # DEV_ONLY
-MEDIA_ROOT = '/srv/publicdb/media/'
+MEDIA_ROOT = os.path.join(publicdb_path, '/mediaroot/')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '{{ media_url }}'
+MEDIA_URL = 'http://localhost:8008/mediaroot/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -103,7 +98,7 @@ STATIC_ROOT = '/srv/publicdb/static/'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '{{ static_url }}'
+STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -122,7 +117,7 @@ STATICFILES_FINDERS = (
 
 # Make this unique, and don't share it with anybody.
 # DEV_ONLY
-SECRET_KEY = '{{ secret_key }}'
+SECRET_KEY = '7f69c4q0%&uthoar406i*bcbeq6+j!ttphnjor_ctsauxj*z*y'
 
 TEMPLATES = [
     {

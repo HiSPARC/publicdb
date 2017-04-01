@@ -1,7 +1,7 @@
 API Reference
 =============
 
-.. automodule:: django_publicdb.api
+.. automodule:: publicdb.api
    :members:
    :undoc-members:
 

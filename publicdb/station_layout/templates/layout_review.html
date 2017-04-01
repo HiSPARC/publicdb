@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}HiSPARC | Station layout review form{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/submit_form.css' %}">
+{% endblock %}
+
+{% block content %}
+
+    <div id="header">
+        <h2>HiSPARC station layout review form</h2>
+    </div>
+
+    <p>
+        This is the submitted station layout for station <strong>{{ layout.station }}</strong>.<br>
+        This layout became active on <strong>{{ layout.active_date|date:"Y/m/d H:i" }}</strong>.<br>
+        These measurements where submitted by <strong>{{ layout.name }}</strong>.<br>
+        The submitter can be reached via: <strong>{{ layout.email }}</strong>.<br>
+        Please review the layout and either approve or dismiss it.
+        {% if config %}
+            <br>It may help to check satellite imagery (from an unknown date) of the station:
+            <a target="_blank" href="https://maps.googleapis.com/maps/api/staticmap?center={{ config.gps_latitude }},{{ config.gps_longitude }}&zoom=20&size=640x640&maptype=satellite">Google Static Map</a>.
+        {% endif %}
+    </p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>
+                <th colspan='2'>Master
+                <th colspan='2'>Slave
+            <tr>
+                <th>
+                <th style="color: black;">1
+                <th style="color: red;">2
+                <th style="color: green;">3
+                <th style="color: blue;">4
+        <tbody>
+            <tr>
+                <td title="radius: distance to detector from GPS, in plane of GPS">r [m]
+                <td><input value="{{ layout.detector_1_radius }}" type="number" readonly>
+                <td><input value="{{ layout.detector_2_radius }}" type="number" readonly>
+                <td><input value="{{ layout.detector_3_radius }}" type="number" readonly>
+                <td><input value="{{ layout.detector_4_radius }}" type="number" readonly>
+            <tr>
+                <td title="alpha: angle between detector and true north as seen from GPS">α [°]
+                <td><input value="{{ layout.detector_1_alpha }}" type="number" readonly>
+                <td><input value="{{ layout.detector_2_alpha }}" type="number" readonly>
+                <td><input value="{{ layout.detector_3_alpha }}" type="number" readonly>
+                <td><input value="{{ layout.detector_4_alpha }}" type="number" readonly>
+            <tr>
+                <td title="height: altitude of the detector above plane of GPS">z [m]
+                <td><input value="{{ layout.detector_1_height }}" type="number" readonly>
+                <td><input value="{{ layout.detector_2_height }}" type="number" readonly>
+                <td><input value="{{ layout.detector_3_height }}" type="number" readonly>
+                <td><input value="{{ layout.detector_4_height }}" type="number" readonly>
+            <tr>
+                <td title="beta: angle of the long side of the scintillator to true north">β [°]
+                <td><input value="{{ layout.detector_1_beta }}" type="number" readonly>
+                <td><input value="{{ layout.detector_2_beta }}" type="number" readonly>
+                <td><input value="{{ layout.detector_3_beta }}" type="number" readonly>
+                <td><input value="{{ layout.detector_4_beta }}" type="number" readonly>
+    </table>
+
+    {% include "layout_canvas.html" %}
+
+    <div style="clear: both;"></div>
+
+    <form style="display: inline-block;" action="{% url 'publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    {% csrf_token %}
+        <input id="id_approved" name="approved" type="hidden" value="1">
+        <input type="submit" value="Accept">
+    </form>
+
+    <form style="display: inline-block;" action="{% url 'publicdb.station_layout.views.validate_review_layout' hash %}" method="post">
+    {% csrf_token %}
+        <input type="submit" value="Decline">
+    </form>
+
+{% endblock %}
+
+{% block script %}
+    {% if layout.detector_3_radius == None %}
+        var radius = [{{ layout.detector_1_radius }},
+                      {{ layout.detector_2_radius }}]
+        var alpha = [{{ layout.detector_1_alpha }},
+                     {{ layout.detector_2_alpha }}]
+        var beta = [{{ layout.detector_1_beta }},
+                    {{ layout.detector_2_beta }}]
+    {% else %}
+        var radius = [{{ layout.detector_1_radius }},
+                      {{ layout.detector_2_radius }},
+                      {{ layout.detector_3_radius }},
+                      {{ layout.detector_4_radius }}]
+        var alpha = [{{ layout.detector_1_alpha }},
+                     {{ layout.detector_2_alpha }},
+                     {{ layout.detector_3_alpha }},
+                     {{ layout.detector_4_alpha }}]
+        var beta = [{{ layout.detector_1_beta }},
+                    {{ layout.detector_2_beta }},
+                    {{ layout.detector_3_beta }},
+                    {{ layout.detector_4_beta }}]
+    {% endif %}
+    draw_station(context, radius, alpha, beta);
+{% endblock %}

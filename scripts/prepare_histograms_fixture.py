@@ -9,10 +9,10 @@ dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 sys.path.append(publicdb_path)
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'publicdb.settings'
 
-from django_publicdb.histograms.models import (Summary, DailyDataset,
-                                               DailyHistogram, PulseheightFit)
+from publicdb.histograms.models import (Summary, DailyDataset, DailyHistogram,
+                                        PulseheightFit)
 
 
 def prepare_histograms_fixture():

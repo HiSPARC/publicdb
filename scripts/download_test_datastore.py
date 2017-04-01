@@ -19,7 +19,7 @@ dirname = os.path.dirname(__file__)
 publicdb_path = os.path.join(dirname, '..')
 sys.path.append(publicdb_path)
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_publicdb.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'publicdb.settings'
 
 import tables
 import datetime
@@ -30,7 +30,7 @@ import django
 django.setup()
 
 from django.conf import settings
-from django_publicdb.inforecords.models import Station
+from publicdb.inforecords.models import Station
 
 
 datastore_path = os.path.abspath(settings.DATASTORE_PATH)

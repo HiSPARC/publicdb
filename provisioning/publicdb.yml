@@ -20,16 +20,22 @@
   become: true
 
 - name: checkout publicdb in /srv/publicdb/www
-  git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
-       update=yes force=no
+  git:
+    repo: https://github.com/HiSPARC/publicdb.git
+    dest: /srv/publicdb/www
+    update: yes
+    force: no
   notify: restart uWSGI
 
 - name: remove compiled python code
   command: find /srv/publicdb/www -name *.pyc -delete
 
 - name: checkout jsparc in /srv/publicdb/jsparc
-  git: repo=https://github.com/HiSPARC/jsparc.git dest=/srv/publicdb/jsparc
-       update=yes force=no
+  git:
+    repo: https://github.com/HiSPARC/jsparc.git
+    dest: /srv/publicdb/jsparc
+    update: yes
+    force: no
 
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
@@ -80,16 +86,16 @@
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: copy Django settings file
-  template: src=settings.py dest=/srv/publicdb/www/django_publicdb/settings.py
+  template: src=settings.py dest=/srv/publicdb/www/publicdb/settings.py
         backup=yes
   notify: restart uWSGI
 
 - name: migrate Django apps
-  shell: chdir=/srv/publicdb/www/django_publicdb
+  shell: chdir=/srv/publicdb/www/publicdb
          yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
 
 - name: collect static files of Django apps
-  shell: chdir=/srv/publicdb/www/django_publicdb
+  shell: chdir=/srv/publicdb/www/publicdb
          /srv/publicdb/publicdb_env/bin/python manage.py collectstatic --noinput
 
 - name: copy uwsgi.ini

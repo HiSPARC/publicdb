@@ -1,7 +1,7 @@
 API Views Reference
 ===================
 
-.. automodule:: django_publicdb.api.views
+.. automodule:: publicdb.api.views
    :members:
    :undoc-members:
 

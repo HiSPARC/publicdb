@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% load static %}
+
+{% block title %}
+HiSPARC data download form
+{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/download_form.css' %}">
+{% endblock %}
+
+{% block head %}
+<script>
+    $(document).ready(function () {
+        hide_stuff()
+        // Show fields depending on filter choice
+        $('[name=data_type]').change(function() {hide_stuff()})
+    });
+
+    function hide_stuff() {
+        if ($('[name=data_type]:checked').val() == 'events') {
+            $('[for=id_station_events]').show();
+            $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').hide();
+            $('[for=id_lightning_type]').hide();
+            $('#id_station_events').show();
+            $('#id_station_weather').hide();
+            $('#id_station_singles').hide();
+            $('#id_lightning_type').hide();}
+        else if ($('[name=data_type]:checked').val() == 'weather') {
+            $('[for=id_station_events]').hide();
+            $('[for=id_station_weather]').show();
+            $('[for=id_station_singles]').hide();
+            $('[for=id_lightning_type]').hide();
+            $('#id_station_events').hide();
+            $('#id_station_weather').show();
+            $('#id_station_singles').hide();
+            $('#id_lightning_type').hide();}
+        else if ($('[name=data_type]:checked').val() == 'singles') {
+            $('[for=id_station_events]').hide();
+            $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').show();
+            $('[for=id_lightning_type]').hide();
+            $('#id_station_events').hide();
+            $('#id_station_weather').hide();
+            $('#id_station_singles').show();
+            $('#id_lightning_type').hide();}
+        else if ($('[name=data_type]:checked').val() == 'lightning') {
+            $('[for=id_station_events]').hide();
+            $('[for=id_station_weather]').hide();
+            $('[for=id_station_singles]').hide();
+            $('[for=id_lightning_type]').show();
+            $('#id_station_events').hide();
+            $('#id_station_weather').hide();
+            $('#id_station_singles').hide();
+            $('#id_lightning_type').show();}
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div id="header"><h2>Data download form</h2></div>
+
+<form action="{% url 'raw_data.views.download_form' %}" method="get">
+    {{ form.as_p }}
+    <input type="submit" value="Submit">
+</form>
+
+<p class="small">
+    <a href="{% url 'raw_data.views.coincidences_download_form' %}">
+        Switch to coincidences download form
+    </a>
+</p>
+
+<p class="reference">
+    Lightning data obtained from Royal Netherlands Meteorological Institute.
+    Available for 2004 up to and including 2015.
+</p>
+
+{% endblock %}
