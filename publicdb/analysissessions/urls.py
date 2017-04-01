@@ -3,10 +3,10 @@ from django.conf.urls import url
 from . import views
 
 urlpatterns = [
-    (r'^(?P<slug>[\w-]+)/data/$', views.data_display),
+    url(r'^(?P<slug>[\w-]+)/data/$', views.data_display),
 
-    (r'^request/$', views.request_form),
-    (r'^request/validate$', views.validate_request_form),
-    (r'^request/(\w{20})/$', views.confirm_request),
-    (r'^request/create', views.create_session),
+    url(r'^request/$', views.request_form),
+    url(r'^request/validate$', views.validate_request_form),
+    url(r'^request/(\w{20})/$', views.confirm_request),
+    url(r'^request/create', views.create_session),
 ]
