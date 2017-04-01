@@ -20,16 +20,22 @@
   become: true
 
 - name: checkout publicdb in /srv/publicdb/www
-  git: repo=https://github.com/HiSPARC/publicdb.git dest=/srv/publicdb/www
-       update=yes force=no
+  git:
+    repo: https://github.com/HiSPARC/publicdb.git
+    dest: /srv/publicdb/www
+    update: yes
+    force: no
   notify: restart uWSGI
 
 - name: remove compiled python code
   command: find /srv/publicdb/www -name *.pyc -delete
 
 - name: checkout jsparc in /srv/publicdb/jsparc
-  git: repo=https://github.com/HiSPARC/jsparc.git dest=/srv/publicdb/jsparc
-       update=yes force=no
+  git:
+    repo: https://github.com/HiSPARC/jsparc.git
+    dest: /srv/publicdb/jsparc
+    update: yes
+    force: no
 
 - name: create django static folder
   file: path=/srv/publicdb/static state=directory
