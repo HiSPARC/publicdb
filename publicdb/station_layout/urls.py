@@ -8,4 +8,4 @@ urlpatterns = [
     url(r'^confirm/(?P<hash>\w{32})/$', views.confirmed_layout),
     url(r'^review/(?P<hash>\w{32})/$', views.review_layout),
     url(r'^review/(?P<hash>\w{32})/validate/$', views.validate_review_layout),
-)
+]
