@@ -150,8 +150,8 @@ def get_target():
 
 
 def download_form(request, station_number=None, start=None, end=None):
-    if request.method == 'POST':
-        form = DataDownloadForm(request.POST)
+    if request.method == 'GET':
+        form = DataDownloadForm(request.GET)
         if form.is_valid():
             start = form.cleaned_data['start']
             end = form.cleaned_data['end']
@@ -549,8 +549,8 @@ def get_lightning_in_range(lightning_type, start, end):
 
 
 def coincidences_download_form(request, start=None, end=None):
-    if request.method == 'POST':
-        form = CoincidenceDownloadForm(request.POST)
+    if request.method == 'GET':
+        form = CoincidenceDownloadForm(request.GET)
         if form.is_valid():
             cluster = form.cleaned_data.get('cluster')
             stations = form.cleaned_data.get('stations')
