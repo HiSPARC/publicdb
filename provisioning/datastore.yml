@@ -1,3 +1,4 @@
+---
 - name: use custom .bashrc
   copy: src=bashrc-datastore dest=~/.bashrc backup=yes
 

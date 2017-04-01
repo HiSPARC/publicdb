@@ -1,3 +1,4 @@
+---
 - name: ensure /databases directory exists
   file: path=/databases state=directory
   become: true
@@ -6,9 +7,9 @@
   file: path=/databases/frome/{{ item }} state=directory
         owner=hisparc group=hisparc mode=2775
   with_items:
-          - /
-          - tmp
-          - incoming
-          - partial
-          - suspicious
+    - /
+    - tmp
+    - incoming
+    - partial
+    - suspicious
   become: true

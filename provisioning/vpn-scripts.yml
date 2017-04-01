@@ -1,48 +1,48 @@
 ---
-  # Do not create backups, it will result in many executables in /usr/local/bin
-  - name: copy vpn/publicdb service scripts
-    copy: src=vpn-scripts/ dest=/usr/local/bin mode=755
-    become: true
-    notify: restart hisparcvpnd
+# Do not create backups, it will result in many executables in /usr/local/bin
+- name: copy vpn/publicdb service scripts
+  copy: src=vpn-scripts/ dest=/usr/local/bin mode=755
+  become: true
+  notify: restart hisparcvpnd
 
-  - name: add nagios config script to cron
-    cron: name=hisparc-nagios cron_file=hisparc-nagios user=nagios job=/usr/local/bin/hisparc-nagios
-    become: true
+- name: add nagios config script to cron
+  cron: name=hisparc-nagios cron_file=hisparc-nagios user=nagios job=/usr/local/bin/hisparc-nagios
+  become: true
 
-  - name: refresh nagios config from publicdb
-    file: path=/tmp/flag_nagios_reload state=touch owner=nagios
-    become: true
+- name: refresh nagios config from publicdb
+  file: path=/tmp/flag_nagios_reload state=touch owner=nagios
+  become: true
 
-  - name: remove old nagios config hash
-    file: path=/tmp/hash_nagios state=absent
-    become: true
+- name: remove old nagios config hash
+  file: path=/tmp/hash_nagios state=absent
+  become: true
 
-  - name: install pip
-    yum: name=python-pip
-    become: true
+- name: install pip
+  yum: name=python-pip
+  become: true
 
-  - name: install supervisord prerequisites
-    yum: name=python-meld3
-    become: true
+- name: install supervisord prerequisites
+  yum: name=python-meld3
+  become: true
 
-  - name: install supervisor daemon
-    pip: name=supervisor
-    become: true
+- name: install supervisor daemon
+  pip: name=supervisor
+  become: true
 
-  - name: copy supervisord init script
-    copy: src=vpn-init-supervisord dest=/etc/init.d/supervisord backup=yes
-          owner=root group=root mode=0755
-    become: true
+- name: copy supervisord init script
+  copy: src=vpn-init-supervisord dest=/etc/init.d/supervisord backup=yes
+        owner=root group=root mode=0755
+  become: true
 
-  - name: copy supervisord.conf
-    copy: src=vpn-supervisord.conf dest=/etc/supervisord.conf backup=yes
-          owner=root group=root mode=0644
-    become: true
-    notify: restart supervisord
+- name: copy supervisord.conf
+  copy: src=vpn-supervisord.conf dest=/etc/supervisord.conf backup=yes
+        owner=root group=root mode=0644
+  become: true
+  notify: restart supervisord
 
-  - name: start supervisord now and on boot
-    service: name=supervisord state=started enabled=yes
-    become: true
+- name: start supervisord now and on boot
+  service: name=supervisord state=started enabled=yes
+  become: true
 
-  - name: start hisparcvpnd
-    supervisorctl: name=hisparcvpnd state=started
+- name: start hisparcvpnd
+  supervisorctl: name=hisparcvpnd state=started
