@@ -1,12 +1,25 @@
 ---
-- name: install shorewall firewall
-  yum: name=shorewall
+- name: ensure local source directory exists
+  file: path=/usr/local/src/hisparc state=directory
+        owner=hisparc group=hisparc mode=2775
+  become: true
+
+- name: install shorewall core rpm
+  yum: name={{ item }} state=present
+  with_items:
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-core-5.1.2.3-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-5.1.2.3-1.el5.noarch.rpm
+      - http://www.invoca.ch/pub/packages/shorewall/RPMS/ils-5/noarch/shorewall-init-5.1.2.3-1.el5.noarch.rpm
   become: true
 
 - name: copy shorewall config
   copy: src=vpn-shorewall/ dest=/etc/shorewall backup=yes
   become: true
   notify: restart shorewall
+
+- name: update shorewall
+  command: shorewall update
+  become: true
 
 - name: ensure shorewall is started
   service: name=shorewall enabled=yes state=started
