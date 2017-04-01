@@ -21,7 +21,7 @@
 
 - name: checkout publicdb in /srv/publicdb/www
   git:
-    repo: https://github.com/HiSPARC/publicdb.git
+    repo: "{{ publicdb_repo }}"
     dest: /srv/publicdb/www
     update: yes
     force: no
