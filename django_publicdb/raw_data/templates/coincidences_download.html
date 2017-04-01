@@ -36,8 +36,7 @@ HiSPARC coincidences download form
 
 <div id="header"><h2>Coincidences download form</h2></div>
 
-<form action="{% url 'raw_data.views.coincidences_download_form' %}" method="post">
-    {% csrf_token %}
+<form action="{% url 'raw_data.views.coincidences_download_form' %}" method="get">
     <p>
         {{ form.filter_by.errors }}
         {{ form.cluster.errors }}
