@@ -1,0 +1,24 @@
+---
+
+debug: False
+
+psql_database_name: publicdb
+psql_user: "{{ ansible_ssh_user }}"
+
+vpn_host: tietar.nikhef.nl
+vpn_proxy: http://tietar.nikhef.nl:8001
+datastore_host: frome.nikhef.nl
+datastore_proxy: http://frome.nikhef.nl:8001
+
+recaptcha_enabled: True
+recaptcha_pub_key: 6LcJxcUSAAAAAEjLvw_9iD1LFSNRCsZajGKMrMJL
+recaptcha_private_key: 6LcJxcUSAAAAAAahcS7rNlfGNbrp9_8u1eOrDt4_
+
+email_backend: django.core.mail.backends.smtp.EmailBackend
+email_host: smtp.nikhef.nl
+email_port: 25
+
+media_url: http://data.hisparc.nl/media/
+static_url: http://data.hisparc.nl/media/static/
+
+secret_key: 4wr2z%c+*j8-5z*kq0%7oycet!5^7u2=i1f)59atii2qdkmh-p
