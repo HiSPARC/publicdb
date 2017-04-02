@@ -1,7 +1,7 @@
 uWSGI
 uwsgitop
 
-Django>=1.8,<1.9
+Django>=1.9,<1.10
 recaptcha-client
 python-dateutil
 
