@@ -9,9 +9,6 @@ import ast
 
 
 class SerializedDataField(models.Field):
-    # This makes sure that to_python() will be called when objects are
-    # initialized
-    __metaclass__ = models.SubfieldBase
 
     def db_type(self, connection):
         return 'BYTEA'
