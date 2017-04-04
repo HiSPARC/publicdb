@@ -13,52 +13,77 @@
                 port={{ ansible_ssh_port | default(22)}} delay=30 state=started
 
 - name: restart postfix
-  service: name=postfix state=restarted
+  service:
+    name: postfix
+    state: restarted
   become: true
 
 - name: restart dnsmasq
-  service: name=dnsmasq state=restarted
+  service:
+    name: dnsmasq
+    state: restarted
   become: true
 
 - name: restart openvpn
-  service: name=openvpn state=restarted sleep=3
+  service:
+    name: openvpn
+    state: restarted
+    sleep: 3
   become: true
   notify: restart shorewall
 
 - name: restart apache
-  service: name=httpd state=restarted
+  service:
+    name: httpd
+    state: restarted
   become: true
 
 - name: restart postgresql
-  service: name=postgresql-9.6 state=restarted
+  service:
+    name: postgresql-9.6
+    state: restarted
   become: true
 
 - name: restart uWSGI
-  supervisorctl: name=uwsgi state=restarted
-                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+  supervisorctl:
+    name: uwsgi
+    state: restarted
+    supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
 - name: restart datastore config server
-  supervisorctl: name=datastore-config-server state=restarted
-                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+  supervisorctl:
+    name: datastore-config-server
+    state: restarted
+    supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
 - name: restart nagios
-  service: name=nagios state=restarted
+  service:
+    name: nagios
+    state: restarted
   become: true
   # notify: restart nsca
 
 - name: restart nsca
-  service: name=nsca state=restarted
+  service:
+    name: nsca
+    state: restarted
   become: true
 
 - name: restart supervisord
-  service: name=supervisord state=restarted
+  service:
+    name: supervisord
+    state: restarted
   become: true
 
 - name: restart hisparcvpnd
-  supervisorctl: name=hisparcvpnd state=restarted
+  supervisorctl:
+    name: hisparcvpnd
+    state: restarted
 
 - name: restart shorewall
-  service: name=shorewall state=restarted
+  service:
+    name: shorewall
+    state: restarted
   become: true
 
 - name: compile firewall rules

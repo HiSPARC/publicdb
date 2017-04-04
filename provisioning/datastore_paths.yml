@@ -1,11 +1,17 @@
 ---
 - name: ensure /databases directory exists
-  file: path=/databases state=directory
+  file:
+    path: /databases
+    state: directory
   become: true
 
 - name: ensure /databases/frome directory and subdirectories exist
-  file: path=/databases/frome/{{ item }} state=directory
-        owner=hisparc group=hisparc mode=2775
+  file:
+    path: "/databases/frome/{{ item }}"
+    state: directory
+    owner: hisparc
+    group: hisparc
+    mode: 2775
   with_items:
     - /
     - tmp
