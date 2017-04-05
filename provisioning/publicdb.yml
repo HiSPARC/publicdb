@@ -30,7 +30,12 @@
   become: true
 
 - name: set default group write ACLs on /srv/publicdb
-  command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
+  acl:
+    default: yes
+    etype: group
+    permissions: rwx
+    path: /srv/publicdb
+    state: present
   become: true
 
 - name: checkout publicdb in /srv/publicdb/www

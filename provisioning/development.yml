@@ -24,8 +24,13 @@
     mode: 02775
   become: true
 
-- name: set default group write ACLs on /usr/local/src
-  command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
+- name: set default group write ACLs on /usr/local/src/hisparc
+  acl:
+    default: yes
+    etype: group
+    permissions: rwx
+    path: /usr/local/src/hisparc
+    state: present
   become: true
 
 - name: install libraries
