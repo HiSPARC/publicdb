@@ -143,6 +143,6 @@
     name: nagios-logs
     cron_file: hisparc-nagios
     user: nagios
-    job: "/bin/find /var/log/nagios/archives -mtime +90 -exec rm {} \\;"
+    job: "find /var/log/nagios/archives -mtime +90 -delete"
     special_time: daily
   become: true
