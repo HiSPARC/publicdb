@@ -31,7 +31,7 @@
     dest: /srv/publicdb/www
     update: yes
     force: no
-    version: "{{ local_head.stdout | default(omit) }}"
+    version: "{{ local_head.stdout | default('master') }}"
   notify: restart uWSGI
 
 - name: remove compiled python code
