@@ -11,7 +11,7 @@
     state: directory
     owner: hisparc
     group: hisparc
-    mode: 2775
+    mode: 02775
   with_items:
     - /
     - tmp

@@ -21,7 +21,7 @@
     state: directory
     owner: hisparc
     group: hisparc
-    mode: 2775
+    mode: 02775
   become: true
 
 - name: set default group write ACLs on /usr/local/src

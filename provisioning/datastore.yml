@@ -17,7 +17,7 @@
     state: directory
     owner: hisparc
     group: hisparc
-    mode: 2775
+    mode: 02775
   become: true
 
 - name: set default group write ACLs on /srv/datastore
@@ -29,7 +29,7 @@
     path: /var/log/hisparc
     state: directory
     group: hisparc
-    mode: 775
+    mode: 0775
   become: true
 
 - name: checkout datastore in /srv/datastore/code

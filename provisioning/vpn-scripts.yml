@@ -4,7 +4,7 @@
   copy:
     src: vpn-scripts/
     dest: /usr/local/bin
-    mode: 755
+    mode: 0755
   become: true
   notify: restart hisparcvpnd
 

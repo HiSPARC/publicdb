@@ -54,7 +54,7 @@
     regexp: "/nagios/cgi-bin/"
     replace: "/cgi-bin/"
     backup: yes
-    mode: 644
+    mode: 0644
   become: true
   notify: restart apache
 
@@ -106,7 +106,7 @@
   copy:
     src: nagios/check_pulseheight_mpv.py
     dest: /usr/lib64/nagios/plugins
-    mode: 755
+    mode: 0755
   become: true
   notify: restart nagios
 
