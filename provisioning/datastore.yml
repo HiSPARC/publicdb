@@ -43,6 +43,7 @@
     dest: /srv/datastore/code
     update: yes
     force: no
+    version: master
   notify: restart uWSGI
 
 - name: remove compiled python code

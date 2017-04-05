@@ -55,6 +55,7 @@
     dest: /srv/publicdb/jsparc
     update: yes
     force: no
+    version: master
 
 - name: create django static folder
   file:
