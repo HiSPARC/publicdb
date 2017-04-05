@@ -20,12 +20,18 @@
   command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
   become: true
 
+- name: get local git HEAD (for dev VM)
+  local_action: command git rev-parse --abbrev-ref HEAD
+  register: local_head
+  when: inventory_hostname == "publicdb"
+
 - name: checkout publicdb in /srv/publicdb/www
   git:
     repo: "{{ publicdb_repo }}"
     dest: /srv/publicdb/www
     update: yes
     force: no
+    version: "{{ local_head.stdout | default('master') }}"
   notify: restart uWSGI
 
 - name: remove compiled python code
