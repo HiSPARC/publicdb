@@ -120,14 +120,16 @@
   notify: restart uWSGI
 
 - name: migrate Django apps
-  shell: yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
-  args:
-    chdir: /srv/publicdb/www/publicdb
+  django_manage:
+    command: migrate
+    app_path: /srv/publicdb/www/publicdb
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: collect static files of Django apps
-  shell: /srv/publicdb/publicdb_env/bin/python manage.py collectstatic --noinput
-  args:
-    chdir: /srv/publicdb/www/publicdb
+  django_manage:
+    command: collectstatic
+    app_path: /srv/publicdb/www/publicdb
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: copy uwsgi.ini
   copy:
