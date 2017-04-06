@@ -17,7 +17,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': '{{ psql_database_name }}',
         'USER': '{{ psql_user }}',
         'PASSWORD': '',
@@ -201,7 +201,7 @@ LOGGING = {
             'class': 'django.utils.log.AdminEmailHandler'
         },
         'null_handler': {
-            'class': 'django.utils.log.NullHandler',
+            'class': 'logging.NullHandler',
         },
     },
     'loggers': {

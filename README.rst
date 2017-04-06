@@ -105,16 +105,13 @@ To generate the histograms for the downloaded data::
 
     $ python scripts/hisparc-update.py
 
-If you have access to a `publicdb.sql` file to fill the database with,
+If you have access to a `publicdb_dump.sql` file to fill the database with,
 place the file in the publicdb directory, log into the machine, and load the
 file into the database, this can be done using the following commands::
 
     $ mv [path/to/publicdb.sql] ./
     $ vagrant ssh publicdb
-    $ mysql -p -u hisparc publicdb < /vagrant/publicdb.sql
-
-You will then be prompted for the password of the hisparc MySQL user,
-which can be found in the ``settings.py``.
+    $ pg_restore --clean --if-exists --no-owner --no-acl --schema=public --dbname=publicdb /vagrant/publicdb_dump.sql
 
 
 Important information regarding provisioning the production servers
