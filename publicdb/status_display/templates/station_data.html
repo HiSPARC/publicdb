@@ -142,7 +142,7 @@
             <div class="plot" id="srh_histogram"></div>
             <script>
                 srh_labels = {yaxis: {axisLabel: "{{ singlesratehighdata.y_label }}"},
-                             xaxis: {axisLabel: "{{ singlesratehighdata.x_label }}"}}
+                              xaxis: {axisLabel: "{{ singlesratehighdata.x_label }}"}}
                 $.extend(true, srh_options, srh_labels)
                 $.plot($("#srh_histogram"), [
                   {% for data in singlesratehighdata.data %}
