@@ -1,23 +1,41 @@
 ---
 - name: use custom .bashrc
-  copy: src=bashrc dest=~/.bashrc backup=yes
+  copy:
+    src: bashrc
+    dest: ~/.bashrc
+    backup: yes
 
 - name: ensure /srv directory exists
-  file: path=/srv state=directory
+  file:
+    path: /srv
+    state: directory
   become: true
 
 - name: ensure /srv/publicdb directory exists
-  file: path=/srv/publicdb state=directory
-        owner=hisparc group=hisparc mode=2775
+  file:
+    path: /srv/publicdb
+    state: directory
+    owner: hisparc
+    group: hisparc
+    mode: 02775
   become: true
 
 - name: ensure /var/log/hisparc-update.log exists
-  file: path=/var/log/hisparc-update.log state=touch
-        owner=hisparc group=hisparc mode=644
+  file:
+    path: /var/log/hisparc-update.log
+    state: touch
+    owner: hisparc
+    group: hisparc
+    mode: 0644
   become: true
 
 - name: set default group write ACLs on /srv/publicdb
-  command: /usr/bin/setfacl -m d:g::rwx /srv/publicdb
+  acl:
+    default: yes
+    etype: group
+    permissions: rwx
+    path: /srv/publicdb
+    state: present
   become: true
 
 - name: get local git HEAD (for dev VM)
@@ -43,31 +61,41 @@
     dest: /srv/publicdb/jsparc
     update: yes
     force: no
+    version: master
 
 - name: create django static folder
-  file: path=/srv/publicdb/static state=directory
+  file:
+    path: /srv/publicdb/static
+    state: directory
 
 - name: create django media/raw_data folder
-  file: path=/srv/publicdb/media/raw_data state=directory
+  file:
+    path: /srv/publicdb/media/raw_data
+    state: directory
 
 - name: Copy conda requirements files
-  copy: src=conda.list dest=/home/{{ ansible_user_id }}/
+  copy:
+    src: conda.list
+    dest: "/home/{{ ansible_user_id }}/"
 
 - name: Copy pip requirements files
-  copy: src=pip.list dest=/home/{{ ansible_user_id }}/
+  copy:
+    src: pip.list
+    dest: "/home/{{ ansible_user_id }}/"
 
 - name: create conda environment
-  shell: creates=/srv/publicdb/publicdb_env
-         yes | /opt/miniconda/bin/conda create
-         -p /srv/publicdb/publicdb_env python --yes
+  shell: yes | /opt/miniconda/bin/conda create -p /srv/publicdb/publicdb_env python --yes
+  args:
+    creates: /srv/publicdb/publicdb_env
 
 - name: install conda packages in conda environment
   command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
            --file /home/{{ ansible_user_id }}/conda.list --yes
 
 - name: install packages in conda environment using pip
-  command: /srv/publicdb/publicdb_env/bin/pip install
-           -r /home/{{ ansible_user_id }}/pip.list
+  pip:
+    requirements: "/home/{{ ansible_user_id }}/pip.list"
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: setup the publicdb database in PostgreSQL
   become: true
@@ -93,43 +121,68 @@
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: copy Django settings file
-  template: src=settings.py dest=/srv/publicdb/www/publicdb/settings.py
-        backup=yes
+  template:
+    src: settings.py
+    dest: /srv/publicdb/www/publicdb/settings.py
+    backup: yes
   notify: restart uWSGI
 
 - name: migrate Django apps
-  shell: chdir=/srv/publicdb/www/publicdb
-         yes 'yes' | /srv/publicdb/publicdb_env/bin/python manage.py migrate
+  django_manage:
+    command: migrate
+    app_path: /srv/publicdb/www/publicdb
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: collect static files of Django apps
-  shell: chdir=/srv/publicdb/www/publicdb
-         /srv/publicdb/publicdb_env/bin/python manage.py collectstatic --noinput
+  django_manage:
+    command: collectstatic
+    app_path: /srv/publicdb/www/publicdb
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: copy uwsgi.ini
-  copy: src=uwsgi.ini dest=/srv/publicdb/www/uwsgi.ini backup=yes
+  copy:
+    src: uwsgi.ini
+    dest: /srv/publicdb/www/uwsgi.ini
+    backup: yes
   notify: restart uWSGI
 
 - name: install supervisor daemon
-  pip: name=supervisor
+  pip:
+    name: supervisor
   become: true
 
 - name: copy supervisord init script
-  copy: src=init-supervisord dest=/etc/init.d/supervisord backup=yes
-        owner=root group=root mode=0755
+  copy:
+    src: init-supervisord
+    dest: /etc/init.d/supervisord
+    backup: yes
+    owner: root
+    group: root
+    mode: 0755
   become: true
 
 - name: copy supervisord.conf
-  copy: src=supervisord.conf dest=/etc/supervisord.conf backup=yes
-        owner=root group=root mode=0644
+  copy:
+    src: supervisord.conf
+    dest: /etc/supervisord.conf
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
   become: true
 
 - name: start supervisord now and on boot
-  service: name=supervisord state=started enabled=yes
+  service:
+    name: supervisord
+    state: started
+    enabled: yes
   become: true
 
 - name: restart uWSGI
-  supervisorctl: name=uwsgi state=restarted
-                 supervisorctl_path=/opt/miniconda/bin/supervisorctl
+  supervisorctl:
+    name: uwsgi
+    state: restarted
+    supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
 - name: enable cron job for updating histograms and ESD
   cron:

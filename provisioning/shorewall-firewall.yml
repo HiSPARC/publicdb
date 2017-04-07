@@ -1,13 +1,20 @@
 ---
 - name: install shorewall firewall
-  yum: name=shorewall
+  yum:
+    name: shorewall
   become: true
 
 - name: copy shorewall config
-  copy: src=vpn-shorewall/ dest=/etc/shorewall backup=yes
+  copy:
+    src: vpn-shorewall/
+    dest: /etc/shorewall
+    backup: yes
   become: true
   notify: restart shorewall
 
 - name: ensure shorewall is started
-  service: name=shorewall enabled=yes state=started
+  service:
+    name: shorewall
+    enabled: yes
+    state: started
   become: true

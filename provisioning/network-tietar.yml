@@ -1,7 +1,9 @@
 ---
 - name: Set static networking
-  lineinfile: dest=/etc/sysconfig/network-scripts/ifcfg-em1
-              regexp=^{{ item[0] }} line={{ item[0] }}={{ item[1] }}
+  lineinfile:
+    dest: /etc/sysconfig/network-scripts/ifcfg-em1
+    regexp: "^{{ item[0] }}"
+    line: "{{ item[0] }}={{ item[1] }}"
   with_items:
     - [[ BOOTPROTO, static ]]
     - [[ IPADDR, 192.16.192.33 ]]
@@ -11,7 +13,9 @@
   notify: reboot
 
 - name: Set static gateway
-  lineinfile: dest=/etc/sysconfig/network regexp=^GATEWAY
-              line=GATEWAY=192.16.192.80
+  lineinfile:
+    dest: /etc/sysconfig/network
+    regexp: ^GATEWAY
+    line: GATEWAY=192.16.192.80
   become: true
   notify: reboot

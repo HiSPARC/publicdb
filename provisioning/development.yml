@@ -1,27 +1,42 @@
 ---
 - name: ensure /usr/local/bin is in sudoers
-  lineinfile: dest=/etc/sudoers regexp='secure_path'
-              line="Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
-              state=present
+  lineinfile:
+    dest: /etc/sudoers
+    regexp: 'secure_path'
+    line: "Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
+    state: present
   become: true
 
 - name: ensure /usr/local/lib is in ld.so.conf
-  lineinfile: dest=/etc/ld.so.conf
-              regexp='/usr/local/lib'
-              line='/usr/local/lib' state=present
+  lineinfile:
+    dest: /etc/ld.so.conf
+    regexp: '/usr/local/lib'
+    line: '/usr/local/lib'
+    state: present
   become: true
 
 - name: ensure local source directory exists
-  file: path=/usr/local/src/hisparc state=directory
-        owner=hisparc group=hisparc mode=2775
+  file:
+    path: /usr/local/src/hisparc
+    state: directory
+    owner: hisparc
+    group: hisparc
+    mode: 02775
   become: true
 
-- name: set default group write ACLs on /usr/local/src
-  command: /usr/bin/setfacl -m d:g::rwx /usr/local/src/hisparc
+- name: set default group write ACLs on /usr/local/src/hisparc
+  acl:
+    default: yes
+    etype: group
+    permissions: rwx
+    path: /usr/local/src/hisparc
+    state: present
   become: true
 
 - name: install libraries
-  yum: name={{ item }} state=present
+  yum:
+    name: "{{ item }}"
+    state: present
   become: true
   with_items:
     - gcc
@@ -35,17 +50,24 @@
     - pcre-devel
 
 - name: download miniconda installer
-  get_url: url=http://repo.continuum.io/miniconda/Miniconda-3.7.3-Linux-x86_64.sh
-           dest=/usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh
+  get_url:
+    url: https://repo.continuum.io/miniconda/Miniconda2-4.3.11-Linux-x86_64.sh
+    dest: /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh
+    checksum: md5:d573980fe3b5cdf80485add2466463f5
 
 - name: install miniconda
-  command: creates=/opt/miniconda
-           /bin/sh /usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh -b -p /opt/miniconda
+  command: /bin/sh /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh -b -p /opt/miniconda
+  args:
+    creates: /opt/miniconda
   become: true
 
 - name: ensure miniconda is in path
-  lineinfile: dest=/etc/profile.d/path.sh create=yes mode=0644
-              regexp='miniconda' line='PATH=/opt/miniconda/bin:$PATH'
+  lineinfile:
+    dest: /etc/profile.d/path.sh
+    create: yes
+    mode: 0644
+    regexp: 'miniconda'
+    line: 'PATH=/opt/miniconda/bin:$PATH'
   become: true
 
 - name: install pip
@@ -53,5 +75,7 @@
   become: true
 
 - name: install git
-  yum: name=git state=present
+  yum:
+    name: git
+    state: present
   become: true

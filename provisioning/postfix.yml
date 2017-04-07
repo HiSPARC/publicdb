@@ -1,5 +1,8 @@
 ---
 - name: install postfix configuration
-  copy: src=main.cf dest=/etc/postfix/main.cf backup=yes
+  copy:
+    src: main.cf
+    dest: /etc/postfix/main.cf
+    backup: yes
   become: true
   notify: restart postfix
