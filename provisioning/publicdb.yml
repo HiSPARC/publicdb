@@ -93,8 +93,9 @@
            --file /home/{{ ansible_user_id }}/conda.list --yes
 
 - name: install packages in conda environment using pip
-  command: /srv/publicdb/publicdb_env/bin/pip install
-           -r /home/{{ ansible_user_id }}/pip.list
+  pip:
+    requirements: "/home/{{ ansible_user_id }}/pip.list"
+    virtualenv: /srv/publicdb/publicdb_env
 
 - name: setup the publicdb database in PostgreSQL
   become: true

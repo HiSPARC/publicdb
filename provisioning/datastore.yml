@@ -69,8 +69,9 @@
            --file /home/{{ ansible_user_id }}/conda-datastore.list --yes
 
 - name: install packages in conda environment using pip
-  command: /srv/datastore/datastore_env/bin/pip install
-           -r /home/{{ ansible_user_id }}/pip-datastore.list
+  pip:
+    requirements: "/home/{{ ansible_user_id }}/pip-datastore.list"
+    virtualenv: /srv/datastore/datastore_env
 
 - name: copy datastore.wsgi
   copy:
