@@ -51,11 +51,12 @@
 
 - name: download miniconda installer
   get_url:
-    url: http://repo.continuum.io/miniconda/Miniconda-3.7.3-Linux-x86_64.sh
-    dest: /usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh
+    url: https://repo.continuum.io/miniconda/Miniconda2-4.3.11-Linux-x86_64.sh
+    dest: /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh
+    checksum: md5:d573980fe3b5cdf80485add2466463f5
 
 - name: install miniconda
-  command: /bin/sh /usr/local/src/hisparc/Miniconda-3.7.3-Linux-x86_64.sh -b -p /opt/miniconda
+  command: /bin/sh /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh -b -p /opt/miniconda
   args:
     creates: /opt/miniconda
   become: true
