@@ -57,6 +57,9 @@ IGNORE_TABLES = ['blobs']
 # configs, this is not possible.  The previous number of configs is used
 # to select only new ones during the update.
 RECORD_EARLY_NUM_EVENTS = ['events', 'weather', 'singles']
+# Maximum number of configs per station per day. If more configs are found
+# for a single day, all (new) configs will be treated as erroneous and skipped.
+MAX_NUMBER_OF_CONFIGS = 100
 
 
 def check_for_updates():
@@ -726,6 +729,12 @@ def update_config(summary):
     file, configs, blobs = datastore.get_config_messages(cluster,
                                                          station_number,
                                                          summary.date)
+    num_config = len(configs)
+    if num_config > MAX_NUMBER_OF_CONFIGS:
+        logger.error('%s: Too many configs: %d. Skipping.' % (summary,
+                                                              num_config))
+        return summary.num_config
+
     for config in configs[summary.num_config:]:
         new_config = Configuration(source=summary)
         for var in vars(new_config):
@@ -741,7 +750,6 @@ def update_config(summary):
         django.db.close_old_connections()
         new_config.save()
 
-    num_config = len(configs)
     file.close()
     return num_config
 
