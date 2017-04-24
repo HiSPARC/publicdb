@@ -7,17 +7,17 @@ urlpatterns = [
     url(r'^stations_by_country/$', views.stations_by_country),
     url(r'^stations_by_name/$', views.stations_by_name),
     url(r'^stations_by_number/$', views.stations_by_number),
-    url(r'^stations_on_map/$', views.stations_on_map),
-    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map),
-    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', views.stations_on_map),
-    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', views.stations_on_map),
+    url(r'^stations_on_map/$', views.stations_on_map, name="stations_on_map"),
+    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
+    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
+    url(r'^stations_on_map/(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
 
     url(r'^network/coincidences/$', views.network_coincidences),
     url(r'^network/coincidences/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.network_coincidences),
 
-    url(r'^stations/(?P<station_number>\d+)/$', views.station),
+    url(r'^stations/(?P<station_number>\d+)/$', views.station, name="station"),
     url(r'^stations/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.station_data),
-    url(r'^stations/(?P<station_number>\d+)/status/$', views.station_status),
+    url(r'^stations/(?P<station_number>\d+)/status/$', views.station_status, name="station_status"),
     url(r'^stations/(?P<station_number>\d+)/config/$', views.station_config),
     url(r'^stations/(?P<station_number>\d+)/latest/$', views.station_latest),
 
