@@ -83,7 +83,7 @@
 {% endblock %}
 
 {% block script %}
-    {% if layout.detector_3_radius == None %}
+    {% if layout.detector_3_radius is None %}
         var radius = [{{ layout.detector_1_radius }},
                       {{ layout.detector_2_radius }}]
         var alpha = [{{ layout.detector_1_alpha }},
