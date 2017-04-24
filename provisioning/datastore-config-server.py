@@ -9,9 +9,9 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import urllib2
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
+import urllib.request, urllib.error, urllib.parse
 import hashlib
 import subprocess
 import os
@@ -24,7 +24,7 @@ RELOAD_PATH = '/tmp/uwsgi-reload.me'
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
-    datastore_cfg = urllib2.urlopen(CFG_URL).read()
+    datastore_cfg = urllib.request.urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:
