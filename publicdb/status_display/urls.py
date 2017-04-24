@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'status'
 urlpatterns = [
     url(r'^stations/$', views.stations),
     url(r'^stations_by_country/$', views.stations_by_country),

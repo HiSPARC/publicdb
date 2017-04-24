@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'updates'
 urlpatterns = [
     url(r'^installer/latest/$', views.get_latest_installer),
     url(r'^(?P<queue>\w+)/check$', views.update_check_querystring),

@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'sessions'
 urlpatterns = [
     url(r'^(?P<slug>[\w-]+)/data/$', views.data_display),
 

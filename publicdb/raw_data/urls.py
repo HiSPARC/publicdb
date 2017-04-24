@@ -3,6 +3,7 @@ from django.views.generic import RedirectView
 
 from . import views
 
+app_name = 'data'
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='download', permanent=False)),
     url(r'^download/$', views.download_form),

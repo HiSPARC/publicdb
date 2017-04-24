@@ -2,6 +2,7 @@ from django.conf.urls import url
 
 from . import views
 
+app_name = 'maps'
 urlpatterns = [
     url(r'^$', views.stations_on_map),
     url(r'^(?P<station_number>\d+)/$', views.station_on_map),
