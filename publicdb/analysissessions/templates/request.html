@@ -16,7 +16,7 @@
 </div>
 
 <div id='reqform'>
-    <form action="{% url 'publicdb.analysissessions.views.validate_request_form' %}" method="post">
+    <form action="{% url 'sessions:validate' %}" method="post">
     {% csrf_token %}
         {{ form.as_p }}
         {{ html_captcha|safe }}
