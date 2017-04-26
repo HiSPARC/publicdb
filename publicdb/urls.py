@@ -19,10 +19,10 @@ urlpatterns = [
     url(r'^raw_data/', include('publicdb.raw_data.urls')),
     url(r'^data/', include('publicdb.raw_data.urls')),
 
-    url(r'^config/nagios$', create_nagios_config),
-    url(r'^config/datastore$', create_datastore_config),
+    url(r'^config/nagios$', create_nagios_config, name='nagios_config'),
+    url(r'^config/datastore$', create_datastore_config, name='datatore_config'),
 
-    url(r'^keys/(?P<host>\w+)/$', keys),
+    url(r'^keys/(?P<host>\w+)/$', keys, name='keys'),
 
     url(r'^admin/', include(admin.site.urls)),
 ]
