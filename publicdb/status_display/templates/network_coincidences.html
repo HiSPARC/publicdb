@@ -76,7 +76,7 @@
 {% block navigation_sidebar %}
     {{ block.super }}
 
-    <div id="download"><a href="{% url 'raw_data.views.coincidences_download_form' date.isoformat tomorrow.isoformat %}">Download event summary data</a></div>
+    <div id="download"><a href="{% url 'data:coincidences_download_form' date.isoformat tomorrow.isoformat %}">Download event summary data</a></div>
 
   {% if prev %}
      <a class='nextprev' id='prev' href="{% url 'status_display.views.network_coincidences' prev.year prev.month prev.day %}">&larr;</a>
