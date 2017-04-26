@@ -32,7 +32,7 @@ MIME_TSV = 'text/tab-separated-values'
 def stations(request):
     """Show the default station list"""
 
-    return redirect(stations_by_country)
+    return redirect('status:stations_by_country')
 
 
 def stations_by_country(request):
