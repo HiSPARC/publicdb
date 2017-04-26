@@ -4,7 +4,7 @@
 {% load static %}
 
 {% block current_data %}currentPage{% endblock %}
-{% block current_date %}{% url 'status_display.views.network_coincidences' date.year date.month date.day %}{% endblock %}
+{% block current_date %}{% url 'status:network:coincidences' date.year date.month date.day %}{% endblock %}
 
 {% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
 
@@ -53,7 +53,7 @@
             <h3>Event histogram (number of events per hour)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#eh_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_eventtime_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:eventtime' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="eh_histogram"></div>
             <script>
@@ -74,7 +74,7 @@
             <h3>Pulseheight histogram</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#ph_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_pulseheight_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:pulseheight' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="ph_histogram"></div>
             <script>
@@ -95,7 +95,7 @@
             <h3>Pulseintegral histogram</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#pi_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_pulseintegral_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:pulseintegral' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="pi_histogram"></div>
             <script>
@@ -116,7 +116,7 @@
             <h3>Singles (per second above low threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sd_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_singlesratelow_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratelow_dataset' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="srl_histogram"></div>
             <script>
@@ -137,7 +137,7 @@
             <h3>Singles (per second above high threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#srh_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_singlesratehigh_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratehigh_dataset' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="srh_histogram"></div>
             <script>
@@ -158,7 +158,7 @@
             <h3>Singles rate histogram (singles above low threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sl_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_singlesratelow_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratelow' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="sl_histogram"></div>
             <script>
@@ -179,7 +179,7 @@
             <h3>Singles rate histogram (singles above high threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sh_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_singlesratehigh_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratehigh' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="sh_histogram"></div>
             <script>
@@ -200,7 +200,7 @@
             <h3>Zenith histogram</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#ze_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_zenith_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:zenith' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="ze_histogram"></div>
             <script>
@@ -221,7 +221,7 @@
             <h3>Azimuth histogram</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#az_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_azimuth_histogram_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:azimuth' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="az_histogram"></div>
             <script>
@@ -242,7 +242,7 @@
             <h3>Barometer data</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#bd_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_barometer_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:barometer' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="bd_histogram"></div>
             <script>
@@ -263,7 +263,7 @@
             <h3>Temperature data</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#td_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_temperature_dataset_source' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:temperature' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="td_histogram"></div>
             <script>
@@ -287,10 +287,10 @@
     <div id="download"><a href="{% url 'data:download_form' station.number date.isoformat tomorrow.isoformat %}">Download event summary data</a></div>
 
   {% if prev %}
-     <a class='nextprev' id='prev' href="{% url 'status_display.views.station_data' station.number prev.year prev.month prev.day %}">&larr;</a>
+     <a class='nextprev' id='prev' href="{% url 'status:station:data' station.number prev.year prev.month prev.day %}">&larr;</a>
   {% endif %}
   {% if next %}
-     <a class='nextprev' id='next' href="{% url 'status_display.views.station_data' station.number next.year next.month next.day %}">&rarr;</a>
+     <a class='nextprev' id='next' href="{% url 'status:station:data' station.number next.year next.month next.day %}">&rarr;</a>
   {% endif %}
 
     <table id="calendar">
@@ -305,7 +305,7 @@
           {% for day in week %}
             <td class="day">
               {% if day.link %}
-                <a {% if current_date.day == day.day %}class='currentDate'{% endif %} href="{% url 'status_display.views.station_data' day.link.0 day.link.1 day.link.2 day.link.3 %}">{{ day.day }}</a>
+                <a {% if current_date.day == day.day %}class='currentDate'{% endif %} href="{% url 'status:station:data' day.link.0 day.link.1 day.link.2 day.link.3 %}">{{ day.day }}</a>
               {% else %}
                 <span class="nolink">{{ day.day }}</span>
               {% endif %}
@@ -320,7 +320,7 @@
       {% for month in month_list %}
         <li>
           {% if month.link %}
-            <a {% if current_date.month == month.month %}class='currentDate'{% endif %} href="{% url 'status_display.views.station_data' month.link.0 month.link.1 month.link.2 month.link.3 %}">{{ month.month }}</a>
+            <a {% if current_date.month == month.month %}class='currentDate'{% endif %} href="{% url 'status:station:data' month.link.0 month.link.1 month.link.2 month.link.3 %}">{{ month.month }}</a>
           {% else %}
             <span class="nolink">{{ month.month }}</span>
           {% endif %}
@@ -334,7 +334,7 @@
       {% for year in year_list %}
         <li>
           {% if year.link %}
-            <a {% if current_date.year == year.year %}class='currentDate'{% endif %} href="{% url 'status_display.views.station_data' year.link.0 year.link.1 year.link.2 year.link.3 %}">{{ year.year }}</a>
+            <a {% if current_date.year == year.year %}class='currentDate'{% endif %} href="{% url 'status:station:data' year.link.0 year.link.1 year.link.2 year.link.3 %}">{{ year.year }}</a>
           {% else %}
             <span class="nolink">{{ year.year }}</span>
           {% endif %}

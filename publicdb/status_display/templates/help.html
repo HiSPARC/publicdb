@@ -42,7 +42,7 @@
             arrival times we know in which order the detectors were hit
             and can reconstruct the shower direction. The following
             graph shows the detector signal traces of one event, the
-            arrival times are indicated with the vertical lines. 
+            arrival times are indicated with the vertical lines.
         </p>
         <div class="sourceLink">
             <a onclick="downloadGraph('#tr_graph_at')">Image</a>
@@ -68,8 +68,8 @@
         <h3 class="term">Cluster</h3>
         <p class="meaning">
             Our detectors are grouped by clusters. A cluster is often a city or region
-            (e.g. <a href="{% url 'status_display.views.stations_on_map' "Groningen" %}">Groningen</a>
-            or <a href="{% url 'status_display.views.stations_on_map' "Bristol" %}">Bristol</a>).
+            (e.g. <a href="{% url 'status:map:stations_on_map' "Groningen" %}">Groningen</a>
+            or <a href="{% url 'status:map:stations_on_map' "Bristol" %}">Bristol</a>).
             This makes it easy to find stations that are close together.
         </p>
     </div>
@@ -130,7 +130,7 @@
             All stations have HiSPARC Master electronics that reads out
             2 detectors. Stations that have 4 detectors also have
             HiSPARC Slave electronics, linked to the Master, to read out
-            the other two detectors. 
+            the other two detectors.
         </p>
     </div>
 
@@ -173,7 +173,7 @@
         <p class="meaning">
             This indicates the minimum signal strength that is needed
             before a detector is triggered. This is used to filter low
-            signals from background sources. 
+            signals from background sources.
         </p>
     </div>
 
@@ -192,7 +192,7 @@
         <p class="meaning">
             The time, relative to the start of the signal trace, at
             which the trigger took place. This allows you to relate the
-            arrival times in detectors to the GPS timestamp. 
+            arrival times in detectors to the GPS timestamp.
         </p>
     </div>
 
@@ -279,12 +279,12 @@
 
         <div class="keyvalue">
             <span class="key">Stations</span>
-            <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
-            <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
+            <span class="value"><a href="{% url 'status:station:data' %}">List</a></span>
+            <span class="value"><a href="{% url 'status:map:stations_on_map' %}">Map</a></span>
         </div>
 
       {% endblock %}
     </div>
 </div>
-    
+
 {% endblock %}

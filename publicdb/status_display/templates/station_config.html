@@ -58,7 +58,7 @@
             <h3>PMT voltage</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#vg_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_voltage_config_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:voltage' station.number %}">Source</a>
             </div>
             <div class="plot" id="vg_histogram"></div>
             <script>
@@ -79,7 +79,7 @@
             <h3>PMT current</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#cg_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_current_config_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:current' station.number %}">Source</a>
             </div>
             <div class="plot" id="cg_histogram"></div>
             <script>
@@ -100,7 +100,7 @@
             <h3>Detector timing offsets</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#to_histogram')">Image</a> |
-                <a href="{% url 'status_display.views.get_detector_timing_offsets_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:detector_offsets' station.number %}">Source</a>
             </div>
             <div class="plot" id="to_histogram"></div>
             <script>
@@ -120,7 +120,7 @@
         <div id="gpsPositions">
             <h3>GPS positions</h3>
             <div class="sourceLink">
-                <a href="{% url 'status_display.views.get_gps_config_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:gps' station.number %}">Source</a>
             </div>
             <div id="gpsMap"></div>
             {% if altitudegraph %}
@@ -147,7 +147,7 @@
           {% if layout %}
             <div class="sourceLink">
                 <a href="{% url 'layout:submit' %}">Submit layout</a> |
-                <a href="{% url 'status_display.views.get_station_layout_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:layout' station.number %}">Source</a>
             </div>
             {% include "layout_canvas.html" %}
             <script>
@@ -195,7 +195,7 @@
         <div class="sectionTitle">
             Master
             <span class="sourceLink">
-                <a href="{% url 'status_display.views.get_electronics_config_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:electronics' station.number %}">Source</a>
             </span>
         </div>
         <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.master }}</span></div>
@@ -228,7 +228,7 @@
             <span class="value bad">&#x2717;</span>
           {% endif %}
             <span class="sourceLink">
-                <a href="{% url 'status_display.views.get_trigger_config_source' station.number %}">Source</a>
+                <a href="{% url 'status:source:trigger' station.number %}">Source</a>
             </span>
         </div>
         <div class="keyvalue">
