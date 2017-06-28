@@ -60,7 +60,7 @@
     dest: "/home/{{ ansible_user_id }}/"
 
 - name: create conda environment
-  shell: yes | /opt/miniconda/bin/conda create -p /srv/datastore/datastore_env python --yes
+  shell: yes | /opt/miniconda/bin/conda create -p /srv/datastore/datastore_env python=3.6 --yes
   args:
     creates: /srv/datastore/datastore_env
 
