@@ -31,7 +31,7 @@ def layout_submit(request):
 
 def validate_layout_submit(request):
     if request.method != 'POST':
-        return redirect(layout_submit)
+        return redirect('layout:submit')
 
     if settings.RECAPTCHA_ENABLED:
         check_captcha = captcha.submit(

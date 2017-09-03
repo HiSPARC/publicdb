@@ -196,7 +196,7 @@ def network_coincidences(request, year=None, month=None, day=None):
         except NetworkSummary.DoesNotExist:
             raise Http404
 
-        return redirect(network_coincidences,
+        return redirect('status:network:coincidences',
                         year=str(summary.date.year),
                         month=str(summary.date.month),
                         day=str(summary.date.day))
@@ -520,7 +520,7 @@ def station(request, station_number):
     except Summary.DoesNotExist:
         raise Http404
 
-    return redirect(station_data,
+    return redirect('status:station:data',
                     station_number=str(station_number),
                     year=str(summary.date.year),
                     month=str(summary.date.month),
