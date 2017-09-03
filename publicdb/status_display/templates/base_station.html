@@ -25,7 +25,7 @@
           {% block navigation_sidebar %}
             <div class="keyvalue">
                 <span class="key">Stations</span>
-                <span class="value"><a href="{% url 'status:station:data' %}">List</a></span>
+                <span class="value"><a href="{% url 'status:stations' %}">List</a></span>
                 <span class="value"><a href="{% url 'status:map:stations_on_map' %}">Map</a></span>
                 <span class="value {% if not coincidences_found %}nolink">Coincidences</span>{% else %}"><a class="{% block current_coincidences %}{% endblock %}" href="{% block current_date %}{% url 'status:network:coincidences' %}{% endblock %}">Coincidences</a></span>{% endif %}
             </div>
