@@ -17,3 +17,17 @@ install:
 
 script:
   - make test
+
+before_deploy:
+  - touch doc/_build/html/.nojekyll
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: doc/_build/html
+  email: beheer@hisparc.nl
+  name: HiSPARC-Bot
+  on:
+    branch: master
+    python: 2.7
