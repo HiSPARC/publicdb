@@ -20,6 +20,5 @@ else
 endif
 
 test:
-	flake8 --ignore=Z --exclude=urls.py,tests.py,*migrations/,*raw_data/views.py publicdb
-	flake8 --ignore=F841 publicdb/raw_data/views.py
-	make -C doc/ test
+	flake8 --ignore=Z --exclude=urls.py,tests.py,*/migrations/ publicdb
+	sphinx-build -anW doc doc/_build/html
