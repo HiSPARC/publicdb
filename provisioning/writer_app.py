@@ -2,9 +2,9 @@
 
 import sys
 
-sys.path.append('/srv/datastore/code/writer')
+sys.path.append('/srv/datastore/code')
 
-import writer
+from writer import writer_app
 
 configfile = ('/srv/datastore/config.ini')
-writer.writer(configfile)
+writer_app.writer(configfile)
