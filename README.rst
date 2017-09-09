@@ -65,7 +65,7 @@ To halt the VM, issue::
     $ vagrant halt publicdb
 
 Please consult the `Vagrant documentation
-<http://docs.vagrantup.com/v2/>`_ for further instructions on using
+<https://www.vagrantup.com/docs/>`_ for further instructions on using
 Vagrant.
 
 

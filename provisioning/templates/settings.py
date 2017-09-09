@@ -10,10 +10,11 @@ DEBUG = {{ debug }}
 
 ADMINS = (
     ('Kasper van Dam', 'kaspervd@nikhef.nl'),
-    ('Arne de Laat', 'adelaat@nikhef.nl'),
+    ('Arne de Laat', 'arne@delaat.net'),
 )
-
 MANAGERS = ADMINS
+
+SERVER_EMAIL = 'info@hisparc.nl'
 
 DATABASES = {
     'default': {

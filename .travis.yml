@@ -6,13 +6,28 @@ sudo: false
 
 before_install:
   - wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -bp $HOME/miniconda
+  - bash miniconda.sh -b -p $HOME/miniconda
   - export PATH=$HOME/miniconda/bin:$PATH
   - conda update --yes conda
 
 install:
-  - pip install flake8 pep8-naming sphinx mock 'Django>=1.7,<1.8'
+  - conda create --yes -n build_env python=$TRAVIS_PYTHON_VERSION
+  - source activate build_env
+  - pip install flake8 pep8-naming sphinx mock 'Django>=1.9,<1.10'
 
 script:
   - make test
+
+before_deploy:
+  - touch doc/_build/html/.nojekyll
+
+deploy:
+  provider: pages
+  skip_cleanup: true
+  github_token: $GITHUB_TOKEN
+  local_dir: doc/_build/html
+  email: beheer@hisparc.nl
+  name: HiSPARC-Bot
+  on:
+    branch: master
+    python: 2.7
