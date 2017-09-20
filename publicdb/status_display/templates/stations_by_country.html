@@ -14,19 +14,19 @@
 {% block list %}
   {% for country, clusters in countries.items %}
     <div class="country">
-        <h1><a href="{% url 'status_display.views.stations_on_map' country %}">{{ country }}</a></h1>
+        <h1><a href="{% url 'status:map:stations_on_map' country %}">{{ country }}</a></h1>
           {% for cluster, subclusters in clusters.items %}
             <div class="cluster">
-                <h2><a href="{% url 'status_display.views.stations_on_map' country cluster %}">{{ cluster }}</a></h2>
+                <h2><a href="{% url 'status:map:stations_on_map' country cluster %}">{{ cluster }}</a></h2>
                 {% for subcluster, stations in subclusters.items %}
                 <div class="subcluster">
-                    <h3><a href="{% url 'status_display.views.stations_on_map' country cluster subcluster %}">{{ subcluster }}</a></h3>
+                    <h3><a href="{% url 'status:map:stations_on_map' country cluster subcluster %}">{{ subcluster }}</a></h3>
                     <ul>
                       {% for station in stations %}
                         <li>
-                            <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+                            <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
                           {% if station.link %}
-                            <a href="{% url 'status_display.views.station' station.number %}">
+                            <a href="{% url 'status:station:data' station.number %}">
                               {{ station.number }} &mdash; {{ station.name }}
                             </a>
                           {% else %}
@@ -47,9 +47,9 @@
         <ul>
           {% for station in test_stations %}
             <li>
-                <a href="{% url 'status_display.views.station_status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+                <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
               {% if station.link %}
-                <a href="{% url 'status_display.views.station' station.number %}">
+                <a href="{% url 'status:station:data' station.number %}">
                   {{ station.number }} &mdash; {{ station.name }}
                 </a>
               {% else %}

@@ -63,13 +63,13 @@ HiSPARC data download form
 
 <div id="header"><h2>Data download form</h2></div>
 
-<form action="{% url 'raw_data.views.download_form' %}" method="get">
+<form action="{% url 'data:download_form' %}" method="get">
     {{ form.as_p }}
     <input type="submit" value="Submit">
 </form>
 
 <p class="small">
-    <a href="{% url 'raw_data.views.coincidences_download_form' %}">
+    <a href="{% url 'data:coincidences_download_form' %}">
         Switch to coincidences download form
     </a>
 </p>

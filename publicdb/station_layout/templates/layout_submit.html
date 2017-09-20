@@ -22,7 +22,7 @@
              src="{% static 'images/coordinate_system.png' %}">
     </div>
 
-    <form action="{% url 'publicdb.station_layout.views.validate_layout_submit' %}" method="post">
+    <form action="{% url 'layout:validate_submit' %}" method="post">
     {% csrf_token %}
         <p>
             {{ form.name.errors }}
@@ -96,7 +96,7 @@
         <input type="submit" value="Submit">
     </form>
 
-{% endblock %} 
+{% endblock %}
 
 {% block script %}
     $('form table').on('change', function(event) {

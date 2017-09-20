@@ -13,7 +13,7 @@ before_install:
 install:
   - conda create --yes -n build_env python=$TRAVIS_PYTHON_VERSION
   - source activate build_env
-  - pip install flake8 pep8-naming sphinx mock 'Django>=1.9,<1.10'
+  - pip install flake8 pep8-naming sphinx mock 'Django>=1.10,<1.11'
 
 script:
   - make test

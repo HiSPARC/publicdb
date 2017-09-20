@@ -16,7 +16,7 @@
         <h2>{% block header %}Station: {{ station.number }} &mdash; {{ station.name }}{% endblock %}</h2>
         <div id="date">{% block date %}{% now "D, j N Y" %}{% endblock %}</div>
     </div>
-    
+
     {% block data %}
     {% endblock %}
 
@@ -25,19 +25,19 @@
           {% block navigation_sidebar %}
             <div class="keyvalue">
                 <span class="key">Stations</span>
-                <span class="value"><a href="{% url 'status_display.views.stations' %}">List</a></span>
-                <span class="value"><a href="{% url 'status_display.views.stations_on_map' %}">Map</a></span>
-                <span class="value {% if not coincidences_found %}nolink">Coincidences</span>{% else %}"><a class="{% block current_coincidences %}{% endblock %}" href="{% block current_date %}{% url 'status_display.views.network_coincidences' %}{% endblock %}">Coincidences</a></span>{% endif %}
+                <span class="value"><a href="{% url 'status:stations' %}">List</a></span>
+                <span class="value"><a href="{% url 'status:map:stations_on_map' %}">Map</a></span>
+                <span class="value {% if not coincidences_found %}nolink">Coincidences</span>{% else %}"><a class="{% block current_coincidences %}{% endblock %}" href="{% block current_date %}{% url 'status:network:coincidences' %}{% endblock %}">Coincidences</a></span>{% endif %}
             </div>
 
             <div class="keyvalue"><span class="key">Station</span>
-                <span class="value {% if not has_data %}nolink">Data</span>{% else %}"><a class="{% block current_data %}{% endblock %}" href="{% url 'status_display.views.station' station.number %}">Data</a></span>{% endif %}
-                <span class="value"><a class="{% block current_status %}{% endblock %}" href="{% url 'status_display.views.station_status' station.number %}">Status</a></span>
-                <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status_display.views.station_config' station.number %}">Config</a></span>{% endif %}
+                <span class="value {% if not has_data %}nolink">Data</span>{% else %}"><a class="{% block current_data %}{% endblock %}" href="{% url 'status:station:data' station.number %}">Data</a></span>{% endif %}
+                <span class="value"><a class="{% block current_status %}{% endblock %}" href="{% url 'status:station:status' station.number %}">Status</a></span>
+                <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status:station:config' station.number %}">Config</a></span>{% endif %}
             </div>
           {% endblock %}
         </div>
-    
+
         <div id="config">
           {% block config %}{% endblock %}
         </div>
@@ -45,9 +45,9 @@
         <div id="help">
           {% block help %}
             <div class="keyvalue">
-                <span class="value"><a href="{% url 'status_display.views.help' %}" target="_blank">Help</a></span>
+                <span class="value"><a href="{% url 'status:help' %}" target="_blank">Help</a></span>
             </div>
-          {% endblock %}    
+          {% endblock %}
         </div>
     </div>
 

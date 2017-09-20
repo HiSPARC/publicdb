@@ -1,7 +1,7 @@
 from django.db import models
 from django.db.models import Max
 from django.core.exceptions import ValidationError
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.text import slugify
 import xmlrpclib
 
@@ -347,10 +347,9 @@ class Pc(models.Model):
         return self.name
 
     def keys(self):
-        return ("<a href=%s>Certificate %s</a>" %
-                (reverse('publicdb.inforecords.views.keys',
-                         args=[self.name]),
-                 self.name))
+        return "<a href={url}>Certificate {name}</a>".format(
+            url=reverse('keys', kwargs={'host': self.name}),
+            name=self.name)
 
     keys.short_description = 'Certificates'
     keys.allow_tags = True

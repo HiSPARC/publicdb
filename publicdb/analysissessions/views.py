@@ -121,7 +121,7 @@ def request_form(request):
 
 def validate_request_form(request):
     if request.method != 'POST':
-        return redirect(request_form)
+        return redirect('sessions:request')
 
     # Check reCaptcha input
     if settings.RECAPTCHA_ENABLED:
