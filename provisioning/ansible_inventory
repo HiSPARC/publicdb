@@ -1,7 +1,7 @@
 pique.nikhef.nl
 tietar.nikhef.nl
 
-vagrant ansible_host=192.168.99.10 ansible_ssh_private_key_file=.vagrant/machines/vagrant/virtualbox/private_key
-publicdb ansible_host=192.168.99.11 ansible_ssh_private_key_file=.vagrant/machines/publicdb/virtualbox/private_key
-vpn ansible_host=192.168.99.12 ansible_ssh_private_key_file=.vagrant/machines/vpn/virtualbox/private_key
-datastore ansible_host=192.168.99.13 ansible_ssh_private_key_file=.vagrant/machines/datastore/virtualbox/private_key
+vagrant ansible_host=localhost ansible_port=2022 ansible_ssh_private_key_file=.vagrant/machines/vagrant/virtualbox/private_key
+publicdb ansible_host=localhost ansible_port=2023 ansible_ssh_private_key_file=.vagrant/machines/publicdb/virtualbox/private_key
+vpn ansible_host=localhost ansible_port=2024 ansible_ssh_private_key_file=.vagrant/machines/vpn/virtualbox/private_key
+datastore  ansible_host=localhost ansible_port=2025 ansible_ssh_private_key_file=.vagrant/machines/datastore/virtualbox/private_key
