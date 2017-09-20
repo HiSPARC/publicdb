@@ -1,5 +1,5 @@
 ---
-# https://support.ansible.com/hc/en-us/articles/201958037-Reboot-a-server-and-wait-for-it-to-come-back
+# https://github.com/ansible/ansible/issues/14413#issuecomment-304337420
 - name: reboot
   command: shutdown -r now "Ansible triggered a reboot"
   async: 0
@@ -9,8 +9,12 @@
   become: true
 
 - name: wait for server to come back
-  local_action: wait_for host={{ ansible_ssh_host | default(inventory_hostname) }}
-                port={{ ansible_ssh_port | default(22)}} delay=30 state=started
+  local_action: wait_for
+  args:
+    host: "{{ ansible_ssh_host|default(inventory_hostname) }}"
+    port: "{{ ansible_ssh_port|default(22) }}"
+    delay: 60
+    state: started
 
 - name: restart postfix
   service:
