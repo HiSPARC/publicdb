@@ -1,2 +1,2 @@
-uWSGI
-uwsgitop
+uWSGI>=2.0,<2.1
+uwsgitop==0.10

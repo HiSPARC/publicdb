@@ -1,8 +1,8 @@
-uWSGI
-uwsgitop
+uWSGI>=2.0,<2.1
+uwsgitop==0.10
 
 Django>=1.10,<1.11
-recaptcha-client
-python-dateutil
+recaptcha-client==1.0.6
+python-dateutil==2.6.1
 
-hisparc-sapphire>=1.3
+hisparc-sapphire==1.4.0
