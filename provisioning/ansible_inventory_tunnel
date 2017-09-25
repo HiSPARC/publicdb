@@ -1,2 +1,13 @@
+[live]
 pique.nikhef.nl ansible_host=localhost ansible_port=2202
 tietar.nikhef.nl ansible_host=localhost ansible_port=2201
+frome.nikhef.nl ansible_host=localhost ansible_port=2203
+
+[publicdb_group]
+pique.nikhef.nl
+
+[vpn_group]
+tietar.nikhef.nl
+
+[datastore_group]
+frome.nikhef.nl

@@ -1,0 +1,20 @@
+---
+
+- name: add HTTP access to firewall rules
+  lineinfile:
+    dest: /etc/sysconfig/system-config-firewall
+    regexp: '--service=http'
+    line: '--service=http'
+    state: present
+  become: true
+  notify: compile firewall rules
+
+- name: add XMLRPC access to firewall rules
+  lineinfile:
+    dest: /etc/sysconfig/system-config-firewall
+    regexp: '--port=8001:tcp'
+    line: '--port=8001:tcp'
+    state: present
+  become: true
+  notify: compile firewall rules
+  # When host is datastore

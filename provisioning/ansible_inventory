@@ -1,7 +1,22 @@
+[live]
 pique.nikhef.nl
 tietar.nikhef.nl
+frome.nikhef.nl
 
+[dev]
 vagrant ansible_host=localhost ansible_port=2022 ansible_ssh_private_key_file=.vagrant/machines/vagrant/virtualbox/private_key
 publicdb ansible_host=localhost ansible_port=2023 ansible_ssh_private_key_file=.vagrant/machines/publicdb/virtualbox/private_key
 vpn ansible_host=localhost ansible_port=2024 ansible_ssh_private_key_file=.vagrant/machines/vpn/virtualbox/private_key
-datastore  ansible_host=localhost ansible_port=2025 ansible_ssh_private_key_file=.vagrant/machines/datastore/virtualbox/private_key
+datastore ansible_host=localhost ansible_port=2025 ansible_ssh_private_key_file=.vagrant/machines/datastore/virtualbox/private_key
+
+[publicdb_group]
+pique.nikhef.nl
+publicdb
+
+[vpn_group]
+tietar.nikhef.nl
+vpn
+
+[datastore_group]
+frome.nikhef.nl
+datastore

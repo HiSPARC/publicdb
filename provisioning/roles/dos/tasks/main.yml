@@ -1,0 +1,9 @@
+---
+
+- name: Increase conntrack hash table
+  lineinfile:
+    dest: /etc/modprobe.d/mitigate-dos.conf
+    create: yes
+    line: "options nf_conntrack hashsize=81920"
+  become: true
+  notify: reboot
