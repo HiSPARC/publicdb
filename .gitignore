@@ -1,5 +1,5 @@
 # Specific
-uwsgi.ini
+/uwsgi.ini
 HiSPARC_coincidences.db
 public.db
 *.h5
