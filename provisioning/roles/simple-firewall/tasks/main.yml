@@ -17,4 +17,4 @@
     state: present
   become: true
   notify: compile firewall rules
-  # When host is datastore
+  when: xmlrpc_firewall is defined
