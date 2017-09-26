@@ -8,12 +8,19 @@
   roles:
     - datastore-paths
 
-- hosts: publicdb_group
+- hosts: publicdb_group:datastore_group
   roles:
     - simple-firewall
-    - postgresql
     - development
+
+- hosts: publicdb_group
+  roles:
+    - postgresql
     - publicdb
+
+- hosts: datastore_group
+  roles:
+    - datastore
 
 - hosts: tietar.nikhef.nl
   roles:
@@ -27,9 +34,3 @@
     - openvpn
     - nagios
     - vpn-scripts
-
-- hosts: datastore_group
-  roles:
-    - datastore
-    - development
-    - simple-firewall
