@@ -1,0 +1,6 @@
+---
+
+datastore_base: "/srv/"
+datastore_path: "{{ datastore_base }}datastore/"
+datastore_code: "{{ datastore_path }}code"
+datastore_venv: "{{ datastore_path }}datastore_venv"

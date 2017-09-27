@@ -2,9 +2,9 @@
 
 import sys
 
-sys.path.append('/srv/datastore/code')
+sys.path.append('{{ datastore_code }}')
 
 from writer import writer_app
 
-configfile = ('/srv/datastore/config.ini')
+configfile = ('{{ datastore_path }}config.ini')
 writer_app.writer(configfile)

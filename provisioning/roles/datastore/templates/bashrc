@@ -8,9 +8,9 @@ fi
 # User specific aliases and functions
 
 # Activate env
-alias envdata='source activate /srv/datastore/datastore_env'
+alias envdata='source activate {{ datastore_venv }}'
 # Go to datastore repository
-alias cddata='cd /srv/datastore/code'
+alias cddata='cd {{ datastore_code }}'
 # Reload web server
 alias reload='touch /tmp/uwsgi-reload.me'
 
