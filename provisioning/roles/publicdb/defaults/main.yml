@@ -1,6 +1,6 @@
 ---
 
-publicdb_base: "/srv/"
+publicdb_base: /srv/
 publicdb_path: "{{ publicdb_base }}publicdb/"
 
 publicdb_code: "{{ publicdb_path }}www/"

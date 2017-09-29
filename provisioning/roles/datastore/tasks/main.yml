@@ -60,12 +60,12 @@
     dest: ~/pip.list
 
 - name: create conda environment
-  shell: "yes | /opt/miniconda/bin/conda create -p {{ datastore_venv }} python=3.6 --yes"
+  shell: "/opt/miniconda/bin/conda create --prefix {{ datastore_venv }} python={{ datastore_python_version }} --yes"
   args:
     creates: "{{ datastore_venv }}"
 
 - name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install -p {{ datastore_venv }} --file ~/conda.list --yes"
+  command: "/opt/miniconda/bin/conda install --prefix {{ datastore_venv }} --file ~/conda.list --yes"
 
 - name: install packages in conda environment using pip
   pip:

@@ -85,12 +85,12 @@
     dest: ~/pip.list
 
 - name: create conda environment
-  shell: "yes | /opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
+  shell: "/opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
   args:
     creates: "{{ publicdb_venv }}"
 
 - name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install -p {{ publicdb_venv }} --file ~/conda.list --yes"
+  command: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --file ~/conda.list --yes"
 
 - name: install packages in conda environment using pip
   pip:
