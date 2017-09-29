@@ -39,7 +39,7 @@
 
 - name: checkout datastore in /srv/datastore/code
   git:
-    repo: https://github.com/HiSPARC/datastore.git
+    repo: "{{ datastore_repo }}"
     dest: "{{ datastore_code }}"
     update: yes
     force: no
@@ -52,12 +52,12 @@
 - name: Copy conda requirements files
   copy:
     src: conda.list
-    dest: "/home/{{ ansible_user_id }}/"
+    dest: ~/conda.list
 
 - name: Copy pip requirements files
   copy:
     src: pip.list
-    dest: "/home/{{ ansible_user_id }}/"
+    dest: ~/pip.list
 
 - name: create conda environment
   shell: "yes | /opt/miniconda/bin/conda create -p {{ datastore_venv }} python=3.6 --yes"
@@ -65,12 +65,11 @@
     creates: "{{ datastore_venv }}"
 
 - name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install -p {{ datastore_venv }} \
-            --file /home/{{ ansible_user_id }}/conda.list --yes"
+  command: "/opt/miniconda/bin/conda install -p {{ datastore_venv }} --file ~/conda.list --yes"
 
 - name: install packages in conda environment using pip
   pip:
-    requirements: "/home/{{ ansible_user_id }}/pip.list"
+    requirements: ~/pip.list
     virtualenv: "{{ datastore_venv }}"
 
 - name: copy datastore.wsgi
