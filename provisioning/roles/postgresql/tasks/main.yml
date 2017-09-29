@@ -2,26 +2,20 @@
 
 - name: install the PostgreSQL rpm from a remote repo
   yum:
-    name: https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm
+    name: "https://download.postgresql.org/pub/repos/yum/{{ psql_version }}/redhat/rhel-6-x86_64/pgdg-centos96-9.6-3.noarch.rpm"
     state: present
   become: true
 
 - name: install the PostgreSQL server
   yum:
-    name: postgresql96-server
-    state: present
-  become: true
-
-- name: install the Python package to interface with the PostgreSQL server
-  yum:
-    name: python-psycopg2
+    name: "postgresql{{ psql_version|replace('.', '') }}-server"
     state: present
   become: true
 
 - name: initiate database
-  command: service postgresql-9.6 initdb
+  command: "service postgresql-{{ psql_version }} initdb"
   args:
-    creates: /var/lib/pgsql/9.6/data/postgresql.conf
+    creates: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
   become: true
 
 - name: copy PostgreSQL authentication config file
@@ -29,13 +23,13 @@
   become_user: postgres
   template:
     src: pg_hba.conf
-    dest: /var/lib/pgsql/9.6/data/pg_hba.conf
+    dest: "/var/lib/pgsql/{{ psql_version }}/data/pg_hba.conf"
     mode: 0600
   notify: restart postgresql
 
 - name: start PostgreSQL server now and on boot
   service:
-    name: postgresql-9.6
+    name: "postgresql-{{ psql_version }}"
     state: started
     enabled: yes
   become: true
