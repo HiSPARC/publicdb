@@ -52,12 +52,12 @@
 
 - name: download miniconda installer
   get_url:
-    url: https://repo.continuum.io/miniconda/Miniconda2-4.3.11-Linux-x86_64.sh
-    dest: /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh
-    checksum: md5:d573980fe3b5cdf80485add2466463f5
+    url: "https://repo.continuum.io/miniconda/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
+    dest: "/usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
+    checksum: "{{ development_conda_md5 }}"
 
 - name: install miniconda
-  command: /bin/sh /usr/local/src/hisparc/Miniconda2-4.3.11-Linux-x86_64.sh -b -p /opt/miniconda
+  command: "/bin/sh /usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh -b -p /opt/miniconda"
   args:
     creates: /opt/miniconda
   become: true
@@ -72,7 +72,7 @@
   become: true
 
 - name: install pip
-  command: /opt/miniconda/bin/conda install pip conda=4.3.9 --yes
+  command: "/opt/miniconda/bin/conda install pip conda={{ development_conda_version }} --yes"
   become: true
 
 - name: install git
