@@ -8,9 +8,10 @@ fi
 # User specific aliases and functions
 
 # Activate env
-alias envpub='source activate /srv/publicdb/publicdb_env'
+alias envpub='source activate {{ publicdb_venv }}'
 # Go to publicdb repository
 alias cdpub='cd /srv/publicdb/www'
+alias cdjsp='cd {{ jsparc_path }}'
 # Collect static files, and reload uwsgi
 alias collectreload='envpub && cdpub && cd publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
@@ -20,7 +21,7 @@ alias uphis='envpub && cdpub && python scripts/hisparc-update.py >> /var/log/his
 # Update publicdb to latest master
 alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && collectreload'
 # Update jSparc to latest master
-alias upjs='envpub && cdpub && cd ../jsparc && git fetch && git reset --hard origin/master'
+alias upjs='envpub && cdjsp && git fetch && git reset --hard origin/master'
 
 # Dev: Update publicdb to local HEAD (only in VM!)
 alias adddev='[[ -d /vagrant ]] && envpub && cdpub && git remote add local /vagrant/.git'

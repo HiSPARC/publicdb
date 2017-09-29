@@ -1,20 +1,20 @@
 ---
 
 - name: use custom .bashrc
-  copy:
+  template:
     src: bashrc
     dest: ~/.bashrc
     backup: yes
 
 - name: ensure /srv directory exists
   file:
-    path: /srv
+    path: "{{ publicdb_base }}"
     state: directory
   become: true
 
 - name: ensure /srv/publicdb directory exists
   file:
-    path: /srv/publicdb
+    path: "{{ publicdb_path }}"
     state: directory
     owner: hisparc
     group: hisparc
@@ -35,7 +35,7 @@
     default: yes
     etype: group
     permissions: rwx
-    path: /srv/publicdb
+    path: "{{ publicdb_path }}"
     state: present
   become: true
 
@@ -59,7 +59,7 @@
 - name: checkout jsparc in /srv/publicdb/jsparc
   git:
     repo: https://github.com/HiSPARC/jsparc.git
-    dest: /srv/publicdb/jsparc
+    dest: "{{ jsparc_path }}"
     update: yes
     force: no
     version: master
@@ -85,18 +85,17 @@
     dest: "/home/{{ ansible_user_id }}/"
 
 - name: create conda environment
-  shell: yes | /opt/miniconda/bin/conda create -p /srv/publicdb/publicdb_env python --yes
+  shell: "yes | /opt/miniconda/bin/conda create -p {{ publicdb_venv }} python --yes"
   args:
-    creates: /srv/publicdb/publicdb_env
+    creates: "{{ publicdb_venv }}"
 
 - name: install conda packages in conda environment
-  command: /opt/miniconda/bin/conda install -p /srv/publicdb/publicdb_env
-           --file /home/{{ ansible_user_id }}/conda.list --yes
+  command: "/opt/miniconda/bin/conda install -p {{ publicdb_venv }} --file /home/{{ ansible_user_id }}/conda.list --yes"
 
 - name: install packages in conda environment using pip
   pip:
     requirements: "/home/{{ ansible_user_id }}/pip.list"
-    virtualenv: /srv/publicdb/publicdb_env
+    virtualenv: "{{ publicdb_venv }}"
 
 - name: setup the publicdb database in PostgreSQL
   become: true
@@ -132,16 +131,16 @@
   django_manage:
     command: migrate
     app_path: /srv/publicdb/www/publicdb
-    virtualenv: /srv/publicdb/publicdb_env
+    virtualenv: "{{ publicdb_venv }}"
 
 - name: collect static files of Django apps
   django_manage:
     command: collectstatic
     app_path: /srv/publicdb/www/publicdb
-    virtualenv: /srv/publicdb/publicdb_env
+    virtualenv: "{{ publicdb_venv }}"
 
 - name: copy uwsgi.ini
-  copy:
+  template:
     src: uwsgi.ini
     dest: /srv/publicdb/www/uwsgi.ini
     backup: yes
@@ -163,7 +162,7 @@
   become: true
 
 - name: copy supervisord.conf
-  copy:
+  template:
     src: supervisord.conf
     dest: /etc/supervisord.conf
     backup: yes
@@ -187,7 +186,7 @@
     hour: 4
     state: present
     user: hisparc
-    job: "/srv/publicdb/publicdb_env/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+    job: "{{ publicdb_venv }}/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files

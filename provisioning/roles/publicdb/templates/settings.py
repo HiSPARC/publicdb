@@ -89,7 +89,7 @@ USE_I18N = False
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
 # DEV_ONLY
-MEDIA_ROOT = '/srv/publicdb/media/'
+MEDIA_ROOT = '{{ publicdb_media }}'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -100,7 +100,7 @@ MEDIA_URL = '{{ media_url }}'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/srv/publicdb/static/'
+STATIC_ROOT = '{{ publicdb_static }}'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"

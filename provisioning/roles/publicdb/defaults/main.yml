@@ -1,0 +1,10 @@
+---
+
+publicdb_base: "/srv/"
+publicdb_path: "{{ publicdb_base }}publicdb/"
+
+publicdb_venv: "{{ publicdb_path }}publicdb_venv"
+publicdb_static: "{{ publicdb_path }}static/"
+publicdb_media: "{{ publicdb_path }}media/"
+
+jsparc_path: "{{ publicdb_path }}jsparc/"
