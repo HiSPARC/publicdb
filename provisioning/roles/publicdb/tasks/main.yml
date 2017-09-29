@@ -47,18 +47,18 @@
 - name: checkout publicdb in /srv/publicdb/www
   git:
     repo: "{{ publicdb_repo }}"
-    dest: /srv/publicdb/www
+    dest: "{{ publicdb_code }}"
     update: yes
     force: no
     version: "{{ local_head.stdout | default('master') }}"
   notify: restart uWSGI
 
 - name: remove compiled python code
-  command: find /srv/publicdb/www -name *.pyc -delete
+  command: "find {{ publicdb_code }} -name *.pyc -delete"
 
 - name: checkout jsparc in /srv/publicdb/jsparc
   git:
-    repo: https://github.com/HiSPARC/jsparc.git
+    repo: "{{ jsparc_repo }}"
     dest: "{{ jsparc_path }}"
     update: yes
     force: no
@@ -66,35 +66,35 @@
 
 - name: create django static folder
   file:
-    path: /srv/publicdb/static
+    path: "{{ publicdb_static }}"
     state: directory
 
 - name: create django media/raw_data folder
   file:
-    path: /srv/publicdb/media/raw_data
+    path: "{{ publicdb_media }}raw_data"
     state: directory
 
 - name: Copy conda requirements files
   copy:
     src: conda.list
-    dest: "/home/{{ ansible_user_id }}/"
+    dest: ~/conda.list
 
 - name: Copy pip requirements files
   copy:
     src: pip.list
-    dest: "/home/{{ ansible_user_id }}/"
+    dest: ~/pip.list
 
 - name: create conda environment
-  shell: "yes | /opt/miniconda/bin/conda create -p {{ publicdb_venv }} python --yes"
+  shell: "yes | /opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
   args:
     creates: "{{ publicdb_venv }}"
 
 - name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install -p {{ publicdb_venv }} --file /home/{{ ansible_user_id }}/conda.list --yes"
+  command: "/opt/miniconda/bin/conda install -p {{ publicdb_venv }} --file ~/conda.list --yes"
 
 - name: install packages in conda environment using pip
   pip:
-    requirements: "/home/{{ ansible_user_id }}/pip.list"
+    requirements: ~/pip.list
     virtualenv: "{{ publicdb_venv }}"
 
 - name: setup the publicdb database in PostgreSQL
@@ -123,26 +123,26 @@
 - name: copy Django settings file
   template:
     src: settings.py
-    dest: /srv/publicdb/www/publicdb/settings.py
+    dest: "{{ publicdb_code }}publicdb/settings.py"
     backup: yes
   notify: restart uWSGI
 
 - name: migrate Django apps
   django_manage:
     command: migrate
-    app_path: /srv/publicdb/www/publicdb
+    app_path: "{{ publicdb_code }}publicdb"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: collect static files of Django apps
   django_manage:
     command: collectstatic
-    app_path: /srv/publicdb/www/publicdb
+    app_path: "{{ publicdb_code }}publicdb"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: copy uwsgi.ini
   template:
     src: uwsgi.ini
-    dest: /srv/publicdb/www/uwsgi.ini
+    dest: "{{ publicdb_code }}uwsgi.ini"
     backup: yes
   notify: restart uWSGI
 
@@ -186,7 +186,7 @@
     hour: 4
     state: present
     user: hisparc
-    job: "{{ publicdb_venv }}/bin/python /srv/publicdb/www/scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files
@@ -196,7 +196,7 @@
     special_time: daily
     state: present
     user: root
-    job: "find /srv/publicdb/media/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
+    job: "find {{ publicdb_media }}raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
   become: true
 
 - name: enable cron job for creating analysis sessions
