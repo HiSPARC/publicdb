@@ -24,6 +24,17 @@
   become: true
   notify: restart openvpn
 
+- name: create private keys
+  copy:
+    content: "{{ item.key }}"
+    dest: "/etc/openvpn/{{ item.path }}"
+    backup: no
+    mode: 0600
+  become: true
+  notify: restart openvpn
+  with_items: "{{ private_keys }}"
+  no_log: True
+
 - name: ensure ccd directory exists
   file:
     path: /etc/openvpn/ccd
