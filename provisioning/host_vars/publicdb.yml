@@ -23,4 +23,4 @@ email_port: 25
 media_url: /media/
 static_url: /static/
 
-secret_key: 7f69c4q0%&uthoar406i*bcbeq6+j!ttphnjor_ctsauxj*z*y
+secret_key: not-very-secret-key-for-development
