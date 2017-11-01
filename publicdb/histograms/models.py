@@ -19,7 +19,7 @@ class SerializedDataField(models.Field):
     def to_python(self, value):
         try:
             unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-        except:
+        except Exception:
             return value
         else:
             return unpickled
