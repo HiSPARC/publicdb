@@ -397,7 +397,7 @@ def determine_detector_timing_offsets_for_summary(summary):
         else:
             try:
                 station = HiSPARCStations([station.number]).stations[0]
-            except:
+            except Exception:
                 station = None
             offsets = determine_detector_timing_offsets(table, station)
 

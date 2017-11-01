@@ -503,7 +503,7 @@ def reload_nagios():
     try:
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
-    except:
+    except Exception:
         # FIXME logging!
         pass
 
@@ -514,6 +514,6 @@ def reload_datastore():
     try:
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
-    except:
+    except Exception:
         # FIXME logging!
         pass
