@@ -77,7 +77,7 @@ We formerly used Veewee, but Packer sees more active development and
 allows us to pre-provision the base box.  If you want to build your own
 base box, you can install Packer on a Mac using::
 
-    $ brew cask install packer
+    $ brew install packer
 
 Then, navigate to the packer/CentOS6/ directory and issue::
 
