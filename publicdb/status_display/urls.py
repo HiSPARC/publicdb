@@ -11,33 +11,33 @@ maps_patterns = ([
 
 network_patterns = ([
     url(r'^network/coincidences/$', views.network_coincidences, name="coincidences"),
-    url(r'^network/coincidences/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.network_coincidences, name="coincidences"),
+    url(r'^network/coincidences/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.network_coincidences, name="coincidences"),
 ], 'network')
 
 station_patterns = ([
     url(r'^(?P<station_number>\d+)/$', views.station, name="data"),
-    url(r'^(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.station_data, name="data"),
+    url(r'^(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.station_data, name="data"),
     url(r'^(?P<station_number>\d+)/status/$', views.station_status, name="status"),
     url(r'^(?P<station_number>\d+)/config/$', views.station_config, name="config"),
     url(r'^(?P<station_number>\d+)/latest/$', views.station_latest, name="latest"),
 ], 'station')
 
 source_patterns = ([
-    url(r'^coincidencetime/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_coincidencetime_histogram_source, name="coincidencetime"),
-    url(r'^coincidencenumber/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
+    url(r'^coincidencetime/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencetime_histogram_source, name="coincidencetime"),
+    url(r'^coincidencenumber/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
 
     url(r'^eventtime/(?P<station_number>\d+)/$', views.get_eventtime_source, name="eventtime"),
-    url(r'^eventtime/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_eventtime_histogram_source, name="eventtime"),
-    url(r'^pulseheight/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_pulseheight_histogram_source, name="pulseheight"),
-    url(r'^pulseintegral/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_pulseintegral_histogram_source, name="pulseintegral"),
-    url(r'^singleshistlow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_singlesratelow_histogram_source, name="singlesratelow"),
-    url(r'^singleshisthigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_singlesratehigh_histogram_source, name="singlesratehigh"),
-    url(r'^zenith/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_zenith_histogram_source, name="zenith"),
-    url(r'^azimuth/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_azimuth_histogram_source, name="azimuth"),
-    url(r'^barometer/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_barometer_dataset_source, name="barometer"),
-    url(r'^temperature/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_temperature_dataset_source, name="temperature"),
-    url(r'^singlesratelow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_singlesratelow_dataset_source, name="singlesratelow_dataset"),
-    url(r'^singlesratehigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d+)/(?P<day>\d+)/$', views.get_singlesratehigh_dataset_source, name="singlesratehigh_dataset"),
+    url(r'^eventtime/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_eventtime_histogram_source, name="eventtime"),
+    url(r'^pulseheight/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseheight_histogram_source, name="pulseheight"),
+    url(r'^pulseintegral/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseintegral_histogram_source, name="pulseintegral"),
+    url(r'^singleshistlow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratelow_histogram_source, name="singlesratelow"),
+    url(r'^singleshisthigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_histogram_source, name="singlesratehigh"),
+    url(r'^zenith/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_zenith_histogram_source, name="zenith"),
+    url(r'^azimuth/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_azimuth_histogram_source, name="azimuth"),
+    url(r'^barometer/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_barometer_dataset_source, name="barometer"),
+    url(r'^temperature/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_temperature_dataset_source, name="temperature"),
+    url(r'^singlesratelow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratelow_dataset_source, name="singlesratelow_dataset"),
+    url(r'^singlesratehigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_dataset_source, name="singlesratehigh_dataset"),
 
     url(r'^electronics/(?P<station_number>\d+)/$', views.get_electronics_config_source, name="electronics"),
     url(r'^voltage/(?P<station_number>\d+)/$', views.get_voltage_config_source, name="voltage"),

@@ -115,7 +115,7 @@ class CoincidenceDownloadForm(forms.Form):
                 try:
                     s_numbers = [int(x)
                                  for x in stations.strip('[]()').split(',')]
-                except:
+                except Exception:
                     msg = u'Incorrect station entry.'
                 else:
                     if len(s_numbers) < cleaned_data.get('n'):
