@@ -5,11 +5,11 @@
     user: hisparc
     key: "{{ item }}"
   with_file:
-    - public_keys/tkooij.pub
-    - public_keys/davidf.pub
     - public_keys/adelaat.pub
-    - public_keys/tond.pub
+    - public_keys/davidf.pub
     - public_keys/kaspervd.pub
+    - public_keys/tkooij.pub
+    - public_keys/tond.pub
 
 - name: upgrade all packages
   yum:
