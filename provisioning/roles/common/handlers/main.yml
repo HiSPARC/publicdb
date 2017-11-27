@@ -5,10 +5,17 @@
   async: 0
   poll: 0
   ignore_errors: true
-  notify: wait for server to come back
+  notify:
+    - fail if dev
+    - wait for server to come back
   become: true
 
 - name: wait for server to come back
   wait_for_connection:
   args:
     delay: 30
+
+- name: fail if dev
+  fail:
+    msg: Reboot VM with vagrant to remount shared folders and continue provisioning, using `$ vagrant reload --provision`
+  when: is_dev is defined
