@@ -2,27 +2,27 @@ from django.conf.urls import include, url
 
 from . import views
 
-maps_patterns = ([
+maps_patterns = [
     url(r'^$', views.stations_on_map, name="stations_on_map"),
     url(r'^(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
     url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
     url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
-], 'map')
+]
 
-network_patterns = ([
+network_patterns = [
     url(r'^network/coincidences/$', views.network_coincidences, name="coincidences"),
     url(r'^network/coincidences/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.network_coincidences, name="coincidences"),
-], 'network')
+]
 
-station_patterns = ([
+station_patterns = [
     url(r'^(?P<station_number>\d+)/$', views.station, name="data"),
     url(r'^(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.station_data, name="data"),
     url(r'^(?P<station_number>\d+)/status/$', views.station_status, name="status"),
     url(r'^(?P<station_number>\d+)/config/$', views.station_config, name="config"),
     url(r'^(?P<station_number>\d+)/latest/$', views.station_latest, name="latest"),
-], 'station')
+]
 
-source_patterns = ([
+source_patterns = [
     url(r'^coincidencetime/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencetime_histogram_source, name="coincidencetime"),
     url(r'^coincidencenumber/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
 
@@ -47,7 +47,7 @@ source_patterns = ([
     url(r'^layout/(?P<station_number>\d+)/$', views.get_station_layout_source, name="layout"),
     url(r'^detector_timing_offsets/(?P<station_number>\d+)/$', views.get_detector_timing_offsets_source, name="detector_offsets"),
     url(r'^station_timing_offsets/(?P<ref_station_number>\d+)/(?P<station_number>\d+)/$', views.get_station_timing_offsets_source, name="station_offsets"),
-], 'source')
+]
 
 app_name = 'status'
 urlpatterns = [
@@ -56,10 +56,10 @@ urlpatterns = [
     url(r'^stations_by_name/$', views.stations_by_name, name="stations_by_name"),
     url(r'^stations_by_number/$', views.stations_by_number, name="stations_by_number"),
 
-    url(r'^stations_on_map/', include(maps_patterns)),
-    url(r'^network/', include(network_patterns)),
-    url(r'^stations/', include(station_patterns)),
-    url(r'^source/', include(source_patterns)),
+    url(r'^stations_on_map/', include((maps_patterns, 'map'))),
+    url(r'^network/', include((network_patterns, 'network'))),
+    url(r'^stations/', include((station_patterns, 'station')),
+    url(r'^source/', include((source_patterns, 'source')),
 
     url(r'^help/$', views.help, name="help"),
 ]
