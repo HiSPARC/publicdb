@@ -58,8 +58,8 @@ urlpatterns = [
 
     url(r'^stations_on_map/', include((maps_patterns, 'map'))),
     url(r'^network/', include((network_patterns, 'network'))),
-    url(r'^stations/', include((station_patterns, 'station')),
-    url(r'^source/', include((source_patterns, 'source')),
+    url(r'^stations/', include((station_patterns, 'station'))),
+    url(r'^source/', include((source_patterns, 'source'))),
 
     url(r'^help/$', views.help, name="help"),
 ]
