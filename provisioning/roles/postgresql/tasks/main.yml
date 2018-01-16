@@ -12,6 +12,12 @@
     state: present
   become: true
 
+- name: install the Python package to interface with the PostgreSQL server
+  yum:
+    name: python-psycopg2
+    state: present
+  become: true
+
 - name: initiate database
   command: "service postgresql-{{ psql_version }} initdb"
   args:
