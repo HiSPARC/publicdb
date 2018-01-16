@@ -165,8 +165,8 @@ To manage the servers from somewhere out on the internet, you have to work with 
 ==========  ===========  ===========
 Local port  Remote host  Remote port
 ==========  ===========  ===========
-2201        tietar       22
-2202        pique        22
+2201        pique        22
+2202        tietar       22
 2203        frome        22
 ==========  ===========  ===========
 

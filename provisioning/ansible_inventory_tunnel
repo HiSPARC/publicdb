@@ -1,6 +1,6 @@
 [live]
-pique.nikhef.nl ansible_host=localhost ansible_port=2202
-tietar.nikhef.nl ansible_host=localhost ansible_port=2201
+pique.nikhef.nl ansible_host=localhost ansible_port=2201
+tietar.nikhef.nl ansible_host=localhost ansible_port=2202
 frome.nikhef.nl ansible_host=localhost ansible_port=2203
 
 [publicdb_group]
