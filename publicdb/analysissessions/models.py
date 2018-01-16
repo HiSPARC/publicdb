@@ -127,8 +127,8 @@ class SessionRequest(models.Model):
             try:
                 stations = self.get_stations_for_session(data)
             except Exception, msg:
-                print "Error in get_stations_for_session(data)"
-                print "Error:", msg
+                print("Error in get_stations_for_session(data)")
+                print("Error:", msg)
                 return nvalid
 
             coinc = coincidences.Coincidences(
@@ -145,8 +145,8 @@ class SessionRequest(models.Model):
                     else:
                         ndups += 1
         if ndups:
-            print '%d duplicate stations dropped' % ndups
-        print "Succesfully stored %d coincidences" % nvalid
+            print('%d duplicate stations dropped' % ndups)
+        print("Succesfully stored %d coincidences" % nvalid)
         return nvalid
 
     def get_stations_for_session(self, data):

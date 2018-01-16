@@ -42,7 +42,7 @@ class Nagios:
 
 
 def exit(status, message):
-    print 'Pulseheight ' + status[1] + ' - ' + message
+    print('Pulseheight ' + status[1] + ' - ' + message)
     sys.exit(status[0])
 
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
     # Check arguments
 
     if len(sys.argv) != 3:
-        print "Usage: %s <station number> <plate number>" % sys.argv[0]
+        print("Usage: %s <station number> <plate number>" % sys.argv[0])
         sys.exit(3)
 
     try:

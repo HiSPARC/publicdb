@@ -21,9 +21,9 @@ def create_key(host, type, ip):
     """create keys for a host and set up openvpn"""
 
     if type == 'client':
-        print "create key Type was client"
+        print("create key Type was client")
     elif type == 'admin':
-        print "create key Type was admin"
+        print("create key Type was admin")
     else:
         raise Exception('Unknown type %s' % type)
 
@@ -36,7 +36,7 @@ def register_hosts_ip(host_list):
     with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
             file.write('%s\t%s.his\n' % (ip, host))
-            print "Writing %s, %s to hosts file" % (ip, host)
+            print("Writing %s, %s to hosts file" % (ip, host))
 
     return True
 
@@ -45,9 +45,9 @@ def get_key(host, type):
     """Get a zip-archive containing all relevant keys"""
 
     if type == 'client':
-        print "Get key type was client"
+        print("Get key type was client")
     elif type == 'admin':
-        print "Get key type was admin"
+        print("Get key type was admin")
     else:
         raise Exception('Unknown type %s' % type)
 
@@ -57,7 +57,7 @@ def get_key(host, type):
 def reload_nagios():
     """Signal a reload of nagios"""
 
-    print "Signalling reload of nagios"
+    print("Signalling reload of nagios")
 
     with open(FLAG, 'a'):
         pass
