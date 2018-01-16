@@ -3,7 +3,7 @@
 test: flaketest doctest ansibletest
 
 flaketest:
-	flake8 --ignore=Z --exclude=urls.py,tests.py,*/migrations/ publicdb
+	flake8
 
 doctest:
 	PYTHONPATH=$(CURDIR):$(PYTHONPATH) sphinx-build -anW doc doc/_build/html
