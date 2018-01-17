@@ -6,7 +6,7 @@
   poll: 0
   ignore_errors: true
   notify:
-    - fail if dev
+    - fail if dev to remount shared folders
     - wait for server to come back
   become: true
 
@@ -15,7 +15,7 @@
   args:
     delay: 30
 
-- name: fail if dev
+- name: fail if dev to remount shared folders
   fail:
-    msg: Reboot VM with vagrant to remount shared folders and continue provisioning, using `$ vagrant reload --provision`
+    msg: Reboot VM with vagrant to remount shared folders and continue provisioning, using `$ vagrant reload --provision [machine]`
   when: is_dev is defined
