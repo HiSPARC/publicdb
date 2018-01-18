@@ -1,16 +1,17 @@
-from django.http import HttpResponse
-
 import calendar
-from datetime import datetime, date
 import json
+import operator
+
+from datetime import date, datetime
 from random import randint
 
 import numpy as np
-import operator
 
-from ..histograms.models import Configuration
-from ..analysissessions.models import (AnalyzedCoincidence, AnalysisSession,
+from django.http import HttpResponse
+
+from ..analysissessions.models import (AnalysisSession, AnalyzedCoincidence,
                                        Student)
+from ..histograms.models import Configuration
 
 
 def get_coincidence(request):

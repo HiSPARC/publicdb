@@ -1,9 +1,8 @@
 from django.contrib import admin
 
-from .models import (Profession, Contact, ContactInformation, Cluster,
-                     Station, Country, PcType, Pc,
-                     MonitorPulseheightThresholds,
-                     MonitorService, EnabledService)
+from .models import (Cluster, Contact, ContactInformation, Country,
+                     EnabledService, MonitorPulseheightThresholds,
+                     MonitorService, Pc, PcType, Profession, Station)
 
 
 class ClusterAdmin(admin.ModelAdmin):

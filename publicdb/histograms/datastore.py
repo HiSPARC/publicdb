@@ -1,7 +1,7 @@
-import os
-import re
 import datetime
 import logging
+import os
+import re
 
 import tables
 

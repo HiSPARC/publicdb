@@ -1,18 +1,19 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.conf import settings
-from django.http import HttpResponse
-# from django.views.decorators.csrf import csrf_protect
-
-import operator
 import datetime
+import operator
+
 from random import randint
 
 import numpy as np
+
 from recaptcha.client import captcha
 
-from .models import (AnalysisSession, AnalyzedCoincidence, Student,
-                     SessionRequest)
+from django.conf import settings
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, redirect, render
+
 from .forms import SessionRequestForm
+from .models import (AnalysisSession, AnalyzedCoincidence, SessionRequest,
+                     Student)
 
 
 def data_display(request, slug):

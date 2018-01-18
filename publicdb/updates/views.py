@@ -1,8 +1,8 @@
-from django import http
-
 from urllib import urlencode
 
-from .models import InstallerUpdate, AdminUpdate, UserUpdate, UpdateQueue
+from django import http
+
+from .models import AdminUpdate, InstallerUpdate, UpdateQueue, UserUpdate
 
 USER_UPDATE = 1
 ADMIN_UPDATE = 2

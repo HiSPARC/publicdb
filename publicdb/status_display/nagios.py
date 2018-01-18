@@ -1,6 +1,6 @@
-import urllib2
-import socket
 import re
+import socket
+import urllib2
 
 from ..inforecords.models import Station
 

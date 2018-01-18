@@ -1,18 +1,19 @@
-import datetime
-import re
 import code
+import datetime
+import inspect
 import os
+import re
 import subprocess
 import urllib
-import inspect
 
 from django.conf import settings
 from django.test import LiveServerTestCase
 from django.test.utils import override_settings
 
-from ..inforecords.models import *
-from ..histograms.models import *
 from scripts.nagios.check_pulseheight_mpv import check_pulseheight_mpv
+
+from ..histograms.models import *
+from ..inforecords.models import *
 
 
 def is_plaintext(response):

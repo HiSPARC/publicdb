@@ -1,28 +1,27 @@
 """Process events from datastore and save Event Summary Data (ESD)"""
 
-import os.path
-import tempfile
 import logging
+import os.path
 import re
+import tempfile
+
 from operator import itemgetter
 
 import numpy as np
 import tables
 
-from sapphire import (determine_detector_timing_offsets,
-                      DetermineStationTimingOffsets, HiSPARCStations,
-                      ProcessEventsFromSourceWithTriggerOffset,
-                      ProcessWeatherFromSource, ProcessSinglesFromSource,
-                      CoincidencesESD, ReconstructESDEventsFromSource,
-                      ProcessTimeDeltas)
-from sapphire.analysis.calibration import datetime_range
-
-from ..inforecords.models import Station
-from .models import DetectorTimingOffset
-from . import datastore
-
 from django.conf import settings
 
+from sapphire import (CoincidencesESD, DetermineStationTimingOffsets,
+                      HiSPARCStations, ProcessEventsFromSourceWithTriggerOffset,
+                      ProcessSinglesFromSource, ProcessTimeDeltas,
+                      ProcessWeatherFromSource, ReconstructESDEventsFromSource,
+                      determine_detector_timing_offsets)
+from sapphire.analysis.calibration import datetime_range
+
+from . import datastore
+from ..inforecords.models import Station
+from .models import DetectorTimingOffset
 
 logger = logging.getLogger('histograms.esd')
 

@@ -1,13 +1,13 @@
+import code
 import datetime
-import time
+import logging
 import os
 import sys
-import code
-import logging
+import time
 import unittest
 
-import tables
 import numpy
+import tables
 
 from mock import patch
 
@@ -16,9 +16,9 @@ from django.test import TestCase, TransactionTestCase
 from django.test.utils import override_settings
 
 from lib.test import datastore as test_datastore
-from . import datastore, jobs, esd, fit_pulseheight_peak
-from .models import *
 
+from . import datastore, esd, fit_pulseheight_peak, jobs
+from .models import *
 
 histograms_logger = logging.getLogger('histograms')
 histograms_logger.setLevel(logging.INFO)

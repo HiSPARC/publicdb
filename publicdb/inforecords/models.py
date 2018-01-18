@@ -1,16 +1,14 @@
-from django.db import models
-from django.db.models import Max
-from django.core.exceptions import ValidationError
-from django.urls import reverse
-from django.utils.text import slugify
+import datetime
 import xmlrpclib
 
 from django.conf import settings
-
-import datetime
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.db.models import Max
+from django.urls import reverse
+from django.utils.text import slugify
 
 from ..histograms.models import Configuration, Summary
-
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 

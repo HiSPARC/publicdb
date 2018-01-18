@@ -1,11 +1,11 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-
-import zlib
-import cPickle as pickle
-import base64
-import re
 import ast
+import base64
+import cPickle as pickle
+import re
+import zlib
+
+from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class SerializedDataField(models.Field):

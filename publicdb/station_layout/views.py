@@ -1,15 +1,14 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import Http404
-from django.conf import settings
-
 import datetime
 
 from recaptcha.client import captcha
 
-from .models import StationLayout, StationLayoutQuarantine
-from .forms import StationLayoutQuarantineForm, ReviewStationLayoutForm
-from ..histograms.models import Configuration
+from django.conf import settings
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 
+from ..histograms.models import Configuration
+from .forms import ReviewStationLayoutForm, StationLayoutQuarantineForm
+from .models import StationLayout, StationLayoutQuarantine
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 

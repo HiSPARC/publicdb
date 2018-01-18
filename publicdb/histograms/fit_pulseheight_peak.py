@@ -1,15 +1,16 @@
 #!/usr/bin/env python
 
 import logging
-from math import sqrt
 import traceback
 
+from math import sqrt
+
 import numpy
+
 from scipy import optimize, stats
 
-from .models import Configuration, PulseheightFit
 from . import esd
-
+from .models import Configuration, PulseheightFit
 
 logger = logging.getLogger('histograms.fit_pulseheight_peak')
 

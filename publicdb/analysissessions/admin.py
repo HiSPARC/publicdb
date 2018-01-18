@@ -1,7 +1,7 @@
 from django.contrib import admin
 
-from .models import (AnalysisSession, AnalyzedCoincidence, Student,
-                     SessionRequest)
+from .models import (AnalysisSession, AnalyzedCoincidence, SessionRequest,
+                     Student)
 
 
 class AnalysisSessionAdmin(admin.ModelAdmin):

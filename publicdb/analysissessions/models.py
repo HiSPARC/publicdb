@@ -1,15 +1,15 @@
-from django.db import models
-from django.core.mail import send_mail
-from django.template.defaultfilters import slugify
-from django.conf import settings
-
 import datetime
 import hashlib
-import tables
 import os
 import re
 
 import numpy as np
+import tables
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import models
+from django.template.defaultfilters import slugify
 
 from sapphire.analysis import coincidences
 

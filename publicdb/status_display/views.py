@@ -1,29 +1,29 @@
-from django.shortcuts import (render, get_object_or_404,
-                              get_list_or_404, redirect)
-from django.http import Http404
-from django.db.models import Q
+import calendar
+import csv
+import datetime
 
 from collections import OrderedDict
-from operator import itemgetter
-from itertools import izip, groupby
-import calendar
-import datetime
 from cStringIO import StringIO
-import csv
+from itertools import groupby, izip
+from operator import itemgetter
 
 from numpy import arange, nan
 
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
+                              render)
+
 from sapphire.transformations import clock
 
-from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
-                                 NetworkHistogram, HistogramType, DatasetType,
-                                 DetectorTimingOffset, StationTimingOffset,
-                                 Summary, NetworkSummary)
-from ..inforecords.models import Pc, Station, Cluster, Country
-from ..station_layout.models import StationLayout
+from ..histograms.models import (Configuration, DailyDataset, DailyHistogram,
+                                 DatasetType, DetectorTimingOffset,
+                                 HistogramType, NetworkHistogram,
+                                 NetworkSummary, StationTimingOffset, Summary)
+from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
-from .nagios import status_lists, get_status_counts, get_station_status
-
+from ..station_layout.models import StationLayout
+from .nagios import get_station_status, get_status_counts, status_lists
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
