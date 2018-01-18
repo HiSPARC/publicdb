@@ -2,7 +2,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import RedirectView, TemplateView
 
-from .inforecords.views import create_nagios_config, create_datastore_config, keys
+from .inforecords.views import (create_datastore_config, create_nagios_config,
+                                keys)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='show/stations', permanent=False)),
