@@ -33,12 +33,6 @@ def is_tsv(response):
 class ViewsTestCase(LiveServerTestCase):
     fixtures = ['tests_inforecords', 'tests_histograms']
 
-    def setUp(self):
-        super(ViewsTestCase, self).setUp()
-
-    def tearDown(self):
-        super(ViewsTestCase, self).tearDown()
-
     def check_and_get_response(self, url):
         response = urllib.urlopen("%s%s%s" %
                                   (self.live_server_url, "/show", url))

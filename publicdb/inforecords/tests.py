@@ -38,12 +38,6 @@ def check_and_get_response(testcase, url):
 class ViewsTestCase(LiveServerTestCase):
     fixtures = ['tests_inforecords']
 
-    def setUp(self):
-        super(ViewsTestCase, self).setUp()
-
-    def tearDown(self):
-        super(ViewsTestCase, self).tearDown()
-
     def test_config_nagios(self):
         check_and_get_response(self, "/config/nagios")
 
@@ -53,12 +47,6 @@ class ViewsTestCase(LiveServerTestCase):
 
 class NagiosConfigTestCase(LiveServerTestCase):
     fixtures = ['tests_inforecords', 'tests_histograms']
-
-    def setUp(self):
-        super(NagiosConfigTestCase, self).setUp()
-
-    def tearDown(self):
-        super(NagiosConfigTestCase, self).tearDown()
 
     def test_config_nagios_501(self):
         """ Tests the generated nagios config file for station 501.
@@ -127,9 +115,6 @@ class NagiosPluginTestCase(LiveServerTestCase):
         super(NagiosPluginTestCase, self).setUp()
 
         settings.PUBLICDB_HOST_FOR_NAGIOS = self.live_server_url
-
-    def tearDown(self):
-        super(NagiosPluginTestCase, self).tearDown()
 
     def test_plugin_wrong_arguments(self):
         """ Tests the check_pulseheight_mpv plugin in case of wrong arguments

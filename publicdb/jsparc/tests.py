@@ -69,9 +69,6 @@ class LiveSessionTestCase(LiveServerTestCase):
 
         super(LiveSessionTestCase, self).setUp()
 
-    def tearDown(self):
-        super(LiveSessionTestCase, self).tearDown()
-
     def test_everythingCorrect(self):
         client = Client(self)
 

@@ -9,12 +9,6 @@ class SerializationTestCase(TestCase):
 
     fixtures = ['tests_inforecords']
 
-    def setUp(self):
-        super(SerializationTestCase, self).setUp()
-
-    def tearDown(self):
-        super(SerializationTestCase, self).tearDown()
-
     def test_event_serialization_json(self):
 
         # Create an event and save it to the database
