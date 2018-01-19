@@ -2,6 +2,9 @@
 Django<1.11
 psycopg2
 
+# unittests
+factory_boy
+
 # flake8 tests
 flake8
 flake8-isort
