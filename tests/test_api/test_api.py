@@ -7,8 +7,8 @@ from django.test import LiveServerTestCase
 
 from lib.test import datastore as test_datastore
 
-from ..histograms.models import *
-from ..inforecords.models import *
+from publicdb.histograms.models import *
+from publicdb.inforecords.models import *
 
 
 def is_json(response):
