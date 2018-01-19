@@ -8,6 +8,8 @@ public.db
 /esd/
 /doc/_build/
 *.sql
+/mediaroot/
+/staticroot/
 
 # Python
 *.pyc
