@@ -17,8 +17,8 @@ from django.test.utils import override_settings
 
 from lib.test import datastore as test_datastore
 
-from . import datastore, esd, fit_pulseheight_peak, jobs
-from .models import *
+from publicdb.histograms import datastore, esd, fit_pulseheight_peak, jobs
+from publicdb.histograms.models import *
 
 histograms_logger = logging.getLogger('histograms')
 histograms_logger.setLevel(logging.INFO)

@@ -12,8 +12,8 @@ from django.test.utils import override_settings
 
 from scripts.nagios.check_pulseheight_mpv import check_pulseheight_mpv
 
-from ..histograms.models import *
-from ..inforecords.models import *
+from publicdb.histograms.models import *
+from publicdb.inforecords.models import *
 
 
 def is_plaintext(response):
