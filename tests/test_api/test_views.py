@@ -17,6 +17,11 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         return response.json()
 
+    def not_found(self, url):
+        """Get url and check if the response is NOT FOUND"""
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
     def test_man(self):
         self.get_json(reverse('api:man'))
 
@@ -78,12 +83,21 @@ class ViewsTestCase(TestCase):
         kwargs = {'subcluster_number': self.station.cluster.number}
         self.get_json(reverse('api:stations', kwargs=kwargs))
 
+        kwargs = {'subcluster_number': 1337}
+        self.not_found(reverse('api:stations', kwargs=kwargs))
+
     def test_clusters(self):
         self.get_json(reverse('api:clusters'))
         kwargs = {'cluster_number': self.station.cluster.number}
         self.get_json(reverse('api:subclusters', kwargs=kwargs))
 
+        kwargs = {'cluster_number': 1337}
+        self.not_found(reverse('api:subclusters', kwargs=kwargs))
+
     def test_countries(self):
         self.get_json(reverse('api:countries'))
         kwargs = {'country_number': self.station.cluster.country.number}
         self.get_json(reverse('api:clusters', kwargs=kwargs))
+
+        kwargs = {'country_number': 1337}
+        self.not_found(reverse('api:clusters', kwargs=kwargs))
