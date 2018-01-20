@@ -2,8 +2,8 @@ import os
 
 from django.conf import settings
 
-from scripts import download_test_datastore
 from publicdb import inforecords
+from scripts import download_test_datastore
 
 
 def setup_test_datastore_directory(datastore_path):
