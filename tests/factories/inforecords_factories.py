@@ -10,17 +10,6 @@ class ProfessionFactory(factory.DjangoModelFactory):
         model = models.Profession
 
 
-class ContactFactory(factory.DjangoModelFactory):
-    profession = factory.SubFactory(ProfessionFactory)
-    title = factory.Faker('word')
-    first_name = factory.Faker('first_name')
-    surname = factory.Faker('last_name')
-    contactinformation = factory.SubFactory(ContactInformation)
-
-    class Meta:
-        model = models.Contact
-
-
 class ContactInformationFactory(factory.DjangoModelFactory):
     street_1 = factory.Faker('street_address')
     street_2 = factory.Faker('street_address')
@@ -40,9 +29,28 @@ class ContactInformationFactory(factory.DjangoModelFactory):
         model = models.ContactInformation
 
 
+class ContactFactory(factory.DjangoModelFactory):
+    profession = factory.SubFactory(ProfessionFactory)
+    title = factory.Faker('word')
+    first_name = factory.Faker('first_name')
+    surname = factory.Faker('last_name')
+    contactinformation = factory.SubFactory(ContactInformationFactory)
+
+    class Meta:
+        model = models.Contact
+
+
+class CountryFactory(factory.DjangoModelFactory):
+    name = factory.Faker('country')
+    # number - set manually
+
+    class Meta:
+        model = models.Country
+
+
 class ClusterFactory(factory.DjangoModelFactory):
     name = factory.Faker('city')
-    # number - set automatically
+    # number - set manually
     # parent - set to another Cluster object
     country = factory.SubFactory(CountryFactory)
     url = 'https://www.example.com/'
@@ -53,7 +61,7 @@ class ClusterFactory(factory.DjangoModelFactory):
 
 class StationFactory(factory.DjangoModelFactory):
     name = factory.Faker('company')
-    # number - set automatically
+    # number - set manually
     contactinformation = factory.SubFactory(ContactInformationFactory)
     cluster = factory.SubFactory(ClusterFactory)
     contact = factory.SubFactory(ContactFactory)
@@ -63,14 +71,6 @@ class StationFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Station
-
-
-class CountryFactory(factory.DjangoModelFactory):
-    name = factory.Faker('country')
-    # number - set automatically
-
-    class Meta:
-        model = models.Country
 
 
 class PcTypeFactory(factory.DjangoModelFactory):
@@ -97,7 +97,7 @@ class PcFactory(factory.DjangoModelFactory):
 
 class MonitorPulseheightThresholdsFactory(factory.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
-    plate = factory.Faker('random_int', 1, 4)
+    plate = factory.Faker('random_int', min=1, max=4)
     mpv_mean = factory.Faker('pyfloat', left_digits=3, right_digits=1, positive=True)
     mpv_sigma = factory.Faker('pyfloat', left_digits=1, right_digits=1, positive=True)
     mpv_max_allowed_drift = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=False)
