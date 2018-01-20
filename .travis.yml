@@ -16,7 +16,7 @@ install:
   - pip install -r requirements-dev.txt
 
 script:
-  - cp settings_develop.py settings.py
+  - cp publicdb/settings_develop.py publicdb/settings.py
   - make test
 
 before_deploy:
