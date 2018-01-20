@@ -1,3 +1,5 @@
+from datetime import date, timedelta
+
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -17,7 +19,7 @@ class ViewsTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         return response.json()
 
-    def not_found(self, url):
+    def assert_not_found(self, url):
         """Get url and check if the response is NOT FOUND"""
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
@@ -78,26 +80,48 @@ class ViewsTestCase(TestCase):
         self.get_json(reverse('api:data_stations', kwargs=kwargs))
         self.get_json(reverse('api:weather_stations', kwargs=kwargs))
 
+        # Invalid dates
+        tomorrow = date.today() + timedelta(days=1)
+        kwargs = {
+            'year': tomorrow.year,
+            'month': tomorrow.month,
+            'day': tomorrow.day
+        }
+        self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
+        self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
+
+        before_hisparc = date(2003, 12, 30)
+        kwargs = {
+            'year': before_hisparc.year,
+            'month': before_hisparc.month,
+            'day': before_hisparc.day
+        }
+        self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
+        self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
+
     def test_subclusters(self):
         self.get_json(reverse('api:subclusters'))
         kwargs = {'subcluster_number': self.station.cluster.number}
         self.get_json(reverse('api:stations', kwargs=kwargs))
 
+        # Non existant subcluster number
         kwargs = {'subcluster_number': 1337}
-        self.not_found(reverse('api:stations', kwargs=kwargs))
+        self.assert_not_found(reverse('api:stations', kwargs=kwargs))
 
     def test_clusters(self):
         self.get_json(reverse('api:clusters'))
         kwargs = {'cluster_number': self.station.cluster.number}
         self.get_json(reverse('api:subclusters', kwargs=kwargs))
 
+        # Non existant cluster number
         kwargs = {'cluster_number': 1337}
-        self.not_found(reverse('api:subclusters', kwargs=kwargs))
+        self.assert_not_found(reverse('api:subclusters', kwargs=kwargs))
 
     def test_countries(self):
         self.get_json(reverse('api:countries'))
         kwargs = {'country_number': self.station.cluster.country.number}
         self.get_json(reverse('api:clusters', kwargs=kwargs))
 
+        # Non existant country number
         kwargs = {'country_number': 1337}
-        self.not_found(reverse('api:clusters', kwargs=kwargs))
+        self.assert_not_found(reverse('api:clusters', kwargs=kwargs))
