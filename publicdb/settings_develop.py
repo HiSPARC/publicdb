@@ -19,7 +19,7 @@ DATABASES = {
         'NAME': 'publicdb',
         'USER': 'postgres',
         'PASSWORD': '',
-        'HOST': '',
+        'HOST': 'localhost',
         'PORT': '',
     }
 }
