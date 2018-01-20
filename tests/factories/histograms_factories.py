@@ -18,6 +18,7 @@ class NetworkSummaryFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.NetworkSummary
+        django_get_or_create = ('date',)
 
 
 class SummaryFactory(factory.DjangoModelFactory):
@@ -37,6 +38,7 @@ class SummaryFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Summary
+        django_get_or_create = ('station', 'date')
 
 
 class ConfigurationFactory(factory.DjangoModelFactory):
@@ -142,6 +144,7 @@ class HistogramTypeFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.HistogramType
+        django_get_or_create = ('slug',)
 
 
 class DatasetTypeFactory(factory.DjangoModelFactory):
@@ -153,6 +156,7 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.DatasetType
+        django_get_or_create = ('slug',)
 
 
 class NetworkHistogramFactory(factory.DjangoModelFactory):

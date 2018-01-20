@@ -46,6 +46,7 @@ class CountryFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Country
+        django_get_or_create = ('number',)
 
 
 class ClusterFactory(factory.DjangoModelFactory):
@@ -57,6 +58,7 @@ class ClusterFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Cluster
+        django_get_or_create = ('number',)
 
 
 class StationFactory(factory.DjangoModelFactory):
@@ -71,6 +73,7 @@ class StationFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Station
+        django_get_or_create = ('number',)
 
 
 class PcTypeFactory(factory.DjangoModelFactory):
