@@ -11,6 +11,10 @@ public.db
 /mediaroot/
 /staticroot/
 
+# Coverage
+/htmlcov/
+.coverage
+
 # Python
 *.pyc
 *.pyo

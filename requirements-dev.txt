@@ -3,6 +3,7 @@ Django<1.11
 psycopg2
 
 # unittests
+coverage
 factory_boy
 
 # flake8 tests
