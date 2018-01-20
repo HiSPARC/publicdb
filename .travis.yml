@@ -17,6 +17,8 @@ install:
 
 script:
   - cp publicdb/settings_develop.py publicdb/settings.py
+  - conda install provisioning/roles/publicdb/files/conda.list
+  - pip install provisioning/roles/publicdb/files/pip.list
   - make test
 
 before_deploy:
