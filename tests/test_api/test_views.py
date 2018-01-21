@@ -63,6 +63,13 @@ class ViewsTestCase(TestCase):
         }
         self.get_json(reverse('api:config', kwargs=kwargs))
 
+        # Invalid station
+        kwargs = {'station_number': 1337}
+        self.assert_not_found(reverse('api:station', kwargs=kwargs))
+        self.assert_not_found(reverse('api:has_data', kwargs=kwargs))
+        self.assert_not_found(reverse('api:has_weather', kwargs=kwargs))
+        self.assert_not_found(reverse('api:num_events', kwargs=kwargs))
+
     def test_stations(self):
         self.get_json(reverse('api:stations'))
         self.get_json(reverse('api:data_stations'))
