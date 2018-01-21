@@ -66,10 +66,10 @@ SITE_ID = 1
 
 USE_I18N = False
 
-MEDIA_ROOT = os.path.join(PUBLICDB_PATH, '/mediaroot/')
+MEDIA_ROOT = os.path.join(PUBLICDB_PATH, 'mediaroot/')
 MEDIA_URL = '/media/'
 
-STATIC_ROOT = os.path.join(PUBLICDB_PATH, '/staticroot/')
+STATIC_ROOT = os.path.join(PUBLICDB_PATH, 'staticroot/')
 STATIC_URL = '/static/'
 
 STATICFILES_FINDERS = (
