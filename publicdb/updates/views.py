@@ -4,8 +4,8 @@ from django import http
 
 from .models import AdminUpdate, InstallerUpdate, UpdateQueue, UserUpdate
 
-USER_UPDATE = 1
-ADMIN_UPDATE = 2
+USER_UPDATE = 0b01
+ADMIN_UPDATE = 0b10
 
 
 def get_latest_installer(request):
@@ -34,7 +34,7 @@ def update_check(request, queue, admin_version, user_version):
     except UpdateQueue.DoesNotExist:
         return http.HttpResponseBadRequest("Queue does not exist.")
 
-    answer = {'mustUpdate': 0}
+    answer = {'mustUpdate': 0b00}
 
     admin_updates = AdminUpdate.objects.filter(queue=queue,
                                                version__gt=admin_version)
