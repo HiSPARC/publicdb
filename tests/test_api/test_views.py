@@ -16,13 +16,13 @@ class ViewsTestCase(TestCase):
     def get_json(self, url):
         """Get url and check if the response is OK and valid json"""
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(200, response.status_code)
         return response.json()
 
     def assert_not_found(self, url):
         """Get url and check if the response is NOT FOUND"""
         response = self.client.get(url)
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(404, response.status_code)
 
     def test_man(self):
         self.get_json(reverse('api:man'))
