@@ -5,7 +5,7 @@ class DataProvider(BaseProvider):
     """Provider for histogram and dataset data"""
 
     def int_list(self, n=24, **kwargs):
-        return [self.random_int(**kwargs) for _ in n]
+        return [self.random_int(**kwargs) for _ in range(n)]
 
     def float_list(self, n=600, min=0, max=100):
-        return [self.generator.random.uniform(a=min, b=max) for _ in n]
+        return [self.generator.random.uniform(a=min, b=max) for _ in range(n)]
