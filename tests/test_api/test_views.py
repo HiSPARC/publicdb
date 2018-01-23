@@ -12,6 +12,7 @@ class ViewsTestCase(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.config = ConfigurationFactory(source__station=self.station)
+        super(ViewsTestCase, self).setUp()
 
     def get_json(self, url):
         """Get url and check if the response is OK and valid json"""
