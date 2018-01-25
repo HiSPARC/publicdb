@@ -5,7 +5,7 @@ from django.urls import reverse
 
 from ..factories.histograms_factories import ConfigurationFactory
 from ..factories.inforecords_factories import StationFactory
-from ..utils import date_to_dict
+from ..utils import date_as_kwargs
 
 
 class TestViews(TestCase):
@@ -58,7 +58,7 @@ class TestViews(TestCase):
 
         config_date = self.config.source.date
         kwargs = {'station_number': self.station.number}
-        kwargs.update(date_to_dict(config_date))
+        kwargs.update(date_as_kwargs(config_date))
         self.get_json(reverse('api:config', kwargs=kwargs))
 
         # Invalid station
@@ -87,12 +87,12 @@ class TestViews(TestCase):
 
         # Invalid dates
         tomorrow = date.today() + timedelta(days=1)
-        kwargs = date_to_dict(tomorrow)
+        kwargs = date_as_kwargs(tomorrow)
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 
         before_hisparc = date(2003, 12, 30)
-        kwargs = date_to_dict(before_hisparc)
+        kwargs = date_as_kwargs(before_hisparc)
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 
