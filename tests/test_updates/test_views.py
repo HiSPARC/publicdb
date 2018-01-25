@@ -1,11 +1,10 @@
-from datetime import date, timedelta
 from tempfile import mkdtemp
 from urlparse import parse_qs
 
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..factories.updates_factories import AdminUpdateFactory, UserUpdateFactory, InstallerUpdateFactory
+from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFactory, UserUpdateFactory
 
 
 @override_settings(MEDIA_ROOT=mkdtemp(prefix='mediaroot'))
