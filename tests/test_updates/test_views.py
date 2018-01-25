@@ -4,7 +4,9 @@ from urlparse import parse_qs
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFactory, UserUpdateFactory
+from ..factories.updates_factories import (AdminUpdateFactory,
+                                           InstallerUpdateFactory,
+                                           UserUpdateFactory)
 
 
 @override_settings(MEDIA_ROOT=mkdtemp(prefix='mediaroot'))
