@@ -58,7 +58,7 @@ class TestViews(TestCase):
 
         config_date = self.config.source.date
         kwargs = {'station_number': self.station.number}
-        kwargs.update(date_to_dict(config_date)
+        kwargs.update(date_to_dict(config_date))
         self.get_json(reverse('api:config', kwargs=kwargs))
 
         # Invalid station
