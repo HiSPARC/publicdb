@@ -9,7 +9,7 @@ from ..factories.updates_factories import AdminUpdateFactory, UserUpdateFactory,
 
 
 @override_settings(MEDIA_ROOT=mkdtemp(prefix='mediaroot'))
-class ViewsTestCase(TestCase):
+class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.admin_update = AdminUpdateFactory(queue__slug='hisparc')

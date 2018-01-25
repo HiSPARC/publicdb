@@ -5,9 +5,10 @@ from django.urls import reverse
 
 from ..factories.histograms_factories import ConfigurationFactory
 from ..factories.inforecords_factories import StationFactory
+from ..utils import date_to_dict
 
 
-class ViewsTestCase(TestCase):
+class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
@@ -56,12 +57,8 @@ class ViewsTestCase(TestCase):
         self.get_json(reverse('api:num_events', kwargs=kwargs))
 
         config_date = self.config.source.date
-        kwargs = {
-            'station_number': self.station.number,
-            'year': config_date.year,
-            'month': config_date.month,
-            'day': config_date.day
-        }
+        kwargs = {'station_number': self.station.number}
+        kwargs.update(date_to_dict(config_date)
         self.get_json(reverse('api:config', kwargs=kwargs))
 
         # Invalid station
@@ -90,20 +87,12 @@ class ViewsTestCase(TestCase):
 
         # Invalid dates
         tomorrow = date.today() + timedelta(days=1)
-        kwargs = {
-            'year': tomorrow.year,
-            'month': tomorrow.month,
-            'day': tomorrow.day
-        }
+        kwargs = date_to_dict(tomorrow)
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 
         before_hisparc = date(2003, 12, 30)
-        kwargs = {
-            'year': before_hisparc.year,
-            'month': before_hisparc.month,
-            'day': before_hisparc.day
-        }
+        kwargs = date_to_dict(before_hisparc)
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 
