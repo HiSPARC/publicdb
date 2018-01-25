@@ -179,6 +179,10 @@ class DailyHistogramFactory(factory.DjangoModelFactory):
         model = models.DailyHistogram
 
 
+class MultiDailyHistogramFactory(DailyHistogramFactory):
+    values = factory.Faker('multi_float_list')
+
+
 class DailyDatasetFactory(factory.DjangoModelFactory):
     source = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(DatasetTypeFactory)
@@ -187,3 +191,28 @@ class DailyDatasetFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.DailyDataset
+
+
+class MultiDailyDatasetFactory(DailyDatasetFactory):
+    y = factory.Faker('multi_float_list')
+
+
+class DetectorTimingOffsetFactory(factory.DjangoModelFactory):
+    source = factory.SubFactory(SummaryFactory)
+    offset_1 = factory.Faker('pyfloat')
+    offset_2 = factory.Faker('pyfloat')
+    offset_3 = factory.Faker('pyfloat')
+    offset_4 = factory.Faker('pyfloat')
+
+    class Meta:
+        model = models.DetectorTimingOffset
+
+
+class StationTimingOffsetFactory(factory.DjangoModelFactory):
+    ref_source = factory.SubFactory(SummaryFactory)
+    source = factory.SubFactory(SummaryFactory)
+    offset = factory.Faker('pyfloat')
+    error = factory.Faker('pyfloat')
+
+    class Meta:
+        model = models.StationTimingOffset
