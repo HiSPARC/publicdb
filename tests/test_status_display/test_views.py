@@ -12,7 +12,7 @@ from ..utils import date_as_kwargs
 class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
-        self.station = histograms_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0)
+        self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug='eventtime')
         self.config = histograms_factories.ConfigurationFactory(source=self.summary)
@@ -68,7 +68,7 @@ class TestViews(TestCase):
 class TestSourceViews(TestCase):
     def setUp(self):
         self.client = Client()
-        self.station = histograms_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0)
+        self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.network_summary = histograms_factories.NetworkSummaryFactory(date=self.summary.date)
         super(TestSourceViews, self).setUp()
@@ -123,7 +123,7 @@ class TestSourceViews(TestCase):
 
     def test_station_layout(self):
         kwargs = {'station_number': self.station.number}
-        histograms_factories.StationLayoutFactory(station=self.station)
+        StationLayoutFactory(station=self.station)
         self.get_tsv(reverse('status:source:layout', kwargs=kwargs))
 
     def test_detector_offsets(self):
@@ -132,7 +132,7 @@ class TestSourceViews(TestCase):
         self.get_tsv(reverse('status:source:detector_offsets', kwargs=kwargs))
 
     def test_station_offsets(self):
-        other_station = histograms_factories.StationFactory(number=2, cluster__number=0, cluster__country__number=0)
+        other_station = StationFactory(number=2, cluster__number=0, cluster__country__number=0)
         ref_summary = histograms_factories.SummaryFactory(station=other_station)
         histograms_factories.StationTimingOffsetFactory(ref_source=ref_summary, source=self.summary)
 
