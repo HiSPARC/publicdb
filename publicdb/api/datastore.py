@@ -19,11 +19,10 @@ def get_event_traces(station, ext_timestamp, raw=False):
     """
     date = ext_timestamp_to_datetime(ext_timestamp)
     path = get_data_path(date)
-    file = get_datastore_file(path)
-    node = get_station_node(file, station)
-    ts, ns = split_ext_timestamp(ext_timestamp)
-    traces = retrieve_traces(node, ts, ns, raw)
-    file.close()
+    with tables.open_file(path, 'r') as file:
+        node = get_station_node(file, station)
+        ts, ns = split_ext_timestamp(ext_timestamp)
+        traces = retrieve_traces(node, ts, ns, raw)
     return traces
 
 
@@ -54,17 +53,6 @@ def get_station_node(file, station):
     return node
 
 
-def get_datastore_file(path):
-    """Get the datafile
-
-    :param path: path to the desired datafile
-    :return: handler for the data file
-
-    """
-    file = tables.open_file(path, 'r')
-    return file
-
-
 def get_data_path(date):
     """Return path to data file
 
@@ -75,8 +63,8 @@ def get_data_path(date):
 
     """
     rootdir = settings.DATASTORE_PATH
-    file = '%d_%d_%d.h5' % (date.year, date.month, date.day)
-    return os.path.join(rootdir, str(date.year), str(date.month), file)
+    filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
+    return os.path.join(rootdir, filepath)
 
 
 def ext_timestamp_to_datetime(ext_timestamp):
