@@ -25,7 +25,7 @@ class TestViews(TestCase):
     def test_confirm(self):
         layout = StationLayoutQuarantineFactory(station=self.station, email_verified=False)
         kwargs = {'hash': layout.hash_submit}
-         self.get_html(reverse('layout:confirm', kwargs=kwargs))
+        self.get_html(reverse('layout:confirm', kwargs=kwargs))
 
         layout.refresh_from_db()
         self.assertTrue(layout.email_verified)
