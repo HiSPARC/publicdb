@@ -24,6 +24,10 @@ script:
   - cp publicdb/settings_develop.py publicdb/settings.py
   - make test
 
+after_success:
+  - pip install coveralls
+  - coveralls
+
 before_deploy:
   - touch doc/_build/html/.nojekyll
 
