@@ -2,6 +2,10 @@ import factory
 
 from publicdb.inforecords import models
 
+from .providers import DataProvider
+
+factory.Faker.add_provider(DataProvider)
+
 
 class ProfessionFactory(factory.DjangoModelFactory):
     description = factory.Faker('word')
@@ -101,10 +105,10 @@ class PcFactory(factory.DjangoModelFactory):
 class MonitorPulseheightThresholdsFactory(factory.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
     plate = factory.Faker('random_int', min=1, max=4)
-    mpv_mean = factory.Faker('pyfloat', left_digits=3, right_digits=1, positive=True)
-    mpv_sigma = factory.Faker('pyfloat', left_digits=1, right_digits=1, positive=True)
-    mpv_max_allowed_drift = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=False)
-    mpv_min_allowed_drift = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=False)
+    mpv_mean = factory.Faker('float', min=0, max=500)
+    mpv_sigma = factory.Faker('float', min=0, max=10)
+    mpv_max_allowed_drift = factory.Faker('float', min=0, max=100)
+    mpv_min_allowed_drift = factory.Faker('float', min=-100, max=0)
 
     class Meta:
         model = models.MonitorPulseheightThresholds
@@ -115,10 +119,10 @@ class MonitorServiceFactory(factory.DjangoModelFactory):
     nagios_command = factory.Faker('word')
     is_default_service = factory.Faker('boolean')
     enable_active_checks = factory.Faker('boolean')
-    min_critical = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    max_critical = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    min_warning = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    max_warning = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
+    min_critical = factory.Faker('float', min=0, max=10000)
+    max_critical = factory.Faker('float', min=0, max=10000)
+    min_warning = factory.Faker('float', min=0, max=10000)
+    max_warning = factory.Faker('float', min=0, max=10000)
 
     class Meta:
         model = models.MonitorService
@@ -127,10 +131,10 @@ class MonitorServiceFactory(factory.DjangoModelFactory):
 class EnabledServiceFactory(factory.DjangoModelFactory):
     pc = factory.SubFactory(PcFactory)
     monitor_service = factory.SubFactory(MonitorServiceFactory)
-    min_critical = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    max_critical = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    min_warning = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
-    max_warning = factory.Faker('pyfloat', left_digits=2, right_digits=1, positive=True)
+    min_critical = factory.Faker('float', min=0, max=10000)
+    max_critical = factory.Faker('float', min=0, max=10000)
+    min_warning = factory.Faker('float', min=0, max=10000)
+    max_warning = factory.Faker('float', min=0, max=10000)
 
     class Meta:
         model = models.EnabledService
