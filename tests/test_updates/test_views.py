@@ -72,3 +72,14 @@ class TestViews(TestCase):
              'newVersionUser': ['2'], 'urlUser': [user_update.update.url],
              'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]},
             data)
+
+    def test_check_querystring_missing_versions(self):
+        kwargs = {'queue': 'hisparc'}
+        response = self.client.get(reverse('updates:check', kwargs=kwargs))
+        self.assertEqual(400, response.status_code)
+
+    def test_check_querystring_wrong_queue(self):
+        kwargs = {'queue': 'thisdoesnotexist'}
+        query = {'admin_version': 1, 'user_version': 1}
+        response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
+        self.assertEqual(400, response.status_code)
