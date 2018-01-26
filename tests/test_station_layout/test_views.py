@@ -20,12 +20,12 @@ class TestViews(TestCase):
         return response
 
     def test_submit(self):
-        response = self.get_html(reverse('layout:submit'))
+        self.get_html(reverse('layout:submit'))
 
     def test_confirm(self):
         layout = StationLayoutQuarantineFactory(station=self.station, email_verified=False)
         kwargs = {'hash': layout.hash_submit}
-        response = self.get_html(reverse('layout:confirm', kwargs=kwargs))
+         self.get_html(reverse('layout:confirm', kwargs=kwargs))
 
         layout.refresh_from_db()
         self.assertTrue(layout.email_verified)
@@ -34,4 +34,4 @@ class TestViews(TestCase):
     def test_review(self):
         layout = StationLayoutQuarantineFactory(station=self.station, email_verified=True, reviewed=False)
         kwargs = {'hash': layout.hash_review}
-        response = self.get_html(reverse('layout:review', kwargs=kwargs))
+        self.get_html(reverse('layout:review', kwargs=kwargs))
