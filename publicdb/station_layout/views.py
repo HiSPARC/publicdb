@@ -19,10 +19,10 @@ def layout_submit(request):
     else:
         form = StationLayoutQuarantineForm()
 
-    html_captcha = "reCAPTCHA disabled"
-
     if settings.RECAPTCHA_ENABLED:
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
+    else:
+        html_captcha = "reCAPTCHA disabled"
 
     return render(request, 'layout_submit.html',
                   {'form': form, 'html_captcha': html_captcha})
