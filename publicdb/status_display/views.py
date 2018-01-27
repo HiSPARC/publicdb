@@ -204,7 +204,10 @@ def network_coincidences(request, year=None, month=None, day=None):
     year = int(year)
     month = int(month)
     day = int(day)
-    date = datetime.date(year, month, day)
+    try:
+        date = datetime.date(year, month, day)
+    except ValueError:
+        raise Http404
 
     summary = get_object_or_404(NetworkSummary,
                                 num_coincidences__isnull=False,
@@ -269,7 +272,10 @@ def station_data(request, station_number, year, month, day):
     year = int(year)
     month = int(month)
     day = int(day)
-    date = datetime.date(year, month, day)
+    try:
+        date = datetime.date(year, month, day)
+    except ValueError:
+        raise Http404
 
     station = get_object_or_404(Station, number=station_number)
     get_object_or_404(Summary,

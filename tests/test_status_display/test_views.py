@@ -46,7 +46,7 @@ class TestViews(TestCase):
         kwargs.update({'subcluster': self.station.cluster.name})
         self.get_html(reverse('status:map:stations_on_map', kwargs=kwargs))
 
-    def test_station(self):
+    def test_station_redirect_to_latest(self):
         kwargs = {'station_number': self.station.number}
         response = self.client.get(reverse('status:station:data', kwargs=kwargs))
         self.assertEqual(302, response.status_code)
@@ -58,6 +58,13 @@ class TestViews(TestCase):
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(self.summary.date))
         self.get_html(reverse('status:station:data', kwargs=kwargs))
+
+    def test_stations_data_invalid_date(self):
+        kwargs = {'station_number': self.station.number}
+        kwargs.update(date_as_kwargs(self.summary.date))
+        kwargs['month'] = 13
+        response = self.client.get(reverse('status:station:data', kwargs=kwargs))
+        self.assertEqual(404, response.status_code)
 
     def test_help(self):
         self.get_html(reverse('status:help'))
