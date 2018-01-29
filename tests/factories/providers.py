@@ -1,4 +1,11 @@
+import re
+
 from faker.providers import BaseProvider
+
+
+def make_urlsafe(value):
+    """Remove all characters that would not be matched by url regex"""
+    return re.sub('[^A-Za-z -]+', '', value)
 
 
 class DataProvider(BaseProvider):
@@ -15,3 +22,9 @@ class DataProvider(BaseProvider):
 
     def multi_float_list(self, detectors=2, **kwargs):
         return [self.float_list(**kwargs) for _ in range(detectors)]
+
+    def country_urlsafe(self):
+        return make_urlsafe(self.country())
+
+    def city_urlsafe(self):
+        return make_urlsafe(self.city())

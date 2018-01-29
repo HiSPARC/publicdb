@@ -45,7 +45,7 @@ class ContactFactory(factory.DjangoModelFactory):
 
 
 class CountryFactory(factory.DjangoModelFactory):
-    name = factory.Faker('country')
+    name = factory.Faker('country_urlsafe')
     # number - set manually
 
     class Meta:
@@ -54,7 +54,7 @@ class CountryFactory(factory.DjangoModelFactory):
 
 
 class ClusterFactory(factory.DjangoModelFactory):
-    name = factory.Faker('city')
+    name = factory.Faker('city_urlsafe')
     # number - set manually
     # parent - set to another Cluster object
     country = factory.SubFactory(CountryFactory)
