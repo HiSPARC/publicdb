@@ -4,7 +4,9 @@ import factory
 
 from publicdb.analysissessions import models
 
-from . import coincidences_factories, inforecords_factories
+from .coincidences_factories import CoincidenceFactory
+from .inforecords_factories import ClusterFactory
+from .providers import DataProvider
 
 factory.Faker.add_provider(DataProvider)
 
@@ -32,7 +34,7 @@ class StudentFactory(factory.DjangoModelFactory):
 
 class AnalyzedCoincidenceFactory(factory.DjangoModelFactory):
     session = factory.SubFactory(AnalysisSessionFactory)
-    coincidence = factory.SubFactory(coincidences_factories.CoincidenceFactory)
+    coincidence = factory.SubFactory(CoincidenceFactory)
     student = factory.SubFactory(StudentFactory)
     is_analyzed = factory.Faker('boolean')
     core_position_x = factory.Faker('float', min=-200, max=200)
@@ -51,9 +53,9 @@ class SessionRequestFactory(factory.DjangoModelFactory):
     sur_name = factory.Faker('last_name')
     email = factory.Faker('safe_email')
     school = factory.Faker('company')
-    cluster = factory.SubFactory(inforecords_factories.ClusterFactory)
+    cluster = factory.SubFactory(ClusterFactory)
     events_to_create = factory.Faker('random_int', min=0, max=10000)
-    events_created = factory.Faker('random_int', min=0, max=10000
+    events_created = factory.Faker('random_int', min=0, max=10000)
     start_date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     mail_send = factory.Faker('boolean')
     session_confirmed = factory.Faker('boolean')
