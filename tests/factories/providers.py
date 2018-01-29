@@ -1,6 +1,7 @@
 import re
 
 from faker.providers import BaseProvider
+from faker.providers.address import Provider as AddressProvider
 
 
 def make_urlsafe(value):
@@ -22,6 +23,10 @@ class DataProvider(BaseProvider):
 
     def multi_float_list(self, detectors=2, **kwargs):
         return [self.float_list(**kwargs) for _ in range(detectors)]
+
+
+class UrlSafeProvider(AddressProvider):
+    """Provider for safe country and city names"""
 
     def country_urlsafe(self):
         return make_urlsafe(self.country())

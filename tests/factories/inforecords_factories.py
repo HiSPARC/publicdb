@@ -2,9 +2,10 @@ import factory
 
 from publicdb.inforecords import models
 
-from .providers import DataProvider
+from .providers import DataProvider, UrlSafeProvider
 
 factory.Faker.add_provider(DataProvider)
+factory.Faker.add_provider(UrlSafeProvider)
 
 
 class ProfessionFactory(factory.DjangoModelFactory):
