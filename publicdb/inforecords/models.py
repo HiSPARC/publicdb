@@ -289,7 +289,7 @@ class Station(models.Model):
 
 
 class Country(models.Model):
-    name = models.CharField(max_length=40, unique=True)
+    name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True, blank=True)
 
     def __unicode__(self):
