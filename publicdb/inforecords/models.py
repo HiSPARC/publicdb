@@ -6,6 +6,7 @@ from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Max
 from django.urls import reverse
+from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
 from ..histograms.models import Configuration, Summary
@@ -345,21 +346,21 @@ class Pc(models.Model):
         return self.name
 
     def keys(self):
-        return "<a href={url}>Certificate {name}</a>".format(
-            url=reverse('keys', kwargs={'host': self.name}),
-            name=self.name)
-
+        return mark_safe(
+            '<a href="{url}">Certificate {name}</a>'
+            .format(url=reverse('keys', kwargs={'host': self.name}), name=self.name)
+        )
     keys.short_description = 'Certificates'
-    keys.allow_tags = True
 
     def url(self):
         if self.type.description == 'Admin PC':
             return ''
         else:
-            return ('<a href=vnc://s{0}.his>s{0}.his</a>'
-                    .format(self.station.number))
+            return mark_safe(
+                '<a href="vnc://s{number}.his">s{number}.his</a>'
+                .format(number=self.station.number)
+            )
     url.short_description = 'VNC URL'
-    url.allow_tags = True
 
     class Meta:
         verbose_name_plural = 'PC and Certificates'
