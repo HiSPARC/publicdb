@@ -1,3 +1,7 @@
+from io import StringIO
+
+from numpy import genfromtxt
+
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -79,10 +83,14 @@ class TestSourceViews(TestCase):
         super(TestSourceViews, self).setUp()
 
     def get_tsv(self, url):
-        """Get url and check if the response is OK and valid json"""
+        """Get url and check if the response is OK and valid TSV"""
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertIn('text/tab-separated-values', response['Content-Type'])
+
+        # Expect properly formatted TSV
+        genfromtxt(StringIO(response), delimiter='\t', dtype=None)
+
         return response
 
     def test_network_histograms(self):
