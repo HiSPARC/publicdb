@@ -89,7 +89,7 @@ class TestSourceViews(TestCase):
         self.assertIn('text/tab-separated-values', response['Content-Type'])
 
         # Expect properly formatted TSV
-        genfromtxt(StringIO(response), delimiter='\t', dtype=None)
+        genfromtxt(StringIO(response.content), delimiter='\t', dtype=None)
 
         return response
 
