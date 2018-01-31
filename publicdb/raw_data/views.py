@@ -624,13 +624,14 @@ def download_coincidences(request):
                         for number in stations.strip('[](), ').split(',')]
         except ValueError:
             error_msg = "Unable to parse station numbers."
-        if len(stations) < n:
-            error_msg = "To few stations in query, give at least n."
-        if len(stations) >= 30:
-            error_msg = "To many stations in query, use less than 30."
-        if (Station.objects.filter(number__in=stations).count() !=
-                len(stations)):
-            error_msg = "Not all station numbers are valid."
+        else:
+            if len(stations) < n:
+                error_msg = "To few stations in query, give at least n."
+            elif len(stations) >= 30:
+                error_msg = "To many stations in query, use less than 30."
+            elif (Station.objects.filter(number__in=stations).count() !=
+                  len(stations)):
+                error_msg = "Not all station numbers are valid."
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
         stations = (Station.objects.filter(Q(cluster__parent=cluster) |
