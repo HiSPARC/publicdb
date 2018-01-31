@@ -1,48 +1,23 @@
 # -*- mode: ruby -*-
-# vi: set ft=ruby :
 
-# Vagrantfile API/syntax version. Don't touch unless you know what you're doing!
-VAGRANTFILE_API_VERSION = "2"
+MACHINES = {
+  publicdb: {hostname: "publicdb.localdomain", ip: "192.168.99.11", ssh: 2021, http: 8081},
+  vpn: {hostname: "vpn.localdomain", ip: "192.168.99.12", ssh: 2022, http: 8082},
+  datastore: {hostname: "datastore.localdomain", ip: "192.168.99.13", ssh: 2023, http: 8083}
+}
 
-Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
-  config.vm.define "vagrant" do |machine|
-    machine.vm.box = "CentOS6"
-    machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
+Vagrant.configure("2") do |config|
 
-    machine.vm.hostname = "vagrant.localdomain"
-    machine.vm.network "private_network", ip: "192.168.99.10"
-    machine.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2022
-    machine.vm.network "forwarded_port", guest: 80, host: 8080
-  end
+  config.vm.box = "CentOS6"
+  config.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
 
-  config.vm.define "publicdb" do |machine|
-    machine.vm.box = "CentOS6"
-    machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
-
-    machine.vm.hostname = "publicdb.localdomain"
-    machine.vm.network "private_network", ip: "192.168.99.11"
-    machine.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2023
-    machine.vm.network "forwarded_port", guest: 80, host: 8081
-  end
-
-  config.vm.define "vpn" do |machine|
-    machine.vm.box = "CentOS6"
-    machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
-
-    machine.vm.hostname = "vpn.localdomain"
-    machine.vm.network "private_network", ip: "192.168.99.12"
-    machine.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2024
-    machine.vm.network "forwarded_port", guest: 80, host: 8082
-  end
-
-  config.vm.define "datastore" do |machine|
-    machine.vm.box = "CentOS6"
-    machine.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
-
-    machine.vm.hostname = "datastore.localdomain"
-    machine.vm.network "private_network", ip: "192.168.99.13"
-    machine.vm.network "forwarded_port", id: "ssh", guest: 22, host: 2025
-    machine.vm.network "forwarded_port", guest: 80, host: 8083
+  MACHINES.each do | ansible_host, values |
+    config.vm.define ansible_host do |machine|
+      machine.vm.hostname = values[:hostname]
+      machine.vm.network :private_network, ip: values[:ip]
+      machine.vm.network :forwarded_port, id: "ssh", guest: 22, host: values[:ssh]
+      machine.vm.network :forwarded_port, id: "http", guest: 80, host: values[:http]
+    end
   end
 
   config.vm.provider :virtualbox do |vb|
@@ -58,6 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.provision provisioner do |ansible|
+    ansible.compatibility_mode = "2.0"
     ansible.inventory_path = inventory_path
     ansible.playbook = "provisioning/playbook.yml"
   end

@@ -1,0 +1,21 @@
+---
+
+- name: restart dnsmasq
+  service:
+    name: dnsmasq
+    state: restarted
+  become: true
+
+- name: restart openvpn
+  service:
+    name: openvpn
+    state: restarted
+    sleep: 3
+  become: true
+  notify: restart shorewall
+
+- name: restart shorewall
+  service:
+    name: shorewall
+    state: restarted
+  become: true

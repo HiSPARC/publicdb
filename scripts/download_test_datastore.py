@@ -45,11 +45,11 @@ def main():
 
 
 def test_for_datastore_directory():
-    print "Checking for datastore path at %s ..." % datastore_path,
+    print("Checking for datastore path at %s ..." % datastore_path,)
     if not os.path.exists(datastore_path):
         raise RuntimeError("Datastore path cannot be found!")
     else:
-        print "Found."
+        print("Found.")
 
 
 def fill_datastore():

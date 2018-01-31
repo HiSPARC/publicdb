@@ -1,0 +1,12 @@
+---
+
+- name: restart supervisord
+  service:
+    name: supervisord
+    state: restarted
+  become: true
+
+- name: restart hisparcvpnd
+  supervisorctl:
+    name: hisparcvpnd
+    state: restarted

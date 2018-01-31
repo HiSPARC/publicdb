@@ -145,7 +145,7 @@ class LiveSessionTestCase(LiveServerTestCase):
         self.assertEqual(len(mail.outbox), 2)
         self.assertEqual(mail.outbox[1].to, ["test@test.test"])
 
-        print mail.outbox[1].body
+        print(mail.outbox[1].body)
         sys.stdout.flush()
 
         for var_name, regexp in [
@@ -168,7 +168,7 @@ class LiveSessionTestCase(LiveServerTestCase):
 
         for student_nr in range(1, number_of_students):
 
-            print "Simulating student nr %s..." % student_nr
+            print("Simulating student nr %s..." % student_nr)
 
             # Request data for a single coincidence
 

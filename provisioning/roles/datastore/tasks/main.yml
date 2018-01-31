@@ -1,0 +1,139 @@
+---
+- name: use custom .bashrc
+  template:
+    src: bashrc
+    dest: ~/.bashrc
+    backup: yes
+
+- name: ensure /srv directory exists
+  file:
+    path: "{{ datastore_base }}"
+    state: directory
+  become: true
+
+- name: ensure /srv/datastore directory exists
+  file:
+    path: "{{ datastore_path }}"
+    state: directory
+    owner: hisparc
+    group: hisparc
+    mode: 02775
+  become: true
+
+- name: set default group write ACLs on /srv/datastore
+  acl:
+    default: yes
+    etype: group
+    permissions: rwx
+    path: "{{ datastore_path }}"
+    state: present
+  become: true
+
+- name: ensure /var/log/hisparc directory exists
+  file:
+    path: /var/log/hisparc
+    state: directory
+    group: hisparc
+    mode: 0775
+  become: true
+
+- name: checkout datastore in /srv/datastore/code
+  git:
+    repo: "{{ datastore_repo }}"
+    dest: "{{ datastore_code }}"
+    update: yes
+    force: no
+    version: master
+  notify: restart uWSGI
+
+- name: remove compiled python code
+  command: "find {{ datastore_code }} -name *.pyc -delete"
+
+- name: Copy conda requirements files
+  copy:
+    src: conda.list
+    dest: ~/conda.list
+
+- name: Copy pip requirements files
+  copy:
+    src: pip.list
+    dest: ~/pip.list
+
+- name: create conda environment
+  shell: "/opt/miniconda/bin/conda create --prefix {{ datastore_venv }} python={{ datastore_python_version }} --yes"
+  args:
+    creates: "{{ datastore_venv }}"
+
+- name: install conda packages in conda environment
+  command: "/opt/miniconda/bin/conda install --prefix {{ datastore_venv }} --file ~/conda.list --yes"
+
+- name: install packages in conda environment using pip
+  pip:
+    requirements: ~/pip.list
+    virtualenv: "{{ datastore_venv }}"
+
+- name: copy datastore.wsgi
+  template:
+    src: datastore.wsgi
+    dest: "{{ datastore_path }}"
+    backup: yes
+  notify: restart uWSGI
+
+- name: copy writer_app.py
+  template:
+    src: writer_app.py
+    dest: "{{ datastore_path }}"
+    backup: yes
+
+- name: copy datastore config server
+  template:
+    src: datastore-config-server.py
+    dest: "{{ datastore_path }}"
+  notify: restart datastore config server
+
+- name: copy config.ini
+  copy:
+    src: config.ini
+    dest: "{{ datastore_path }}"
+    backup: yes
+  notify: restart uWSGI
+
+- name: copy uwsgi.ini
+  template:
+    src: uwsgi.ini
+    dest: "{{ datastore_path }}"
+    backup: yes
+  notify: restart uWSGI
+
+- name: install supervisor daemon
+  pip:
+    name: supervisor
+  become: true
+
+- name: copy supervisord init script
+  copy:
+    src: supervisord
+    dest: /etc/init.d/supervisord
+    backup: yes
+    owner: root
+    group: root
+    mode: 0755
+  become: true
+
+- name: copy supervisord.conf
+  template:
+    src: supervisord.conf
+    dest: /etc/supervisord.conf
+    backup: yes
+    owner: root
+    group: root
+    mode: 0644
+  become: true
+  notify: restart supervisord
+
+- name: start supervisord now and on boot
+  service:
+    name: supervisord
+    state: started
+    enabled: yes
+  become: true

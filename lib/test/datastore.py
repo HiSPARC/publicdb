@@ -12,14 +12,11 @@ def setup_test_datastore_directory(datastore_path):
         os.makedirs(datastore_path)
     else:
         test_file = os.path.join(datastore_path, "testfile")
-        f = open(test_file, 'w')
-        f.write("test")
-        f.flush()
-        f.close()
+        with open(test_file, 'w') as f:
+            f.write("test")
 
-        f = open(test_file, 'r')
-        content = f.read()
-        f.close()
+        with open(test_file, 'r') as f:
+            f.read()
 
         os.remove(test_file)
 

@@ -54,14 +54,15 @@ def prepare_inforecords_fixture():
 
 
 def print_warning():
-    print dedent("""\
-                 This script modifies the inforecords tables. It
-                 replaces sensitive information with placeholder
-                 values. Since it directly changes the database, you
-                 have to add the --shut-up argument to imply that you
-                 know what you are doing.
+    print(dedent("""\
+        This script modifies the inforecords tables. It
+        replaces sensitive information with placeholder
+        values. Since it directly changes the database, you
+        have to add the --shut-up argument to imply that you
+        know what you are doing.
 
-                 Usage: prepare_inforecords_fixture.py --shut-up""")
+        Usage: prepare_inforecords_fixture.py --shut-up
+    """))
 
 
 if __name__ == '__main__':

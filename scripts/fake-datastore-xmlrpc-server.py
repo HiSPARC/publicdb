@@ -32,13 +32,13 @@ def reload_datastore():
         old_hash = None
 
     if new_hash == old_hash:
-        print "New hash is old hash"
+        print("New hash is old hash")
         return True
     else:
         with open(DATASTORE_CFG, 'w') as file:
             file.write(datastore_cfg)
 
-        print "New hash received"
+        print("New hash received")
 
         with open(HASH, 'w') as file:
             file.write(new_hash)

@@ -3,11 +3,11 @@
     {
       "type": "virtualbox-iso",
       "guest_os_type": "RedHat_64",
-      "iso_url": "http://ftp.tudelft.nl/centos.org/6/isos/x86_64/CentOS-6.8-x86_64-netinstall.iso",
-      "iso_checksum": "22bd9300735ff092cc0c8cdd1bc8e9e600af124e",
-      "iso_checksum_type": "sha1",
+      "iso_url": "http://ftp.tudelft.nl/centos.org/6/isos/x86_64/CentOS-6.9-x86_64-netinstall.iso",
+      "iso_checksum": "6b2cbec908708476389b143841a8e73462506de0744bda8b4192d3655d5bb8d2",
+      "iso_checksum_type": "sha256",
 
-      "disk_size": 10240,
+      "disk_size": 10000,
 
       "http_directory": "http",
       "boot_command": [

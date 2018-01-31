@@ -28,13 +28,14 @@ def prepare_histograms_fixture():
 
 
 def print_warning():
-    print dedent("""\
-                 This script modifies the histograms tables. Since it
-                 directly changes the database, you have to add the
-                 --shut-up argument to imply that you know what you are
-                 doing.
+    print(dedent("""\
+        This script modifies the histograms tables. Since it
+        directly changes the database, you have to add the
+        --shut-up argument to imply that you know what you are
+        doing.
 
-                 Usage: prepare_histograms_fixture.py --shut-up""")
+        Usage: prepare_histograms_fixture.py --shut-up
+    """))
 
 
 if __name__ == '__main__':

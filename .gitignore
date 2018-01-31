@@ -1,12 +1,12 @@
 # Specific
-uwsgi.ini
+/uwsgi.ini
 HiSPARC_coincidences.db
 public.db
 *.h5
-datastore/
-datastore_test/
-esd/
-_build/
+/datastore/
+/datastore_test/
+/esd/
+/doc/_build/
 *.sql
 
 # Python

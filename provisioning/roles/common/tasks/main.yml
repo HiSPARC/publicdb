@@ -1,0 +1,54 @@
+---
+
+- name: add SSH keys for hisparc user
+  authorized_key:
+    user: hisparc
+    key: "{{ item }}"
+  with_file:
+    - public_keys/adelaat.pub
+    - public_keys/davidf.pub
+    - public_keys/kaspervd.pub
+    - public_keys/tkooij.pub
+    - public_keys/tond.pub
+
+- name: upgrade all packages
+  yum:
+    name: "*"
+    state: latest
+  become: true
+
+- name: flag a reboot if necessary
+  script: flag_reboot.sh
+  register: result
+  changed_when: result.rc == 0
+  failed_when: result.rc >= 2
+  notify: reboot
+
+- name: install epel-release package
+  yum:
+    name: epel-release
+  become: true
+
+- name: install ACL utilities
+  yum:
+    name: acl
+  become: true
+
+- name: install screen
+  yum:
+    name: screen
+  become: true
+
+# Install mailcap for the mime.types file
+- name: install mailcap
+  yum:
+    name: mailcap
+  become: true
+
+- name: install troubleshooting tools
+  yum:
+    name:
+      - nmap
+      - tcpdump
+      - conntrack-tools
+  become: true

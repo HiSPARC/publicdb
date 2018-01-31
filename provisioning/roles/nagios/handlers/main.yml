@@ -1,0 +1,20 @@
+---
+
+- name: restart nagios
+  service:
+    name: nagios
+    state: restarted
+  become: true
+  # notify: restart nsca
+
+- name: restart nsca
+  service:
+    name: nsca
+    state: restarted
+  become: true
+
+- name: restart apache
+  service:
+    name: httpd
+    state: restarted
+  become: true

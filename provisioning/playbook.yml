@@ -1,44 +1,36 @@
 ---
+
 - hosts: all
-  tasks:
-    - include: common.yml
-  handlers:
-    - include: handlers.yml
-
-- hosts: publicdb:pique.nikhef.nl
-  tasks:
-    - include: simple-firewall.yml
-    - include: postgresql.yml
-    - include: development.yml
-    - include: publicdb.yml
-  handlers:
-    - include: handlers.yml
-
-- hosts: tietar.nikhef.nl
-  tasks:
-    - include: network-tietar.yml
-  handlers:
-    - include: handlers.yml
-
-- hosts: vpn:tietar.nikhef.nl
-  tasks:
-    - include: mitigate-dos.yml
-    - include: postfix.yml
-    - include: shorewall-firewall.yml
-    - include: openvpn.yml
-    - include: nagios.yml
-    - include: vpn-scripts.yml
-  handlers:
-    - include: handlers.yml
+  roles:
+    - common
 
 - hosts: publicdb:datastore
-  tasks:
-    - include: datastore_paths.yml
+  roles:
+    - datastore-paths
 
-- hosts: datastore
-  tasks:
-   - include: simple-firewall-datastore.yml
-   - include: development.yml
-   - include: datastore.yml
-  handlers:
-   - include: handlers.yml
+- hosts: publicdb_group:datastore_group
+  roles:
+    - simple-firewall
+    - development
+
+- hosts: publicdb_group
+  roles:
+    - postgresql
+    - publicdb
+
+- hosts: datastore_group
+  roles:
+    - datastore
+
+- hosts: tietar.nikhef.nl
+  roles:
+    - network-tietar
+
+- hosts: vpn_group
+  roles:
+    - dos
+    - postfix
+    - shorewall-firewall
+    - openvpn
+    - nagios
+    - vpn-scripts

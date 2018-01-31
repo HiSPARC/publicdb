@@ -77,7 +77,7 @@ We formerly used Veewee, but Packer sees more active development and
 allows us to pre-provision the base box.  If you want to build your own
 base box, you can install Packer on a Mac using::
 
-    $ brew cask install packer
+    $ brew install packer
 
 Then, navigate to the packer/CentOS6/ directory and issue::
 
@@ -133,7 +133,10 @@ to::
 
    Defaults !requiretty
 
-Also, lock the root account and the user account. First, make sure to add your public key to ``~/.ssh/authorized_keys``, with the mode of both the directory and the file set to ``0600``. First make sure to test logging in without a password!!! Only then, lock the accounts::
+Also, lock the root account and the user account. First, make sure to add your public key
+to ``~/.ssh/authorized_keys``, with the mode of both the directory and the file set to
+``0600``. First make sure to test logging in without a password!!! Only then, lock the
+accounts::
 
    $ sudo passwd -l root
    $ sudo passwd -l hisparc
@@ -144,7 +147,9 @@ The *only* way to get into the machine is via SSH, so *don't lock yourself out!*
 Provisioning production servers
 -------------------------------
 
-We use Ansible for all our provisioning needs. You can run it from the top repository directory. At that location, there is a file called ``ansible.cfg`` which sets up a few config values. To run the playbook, issue::
+We use Ansible for all our provisioning needs. You can run it from the top repository
+directory. At that location, there is a file called ``ansible.cfg`` which sets up a few
+config values. To run the playbook, issue::
 
    $ ansible-playbook provisioning/playbook.yml
 
@@ -160,13 +165,19 @@ If you want to check first what the provisioner would like to change, without ac
 Running a provisioner from a remote location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To manage the servers from somewhere out on the internet, you have to work with an SSH tunnel. Basically, you SSH into ``login.nikhef.nl`` and route all traffic destined for the production servers through that connection. So you never log into Tietar or Pique from your remote location. Instead, from your location, you log into ``login.nikhef.nl``, and from there, you log into Tietar or Pique. To make that work more or less transparently, we'll have to setup a few things. Every tunnel needs a port number, and I (DF) have chosen a few completely arbitrary ones:
+To manage the servers from somewhere out on the internet, you have to work with an SSH
+tunnel. Basically, you SSH into ``login.nikhef.nl`` and route all traffic destined for the
+production servers through that connection. So you never log into Tietar or Pique from
+your remote location. Instead, from your location, you log into ``login.nikhef.nl``, and
+from there, you log into Tietar or Pique. To make that work more or less transparently,
+we'll have to setup a few things. Every tunnel needs a port number, and I (DF) have chosen
+a few completely arbitrary ones:
 
 ==========  ===========  ===========
 Local port  Remote host  Remote port
 ==========  ===========  ===========
-2201        tietar       22
-2202        pique        22
+2201        pique        22
+2202        tietar       22
 2203        frome        22
 ==========  ===========  ===========
 
@@ -182,7 +193,9 @@ You can also use an application like *SSH Tunnel Manager* by Tynsoe or *SSH Tunn
 
 If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
 
-Once you have everything up and running, you have to use a different Ansible inventory file. That is needed to tell Ansible to use the tunnels, and not a direct connection. One is provided, so you can run::
+Once you have everything up and running, you have to use a different Ansible inventory
+file. That is needed to tell Ansible to use the tunnels, and not a direct connection. One
+is provided, so you can run::
 
    $ ansible-playbook provisioning/playbook.yml -i provisioning/ansible_inventory_tunnel -l tietar.nikhef.nl
 

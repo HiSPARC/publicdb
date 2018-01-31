@@ -1,0 +1,21 @@
+---
+
+- name: reboot
+  command: shutdown -r +1 "Ansible triggered a reboot"
+  async: 0
+  poll: 0
+  ignore_errors: true
+  notify:
+    - fail if dev to remount shared folders
+    - wait for server to come back
+  become: true
+
+- name: wait for server to come back
+  wait_for_connection:
+  args:
+    delay: 30
+
+- name: fail if dev to remount shared folders
+  fail:
+    msg: Reboot VM with vagrant to remount shared folders and continue provisioning, using `$ vagrant reload --provision [machine]`
+  when: is_dev is defined
