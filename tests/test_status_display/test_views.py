@@ -93,23 +93,45 @@ class TestSourceViews(TestCase):
 
         return response
 
+    def assert_context_contains(self, expected_context, context):
+        for key, value in expected_context.items():
+            self.assertEqual(value, context[key])
+
     def test_network_histograms(self):
+        kwargs = date_as_kwargs(self.network_summary.date)
+
         for network_histogram_type in ['coincidencetime', 'coincidencenumber']:
-            histograms_factories.NetworkHistogramFactory(source=self.network_summary, type__slug=network_histogram_type)
-            kwargs = date_as_kwargs(self.network_summary.date)
-            self.get_tsv(reverse('status:source:{type}'.format(type=network_histogram_type), kwargs=kwargs))
+            data = histograms_factories.NetworkHistogramFactory(source=self.network_summary, type__slug=network_histogram_type)
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=network_histogram_type), kwargs=kwargs))
+            expected_context = {
+                'data': zip(data.bins, data.values),
+                'date': self.network_summary.date.strftime('%-Y-%-m-%-d'),
+            }
+            self.assert_context_contains(expected_context, response.context)
 
     def test_daily_histograms(self):
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(self.summary.date))
 
         for daily_histogram_type in ['eventtime', 'zenith', 'azimuth']:
-            histograms_factories.DailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
-            self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            expected_context = {
+                'data': zip(data.bins, data.values),
+                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
+                'station_number': str(self.station.number)
+            }
+            self.assert_context_contains(expected_context, response.context)
 
         for daily_histogram_type in ['pulseheight', 'pulseintegral', 'singleslow', 'singleshigh']:
-            histograms_factories.MultiDailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
-            self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            data = histograms_factories.MultiDailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            expected_context = {
+                'data': zip(data.bins, *data.values),
+                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
+                'station_number': str(self.station.number)
+            }
+            self.assert_context_contains(expected_context, response.context)
 
         # Get full eventtime data for the station
         kwargs = {'station_number': self.station.number}
@@ -120,19 +142,36 @@ class TestSourceViews(TestCase):
         kwargs.update(date_as_kwargs(self.summary.date))
 
         for daily_dataset_type in ['barometer', 'temperature']:
-            histograms_factories.DailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
-            self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            data = histograms_factories.DailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            expected_context = {
+                'data': zip(data.x, data.y),
+                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
+                'station_number': str(self.station.number)
+            }
+            self.assert_context_contains(expected_context, response.context)
 
         for daily_dataset_type in ['singlesratelow', 'singlesratehigh']:
-            histograms_factories.MultiDailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
-            self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            data = histograms_factories.MultiDailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            expected_context = {
+                'data': zip(data.x, *data.y),
+                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
+                'station_number': str(self.station.number)
+            }
+            self.assert_context_contains(expected_context, response.context)
 
     def test_configs(self):
         kwargs = {'station_number': self.station.number}
         histograms_factories.ConfigurationFactory(source=self.summary)
 
         for config_type in ['electronics', 'voltage', 'current', 'gps', 'trigger']:
-            self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
+            response = self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
+            expected_context = {
+                'station_number': str(self.station.number)
+                # data structures are a bit more work to check.
+            }
+            self.assert_context_contains(expected_context, response.context)
 
     def test_station_layout(self):
         kwargs = {'station_number': self.station.number}
