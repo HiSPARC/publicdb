@@ -1,5 +1,6 @@
 from io import BytesIO
 
+from mock import patch
 from numpy import genfromtxt
 
 from django.test import Client, TestCase
@@ -11,6 +12,7 @@ from ..factories.station_layout_factories import StationLayoutFactory
 from ..utils import date_as_kwargs
 
 
+@patch('publicdb.status_display.nagios.retrieve_station_status', new=lambda q: [])
 class TestViews(TestCase):
     def setUp(self):
         self.client = Client()

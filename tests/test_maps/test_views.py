@@ -1,3 +1,5 @@
+from mock import patch
+
 from django.test import Client, TestCase
 from django.urls import reverse
 
@@ -5,6 +7,7 @@ from ..factories import histograms_factories
 from ..factories.inforecords_factories import StationFactory
 
 
+@patch('publicdb.status_display.nagios.retrieve_station_status', new=lambda q: [])
 class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
