@@ -346,7 +346,7 @@ def get_pulseheights(summary):
         return None
     else:
         # FIXME: do we need configurations for this?
-        pulseheights = np.where(pulseheights >= 0, pulseheights * .57,
+        pulseheights = np.where(pulseheights >= 0, pulseheights * 0.57,
                                 pulseheights)
 
         # transpose, so we have '4 arrays of many pulseheights'
@@ -366,9 +366,9 @@ def get_integrals(summary):
     if integrals is None:
         return None
     else:
-        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
+        # multiply by 0.57 for ADC -> mV, and by 2.5 for sample -> ns
         # FIXME: do we need configurations for this?
-        integrals = np.where(integrals >= 0, integrals * .57 * 2.5,
+        integrals = np.where(integrals >= 0, integrals * 0.57 * 2.5,
                              integrals)
 
         # transpose, so we have '4 arrays of many integrals'

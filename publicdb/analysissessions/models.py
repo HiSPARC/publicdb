@@ -180,10 +180,10 @@ class SessionRequest(models.Model):
             timestamps.append((date_time, event['nanoseconds']))
 
             pulseheights = np.where(event['pulseheights'] > 0,
-                                    np.around(event['pulseheights'] * .57, 2),
+                                    np.around(event['pulseheights'] * 0.57, 2),
                                     event['pulseheights']).tolist()
             integrals = np.where(event['integrals'] > 0,
-                                 np.around(event['integrals'] * .57 * 2.5, 2),
+                                 np.around(event['integrals'] * 0.57 * 2.5, 2),
                                  event['integrals']).tolist()
             traces = np.around(traces, 2).tolist()
             dt = self.analyze_traces(traces)
@@ -217,7 +217,7 @@ class SessionRequest(models.Model):
                 # No significant pulse (not lower than -20 mV)
                 continue
             for i, v in enumerate(trace):
-                if v < .2 * m:
+                if v < 0.2 * m:
                     break
             t.append(i * 2.5)
         if len(t) > 0:

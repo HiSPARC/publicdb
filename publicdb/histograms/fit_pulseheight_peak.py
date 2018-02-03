@@ -95,7 +95,7 @@ def get_fit_parameters(x, y):
 
     # Smooth y by averaging while keeping sharp cut at 120 ADC
 
-    y_diff_smoothed = numpy.convolve(y_diff, [.2, .2, .2, .2, .2, 0], "same")
+    y_diff_smoothed = numpy.convolve(y_diff, [0.2, 0.2, 0.2, 0.2, 0.2, 0], "same")
 
     for i in range(len(y_diff_smoothed)):
         if x_rebinned[i] > 120:
