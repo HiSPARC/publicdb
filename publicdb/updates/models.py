@@ -1,6 +1,6 @@
-from django.db import models, IntegrityError
-
 import re
+
+from django.db import IntegrityError, models
 
 
 def upload_queue(instance, filename):

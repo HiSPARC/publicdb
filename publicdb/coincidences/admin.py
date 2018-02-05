@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Event, Coincidence
+from .models import Coincidence, Event
 
 
 class EventAdmin(admin.ModelAdmin):

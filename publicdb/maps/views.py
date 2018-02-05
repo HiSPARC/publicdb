@@ -1,8 +1,8 @@
-from django.shortcuts import render, get_object_or_404
 from django.http import Http404
+from django.shortcuts import get_object_or_404, render
 
-from ..inforecords.models import Station, Cluster, Country
-from ..status_display.nagios import status_lists, get_station_status
+from ..inforecords.models import Cluster, Country, Station
+from ..status_display.nagios import get_station_status, status_lists
 from ..status_display.views import stations_with_data
 
 

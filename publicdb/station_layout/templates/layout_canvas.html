@@ -8,18 +8,18 @@
         return degrees * Math.PI / 180;}
 
     function draw_gps(ctx) {
-        var size = .15;
+        var size = 0.15;
         ctx.fillStyle = 'darkgray';
         ctx.lineWidth = 0;
         ctx.beginPath();
-        ctx.arc(0, 0, size, 0, Math.PI*2, true); 
+        ctx.arc(0, 0, size, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();}
 
     function draw_detector(ctx, r, alpha, beta, color) {
         /* Draw a detector defined by r, alpha, beta coordinates on the canvas
         */
-        var detector_width = .5;
+        var detector_width = 0.5;
         var detector_length = 1;
         var pmt_width = 0.04;
         var pmt_length = 0.2;

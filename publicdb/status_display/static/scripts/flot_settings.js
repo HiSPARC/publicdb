@@ -157,7 +157,7 @@ var _temperaturedata = {
             show: false},
         points: {
             show: true,
-            radius: .75,
+            radius: 0.75,
             lineWidth: 0.00001,
             fill: true,
             fillColor: "#222"}},
@@ -176,7 +176,7 @@ var _barometerdata = {
             show: false},
         points: {
             show: true,
-            radius: .75,
+            radius: 0.75,
             lineWidth: 0.00001,
             fill: true,
             fillColor: "#222"}},

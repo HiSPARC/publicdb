@@ -8,6 +8,12 @@ public.db
 /esd/
 /doc/_build/
 *.sql
+/mediaroot/
+/staticroot/
+
+# Coverage
+/htmlcov/
+.coverage
 
 # Python
 *.pyc

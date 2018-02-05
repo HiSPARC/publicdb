@@ -1,7 +1,7 @@
 from django.db import models
 
-from ..inforecords.models import Station
 from ..histograms.models import SerializedDataField
+from ..inforecords.models import Station
 
 
 class Event(models.Model):

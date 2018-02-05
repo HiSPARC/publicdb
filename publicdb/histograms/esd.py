@@ -1,28 +1,27 @@
 """Process events from datastore and save Event Summary Data (ESD)"""
 
-import os.path
-import tempfile
 import logging
+import os.path
 import re
+import tempfile
+
 from operator import itemgetter
 
 import numpy as np
 import tables
 
-from sapphire import (determine_detector_timing_offsets,
-                      DetermineStationTimingOffsets, HiSPARCStations,
-                      ProcessEventsFromSourceWithTriggerOffset,
-                      ProcessWeatherFromSource, ProcessSinglesFromSource,
-                      CoincidencesESD, ReconstructESDEventsFromSource,
-                      ProcessTimeDeltas)
-from sapphire.analysis.calibration import datetime_range
-
-from ..inforecords.models import Station
-from .models import DetectorTimingOffset
-from . import datastore
-
 from django.conf import settings
 
+from sapphire import (CoincidencesESD, DetermineStationTimingOffsets,
+                      HiSPARCStations, ProcessEventsFromSourceWithTriggerOffset,
+                      ProcessSinglesFromSource, ProcessTimeDeltas,
+                      ProcessWeatherFromSource, ReconstructESDEventsFromSource,
+                      determine_detector_timing_offsets)
+from sapphire.analysis.calibration import datetime_range
+
+from . import datastore
+from ..inforecords.models import Station
+from .models import DetectorTimingOffset
 
 logger = logging.getLogger('histograms.esd')
 
@@ -347,7 +346,7 @@ def get_pulseheights(summary):
         return None
     else:
         # FIXME: do we need configurations for this?
-        pulseheights = np.where(pulseheights >= 0, pulseheights * .57,
+        pulseheights = np.where(pulseheights >= 0, pulseheights * 0.57,
                                 pulseheights)
 
         # transpose, so we have '4 arrays of many pulseheights'
@@ -367,9 +366,9 @@ def get_integrals(summary):
     if integrals is None:
         return None
     else:
-        # multiply by .57 for ADC -> mV, and by 2.5 for sample -> ns
+        # multiply by 0.57 for ADC -> mV, and by 2.5 for sample -> ns
         # FIXME: do we need configurations for this?
-        integrals = np.where(integrals >= 0, integrals * .57 * 2.5,
+        integrals = np.where(integrals >= 0, integrals * 0.57 * 2.5,
                              integrals)
 
         # transpose, so we have '4 arrays of many integrals'

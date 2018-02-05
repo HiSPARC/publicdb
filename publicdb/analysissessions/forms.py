@@ -1,7 +1,7 @@
+from datetime import date
+
 from django import forms
 from django.forms.extras.widgets import SelectDateWidget
-
-from datetime import date
 
 from ..inforecords.models import Cluster
 

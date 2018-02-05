@@ -1,29 +1,29 @@
-from django.shortcuts import (render, get_object_or_404,
-                              get_list_or_404, redirect)
-from django.http import Http404
-from django.db.models import Q
+import calendar
+import csv
+import datetime
 
 from collections import OrderedDict
-from operator import itemgetter
-from itertools import izip, groupby
-import calendar
-import datetime
 from cStringIO import StringIO
-import csv
+from itertools import groupby, izip
+from operator import itemgetter
 
 from numpy import arange, nan
 
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
+                              render)
+
 from sapphire.transformations import clock
 
-from ..histograms.models import (DailyHistogram, DailyDataset, Configuration,
-                                 NetworkHistogram, HistogramType, DatasetType,
-                                 DetectorTimingOffset, StationTimingOffset,
-                                 Summary, NetworkSummary)
-from ..inforecords.models import Pc, Station, Cluster, Country
-from ..station_layout.models import StationLayout
+from ..histograms.models import (Configuration, DailyDataset, DailyHistogram,
+                                 DatasetType, DetectorTimingOffset,
+                                 HistogramType, NetworkHistogram,
+                                 NetworkSummary, StationTimingOffset, Summary)
+from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
-from .nagios import status_lists, get_status_counts, get_station_status
-
+from ..station_layout.models import StationLayout
+from .nagios import get_station_status, get_status_counts, status_lists
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
@@ -204,7 +204,10 @@ def network_coincidences(request, year=None, month=None, day=None):
     year = int(year)
     month = int(month)
     day = int(day)
-    date = datetime.date(year, month, day)
+    try:
+        date = datetime.date(year, month, day)
+    except ValueError:
+        raise Http404
 
     summary = get_object_or_404(NetworkSummary,
                                 num_coincidences__isnull=False,
@@ -269,7 +272,10 @@ def station_data(request, station_number, year, month, day):
     year = int(year)
     month = int(month)
     day = int(day)
-    date = datetime.date(year, month, day)
+    try:
+        date = datetime.date(year, month, day)
+    except ValueError:
+        raise Http404
 
     station = get_object_or_404(Station, number=station_number)
     get_object_or_404(Summary,

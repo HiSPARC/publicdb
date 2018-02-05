@@ -1,15 +1,16 @@
-from django.db import models
-from django.core.mail import send_mail
-from django.template.defaultfilters import slugify
-from django.conf import settings
-
 import datetime
 import hashlib
-import tables
 import os
 import re
+import textwrap
 
 import numpy as np
+import tables
+
+from django.conf import settings
+from django.core.mail import send_mail
+from django.db import models
+from django.template.defaultfilters import slugify
 
 from sapphire.analysis import coincidences
 
@@ -179,10 +180,10 @@ class SessionRequest(models.Model):
             timestamps.append((date_time, event['nanoseconds']))
 
             pulseheights = np.where(event['pulseheights'] > 0,
-                                    np.around(event['pulseheights'] * .57, 2),
+                                    np.around(event['pulseheights'] * 0.57, 2),
                                     event['pulseheights']).tolist()
             integrals = np.where(event['integrals'] > 0,
-                                 np.around(event['integrals'] * .57 * 2.5, 2),
+                                 np.around(event['integrals'] * 0.57 * 2.5, 2),
                                  event['integrals']).tolist()
             traces = np.around(traces, 2).tolist()
             dt = self.analyze_traces(traces)
@@ -216,7 +217,7 @@ class SessionRequest(models.Model):
                 # No significant pulse (not lower than -20 mV)
                 continue
             for i, v in enumerate(trace):
-                if v < .2 * m:
+                if v < 0.2 * m:
                     break
             t.append(i * 2.5)
         if len(t) > 0:
@@ -234,11 +235,16 @@ class SessionRequest(models.Model):
 
     def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
-        message = ('Hello %s,'
-                   '\n\nPlease click on this link to confirm your request for'
-                   ' an analysis session with jSparc:'
-                   '\nhttp://data.hisparc.nl/analysis-session/request/%s' %
-                   (self.name, self.url))
+        message = textwrap.dedent(
+            '''\
+            Hello %s,
+
+            Please click on this link to confirm your request for an analysis session with jSparc:
+            http://data.hisparc.nl/analysis-session/request/%s/
+
+            Greetings,
+            The HiSPARC Team''' %
+            (self.name, self.url))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
@@ -246,17 +252,24 @@ class SessionRequest(models.Model):
 
     def sendmail_created(self):
         subject = 'HiSPARC analysis session created'
-        message = ('Hello %s,'
-                   '\n\nYour analysis session for jSparc has been created.'
-                   '\nTitle = %s'
-                   '\nPin = %d'
-                   '\nEvents created = %d'
-                   '\n\nGo here to start analysing events:'
-                   '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
-                   '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created,
-                    slugify(self.sid)))
+        message = textwrap.dedent(
+            '''\
+            Hello %s,
+
+            Your analysis session for jSparc has been created.
+            Title = %s
+            Pin = %d
+            Events created = %d
+
+            Go here to start analysing events:
+            http://data.hisparc.nl/media/jsparc/jsparc.html
+
+            During the session you can view the results at:
+            http://data.hisparc.nl/analysis-session/%s/data/
+
+            Greetings,
+            The HiSPARC Team''' %
+            (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
@@ -264,19 +277,26 @@ class SessionRequest(models.Model):
 
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
-        message = ('Hello %s,'
-                   '\n\nYour analysis session for jSparc has been created.'
-                   '\nTitle = %s'
-                   '\nPin = %d'
-                   '\nHowever, we were unable to find the amount of events you'
-                   ' requested.'
-                   '\nEvents created = %d'
-                   '\n\nGo here to start analysing events:'
-                   '\nhttp://data.hisparc.nl/media/jsparc/jsparc.html'
-                   '\n\nDuring the session you can view the results at:'
-                   '\nhttp://data.hisparc.nl/analysis-session/%s/data' %
-                   (self.name, self.sid, self.pin, self.events_created,
-                    slugify(self.sid)))
+        message = textwrap.dedent(
+            '''\
+            Hello %s,'
+
+            Your analysis session for jSparc has been created.
+            Title = %s
+            Pin = %d
+
+            However, we were unable to find the amount of events you requested.
+            Events created = %d
+
+            Go here to start analysing events:
+            http://data.hisparc.nl/media/jsparc/jsparc.html
+
+            During the session you can view the results at:
+            http://data.hisparc.nl/analysis-session/%s/data/
+
+            Greetings,
+            The HiSPARC Team''' %
+            (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
@@ -284,12 +304,17 @@ class SessionRequest(models.Model):
 
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
-        message = ('Hello %s,'
-                   '\n\nYour analysis session for jSparc could not be created.'
-                   '\nPerhaps there was no data for the date and/or stations'
-                   ' you selected.'
-                   '\nPlease try selecting a different cluster or date.' %
-                   self.name)
+        message = textwrap.dedent(
+            '''\
+            Hello %s,
+
+            Your analysis session for jSparc could not be created.
+            Perhaps there was no data for the date and/or stations you selected.
+            Please try selecting a different cluster or date.
+
+            Greetings,
+            The HiSPARC Team''' %
+            self.name)
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True

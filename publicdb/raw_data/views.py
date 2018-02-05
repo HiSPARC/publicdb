@@ -1,33 +1,35 @@
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseRedirect, StreamingHttpResponse)
-from django.shortcuts import get_object_or_404, render
-from django.template import loader, Context
-from django.conf import settings
-from django.db.models import Q
-
-import os
-import datetime
-import urlparse
-import tempfile
-import csv
 import calendar
+import csv
+import datetime
+import os
+import tempfile
 import urllib
+import urlparse
+
 from cStringIO import StringIO
+from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 
 import dateutil.parser
 import tables
-from numpy import column_stack, where, degrees, isnan, char, empty
+
+from numpy import char, column_stack, degrees, empty, isnan, where
+
+from django.conf import settings
+from django.db.models import Q
+from django.http import (HttpResponse, HttpResponseBadRequest,
+                         HttpResponseRedirect, StreamingHttpResponse)
+from django.shortcuts import get_object_or_404, render
+from django.template import Context, loader
 
 from sapphire import CoincidenceQuery
 
-from ..inforecords.models import Station, Cluster
-from ..histograms.models import Summary, NetworkSummary
-from ..histograms import esd
-from .forms import DataDownloadForm, CoincidenceDownloadForm
-from .date_generator import single_day_ranges
 from . import knmi_lightning
+from ..histograms import esd
+from ..histograms.models import NetworkSummary, Summary
+from ..inforecords.models import Cluster, Station
+from .date_generator import single_day_ranges
+from .forms import CoincidenceDownloadForm, DataDownloadForm
 
-from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
 dispatcher = SimpleXMLRPCDispatcher()
 
 

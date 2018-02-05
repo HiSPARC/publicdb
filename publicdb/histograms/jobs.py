@@ -2,30 +2,29 @@
     accessing a view.
 
 """
-import datetime
-import time
 import calendar
+import datetime
 import logging
 import multiprocessing
+import time
 import warnings
 
 import numpy as np
 
-from sapphire.utils import round_in_base
-from sapphire.analysis.calibration import datetime_range
-
-from ..inforecords.models import Station
-from ..station_layout.models import StationLayout
-from .models import (GeneratorState, NetworkSummary, Summary,
-                     Configuration, HistogramType, DatasetType,
-                     DailyHistogram, NetworkHistogram, DailyDataset,
-                     PulseheightFit, DetectorTimingOffset,
-                     StationTimingOffset)
-from . import datastore, esd, fit_pulseheight_peak
-
 import django.db
+
 from django.conf import settings
 
+from sapphire.analysis.calibration import datetime_range
+from sapphire.utils import round_in_base
+
+from . import datastore, esd, fit_pulseheight_peak
+from ..inforecords.models import Station
+from ..station_layout.models import StationLayout
+from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
+                     DetectorTimingOffset, GeneratorState, HistogramType,
+                     NetworkHistogram, NetworkSummary, PulseheightFit,
+                     StationTimingOffset, Summary)
 
 logger = logging.getLogger('histograms.jobs')
 

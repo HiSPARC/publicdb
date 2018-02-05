@@ -1,12 +1,13 @@
-from django.db import models
-from django.core.mail import send_mail
-
 import os
+
 from datetime import date
 from textwrap import dedent
 
-from ..inforecords.models import Station
+from django.core.mail import send_mail
+from django.db import models
+
 from ..histograms.models import Summary
+from ..inforecords.models import Station
 
 
 class StationLayout(models.Model):

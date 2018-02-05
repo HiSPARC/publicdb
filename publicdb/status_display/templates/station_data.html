@@ -116,7 +116,7 @@
             <h3>Singles (per second above low threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sd_histogram')">Image</a> |
-                <a href="{% url 'status:source:singlesratelow_dataset' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratelow' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="srl_histogram"></div>
             <script>
@@ -137,7 +137,7 @@
             <h3>Singles (per second above high threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#srh_histogram')">Image</a> |
-                <a href="{% url 'status:source:singlesratehigh_dataset' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singlesratehigh' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="srh_histogram"></div>
             <script>
@@ -158,7 +158,7 @@
             <h3>Singles rate histogram (singles above low threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sl_histogram')">Image</a> |
-                <a href="{% url 'status:source:singlesratelow' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singleslow' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="sl_histogram"></div>
             <script>
@@ -179,7 +179,7 @@
             <h3>Singles rate histogram (singles above high threshold)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#sh_histogram')">Image</a> |
-                <a href="{% url 'status:source:singlesratehigh' link.0 link.1 link.2 link.3 %}">Source</a>
+                <a href="{% url 'status:source:singleshigh' link.0 link.1 link.2 link.3 %}">Source</a>
             </div>
             <div class="plot" id="sh_histogram"></div>
             <script>

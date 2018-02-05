@@ -1,16 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+import base64
+import socket
+import xmlrpclib
+
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponse
+from django.shortcuts import get_object_or_404, render
 
-import socket
-import xmlrpclib
-import base64
-
-from .models import Pc, Contact, Station, Cluster, MonitorPulseheightThresholds
 from ..histograms.models import Configuration
 from ..status_display.views import station_has_data
+from .models import Cluster, Contact, MonitorPulseheightThresholds, Pc, Station
 
 
 @login_required

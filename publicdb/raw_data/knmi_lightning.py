@@ -1,10 +1,11 @@
-from django.conf import settings
-
-import os
 import calendar
+import os
+
 from datetime import datetime, timedelta
 
 import numpy
+
+from django.conf import settings
 
 from sapphire.transformations import clock
 

@@ -1,11 +1,11 @@
-from django.db import models
-from django.core.exceptions import ValidationError
-
-import zlib
-import cPickle as pickle
-import base64
-import re
 import ast
+import base64
+import cPickle as pickle
+import re
+import zlib
+
+from django.core.exceptions import ValidationError
+from django.db import models
 
 
 class SerializedDataField(models.Field):
@@ -64,7 +64,7 @@ class Summary(models.Model):
 
     class Meta:
         verbose_name_plural = 'summaries'
-        unique_together = (('station', 'date'),)
+        unique_together = ('station', 'date')
         ordering = ('date', 'station')
         get_latest_by = 'date'
 
@@ -253,7 +253,7 @@ class NetworkHistogram(models.Model):
         return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
-        unique_together = (('source', 'type'),)
+        unique_together = ('source', 'type')
         ordering = ('source', 'type')
 
 
@@ -283,7 +283,7 @@ class DailyHistogram(models.Model):
                                  self.type)
 
     class Meta:
-        unique_together = (('source', 'type'),)
+        unique_together = ('source', 'type')
         ordering = ('source', 'type')
 
 
@@ -313,7 +313,7 @@ class DailyDataset(models.Model):
                                  self.type)
 
     class Meta:
-        unique_together = (('source', 'type'),)
+        unique_together = ('source', 'type')
         ordering = ('source', 'type')
 
 

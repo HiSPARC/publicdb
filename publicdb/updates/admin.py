@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import UpdateQueue, AdminUpdate, UserUpdate, InstallerUpdate
+from .models import AdminUpdate, InstallerUpdate, UpdateQueue, UserUpdate
 
 
 class AdminUpdateAdmin(admin.ModelAdmin):

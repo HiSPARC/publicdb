@@ -1,6 +1,6 @@
-from django import forms
-
 from datetime import date
+
+from django import forms
 
 from ..inforecords.models import Station
 

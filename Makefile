@@ -1,6 +1,12 @@
-.PHONY: test flaketest doctest ansibletest
+.PHONY: test unittests coveragetests flaketest doctest ansibletest
 
-test: flaketest doctest ansibletest
+test: coveragetests flaketest doctest ansibletest
+
+unittests:
+	coverage run ./publicdb/manage.py test tests
+
+coveragetests: unittests
+	coverage report
 
 flaketest:
 	flake8

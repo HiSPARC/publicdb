@@ -2,7 +2,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from django.views.generic import RedirectView, TemplateView
 
-from .inforecords.views import create_nagios_config, create_datastore_config, keys
+from .inforecords.views import (create_datastore_config, create_nagios_config,
+                                keys)
 
 urlpatterns = [
     url(r'^$', RedirectView.as_view(url='show/stations', permanent=False)),
@@ -22,7 +23,7 @@ urlpatterns = [
     url(r'^config/nagios$', create_nagios_config, name='nagios_config'),
     url(r'^config/datastore$', create_datastore_config, name='datatore_config'),
 
-    url(r'^keys/(?P<host>\w+)/$', keys, name='keys'),
+    url(r'^keys/(?P<host>[a-zA-Z0-9_]+)/$', keys, name='keys'),
 
     url(r'^admin/', include(admin.site.urls)),
 ]

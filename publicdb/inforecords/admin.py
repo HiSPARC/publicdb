@@ -1,9 +1,9 @@
 from django.contrib import admin
+from django.utils.safestring import mark_safe
 
-from .models import (Profession, Contact, ContactInformation, Cluster,
-                     Station, Country, PcType, Pc,
-                     MonitorPulseheightThresholds,
-                     MonitorService, EnabledService)
+from .models import (Cluster, Contact, ContactInformation, Country,
+                     EnabledService, MonitorPulseheightThresholds,
+                     MonitorService, Pc, PcType, Profession, Station)
 
 
 class ClusterAdmin(admin.ModelAdmin):
@@ -37,9 +37,7 @@ class ContactAdmin(admin.ModelAdmin):
             return "%s" % obj.surname
 
     def email_work_link(self, obj):
-        return "<a href='mailto:%s'>%s</a>" % (obj.email_work, obj.email_work)
-
-    email_work_link.allow_tags = True
+        return mark_safe("<a href='mailto:{email}'>{email}</a>".format(email=obj.email_work))
 
 
 class CountryAdmin(admin.ModelAdmin):
