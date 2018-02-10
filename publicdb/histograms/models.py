@@ -6,6 +6,7 @@ import zlib
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
 
 
 class SerializedDataField(models.Field):
@@ -34,6 +35,12 @@ class NetworkSummary(models.Model):
     needs_update = models.BooleanField(default=False)
     needs_update_coincidences = models.BooleanField(default=False)
 
+    def get_absolute_url(self):
+        kwargs = {'year': self.date.year,
+                  'month': self.date.month,
+                  'day': self.date.day}
+        return reverse('status:network:coincidences', kwargs=kwargs)
+
     def __unicode__(self):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
 
@@ -57,6 +64,13 @@ class Summary(models.Model):
     needs_update_errors = models.BooleanField(default=False)
     needs_update_weather = models.BooleanField(default=False)
     needs_update_singles = models.BooleanField(default=False)
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.station.number,
+                  'year': self.date.year,
+                  'month': self.date.month,
+                  'day': self.date.day}
+        return reverse('status:station:data', kwargs=kwargs)
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
