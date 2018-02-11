@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
                               render)
-from django.views.generic import DateDetailView
+from django.views.generic import DateDetailView, RedirectView
 
 from sapphire.transformations import clock
 
@@ -571,24 +571,19 @@ def station_latest(request, station_number):
                    'old_data': old_data})
 
 
-def station(request, station_number):
-    """Show most recent histograms for a particular station"""
+class LatestSummaryRedirectView(RedirectView):
+    """Show most recent data for a particular station"""
 
-    try:
-        summary = (Summary.objects.filter(Q(num_events__isnull=False) |
-                                          Q(num_weather__isnull=False),
-                                          station__number=station_number,
-                                          date__gte=FIRSTDATE,
-                                          date__lte=datetime.date.today())
-                                  .latest())
-    except Summary.DoesNotExist:
-        raise Http404
-
-    return redirect('status:station:data',
-                    station_number=str(station_number),
-                    year=str(summary.date.year),
-                    month=str(summary.date.month),
-                    day=str(summary.date.day))
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            return (Summary.objects.filter(Q(num_events__isnull=False) |
+                                           Q(num_weather__isnull=False),
+                                           station__number=kwargs['station_number'],
+                                           date__gte=FIRSTDATE,
+                                           date__lte=datetime.date.today())
+                           .latest().get_absolute_url())
+        except Summary.DoesNotExist:
+            return None
 
 
 def get_coincidencetime_histogram_source(request, year, month, day):
