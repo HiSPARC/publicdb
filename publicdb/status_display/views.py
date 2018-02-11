@@ -46,9 +46,10 @@ def stations_by_country(request):
     countries = OrderedDict()
     test_stations = []
 
-    for station in (Station.objects.exclude(pc__type__slug='admin')
-                                   .select_related('cluster__country',
-                                                   'cluster__parent')):
+    for station in (Station.objects
+                           .exclude(pc__type__slug='admin')
+                           .select_related('cluster__country',
+                                           'cluster__parent')):
         link = station in data_stations
         status = get_station_status(station.number, down, problem, up)
 
@@ -143,26 +144,29 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                 else:
                     get_object_or_404(Cluster, name=subcluster,
                                       parent__name=cluster)
-                focus = (Cluster.objects.filter(name=subcluster)
-                                        .values_list('name', flat=True))
+                focus = (Cluster.objects
+                                .filter(name=subcluster)
+                                .values_list('name', flat=True))
             else:
                 focus = [Cluster.objects.get(name=cluster, parent=None).name]
-                focus.extend(Cluster.objects.filter(parent__name=cluster)
-                                            .values_list('name', flat=True))
-        else:
-            focus = (Cluster.objects.filter(country__name=country)
+                focus.extend(Cluster.objects
+                                    .filter(parent__name=cluster)
                                     .values_list('name', flat=True))
+        else:
+            focus = (Cluster.objects
+                            .filter(country__name=country)
+                            .values_list('name', flat=True))
     else:
         focus = Cluster.objects.all().values_list('name', flat=True)
 
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in (Station.objects.select_related('cluster__parent',
-                                                       'cluster__country')
-                                       .filter(cluster=subcluster,
-                                               pc__is_test=False)):
-
+        for station in (Station.objects
+                               .select_related('cluster__parent',
+                                               'cluster__country')
+                               .filter(cluster=subcluster,
+                                       pc__is_test=False)):
             link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
             location = station.latest_location()
@@ -190,9 +194,7 @@ def network_coincidences(request, year=None, month=None, day=None):
     if year is None:
         try:
             summary = (NetworkSummary.objects
-                                     .filter(num_coincidences__isnull=False,
-                                             date__gte=FIRSTDATE,
-                                             date__lte=today)
+                                     .with_coincidences()
                                      .latest())
         except NetworkSummary.DoesNotExist:
             raise Http404
@@ -216,25 +218,32 @@ def network_coincidences(request, year=None, month=None, day=None):
 
     # Find previous/next dates with data
     try:
-        prev = NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                             date__gte=FIRSTDATE,
-                                             date__lt=date).latest().date
+        prev = (NetworkSummary.objects
+                              .with_coincidences()
+                              .filter(date__lt=date)
+                              .latest()
+                              .date)
     except NetworkSummary.DoesNotExist:
         prev = None
 
     try:
-        next = NetworkSummary.objects.filter(num_coincidences__isnull=False,
-                                             date__gt=date,
-                                             date__lte=today).earliest().date
+        next = (NetworkSummary.objects
+                              .with_coincidences()
+                              .filter(date__gt=date)
+                              .earliest()
+                              .date)
     except NetworkSummary.DoesNotExist:
         next = None
 
-    n_stations = Station.objects.filter(summary__date=date,
-                                        summary__num_events__isnull=False,
-                                        pc__is_test=False).count()
-    histograms = DailyHistogram.objects.filter(
-        source__date=date, source__station__pc__is_test=False,
-        type__slug='eventtime')
+    n_stations = (Station.objects
+                         .filter(summary__date=date,
+                                 summary__num_events__isnull=False,
+                                 pc__is_test=False)
+                         .count())
+    histograms = (DailyHistogram.objects
+                                .filter(source__date=date,
+                                        source__station__pc__is_test=False,
+                                        type__slug='eventtime'))
     number_of_events = sum(sum(histogram.values) for histogram in histograms)
     status = {'station_count': n_stations,
               'n_events': number_of_events}
@@ -275,11 +284,7 @@ class SummaryDetailView(DateDetailView):
     template_name = 'station_data.html'
 
     def get_queryset(self):
-        return Summary.objects.filter(
-            Q(num_events__isnull=False) |
-            Q(num_weather__isnull=False),
-            date__gte=FIRSTDATE,
-            date__lte=datetime.date.today())
+        return Summary.objects.with_data()
 
     def get_context_data(self, **kwargs):
         context = super(SummaryDetailView, self).get_context_data(**kwargs)
@@ -300,10 +305,9 @@ class SummaryDetailView(DateDetailView):
 
         # Get most recent configuration
         try:
-            source = (Summary.objects.filter(station=station,
-                                             num_config__isnull=False,
-                                             date__gte=FIRSTDATE,
-                                             date__lte=date)
+            source = (Summary.objects
+                             .with_config()
+                             .filter(station=station, date__lte=date)
                              .latest())
             config = Configuration.objects.filter(source=source).latest()
             if config.slave == -1:
@@ -490,9 +494,11 @@ def station_config(request, station_number):
     timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
     gpstrack = set(gpslocations)
-    layout = StationLayout.objects.filter(station=station,
-                                          active_date__gte=FIRSTDATE,
-                                          active_date__lte=today).last()
+    layout = (StationLayout.objects
+                           .filter(station=station,
+                                   active_date__gte=FIRSTDATE,
+                                   active_date__lte=today)
+                           .last())
 
     return render(request, 'station_config.html',
                   {'station': station,
@@ -519,17 +525,18 @@ def station_latest(request, station_number):
 
     station = get_object_or_404(Station, number=station_number)
     try:
-        summary = Summary.objects.get(num_events__isnull=False,
-                                      station=station,
-                                      date=yesterday)
+        summary = (Summary.objects
+                          .get(num_events__isnull=False,
+                               station=station,
+                               date=yesterday))
     except Summary.DoesNotExist:
         # Do something nice, get older data
         old_data = True
-        summary = (Summary.objects.filter(num_events__isnull=False,
-                                          station=station,
-                                          date__gte=FIRSTDATE,
-                                          date__lte=datetime.date.today())
-                                  .latest())
+        summary = (Summary.objects
+                          .valid_date()
+                          .filter(num_events__isnull=False,
+                                  station=station)
+                          .latest())
 
     down, problem, up = status_lists()
     status = get_station_status(station.number, down, problem, up)
@@ -576,12 +583,11 @@ class LatestSummaryRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         try:
-            return (Summary.objects.filter(Q(num_events__isnull=False) |
-                                           Q(num_weather__isnull=False),
-                                           station__number=kwargs['station_number'],
-                                           date__gte=FIRSTDATE,
-                                           date__lte=datetime.date.today())
-                           .latest().get_absolute_url())
+            return (Summary.objects
+                           .with_data()
+                           .filter(station__number=kwargs['station_number'])
+                           .latest()
+                           .get_absolute_url())
         except Summary.DoesNotExist:
             return None
 
@@ -668,20 +674,25 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     if end is None:
         today = datetime.date.today()
         try:
-            last = (Summary.objects.filter(station__number=station_number,
-                                           date__gte=FIRSTDATE, date__lt=today,
-                                           num_events__isnull=False)
-                                   .latest().date)
+            last = (Summary.objects
+                           .valid_date()
+                           .filter(station__number=station_number,
+                                   num_events__isnull=False)
+                           .latest()
+                           .date)
         except Summary.DoesNotExist:
             raise Http404
         end = last + datetime.timedelta(days=1)
     if start is None:
         # Get first date with data
         try:
-            start = (Summary.objects.filter(station__number=station_number,
-                                            date__gte=FIRSTDATE, date__lt=end,
-                                            num_events__isnull=False)
-                                    .earliest().date)
+            start = (Summary.objects.
+                            .valid_date()
+                            .filter(station__number=station_number,
+                                    date__lt=end,
+                                    num_events__isnull=False)
+                            .earliest()
+                            .date)
         except Summary.DoesNotExist:
             raise Http404
 
@@ -973,10 +984,11 @@ def get_config_source(station_number, type):
     else:
         return None
 
-    configs = Configuration.objects.filter(
-        source__station__number=station_number,
-        timestamp__gte=FIRSTDATE,
-        timestamp__lte=datetime.date.today()).order_by('timestamp')
+    configs = (Configuration.objects
+                            .filter(source__station__number=station_number,
+                                    timestamp__gte=FIRSTDATE,
+                                    timestamp__lte=datetime.date.today())
+                            .order_by('timestamp'))
 
     if not configs:
         raise Http404
@@ -1170,9 +1182,10 @@ def nav_calendar(theyear, themonth):
 def nav_months_network(theyear):
     """Create list of months with links"""
 
-    date_list = (NetworkSummary.objects.filter(date__year=theyear,
-                                               num_coincidences__isnull=False)
-                                       .dates('date', 'month'))
+    date_list = (NetworkSummary.objects
+                               .filter(date__year=theyear,
+                                       num_coincidences__isnull=False)
+                               .dates('date', 'month'))
 
     month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
 
@@ -1236,14 +1249,10 @@ def station_has_config(station):
     :return: boolean indicating if the station has a configuration available.
 
     """
-    has_config = (Summary.objects
-                         .filter(station=station,
-                                 num_config__isnull=False,
-                                 date__gte=FIRSTDATE,
-                                 date__lte=datetime.date.today())
-                         .exists())
-
-    return has_config
+    return (Summary.objects
+                   .with_config()
+                   .filter(station=station)
+                   .exists())
 
 
 def station_has_data(station):
@@ -1254,13 +1263,10 @@ def station_has_data(station):
              weather or shower, between 2002 and now.
 
     """
-    has_data = Summary.objects.filter(Q(station=station),
-                                      Q(num_events__isnull=False) |
-                                      Q(num_weather__isnull=False),
-                                      date__gte=FIRSTDATE,
-                                      date__lte=datetime.date.today()).exists()
-
-    return has_data
+    return (Summary.objects
+                   .with_data()
+                   .filter(station=station)
+                   .exists())
 
 
 def none_to_nan(x):

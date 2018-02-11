@@ -261,16 +261,17 @@ class Station(models.Model):
         config = Configuration()
 
         try:
-            summaries = Summary.objects.filter(station=self,
-                                               num_config__isnull=False,
-                                               date__gte=FIRSTDATE,
-                                               date__lte=date).reverse()
+            summaries = (Summary.objects
+                                .with_config()
+                                .filter(station=self, date__lte=date)
+                                .reverse())
             for summary in summaries:
                 try:
-                    config = (Configuration.objects.filter(source=summary)
-                                                   .exclude(gps_latitude=0,
-                                                            gps_longitude=0)
-                                                   .latest())
+                    config = (Configuration.objects
+                                           .filter(source=summary)
+                                           .exclude(gps_latitude=0,
+                                                    gps_longitude=0)
+                                           .latest())
                 except Configuration.DoesNotExist:
                     pass
                 else:
