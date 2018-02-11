@@ -270,12 +270,16 @@ class SummaryDetailView(DateDetailView):
     date_field = 'date'
     http_method_names = [u'get']
     month_format = '%m'
-    queryset = Summary.objects.filter(
-        Q(num_events__isnull=False) | Q(num_weather__isnull=False),
-        date__gte=FIRSTDATE)
     slug_field = 'station__number'
     slug_url_kwarg = 'station_number'
     template_name = 'station_data.html'
+
+    def get_queryset(self):
+        return Summary.objects.filter(
+            Q(num_events__isnull=False) |
+            Q(num_weather__isnull=False),
+            date__gte=FIRSTDATE,
+            date__lte=datetime.date.today())
 
     def get_context_data(self, **kwargs):
         context = super(SummaryDetailView, self).get_context_data(**kwargs)
@@ -284,14 +288,12 @@ class SummaryDetailView(DateDetailView):
 
         # Find previous/next dates with data
         try:
-            previous = (self.queryset.filter(station=station, date__lt=date)
+            previous = (self.get_queryset().filter(station=station, date__lt=date)
                             .latest().get_absolute_url())
         except Summary.DoesNotExist:
             previous = None
         try:
-            next = (self.queryset.filter(station=station,
-                                         date__gt=date,
-                                         date__lte=datetime.date.today())
+            next = (self.get_queryset().filter(station=station, date__gt=date)
                         .earliest().get_absolute_url())
         except Summary.DoesNotExist:
             next = None
@@ -373,16 +375,15 @@ class SummaryDetailView(DateDetailView):
     def nav_years(self):
         """Create list of previous years"""
 
-        years_with_data = (self.queryset.filter(station=self.object.station,
-                                                date__lte=datetime.date.today())
+        years_with_data = (self.get_queryset().filter(station=self.object.station)
                                .dates('date', 'year'))
         years_with_data = [date.year for date in years_with_data]
 
         year_list = []
         for year in range(years_with_data[0], years_with_data[-1] + 1):
             if year in years_with_data:
-                first_of_year = (self.queryset.filter(station=self.object.station,
-                                                      date__year=year)
+                first_of_year = (self.get_queryset().filter(station=self.object.station,
+                                                            date__year=year)
                                      .earliest().get_absolute_url())
                 year_list.append({'year': year, 'link': first_of_year})
             else:
@@ -392,15 +393,15 @@ class SummaryDetailView(DateDetailView):
     def nav_months(self):
         """Create list of months with links"""
 
-        months_with_data = (self.queryset.filter(station=self.object.station,
-                                                 date__year=self.object.date.year)
+        months_with_data = (self.get_queryset().filter(station=self.object.station,
+                                                       date__year=self.object.date.year)
                                 .dates('date', 'month'))
         month_list = [{'month': month} for month in calendar.month_abbr[1:]]
 
         for date in months_with_data:
-            first_of_month = (self.queryset.filter(station=self.object.station,
-                                                   date__year=date.year,
-                                                   date__month=date.month)
+            first_of_month = (self.get_queryset().filter(station=self.object.station,
+                                                         date__year=date.year,
+                                                         date__month=date.month)
                                   .earliest().get_absolute_url())
             month_list[date.month - 1]['link'] = first_of_month
 
@@ -408,14 +409,13 @@ class SummaryDetailView(DateDetailView):
 
     def nav_calendar(self):
         """Create a month calendar with links"""
+
         date = self.object.date
-
         month = calendar.Calendar().monthdatescalendar(date.year, date.month)
-        month_name = '%s %d' % (calendar.month_name[date.month], date.year)
 
-        days_with_data = self.queryset.filter(station=self.object.station,
-                                              date__year=date.year,
-                                              date__month=date.month)
+        days_with_data = self.get_queryset().filter(station=self.object.station,
+                                                    date__year=date.year,
+                                                    date__month=date.month)
         days_with_data = {day.date: day.get_absolute_url() for day in days_with_data}
 
         weeks = []
