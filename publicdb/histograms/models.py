@@ -1,12 +1,15 @@
 import ast
 import base64
 import cPickle as pickle
+import datetime
 import re
 import zlib
 
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+
+FIRSTDATE = datetime.date(2004, 1, 1)
 
 
 class SerializedDataField(models.Field):
@@ -29,11 +32,25 @@ class SerializedDataField(models.Field):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
+class NetworkSummaryQuerySet(models.QuerySet):
+    def valid_date(self):
+        """Filter by date to dates between start and today"""
+        return self.filter(
+            date__gte=FIRSTDATE,
+            date__lte=datetime.date.today())
+
+    def with_coincidences(self):
+        return self.valid_date().filter(
+            num_coincidences__isnull=False)
+
+
 class NetworkSummary(models.Model):
     date = models.DateField(unique=True)
     num_coincidences = models.IntegerField(blank=True, null=True)
     needs_update = models.BooleanField(default=False)
     needs_update_coincidences = models.BooleanField(default=False)
+
+    objects = NetworkSummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
         kwargs = {'year': self.date.year,
@@ -50,6 +67,25 @@ class NetworkSummary(models.Model):
         get_latest_by = 'date'
 
 
+class SummaryQuerySet(models.QuerySet):
+    def valid_date(self):
+        """Filter by date to dates between start and today"""
+        return self.filter(
+            date__gte=FIRSTDATE,
+            date__lte=datetime.date.today())
+
+    def with_data(self):
+        """Filter with at least either events or weather data"""
+        return self.valid_date().filter(
+            models.Q(num_events__isnull=False) |
+            models.Q(num_weather__isnull=False))
+
+    def with_config(self):
+        """Filter with at least configurations"""
+        return self.valid_date().filter(
+            num_configs__isnull=False)
+
+
 class Summary(models.Model):
     station = models.ForeignKey('inforecords.Station')
     date = models.DateField()
@@ -64,6 +100,8 @@ class Summary(models.Model):
     needs_update_errors = models.BooleanField(default=False)
     needs_update_weather = models.BooleanField(default=False)
     needs_update_singles = models.BooleanField(default=False)
+
+    objects = SummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
         kwargs = {'station_number': self.station.number,
