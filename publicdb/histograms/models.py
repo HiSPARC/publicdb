@@ -83,7 +83,7 @@ class SummaryQuerySet(models.QuerySet):
     def with_config(self):
         """Filter with at least configurations"""
         return self.valid_date().filter(
-            num_configs__isnull=False)
+            num_config__isnull=False)
 
 
 class Summary(models.Model):

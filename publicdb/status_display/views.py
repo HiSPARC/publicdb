@@ -189,7 +189,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 def network_coincidences(request, year=None, month=None, day=None):
     """Show daily coincidences histograms for the entire network"""
 
-    today = datetime.date.today()
     # Redirect to latest date with data if no date is given
     if year is None:
         try:
@@ -672,7 +671,6 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     """Get all eventtime data from start to end"""
 
     if end is None:
-        today = datetime.date.today()
         try:
             last = (Summary.objects
                            .valid_date()
@@ -686,7 +684,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     if start is None:
         # Get first date with data
         try:
-            start = (Summary.objects.
+            start = (Summary.objects
                             .valid_date()
                             .filter(station__number=station_number,
                                     date__lt=end,
@@ -807,10 +805,10 @@ def get_specific_config_source(request, station_number, type):
 
 
 def get_station_layout_source(request, station_number):
-    today = datetime.date.today()
-    layouts = StationLayout.objects.filter(station__number=station_number,
-                                           active_date__gte=FIRSTDATE,
-                                           active_date__lte=today)
+    layouts = (StationLayout.objects
+                            .filter(station__number=station_number,
+                                    active_date__gte=FIRSTDATE,
+                                    active_date__lte=datetime.date.today()))
     if not layouts:
         raise Http404
 
