@@ -31,19 +31,17 @@ class Contact(models.Model):
                                            related_name='contacts')
 
     def __unicode__(self):
-        return (("%s %s %s %s" % (self.title, self.first_name,
-                                  self.prefix_surname, self.surname))
-                .replace('  ', ' ').strip(' '))
+        return self.name
 
+    @property
     def email_work(self):
         return self.contactinformation.email_work
-    email_work = property(email_work)
 
+    @property
     def name(self):
-        return (("%s %s %s %s" % (self.title, self.first_name,
-                                  self.prefix_surname, self.surname))
-                .replace('  ', ' ').strip(' '))
-    name = property(name)
+        return (' '.join((self.title, self.first_name,
+                          self.prefix_surname, self.surname))
+                   .replace('  ', ' ').strip())
 
     def save(self, *args, **kwargs):
         super(Contact, self).save(*args, **kwargs)
@@ -72,6 +70,7 @@ class ContactInformation(models.Model):
     def __unicode__(self):
         return "%s %s %s" % (self.city, self.street_1, self.email_work)
 
+    @property
     def type(self):
         if self.contacts.all():
             type = 'Contact'
@@ -80,8 +79,8 @@ class ContactInformation(models.Model):
         else:
             type = 'no owner'
         return type
-    type = property(type)
 
+    @property
     def contact_owner(self):
         contacts = self.contacts.all()
         stations = self.stations.all()
@@ -101,7 +100,6 @@ class ContactInformation(models.Model):
         else:
             contact_owner = 'no owner'
         return contact_owner
-    contact_owner = property(contact_owner)
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)

@@ -84,9 +84,9 @@ class SessionRequest(models.Model):
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
 
+    @property
     def name(self):
         return "%s %s" % (self.first_name, self.sur_name)
-    name = property(name)
 
     def create_session(self):
         self.session_pending = False
