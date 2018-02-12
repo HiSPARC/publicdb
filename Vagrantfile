@@ -33,11 +33,11 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.provision provisioner do |ansible|
-      if provisioner == "ansible_local" then
-        # force required upgrade of ansible on guest
-        ansible.install = true
-        ansible.version = "latest"
-      end
+    if provisioner == :ansible_local then
+      # force required upgrade of ansible on guest
+      ansible.install = true
+      ansible.version = "latest"
+    end
     ansible.compatibility_mode = "2.0"
     ansible.inventory_path = inventory_path
     ansible.playbook = "provisioning/playbook.yml"
