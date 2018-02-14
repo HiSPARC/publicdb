@@ -287,6 +287,12 @@ class NetworkHistogram(models.Model):
     bins = SerializedDataField()
     values = SerializedDataField()
 
+    def get_absolute_url(self):
+        kwargs = {'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+
     def save(self, *args, **kwargs):
         """Ensure the stored bins and values are numbers
 
@@ -314,6 +320,13 @@ class DailyHistogram(models.Model):
     type = models.ForeignKey('HistogramType')
     bins = SerializedDataField()
     values = SerializedDataField()
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.source.station.number,
+                  'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
     def save(self, *args, **kwargs):
         """Ensure the stored bins and values are numbers
@@ -344,6 +357,13 @@ class DailyDataset(models.Model):
     type = models.ForeignKey('DatasetType')
     x = SerializedDataField()
     y = SerializedDataField()
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.source.station.number,
+                  'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
     def save(self, *args, **kwargs):
         """Ensure the stored values are numbers
