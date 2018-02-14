@@ -23,9 +23,11 @@ station_patterns = [
 ]
 
 source_patterns = [
+    # Network histograms
     url(r'^coincidencetime/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencetime_histogram_source, name="coincidencetime"),
     url(r'^coincidencenumber/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
 
+    # Histograms
     url(r'^eventtime/(?P<station_number>\d+)/$', views.get_eventtime_source, name="eventtime"),
     url(r'^eventtime/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_eventtime_histogram_source, name="eventtime"),
     url(r'^pulseheight/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseheight_histogram_source, name="pulseheight"),
@@ -34,17 +36,22 @@ source_patterns = [
     url(r'^singleshisthigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_histogram_source, name="singleshigh"),
     url(r'^zenith/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_zenith_histogram_source, name="zenith"),
     url(r'^azimuth/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_azimuth_histogram_source, name="azimuth"),
+
+    # Datasets
     url(r'^barometer/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_barometer_dataset_source, name="barometer"),
     url(r'^temperature/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_temperature_dataset_source, name="temperature"),
     url(r'^singlesratelow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratelow_dataset_source, name="singlesratelow"),
     url(r'^singlesratehigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_dataset_source, name="singlesratehigh"),
 
+    # Configurations
     url(r'^electronics/(?P<station_number>\d+)/$', views.get_electronics_config_source, name="electronics"),
     url(r'^voltage/(?P<station_number>\d+)/$', views.get_voltage_config_source, name="voltage"),
     url(r'^current/(?P<station_number>\d+)/$', views.get_current_config_source, name="current"),
     url(r'^gps/(?P<station_number>\d+)/$', views.get_gps_config_source, name="gps"),
     url(r'^trigger/(?P<station_number>\d+)/$', views.get_trigger_config_source, name="trigger"),
     url(r'^layout/(?P<station_number>\d+)/$', views.get_station_layout_source, name="layout"),
+
+    # Calibrations
     url(r'^detector_timing_offsets/(?P<station_number>\d+)/$', views.get_detector_timing_offsets_source, name="detector_offsets"),
     url(r'^station_timing_offsets/(?P<ref_station_number>\d+)/(?P<station_number>\d+)/$', views.get_station_timing_offsets_source, name="station_offsets"),
 ]
