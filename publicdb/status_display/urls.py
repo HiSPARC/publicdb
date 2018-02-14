@@ -2,6 +2,10 @@ from django.conf.urls import include, url
 
 from . import views
 
+DATE_REGEX = r'(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$'
+STATION_DATE_REGEX = r'(?P<station_number>\d+)/' + DATE_REGEX
+
+
 maps_patterns = [
     url(r'^$', views.stations_on_map, name="stations_on_map"),
     url(r'^(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map, name="stations_on_map"),
@@ -11,12 +15,12 @@ maps_patterns = [
 
 network_patterns = [
     url(r'^network/coincidences/$', views.network_coincidences, name="coincidences"),
-    url(r'^network/coincidences/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.network_coincidences, name="coincidences"),
+    url(r'^network/coincidences/' + DATE_REGEX, views.network_coincidences, name="coincidences"),
 ]
 
 station_patterns = [
     url(r'^(?P<station_number>\d+)/$', views.LatestSummaryRedirectView.as_view(), name="data"),
-    url(r'^(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.SummaryDetailView.as_view(), name="data"),
+    url(r'^' + STATION_DATE_REGEX, views.SummaryDetailView.as_view(), name="data"),
     url(r'^(?P<station_number>\d+)/status/$', views.station_status, name="status"),
     url(r'^(?P<station_number>\d+)/config/$', views.station_config, name="config"),
     url(r'^(?P<station_number>\d+)/latest/$', views.station_latest, name="latest"),
@@ -24,24 +28,24 @@ station_patterns = [
 
 source_patterns = [
     # Network histograms
-    url(r'^coincidencetime/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencetime_histogram_source, name="coincidencetime"),
-    url(r'^coincidencenumber/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
+    url(r'^coincidencetime/' + DATE_REGEX, views.get_coincidencetime_histogram_source, name="coincidencetime"),
+    url(r'^coincidencenumber/' + DATE_REGEX, views.get_coincidencenumber_histogram_source, name="coincidencenumber"),
 
     # Histograms
     url(r'^eventtime/(?P<station_number>\d+)/$', views.get_eventtime_source, name="eventtime"),
-    url(r'^eventtime/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_eventtime_histogram_source, name="eventtime"),
-    url(r'^pulseheight/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseheight_histogram_source, name="pulseheight"),
-    url(r'^pulseintegral/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseintegral_histogram_source, name="pulseintegral"),
-    url(r'^singleshistlow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratelow_histogram_source, name="singleslow"),
-    url(r'^singleshisthigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_histogram_source, name="singleshigh"),
-    url(r'^zenith/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_zenith_histogram_source, name="zenith"),
-    url(r'^azimuth/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_azimuth_histogram_source, name="azimuth"),
+    url(r'^eventtime/' + STATION_DATE_REGEX, views.get_eventtime_histogram_source, name="eventtime"),
+    url(r'^pulseheight/' + STATION_DATE_REGEX, views.get_pulseheight_histogram_source, name="pulseheight"),
+    url(r'^pulseintegral/' + STATION_DATE_REGEX, views.get_pulseintegral_histogram_source, name="pulseintegral"),
+    url(r'^singleshistlow/' + STATION_DATE_REGEX, views.get_singlesratelow_histogram_source, name="singleslow"),
+    url(r'^singleshisthigh/' + STATION_DATE_REGEX, views.get_singlesratehigh_histogram_source, name="singleshigh"),
+    url(r'^zenith/' + STATION_DATE_REGEX, views.get_zenith_histogram_source, name="zenith"),
+    url(r'^azimuth/' + STATION_DATE_REGEX, views.get_azimuth_histogram_source, name="azimuth"),
 
     # Datasets
-    url(r'^barometer/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_barometer_dataset_source, name="barometer"),
-    url(r'^temperature/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_temperature_dataset_source, name="temperature"),
-    url(r'^singlesratelow/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratelow_dataset_source, name="singlesratelow"),
-    url(r'^singlesratehigh/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_singlesratehigh_dataset_source, name="singlesratehigh"),
+    url(r'^barometer/' + STATION_DATE_REGEX, views.get_barometer_dataset_source, name="barometer"),
+    url(r'^temperature/' + STATION_DATE_REGEX, views.get_temperature_dataset_source, name="temperature"),
+    url(r'^singlesratelow/' + STATION_DATE_REGEX, views.get_singlesratelow_dataset_source, name="singlesratelow"),
+    url(r'^singlesratehigh/' + STATION_DATE_REGEX, views.get_singlesratehigh_dataset_source, name="singlesratehigh"),
 
     # Configurations
     url(r'^electronics/(?P<station_number>\d+)/$', views.get_electronics_config_source, name="electronics"),
