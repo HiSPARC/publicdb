@@ -5,6 +5,7 @@ import datetime
 import re
 import zlib
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
@@ -284,8 +285,8 @@ class Configuration(models.Model):
 class NetworkHistogram(models.Model):
     source = models.ForeignKey('NetworkSummary')
     type = models.ForeignKey('HistogramType')
-    bins = SerializedDataField()
-    values = SerializedDataField()
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(models.PositiveIntegerField())
 
     def get_absolute_url(self):
         kwargs = {'year': self.source.date.year,
