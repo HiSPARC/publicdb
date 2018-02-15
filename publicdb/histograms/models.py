@@ -294,20 +294,6 @@ class NetworkHistogram(models.Model):
                   'day': self.source.date.day}
         return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
-    def save(self, *args, **kwargs):
-        """Ensure the stored bins and values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.bins, basestring):
-            self.bins = ast.literal_eval(self.bins)
-        if isinstance(self.values, basestring):
-            self.values = ast.literal_eval(self.values)
-        super(NetworkHistogram, self).save(*args, **kwargs)
-
     def __unicode__(self):
         return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
 
