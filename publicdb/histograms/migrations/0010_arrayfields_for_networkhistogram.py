@@ -3,13 +3,17 @@
 from __future__ import unicode_literals
 
 import django.contrib.postgres.fields
+
 from django.db import migrations, models
+
+from sapphire.utils import pbar
 
 
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'NetworkHistogram')
-    for histogram in model.objects.all():
+    print()
+    for histogram in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         histogram.bins = histogram.old_bins
         histogram.values = histogram.old_values
         histogram.save()

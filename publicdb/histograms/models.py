@@ -302,78 +302,53 @@ class NetworkHistogram(models.Model):
         ordering = ('source', 'type')
 
 
-class DailyHistogram(models.Model):
+class BaseDailyStationDataMixin(models.Model):
+    """Base class for daily station data models"""
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.source.station.number,
+                  'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+
+    def __unicode__(self):
+        return "%d - %s - %s" % (self.source.station.number,
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
+
+    class Meta:
+        abstract = True
+        unique_together = ('source', 'type')
+        ordering = ('source', 'type')
+
+
+class DailyHistogram(BaseDailyStationDataMixin):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('HistogramType')
-    bins = SerializedDataField()
-    values = SerializedDataField()
-
-    def get_absolute_url(self):
-        kwargs = {'station_number': self.source.station.number,
-                  'year': self.source.date.year,
-                  'month': self.source.date.month,
-                  'day': self.source.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
-
-    def save(self, *args, **kwargs):
-        """Ensure the stored bins and values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.bins, basestring):
-            self.bins = ast.literal_eval(self.bins)
-        if isinstance(self.values, basestring):
-            self.values = ast.literal_eval(self.values)
-        super(DailyHistogram, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
-                                 self.type)
-
-    class Meta:
-        unique_together = ('source', 'type')
-        ordering = ('source', 'type')
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(models.PositiveIntegerField())
 
 
-class DailyDataset(models.Model):
+class MultiDailyHistogram(BaseDailyStationDataMixin):
+    source = models.ForeignKey('Summary')
+    type = models.ForeignKey('HistogramType')
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(ArrayField(models.PositiveIntegerField()))
+
+
+class DailyDataset(BaseDailyStationDataMixin):
     source = models.ForeignKey('Summary')
     type = models.ForeignKey('DatasetType')
-    x = SerializedDataField()
-    y = SerializedDataField()
+    x = ArrayField(models.PositiveIntegerField())
+    y = ArrayField(models.FloatField())
 
-    def get_absolute_url(self):
-        kwargs = {'station_number': self.source.station.number,
-                  'year': self.source.date.year,
-                  'month': self.source.date.month,
-                  'day': self.source.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
-    def save(self, *args, **kwargs):
-        """Ensure the stored values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.x, basestring):
-            self.x = ast.literal_eval(self.x)
-        if isinstance(self.y, basestring):
-            self.y = ast.literal_eval(self.y)
-        super(DailyDataset, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
-                                 self.type)
-
-    class Meta:
-        unique_together = ('source', 'type')
-        ordering = ('source', 'type')
+class MultiDailyDataset(BaseDailyStationDataMixin):
+    source = models.ForeignKey('Summary')
+    type = models.ForeignKey('DatasetType')
+    x = ArrayField(models.PositiveIntegerField())
+    y = ArrayField(ArrayField(models.FloatField()))
 
 
 class HistogramType(models.Model):
