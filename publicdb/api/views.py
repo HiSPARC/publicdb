@@ -750,7 +750,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
 
     if not hour:
         histograms = DailyHistogram.objects.filter(**filters)
-        num_events = sum([sum(histogram.values) for histogram in histograms])
+        num_events = sum(sum(histogram.values) for histogram in histograms)
 
     return json_dict(num_events)
 
