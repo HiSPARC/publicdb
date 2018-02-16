@@ -19,7 +19,8 @@ from sapphire.transformations import clock
 
 from ..histograms.models import (Configuration, DailyDataset, DailyHistogram,
                                  DatasetType, DetectorTimingOffset,
-                                 HistogramType, NetworkHistogram,
+                                 HistogramType, MultiDailyDataset,
+                                 MultiDailyHistogram, NetworkHistogram,
                                  NetworkSummary, StationTimingOffset, Summary)
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
@@ -332,17 +333,18 @@ class SummaryDetailView(DateDetailView):
         year_list = self.nav_years()
 
         # Data for the plots
-        eventhistogram = create_histogram('eventtime', station, date)
-        pulseheighthistogram = create_histogram('pulseheight', station, date)
-        pulseintegralhistogram = create_histogram('pulseintegral', station, date)
-        zenithhistogram = create_histogram('zenith', station, date)
-        azimuthhistogram = create_histogram('azimuth', station, date)
-        singleslowhistogram = create_histogram('singleslow', station, date)
-        singleshighhistogram = create_histogram('singleshigh', station, date)
-        singlesratelowdata = plot_dataset('singlesratelow', station, date)
-        singlesratehighdata = plot_dataset('singlesratehigh', station, date)
-        barometerdata = plot_dataset('barometer', station, date)
-        temperaturedata = plot_dataset('temperature', station, date)
+        eventhistogram = create_histogram(self.object, 'eventtime')
+        pulseheighthistogram = create_histogram(self.object, 'pulseheight')
+        pulseintegralhistogram = create_histogram(self.object, 'pulseintegral')
+        zenithhistogram = create_histogram(self.object, 'zenith')
+        azimuthhistogram = create_histogram(self.object, 'azimuth')
+        singleslowhistogram = create_histogram(self.object, 'singleslow')
+        singleshighhistogram = create_histogram(self.object, 'singleshigh')
+
+        singlesratelowdata = plot_dataset(self.object, 'singlesratelow')
+        singlesratehighdata = plot_dataset(self.object, 'singlesratehigh')
+        barometerdata = plot_dataset(self.object, 'barometer')
+        temperaturedata = plot_dataset(self.object, 'temperature')
 
         context.update({'station': station,
                         'date': date,
@@ -358,6 +360,7 @@ class SummaryDetailView(DateDetailView):
                         'azimuthhistogram': azimuthhistogram,
                         'singleslowhistogram': singleslowhistogram,
                         'singleshighhistogram': singleshighhistogram,
+
                         'singlesratelowdata': singlesratelowdata,
                         'singlesratehighdata': singlesratehighdata,
                         'barometerdata': barometerdata,
@@ -542,10 +545,10 @@ def station_latest(request, station_number):
 
     date = summary.date
 
-    eventhistogram = create_histogram('eventtime', station, date)
-    pulseheighthistogram = create_histogram('pulseheight', station, date)
-    pulseintegralhistogram = create_histogram('pulseintegral', station, date)
-    barometerdata = plot_dataset('barometer', station, date)
+    eventhistogram = create_histogram(summary, 'eventtime')
+    pulseheighthistogram = create_histogram(summary, 'pulseheight')
+    pulseintegralhistogram = create_histogram(summary, 'pulseintegral')
+    barometerdata = plot_dataset(summary, 'barometer')
 
     # Show alternative
     extra_station = None
@@ -558,8 +561,7 @@ def station_latest(request, station_number):
             closest_station = min(weather_stations,
                                   key=lambda x: abs(x - station_number))
             summary_weather = sum_weather.get(station__number=closest_station)
-            barometerdata = plot_dataset('barometer', summary_weather.station,
-                                         summary_weather.date)
+            barometerdata = plot_dataset(summary_weather, 'barometer')
             if barometerdata is not None:
                 extra_station = closest_station
         except IndexError:
@@ -917,10 +919,16 @@ def get_histogram_source(year, month, day, type, station_number=None):
                                       type__slug=type)
     else:
         station_number = int(station_number)
-        histogram = get_object_or_404(DailyHistogram,
+        if type in ['eventtime', 'zenith', 'azimuth']:
+            histogram_model = DailyHistogram
+        else:
+            histogram_model = MultiDailyHistogram
+
+        histogram = get_object_or_404(histogram_model,
                                       source__station__number=station_number,
                                       source__date=date,
                                       type__slug=type)
+
     if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime',
                 'coincidencenumber']:
         return zip(histogram.bins, histogram.values)
@@ -943,10 +951,16 @@ def get_dataset_source(year, month, day, type, station_number):
     except ValueError:
         raise Http404
 
-    dataset = get_object_or_404(DailyDataset,
+    if type in ['barometer', 'temperature']:
+        dataset_model = DailyDataset
+    else:
+        dataset_model = MultiDailyDataset
+
+    dataset = get_object_or_404(dataset_model,
                                 source__station__number=int(station_number),
                                 source__date=date,
                                 type__slug=type)
+
     if type in ['barometer', 'temperature']:
         return zip(dataset.x, dataset.y)
     else:
@@ -1018,15 +1032,17 @@ def create_histogram_network(type, date):
     return plot_object
 
 
-def create_histogram(type, station, date):
+def create_histogram(summary, type):
     """Create a histogram object"""
 
-    source = get_object_or_404(Summary, station=station, date=date)
     type = HistogramType.objects.get(slug=type)
 
     try:
-        histogram = DailyHistogram.objects.get(source=source, type=type)
-    except DailyHistogram.DoesNotExist:
+        if not type.has_multiple_datasets:
+            histogram = DailyHistogram.objects.get(source=summary, type=type)
+        else:
+            histogram = MultiDailyHistogram.objects.get(source=summary, type=type)
+    except (DailyHistogram.DoesNotExist, MultiDailyHistogram.DoesNotExist):
         return None
 
     plot_object = create_plot_object(histogram.bins[:-1], histogram.values,
@@ -1035,15 +1051,17 @@ def create_histogram(type, station, date):
     return plot_object
 
 
-def plot_dataset(type, station, date, log=False):
+def plot_dataset(summary, type):
     """Create a dataset plot object"""
 
-    source = get_object_or_404(Summary, station=station, date=date)
     type = DatasetType.objects.get(slug=type)
 
     try:
-        dataset = DailyDataset.objects.get(source=source, type=type)
-    except DailyDataset.DoesNotExist:
+        if type.slug in ['barometer', 'temperature']:
+            dataset = DailyDataset.objects.get(source=summary, type=type)
+        else:
+            dataset = MultiDailyDataset.objects.get(source=summary, type=type)
+    except (DailyDataset.DoesNotExist, MultiDailyDataset.DoesNotExist):
         return None
 
     plot_object = create_plot_object(dataset.x, dataset.y, type.x_axis_title,

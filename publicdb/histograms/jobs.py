@@ -23,8 +23,9 @@ from ..inforecords.models import Station
 from ..station_layout.models import StationLayout
 from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
                      DetectorTimingOffset, GeneratorState, HistogramType,
-                     NetworkHistogram, NetworkSummary, PulseheightFit,
-                     StationTimingOffset, Summary)
+                     MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
+                     NetworkSummary, PulseheightFit, StationTimingOffset,
+                     Summary)
 
 logger = logging.getLogger('histograms.jobs')
 
@@ -775,8 +776,12 @@ def save_histograms(summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
-    DailyHistogram.objects.update_or_create(source=summary, type=type,
-                                            defaults=histogram)
+    if not type.has_multiple_datasets:
+        DailyHistogram.objects.update_or_create(source=summary, type=type,
+                                                defaults=histogram)
+    else:
+        MultiDailyHistogram.objects.update_or_create(source=summary, type=type,
+                                                     defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -795,8 +800,12 @@ def save_dataset(summary, slug, x, y):
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
     dataset = {'x': x, 'y': y}
-    DailyDataset.objects.update_or_create(source=summary, type=type,
-                                          defaults=dataset)
+    if slug in ['barometer', 'temperature']:
+        DailyDataset.objects.update_or_create(source=summary, type=type,
+                                              defaults=dataset)
+    else:
+        MultiDailyDataset.objects.update_or_create(source=summary, type=type,
+                                                   defaults=dataset)
     logger.debug("Saved succesfully")
 
 
