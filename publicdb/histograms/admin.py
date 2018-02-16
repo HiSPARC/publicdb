@@ -29,6 +29,21 @@ class DailyHistogramInline(admin.StackedInline):
     extra = 0
 
 
+class MultiDailyHistogramInline(admin.StackedInline):
+    model = models.MultiDailyHistogram
+    extra = 0
+
+
+class DailyDatasetInline(admin.StackedInline):
+    model = models.DailyDataset
+    extra = 0
+
+
+class MultiDailyDatasetInline(admin.StackedInline):
+    model = models.MultiDailyDataset
+    extra = 0
+
+
 class NetworkHistogramInline(admin.StackedInline):
     model = models.NetworkHistogram
     extra = 0
@@ -78,7 +93,8 @@ class SummaryAdmin(admin.ModelAdmin):
     list_editable = ('needs_update', 'needs_update_events',
                      'needs_update_weather', 'needs_update_singles',
                      'needs_update_config')
-    inlines = (DailyHistogramInline,)
+    inlines = (DailyHistogramInline, MultiDailyHistogramInline,
+               DailyDatasetInline, MultiDailyDatasetInline)
     list_per_page = 200
     actions = ['unset_update_flag', 'unset_events_flag', 'unset_config_flag',
                'set_update_flag', 'set_events_flag', 'set_config_flag']
