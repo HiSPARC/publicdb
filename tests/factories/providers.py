@@ -18,6 +18,9 @@ class DataProvider(BaseProvider):
     def int_list(self, n=24, **kwargs):
         return [self.random_int(**kwargs) for _ in range(n)]
 
+    def multi_int_list(self, detectors=2, **kwargs):
+        return [self.int_list(**kwargs) for _ in range(detectors)]
+
     def float_list(self, n=600, **kwargs):
         return [self.float(**kwargs) for _ in range(n)]
 
