@@ -1,7 +1,30 @@
+import base64
+import cPickle as pickle
+import zlib
+
 from django.db import models
 
-from ..histograms.models import SerializedDataField
 from ..inforecords.models import Station
+
+
+class SerializedDataField(models.Field):
+
+    def db_type(self, connection):
+        return 'BYTEA'
+
+    def from_db_value(self, value, expression, connection, context):
+        return self.to_python(value)
+
+    def to_python(self, value):
+        try:
+            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
+        except Exception:
+            return value
+        else:
+            return unpickled
+
+    def get_prep_value(self, value):
+        return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
 class Event(models.Model):

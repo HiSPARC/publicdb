@@ -1,9 +1,5 @@
-import ast
-import base64
-import cPickle as pickle
 import datetime
 import re
-import zlib
 
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
@@ -11,26 +7,6 @@ from django.db import models
 from django.urls import reverse
 
 FIRSTDATE = datetime.date(2004, 1, 1)
-
-
-class SerializedDataField(models.Field):
-
-    def db_type(self, connection):
-        return 'BYTEA'
-
-    def from_db_value(self, value, expression, connection, context):
-        return self.to_python(value)
-
-    def to_python(self, value):
-        try:
-            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-        except Exception:
-            return value
-        else:
-            return unpickled
-
-    def get_prep_value(self, value):
-        return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
 class NetworkSummaryQuerySet(models.QuerySet):
