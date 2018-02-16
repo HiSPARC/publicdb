@@ -12,7 +12,7 @@ from sapphire.utils import pbar
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'NetworkHistogram')
-    print()
+    print('')
     for histogram in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         histogram.bins = histogram.old_bins
         histogram.values = histogram.old_values
