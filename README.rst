@@ -115,8 +115,9 @@ file into the database, this can be done using the following commands::
 
     $ mv [path/to/publicdb.sql] ./
     $ vagrant ssh publicdb
-    $ pg_restore --clean --if-exists --no-owner --no-acl --schema=public --dbname=publicdb /vagrant/publicdb_dump.sql
-
+    $ dropdb --host=localhost --username=postgres publicdb
+    $ createdb --host=localhost --username=postgres publicdb
+    $ pg_restore --host=localhost --username=postgres  --create --dbname=publicdb /vagrant/publicdb_dump.sql
 
 Important information regarding provisioning the production servers
 -------------------------------------------------------------------
