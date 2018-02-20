@@ -411,8 +411,8 @@ class DetectorTimingOffset(models.Model):
 
 
 class StationTimingOffset(models.Model):
-    ref_source = models.ForeignKey(Summary, models.CASCADE, related_name='ref_source')
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='source')
+    ref_source = models.ForeignKey(Summary, models.CASCADE, related_name='ref_station_offsets')
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='station_offsets')
     offset = models.FloatField(blank=True, null=True)
     error = models.FloatField(blank=True, null=True)
 
