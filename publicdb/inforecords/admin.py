@@ -39,6 +39,7 @@ class ContactAdmin(admin.ModelAdmin):
     def email_work_link(self, obj):
         return mark_safe("<a href='mailto:{email}'>{email}</a>".format(email=obj.email_work))
 
+
 @admin.register(models.Country)
 class CountryAdmin(admin.ModelAdmin):
     list_display = ('number', 'name')
