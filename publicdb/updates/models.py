@@ -19,7 +19,7 @@ class UpdateQueue(models.Model):
 class AdminUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
     update = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
 
     def __unicode__(self):
         return 'Queue: %s - Admin Update v%d' % (self.queue, self.version)
@@ -37,7 +37,7 @@ class AdminUpdate(models.Model):
 class UserUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
     update = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
 
     def __unicode__(self):
         return 'Queue: %s - User Update v%d' % (self.queue, self.version)
@@ -58,7 +58,7 @@ class UserUpdate(models.Model):
 class InstallerUpdate(models.Model):
     version = models.CharField(max_length=5)
     installer = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
 
     def __unicode__(self):
         return 'Installer v%s' % self.version

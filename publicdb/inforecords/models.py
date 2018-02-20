@@ -21,37 +21,6 @@ class Profession(models.Model):
         return self.description
 
 
-class Contact(models.Model):
-    profession = models.ForeignKey(Profession)
-    title = models.CharField(max_length=20, null=True, blank=True)
-    first_name = models.CharField(max_length=40)
-    prefix_surname = models.CharField(max_length=10, blank=True)
-    surname = models.CharField(max_length=40)
-    contactinformation = models.ForeignKey('ContactInformation',
-                                           related_name='contacts')
-
-    def __unicode__(self):
-        return self.name
-
-    @property
-    def email_work(self):
-        return self.contactinformation.email_work
-
-    @property
-    def name(self):
-        return (' '.join((self.title, self.first_name,
-                          self.prefix_surname, self.surname))
-                   .replace('  ', ' ').strip())
-
-    def save(self, *args, **kwargs):
-        super(Contact, self).save(*args, **kwargs)
-        reload_nagios()
-
-    class Meta:
-        unique_together = [('first_name', 'prefix_surname', 'surname')]
-        ordering = ('surname', 'first_name')
-
-
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
     street_2 = models.CharField(max_length=40, null=True, blank=True)
@@ -111,12 +80,73 @@ class ContactInformation(models.Model):
         verbose_name_plural = "Contact Information"
 
 
+class Contact(models.Model):
+    profession = models.ForeignKey(Profession, models.CASCADE)
+    title = models.CharField(max_length=20, null=True, blank=True)
+    first_name = models.CharField(max_length=40)
+    prefix_surname = models.CharField(max_length=10, blank=True)
+    surname = models.CharField(max_length=40)
+    contactinformation = models.ForeignKey(ContactInformation, models.CASCADE,
+                                           related_name='contacts')
+
+    def __unicode__(self):
+        return self.name
+
+    @property
+    def email_work(self):
+        return self.contactinformation.email_work
+
+    @property
+    def name(self):
+        return (' '.join((self.title, self.first_name,
+                          self.prefix_surname, self.surname))
+                   .replace('  ', ' ').strip())
+
+    def save(self, *args, **kwargs):
+        super(Contact, self).save(*args, **kwargs)
+        reload_nagios()
+
+    class Meta:
+        unique_together = [('first_name', 'prefix_surname', 'surname')]
+        ordering = ('surname', 'first_name')
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=70, unique=True)
+    number = models.IntegerField(unique=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def clean(self):
+        if self.number is None:
+            if Country.objects.count() > 0:
+                countrymax = Country.objects.aggregate(Max('number'))
+                self.number = countrymax['number__max'] + 10000
+            else:
+                self.number = 0
+
+        if self.number % 10000:
+            raise ValidationError("Country number must be multiple of 10000")
+
+    def last_cluster_number(self):
+        clusters = self.clusters.filter(parent=None)
+        if clusters:
+            clustermax = clusters.aggregate(Max('number'))
+            return clustermax['number__max']
+        else:
+            return self.number - 1000
+
+    class Meta:
+        verbose_name_plural = "Countries"
+
+
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True,
+    parent = models.ForeignKey('self', models.CASCADE, null=True, blank=True,
                                related_name='children')
-    country = models.ForeignKey('Country', related_name='clusters')
+    country = models.ForeignKey(Country, models.CASCADE, related_name='clusters')
     url = models.URLField(null=True, blank=True)
 
     def __unicode__(self):
@@ -187,12 +217,12 @@ class Cluster(models.Model):
 class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True, blank=True)
-    contactinformation = models.ForeignKey('ContactInformation',
+    contactinformation = models.ForeignKey(ContactInformation, models.CASCADE,
                                            related_name='stations')
-    cluster = models.ForeignKey('Cluster', related_name='stations')
-    contact = models.ForeignKey(Contact, related_name='stations_contact',
+    cluster = models.ForeignKey(Cluster, models.CASCADE, related_name='stations')
+    contact = models.ForeignKey(Contact, models.SET_NULL, related_name='stations_contact',
                                 null=True)
-    ict_contact = models.ForeignKey(Contact,
+    ict_contact = models.ForeignKey(Contact, models.SET_NULL,
                                     related_name='stations_ict_contact',
                                     null=True)
     password = models.CharField(max_length=40)
@@ -288,36 +318,6 @@ class Station(models.Model):
         ordering = ('number',)
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=70, unique=True)
-    number = models.IntegerField(unique=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    def clean(self):
-        if self.number is None:
-            if Country.objects.count() > 0:
-                countrymax = Country.objects.aggregate(Max('number'))
-                self.number = countrymax['number__max'] + 10000
-            else:
-                self.number = 0
-
-        if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
-
-    def last_cluster_number(self):
-        clusters = self.clusters.filter(parent=None)
-        if clusters:
-            clustermax = clusters.aggregate(Max('number'))
-            return clustermax['number__max']
-        else:
-            return self.number - 1000
-
-    class Meta:
-        verbose_name_plural = "Countries"
-
-
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20)
@@ -330,8 +330,8 @@ class PcType(models.Model):
 
 
 class Pc(models.Model):
-    station = models.ForeignKey(Station)
-    type = models.ForeignKey(PcType)
+    station = models.ForeignKey(Station, models.CASCADE)
+    type = models.ForeignKey(PcType, models.CASCADE)
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
@@ -429,7 +429,7 @@ class Pc(models.Model):
 
 
 class MonitorPulseheightThresholds(models.Model):
-    station = models.ForeignKey('Station')
+    station = models.ForeignKey(Station, models.CASCADE)
     plate = models.IntegerField()
 
     mpv_mean = models.FloatField()
@@ -472,8 +472,8 @@ class MonitorService(models.Model):
 
 
 class EnabledService(models.Model):
-    pc = models.ForeignKey(Pc)
-    monitor_service = models.ForeignKey(MonitorService)
+    pc = models.ForeignKey(Pc, models.CASCADE)
+    monitor_service = models.ForeignKey(MonitorService, models.CASCADE)
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)

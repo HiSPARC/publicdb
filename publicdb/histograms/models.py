@@ -64,7 +64,7 @@ class SummaryQuerySet(models.QuerySet):
 
 
 class Summary(models.Model):
-    station = models.ForeignKey('inforecords.Station')
+    station = models.ForeignKey('inforecords.Station', models.CASCADE)
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
@@ -99,7 +99,7 @@ class Summary(models.Model):
 
 
 class Configuration(models.Model):
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     timestamp = models.DateTimeField()
     gps_latitude = models.FloatField()
     gps_longitude = models.FloatField()
@@ -258,9 +258,32 @@ class Configuration(models.Model):
         return version
 
 
+class HistogramType(models.Model):
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.CharField(max_length=20, unique=True)
+    has_multiple_datasets = models.BooleanField(default=False)
+    bin_axis_title = models.CharField(max_length=40)
+    value_axis_title = models.CharField(max_length=40)
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+
+class DatasetType(models.Model):
+    name = models.CharField(max_length=40, unique=True)
+    slug = models.CharField(max_length=20, unique=True)
+    x_axis_title = models.CharField(max_length=40)
+    y_axis_title = models.CharField(max_length=40)
+    description = models.TextField(blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+
 class NetworkHistogram(models.Model):
-    source = models.ForeignKey('NetworkSummary')
-    type = models.ForeignKey('HistogramType')
+    source = models.ForeignKey(NetworkSummary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
@@ -300,54 +323,31 @@ class BaseDailyStationDataMixin(models.Model):
 
 
 class DailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('HistogramType')
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
 
 class MultiDailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('HistogramType')
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(ArrayField(models.PositiveIntegerField()))
 
 
 class DailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('DatasetType')
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(DatasetType, models.CASCADE)
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(models.FloatField())
 
 
 class MultiDailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('DatasetType')
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(DatasetType, models.CASCADE)
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(ArrayField(models.FloatField()))
-
-
-class HistogramType(models.Model):
-    name = models.CharField(max_length=40, unique=True)
-    slug = models.CharField(max_length=20, unique=True)
-    has_multiple_datasets = models.BooleanField(default=False)
-    bin_axis_title = models.CharField(max_length=40)
-    value_axis_title = models.CharField(max_length=40)
-    description = models.TextField(blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-
-class DatasetType(models.Model):
-    name = models.CharField(max_length=40, unique=True)
-    slug = models.CharField(max_length=20, unique=True)
-    x_axis_title = models.CharField(max_length=40)
-    y_axis_title = models.CharField(max_length=40)
-    description = models.TextField(blank=True)
-
-    def __unicode__(self):
-        return self.name
 
 
 class GeneratorState(models.Model):
@@ -363,7 +363,7 @@ class PulseheightFit(models.Model):
                         (3, 'Scintillator 3'),
                         (4, 'Scintillator 4'))
 
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     plate = models.IntegerField(choices=DETECTOR_CHOICES)
 
     initial_mpv = models.FloatField()
@@ -400,7 +400,7 @@ class PulseheightFit(models.Model):
 
 
 class DetectorTimingOffset(models.Model):
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     offset_1 = models.FloatField(blank=True, null=True)
     offset_2 = models.FloatField(blank=True, null=True)
     offset_3 = models.FloatField(blank=True, null=True)
@@ -411,8 +411,8 @@ class DetectorTimingOffset(models.Model):
 
 
 class StationTimingOffset(models.Model):
-    ref_source = models.ForeignKey('Summary', related_name='ref_source')
-    source = models.ForeignKey('Summary', related_name='source')
+    ref_source = models.ForeignKey(Summary, models.CASCADE, related_name='ref_source')
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='source')
     offset = models.FloatField(blank=True, null=True)
     error = models.FloatField(blank=True, null=True)
 

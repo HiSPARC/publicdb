@@ -31,7 +31,7 @@ class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     nanoseconds = models.IntegerField()
-    station = models.ForeignKey(Station)
+    station = models.ForeignKey(Station, models.CASCADE)
     pulseheights = SerializedDataField()
     integrals = SerializedDataField()
     traces = SerializedDataField()

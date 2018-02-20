@@ -40,10 +40,18 @@ class AnalysisSession(models.Model):
         return self.title
 
 
+class Student(models.Model):
+    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    name = models.CharField(max_length=40)
+
+    def __unicode__(self):
+        return '%s - %s' % (self.session, self.name)
+
+
 class AnalyzedCoincidence(models.Model):
-    session = models.ForeignKey(AnalysisSession)
-    coincidence = models.ForeignKey(Coincidence)
-    student = models.ForeignKey('Student', null=True, blank=True)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    coincidence = models.ForeignKey(Coincidence, models.CASCADE)
+    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True)
     is_analyzed = models.BooleanField(default=False)
     core_position_x = models.FloatField(null=True, blank=True)
     core_position_y = models.FloatField(null=True, blank=True)
@@ -59,20 +67,12 @@ class AnalyzedCoincidence(models.Model):
         ordering = ('coincidence',)
 
 
-class Student(models.Model):
-    session = models.ForeignKey(AnalysisSession)
-    name = models.CharField(max_length=40)
-
-    def __unicode__(self):
-        return '%s - %s' % (self.session, self.name)
-
-
 class SessionRequest(models.Model):
     first_name = models.CharField(max_length=50)
     sur_name = models.CharField(max_length=50)
     email = models.EmailField()
     school = models.CharField(max_length=50)
-    cluster = models.ForeignKey('inforecords.Cluster')
+    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE)
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
     start_date = models.DateField()
