@@ -99,8 +99,9 @@ def mv_to_adc(value):
     Old versions of the DAQ report thresholds in mV. For both
     HiSPARC II and III the baseline is 200 with the old DAQ.
 
-    For new versions of the DAQ the bundled hisparc-monitor
-    converts the threshold to ADC using the appropriate transformation.
+    Newer versions of the DAQ the bundled hisparc-monitor
+    converts the threshold to ADC before uploading the configuration
+    to the public database using the appropriate transformation.
 
     If value < 0: Assume mV and convert to ADC assume baseline 200.
     """
