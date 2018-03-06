@@ -105,12 +105,12 @@ def get_station_status(station_number, down, problem, up):
              station occurs in multiple lists, the worst case is returned.
 
     """
-    if station_number in down:
-        return 'down'
-    elif station_number in problem:
+    if station_number in problem:
         return 'problem'
     elif station_number in up:
         return 'up'
+    elif station_number in down:
+        return 'down'
     else:
         return 'unknown'
 
