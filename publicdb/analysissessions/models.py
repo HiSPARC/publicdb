@@ -161,7 +161,7 @@ class SessionRequest(models.Model):
 
         stations = []
         for station in Station.objects.filter(cluster=self.cluster,
-                                              pc__is_test=False):
+                                              pc__is_test=False).distinct():
             station_group_name = 'station_%d' % station.number
 
             if station_group_name in cluster_group:
