@@ -2,6 +2,7 @@ import base64
 import cPickle as pickle
 import zlib
 
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
 from ..inforecords.models import Station
@@ -32,9 +33,9 @@ class Event(models.Model):
     time = models.TimeField()
     nanoseconds = models.IntegerField()
     station = models.ForeignKey(Station, models.CASCADE)
-    pulseheights = SerializedDataField()
-    integrals = SerializedDataField()
-    traces = SerializedDataField()
+    pulseheights = ArrayField(models.FloatField(), size=4)
+    integrals = ArrayField(models.FloatField(), size=4)
+    traces = ArrayField(ArrayField(models.FloatField()), size=4)
 
     class Meta:
         ordering = ('date', 'time', 'nanoseconds', 'station')
