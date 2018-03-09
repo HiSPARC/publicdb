@@ -160,7 +160,8 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_test=False)):
+                                               pc__is_test=False)
+                                       .distinct()):
 
             link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
@@ -230,10 +231,10 @@ def network_coincidences(request, year=None, month=None, day=None):
 
     n_stations = Station.objects.filter(summary__date=date,
                                         summary__num_events__isnull=False,
-                                        pc__is_test=False).count()
+                                        pc__is_test=False).distinct().count()
     histograms = DailyHistogram.objects.filter(
         source__date=date, source__station__pc__is_test=False,
-        type__slug='eventtime')
+        type__slug='eventtime').distinct()
     number_of_events = sum(sum(histogram.values) for histogram in histograms)
     status = {'station_count': n_stations,
               'n_events': number_of_events}
@@ -616,7 +617,8 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         today = datetime.date.today()
         try:
             last = (Summary.objects.filter(station__number=station_number,
-                                           date__gte=FIRSTDATE, date__lt=today,
+                                           date__gte=FIRSTDATE,
+                                           date__lt=today,
                                            num_events__isnull=False)
                                    .latest().date)
         except Summary.DoesNotExist:
@@ -626,7 +628,8 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         # Get first date with data
         try:
             start = (Summary.objects.filter(station__number=station_number,
-                                            date__gte=FIRSTDATE, date__lt=end,
+                                            date__gte=FIRSTDATE,
+                                            date__lt=end,
                                             num_events__isnull=False)
                                     .earliest().date)
         except Summary.DoesNotExist:

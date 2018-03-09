@@ -185,8 +185,8 @@ def confirm_request(request, url):
 
 
 def create_session(request):
-    sessionlist = (SessionRequest.objects.filter(session_confirmed=True)
-                                         .filter(session_pending=True))
+    sessionlist = SessionRequest.objects.filter(session_confirmed=True,
+                                                session_pending=True)
     for sessionrequest in sessionlist:
         sessionrequest.session_confirmed = False
         sessionrequest.save()
