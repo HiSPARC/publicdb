@@ -333,7 +333,7 @@ class MultiDailyHistogram(BaseDailyStationDataMixin):
     source = models.ForeignKey(Summary, models.CASCADE)
     type = models.ForeignKey(HistogramType, models.CASCADE)
     bins = ArrayField(models.PositiveIntegerField())
-    values = ArrayField(ArrayField(models.PositiveIntegerField()))
+    values = ArrayField(ArrayField(models.PositiveIntegerField()), size=4)
 
 
 class DailyDataset(BaseDailyStationDataMixin):
@@ -347,7 +347,7 @@ class MultiDailyDataset(BaseDailyStationDataMixin):
     source = models.ForeignKey(Summary, models.CASCADE)
     type = models.ForeignKey(DatasetType, models.CASCADE)
     x = ArrayField(models.PositiveIntegerField())
-    y = ArrayField(ArrayField(models.FloatField()))
+    y = ArrayField(ArrayField(models.FloatField()), size=4)
 
 
 class GeneratorState(models.Model):
