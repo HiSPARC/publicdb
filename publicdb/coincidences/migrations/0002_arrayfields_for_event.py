@@ -16,7 +16,10 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
     for event in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         event.pulseheights = event.old_pulseheights
         event.integrals = event.old_integrals
-        event.traces = event.old_traces
+        try:
+            event.traces = [trace.tolist() for trace in event.old_traces]
+        except AttributeError:
+            event.traces = event.old_traces
         event.save()
 
 
