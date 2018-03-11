@@ -10,6 +10,11 @@ from ..inforecords.models import Station
 
 class SerializedDataField(models.Field):
 
+    # After deploy change attribute to system_check_removed_details
+    system_check_deprecated_details = {
+        'hint': 'Use ArrayField instead.',
+    }
+
     def db_type(self, connection):
         return 'BYTEA'
 
