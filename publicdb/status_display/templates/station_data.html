@@ -8,20 +8,8 @@
 
 {% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
 
-{% block head_styles %}
-    {{ block.super }}
-    <!--[if lte IE 7]><style type="text/css" media="all">
-        #yearlist li, #monthlist li {
-            display: inline;}
-    </style><![endif]-->
-{% endblock %}
-
 {% block head %}
     <script src="{% static 'scripts/flot_settings.js' %}"></script>
-    <!--[if lte IE 8]><script>
-        var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
-        var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
-    </script><![endif]-->
     <script>
       {% if location.latitude and location.longitude %}
         $(document).ready(function() {
