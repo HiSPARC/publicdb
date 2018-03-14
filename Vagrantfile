@@ -1,9 +1,9 @@
 # -*- mode: ruby -*-
 
 MACHINES = {
-  publicdb: {hostname: "publicdb.localdomain", ip: "192.168.99.11", ssh: 2021, http: 8081},
-  vpn: {hostname: "vpn.localdomain", ip: "192.168.99.12", ssh: 2022, http: 8082},
-  datastore: {hostname: "datastore.localdomain", ip: "192.168.99.13", ssh: 2023, http: 8083}
+  publicdb: {hostname: "publicdb.localdomain", ip: "192.168.99.11", ssh: 2021, http: 8081, https:8443},
+  vpn: {hostname: "vpn.localdomain", ip: "192.168.99.12", ssh: 2022, http: 8082, https:8443},
+  datastore: {hostname: "datastore.localdomain", ip: "192.168.99.13", ssh: 2023, http: 8083, https:8443}
 }
 
 Vagrant.configure("2") do |config|
@@ -17,6 +17,7 @@ Vagrant.configure("2") do |config|
       machine.vm.network :private_network, ip: values[:ip]
       machine.vm.network :forwarded_port, id: "ssh", guest: 22, host: values[:ssh]
       machine.vm.network :forwarded_port, id: "http", guest: 80, host: values[:http]
+      machine.vm.network :forwarded_port, id: "https", guest: 443, host: values[:https]
     end
   end
 
