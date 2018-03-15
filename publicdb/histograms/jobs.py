@@ -497,10 +497,10 @@ def update_eventtime_histogram(summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = np.histogram(timestamps, bins=bins)
+    hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
-    hist = hist[0].tolist()
+    hist = hist.tolist()
     save_histograms(summary, 'eventtime', bins, hist)
 
 
@@ -517,10 +517,10 @@ def update_coincidencetime_histogram(network_summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = np.histogram(timestamps, bins=bins)
+    hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
-    hist = hist[0].tolist()
+    hist = hist.tolist()
     save_network_histograms(network_summary, 'coincidencetime', bins, hist)
 
 
@@ -534,8 +534,8 @@ def update_coincidencenumber_histogram(network_summary):
     # create bins, don't forget right-most edge
     bins = range(2, 101)
 
-    hist = np.histogram(n_stations, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(n_stations, bins=bins)
+    hist = hist.tolist()
     save_network_histograms(network_summary, 'coincidencenumber', bins, hist)
 
 
@@ -656,10 +656,10 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
     zeniths = esd.get_zeniths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(0, 91, 3)
+    bins = range(0, 91, 3)  # degrees
 
-    hist = np.histogram(zeniths, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(zeniths, bins=bins)
+    hist = hist.tolist()
     save_histograms(summary, 'zenith', bins, hist)
 
 
@@ -670,10 +670,10 @@ def update_azimuth_histogram(summary, tempfile_path, node_path):
     azimuths = esd.get_azimuths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(-180, 181, 12)
+    bins = range(-180, 181, 12)  # degrees
 
-    hist = np.histogram(azimuths, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(azimuths, bins=bins)
+    hist = hist.tolist()
     save_histograms(summary, 'azimuth', bins, hist)
 
 
