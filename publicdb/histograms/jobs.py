@@ -15,7 +15,7 @@ import django.db
 
 from django.conf import settings
 
-from sapphire.analysis.calibration import datetime_range
+#from sapphire.analysis.calibration import datetime_range
 from sapphire.utils import round_in_base
 
 from . import datastore, esd, fit_pulseheight_peak
@@ -627,10 +627,10 @@ def update_station_timing_offsets(network_summary):
         cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date,
                                                         sn, ref_sn)
-        # To only update offset for specific date use:
-        for date in [summary_date]:
         # To update all affected offsets use:
         # for date, _ in datetime_range(left, right):
+        # To only update offset for specific date use:
+        for date in [summary_date]:
             ref_summary = get_summary_or_none(date, ref_sn)
             if ref_summary is None:
                 continue
