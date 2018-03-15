@@ -2,8 +2,8 @@
 
 MACHINES = {
   publicdb: {hostname: "publicdb.localdomain", ip: "192.168.99.11", ssh: 2021, http: 8081, https:8443},
-  vpn: {hostname: "vpn.localdomain", ip: "192.168.99.12", ssh: 2022, http: 8082, https:8443},
-  datastore: {hostname: "datastore.localdomain", ip: "192.168.99.13", ssh: 2023, http: 8083, https:8443}
+  vpn: {hostname: "vpn.localdomain", ip: "192.168.99.12", ssh: 2022, http: 8082, https:8444},
+  datastore: {hostname: "datastore.localdomain", ip: "192.168.99.13", ssh: 2023, http: 8083, https:8445}
 }
 
 Vagrant.configure("2") do |config|
