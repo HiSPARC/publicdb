@@ -1,10 +1,18 @@
 from datetime import date
+from functools import partial
 
 from django import forms
 
 from ..inforecords.models import Station
 
-todays_year = range(2004, date.today().year + 1)
+# Distance and angle limits
+DISTANCE_LIMITS = {'min_value': -60, 'max_value': 60}  # meters
+ANGLE_LIMITS = {'min_value': -360, 'max_value': 360}  # degrees
+
+radius_field = partial(forms.FloatField, **DISTANCE_LIMITS)
+alpha_field = partial(forms.FloatField, **ANGLE_LIMITS)
+height_field = partial(forms.FloatField, initial=0., **DISTANCE_LIMITS)
+beta_field = partial(forms.FloatField, **ANGLE_LIMITS)
 
 
 class StationLayoutQuarantineForm(forms.Form):
@@ -18,34 +26,24 @@ class StationLayoutQuarantineForm(forms.Form):
                   "e.g. '2010-5-17 12:45'.")
 
     # Master detectors
-    detector_1_radius = forms.FloatField(min_value=-60, max_value=60)
-    detector_1_alpha = forms.FloatField(min_value=-360, max_value=360)
-    detector_1_height = forms.FloatField(min_value=-60, max_value=60,
-                                         initial=0.)
-    detector_1_beta = forms.FloatField(min_value=-360, max_value=360)
-    detector_2_radius = forms.FloatField(min_value=-60, max_value=60)
-    detector_2_alpha = forms.FloatField(min_value=-360, max_value=360)
-    detector_2_height = forms.FloatField(min_value=-60, max_value=60,
-                                         initial=0.)
-    detector_2_beta = forms.FloatField(min_value=-360, max_value=360)
+    detector_1_radius = radius_field()
+    detector_1_alpha = alpha_field()
+    detector_1_height = height_field()
+    detector_1_beta = beta_field()
+    detector_2_radius = radius_field()
+    detector_2_alpha = alpha_field()
+    detector_2_height = height_field()
+    detector_2_beta = beta_field()
 
     # Optional slave detectors
-    detector_3_radius = forms.FloatField(min_value=-60, max_value=60,
-                                         required=False)
-    detector_3_alpha = forms.FloatField(min_value=-360, max_value=360,
-                                        required=False)
-    detector_3_height = forms.FloatField(min_value=-60, max_value=60,
-                                         initial=0., required=False)
-    detector_3_beta = forms.FloatField(min_value=-360, max_value=360,
-                                       required=False)
-    detector_4_radius = forms.FloatField(min_value=-60, max_value=60,
-                                         required=False)
-    detector_4_alpha = forms.FloatField(min_value=-360, max_value=360,
-                                        required=False)
-    detector_4_height = forms.FloatField(min_value=-60, max_value=60,
-                                         initial=0., required=False)
-    detector_4_beta = forms.FloatField(min_value=-360, max_value=360,
-                                       required=False)
+    detector_3_radius = radius_field(required=False)
+    detector_3_alpha = alpha_field(required=False)
+    detector_3_height = height_field(required=False)
+    detector_3_beta = beta_field(required=False)
+    detector_4_radius = radius_field(required=False)
+    detector_4_alpha = alpha_field(required=False)
+    detector_4_height = height_field(required=False)
+    detector_4_beta = beta_field(required=False)
 
 
 class ReviewStationLayoutForm(forms.Form):
