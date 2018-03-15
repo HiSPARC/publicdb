@@ -586,13 +586,6 @@ def update_singles_histogram(summary):
 def update_singles_rate_dataset(summary):
     """Singles rate for each detector individually"""
 
-    def shrink(col, bin_idxs):
-        with warnings.catch_warnings():  # suppress "Mean of empty slice"
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            data = np.nan_to_num([np.nanmean(col[bin_idxs[i - 1]:bin_idxs[i]])
-                                 for i in range(1, len(bins))])
-        return data
-
     logger.debug("Updating singles rate datasets for %s" % summary)
     ts, high, low = esd.get_singles(summary)
 
@@ -600,16 +593,14 @@ def update_singles_rate_dataset(summary):
     start = calendar.timegm(summary.date.timetuple())
 
     # create bins, don't forget right-most edge
-    n_bins = 24 * 3600 // BIN_SINGLES_RATE
+    n_bins = 24 * 60 * 60 // BIN_SINGLES_RATE
     bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins + 1)]
-    bin_idxs = [np.searchsorted(ts, bins[i]) for i in range(len(bins))]
+    bin_idxs = [np.searchsorted(ts, bin) for bin in bins]
 
-    rates = [shrink(col, bin_idxs) for col in low]
-    rates = [col.tolist() for col in rates]
+    rates = [shrink(column, bin_idxs, n_bins) for column in low]
     save_dataset(summary, 'singlesratelow', bins, rates)
 
-    rates = [shrink(col, bin_idxs) for col in high]
-    rates = [col.tolist() for col in rates]
+    rates = [shrink(column, bin_idxs, n_bins) for column in high]
     save_dataset(summary, 'singlesratehigh', bins, rates)
 
 
@@ -722,6 +713,22 @@ def shrink_dataset(dataset, interval):
         if x - data[-1][0] >= interval:
             data.append((x, y))
     return data
+
+
+def shrink(column, bin_idxs, n_bins):
+    """Shrink a dataset.
+
+    :param column: a column of data.
+    :param bin_idxs: bin edge indexes.
+    :param n_bins: number of bins.
+    :return: list of shrunken data.
+
+    """
+    with warnings.catch_warnings():  # suppress "Mean of empty slice"
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        data = np.nan_to_num([np.nanmean(column[bin_idxs[i]:bin_idxs[i + 1]])
+                              for i in range(n_bins)])
+    return data.tolist()
 
 
 def update_config(summary):
