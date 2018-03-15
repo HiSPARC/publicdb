@@ -628,8 +628,9 @@ def update_station_timing_offsets(network_summary):
         left, right = off.determine_first_and_last_date(summary_date,
                                                         sn, ref_sn)
         # To only update offset for specific date use:
-        # for date in [summary_date]:
-        for date, _ in datetime_range(left, right):
+        for date in [summary_date]:
+        # To update all affected offsets use:
+        # for date, _ in datetime_range(left, right):
             ref_summary = get_summary_or_none(date, ref_sn)
             if ref_summary is None:
                 continue

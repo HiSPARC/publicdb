@@ -20,6 +20,7 @@ from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect, StreamingHttpResponse)
 from django.shortcuts import get_object_or_404, render
 from django.template import Context, loader
+from django.views.decorators.csrf import csrf_exempt
 
 from sapphire import CoincidenceQuery
 
@@ -45,6 +46,7 @@ class SingleLineStringIO:
         self.line = line
 
 
+@csrf_exempt
 def call_xmlrpc(request):
     """Dispatch XML-RPC requests."""
 
