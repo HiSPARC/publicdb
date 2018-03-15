@@ -396,7 +396,7 @@ def perform_events_tasks(summary):
     except StationLayout.DoesNotExist:
         logger.debug("No station layout available for %s" % summary)
     else:
-        if layout.detector_3_radius is not None:
+        if layout.has_four_detectors:
             tmp_locations.append(
                 esd.reconstruct_events_and_store_temporary_esd(summary))
             update_zenith_histogram(summary, *tmp_locations[-1])

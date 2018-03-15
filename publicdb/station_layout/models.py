@@ -30,6 +30,11 @@ class StationLayout(models.Model):
     detector_4_height = models.FloatField(null=True, blank=True)
     detector_4_beta = models.FloatField(null=True, blank=True)
 
+    @property
+    def has_four_detectors(self):
+        return (self.detector_3_radius is not None and
+                self.detector_4_radius is not None)
+
     class Meta:
         unique_together = [('station', 'active_date')]
         ordering = ('station', 'active_date')
@@ -44,7 +49,7 @@ class StationLayout(models.Model):
             next_date = next_layout.active_date
         except StationLayout.DoesNotExist:
             next_date = date.today()
-        if self.detector_3_radius is not None:
+        if self.has_four_detectors:
             # Only for 4 detector stations
             summaries = Summary.objects.filter(station=self.station,
                                                date__gte=self.active_date,
