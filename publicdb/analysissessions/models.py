@@ -179,7 +179,7 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            traces = np.around(traces, 2).tolist()
+            traces = traces.tolist()
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
@@ -204,17 +204,16 @@ class SessionRequest(models.Model):
     def analyze_traces(self, traces):
         """Analyze traces and determine time of first particle"""
 
-        t = []
+        arrival_times = []
         for trace in traces:
-            m = min(trace)
-            if not m < -20:
-                # No significant pulse (not lower than -20 mV)
+            if not max(trace) < 20:
+                # No significant pulse (not more than 20 ADC over baseline)
                 continue
-            for i, v in enumerate(trace):
-                if v < 0.2 * m:
+            for index, v in enumerate(trace):
+                if v >= 20:
                     break
-            t.append(i * 2.5)
-        if len(t) > 0:
+            arrival_times.append(index * 2.5)
+        if len(arrival_times) > 0:
             trace_timing = min(t)
         else:
             trace_timing = -999

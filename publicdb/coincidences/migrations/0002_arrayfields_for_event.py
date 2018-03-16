@@ -17,6 +17,10 @@ def mv_to_adc(values):
     return [int(x / 0.57) if x > 0 else x for value in values]
 
 
+def traces_mv_to_adc(traces):
+    return [[int(x / -0.57) for x in trace] for trace in traces]
+
+
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('coincidences', 'Event')
@@ -24,10 +28,7 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
     for event in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         event.pulseheights = mv_to_adc(event.old_pulseheights)
         event.integrals = mvns_to_adcsample(event.old_integrals)
-        try:
-            event.traces = [trace.tolist() for trace in event.old_traces]
-        except AttributeError:
-            event.traces = event.old_traces
+        event.traces = traces_mv_to_adc(event.old_traces)
         event.save()
 
 
@@ -73,7 +74,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='traces',
-            field=django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), size=None), null=True, size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), size=None), null=True, size=4),
         ),
         # Move data into new fields
         migrations.RunPython(
@@ -108,6 +109,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='traces',
-            field=django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), size=None), size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), size=None), size=4),
         ),
     ]

@@ -40,7 +40,7 @@ class Event(models.Model):
     station = models.ForeignKey(Station, models.CASCADE)
     pulseheights = ArrayField(models.IntegerField(), size=4)
     integrals = ArrayField(models.IntegerField(), size=4)
-    traces = ArrayField(ArrayField(models.FloatField()), size=4)
+    traces = ArrayField(ArrayField(models.IntegerField()), size=4)
 
     class Meta:
         ordering = ('date', 'time', 'nanoseconds', 'station')
