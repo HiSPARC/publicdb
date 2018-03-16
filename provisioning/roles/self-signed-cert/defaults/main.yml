@@ -1,0 +1,16 @@
+---
+
+publicdb_base: /srv/
+publicdb_path: "{{ publicdb_base }}publicdb/"
+
+publicdb_code: "{{ publicdb_path }}www/"
+publicdb_venv: "{{ publicdb_path }}publicdb_venv"
+publicdb_static: "{{ publicdb_path }}static/"
+publicdb_media: "{{ publicdb_path }}media/"
+
+publicdb_python_version: 2.7
+
+certificate_root: "/etc/nginx/ssl"
+certificate_private_key: "{{ certificate_root }}/private_key.pem"
+certificate_csr: "{{ certificate_root }}/{{ cert_name }}.csr"
+certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.pem"

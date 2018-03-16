@@ -1,0 +1,62 @@
+---
+
+- name: install libraries for python cryptography package
+  yum:
+    name: "{{ item }}"
+    state: present
+  become: true
+  with_items:
+    - openssl-devel
+    - libffi-devel
+    - python-devel
+
+- name: install pip
+  package:
+    name: python-pip
+    state: latest
+  become: true
+
+- name: install pyOpenSSL
+  pip:
+    name: pyopenssl
+    state: latest
+ # become: true
+
+- name: directory for certs
+  file:
+    path: "{{ certificate_root }}"
+    state: directory
+  become: true
+
+- name: generate private key
+  openssl_privatekey:
+    path: "{{ certificate_private_key }}"
+  become: true
+
+- name: generate csr.
+  openssl_csr:
+    path: "{{ certificate_csr }}"
+    privatekey_path: "{{ certificate_private_key }}"
+    subject_alt_name: "DNS:localhost"
+    C: "NL"
+    ST: "Noord-Holland"
+    L: "Amsterdam"
+    O: "HiSPARC"
+    OU: "HiSPARC devs"
+    CN: "{{ cert_hostname }}"
+  become: true
+
+- name: generate self-signed certificate
+  openssl_certificate:
+    path: "{{ certificate_certificate }}"
+    privatekey_path: "{{ certificate_private_key }}"
+    csr_path: "{{ certificate_csr }}"
+    provider: selfsigned
+    key_usage:
+      - keyEncipherment
+      - dataEncipherment
+    extended_key_usage:
+      - serverAuth
+    issuer:
+      CN: "Fake CA. DO NOT TRUST."
+  become: true
