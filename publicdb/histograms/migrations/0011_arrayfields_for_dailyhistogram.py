@@ -10,6 +10,14 @@ from django.db import migrations, models
 from sapphire.utils import pbar
 
 
+def mvns_to_adcsample(nested_values):
+    return [[int(x / 0.57 / 2.5) for value in values] for values in nested_values]
+
+
+def mv_to_adc(nested_values):
+    return [[int(x / 0.57) for value in values] for values in nested_values]
+
+
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'DailyHistogram')
@@ -21,10 +29,16 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
             histogram.values = histogram.old_values
             histogram.save()
         else:
+            if histogram.type.slug == 'pulseheight':
+                new_bins = mv_to_adc(histogram.old_bins)
+            elif histogram.type.slug == 'pulseintegral':
+                new_bins = mvns_to_adcsample(histogram.old_bins)
+            else:
+                new_bins = histogram.old_bins
             multi_model.objects.create(
                 source=histogram.source,
                 type=histogram.type,
-                bins=histogram.old_bins,
+                bins=new_bins,
                 values=histogram.old_values)
             histogram.delete()
 
