@@ -9,6 +9,15 @@
   become: true
   notify: compile firewall rules
 
+- name: add HTTPS access to firewall rules
+  lineinfile:
+    dest: /etc/sysconfig/system-config-firewall
+    regexp: '--service=https'
+    line: '--service=https'
+    state: present
+  become: true
+  notify: compile firewall rules
+
 - name: add XMLRPC access to firewall rules
   lineinfile:
     dest: /etc/sysconfig/system-config-firewall
