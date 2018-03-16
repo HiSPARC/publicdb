@@ -112,7 +112,7 @@ var _pulseheighthistogram = {
         tickLength: 0},
     xaxis: {
         max: 2000,
-        axisLabel: 'Pulseheight (mV)'}
+        axisLabel: 'Pulseheight (ADC)'}
 };
 
 var _pulseintegralhistogram = {
@@ -126,7 +126,7 @@ var _pulseintegralhistogram = {
         tickLength: 0},
     xaxis: {
         max: 62500,
-        axisLabel: 'Pulseintegral (mVns)'}
+        axisLabel: 'Pulseintegral (ADCsample)'}
 };
 
 var _zenithhistogram = {
@@ -268,7 +268,7 @@ var _tracegraph = {
         axisLabel: 'Time (ns)',
         max: 200},
     yaxis: {
-        axisLabel: 'Signal (mV)',
+        axisLabel: 'Signal (ADC)',
         min: -1500,
         max: 0}
 };
