@@ -111,7 +111,7 @@ var _pulseheighthistogram = {
     y2axis: {
         tickLength: 0},
     xaxis: {
-        max: 2000,
+        max: 4000,
         axisLabel: 'Pulseheight (ADC)'}
 };
 
@@ -125,7 +125,7 @@ var _pulseintegralhistogram = {
     y2axis: {
         tickLength: 0},
     xaxis: {
-        max: 62500,
+        max: 50000,
         axisLabel: 'Pulseintegral (ADCsample)'}
 };
 
@@ -269,8 +269,8 @@ var _tracegraph = {
         max: 200},
     yaxis: {
         axisLabel: 'Signal (ADC)',
-        min: -1500,
-        max: 0}
+        min: 0,
+        max: 1500}
 };
 
 var ct_options = $.extend(true, {}, _base, _coincidencetimehistogram);
