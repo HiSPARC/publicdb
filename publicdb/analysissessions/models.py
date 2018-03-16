@@ -179,20 +179,14 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = np.where(event['pulseheights'] > 0,
-                                    np.around(event['pulseheights'] * 0.57, 2),
-                                    event['pulseheights']).tolist()
-            integrals = np.where(event['integrals'] > 0,
-                                 np.around(event['integrals'] * 0.57 * 2.5, 2),
-                                 event['integrals']).tolist()
             traces = np.around(traces, 2).tolist()
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
                           nanoseconds=event['nanoseconds'] - dt,
                           station=Station.objects.get(number=station),
-                          pulseheights=pulseheights,
-                          integrals=integrals,
+                          pulseheights=event['pulseheights'].tolist(),
+                          integrals=event['integrals'].tolist(),
                           traces=traces)
             event.save()
             events.append(event)

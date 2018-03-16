@@ -9,13 +9,21 @@ from django.db import migrations, models
 from sapphire.utils import pbar
 
 
+def mvns_to_adcsample(values):
+    return [int(x / 0.57 / 2.5) if x > 0 else x for value in values]
+
+
+def mv_to_adc(values):
+    return [int(x / 0.57) if x > 0 else x for value in values]
+
+
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('coincidences', 'Event')
     print('')
     for event in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
-        event.pulseheights = event.old_pulseheights
-        event.integrals = event.old_integrals
+        event.pulseheights = mv_to_adc(event.old_pulseheights)
+        event.integrals = mvns_to_adcsample(event.old_integrals)
         try:
             event.traces = [trace.tolist() for trace in event.old_traces]
         except AttributeError:
@@ -55,12 +63,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='pulseheights',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), null=True, size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), null=True, size=4),
         ),
         migrations.AddField(
             model_name='event',
             name='integrals',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), null=True, size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), null=True, size=4),
         ),
         migrations.AddField(
             model_name='event',
@@ -90,12 +98,12 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='event',
             name='pulseheights',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), size=4),
         ),
         migrations.AlterField(
             model_name='event',
             name='integrals',
-            field=django.contrib.postgres.fields.ArrayField(base_field=models.FloatField(), size=4),
+            field=django.contrib.postgres.fields.ArrayField(base_field=models.IntegerField(), size=4),
         ),
         migrations.AlterField(
             model_name='event',

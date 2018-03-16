@@ -38,8 +38,8 @@ class Event(models.Model):
     time = models.TimeField()
     nanoseconds = models.IntegerField()
     station = models.ForeignKey(Station, models.CASCADE)
-    pulseheights = ArrayField(models.FloatField(), size=4)
-    integrals = ArrayField(models.FloatField(), size=4)
+    pulseheights = ArrayField(models.IntegerField(), size=4)
+    integrals = ArrayField(models.IntegerField(), size=4)
     traces = ArrayField(ArrayField(models.FloatField()), size=4)
 
     class Meta:
