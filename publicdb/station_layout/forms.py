@@ -1,4 +1,3 @@
-from datetime import date
 from functools import partial
 
 from django import forms
