@@ -7,6 +7,9 @@ publicdb_repo: /vagrant/.git
 psql_database_name: publicdb
 psql_user: "{{ ansible_user }}"
 
+cert_name: publicdb
+cert_hostname: localhost
+
 vpn_host: 192.168.99.12
 vpn_proxy: http://192.168.99.12:8001
 datastore_host: 192.168.99.13
