@@ -30,18 +30,17 @@ from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
 logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
-MAX_PH = 2500
-BIN_PH_NUM = 250  # bin width = 10 mV
-MAX_IN = 62500
-BIN_IN_NUM = 250  # bin width = 250 mVns
+MAX_PH = 4096  # max value for 12-bit ADC
+BIN_PH_NUM = 256  # bin width = 16 ADC
+MAX_IN = 51200
+BIN_IN_NUM = 512  # bin width = 100 ADCsample
 MAX_SINGLES_LOW = 1000
-BIN_SINGLES_LOW_NUM = 100  # bin width = 10
+BIN_SINGLES_LOW_NUM = 100  # bin width = 10 Hz
 MAX_SINGLES_HIGH = 300
-BIN_SINGLES_HIGH_NUM = 100  # bin width = 3
+BIN_SINGLES_HIGH_NUM = 100  # bin width = 3 Hz
 
-BIN_SINGLES_RATE = 150  # seconds
-
-# Parameters for the datasets, interval in seconds
+# Parameters for the datasets, intervals in seconds
+BIN_SINGLES_RATE = 180
 INTERVAL_TEMP = 150
 INTERVAL_BARO = 150
 
