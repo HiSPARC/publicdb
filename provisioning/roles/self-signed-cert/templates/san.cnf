@@ -5,10 +5,6 @@ x509_extensions    = v3_req
 
 [req_distinguished_name]
 commonName       = {{ cert_hostname }}
-#emailAddress     = fake@fake
-#organizationName = HiSPARC
-#localityName     = Amsterdam
-#countryName      = NL
 
 [v3_req]
 # The extentions to add to a self-signed cert

@@ -14,6 +14,5 @@ jsparc_repo: https://github.com/HiSPARC/jsparc.git
 jsparc_path: "{{ publicdb_path }}jsparc/"
 
 certificate_root: "/etc/nginx/ssl"
-certificate_private_key: "{{ certificate_root }}/private_key.pem"
-certificate_csr: "{{ certificate_root }}/{{ cert_name }}.csr"
-certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.pem"
+certificate_private_key: "{{ certificate_root }}/private_key.key"
+certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.crt"
