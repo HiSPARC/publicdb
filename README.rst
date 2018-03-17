@@ -119,6 +119,19 @@ file into the database, this can be done using the following commands::
     $ createdb --host=localhost --username=postgres publicdb
     $ pg_restore --host=localhost --username=postgres  --create --dbname=publicdb /vagrant/publicdb_dump.sql
 
+The development server creates and uses an x509 certificate issued (signed)
+by a self-signed fake root CA. The fake root CA is created during
+provisioning, but it's private key is immediately removed to prevent abuse.
+The x509 certificate is valid in modern browsers, but not automatically
+trusted. In general you should NOT add the fake root CA to your computer.
+For testing SSL you can add the fake root CA certificate to your
+computer/browsers trusted certificates::
+
+    /etc/nginx/ssl/ca.crt
+
+As the private key of the fake root CA has been deleted during provisioning,
+this is fairly safe: No new certificates can be issued by this CA.
+
 Important information regarding provisioning the production servers
 -------------------------------------------------------------------
 
