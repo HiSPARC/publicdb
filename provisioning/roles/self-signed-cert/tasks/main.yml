@@ -1,62 +1,62 @@
 ---
 
-- name: install libraries for python cryptography package
-  yum:
-    name: "{{ item }}"
-    state: present
-  become: true
-  with_items:
-    - openssl-devel
-    - libffi-devel
-    - python-devel
-
-- name: install pip
-  package:
-    name: python-pip
-    state: latest
-  become: true
-
-- name: install pyOpenSSL
-  pip:
-    name: pyopenssl
-    state: latest
- # become: true
-
 - name: directory for certs
   file:
     path: "{{ certificate_root }}"
     state: directory
   become: true
 
-- name: generate private key
-  openssl_privatekey:
-    path: "{{ certificate_private_key }}"
+- name: copy san.cnf
+  template:
+    src: san.cnf
+    dest: "{{ certificate_root }}/san.cnf"
   become: true
 
-- name: generate csr.
-  openssl_csr:
-    path: "{{ certificate_csr }}"
-    privatekey_path: "{{ certificate_private_key }}"
-    subject_alt_name: "DNS:localhost"
-    C: "NL"
-    ST: "Noord-Holland"
-    L: "Amsterdam"
-    O: "HiSPARC"
-    OU: "HiSPARC devs"
-    CN: "{{ cert_hostname }}"
+- name: generate fake CA private key
+  command: openssl genrsa \
+    -out "{{ certificate_CA_private_key }}" 1024
+  args:
+    creates: "{{ certificate_CA_private_key }}"
+  become: true
+
+- name: generate fake CA certificate
+  command: openssl req \
+     -new -x509 -days 3650 -key {{certificate_CA_private_key}} \
+     -subj "/C=NL/L=Amsterdam/O=HiSPARC/CN=FAKE HiSPARC Root CA" \
+     -out {{ certificate_CA_cert }}
+  args:
+    creates: "{{ certificate_CA_cert }}"
+  become: true
+
+- name: generate RSA private key
+  command: openssl genrsa \
+    -out "{{ certificate_private_key }}" 1024
+  args:
+    creates: "{{ certificate_private_key }}"
+  become: true
+
+- name: generate csr
+  command: openssl req \
+    -new \
+    -subj '/C=NL/L=Amsterdam/O=HiSPARC/CN={{ cert_hostname }}'
+    -config "{{ certificate_root }}/san.cnf"
+    -key "{{ certificate_private_key }}" \
+    -out "{{ certificate_csr }}"
+  args:
+    creates: "{{ certificate_csr }}"
   become: true
 
 - name: generate self-signed certificate
-  openssl_certificate:
-    path: "{{ certificate_certificate }}"
-    privatekey_path: "{{ certificate_private_key }}"
-    csr_path: "{{ certificate_csr }}"
-    provider: selfsigned
-    key_usage:
-      - keyEncipherment
-      - dataEncipherment
-    extended_key_usage:
-      - serverAuth
-    issuer:
-      CN: "Fake CA. DO NOT TRUST."
+  command: openssl x509 \
+    -req \
+    -days 3650 \
+    -extfile "{{ certificate_root }}/san.cnf" \
+    -extensions v3_req \
+    -CA "{{ certificate_CA_cert}}" \
+    -CAkey ""{{ certificate_CA_private_key}} \
+    -set_serial 0xBAD \
+    -in "{{ certificate_csr }}" \
+    -out "{{ certificate_certificate }}"
+  args:
+    creates: "{{ certificate_certificate }}"
   become: true
