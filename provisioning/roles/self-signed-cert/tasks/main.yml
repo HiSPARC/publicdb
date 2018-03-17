@@ -22,7 +22,7 @@
 - name: generate fake CA certificate
   command: openssl req \
      -new -x509 -days 3650 -key {{certificate_CA_private_key}} \
-     -subj "/C=NL/L=Amsterdam/O=HiSPARC/CN=FAKE HiSPARC Root CA" \
+     -subj "/C=NL/L=Amsterdam/O=HiSPARC/OU=FakeCA/CN={{ cert_hostname }}" \
      -out {{ certificate_CA_cert }}
   args:
     creates: "{{ certificate_CA_cert }}"
@@ -53,10 +53,16 @@
     -extfile "{{ certificate_root }}/san.cnf" \
     -extensions v3_req \
     -CA "{{ certificate_CA_cert}}" \
-    -CAkey ""{{ certificate_CA_private_key}} \
+    -CAkey "{{ certificate_CA_private_key}}" \
     -set_serial 0xBAD \
     -in "{{ certificate_csr }}" \
     -out "{{ certificate_certificate }}"
   args:
     creates: "{{ certificate_certificate }}"
+  become: true
+
+- name: remove fake CA private key
+  file:
+    state: absent
+    path: "{{ certificate_CA_private_key }}"
   become: true

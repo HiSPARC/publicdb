@@ -4,11 +4,19 @@ req_extensions     = v3_req
 x509_extensions    = v3_req
 
 [req_distinguished_name]
-commonName       = {{ cert_hostname }}
+C = NL
+L = Amsterdam
+O = HiSPARC
+OU = FakeCA
+CN = {{ cert_hostname }}
 
 [v3_req]
 # The extentions to add to a self-signed cert
+#authorityKeyIdentifier=issuer
 subjectKeyIdentifier = hash
-basicConstraints     = critical,CA:false
-subjectAltName       = DNS:{{ cert_hostname }}
-keyUsage             = critical,digitalSignature,keyEncipherment
+basicConstraints     = CA:false
+subjectAltName       = @alt_names
+keyUsage             = digitalSignature,keyEncipherment
+
+[alt_names]
+DNS.1 = {{ cert_hostname }}
