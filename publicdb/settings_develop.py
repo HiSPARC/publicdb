@@ -80,6 +80,11 @@ STATICFILES_FINDERS = (
 
 SECRET_KEY = 'Make-this-unique-and-do-not-share-it-with-anybody'
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_REDIRECT_EXEMPT = [r'^(?!admin/).*']
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
