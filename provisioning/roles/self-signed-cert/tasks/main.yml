@@ -20,9 +20,11 @@
   become: true
 
 - name: generate fake CA certificate
-  command: openssl req \
-     -new -x509 -days 3650 -key {{certificate_CA_private_key}} \
-     -subj "/C=NL/L=Amsterdam/O=HiSPARC/OU=FakeCA/CN={{ cert_hostname }}" \
+  command: openssl req -config "{{ certificate_root }}/san.cnf" \
+     -x509 -new \
+     -days 3650 -key {{certificate_CA_private_key}} \
+     -subj "/C=NL/L=Amsterdam/O=HiSPARC Fake CA/CN=HiSPARC Fake ROOT CA" \
+     -extensions v3_ca \
      -out {{ certificate_CA_cert }}
   args:
     creates: "{{ certificate_CA_cert }}"
@@ -39,7 +41,6 @@
   command: openssl req \
     -new \
     -subj '/C=NL/L=Amsterdam/O=HiSPARC/CN={{ cert_hostname }}'
-    -config "{{ certificate_root }}/san.cnf"
     -key "{{ certificate_private_key }}" \
     -out "{{ certificate_csr }}"
   args:

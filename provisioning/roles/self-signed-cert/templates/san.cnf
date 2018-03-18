@@ -10,9 +10,14 @@ O = HiSPARC
 OU = FakeCA
 CN = {{ cert_hostname }}
 
+[v3_ca]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints       = CA:TRUE
+keyUsage               = digitalSignature, nonRepudiation, keyEncipherment, dataEncipherment, keyAgreement, keyCertSign
+
 [v3_req]
-# The extentions to add to a self-signed cert
-#authorityKeyIdentifier=issuer
+authorityKeyIdentifier=keyid:always, issuer:always
 subjectKeyIdentifier = hash
 basicConstraints     = CA:false
 subjectAltName       = @alt_names
