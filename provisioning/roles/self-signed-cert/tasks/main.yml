@@ -25,6 +25,7 @@
      -days 3650 -key {{certificate_CA_private_key}} \
      -subj "/C=NL/L=Amsterdam/O=HiSPARC Fake CA/CN=HiSPARC Fake ROOT CA" \
      -extensions v3_ca \
+     -set_serial 0x8BADF00D \
      -out {{ certificate_CA_cert }}
   args:
     creates: "{{ certificate_CA_cert }}"
