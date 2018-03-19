@@ -608,7 +608,7 @@ def get_coincidencenumber_histogram_source(request, year, month, day):
 
 def get_specific_network_histogram_source(request, year, month, day, type):
     data = get_histogram_source(year, month, day, type)
-    response = render(request, 'source_%s_histogram.tsv' % type,
+    response = render(request, 'source/%s_histogram.tsv' % type,
                       {'data': data,
                        'date': '-'.join((year, month, day))},
                       content_type=MIME_TSV)
@@ -661,7 +661,7 @@ def get_singlesratehigh_histogram_source(request, station_number, year, month,
 def get_specific_histogram_source(request, station_number, year, month, day,
                                   type):
     data = get_histogram_source(year, month, day, type, station_number)
-    response = render(request, 'source_%s_histogram.tsv' % type,
+    response = render(request, 'source/%s_histogram.tsv' % type,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
@@ -706,7 +706,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source_eventtime.tsv',
+    response = render(request, 'source/eventtime.tsv',
                       {'tsvdata': tsvdata,
                        'start': start,
                        'end': end,
@@ -767,7 +767,7 @@ def get_singlesratehigh_dataset_source(request, station_number, year, month,
 def get_specific_dataset_source(request, station_number, year, month, day,
                                 type):
     data = get_dataset_source(year, month, day, type, station_number)
-    response = render(request, 'source_%s_dataset.tsv' % type,
+    response = render(request, 'source/%s_dataset.tsv' % type,
                       {'data': data,
                        'date': '-'.join((year, month, day)),
                        'station_number': station_number},
@@ -800,7 +800,7 @@ def get_trigger_config_source(request, station_number):
 
 def get_specific_config_source(request, station_number, type):
     data = get_config_source(station_number, type)
-    response = render(request, 'source_%s_config.tsv' % type,
+    response = render(request, 'source/%s_config.tsv' % type,
                       {'data': data,
                        'station_number': station_number},
                       content_type=MIME_TSV)
@@ -820,7 +820,7 @@ def get_station_layout_source(request, station_number):
     for layout in layouts:
         layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
 
-    response = render(request, 'source_station_layout.tsv',
+    response = render(request, 'source/station_layout.tsv',
                       {'layouts': layouts,
                        'station_number': station_number},
                       content_type=MIME_TSV)
@@ -847,7 +847,7 @@ def get_detector_timing_offsets_source(request, station_number):
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source_detector_timing_offsets.tsv',
+    response = render(request, 'source/detector_timing_offsets.tsv',
                       {'tsvdata': tsvdata,
                        'station_number': station_number},
                       content_type=MIME_TSV)
@@ -890,7 +890,7 @@ def get_station_timing_offsets_source(request, ref_station_number,
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source_station_timing_offsets.tsv',
+    response = render(request, 'source/station_timing_offsets.tsv',
                       {'tsvdata': tsvdata,
                        'ref_station_number': ref_station_number,
                        'station_number': station_number},
