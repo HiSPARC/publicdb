@@ -4,7 +4,6 @@ import os
 import re
 import textwrap
 
-import numpy as np
 import tables
 
 from django.conf import settings
@@ -214,7 +213,7 @@ class SessionRequest(models.Model):
                     break
             arrival_times.append(index * 2.5)
         if len(arrival_times) > 0:
-            trace_timing = min(t)
+            trace_timing = min(arrival_times)
         else:
             trace_timing = -999
         return trace_timing
