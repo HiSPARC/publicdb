@@ -3,10 +3,12 @@
 #
 # Build a root certificate
 #
+# TK: Set certificate expiration to 100 years.
+# TK: `default_days` seems to be ignored for `req` in openssl.conf.
 
 if test $KEY_DIR; then
 	cd $KEY_DIR && \
-	openssl req -days 3650 -nodes -new -x509 -keyout ca.key -out ca.crt -config $KEY_CONFIG && \
+	openssl req -days 36500 -nodes -new -x509 -keyout ca.key -out ca.crt -config $KEY_CONFIG && \
         chmod 0600 ca.key
 else
 	echo you must define KEY_DIR
