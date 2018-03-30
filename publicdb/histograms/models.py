@@ -273,6 +273,7 @@ class HistogramType(models.Model):
 class DatasetType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
+    has_multiple_datasets = models.BooleanField(default=False)
     x_axis_title = models.CharField(max_length=40)
     y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
