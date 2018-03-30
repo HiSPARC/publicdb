@@ -39,26 +39,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='event',
             name='coinc',
-            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='_events', to='coincidences.Coincidence'),
+            field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.CASCADE, related_name='fk_events', to='coincidences.Coincidence'),
         ),
         # Convert m2m from coincidences relations to foreign keys on events
         migrations.RunPython(
             m2m_to_foreignkey,
             foreignkey_to_m2m,
-        ),
-        migrations.RenameField(
-            model_name='event',
-            old_name='coinc',
-            new_name='coincidence',
-        ),
-        migrations.AlterField(
-            model_name='event',
-            name='coincidence',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='events', to='coincidences.Coincidence'),
-            preserve_default=False,
-        ),
-        migrations.RemoveField(
-            model_name='coincidence',
-            name='events',
         ),
     ]
