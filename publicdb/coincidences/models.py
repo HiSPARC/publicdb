@@ -33,10 +33,27 @@ class SerializedDataField(models.Field):
         return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
+class Coincidence(models.Model):
+    date = models.DateField()
+    time = models.TimeField()
+    nanoseconds = models.IntegerField()
+
+    def num_events(self):
+        return self.events.count()
+
+    def __unicode__(self):
+        return '%d-fold - %s %s %d' % (self.num_events(), self.date,
+                                       self.time, self.nanoseconds)
+
+    class Meta:
+        ordering = ('date', 'time', 'nanoseconds')
+
+
 class Event(models.Model):
     date = models.DateField()
     time = models.TimeField()
     nanoseconds = models.IntegerField()
+    coincidence = models.ForeignKey(Coincidence, models.CASCADE, related_name='events')
     station = models.ForeignKey(Station, models.CASCADE)
     pulseheights = ArrayField(models.IntegerField(), size=4)
     integrals = ArrayField(models.IntegerField(), size=4)
@@ -48,20 +65,3 @@ class Event(models.Model):
     def __unicode__(self):
         return '%d - %s %s %d' % (self.station.number, self.date, self.time,
                                   self.nanoseconds)
-
-
-class Coincidence(models.Model):
-    date = models.DateField()
-    time = models.TimeField()
-    nanoseconds = models.IntegerField()
-    events = models.ManyToManyField(Event)
-
-    def num_events(self):
-        return self.events.count()
-
-    def __unicode__(self):
-        return '%d-fold - %s %s %d' % (self.num_events(), self.date,
-                                       self.time, self.nanoseconds)
-
-    class Meta:
-        ordering = ('date', 'time', 'nanoseconds')
