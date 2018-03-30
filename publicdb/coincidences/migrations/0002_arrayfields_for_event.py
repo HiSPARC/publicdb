@@ -10,11 +10,11 @@ from sapphire.utils import pbar
 
 
 def mvns_to_adcsample(values):
-    return [int(x / 0.57 / 2.5) if x > 0 else x for value in values]
+    return [int(x / 0.57 / 2.5) if x >= 0 else -1 for x in values]
 
 
 def mv_to_adc(values):
-    return [int(x / 0.57) if x > 0 else x for value in values]
+    return [int(x / 0.57) if x >= 0 else -1 for x in values]
 
 
 def traces_mv_to_adc(traces):
@@ -29,6 +29,8 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
         event.pulseheights = mv_to_adc(event.old_pulseheights)
         event.integrals = mvns_to_adcsample(event.old_integrals)
         event.traces = traces_mv_to_adc(event.old_traces)
+        if not (len(event.traces[0]) == len(event.traces[-1])):
+            event.traces = event.traces[:2]
         event.save()
 
 
