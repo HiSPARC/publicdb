@@ -1,0 +1,23 @@
+#!/bin/sh
+
+# Added by Tom Kooij, Mar 2018
+#
+# Make a new certificate for an existing private key
+# signed by the CA root certificate.
+#
+# This is useful for replacing a certifcate while to existing is still valid.
+# This requires unique_keys: 
+
+if test $# -ne 1; then
+        echo "usage: replace-key <name>";
+        exit 1
+fi
+
+if test $KEY_DIR; then
+        cd $KEY_DIR && \
+        cp $1.crt $1.crt.OLD && \
+        openssl req -nodes -new -key $1.key -out $1.csr -config $KEY_CONFIG && \
+        openssl ca -out $1.crt -in $1.csr -config $KEY_CONFIG -batch
+else
+        echo you must define KEY_DIR
+fi
