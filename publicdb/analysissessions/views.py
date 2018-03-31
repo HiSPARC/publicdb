@@ -27,7 +27,7 @@ def data_display(request, slug):
     star_map = None  # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
 
-    return render(request, 'results.html',
+    return render(request, 'analysissessions/results.html',
                   {'energy_histogram': energy_histogram,
                    'core_map': core_map,
                    'star_map': star_map,
@@ -116,7 +116,7 @@ def request_form(request):
     if settings.RECAPTCHA_ENABLED:
         html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
 
-    return render(request, 'request.html',
+    return render(request, 'analysissessions/request.html',
                   {'form': form, 'html_captcha': html_captcha})
 
 
@@ -165,7 +165,7 @@ def validate_request_form(request):
     new_request.save()
     new_request.sendmail_request()
 
-    return render(request, 'thankyou.html', {'data': data})
+    return render(request, 'analysissessions/thankyou.html', {'data': data})
 
 
 def confirm_request(request, url):
@@ -179,7 +179,7 @@ def confirm_request(request, url):
                         pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
-    return render(request, 'confirm.html',
+    return render(request, 'analysissessions/confirm.html',
                   {'id': sessionrequest.sid,
                    'pin': sessionrequest.pin})
 
