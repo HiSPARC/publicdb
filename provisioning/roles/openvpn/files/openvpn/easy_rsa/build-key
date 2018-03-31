@@ -15,7 +15,7 @@ if test $KEY_DIR; then
 	cd $KEY_DIR && \
 	openssl req -nodes -new -keyout $1.key -out $1.csr -config $KEY_CONFIG -batch && \
 	openssl ca -out $1.crt -in $1.csr -config $KEY_CONFIG -batch
-	#chmod 0600 $1.key
+	chmod 0600 $1.key
 else
 	echo you must define KEY_DIR
 fi
