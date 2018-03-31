@@ -198,13 +198,10 @@ authorityKeyIdentifier=keyid,issuer:always
 
 [ server ]
 
-# Add *both* nsCertType=server and extendedKeyUsage = ServerAuth
-# to the server cert. This allows both the deprecated `ns-cert-type server`
-# and `remote-cert-tls server` in the openvpn client config.
-# nsCertType=server can be removed once we have upgraded all clients
-# to use `remote-cert-tls server`
+# Add extendedKeyUsage = ServerAuth to the server cert. This requires
+# `remote-cert-tls server` in the openvpn client config.
+# `ns-cert-type server` is deprecated and not allowed on the Admin VPN.
 basicConstraints=CA:FALSE
-nsCertType                      = server
 nsComment                       = "OpenSSL Generated Server Certificate"
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
