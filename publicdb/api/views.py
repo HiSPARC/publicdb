@@ -28,9 +28,9 @@ class Nagios:
     unknown = (3, 'UNKNOWN')
 
 
-def json_dict(dict):
+def json_dict(result):
     """Create a json HTTPResponse"""
-    response = HttpResponse(json.dumps(dict, sort_keys=True),
+    response = HttpResponse(json.dumps(result, sort_keys=True),
                             content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -365,17 +365,17 @@ def get_pulseheight_drift(request, station_number, plate_number,
     requested_date = datetime.date(int(year), int(month), int(day))
     number_of_days = int(number_of_days)
 
-    dict = {'station': station_number,
-            'plate_number': plate_number,
-            'year': requested_date.year,
-            'month': requested_date.month,
-            'day': requested_date.day}
+    result = {'station': station_number,
+              'plate_number': plate_number,
+              'year': requested_date.year,
+              'month': requested_date.month,
+              'day': requested_date.day}
 
     if (plate_number < 1) or (plate_number > 4):
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Platenumber (value = %s) is out of range, "
-                              "should be between 1 and 4" % plate_number})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Platenumber (value = %s) is out of range, "
+                                "should be between 1 and 4" % plate_number})
+        return json_dict(result)
 
     try:
         station = Station.objects.get(number=station_number)
@@ -389,16 +389,16 @@ def get_pulseheight_drift(request, station_number, plate_number,
                                              chi_square_reduced__lt=8.0,
                                              initial_width__gt=45.0)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Error retrieving fits",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Error retrieving fits",
+                       "exception": str(e)})
+        return json_dict(result)
 
     if len(fits) < 14:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": ("There are less than 14 fits in the requested "
-                               "date range, drift rate won't be calculated.")})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": ("There are less than 14 fits in the requested "
+                                 "date range, drift rate won't be calculated.")})
+        return json_dict(result)
 
     try:
         # Fit drift
@@ -434,28 +434,22 @@ def get_pulseheight_drift(request, station_number, plate_number,
                                                          initial_mean,
                                                          initial_width))
 
-        dict.update({'number_of_selected_days': len(t_array),
-                     'number_of_requested_days': number_of_days,
-                     'fit_offset': p1[0],
-                     'fit_slope': p1[1],
-                     'drift_per_day': drift,
-                     'timestamp': t_array.tolist(),
-                     'mpv': mpv_array.tolist(),
-                     'relative_mean': popt[1],
-                     'relative_width': popt[2],
+        result.update({'number_of_selected_days': len(t_array),
+                       'number_of_requested_days': number_of_days,
+                       'fit_offset': p1[0],
+                       'fit_slope': p1[1],
+                       'drift_per_day': drift,
+                       'timestamp': t_array.tolist(),
+                       'mpv': mpv_array.tolist(),
+                       'relative_mean': popt[1],
+                       'relative_width': popt[2]})
 
-                     # Debug
-                     # 'relative_mpv': relative_mpv,
-                     # 'frequency': frequency.tolist(),
-                     # 'x': x.tolist()
-                     })
-
-        return json_dict(dict)
+        return json_dict(result)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Error in calculating the drift",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Error in calculating the drift",
+                       "exception": str(e)})
+        return json_dict(result)
 
 
 def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
@@ -502,11 +496,11 @@ def get_pulseheight_fit(request, station_number, plate_number,
     else:
         requested_date = datetime.date(int(year), int(month), int(day))
 
-    dict = {'station': station_number,
-            'plate_number': plate_number,
-            'year': requested_date.year,
-            'month': requested_date.month,
-            'day': requested_date.day}
+    result = {'station': station_number,
+              'plate_number': plate_number,
+              'year': requested_date.year,
+              'month': requested_date.month,
+              'day': requested_date.day}
 
     try:
         fit = PulseheightFit.objects.get(
@@ -514,58 +508,58 @@ def get_pulseheight_fit(request, station_number, plate_number,
             source__date=requested_date,
             plate=plate_number)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Fit has not been found",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Fit has not been found",
+                       "exception": str(e)})
+        return json_dict(result)
 
     try:
-        dict.update({"entries": fit.source.num_events,
-                     "initial_mpv": fit.initial_mpv,
-                     "initial_width": fit.initial_width,
-                     "fitted_mpv": fit.fitted_mpv,
-                     "fitted_mpv_error": fit.fitted_mpv_error,
-                     "fitted_width": fit.fitted_width,
-                     "fitted_width_error": fit.fitted_width_error,
-                     "degrees_of_freedom": fit.degrees_of_freedom,
-                     "chi_square_reduced": fit.chi_square_reduced,
-                     "error_type": fit.error_type,
-                     "error_message": fit.error_message})
+        result.update({"entries": fit.source.num_events,
+                       "initial_mpv": fit.initial_mpv,
+                       "initial_width": fit.initial_width,
+                       "fitted_mpv": fit.fitted_mpv,
+                       "fitted_mpv_error": fit.fitted_mpv_error,
+                       "fitted_width": fit.fitted_width,
+                       "fitted_width_error": fit.fitted_width_error,
+                       "degrees_of_freedom": fit.degrees_of_freedom,
+                       "chi_square_reduced": fit.chi_square_reduced,
+                       "error_type": fit.error_type,
+                       "error_message": fit.error_message})
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Data has been found, "
-                              "but error in converting data to numbers",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Data has been found, "
+                                "but error in converting data to numbers",
+                       "exception": str(e)})
+        return json_dict(result)
 
     # Fit failures
 
     if len(fit.error_message) > 0:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": fit.error_message})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": fit.error_message})
+        return json_dict(result)
 
     # Based on chi2 of the fit
 
     if fit.chi_square_reduced < 0.01:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
-                                fit.chi_square_reduced})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
+                                  fit.chi_square_reduced})
+        return json_dict(result)
 
     if fit.chi_square_reduced > 8.0:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
-                                fit.chi_square_reduced})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
+                                  fit.chi_square_reduced})
+        return json_dict(result)
 
     # Based on the fit range (= initial_width)
 
     if fit.initial_width < 45:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
-                                fit.initial_width})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
+                                  fit.initial_width})
+        return json_dict(result)
 
     # Based on MPV and 4*sigma
 
@@ -576,15 +570,15 @@ def get_pulseheight_fit(request, station_number, plate_number,
     upper_bound = threshold.mpv_mean * (1 + 4 * threshold.mpv_sigma)
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "MPV fit is outside bounds (%.1f;%.1f): %.1f" %
-                                (lower_bound, upper_bound, fit.fitted_mpv)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "MPV fit is outside bounds (%.1f;%.1f): %.1f" %
+                                  (lower_bound, upper_bound, fit.fitted_mpv)})
+        return json_dict(result)
 
-    dict.update({"nagios": Nagios.ok,
-                 "quality": "MPV fit is within bounds (%.1f;%.1f): %.1f" %
-                            (lower_bound, upper_bound, fit.fitted_mpv)})
-    return json_dict(dict)
+    result.update({"nagios": Nagios.ok,
+                   "quality": "MPV fit is within bounds (%.1f;%.1f): %.1f" %
+                              (lower_bound, upper_bound, fit.fitted_mpv)})
+    return json_dict(result)
 
 
 def has_data(request, station_number, type=None, year=None, month=None,
@@ -750,7 +744,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
 
     if not hour:
         histograms = DailyHistogram.objects.filter(**filters)
-        num_events = sum([sum(histogram.values) for histogram in histograms])
+        num_events = sum(sum(histogram.values) for histogram in histograms)
 
     return json_dict(num_events)
 

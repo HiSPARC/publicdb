@@ -20,6 +20,7 @@
     margin-bottom: 20px;}
 
 #nagios {
+    margin-top: 140px;
     position: absolute;
     z-index: -1;
     width: 850px;

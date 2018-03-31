@@ -15,7 +15,7 @@ import django.db
 
 from django.conf import settings
 
-from sapphire.analysis.calibration import datetime_range
+# from sapphire.analysis.calibration import datetime_range
 from sapphire.utils import round_in_base
 
 from . import datastore, esd, fit_pulseheight_peak
@@ -23,24 +23,24 @@ from ..inforecords.models import Station
 from ..station_layout.models import StationLayout
 from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
                      DetectorTimingOffset, GeneratorState, HistogramType,
-                     NetworkHistogram, NetworkSummary, PulseheightFit,
-                     StationTimingOffset, Summary)
+                     MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
+                     NetworkSummary, PulseheightFit, StationTimingOffset,
+                     Summary)
 
 logger = logging.getLogger('histograms.jobs')
 
 # Parameters for the histograms
-MAX_PH = 2500
-BIN_PH_NUM = 250  # bin width = 10 mV
-MAX_IN = 62500
-BIN_IN_NUM = 250  # bin width = 250 mVns
+MAX_PH = 4096  # max value for 12-bit ADC
+BIN_PH_NUM = 256  # bin width = 16 ADC
+MAX_IN = 51200
+BIN_IN_NUM = 512  # bin width = 100 ADCsample
 MAX_SINGLES_LOW = 1000
-BIN_SINGLES_LOW_NUM = 100  # bin width = 10
+BIN_SINGLES_LOW_NUM = 100  # bin width = 10 Hz
 MAX_SINGLES_HIGH = 300
-BIN_SINGLES_HIGH_NUM = 100  # bin width = 3
+BIN_SINGLES_HIGH_NUM = 100  # bin width = 3 Hz
 
-BIN_SINGLES_RATE = 150  # seconds
-
-# Parameters for the datasets, interval in seconds
+# Parameters for the datasets, intervals in seconds
+BIN_SINGLES_RATE = 180
 INTERVAL_TEMP = 150
 INTERVAL_BARO = 150
 
@@ -395,7 +395,7 @@ def perform_events_tasks(summary):
     except StationLayout.DoesNotExist:
         logger.debug("No station layout available for %s" % summary)
     else:
-        if layout.detector_3_radius is not None:
+        if layout.has_four_detectors:
             tmp_locations.append(
                 esd.reconstruct_events_and_store_temporary_esd(summary))
             update_zenith_histogram(summary, *tmp_locations[-1])
@@ -496,10 +496,10 @@ def update_eventtime_histogram(summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = np.histogram(timestamps, bins=bins)
+    hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
-    hist = hist[0].tolist()
+    hist = hist.tolist()
     save_histograms(summary, 'eventtime', bins, hist)
 
 
@@ -516,10 +516,10 @@ def update_coincidencetime_histogram(network_summary):
     # create bins, don't forget right-most edge
     bins = [start + hour * 3600 for hour in range(25)]
 
-    hist = np.histogram(timestamps, bins=bins)
+    hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
     bins = range(25)
-    hist = hist[0].tolist()
+    hist = hist.tolist()
     save_network_histograms(network_summary, 'coincidencetime', bins, hist)
 
 
@@ -533,8 +533,8 @@ def update_coincidencenumber_histogram(network_summary):
     # create bins, don't forget right-most edge
     bins = range(2, 101)
 
-    hist = np.histogram(n_stations, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(n_stations, bins=bins)
+    hist = hist.tolist()
     save_network_histograms(network_summary, 'coincidencenumber', bins, hist)
 
 
@@ -585,13 +585,6 @@ def update_singles_histogram(summary):
 def update_singles_rate_dataset(summary):
     """Singles rate for each detector individually"""
 
-    def shrink(col, bin_idxs):
-        with warnings.catch_warnings():  # suppress "Mean of empty slice"
-            warnings.simplefilter("ignore", category=RuntimeWarning)
-            data = np.nan_to_num([np.nanmean(col[bin_idxs[i - 1]:bin_idxs[i]])
-                                 for i in range(1, len(bins))])
-        return data
-
     logger.debug("Updating singles rate datasets for %s" % summary)
     ts, high, low = esd.get_singles(summary)
 
@@ -599,16 +592,14 @@ def update_singles_rate_dataset(summary):
     start = calendar.timegm(summary.date.timetuple())
 
     # create bins, don't forget right-most edge
-    n_bins = 24 * 3600 // BIN_SINGLES_RATE
+    n_bins = 24 * 60 * 60 // BIN_SINGLES_RATE
     bins = [start + step * BIN_SINGLES_RATE for step in range(n_bins + 1)]
-    bin_idxs = [np.searchsorted(ts, bins[i]) for i in range(len(bins))]
+    bin_idxs = [np.searchsorted(ts, bin) for bin in bins]
 
-    rates = [shrink(col, bin_idxs) for col in low]
-    rates = [col.tolist() for col in rates]
+    rates = [shrink(column, bin_idxs, n_bins) for column in low]
     save_dataset(summary, 'singlesratelow', bins, rates)
 
-    rates = [shrink(col, bin_idxs) for col in high]
-    rates = [col.tolist() for col in rates]
+    rates = [shrink(column, bin_idxs, n_bins) for column in high]
     save_dataset(summary, 'singlesratehigh', bins, rates)
 
 
@@ -635,9 +626,10 @@ def update_station_timing_offsets(network_summary):
         cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date,
                                                         sn, ref_sn)
+        # To update all affected offsets use:
+        # for date, _ in datetime_range(left, right):
         # To only update offset for specific date use:
-        # for date in [summary_date]:
-        for date, _ in datetime_range(left, right):
+        for date in [summary_date]:
             ref_summary = get_summary_or_none(date, ref_sn)
             if ref_summary is None:
                 continue
@@ -663,10 +655,10 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
     zeniths = esd.get_zeniths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(0, 91, 3)
+    bins = range(0, 91, 3)  # degrees
 
-    hist = np.histogram(zeniths, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(zeniths, bins=bins)
+    hist = hist.tolist()
     save_histograms(summary, 'zenith', bins, hist)
 
 
@@ -677,10 +669,10 @@ def update_azimuth_histogram(summary, tempfile_path, node_path):
     azimuths = esd.get_azimuths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(-180, 181, 12)
+    bins = range(-180, 181, 12)  # degrees
 
-    hist = np.histogram(azimuths, bins=bins)
-    hist = hist[0].tolist()
+    hist, _ = np.histogram(azimuths, bins=bins)
+    hist = hist.tolist()
     save_histograms(summary, 'azimuth', bins, hist)
 
 
@@ -721,6 +713,22 @@ def shrink_dataset(dataset, interval):
         if x - data[-1][0] >= interval:
             data.append((x, y))
     return data
+
+
+def shrink(column, bin_idxs, n_bins):
+    """Shrink a dataset.
+
+    :param column: a column of data.
+    :param bin_idxs: bin edge indexes.
+    :param n_bins: number of bins.
+    :return: list of shrunken data.
+
+    """
+    with warnings.catch_warnings():  # suppress "Mean of empty slice"
+        warnings.simplefilter("ignore", category=RuntimeWarning)
+        data = np.nan_to_num([np.nanmean(column[bin_idxs[i]:bin_idxs[i + 1]])
+                              for i in range(n_bins)])
+    return data.tolist()
 
 
 def update_config(summary):
@@ -775,8 +783,12 @@ def save_histograms(summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s" % (slug, summary))
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
-    DailyHistogram.objects.update_or_create(source=summary, type=type,
-                                            defaults=histogram)
+    if not type.has_multiple_datasets:
+        DailyHistogram.objects.update_or_create(source=summary, type=type,
+                                                defaults=histogram)
+    else:
+        MultiDailyHistogram.objects.update_or_create(source=summary, type=type,
+                                                     defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -795,8 +807,12 @@ def save_dataset(summary, slug, x, y):
     logger.debug("Saving dataset %s for %s" % (slug, summary))
     type = DatasetType.objects.get(slug=slug)
     dataset = {'x': x, 'y': y}
-    DailyDataset.objects.update_or_create(source=summary, type=type,
-                                          defaults=dataset)
+    if slug in ['barometer', 'temperature']:
+        DailyDataset.objects.update_or_create(source=summary, type=type,
+                                              defaults=dataset)
+    else:
+        MultiDailyDataset.objects.update_or_create(source=summary, type=type,
+                                                   defaults=dataset)
     logger.debug("Saved succesfully")
 
 

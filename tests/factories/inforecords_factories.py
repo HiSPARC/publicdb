@@ -13,6 +13,7 @@ class ProfessionFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Profession
+        django_get_or_create = ('description',)
 
 
 class ContactInformationFactory(factory.DjangoModelFactory):
@@ -43,6 +44,7 @@ class ContactFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.Contact
+        django_get_or_create = ('first_name', 'surname')
 
 
 class CountryFactory(factory.DjangoModelFactory):

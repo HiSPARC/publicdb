@@ -24,7 +24,7 @@ def layout_submit(request):
     else:
         html_captcha = "reCAPTCHA disabled"
 
-    return render(request, 'layout_submit.html',
+    return render(request, 'station_layout/submit.html',
                   {'form': form, 'html_captcha': html_captcha})
 
 
@@ -72,7 +72,7 @@ def validate_layout_submit(request):
     new_layout.save()
     new_layout.sendmail_submit()
 
-    return render(request, 'layout_submitted.html',
+    return render(request, 'station_layout/submitted.html',
                   {'name': form.cleaned_data['name'],
                    'email': form.cleaned_data['email'],
                    'station': form.cleaned_data['station']})
@@ -85,7 +85,7 @@ def confirmed_layout(request, hash):
     submitted_layout.email_verified = True
     submitted_layout.save()
     submitted_layout.sendmail_review()
-    return render(request, 'layout_confirm.html')
+    return render(request, 'station_layout/confirm.html')
 
 
 def review_layout(request, hash):
@@ -115,7 +115,7 @@ def review_layout(request, hash):
         except Configuration.DoesNotExist:
             config = None
 
-    return render(request, 'layout_review.html',
+    return render(request, 'station_layout/review.html',
                   {'layout': submitted_layout, 'form': form, 'hash': hash,
                    'config': config})
 
@@ -162,4 +162,4 @@ def validate_review_layout(request, hash):
     else:
         submitted_layout.sendmail_declined()
 
-    return render(request, 'layout_reviewed.html')
+    return render(request, 'station_layout/reviewed.html')

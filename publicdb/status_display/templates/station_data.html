@@ -8,20 +8,8 @@
 
 {% block title %}{{ block.super }} - {{ date|date:"D, j N Y" }}{% endblock %}
 
-{% block head_styles %}
-    {{ block.super }}
-    <!--[if lte IE 7]><style type="text/css" media="all">
-        #yearlist li, #monthlist li {
-            display: inline;}
-    </style><![endif]-->
-{% endblock %}
-
 {% block head %}
     <script src="{% static 'scripts/flot_settings.js' %}"></script>
-    <!--[if lte IE 8]><script>
-        var td_options = $.extend(true, {}, td_options, {series: {lines: {show: true}, points: {show: false}}});
-        var bd_options = $.extend(true, {}, bd_options, {series: {lines: {show: true}, points: {show: false}}});
-    </script><![endif]-->
     <script>
       {% if location.latitude and location.longitude %}
         $(document).ready(function() {
@@ -286,15 +274,15 @@
 
     <div id="download"><a href="{% url 'data:download_form' station.number date.isoformat tomorrow.isoformat %}">Download event summary data</a></div>
 
-  {% if prev %}
-     <a class='nextprev' id='prev' href="{% url 'status:station:data' station.number prev.year prev.month prev.day %}">&larr;</a>
+  {% if previous %}
+     <a class='nextprev' id='prev' href="{{ previous }}">&larr;</a>
   {% endif %}
   {% if next %}
-     <a class='nextprev' id='next' href="{% url 'status:station:data' station.number next.year next.month next.day %}">&rarr;</a>
+     <a class='nextprev' id='next' href="{{ next }}">&rarr;</a>
   {% endif %}
 
     <table id="calendar">
-    <tr><th colspan="7">{{ thismonth.month }}</th></tr>
+    <tr><th colspan="7">{{ date|date:"F Y" }}</th></tr>
     <tr>
       {% for day in thismonth.days %}
         <th class="dayname">{{ day }}</th>
@@ -305,7 +293,7 @@
           {% for day in week %}
             <td class="day">
               {% if day.link %}
-                <a {% if current_date.day == day.day %}class='currentDate'{% endif %} href="{% url 'status:station:data' day.link.0 day.link.1 day.link.2 day.link.3 %}">{{ day.day }}</a>
+                <a {% if date.day == day.day %}class='currentDate'{% endif %} href="{{ day.link }}">{{ day.day }}</a>
               {% else %}
                 <span class="nolink">{{ day.day }}</span>
               {% endif %}
@@ -320,7 +308,7 @@
       {% for month in month_list %}
         <li>
           {% if month.link %}
-            <a {% if current_date.month == month.month %}class='currentDate'{% endif %} href="{% url 'status:station:data' month.link.0 month.link.1 month.link.2 month.link.3 %}">{{ month.month }}</a>
+            <a {% if date.month == forloop.counter %}class='currentDate'{% endif %} href="{{ month.link }}">{{ month.month }}</a>
           {% else %}
             <span class="nolink">{{ month.month }}</span>
           {% endif %}
@@ -334,7 +322,7 @@
       {% for year in year_list %}
         <li>
           {% if year.link %}
-            <a {% if current_date.year == year.year %}class='currentDate'{% endif %} href="{% url 'status:station:data' year.link.0 year.link.1 year.link.2 year.link.3 %}">{{ year.year }}</a>
+            <a {% if date.year == year.year %}class='currentDate'{% endif %} href="{{ year.link }}">{{ year.year }}</a>
           {% else %}
             <span class="nolink">{{ year.year }}</span>
           {% endif %}

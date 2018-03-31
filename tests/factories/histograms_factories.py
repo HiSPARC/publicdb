@@ -173,21 +173,24 @@ class DailyHistogramFactory(factory.DjangoModelFactory):
     source = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
     bins = factory.LazyAttribute(lambda o: range(len(o.values)))
-    values = factory.Faker('float_list')
+    values = factory.Faker('int_list')
 
     class Meta:
         model = models.DailyHistogram
 
 
 class MultiDailyHistogramFactory(DailyHistogramFactory):
-    values = factory.Faker('multi_float_list')
+    values = factory.Faker('multi_int_list')
+
+    class Meta:
+        model = models.MultiDailyHistogram
 
 
 class DailyDatasetFactory(factory.DjangoModelFactory):
     source = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(DatasetTypeFactory)
     x = factory.Faker('int_list')
-    y = factory.Faker('int_list')
+    y = factory.Faker('float_list')
 
     class Meta:
         model = models.DailyDataset
@@ -195,6 +198,9 @@ class DailyDatasetFactory(factory.DjangoModelFactory):
 
 class MultiDailyDatasetFactory(DailyDatasetFactory):
     y = factory.Faker('multi_float_list')
+
+    class Meta:
+        model = models.MultiDailyDataset
 
 
 class DetectorTimingOffsetFactory(factory.DjangoModelFactory):

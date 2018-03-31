@@ -46,7 +46,7 @@ def search_coincidences_and_store_in_esd(network_summary):
     stations = Station.objects.filter(summary__date=date,
                                       summary__num_events__isnull=False,
                                       summary__needs_update=False,
-                                      pc__is_test=False)
+                                      pc__is_test=False).distinct()
 
     station_numbers = [station.number for station in stations]
     station_groups = ['/hisparc/cluster_%s/station_%d' %
@@ -345,10 +345,6 @@ def get_pulseheights(summary):
     if pulseheights is None:
         return None
     else:
-        # FIXME: do we need configurations for this?
-        pulseheights = np.where(pulseheights >= 0, pulseheights * 0.57,
-                                pulseheights)
-
         # transpose, so we have '4 arrays of many pulseheights'
         return pulseheights.T
 
@@ -366,11 +362,6 @@ def get_integrals(summary):
     if integrals is None:
         return None
     else:
-        # multiply by 0.57 for ADC -> mV, and by 2.5 for sample -> ns
-        # FIXME: do we need configurations for this?
-        integrals = np.where(integrals >= 0, integrals * 0.57 * 2.5,
-                             integrals)
-
         # transpose, so we have '4 arrays of many integrals'
         return integrals.T
 

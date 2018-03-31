@@ -4,17 +4,6 @@
 
 {% block title %}{{ block.super }} - Status{% endblock %}
 
-{% block head_styles %}
-    {{ block.super }}
-    
-    <style type="text/css" media="all">
-        #sidebar {background: white;}
-    </style>
-    <!--[if lte IE 8]><style type="text/css" media="all">
-        #nagios {top: 220px;}
-    </style><![endif]-->
-{% endblock %}
-
 {% block data %}
     {% if pc.is_active %}
     <div id="nagios">

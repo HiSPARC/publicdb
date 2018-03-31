@@ -4,7 +4,6 @@ import os
 import re
 import textwrap
 
-import numpy as np
 import tables
 
 from django.conf import settings
@@ -40,10 +39,18 @@ class AnalysisSession(models.Model):
         return self.title
 
 
+class Student(models.Model):
+    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    name = models.CharField(max_length=40)
+
+    def __unicode__(self):
+        return '%s - %s' % (self.session, self.name)
+
+
 class AnalyzedCoincidence(models.Model):
-    session = models.ForeignKey(AnalysisSession)
-    coincidence = models.ForeignKey(Coincidence)
-    student = models.ForeignKey('Student', null=True, blank=True)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    coincidence = models.ForeignKey(Coincidence, models.CASCADE)
+    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True)
     is_analyzed = models.BooleanField(default=False)
     core_position_x = models.FloatField(null=True, blank=True)
     core_position_y = models.FloatField(null=True, blank=True)
@@ -59,20 +66,12 @@ class AnalyzedCoincidence(models.Model):
         ordering = ('coincidence',)
 
 
-class Student(models.Model):
-    session = models.ForeignKey(AnalysisSession)
-    name = models.CharField(max_length=40)
-
-    def __unicode__(self):
-        return '%s - %s' % (self.session, self.name)
-
-
 class SessionRequest(models.Model):
     first_name = models.CharField(max_length=50)
     sur_name = models.CharField(max_length=50)
     email = models.EmailField()
     school = models.CharField(max_length=50)
-    cluster = models.ForeignKey('inforecords.Cluster')
+    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE)
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
     start_date = models.DateField()
@@ -84,9 +83,9 @@ class SessionRequest(models.Model):
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
 
+    @property
     def name(self):
         return "%s %s" % (self.first_name, self.sur_name)
-    name = property(name)
 
     def create_session(self):
         self.session_pending = False
@@ -161,7 +160,7 @@ class SessionRequest(models.Model):
 
         stations = []
         for station in Station.objects.filter(cluster=self.cluster,
-                                              pc__is_test=False):
+                                              pc__is_test=False).distinct():
             station_group_name = 'station_%d' % station.number
 
             if station_group_name in cluster_group:
@@ -179,20 +178,14 @@ class SessionRequest(models.Model):
             date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
             timestamps.append((date_time, event['nanoseconds']))
 
-            pulseheights = np.where(event['pulseheights'] > 0,
-                                    np.around(event['pulseheights'] * 0.57, 2),
-                                    event['pulseheights']).tolist()
-            integrals = np.where(event['integrals'] > 0,
-                                 np.around(event['integrals'] * 0.57 * 2.5, 2),
-                                 event['integrals']).tolist()
-            traces = np.around(traces, 2).tolist()
+            traces = traces.tolist()
             dt = self.analyze_traces(traces)
             event = Event(date=date_time.date(),
                           time=date_time.time(),
                           nanoseconds=event['nanoseconds'] - dt,
                           station=Station.objects.get(number=station),
-                          pulseheights=pulseheights,
-                          integrals=integrals,
+                          pulseheights=event['pulseheights'].tolist(),
+                          integrals=event['integrals'].tolist(),
                           traces=traces)
             event.save()
             events.append(event)
@@ -210,18 +203,17 @@ class SessionRequest(models.Model):
     def analyze_traces(self, traces):
         """Analyze traces and determine time of first particle"""
 
-        t = []
+        arrival_times = []
         for trace in traces:
-            m = min(trace)
-            if not m < -20:
-                # No significant pulse (not lower than -20 mV)
+            if not max(trace) < 20:
+                # No significant pulse (not more than 20 ADC over baseline)
                 continue
-            for i, v in enumerate(trace):
-                if v < 0.2 * m:
+            for index, v in enumerate(trace):
+                if v >= 20:
                     break
-            t.append(i * 2.5)
-        if len(t) > 0:
-            trace_timing = min(t)
+            arrival_times.append(index * 2.5)
+        if len(arrival_times) > 0:
+            trace_timing = min(arrival_times)
         else:
             trace_timing = -999
         return trace_timing

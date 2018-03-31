@@ -29,7 +29,7 @@ def down_list():
     down = retrieve_station_status(query)
     down_numbers = pc_name_to_station_number(down)
 
-    return set(down_numbers)
+    return down_numbers
 
 
 def problem_list():
@@ -44,7 +44,7 @@ def problem_list():
     problem = retrieve_station_status(query)
     problem_numbers = pc_name_to_station_number(problem)
 
-    return set(problem_numbers)
+    return problem_numbers
 
 
 def up_list():
@@ -57,7 +57,7 @@ def up_list():
     up = retrieve_station_status(query)
     up_numbers = pc_name_to_station_number(up)
 
-    return set(up_numbers)
+    return up_numbers
 
 
 def retrieve_station_status(query):
@@ -88,8 +88,8 @@ def pc_name_to_station_number(shortnames):
     :return: station numbers that have a pc with name in the shortnames.
 
     """
-    stations = list(Station.objects.filter(pc__name__in=shortnames)
-                                   .values_list('number', flat=True))
+    stations = set(Station.objects.filter(pc__name__in=shortnames)
+                                  .values_list('number', flat=True))
     return stations
 
 
