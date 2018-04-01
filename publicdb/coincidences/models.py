@@ -1,7 +1,3 @@
-import base64
-import cPickle as pickle
-import zlib
-
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 
@@ -15,21 +11,8 @@ class SerializedDataField(models.Field):
     }
 
     def db_type(self, connection):
+        # Required for old migrations
         return 'BYTEA'
-
-    def from_db_value(self, value, expression, connection, context):
-        return self.to_python(value)
-
-    def to_python(self, value):
-        try:
-            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-        except Exception:
-            return value
-        else:
-            return unpickled
-
-    def get_prep_value(self, value):
-        return base64.b64encode(zlib.compress(pickle.dumps(value)))
 
 
 class Coincidence(models.Model):
