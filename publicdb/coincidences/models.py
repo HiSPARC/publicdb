@@ -10,8 +10,7 @@ from ..inforecords.models import Station
 
 class SerializedDataField(models.Field):
 
-    # After deploy change attribute to system_check_removed_details
-    system_check_deprecated_details = {
+    system_check_removed_details = {
         'hint': 'Use ArrayField instead.',
     }
 
