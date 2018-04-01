@@ -17,9 +17,9 @@ from ..histograms.models import Configuration
 def get_coincidence(request):
     """Return a coincidence for jSparc client"""
 
-    session_title = request.GET.get('session_title', None)
-    session_pin = request.GET.get('session_pin', None)
-    student_name = request.GET.get('student_name', None)
+    session_title = request.GET.get('session_title', '')
+    session_pin = request.GET.get('session_pin', '')
+    student_name = request.GET.get('student_name', '')
 
     if session_title.lower() == 'example':
         today = date.today()
