@@ -182,15 +182,9 @@ class TestSourceViews(TestCase):
         ref_summary = histograms_factories.SummaryFactory(station=other_station)
         histograms_factories.StationTimingOffsetFactory(ref_source=ref_summary, source=self.summary)
 
-        if other_station.number < self.station.number:
-            kwargs = {
-                'ref_station_number': other_station.number,
-                'station_number': self.station.number
-            }
-        else:
-            kwargs = {
-                'ref_station_number': self.station.number,
-                'station_number': other_station.number
-            }
+        kwargs = {
+            'ref_station_number': min(other_station.number, self.station.number),
+            'station_number': max(other_station.number, self.station.number)
+        }
 
         self.get_tsv(reverse('status:source:station_offsets', kwargs=kwargs))
