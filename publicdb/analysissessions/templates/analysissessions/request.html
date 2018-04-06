@@ -19,7 +19,6 @@
     <form action="{% url 'sessions:validate' %}" method="post">
     {% csrf_token %}
         {{ form.as_p }}
-        {{ html_captcha|safe }}
         <input type="submit" value="Submit">
     </form>
 </div>

@@ -45,10 +45,6 @@ DATASTORE_PROXY = '{{ datastore_proxy }}'
 VPN_HOST = '{{ vpn_host }}'
 DATASTORE_HOST = '{{ datastore_host }}'
 
-RECAPTCHA_ENABLED = {{ recaptcha_enabled }}
-RECAPTCHA_PUB_KEY = '{{ recaptcha_pub_key }}'
-RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
-
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
