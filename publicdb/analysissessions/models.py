@@ -187,7 +187,6 @@ class SessionRequest(models.Model):
                           pulseheights=event['pulseheights'].tolist(),
                           integrals=event['integrals'].tolist(),
                           traces=traces)
-            event.save()
             events.append(event)
 
         first_timestamp = sorted(timestamps)[0]
@@ -195,7 +194,11 @@ class SessionRequest(models.Model):
                                   time=first_timestamp[0].time(),
                                   nanoseconds=first_timestamp[1])
         coincidence.save()
-        coincidence.events.add(*events)
+
+        for event in events:
+            event.coincidence = coincidence
+            event.save()
+
         analyzed_coincidence = AnalyzedCoincidence(session=session,
                                                    coincidence=coincidence)
         analyzed_coincidence.save()
