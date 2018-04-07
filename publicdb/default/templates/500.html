@@ -9,13 +9,16 @@
     <style type="text/css">
         html {
             font-family: sans-serif;}
-    
+
         #container {
             margin: auto;
             width: 850px;}
-    
+
         #pageHeader {
-            background: white url("{% static 'header.png' %}") top right no-repeat;
+            background-image: url("{% static 'header.svg' %}");
+            background-position: top right;
+            background-repeat: no-repeat;
+            background-size: contain;
             height: 63px;
             width: 200px;
             margin: 0;
@@ -23,7 +26,7 @@
             left: 630px;
             display: inline-block;
             position: relative;}
-    
+
         #pageHeader span {
             display: none;}
 
@@ -38,7 +41,7 @@
             margin: 0 auto;
             text-align: center;
             font-size: 10pt;}
-    
+
         a {
             color: #25B;
             text-decoration: none;}

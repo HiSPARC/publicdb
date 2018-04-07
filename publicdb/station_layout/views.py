@@ -1,8 +1,5 @@
 import datetime
 
-from recaptcha.client import captcha
-
-from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -19,27 +16,12 @@ def layout_submit(request):
     else:
         form = StationLayoutQuarantineForm()
 
-    if settings.RECAPTCHA_ENABLED:
-        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-    else:
-        html_captcha = "reCAPTCHA disabled"
-
-    return render(request, 'station_layout/submit.html',
-                  {'form': form, 'html_captcha': html_captcha})
+    return render(request, 'station_layout/submit.html', {'form': form})
 
 
 def validate_layout_submit(request):
     if request.method != 'POST':
         return redirect('layout:submit')
-
-    if settings.RECAPTCHA_ENABLED:
-        check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'],
-            request.POST['recaptcha_response_field'],
-            settings.RECAPTCHA_PRIVATE_KEY,
-            request.META['REMOTE_ADDR'])
-        if not check_captcha.is_valid:
-            return layout_submit(request)
 
     form = StationLayoutQuarantineForm(request.POST)
 

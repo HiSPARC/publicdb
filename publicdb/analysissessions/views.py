@@ -7,9 +7,6 @@ from random import randint
 
 import numpy as np
 
-from recaptcha.client import captcha
-
-from django.conf import settings
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -22,9 +19,9 @@ from ..histograms.models import Configuration
 def get_coincidence(request):
     """Return a coincidence for jSparc client"""
 
-    session_title = request.GET.get('session_title', None)
-    session_pin = request.GET.get('session_pin', None)
-    student_name = request.GET.get('student_name', None)
+    session_title = request.GET.get('session_title', '')
+    session_pin = request.GET.get('session_pin', '')
+    student_name = request.GET.get('student_name', '')
 
     if session_title.lower() == 'example':
         today = date.today()
@@ -305,33 +302,12 @@ def request_form(request):
     else:
         form = SessionRequestForm()
 
-    html_captcha = "reCAPTCHA disabled"
-
-    if settings.RECAPTCHA_ENABLED:
-        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-
-    return render(request, 'analysissessions/request.html',
-                  {'form': form, 'html_captcha': html_captcha})
+    return render(request, 'analysissessions/request.html', {'form': form})
 
 
 def validate_request_form(request):
     if request.method != 'POST':
         return redirect('sessions:request')
-
-    # Check reCaptcha input
-    if settings.RECAPTCHA_ENABLED:
-        check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'],
-            request.POST['recaptcha_response_field'],
-            settings.RECAPTCHA_PRIVATE_KEY,
-            request.META['REMOTE_ADDR'])
-        if not check_captcha.is_valid:
-            return request_form(request)
-
-        # html_captcha = captcha.displayhtml(
-        #     settings.RECAPTCHA_PUB_KEY,
-        #     error=check_captcha.error_code
-        # )
 
     # Check form input
     form = SessionRequestForm(request.POST)

@@ -45,11 +45,6 @@ DATASTORE_HOST = 'localhost'
 # Webserver of the publicdb where Nagios will retrieve active check results
 PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
 
-# reCAPTCHA settings
-RECAPTCHA_ENABLED = False
-RECAPTCHA_PUB_KEY = 'foobar'
-RECAPTCHA_PRIVATE_KEY = 'foobaz'
-
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.

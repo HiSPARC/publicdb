@@ -10,12 +10,12 @@ from django.db import migrations, models
 from sapphire.utils import pbar
 
 
-def mvns_to_adcsample(nested_values):
-    return [[int(x / 0.57 / 2.5) for value in values] for values in nested_values]
+def mvns_to_adcsample(values):
+    return [int(value / 0.57 / 2.5) for value in values]
 
 
-def mv_to_adc(nested_values):
-    return [[int(x / 0.57) for value in values] for values in nested_values]
+def mv_to_adc(values):
+    return [int(value / 0.57) for value in values]
 
 
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
