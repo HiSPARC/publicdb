@@ -673,7 +673,7 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
 
     t = loader.get_template('coincidences.tsv')
     context = {'start': start, 'end': end, 'cluster': cluster,
-                 'stations': stations, 'n': n}
+               'stations': stations, 'n': n}
 
     yield t.render(context)
 
