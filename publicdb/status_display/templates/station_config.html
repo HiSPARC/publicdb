@@ -149,7 +149,7 @@
                 <a href="{% url 'layout:submit' %}">Submit layout</a> |
                 <a href="{% url 'status:source:layout' station.number %}">Source</a>
             </div>
-            {% include "layout_canvas.html" %}
+            {% include "station_layout/canvas.html" %}
             <script>
                 {% if layout.has_four_detectors %}
                     var radius = [{{ layout.detector_1_radius }},
