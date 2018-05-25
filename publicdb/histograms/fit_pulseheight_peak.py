@@ -179,18 +179,17 @@ def fit_pulseheight_peak(pulseheights):
     # 3. Get initial fit parameters for gauss: mean and width
 
     try:
-        initial_mpv, minRange, maxRange = get_fit_parameters(pulseheight,
-                                                             occurence)
-        # logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
-        #              (initial_mpv, minRange, maxRange))
-    except Exception, e:
+        initial_mpv, min_range, max_range = get_fit_parameters(pulseheight, occurence)
+        # logger.debug("Initial peak, min_range, max_range: %s, %s, %s" %
+        #              (initial_mpv, min_range, max_range))
+    except Exception as e:
         pulseheight_fit.error_type = "Exception"
         pulseheight_fit.error_message = ("Unable to find initial fit "
                                          "parameters: %s" % e)
         return pulseheight_fit
 
     pulseheight_fit.initial_mpv = initial_mpv
-    pulseheight_fit.initial_width = initial_mpv - minRange
+    pulseheight_fit.initial_width = initial_mpv - min_range
 
     # Check the width. More than 40 ADC is nice, just to be able to have a fit
     # at all.
@@ -208,7 +207,7 @@ def fit_pulseheight_peak(pulseheights):
     fit_window_pulseheight = []
     fit_window_occurence = []
     for i in range(len(pulseheight)):
-        if minRange < pulseheight[i] < maxRange:
+        if min_range < pulseheight[i] < max_range:
             fit_window_pulseheight.append(pulseheight[i])
             fit_window_occurence.append(occurence[i])
 
@@ -230,7 +229,7 @@ def fit_pulseheight_peak(pulseheights):
                                         fit_window_occurence,
                                         [initial_n, initial_mean,
                                          initial_width])
-    except RuntimeError, exception:
+    except RuntimeError as exception:
         pulseheight_fit.error_type = "RuntimeError"
         pulseheight_fit.error_message = exception
         return pulseheight_fit
@@ -305,7 +304,7 @@ def get_pulseheight_fits(summary):
     for detector_n in range(1, n_detectors + 1):
         try:
             fit = fit_pulseheight_peak(pulseheights[:, detector_n - 1])
-        except Exception, exception:
+        except Exception as exception:
             logger.error("[%s detector %s] %s" %
                          (summary, detector_n, exception))
 
