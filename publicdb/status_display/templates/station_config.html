@@ -153,13 +153,6 @@
             <script>
                 {% if layout.has_four_detectors %}
                     var radius = [{{ layout.detector_1_radius }},
-                                  {{ layout.detector_2_radius }}]
-                    var alpha = [{{ layout.detector_1_alpha }},
-                                 {{ layout.detector_2_alpha }}]
-                    var beta = [{{ layout.detector_1_beta }},
-                                {{ layout.detector_2_beta }}]
-                {% else %}
-                    var radius = [{{ layout.detector_1_radius }},
                                   {{ layout.detector_2_radius }},
                                   {{ layout.detector_3_radius }},
                                   {{ layout.detector_4_radius }}]
@@ -171,6 +164,13 @@
                                 {{ layout.detector_2_beta }},
                                 {{ layout.detector_3_beta }},
                                 {{ layout.detector_4_beta }}]
+                {% else %}
+                    var radius = [{{ layout.detector_1_radius }},
+                                  {{ layout.detector_2_radius }}]
+                    var alpha = [{{ layout.detector_1_alpha }},
+                                 {{ layout.detector_2_alpha }}]
+                    var beta = [{{ layout.detector_1_beta }},
+                                {{ layout.detector_2_beta }}]
                 {% endif %}
                 draw_station(context, radius, alpha, beta);
             </script>
