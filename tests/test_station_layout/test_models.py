@@ -15,7 +15,7 @@ class TestModels(TestCase):
         self.assertTrue(layout.has_four_detectors)
 
     def test_does_not_have_four_detectors(self):
-        """Check property to verify not fuor detectors"""
+        """Check property to verify not four detectors"""
         layout = StationLayoutFactory(
             station=self.station,
             detector_3_radius=None,
