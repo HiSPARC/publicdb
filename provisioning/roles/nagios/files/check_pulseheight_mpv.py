@@ -12,7 +12,7 @@ Nagios Plugin API:
 import sys
 import datetime
 import os
-import urllib2
+import urllib.request, urllib.error
 import json
 import socket
 
@@ -42,17 +42,17 @@ class Nagios:
 
 
 def exit(status, message):
-    print('Pulseheight ' + status[1] + ' - ' + message)
+    print(f'Pulseheight {status[1]} - {message}')
     sys.exit(status[0])
 
 
-def check_pulseheight_mpv(publicdb_host, stationNumber, plateNumber, date):
+def check_pulseheight_mpv(publicdb_host, station_number, plate_number, date):
 
     publicdb_host = publicdb_host.replace("http://", "")
 
     try:
         uri = ("http://%s/api/station/%s/plate/%s/pulseheight/fit/%s/%s/%s" %
-               (publicdb_host, stationNumber, plateNumber,
+               (publicdb_host, station_number, plate_number,
                 date.year, date.month, date.day))
     except:
         return Nagios.unknown, "Exception raised"
@@ -63,28 +63,27 @@ def check_pulseheight_mpv(publicdb_host, stationNumber, plateNumber, date):
     timeout = 10
 
     try:
-        j = json.load(urllib2.urlopen(uri, timeout=timeout))
-    except urllib2.HTTPError:
+        response = json.load(urllib.request.urlopen(uri, timeout=timeout))
+    except urllib.error.HTTPError:
         exit_code = Nagios.unknown
-        exit_message = 'unable to retrieve url: "%s"' % uri
-    except urllib2.URLError:
+        exit_message = f'unable to retrieve url: "{uri}"'
+    except urllib.error.URLError:
         exit_code = Nagios.critical
-        exit_message = 'unable to retrieve url: "%s"' % uri
+        exit_message = f'unable to retrieve url: "{uri}"'
     except socket.timeout:
         exit_code = Nagios.warning
-        exit_message = ('timeout in %d seconds trying to retrieve url: "%s"' %
-                        (timeout, uri))
+        exit_message = 'timeout in {timeout} seconds trying to retrieve url: "{uri}"'
 
     if exit_code is not None:
         return exit_code, exit_message
 
-    if "error" in j:
+    if "error" in response:
         if j["error"].count("no fit found for plate"):
-            return Nagios.ok, j["error"]
+            return Nagios.ok, response["error"]
 
-        return Nagios.unknown, j["error"]
+        return Nagios.unknown, response["error"]
 
-    return j["nagios"], j["quality"]
+    return response["nagios"], response["quality"]
 
 
 if __name__ == '__main__':
@@ -92,24 +91,23 @@ if __name__ == '__main__':
     # Check arguments
 
     if len(sys.argv) != 3:
-        print("Usage: %s <station number> <plate number>" % sys.argv[0])
+        print(f"Usage: {sys.argv[0]} <station number> <plate number>")
         sys.exit(3)
 
     try:
-        stationNumber = int(sys.argv[1])
-        plateNumber = int(sys.argv[2])
+        station_number = int(sys.argv[1])
+        plate_number = int(sys.argv[2])
     except:
         exit(Nagios.unknown,
              "Error in command line arguments, they must all be numbers: "
              "%s, %s, %s, %s" % (sys.argv[1], sys.argv[2]))
 
     today = datetime.date.today()
-    # today = datetime.date(2011, 5, 1)
     yesterday = today - datetime.timedelta(days=1)
 
     exit_code, exit_message = check_pulseheight_mpv(PUBLICDB_HOST_FOR_NAGIOS,
-                                                    stationNumber,
-                                                    plateNumber,
+                                                    station_number,
+                                                    plate_number,
                                                     yesterday)
 
     exit(exit_code, exit_message)
