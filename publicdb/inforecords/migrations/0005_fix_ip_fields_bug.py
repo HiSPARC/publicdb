@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             model_name='pc',
             name='new_ip',
             field=models.GenericIPAddressField(unique=True, blank=True,
-                                               null=True, protocol='IPV4'),
+                                               null=True, protocol='ipv4'),
         ),
         migrations.RunPython(copy_ip, lambda *args, **kwargs: None),
         migrations.RemoveField(

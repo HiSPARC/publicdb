@@ -336,7 +336,7 @@ class Pc(models.Model):
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
     ip = models.GenericIPAddressField(unique=True, blank=True, null=True,
-                                      protocol='IPV4')
+                                      protocol='ipv4')
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
                                       through='EnabledService')

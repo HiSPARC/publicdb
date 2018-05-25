@@ -21,6 +21,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='pc',
             name='ip',
-            field=models.GenericIPAddressField(unique=True, null=True, protocol=b'IPV4', blank=True),
+            field=models.GenericIPAddressField(unique=True, null=True, protocol='ipv4', blank=True),
         ),
     ]
