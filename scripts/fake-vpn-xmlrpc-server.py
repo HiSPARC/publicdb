@@ -9,8 +9,8 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 import base64
 
 HOSTS_FILE = '/tmp/hosts-hisparc'
@@ -35,8 +35,8 @@ def register_hosts_ip(host_list):
 
     with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
-            file.write('%s\t%s.his\n' % (ip, host))
-            print("Writing %s, %s to hosts file" % (ip, host))
+            file.write(f'{ip}\t{host}.his\n')
+            print(f"Writing {ip}, {host} to hosts file")
 
     return True
 

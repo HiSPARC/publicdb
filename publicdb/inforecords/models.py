@@ -1,5 +1,5 @@
 import datetime
-import xmlrpclib
+import xmlrpc.client
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -336,7 +336,7 @@ class Pc(models.Model):
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
     ip = models.GenericIPAddressField(unique=True, blank=True, null=True,
-                                      protocol='IPV4')
+                                      protocol='ipv4')
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService',
                                       through='EnabledService')
@@ -372,8 +372,8 @@ class Pc(models.Model):
         Source: http://code.activestate.com/recipes/65219/
 
         """
-        hexn = ''.join(["%02X" % long(i) for i in ipaddress.split('.')])
-        n = long(hexn, 16) + 1
+        hexn = ''.join(["%02X" % int(i) for i in ipaddress.split('.')])
+        n = int(hexn, 16) + 1
 
         d = 256 * 256 * 256
         q = []
@@ -386,9 +386,9 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
-        self.name = (unicode(slugify(self.name)).replace('-', '')
+        self.name = (str(slugify(self.name)).replace('-', '')
                                                 .replace('_', ''))
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = xmlrpc.client.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
             super(Pc, self).save(*args, **kwargs)
@@ -415,7 +415,7 @@ class Pc(models.Model):
 
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = xmlrpc.client.ServerProxy(settings.VPN_PROXY)
         aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
         aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
         proxy.register_hosts_ip(aliases)
@@ -499,7 +499,7 @@ def reload_nagios():
     """Reload the nagios configuration"""
 
     try:
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = xmlrpc.client.ServerProxy(settings.VPN_PROXY)
         proxy.reload_nagios()
     except Exception:
         # FIXME logging!
@@ -510,7 +510,7 @@ def reload_datastore():
     """Reload the datastore configuration"""
 
     try:
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+        proxy = xmlrpc.client.ServerProxy(settings.DATASTORE_PROXY)
         proxy.reload_datastore()
     except Exception:
         # FIXME logging!

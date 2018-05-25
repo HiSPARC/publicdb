@@ -3,11 +3,10 @@ import csv
 import datetime
 import os
 import tempfile
-import urllib
-import urlparse
+import urllib.parse
 
-from cStringIO import StringIO
-from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
+from io import StringIO
+from xmlrpc.server import SimpleXMLRPCDispatcher
 
 import dateutil.parser
 import tables
@@ -105,8 +104,8 @@ def get_data_url(station_number, date, get_blobs=False):
             if node.name != 'blobs':
                 datafile.copy_node(node, target_node)
 
-    url = urlparse.urljoin(settings.MEDIA_URL, 'raw_data/')
-    url = urlparse.urljoin(url, os.path.basename(target.filename))
+    url = urllib.parse.urljoin(settings.MEDIA_URL, 'raw_data/')
+    url = urllib.parse.urljoin(url, os.path.basename(target.filename))
 
     datafile.close()
     target.close()
@@ -161,8 +160,7 @@ def download_form(request, station_number=None, start=None, end=None):
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
             data_type = form.cleaned_data['data_type']
-            query_string = urllib.urlencode({'start': start, 'end': end,
-                                             'download': download})
+            query_string = urllib.parse.urlencode({'start': start, 'end': end, 'download': download})
             if data_type == 'lightning':
                 lightning_type = form.cleaned_data['lightning_type']
                 return HttpResponseRedirect('/data/knmi/%s/%s/?%s' %
@@ -243,7 +241,7 @@ def download_data(request, data_type='events', station_number=None,
         filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'lightning':
         lightning_type = int(lightning_type)
-        if lightning_type not in range(6):
+        if lightning_type not in list(range(6)):
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
@@ -562,12 +560,15 @@ def coincidences_download_form(request, start=None, end=None):
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
-            query_string = urllib.urlencode({'cluster': cluster,
-                                             'stations': stations,
-                                             'start': start, 'end': end,
-                                             'n': n, 'download': download})
-            return HttpResponseRedirect('/data/network/coincidences/?%s' %
-                                        query_string)
+            query_string = urllib.parse.urlencode({
+                'cluster': cluster,
+                'stations': stations,
+                'start': start,
+                'end': end,
+                'n': n,
+                'download': download
+            })
+            return HttpResponseRedirect('/data/network/coincidences/?%s' % query_string)
     else:
         form = CoincidenceDownloadForm(initial={'filter_by': 'network',
                                                 'start': start, 'end': end,

@@ -1,6 +1,6 @@
 language: python
 python:
-  - "2.7"
+  - "3.6"
 
 sudo: false
 
@@ -41,4 +41,4 @@ deploy:
   name: HiSPARC-Bot
   on:
     branch: master
-    python: 2.7
+    python: 3.6

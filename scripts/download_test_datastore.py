@@ -45,7 +45,7 @@ def main():
 
 
 def test_for_datastore_directory():
-    print("Checking for datastore path at %s ..." % datastore_path,)
+    print(f"Checking for datastore path at {datastore_path} ...",)
     if not os.path.exists(datastore_path):
         raise RuntimeError("Datastore path cannot be found!")
     else:
@@ -102,7 +102,7 @@ def open_or_create_file(data_dir, date):
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x
-        os.makedirs(dir, 0755)
+        os.makedirs(dir, 0o755)
 
     return tables.open_file(file, 'a')
 

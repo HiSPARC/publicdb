@@ -18,10 +18,10 @@ if __name__ == '__main__':
         print('This pc does not exist.  Doing nothing.')
     else:
         for service in EnabledService.objects.filter(pc=pc):
-            print('Deleting service: %s', service)
+            print(f'Deleting service: {service}')
             service.delete()
 
         for service in MonitorService.objects.filter(is_default_service=True):
             new_service = EnabledService(pc=pc, monitor_service=service)
-            print('Creating service: %s', new_service)
+            print(f'Creating service: {new_service}')
             new_service.save()

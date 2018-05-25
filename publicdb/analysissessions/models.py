@@ -126,7 +126,7 @@ class SessionRequest(models.Model):
         with tables.open_file(datastore_path, 'r') as data:
             try:
                 stations = self.get_stations_for_session(data)
-            except Exception, msg:
+            except Exception as msg:
                 print("Error in get_stations_for_session(data)")
                 print("Error:", msg)
                 return nvalid
@@ -145,8 +145,8 @@ class SessionRequest(models.Model):
                     else:
                         ndups += 1
         if ndups:
-            print('%d duplicate stations dropped' % ndups)
-        print("Succesfully stored %d coincidences" % nvalid)
+            print(f'{ndups} duplicate stations dropped')
+        print(f"Succesfully stored {nvalid} coincidences")
         return nvalid
 
     def get_stations_for_session(self, data):

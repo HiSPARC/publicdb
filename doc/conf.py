@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Public Database documentation build configuration file
 #
 # Note that not all possible configuration values are present in this

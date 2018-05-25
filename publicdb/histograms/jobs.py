@@ -89,7 +89,7 @@ def check_for_new_events_and_update_flags(state):
         possibly_new = datastore.check_for_new_events(last_check_time)
 
         # perform a thorough check for each possible date
-        for date, station_list in possibly_new.iteritems():
+        for date, station_list in possibly_new.items():
             process_possible_stations_for_date(date, station_list)
         state.check_last_run = check_last_run
     finally:
@@ -108,11 +108,11 @@ def process_possible_stations_for_date(date, station_list):
     """
     logger.info('Now processing %s' % date)
     unique_table_list = set([table_name
-                             for table_list in station_list.values()
-                             for table_name in table_list.keys()])
+                             for table_list in list(station_list.values())
+                             for table_name in list(table_list.keys())])
     for table_name in unique_table_list:
         process_possible_tables_for_network(date, table_name)
-    for station, table_list in station_list.iteritems():
+    for station, table_list in station_list.items():
         process_possible_tables_for_station(station, table_list, date)
 
 
@@ -145,7 +145,7 @@ def process_possible_tables_for_station(station, table_list, date):
     else:
         summary, created = Summary.objects.get_or_create(station=station,
                                                          date=date)
-        for table, num_events in table_list.iteritems():
+        for table, num_events in table_list.items():
             check_table_and_update_flags(table, num_events, summary)
 
 
@@ -498,7 +498,7 @@ def update_eventtime_histogram(summary):
 
     hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
-    bins = range(25)
+    bins = list(range(25))
     hist = hist.tolist()
     save_histograms(summary, 'eventtime', bins, hist)
 
@@ -518,7 +518,7 @@ def update_coincidencetime_histogram(network_summary):
 
     hist, _ = np.histogram(timestamps, bins=bins)
     # redefine bins and histogram, don't forget right-most edge
-    bins = range(25)
+    bins = list(range(25))
     hist = hist.tolist()
     save_network_histograms(network_summary, 'coincidencetime', bins, hist)
 
@@ -531,7 +531,7 @@ def update_coincidencenumber_histogram(network_summary):
     n_stations = esd.get_coincidence_data(network_summary, 'N')
 
     # create bins, don't forget right-most edge
-    bins = range(2, 101)
+    bins = list(range(2, 101))
 
     hist, _ = np.histogram(n_stations, bins=bins)
     hist = hist.tolist()
@@ -655,7 +655,7 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
     zeniths = esd.get_zeniths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(0, 91, 3)  # degrees
+    bins = list(range(0, 91, 3))  # degrees
 
     hist, _ = np.histogram(zeniths, bins=bins)
     hist = hist.tolist()
@@ -669,7 +669,7 @@ def update_azimuth_histogram(summary, tempfile_path, node_path):
     azimuths = esd.get_azimuths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
-    bins = range(-180, 181, 12)  # degrees
+    bins = list(range(-180, 181, 12))  # degrees
 
     hist, _ = np.histogram(azimuths, bins=bins)
     hist = hist.tolist()
@@ -685,7 +685,7 @@ def update_temperature_dataset(summary):
     temperature = [(x, y) for x, y in temperature if y not in error_values]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
-        save_dataset(summary, 'temperature', *zip(*temperature))
+        save_dataset(summary, 'temperature', *list(zip(*temperature)))
 
 
 def update_barometer_dataset(summary):
@@ -697,7 +697,7 @@ def update_barometer_dataset(summary):
     barometer = [(x, y) for x, y in barometer if y not in error_values]
     if barometer != []:
         barometer = shrink_dataset(barometer, INTERVAL_BARO)
-        save_dataset(summary, 'barometer', *zip(*barometer))
+        save_dataset(summary, 'barometer', *list(zip(*barometer)))
 
 
 def shrink_dataset(dataset, interval):

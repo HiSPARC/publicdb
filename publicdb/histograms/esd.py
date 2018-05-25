@@ -301,7 +301,7 @@ def get_or_create_esd_data_path(date):
 
     if not os.path.exists(dirpath):
         # create dir and parent dirs with mode rwxr-xr-x
-        os.makedirs(dirpath, 0755)
+        os.makedirs(dirpath, 0o755)
 
     return filepath
 
@@ -573,7 +573,7 @@ def get_time_series(summary, tablename, quantity):
         else:
             col1 = table.col('timestamp')
             col2 = table.col(quantity)
-            data = zip(col1, col2)
+            data = list(zip(col1, col2))
             data.sort(key=itemgetter(0))
 
     return data
