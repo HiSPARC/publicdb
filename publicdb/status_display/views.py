@@ -3,8 +3,8 @@ import csv
 import datetime
 
 from collections import OrderedDict
-from cStringIO import StringIO
-from itertools import groupby, izip
+from io import StringIO
+from itertools import groupby
 from operator import itemgetter
 
 from numpy import arange, nan
@@ -280,7 +280,7 @@ def network_coincidences(request, year=None, month=None, day=None):
 
 class SummaryDetailView(DateDetailView):
     date_field = 'date'
-    http_method_names = [u'get']
+    http_method_names = ['get']
     month_format = '%m'
     slug_field = 'station__number'
     slug_url_kwarg = 'station_number'
@@ -739,7 +739,7 @@ def get_eventtime_histogram_sources(station_number, start, end):
                 break
         else:
             values.extend(no_data)
-    return izip(bins, values)
+    return zip(bins, values)
 
 
 def get_barometer_dataset_source(request, station_number, year, month, day):
@@ -934,10 +934,10 @@ def get_histogram_source(year, month, day, type, station_number=None):
 
     if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime',
                 'coincidencenumber']:
-        return zip(histogram.bins, histogram.values)
+        return list(zip(histogram.bins, histogram.values))
     else:
         # Multiple value columns
-        return zip(histogram.bins, *histogram.values)
+        return list(zip(histogram.bins, *histogram.values))
 
 
 def get_dataset_source(year, month, day, type, station_number):
@@ -965,10 +965,10 @@ def get_dataset_source(year, month, day, type, station_number):
                                 type__slug=type)
 
     if type in ['barometer', 'temperature']:
-        return zip(dataset.x, dataset.y)
+        return list(zip(dataset.x, dataset.y))
     else:
         # Multiple value columns
-        return zip(dataset.x, *dataset.y)
+        return list(zip(dataset.x, *dataset.y))
 
 
 def get_config_source(station_number, type):
@@ -1083,13 +1083,13 @@ def plot_config(type, configs):
         values = [[config.mas_ch1_voltage, config.mas_ch2_voltage,
                    config.slv_ch1_voltage, config.slv_ch2_voltage]
                   for config in configs]
-        values = zip(*values)
+        values = list(zip(*values))
         y_label = 'PMT Voltage (V)'
     elif type == 'current':
         values = [[config.mas_ch1_current, config.mas_ch2_current,
                    config.slv_ch1_current, config.slv_ch2_current]
                   for config in configs]
-        values = zip(*values)
+        values = list(zip(*values))
         y_label = 'PMT Current (mA)'
     if type == 'altitude':
         values = [config.gps_altitude for config in configs
@@ -1106,13 +1106,13 @@ def plot_timing_offsets(station_number):
 
     data = get_detector_timing_offsets(station_number)
     data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
-    data = zip(*data)
+    data = list(zip(*data))
 
     if not data:
         return None
 
     timestamps = data[0]
-    values = zip(*data[1])
+    values = list(zip(*data[1]))
 
     x_label = 'Date (month/year)'
     y_label = 'Timing offset (ns)'

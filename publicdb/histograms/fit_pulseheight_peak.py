@@ -183,7 +183,7 @@ def fit_pulseheight_peak(pulseheights):
                                                              occurence)
         # logger.debug("Initial peak, minRange, maxRange: %s, %s, %s" %
         #              (initial_mpv, minRange, maxRange))
-    except Exception, e:
+    except Exception as e:
         pulseheight_fit.error_type = "Exception"
         pulseheight_fit.error_message = ("Unable to find initial fit "
                                          "parameters: %s" % e)
@@ -230,7 +230,7 @@ def fit_pulseheight_peak(pulseheights):
                                         fit_window_occurence,
                                         [initial_n, initial_mean,
                                          initial_width])
-    except RuntimeError, exception:
+    except RuntimeError as exception:
         pulseheight_fit.error_type = "RuntimeError"
         pulseheight_fit.error_message = exception
         return pulseheight_fit
@@ -305,7 +305,7 @@ def get_pulseheight_fits(summary):
     for detector_n in range(1, n_detectors + 1):
         try:
             fit = fit_pulseheight_peak(pulseheights[:, detector_n - 1])
-        except Exception, exception:
+        except Exception as exception:
             logger.error("[%s detector %s] %s" %
                          (summary, detector_n, exception))
 

@@ -9,10 +9,10 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 import subprocess
-import cStringIO as StringIO
+import io as StringIO
 import zipfile
 import os
 import base64

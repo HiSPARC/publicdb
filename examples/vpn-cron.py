@@ -17,7 +17,7 @@
 
 """
 import os
-import urllib2
+import urllib.request, urllib.error, urllib.parse
 import hashlib
 import subprocess
 
@@ -30,7 +30,7 @@ CFG_URL = 'http://data.hisparc.nl/config/nagios'
 def reload_nagios():
     """Load nagios config and reload nagios, if necessary"""
 
-    nagios_cfg = urllib2.urlopen(CFG_URL).read()
+    nagios_cfg = urllib.request.urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(nagios_cfg).hexdigest()
 
     try:

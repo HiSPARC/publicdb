@@ -1,6 +1,6 @@
 import re
 import socket
-import urllib2
+import urllib.request, urllib.error
 
 from ..inforecords.models import Station
 
@@ -71,10 +71,10 @@ def retrieve_station_status(query):
     nagios_base = "http://vpn.hisparc.nl/cgi-bin/status.cgi?"
 
     try:
-        request = urllib2.urlopen(nagios_base + query, timeout=1)
+        request = urllib.request.urlopen(nagios_base + query, timeout=1)
         response = request.read()
         stations = re.findall("host=([a-z0-9]+)\' title", response)
-    except (urllib2.URLError, socket.timeout):
+    except (urllib.error.URLError, socket.timeout):
         stations = []
 
     return stations

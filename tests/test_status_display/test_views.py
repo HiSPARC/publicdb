@@ -96,7 +96,7 @@ class TestSourceViews(TestCase):
         return response
 
     def assert_context_contains(self, expected_context, context):
-        for key, value in expected_context.items():
+        for key, value in list(expected_context.items()):
             self.assertEqual(value, context[key])
 
     def test_network_histograms(self):
@@ -104,7 +104,7 @@ class TestSourceViews(TestCase):
             data = histograms_factories.NetworkHistogramFactory(source=self.network_summary, type__slug=network_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, data.values),
+                'data': list(zip(data.bins, data.values)),
                 'date': self.network_summary.date.strftime('%-Y-%-m-%-d'),
             }
             self.assert_context_contains(expected_context, response.context)
@@ -114,7 +114,7 @@ class TestSourceViews(TestCase):
             data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, data.values),
+                'data': list(zip(data.bins, data.values)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -124,7 +124,7 @@ class TestSourceViews(TestCase):
             data = histograms_factories.MultiDailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, *data.values),
+                'data': list(zip(data.bins, *data.values)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -139,7 +139,7 @@ class TestSourceViews(TestCase):
             data = histograms_factories.DailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.x, data.y),
+                'data': list(zip(data.x, data.y)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -149,7 +149,7 @@ class TestSourceViews(TestCase):
             data = histograms_factories.MultiDailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.x, *data.y),
+                'data': list(zip(data.x, *data.y)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }

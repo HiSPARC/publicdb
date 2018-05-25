@@ -162,7 +162,7 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
 class NetworkHistogramFactory(factory.DjangoModelFactory):
     source = factory.SubFactory(NetworkSummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values)))
+    bins = factory.LazyAttribute(lambda o: list(range(len(o.values))))
     values = factory.Faker('int_list')
 
     class Meta:
@@ -172,7 +172,7 @@ class NetworkHistogramFactory(factory.DjangoModelFactory):
 class DailyHistogramFactory(factory.DjangoModelFactory):
     source = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values)))
+    bins = factory.LazyAttribute(lambda o: list(range(len(o.values))))
     values = factory.Faker('int_list')
 
     class Meta:

@@ -10,7 +10,7 @@ from scipy import optimize, stats
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseNotFound
 
-import datastore
+from . import datastore
 
 from ..histograms.models import (Configuration, DailyHistogram, HistogramType,
                                  PulseheightFit, Summary)
@@ -388,7 +388,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
                                              chi_square_reduced__gt=0.01,
                                              chi_square_reduced__lt=8.0,
                                              initial_width__gt=45.0)
-    except Exception, e:
+    except Exception as e:
         result.update({"nagios": Nagios.unknown,
                        "error": "Error retrieving fits",
                        "exception": str(e)})
@@ -445,7 +445,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
                        'relative_width': popt[2]})
 
         return json_dict(result)
-    except Exception, e:
+    except Exception as e:
         result.update({"nagios": Nagios.unknown,
                        "error": "Error in calculating the drift",
                        "exception": str(e)})
@@ -507,7 +507,7 @@ def get_pulseheight_fit(request, station_number, plate_number,
             source__station__number=station_number,
             source__date=requested_date,
             plate=plate_number)
-    except Exception, e:
+    except Exception as e:
         result.update({"nagios": Nagios.unknown,
                        "error": "Fit has not been found",
                        "exception": str(e)})
@@ -525,7 +525,7 @@ def get_pulseheight_fit(request, station_number, plate_number,
                        "chi_square_reduced": fit.chi_square_reduced,
                        "error_type": fit.error_type,
                        "error_message": fit.error_message})
-    except Exception, e:
+    except Exception as e:
         result.update({"nagios": Nagios.unknown,
                        "error": "Data has been found, "
                                 "but error in converting data to numbers",
