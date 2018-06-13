@@ -773,9 +773,8 @@ def get_event_traces(request, station_number, ext_timestamp):
 
     try:
         station = Station.objects.get(number=station_number)
-        Summary.objects.get(station=station, date=date,
-                            num_events__isnull=False)
-    except Station.DoesNotExist:
+        Summary.objects.get(station=station, date=date, num_events__isnull=False)
+    except (Station.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
     try:
