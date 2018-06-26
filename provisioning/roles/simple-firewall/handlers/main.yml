@@ -1,5 +1,0 @@
----
-
-- name: compile firewall rules
-  command: lokkit --update
-  become: true
