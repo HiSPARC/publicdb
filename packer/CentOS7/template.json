@@ -45,6 +45,7 @@
       "scripts": [
         "scripts/virtualbox.sh",
         "scripts/cleanup.sh",
+        "scripts/ssh_usedns_no.sh",
         "scripts/zerodisk.sh"
       ],
       "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
