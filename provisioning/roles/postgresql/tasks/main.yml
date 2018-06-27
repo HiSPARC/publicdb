@@ -18,11 +18,20 @@
     state: present
   become: true
 
+- name: check if PostgreSQL database is initialized.
+  stat:
+    path: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
+  register: pgdata_dir_conf
+  become: true
+  become_user: postgres
+
 - name: initiate database
-  command: "service postgresql-{{ psql_version }} initdb"
+  command: "/usr/pgsql-{{ psql_version }}/bin/postgresql96-setup initdb"
+  when: not pgdata_dir_conf.stat.exists
   args:
     creates: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
   become: true
+  become_user: postgres
 
 - name: copy PostgreSQL authentication config file
   become: true
