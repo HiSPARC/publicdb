@@ -12,7 +12,7 @@
 #SECTION ALL
 #SECTION ESTABLISHED
 #SECTION RELATED
-SECTION NEW
+?SECTION NEW
 
 # Always accept SSH to tietar
 SSH(ACCEPT)    all             $FW

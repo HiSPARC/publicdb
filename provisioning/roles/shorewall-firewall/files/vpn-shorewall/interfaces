@@ -7,7 +7,7 @@
 # http://www.shorewall.net/manpages/shorewall-interfaces.html
 #
 ###############################################################################
-FORMAT 2
+?FORMAT 2
 ###############################################################################
 #ZONE		INTERFACE		OPTIONS
 net             em1                    logmartians,nosmurfs,routefilter,tcpflags
