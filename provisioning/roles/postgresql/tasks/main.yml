@@ -23,7 +23,6 @@
   args:
     creates: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
   become: true
-  become_user: postgres
 
 - name: copy PostgreSQL authentication config file
   become: true
