@@ -6,13 +6,9 @@
       - nagios
       - nagios-plugins-all
       - nagios-plugins-nrpe
+      - nsca
       - nrpe
       - httpd
-  become: true
-
-- name: install older nsca 2.6.2
-  yum:
-    name: http://ftp.nluug.nl/os/Linux/distr/repoforge/redhat/el5/en/x86_64/rpmforge/RPMS/nagios-nsca-2.6-2.el5.rf.x86_64.rpm
   become: true
 
 - name: copy apache nagios config
@@ -67,6 +63,15 @@
     backup: yes
   become: true
   notify: restart apache
+
+- name: ensure /var/run/nagios exists
+  file:
+    path: /var/run/nagios
+    state: directory
+    owner: nagios
+    group: nagios
+    mode: 0755
+  become: true
 
 - name: copy nagios config
   copy:
