@@ -1,10 +1,10 @@
 ---
 
-- name: install openvpn, easy-rsa and dnsmasq
+- name: install openvpn and dnsmasq
   yum:
     name:
       - openvpn
-      - easy-rsa
+      - openssl
       - dnsmasq
   become: true
 
@@ -51,9 +51,11 @@
 
 - name: ensure openvpn is started
   service:
-    name: openvpn
-    enabled: yes
+    name: "openvpn@{{ item }}.service"
     state: started
+  with_items:
+    - admin
+    - client
   become: true
 
 - name: create nikhef network resolv.conf
@@ -71,4 +73,5 @@
     src: resolv.conf
     dest: /etc/resolv.conf
     backup: yes
+  when: is_dev is not defined
   become: true
