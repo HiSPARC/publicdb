@@ -11,6 +11,8 @@
 ###############################################################################
 #ZONE		INTERFACE		OPTIONS
 net             em1                    logmartians,nosmurfs,routefilter,tcpflags
+net             enp0s3                   logmartians,nosmurfs,routefilter,tcpflags
+net             enp0s8                  logmartians,nosmurfs,routefilter,tcpflags
 net             eth0                    logmartians,nosmurfs,routefilter,tcpflags
 net             eth1                    logmartians,nosmurfs,routefilter,tcpflags
 det             tun1                    logmartians,nosmurfs,routefilter,tcpflags
