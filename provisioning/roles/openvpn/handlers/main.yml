@@ -8,9 +8,11 @@
 
 - name: restart openvpn
   service:
-    name: openvpn
+    name: "openvpn@{{ item }}.service"
     state: restarted
-    sleep: 3
+  with_items:
+    - admin
+    - client
   become: true
   notify: restart shorewall
 
