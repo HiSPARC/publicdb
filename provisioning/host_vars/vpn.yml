@@ -3,7 +3,7 @@
 private_keys:
   - path: adminkeys/ca.key
     key: fake-admin-ca-key
-  - path: admin/server.key
+  - path: adminkeys/server.key
     key: fake-admin-server-key
   - path: keys/ta.key
     key: fake-keys-ta-key
