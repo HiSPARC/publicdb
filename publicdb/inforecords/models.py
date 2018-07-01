@@ -3,7 +3,7 @@ import xmlrpclib
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Max
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -500,7 +500,7 @@ def reload_nagios():
 
     try:
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        transaction.on_commit(proxy.reload_nagios)
     except Exception:
         # FIXME logging!
         pass
@@ -511,7 +511,7 @@ def reload_datastore():
 
     try:
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        transaction.on_commit(proxy.reload_datastore)
     except Exception:
         # FIXME logging!
         pass

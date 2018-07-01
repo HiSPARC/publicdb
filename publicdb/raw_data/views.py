@@ -19,7 +19,7 @@ from django.db.models import Q
 from django.http import (HttpResponse, HttpResponseBadRequest,
                          HttpResponseRedirect, StreamingHttpResponse)
 from django.shortcuts import get_object_or_404, render
-from django.template import Context, loader
+from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 
 from sapphire import CoincidenceQuery
@@ -64,8 +64,8 @@ def call_xmlrpc(request):
         for method in dispatcher.system_listMethods():
             methods.append({'name': method,
                             'help': dispatcher.system_methodHelp(method)})
-        c = Context({'methods': methods})
-        response.write(t.render(c))
+        context = {'methods': methods}
+        response.write(t.render(context))
         return response
 
 
@@ -265,9 +265,9 @@ def generate_events_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
     t = loader.get_template('event_data.tsv')
-    c = Context({'station': station, 'start': start, 'end': end})
+    context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(c)
+    yield t.render(context)
 
     events_returned = False
 
@@ -358,9 +358,9 @@ def generate_weather_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
     t = loader.get_template('weather_data.tsv')
-    c = Context({'station': station, 'start': start, 'end': end})
+    context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(c)
+    yield t.render(context)
 
     weather_returned = False
 
@@ -432,9 +432,9 @@ def generate_singles_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
     t = loader.get_template('singles_data.tsv')
-    c = Context({'station': station, 'start': start, 'end': end})
+    context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(c)
+    yield t.render(context)
 
     singles_returned = False
 
@@ -504,9 +504,9 @@ def generate_lightning_as_tsv(lightning_type, start, end):
     type_str = '%d: %s' % (lightning_type, types[lightning_type])
 
     t = loader.get_template('lightning_data.tsv')
-    c = Context({'lightning_type': type_str, 'start': start, 'end': end})
+    context = {'lightning_type': type_str, 'start': start, 'end': end}
 
-    yield t.render(c)
+    yield t.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
@@ -672,10 +672,10 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
     """Render TSV output as an iterator."""
 
     t = loader.get_template('coincidences.tsv')
-    c = Context({'start': start, 'end': end, 'cluster': cluster,
-                 'stations': stations, 'n': n})
+    context = {'start': start, 'end': end, 'cluster': cluster,
+               'stations': stations, 'n': n}
 
-    yield t.render(c)
+    yield t.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
