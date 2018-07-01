@@ -186,7 +186,7 @@
     hour: 4
     state: present
     user: hisparc
-    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}publicdb/manage.py updatehistograms"
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files

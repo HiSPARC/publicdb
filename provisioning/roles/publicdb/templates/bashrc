@@ -16,7 +16,7 @@ alias cdjsp='cd {{ jsparc_path }}'
 alias collectreload='envpub && cdpub && cd publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
 # Perform the daily hisparc-update task
-alias uphis='envpub && cdpub && python scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1'
+alias uphis='envpub && cdpub && cd publicdb && ./manage.py updatehistograms'
 
 # Update publicdb to latest master
 alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && collectreload'
