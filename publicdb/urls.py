@@ -15,7 +15,6 @@ urlpatterns = [
     url(r'^maps/', include('publicdb.maps.urls')),
     url(r'^layout/', include('publicdb.station_layout.urls')),
     url(r'^analysis-session/', include('publicdb.analysissessions.urls')),
-    url(r'^jsparc/', include('publicdb.jsparc.urls')),  # Deprecated
     url(r'^software-updates/', include('publicdb.updates.urls')),
     url(r'^raw_data/', include('publicdb.raw_data.urls')),
     url(r'^data/', include('publicdb.raw_data.urls')),
