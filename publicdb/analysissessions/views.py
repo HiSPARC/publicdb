@@ -311,14 +311,3 @@ def confirm_request(request, url):
         sessionrequest.save()
     return render(request, 'analysissessions/confirm.html',
                   {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
-
-
-def create_session(request):
-    sessionlist = SessionRequest.objects.filter(session_confirmed=True, session_pending=True)
-    for sessionrequest in sessionlist:
-        sessionrequest.session_confirmed = False
-        sessionrequest.save()
-
-    for sessionrequest in sessionlist:
-        sessionrequest.create_session()
-    return HttpResponse('')

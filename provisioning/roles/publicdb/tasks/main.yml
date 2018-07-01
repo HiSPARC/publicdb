@@ -206,7 +206,7 @@
     minute: "*/2"
     state: present
     user: hisparc
-    job: "curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}publicdb/manage.py updatehistograms"
   become: true
 
 - name: enable cron job for daily backup of publicdb database

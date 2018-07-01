@@ -77,8 +77,8 @@ class SessionRequest(models.Model):
     start_date = models.DateField()
     mail_send = models.BooleanField(default=False)
     session_confirmed = models.BooleanField(default=False)
-    session_created = models.BooleanField(default=False)
     session_pending = models.BooleanField(default=False)
+    session_created = models.BooleanField(default=False)
     url = models.CharField(max_length=20)
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
@@ -114,7 +114,6 @@ class SessionRequest(models.Model):
             self.sendmail_created()
             self.session_created = True
         self.save()
-        return [self.sid, self.pin]
 
     def find_coincidence(self, date, session):
         filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
@@ -223,7 +222,7 @@ class SessionRequest(models.Model):
 
     def generate_url(self):
         newurl = os.urandom(10).encode('hex')
-        if SessionRequest.objects.filter(url=newurl):
+        if SessionRequest.objects.filter(url=newurl).exists():
             self.generate_url()
         else:
             self.url = newurl
@@ -267,8 +266,6 @@ class SessionRequest(models.Model):
             (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()
 
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
@@ -294,8 +291,6 @@ class SessionRequest(models.Model):
             (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()
 
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
@@ -312,5 +307,3 @@ class SessionRequest(models.Model):
             self.name)
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()
