@@ -12,10 +12,8 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 import datastore
 
-from ..histograms.models import (Configuration, DailyHistogram, HistogramType,
-                                 PulseheightFit, Summary)
-from ..inforecords.models import (Cluster, Country,
-                                  MonitorPulseheightThresholds, Pc, Station)
+from ..histograms.models import Configuration, DailyHistogram, HistogramType, PulseheightFit, Summary
+from ..inforecords.models import Cluster, Country, MonitorPulseheightThresholds, Pc, Station
 from ..station_layout.models import StationLayout
 
 FIRSTDATE = datetime.date(2004, 1, 1)

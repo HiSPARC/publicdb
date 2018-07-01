@@ -5,7 +5,6 @@ from __future__ import unicode_literals
 from django.db import migrations, models
 
 
-
 def set_datasettype_has_multiple_datasets(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'DatasetType')

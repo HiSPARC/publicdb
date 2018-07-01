@@ -11,17 +11,14 @@ from numpy import arange, nan
 
 from django.db.models import Q
 from django.http import Http404
-from django.shortcuts import (get_list_or_404, get_object_or_404, redirect,
-                              render)
+from django.shortcuts import get_list_or_404, get_object_or_404, redirect, render
 from django.views.generic import DateDetailView, RedirectView
 
 from sapphire.transformations import clock
 
-from ..histograms.models import (Configuration, DailyDataset, DailyHistogram,
-                                 DatasetType, DetectorTimingOffset,
-                                 HistogramType, MultiDailyDataset,
-                                 MultiDailyHistogram, NetworkHistogram,
-                                 NetworkSummary, StationTimingOffset, Summary)
+from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
+                                 DetectorTimingOffset, HistogramType, MultiDailyDataset, MultiDailyHistogram,
+                                 NetworkHistogram, NetworkSummary, StationTimingOffset, Summary)
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
