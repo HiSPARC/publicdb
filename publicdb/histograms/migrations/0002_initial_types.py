@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import os
 
 from django.core import serializers
-from django.core.management import call_command
 from django.db import migrations
 
 
@@ -28,10 +27,10 @@ def unload_fixture(apps, schema_editor):
     This will also delete all related histograms/datasets!
 
     """
-    HistogramType = apps.get_model('histograms', 'HistogramType')
-    HistogramType.objects.all().delete()
-    DatasetType = apps.get_model('histograms', 'DatasetType')
-    DatasetType.objects.all().delete()
+    histogram_type_model = apps.get_model('histograms', 'HistogramType')
+    histogram_type_model.objects.all().delete()
+    dataset_type_model = apps.get_model('histograms', 'DatasetType')
+    dataset_type_model.objects.all().delete()
 
 
 class Migration(migrations.Migration):

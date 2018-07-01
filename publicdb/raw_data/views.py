@@ -16,8 +16,7 @@ from numpy import char, column_stack, degrees, empty, isnan, where
 
 from django.conf import settings
 from django.db.models import Q
-from django.http import (HttpResponse, HttpResponseBadRequest,
-                         HttpResponseRedirect, StreamingHttpResponse)
+from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
