@@ -206,7 +206,7 @@
     minute: "*/2"
     state: present
     user: hisparc
-    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}publicdb/manage.py updatehistograms"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}publicdb/manage.py createsessions"
   become: true
 
 - name: enable cron job for daily backup of publicdb database
