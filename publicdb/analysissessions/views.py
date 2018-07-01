@@ -10,10 +10,9 @@ import numpy as np
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import SessionRequestForm
-from .models import (AnalysisSession, AnalyzedCoincidence, SessionRequest,
-                     Student)
 from ..histograms.models import Configuration
+from .forms import SessionRequestForm
+from .models import AnalysisSession, AnalyzedCoincidence, SessionRequest, Student
 
 
 def get_coincidence(request):
@@ -50,20 +49,16 @@ def get_coincidence(request):
                                    "or is already expired.")
 
     if not student_name:
-        student = Student.objects.get(session=session,
-                                      name='Test student')
+        student = Student.objects.get(session=session, name='Test student')
     else:
-        student, is_created = Student.objects.get_or_create(session=session,
-                                                            name=student_name)
+        student, is_created = Student.objects.get_or_create(session=session, name=student_name)
 
     coincidences = AnalyzedCoincidence.objects.filter(session=session)
     try:
-        coincidence = coincidences.filter(student=student,
-                                          is_analyzed=False)[0]
+        coincidence = coincidences.filter(student=student, is_analyzed=False)[0]
     except IndexError:
         try:
-            coincidence = coincidences.filter(student=None,
-                                              is_analyzed=False)[0]
+            coincidence = coincidences.filter(student=None, is_analyzed=False)[0]
             coincidence.student = student
             coincidence.save()
         except IndexError:
@@ -88,8 +83,7 @@ def get_events(coincidence):
         except Configuration.DoesNotExist:
             continue
 
-        timestamp = calendar.timegm(datetime.combine(event.date, event.time)
-                                            .utctimetuple())
+        timestamp = calendar.timegm(datetime.combine(event.date, event.time).utctimetuple())
         event_dict = dict(timestamp=timestamp,
                           nanoseconds=event.nanoseconds,
                           number=event.station.number,
@@ -124,15 +118,13 @@ def data_json(coincidence, events):
 def error_json(error_code, message):
     """Construct error response json for jSparc requests"""
     data = dict(message=message, code=error_code)
-    response = HttpResponse(json.dumps(data), status=error_code,
-                            content_type='application/json')
+    response = HttpResponse(json.dumps(data), status=error_code, content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
 def top_lijst(slug):
-    coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug,
-                                                      is_analyzed=True)
+    coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug, is_analyzed=True)
     scores = []
     for s in Student.objects.all():
         error = []
@@ -191,8 +183,7 @@ def result(request):
     except ValueError:
         rank = None
     msg = "OK [result stored]"
-    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
-                            content_type='application/json')
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -201,8 +192,7 @@ def test_result():
     """Generate random ranking for test sessions"""
     msg = "Test session, result not stored"
     rank = randint(1, 10)
-    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)),
-                            content_type='application/json')
+    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -211,8 +201,7 @@ def data_display(request, slug):
     """Simple data display for symposium results"""
 
     session = get_object_or_404(AnalysisSession, slug=slug)
-    coincidences = AnalyzedCoincidence.objects.filter(session=session,
-                                                      is_analyzed=True)
+    coincidences = AnalyzedCoincidence.objects.filter(session=session, is_analyzed=True)
     energy_histogram = create_energy_histogram(slug, coincidences)
     core_map = get_cores(slug, coincidences)
     star_map = None  # create_star_map(slug, coincidences)
@@ -231,15 +220,13 @@ def create_energy_histogram(slug, coincidences):
     """Create an energy histogram"""
 
     energies = [x.log_energy for x in coincidences]
-    good_energies = [x.log_energy for x in
-                     coincidences.filter(error_estimate__lte=100.)]
+    good_energies = [x.log_energy for x in coincidences.filter(error_estimate__lte=100.)]
 
     v1, bins = np.histogram(energies, bins=np.arange(14, 23, 1))
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
     values = [v1.tolist(), v2.tolist()]
 
-    plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)',
-                                     'Count')
+    plot_object = create_plot_object(bins[:-1], values, 'Log energy (eV)', 'Count')
     return plot_object
 
 
@@ -255,36 +242,10 @@ def create_plot_object(x_values, y_series, x_label, y_label):
     if type(y_series[0]) != list:
         y_series = [y_series]
 
-    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for
-            y_values in y_series]
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for y_values in y_series]
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
-
-
-def top_lijst(slug):
-    coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug,
-                                                      is_analyzed=True)
-    scores = []
-    for s in Student.objects.all():
-        error = []
-        num_events = 0
-        for ac in coincidences.filter(student=s):
-            if ac.error_estimate:
-                error.append(ac.error_estimate)
-                num_events += 1
-        error.sort()
-        if error:
-            if len(error) > 1 and slug != 'leerlingensymposium-2010':
-                error = error[:-1]
-            avg_error = np.average(error)
-            wgh_error = avg_error / num_events
-            min_error = min(error)
-            scores.append({'name': s.name, 'avg_error': avg_error,
-                           'wgh_error': wgh_error, 'min_error': min_error,
-                           'num_events': num_events})
-
-    return sorted(scores, key=operator.itemgetter('wgh_error'))
 
 
 def get_core_positions(coincidences):
@@ -345,18 +306,15 @@ def confirm_request(request, url):
         sessionrequest.pin = randint(1000, 9999)
         starts = datetime.now()
         ends = datetime.now()
-        AnalysisSession(starts=starts, ends=ends,
-                        pin=str(sessionrequest.id), title=sessionrequest.sid)
+        AnalysisSession(starts=starts, ends=ends, pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
     return render(request, 'analysissessions/confirm.html',
-                  {'id': sessionrequest.sid,
-                   'pin': sessionrequest.pin})
+                  {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
 
 
 def create_session(request):
-    sessionlist = SessionRequest.objects.filter(session_confirmed=True,
-                                                session_pending=True)
+    sessionlist = SessionRequest.objects.filter(session_confirmed=True, session_pending=True)
     for sessionrequest in sessionlist:
         sessionrequest.session_confirmed = False
         sessionrequest.save()
