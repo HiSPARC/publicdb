@@ -363,7 +363,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='cluster',
             name='parent',
-            field=models.ForeignKey(related_name='children', blank=True, to='inforecords.Cluster', null=True),
+            field=models.ForeignKey(related_name='subclusters', blank=True, to='inforecords.Cluster', null=True),
             preserve_default=True,
         ),
     ]
