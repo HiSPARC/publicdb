@@ -1,0 +1,5 @@
+The PKI (where hisparcvpnd does its work, controlled by the data.hisparc.nl admin interface) lives in /etc/openvpn/adminkeys.
+
+in this folder the keys/certs necessary for OpenVPN live.
+
+

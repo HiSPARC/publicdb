@@ -1,1 +1,0 @@
-V	180301095518Z		01	unknown	/C=NL/ST=NH/O=HiSPARC, Nikhef/OU=HiSPARC/CN=tietar.nikhef.nl/emailAddress=hisparc@nikhef.nl
