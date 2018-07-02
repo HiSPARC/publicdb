@@ -10,7 +10,7 @@
 if test $# -ne 1; then
         echo "usage: build-key-server <name>";
         exit 1
-fi                                                                             
+fi
 
 if test $KEY_DIR; then
 	cd $KEY_DIR && \
