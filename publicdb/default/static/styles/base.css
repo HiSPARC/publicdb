@@ -13,7 +13,10 @@ html {
     padding: 0;
     width: 200px;
     height: 63px;
-    background: url(../header.png) top right no-repeat;}
+    background-image: url(../header.svg);
+    background-position: top right;
+    background-repeat: no-repeat;
+    background-size: contain;}
 
 #pageHeader span {
     display: none;}

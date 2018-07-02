@@ -17,7 +17,7 @@
     "fields": {
         "value_axis_title": "Count",
         "description": "This histogram will show you the pulse integral distribution of events for a given day.",
-        "bin_axis_title": "Pulse integral (mVns)",
+        "bin_axis_title": "Pulse integral (ADCsample)",
         "has_multiple_datasets": true,
         "slug": "pulseintegral",
         "name": "Pulse integral histogram"
@@ -29,7 +29,7 @@
     "fields": {
         "value_axis_title": "Count",
         "description": "This histogram will show you the pulse height distribution of events for a given day.",
-        "bin_axis_title": "Pulse height (mV)",
+        "bin_axis_title": "Pulse height (ADC)",
         "has_multiple_datasets": true,
         "slug": "pulseheight",
         "name": "Pulse height histogram"

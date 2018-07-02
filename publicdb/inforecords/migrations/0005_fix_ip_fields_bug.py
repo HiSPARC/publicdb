@@ -5,9 +5,9 @@ from django.db import migrations, models
 
 
 def copy_ip(apps, schema_editor):
-    Pc = apps.get_model("inforecords", "Pc")
-        
-    for pc in Pc.objects.all():
+    pc_model = apps.get_model("inforecords", "Pc")
+
+    for pc in pc_model.objects.all():
         pc.new_ip = pc.ip.strip() or None if pc.ip else None
         pc.save(update_fields=['new_ip'])
 

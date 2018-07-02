@@ -111,8 +111,8 @@ var _pulseheighthistogram = {
     y2axis: {
         tickLength: 0},
     xaxis: {
-        max: 2000,
-        axisLabel: 'Pulseheight (mV)'}
+        max: 4000,
+        axisLabel: 'Pulseheight (ADC)'}
 };
 
 var _pulseintegralhistogram = {
@@ -125,8 +125,8 @@ var _pulseintegralhistogram = {
     y2axis: {
         tickLength: 0},
     xaxis: {
-        max: 62500,
-        axisLabel: 'Pulseintegral (mVns)'}
+        max: 50000,
+        axisLabel: 'Pulseintegral (ADCsample)'}
 };
 
 var _zenithhistogram = {
@@ -268,9 +268,9 @@ var _tracegraph = {
         axisLabel: 'Time (ns)',
         max: 200},
     yaxis: {
-        axisLabel: 'Signal (mV)',
-        min: -1500,
-        max: 0}
+        axisLabel: 'Signal (ADC)',
+        min: 0,
+        max: 1500}
 };
 
 var ct_options = $.extend(true, {}, _base, _coincidencetimehistogram);

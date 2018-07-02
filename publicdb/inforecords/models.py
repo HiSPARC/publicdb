@@ -3,7 +3,7 @@ import xmlrpclib
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.db.models import Max
 from django.urls import reverse
 from django.utils.safestring import mark_safe
@@ -19,39 +19,6 @@ class Profession(models.Model):
 
     def __unicode__(self):
         return self.description
-
-
-class Contact(models.Model):
-    profession = models.ForeignKey(Profession)
-    title = models.CharField(max_length=20, null=True, blank=True)
-    first_name = models.CharField(max_length=40)
-    prefix_surname = models.CharField(max_length=10, blank=True)
-    surname = models.CharField(max_length=40)
-    contactinformation = models.ForeignKey('ContactInformation',
-                                           related_name='contacts')
-
-    def __unicode__(self):
-        return (("%s %s %s %s" % (self.title, self.first_name,
-                                  self.prefix_surname, self.surname))
-                .replace('  ', ' ').strip(' '))
-
-    def email_work(self):
-        return self.contactinformation.email_work
-    email_work = property(email_work)
-
-    def name(self):
-        return (("%s %s %s %s" % (self.title, self.first_name,
-                                  self.prefix_surname, self.surname))
-                .replace('  ', ' ').strip(' '))
-    name = property(name)
-
-    def save(self, *args, **kwargs):
-        super(Contact, self).save(*args, **kwargs)
-        reload_nagios()
-
-    class Meta:
-        unique_together = [('first_name', 'prefix_surname', 'surname')]
-        ordering = ('surname', 'first_name')
 
 
 class ContactInformation(models.Model):
@@ -72,6 +39,7 @@ class ContactInformation(models.Model):
     def __unicode__(self):
         return "%s %s %s" % (self.city, self.street_1, self.email_work)
 
+    @property
     def type(self):
         if self.contacts.all():
             type = 'Contact'
@@ -80,8 +48,8 @@ class ContactInformation(models.Model):
         else:
             type = 'no owner'
         return type
-    type = property(type)
 
+    @property
     def contact_owner(self):
         contacts = self.contacts.all()
         stations = self.stations.all()
@@ -101,7 +69,6 @@ class ContactInformation(models.Model):
         else:
             contact_owner = 'no owner'
         return contact_owner
-    contact_owner = property(contact_owner)
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)
@@ -113,12 +80,71 @@ class ContactInformation(models.Model):
         verbose_name_plural = "Contact Information"
 
 
+class Contact(models.Model):
+    profession = models.ForeignKey(Profession, models.CASCADE)
+    title = models.CharField(max_length=20, null=True, blank=True)
+    first_name = models.CharField(max_length=40)
+    prefix_surname = models.CharField(max_length=10, blank=True)
+    surname = models.CharField(max_length=40)
+    contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='contacts')
+
+    def __unicode__(self):
+        return self.name
+
+    @property
+    def email_work(self):
+        return self.contactinformation.email_work
+
+    @property
+    def name(self):
+        return (' '.join((self.title, self.first_name,
+                          self.prefix_surname, self.surname))
+                   .replace('  ', ' ').strip())
+
+    def save(self, *args, **kwargs):
+        super(Contact, self).save(*args, **kwargs)
+        reload_nagios()
+
+    class Meta:
+        unique_together = [('first_name', 'prefix_surname', 'surname')]
+        ordering = ('surname', 'first_name')
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=70, unique=True)
+    number = models.IntegerField(unique=True, blank=True)
+
+    def __unicode__(self):
+        return self.name
+
+    def clean(self):
+        if self.number is None:
+            if Country.objects.count() > 0:
+                countrymax = Country.objects.aggregate(Max('number'))
+                self.number = countrymax['number__max'] + 10000
+            else:
+                self.number = 0
+
+        if self.number % 10000:
+            raise ValidationError("Country number must be multiple of 10000")
+
+    def last_cluster_number(self):
+        clusters = self.clusters.filter(parent=None)
+        if clusters:
+            clustermax = clusters.aggregate(Max('number'))
+            return clustermax['number__max']
+        else:
+            return self.number - 1000
+
+    class Meta:
+        verbose_name_plural = "Countries"
+
+
 class Cluster(models.Model):
     name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True, blank=True)
-    parent = models.ForeignKey('self', null=True, blank=True,
-                               related_name='children')
-    country = models.ForeignKey('Country', related_name='clusters')
+    parent = models.ForeignKey('self', models.CASCADE, null=True, blank=True, related_name='subclusters')
+    country = models.ForeignKey(Country, models.CASCADE, related_name='clusters')
     url = models.URLField(null=True, blank=True)
 
     def __unicode__(self):
@@ -127,30 +153,28 @@ class Cluster(models.Model):
     def clean(self):
         if self.number is None:
             if self.parent is None:
+                # New cluster
                 self.number = self.country.last_cluster_number() + 1000
             else:
-                self.number = self.parent.last_cluster_number() + 100
+                # New subcluster
+                self.number = self.parent.last_subcluster_number() + 100
 
         if self.parent is None:
             if self.number % 1000:
-                raise ValidationError("Cluster number must be multiple of "
-                                      "1000")
+                raise ValidationError("Cluster number must be multiple of 1000")
             if not 0 <= (self.number - self.country.number) < 10000:
                 raise ValidationError("Cluster number must be in range of "
                                       "numbers for the country (%d, %d)." %
-                                      (self.country.number,
-                                       self.country.number + 10000))
+                                      (self.country.number, self.country.number + 10000))
         if self.parent is not None:
             if self.parent.parent is not None:
                 raise ValidationError("Subsubclusters are not allowed")
             if self.number % 100:
-                raise ValidationError("Subcluster number must be multiple of "
-                                      "100")
+                raise ValidationError("Subcluster number must be multiple of 100")
             if not 0 < (self.number - self.parent.number) < 1000:
                 raise ValidationError("Subcluster number must be in range of "
                                       "numbers for the cluster (%d, %d)." %
-                                      (self.parent.number,
-                                       self.parent.number + 1000))
+                                      (self.parent.number, self.parent.number + 1000))
 
     def save(self, *args, **kwargs):
         super(Cluster, self).save(*args, **kwargs)
@@ -174,10 +198,10 @@ class Cluster(models.Model):
         else:
             return self.number - 1
 
-    def last_cluster_number(self):
-        clusters = self.children.all()
-        if clusters:
-            clustermax = clusters.aggregate(Max('number'))
+    def last_subcluster_number(self):
+        subclusters = self.subclusters.all()
+        if subclusters:
+            clustermax = subclusters.aggregate(Max('number'))
             return clustermax['number__max']
         else:
             return self.number
@@ -189,14 +213,10 @@ class Cluster(models.Model):
 class Station(models.Model):
     name = models.CharField(max_length=70)
     number = models.IntegerField(unique=True, blank=True)
-    contactinformation = models.ForeignKey('ContactInformation',
-                                           related_name='stations')
-    cluster = models.ForeignKey('Cluster', related_name='stations')
-    contact = models.ForeignKey(Contact, related_name='stations_contact',
-                                null=True)
-    ict_contact = models.ForeignKey(Contact,
-                                    related_name='stations_ict_contact',
-                                    null=True)
+    contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='stations')
+    cluster = models.ForeignKey(Cluster, models.CASCADE, related_name='stations')
+    contact = models.ForeignKey(Contact, models.SET_NULL, related_name='stations_contact', null=True)
+    ict_contact = models.ForeignKey(Contact, models.SET_NULL, related_name='stations_ict_contact', null=True)
     password = models.CharField(max_length=40)
     info_page = models.TextField(blank=True)
 
@@ -234,9 +254,7 @@ class Station(models.Model):
         today = datetime.datetime.utcnow()
 
         try:
-            config = (Configuration.objects.filter(source__station=self,
-                                                   timestamp__lte=today)
-                                           .latest())
+            config = (Configuration.objects.filter(source__station=self, timestamp__lte=today).latest())
         except Configuration.DoesNotExist:
             n_detectors = 4
         else:
@@ -261,16 +279,13 @@ class Station(models.Model):
         config = Configuration()
 
         try:
-            summaries = Summary.objects.filter(station=self,
-                                               num_config__isnull=False,
-                                               date__gte=FIRSTDATE,
-                                               date__lte=date).reverse()
+            summaries = (Summary.objects.with_config().filter(station=self, date__lte=date).reverse())
             for summary in summaries:
                 try:
-                    config = (Configuration.objects.filter(source=summary)
-                                                   .exclude(gps_latitude=0,
-                                                            gps_longitude=0)
-                                                   .latest())
+                    config = (Configuration.objects
+                                           .filter(source=summary)
+                                           .exclude(gps_latitude=0, gps_longitude=0)
+                                           .latest())
                 except Configuration.DoesNotExist:
                     pass
                 else:
@@ -289,36 +304,6 @@ class Station(models.Model):
         ordering = ('number',)
 
 
-class Country(models.Model):
-    name = models.CharField(max_length=70, unique=True)
-    number = models.IntegerField(unique=True, blank=True)
-
-    def __unicode__(self):
-        return self.name
-
-    def clean(self):
-        if self.number is None:
-            if Country.objects.count() > 0:
-                countrymax = Country.objects.aggregate(Max('number'))
-                self.number = countrymax['number__max'] + 10000
-            else:
-                self.number = 0
-
-        if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
-
-    def last_cluster_number(self):
-        clusters = self.clusters.filter(parent=None)
-        if clusters:
-            clustermax = clusters.aggregate(Max('number'))
-            return clustermax['number__max']
-        else:
-            return self.number - 1000
-
-    class Meta:
-        verbose_name_plural = "Countries"
-
-
 class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20)
@@ -331,16 +316,14 @@ class PcType(models.Model):
 
 
 class Pc(models.Model):
-    station = models.ForeignKey(Station)
-    type = models.ForeignKey(PcType)
+    station = models.ForeignKey(Station, models.CASCADE)
+    type = models.ForeignKey(PcType, models.CASCADE)
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
-    ip = models.GenericIPAddressField(unique=True, blank=True, null=True,
-                                      protocol='IPV4')
+    ip = models.GenericIPAddressField(unique=True, blank=True, null=True, protocol='IPV4')
     notes = models.TextField(blank=True)
-    services = models.ManyToManyField('MonitorService',
-                                      through='EnabledService')
+    services = models.ManyToManyField('MonitorService', through='EnabledService')
 
     def __unicode__(self):
         return self.name
@@ -387,19 +370,16 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
-        self.name = (unicode(slugify(self.name)).replace('-', '')
-                                                .replace('_', ''))
+        self.name = unicode(slugify(self.name)).replace('-', '').replace('_', '')
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
             super(Pc, self).save(*args, **kwargs)
         else:
             if self.type.description == "Admin PC":
-                last_ip = (Pc.objects.filter(type__description="Admin PC")
-                                     .latest('id').ip)
+                last_ip = Pc.objects.filter(type__description="Admin PC").latest('id').ip
             else:
-                last_ip = (Pc.objects.exclude(type__description="Admin PC")
-                                     .latest('id').ip)
+                last_ip = Pc.objects.exclude(type__description="Admin PC").latest('id').ip
             self.ip = self.generate_ip_address(last_ip)
 
             # First create keys, then issue final save
@@ -424,13 +404,12 @@ class Pc(models.Model):
 
     def install_default_services(self):
         if self.type.description != "Admin PC":
-            for service in (MonitorService.objects
-                                          .filter(is_default_service=True)):
+            for service in MonitorService.objects.filter(is_default_service=True):
                 EnabledService(pc=self, monitor_service=service).save()
 
 
 class MonitorPulseheightThresholds(models.Model):
-    station = models.ForeignKey('Station')
+    station = models.ForeignKey(Station, models.CASCADE)
     plate = models.IntegerField()
 
     mpv_mean = models.FloatField()
@@ -465,16 +444,15 @@ class MonitorService(models.Model):
         if self.is_default_service:
             for pc in Pc.objects.exclude(type__description="Admin PC"):
                 try:
-                    service = EnabledService.objects.get(pc=pc,
-                                                         monitor_service=self)
+                    service = EnabledService.objects.get(pc=pc, monitor_service=self)
                 except EnabledService.DoesNotExist:
                     service = EnabledService(pc=pc, monitor_service=self)
                     service.save()
 
 
 class EnabledService(models.Model):
-    pc = models.ForeignKey(Pc)
-    monitor_service = models.ForeignKey(MonitorService)
+    pc = models.ForeignKey(Pc, models.CASCADE)
+    monitor_service = models.ForeignKey(MonitorService, models.CASCADE)
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)
@@ -501,7 +479,7 @@ def reload_nagios():
 
     try:
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        proxy.reload_nagios()
+        transaction.on_commit(proxy.reload_nagios)
     except Exception:
         # FIXME logging!
         pass
@@ -512,7 +490,7 @@ def reload_datastore():
 
     try:
         proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        proxy.reload_datastore()
+        transaction.on_commit(proxy.reload_datastore)
     except Exception:
         # FIXME logging!
         pass

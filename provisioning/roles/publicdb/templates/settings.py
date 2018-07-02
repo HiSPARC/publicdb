@@ -45,10 +45,6 @@ DATASTORE_PROXY = '{{ datastore_proxy }}'
 VPN_HOST = '{{ vpn_host }}'
 DATASTORE_HOST = '{{ datastore_host }}'
 
-RECAPTCHA_ENABLED = {{ recaptcha_enabled }}
-RECAPTCHA_PUB_KEY = '{{ recaptcha_pub_key }}'
-RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
-
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
@@ -122,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -131,9 +128,10 @@ INSTALLED_APPS = (
     'publicdb.raw_data',
     'publicdb.api',
     'publicdb.maps',
-    'publicdb.jsparc',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -169,4 +167,8 @@ LOGGING = {
             'propagate': False,
         }
     },
+}
+
+RAVEN_CONFIG = {
+    'dsn': '{{ sentry_dsn }}'
 }

@@ -12,10 +12,8 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 import datastore
 
-from ..histograms.models import (Configuration, DailyHistogram, HistogramType,
-                                 PulseheightFit, Summary)
-from ..inforecords.models import (Cluster, Country,
-                                  MonitorPulseheightThresholds, Pc, Station)
+from ..histograms.models import Configuration, DailyHistogram, HistogramType, PulseheightFit, Summary
+from ..inforecords.models import Cluster, Country, MonitorPulseheightThresholds, Pc, Station
 from ..station_layout.models import StationLayout
 
 FIRSTDATE = datetime.date(2004, 1, 1)
@@ -28,9 +26,9 @@ class Nagios:
     unknown = (3, 'UNKNOWN')
 
 
-def json_dict(dict):
+def json_dict(result):
     """Create a json HTTPResponse"""
-    response = HttpResponse(json.dumps(dict, sort_keys=True),
+    response = HttpResponse(json.dumps(result, sort_keys=True),
                             content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -52,18 +50,13 @@ def man(request):
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
         "station_info": 'station/{station_number}/{year}/{month}/{day}/',
         "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_number}/weather/'
-                       '{year}/{month}/{day}/',
-        "configuration": 'station/{station_number}/config/'
-                         '{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_number}/num_events/'
-                            '{year}/{month}/{day}/{hour}/',
+        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
+        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
         "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
-        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/'
-                           'pulseheight/fit/{year}/{month}/{day}/',
-        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/'
-                             'pulseheight/drift/{year}/{month}/{day}/'
-                             '{number_of_days}/'}
+        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
+        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/'
+                             '{year}/{month}/{day}/{number_of_days}/'}
 
     return json_dict(man)
 
@@ -100,8 +93,7 @@ def station(request, station_number, year=None, month=None, day=None):
     location = station.latest_location(date)
 
     try:
-        layout = StationLayout.objects.filter(station=station,
-                                              active_date__lte=date).latest()
+        layout = StationLayout.objects.filter(station=station, active_date__lte=date).latest()
     except StationLayout.DoesNotExist:
         # Get new StationLayout with all None values
         layout = StationLayout()
@@ -207,8 +199,7 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    stations = [{'number': station.number, 'name': station.name}
-                for station in stations]
+    stations = [{'number': station.number, 'name': station.name} for station in stations]
 
     return json_dict(stations)
 
@@ -307,11 +298,9 @@ def get_subcluster_dict(cluster=None):
     else:
         subclusters = Cluster.objects.all()
 
-    subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name}
-                       for subcluster in subclusters]
+    subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name} for subcluster in subclusters]
     if cluster:
-        subcluster_dict.append({'number': cluster.number,
-                                'name': cluster.name})
+        subcluster_dict.append({'number': cluster.number, 'name': cluster.name})
 
     return sorted(subcluster_dict, key=itemgetter('number'))
 
@@ -322,16 +311,14 @@ def get_cluster_dict(country=None):
     else:
         clusters = Cluster.objects.filter(parent=None)
 
-    cluster_dict = [{'number': cluster.number, 'name': cluster.name}
-                    for cluster in clusters]
+    cluster_dict = [{'number': cluster.number, 'name': cluster.name} for cluster in clusters]
 
     return sorted(cluster_dict, key=itemgetter('number'))
 
 
 def get_country_dict():
     countries = Country.objects.all()
-    country_dict = [{'number': country.number, 'name': country.name}
-                    for country in countries]
+    country_dict = [{'number': country.number, 'name': country.name} for country in countries]
     return sorted(country_dict, key=itemgetter('number'))
 
 
@@ -350,8 +337,7 @@ def gauss(x, n, m, s):
     return n * stats.norm.pdf(x, m, s)
 
 
-def get_pulseheight_drift(request, station_number, plate_number,
-                          year, month, day, number_of_days):
+def get_pulseheight_drift(request, station_number, plate_number, year, month, day, number_of_days):
     """Get pulseheight drift
 
     :param station_number: station number
@@ -365,46 +351,44 @@ def get_pulseheight_drift(request, station_number, plate_number,
     requested_date = datetime.date(int(year), int(month), int(day))
     number_of_days = int(number_of_days)
 
-    dict = {'station': station_number,
-            'plate_number': plate_number,
-            'year': requested_date.year,
-            'month': requested_date.month,
-            'day': requested_date.day}
+    result = {'station': station_number,
+              'plate_number': plate_number,
+              'year': requested_date.year,
+              'month': requested_date.month,
+              'day': requested_date.day}
 
     if (plate_number < 1) or (plate_number > 4):
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Platenumber (value = %s) is out of range, "
-                              "should be between 1 and 4" % plate_number})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Platenumber (value = %s) is out of range, "
+                                "should be between 1 and 4" % plate_number})
+        return json_dict(result)
 
     try:
         station = Station.objects.get(number=station_number)
         start = requested_date - datetime.timedelta(days=number_of_days - 1)
         date_range = (start, requested_date)
-        summaries = Summary.objects.filter(station=station,
-                                           date__range=date_range)
+        summaries = Summary.objects.filter(station=station, date__range=date_range)
         fits = PulseheightFit.objects.filter(source__in=summaries,
                                              plate=plate_number,
                                              chi_square_reduced__gt=0.01,
                                              chi_square_reduced__lt=8.0,
                                              initial_width__gt=45.0)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Error retrieving fits",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Error retrieving fits",
+                       "exception": str(e)})
+        return json_dict(result)
 
     if len(fits) < 14:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": ("There are less than 14 fits in the requested "
-                               "date range, drift rate won't be calculated.")})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": ("There are less than 14 fits in the requested "
+                                 "date range, drift rate won't be calculated.")})
+        return json_dict(result)
 
     try:
         # Fit drift
 
-        t_array = numpy.float_([int(fit.source.date.strftime("%s"))
-                                for fit in fits])
+        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
         mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
         # Determine the drift by a linear fit
@@ -430,32 +414,24 @@ def get_pulseheight_drift(request, station_number, plate_number,
         initial_mean = 1
         initial_width = 0.03
 
-        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_n,
-                                                         initial_mean,
-                                                         initial_width))
+        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_n, initial_mean, initial_width))
 
-        dict.update({'number_of_selected_days': len(t_array),
-                     'number_of_requested_days': number_of_days,
-                     'fit_offset': p1[0],
-                     'fit_slope': p1[1],
-                     'drift_per_day': drift,
-                     'timestamp': t_array.tolist(),
-                     'mpv': mpv_array.tolist(),
-                     'relative_mean': popt[1],
-                     'relative_width': popt[2],
+        result.update({'number_of_selected_days': len(t_array),
+                       'number_of_requested_days': number_of_days,
+                       'fit_offset': p1[0],
+                       'fit_slope': p1[1],
+                       'drift_per_day': drift,
+                       'timestamp': t_array.tolist(),
+                       'mpv': mpv_array.tolist(),
+                       'relative_mean': popt[1],
+                       'relative_width': popt[2]})
 
-                     # Debug
-                     # 'relative_mpv': relative_mpv,
-                     # 'frequency': frequency.tolist(),
-                     # 'x': x.tolist()
-                     })
-
-        return json_dict(dict)
+        return json_dict(result)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Error in calculating the drift",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Error in calculating the drift",
+                       "exception": str(e)})
+        return json_dict(result)
 
 
 def get_pulseheight_drift_last_14_days(request, station_number, plate_number):
@@ -472,8 +448,7 @@ def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
                                  today.year, today.month, today.day, 30)
 
 
-def get_pulseheight_fit(request, station_number, plate_number,
-                        year=None, month=None, day=None):
+def get_pulseheight_fit(request, station_number, plate_number, year=None, month=None, day=None):
     """Get fit values of the pulseheight distribution for a station on a date
 
     Retrieve fit values of the pulseheight distribution. The fitting has
@@ -502,11 +477,11 @@ def get_pulseheight_fit(request, station_number, plate_number,
     else:
         requested_date = datetime.date(int(year), int(month), int(day))
 
-    dict = {'station': station_number,
-            'plate_number': plate_number,
-            'year': requested_date.year,
-            'month': requested_date.month,
-            'day': requested_date.day}
+    result = {'station': station_number,
+              'plate_number': plate_number,
+              'year': requested_date.year,
+              'month': requested_date.month,
+              'day': requested_date.day}
 
     try:
         fit = PulseheightFit.objects.get(
@@ -514,58 +489,57 @@ def get_pulseheight_fit(request, station_number, plate_number,
             source__date=requested_date,
             plate=plate_number)
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Fit has not been found",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Fit has not been found",
+                       "exception": str(e)})
+        return json_dict(result)
 
     try:
-        dict.update({"entries": fit.source.num_events,
-                     "initial_mpv": fit.initial_mpv,
-                     "initial_width": fit.initial_width,
-                     "fitted_mpv": fit.fitted_mpv,
-                     "fitted_mpv_error": fit.fitted_mpv_error,
-                     "fitted_width": fit.fitted_width,
-                     "fitted_width_error": fit.fitted_width_error,
-                     "degrees_of_freedom": fit.degrees_of_freedom,
-                     "chi_square_reduced": fit.chi_square_reduced,
-                     "error_type": fit.error_type,
-                     "error_message": fit.error_message})
+        result.update({"entries": fit.source.num_events,
+                       "initial_mpv": fit.initial_mpv,
+                       "initial_width": fit.initial_width,
+                       "fitted_mpv": fit.fitted_mpv,
+                       "fitted_mpv_error": fit.fitted_mpv_error,
+                       "fitted_width": fit.fitted_width,
+                       "fitted_width_error": fit.fitted_width_error,
+                       "degrees_of_freedom": fit.degrees_of_freedom,
+                       "chi_square_reduced": fit.chi_square_reduced,
+                       "error_type": fit.error_type,
+                       "error_message": fit.error_message})
     except Exception, e:
-        dict.update({"nagios": Nagios.unknown,
-                     "error": "Data has been found, "
-                              "but error in converting data to numbers",
-                     "exception": str(e)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.unknown,
+                       "error": "Data has been found, but error in converting data to numbers",
+                       "exception": str(e)})
+        return json_dict(result)
 
     # Fit failures
 
     if len(fit.error_message) > 0:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": fit.error_message})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": fit.error_message})
+        return json_dict(result)
 
     # Based on chi2 of the fit
 
     if fit.chi_square_reduced < 0.01:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
-                                fit.chi_square_reduced})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Chi2 of the fit is smaller than 0.01: %.1f" %
+                                  fit.chi_square_reduced})
+        return json_dict(result)
 
     if fit.chi_square_reduced > 8.0:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
-                                fit.chi_square_reduced})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Chi2 of the fit is greater than 8.0: %.1f" %
+                                  fit.chi_square_reduced})
+        return json_dict(result)
 
     # Based on the fit range (= initial_width)
 
     if fit.initial_width < 45:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
-                                fit.initial_width})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "Fit range is smaller than 45 ADC: %.1f ADC" %
+                                  fit.initial_width})
+        return json_dict(result)
 
     # Based on MPV and 4*sigma
 
@@ -576,15 +550,15 @@ def get_pulseheight_fit(request, station_number, plate_number,
     upper_bound = threshold.mpv_mean * (1 + 4 * threshold.mpv_sigma)
 
     if fit.fitted_mpv < lower_bound or fit.fitted_mpv > upper_bound:
-        dict.update({"nagios": Nagios.critical,
-                     "quality": "MPV fit is outside bounds (%.1f;%.1f): %.1f" %
-                                (lower_bound, upper_bound, fit.fitted_mpv)})
-        return json_dict(dict)
+        result.update({"nagios": Nagios.critical,
+                       "quality": "MPV fit is outside bounds (%.1f;%.1f): %.1f" %
+                                  (lower_bound, upper_bound, fit.fitted_mpv)})
+        return json_dict(result)
 
-    dict.update({"nagios": Nagios.ok,
-                 "quality": "MPV fit is within bounds (%.1f;%.1f): %.1f" %
-                            (lower_bound, upper_bound, fit.fitted_mpv)})
-    return json_dict(dict)
+    result.update({"nagios": Nagios.ok,
+                   "quality": "MPV fit is within bounds (%.1f;%.1f): %.1f" %
+                              (lower_bound, upper_bound, fit.fitted_mpv)})
+    return json_dict(result)
 
 
 def has_data(request, station_number, type=None, year=None, month=None,
@@ -620,15 +594,13 @@ def has_data(request, station_number, type=None, year=None, month=None,
         summaries = summaries.filter(date=date)
     elif month:
         date = datetime.date(int(year), int(month), 1)
-        summaries = summaries.filter(date__year=date.year,
-                                     date__month=date.month)
+        summaries = summaries.filter(date__year=date.year, date__month=date.month)
     elif year:
         date = datetime.date(int(year), 1, 1)
         summaries = summaries.filter(date__year=date.year)
     else:
         date = datetime.date.today()
-        summaries = summaries.filter(date__gte=FIRSTDATE,
-                                     date__lte=date)
+        summaries = summaries.filter(date__gte=FIRSTDATE, date__lte=date)
 
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -667,9 +639,7 @@ def config(request, station_number, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        source = Summary.objects.filter(station=station,
-                                        num_config__isnull=False,
-                                        date__lte=date).latest()
+        source = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
         c = Configuration.objects.filter(source=source).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
@@ -684,8 +654,7 @@ def config(request, station_number, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_number, year=None, month=None, day=None,
-               hour=None):
+def num_events(request, station_number, year=None, month=None, day=None, hour=None):
     """Get number of events for a station
 
     Retrieve the number of events that a station has measured during its
@@ -739,8 +708,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
         except ValueError:
             return HttpResponseNotFound()
         try:
-            histogram_values = DailyHistogram.objects.get(source__date=date,
-                                                          **filters).values
+            histogram_values = DailyHistogram.objects.get(source__date=date, **filters).values
             num_events = histogram_values[int(hour)]
         except DailyHistogram.DoesNotExist:
             num_events = 0
@@ -750,7 +718,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
 
     if not hour:
         histograms = DailyHistogram.objects.filter(**filters)
-        num_events = sum([sum(histogram.values) for histogram in histograms])
+        num_events = sum(sum(histogram.values) for histogram in histograms)
 
     return json_dict(num_events)
 
@@ -779,9 +747,8 @@ def get_event_traces(request, station_number, ext_timestamp):
 
     try:
         station = Station.objects.get(number=station_number)
-        Summary.objects.get(station=station, date=date,
-                            num_events__isnull=False)
-    except Station.DoesNotExist:
+        Summary.objects.get(station=station, date=date, num_events__isnull=False)
+    except (Station.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
     try:

@@ -8,10 +8,10 @@
 #
 # Please note: the 'bin' is the left bin edge.  The width of the bin is
 # defined by the value of the next bin.
-# 
+#
 # This data contains the following columns:
 #
-# bin:        pulseintegral [mVns]
+# bin:        pulseintegral [ADCsample]
 # scint (4x): number of events [counts]
 #
 #

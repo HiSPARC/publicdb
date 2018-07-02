@@ -14,7 +14,7 @@
 # timestamp:           time of event [UNIX timestamp]
 # nanoseconds:         time of event [number of nanoseconds after timestamp]
 # pulseheights (4x):   maximum signal pulseheight [ADC]
-# integral (4x):       integral of the signal [ADC.ns]
+# integral (4x):       integral of the signal [ADC.sample]
 # number_of_mips (4x): estimate for the number of particles in the detector
 # arrival_times (4x):  relative time of arrival of the first particle in the detector [ns]
 # trigger_time:        relative time of the trigger timestamp [ns]

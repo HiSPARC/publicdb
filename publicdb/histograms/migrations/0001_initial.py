@@ -112,8 +112,8 @@ class Migration(migrations.Migration):
             name='DailyDataset',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('x', publicdb.histograms.models.SerializedDataField()),
-                ('y', publicdb.histograms.models.SerializedDataField()),
+                ('x', publicdb.coincidences.models.SerializedDataField()),
+                ('y', publicdb.coincidences.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),
@@ -124,8 +124,8 @@ class Migration(migrations.Migration):
             name='DailyHistogram',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bins', publicdb.histograms.models.SerializedDataField()),
-                ('values', publicdb.histograms.models.SerializedDataField()),
+                ('bins', publicdb.coincidences.models.SerializedDataField()),
+                ('values', publicdb.coincidences.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),
@@ -191,8 +191,8 @@ class Migration(migrations.Migration):
             name='NetworkHistogram',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('bins', publicdb.histograms.models.SerializedDataField()),
-                ('values', publicdb.histograms.models.SerializedDataField()),
+                ('bins', publicdb.coincidences.models.SerializedDataField()),
+                ('values', publicdb.coincidences.models.SerializedDataField()),
             ],
             options={
                 'ordering': ('source', 'type'),

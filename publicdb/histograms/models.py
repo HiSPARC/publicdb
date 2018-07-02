@@ -1,31 +1,24 @@
-import ast
-import base64
-import cPickle as pickle
+import datetime
 import re
-import zlib
 
+from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse
+
+FIRSTDATE = datetime.date(2004, 1, 1)
 
 
-class SerializedDataField(models.Field):
+class NetworkSummaryQuerySet(models.QuerySet):
+    def valid_date(self):
+        """Filter by date to dates between start and today"""
+        return self.filter(
+            date__gte=FIRSTDATE,
+            date__lte=datetime.date.today())
 
-    def db_type(self, connection):
-        return 'BYTEA'
-
-    def from_db_value(self, value, expression, connection, context):
-        return self.to_python(value)
-
-    def to_python(self, value):
-        try:
-            unpickled = pickle.loads(zlib.decompress(base64.b64decode(value)))
-        except Exception:
-            return value
-        else:
-            return unpickled
-
-    def get_prep_value(self, value):
-        return base64.b64encode(zlib.compress(pickle.dumps(value)))
+    def with_coincidences(self):
+        return self.valid_date().filter(
+            num_coincidences__isnull=False)
 
 
 class NetworkSummary(models.Model):
@@ -33,6 +26,14 @@ class NetworkSummary(models.Model):
     num_coincidences = models.IntegerField(blank=True, null=True)
     needs_update = models.BooleanField(default=False)
     needs_update_coincidences = models.BooleanField(default=False)
+
+    objects = NetworkSummaryQuerySet.as_manager()
+
+    def get_absolute_url(self):
+        kwargs = {'year': self.date.year,
+                  'month': self.date.month,
+                  'day': self.date.day}
+        return reverse('status:network:coincidences', kwargs=kwargs)
 
     def __unicode__(self):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
@@ -43,8 +44,27 @@ class NetworkSummary(models.Model):
         get_latest_by = 'date'
 
 
+class SummaryQuerySet(models.QuerySet):
+    def valid_date(self):
+        """Filter by date to dates between start and today"""
+        return self.filter(
+            date__gte=FIRSTDATE,
+            date__lte=datetime.date.today())
+
+    def with_data(self):
+        """Filter with at least either events or weather data"""
+        return self.valid_date().filter(
+            models.Q(num_events__isnull=False) |
+            models.Q(num_weather__isnull=False))
+
+    def with_config(self):
+        """Filter with at least configurations"""
+        return self.valid_date().filter(
+            num_config__isnull=False)
+
+
 class Summary(models.Model):
-    station = models.ForeignKey('inforecords.Station')
+    station = models.ForeignKey('inforecords.Station', models.CASCADE)
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
@@ -58,6 +78,15 @@ class Summary(models.Model):
     needs_update_weather = models.BooleanField(default=False)
     needs_update_singles = models.BooleanField(default=False)
 
+    objects = SummaryQuerySet.as_manager()
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.station.number,
+                  'year': self.date.year,
+                  'month': self.date.month,
+                  'day': self.date.day}
+        return reverse('status:station:data', kwargs=kwargs)
+
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number,
                                      self.date.strftime('%d %b %Y'))
@@ -70,7 +99,7 @@ class Summary(models.Model):
 
 
 class Configuration(models.Model):
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     timestamp = models.DateTimeField()
     gps_latitude = models.FloatField()
     gps_longitude = models.FloatField()
@@ -229,94 +258,6 @@ class Configuration(models.Model):
         return version
 
 
-class NetworkHistogram(models.Model):
-    source = models.ForeignKey('NetworkSummary')
-    type = models.ForeignKey('HistogramType')
-    bins = SerializedDataField()
-    values = SerializedDataField()
-
-    def save(self, *args, **kwargs):
-        """Ensure the stored bins and values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.bins, basestring):
-            self.bins = ast.literal_eval(self.bins)
-        if isinstance(self.values, basestring):
-            self.values = ast.literal_eval(self.values)
-        super(NetworkHistogram, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
-
-    class Meta:
-        unique_together = ('source', 'type')
-        ordering = ('source', 'type')
-
-
-class DailyHistogram(models.Model):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('HistogramType')
-    bins = SerializedDataField()
-    values = SerializedDataField()
-
-    def save(self, *args, **kwargs):
-        """Ensure the stored bins and values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.bins, basestring):
-            self.bins = ast.literal_eval(self.bins)
-        if isinstance(self.values, basestring):
-            self.values = ast.literal_eval(self.values)
-        super(DailyHistogram, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
-                                 self.type)
-
-    class Meta:
-        unique_together = ('source', 'type')
-        ordering = ('source', 'type')
-
-
-class DailyDataset(models.Model):
-    source = models.ForeignKey('Summary')
-    type = models.ForeignKey('DatasetType')
-    x = SerializedDataField()
-    y = SerializedDataField()
-
-    def save(self, *args, **kwargs):
-        """Ensure the stored values are numbers
-
-        Saving a model via the admin interface can cause the list to be
-        interpreted as unicode. This code converts the strings to
-        numbers in a safe way.
-
-        """
-        if isinstance(self.x, basestring):
-            self.x = ast.literal_eval(self.x)
-        if isinstance(self.y, basestring):
-            self.y = ast.literal_eval(self.y)
-        super(DailyDataset, self).save(*args, **kwargs)
-
-    def __unicode__(self):
-        return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
-                                 self.type)
-
-    class Meta:
-        unique_together = ('source', 'type')
-        ordering = ('source', 'type')
-
-
 class HistogramType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
@@ -332,12 +273,82 @@ class HistogramType(models.Model):
 class DatasetType(models.Model):
     name = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20, unique=True)
+    has_multiple_datasets = models.BooleanField(default=False)
     x_axis_title = models.CharField(max_length=40)
     y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
     def __unicode__(self):
         return self.name
+
+
+class NetworkHistogram(models.Model):
+    source = models.ForeignKey(NetworkSummary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(models.PositiveIntegerField())
+
+    def get_absolute_url(self):
+        kwargs = {'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+
+    def __unicode__(self):
+        return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
+
+    class Meta:
+        unique_together = ('source', 'type')
+        ordering = ('source', 'type')
+
+
+class BaseDailyStationDataMixin(models.Model):
+    """Base class for daily station data models"""
+
+    def get_absolute_url(self):
+        kwargs = {'station_number': self.source.station.number,
+                  'year': self.source.date.year,
+                  'month': self.source.date.month,
+                  'day': self.source.date.day}
+        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+
+    def __unicode__(self):
+        return "%d - %s - %s" % (self.source.station.number,
+                                 self.source.date.strftime('%d %b %Y'),
+                                 self.type)
+
+    class Meta:
+        abstract = True
+        unique_together = ('source', 'type')
+        ordering = ('source', 'type')
+
+
+class DailyHistogram(BaseDailyStationDataMixin):
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(models.PositiveIntegerField())
+
+
+class MultiDailyHistogram(BaseDailyStationDataMixin):
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(HistogramType, models.CASCADE)
+    bins = ArrayField(models.PositiveIntegerField())
+    values = ArrayField(ArrayField(models.PositiveIntegerField()), size=4)
+
+
+class DailyDataset(BaseDailyStationDataMixin):
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(DatasetType, models.CASCADE)
+    x = ArrayField(models.PositiveIntegerField())
+    y = ArrayField(models.FloatField())
+
+
+class MultiDailyDataset(BaseDailyStationDataMixin):
+    source = models.ForeignKey(Summary, models.CASCADE)
+    type = models.ForeignKey(DatasetType, models.CASCADE)
+    x = ArrayField(models.PositiveIntegerField())
+    y = ArrayField(ArrayField(models.FloatField()), size=4)
 
 
 class GeneratorState(models.Model):
@@ -353,7 +364,7 @@ class PulseheightFit(models.Model):
                         (3, 'Scintillator 3'),
                         (4, 'Scintillator 4'))
 
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     plate = models.IntegerField(choices=DETECTOR_CHOICES)
 
     initial_mpv = models.FloatField()
@@ -390,7 +401,7 @@ class PulseheightFit(models.Model):
 
 
 class DetectorTimingOffset(models.Model):
-    source = models.ForeignKey('Summary')
+    source = models.ForeignKey(Summary, models.CASCADE)
     offset_1 = models.FloatField(blank=True, null=True)
     offset_2 = models.FloatField(blank=True, null=True)
     offset_3 = models.FloatField(blank=True, null=True)
@@ -401,8 +412,8 @@ class DetectorTimingOffset(models.Model):
 
 
 class StationTimingOffset(models.Model):
-    ref_source = models.ForeignKey('Summary', related_name='ref_source')
-    source = models.ForeignKey('Summary', related_name='source')
+    ref_source = models.ForeignKey(Summary, models.CASCADE, related_name='ref_station_offsets')
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='station_offsets')
     offset = models.FloatField(blank=True, null=True)
     error = models.FloatField(blank=True, null=True)
 

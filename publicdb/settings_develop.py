@@ -45,11 +45,6 @@ DATASTORE_HOST = 'localhost'
 # Webserver of the publicdb where Nagios will retrieve active check results
 PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
 
-# reCAPTCHA settings
-RECAPTCHA_ENABLED = False
-RECAPTCHA_PUB_KEY = 'foobar'
-RECAPTCHA_PRIVATE_KEY = 'foobaz'
-
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
@@ -122,6 +117,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -131,9 +127,10 @@ INSTALLED_APPS = (
     'publicdb.raw_data',
     'publicdb.api',
     'publicdb.maps',
-    'publicdb.jsparc',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -170,3 +167,5 @@ LOGGING = {
         }
     },
 }
+
+RAVEN_CONFIG = {}
