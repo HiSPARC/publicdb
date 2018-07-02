@@ -3,8 +3,6 @@ from mock import patch
 from django.core.management import call_command
 from django.test import TestCase
 
-from publicdb.analysissessions.models import SessionRequest
-
 from ..factories.analysissessions_factories import SessionRequestFactory
 from ..factories.inforecords_factories import ClusterFactory
 
