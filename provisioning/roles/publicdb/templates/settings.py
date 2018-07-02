@@ -68,12 +68,6 @@ MEDIA_URL = '{{ media_url }}'
 STATIC_ROOT = '{{ publicdb_static }}'
 STATIC_URL = '{{ static_url }}'
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
 SECRET_KEY = '{{ secret_key }}'
 
 TEMPLATES = [
@@ -90,7 +84,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
-    # 'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

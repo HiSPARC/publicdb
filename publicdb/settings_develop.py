@@ -67,12 +67,6 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(PUBLICDB_PATH, 'staticroot/')
 STATIC_URL = '/static/'
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
 SECRET_KEY = 'Make-this-unique-and-do-not-share-it-with-anybody'
 
 TEMPLATES = [
@@ -89,7 +83,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
-    # 'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
