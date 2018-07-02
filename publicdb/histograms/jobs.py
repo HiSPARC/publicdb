@@ -21,11 +21,9 @@ from sapphire.utils import round_in_base
 from . import datastore, esd, fit_pulseheight_peak
 from ..inforecords.models import Station
 from ..station_layout.models import StationLayout
-from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
-                     DetectorTimingOffset, GeneratorState, HistogramType,
-                     MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
-                     NetworkSummary, PulseheightFit, StationTimingOffset,
-                     Summary)
+from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType, DetectorTimingOffset,
+                     GeneratorState, HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
+                     NetworkSummary, PulseheightFit, StationTimingOffset, Summary)
 
 logger = logging.getLogger('histograms.jobs')
 

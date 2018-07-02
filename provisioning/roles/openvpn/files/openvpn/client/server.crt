@@ -1,0 +1,96 @@
+Certificate:
+    Data:
+        Version: 3 (0x2)
+        Serial Number: 4097 (0x1001)
+    Signature Algorithm: sha256WithRSAEncryption
+        Issuer: C=NL, ST=NH, L=Amsterdam, O=HiSPARC, Nikhef, OU=HiSPARC, CN=tietar.nikhef.nl/emailAddress=hisparc@nikhef.nl
+        Validity
+            Not Before: Mar 29 12:18:24 2018 GMT
+            Not After : Mar  5 12:18:24 2118 GMT
+        Subject: C=NL, ST=NH, O=HiSPARC, Nikhef, OU=HiSPARC, CN=server/emailAddress=hisparc@nikhef.nl
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+                Public-Key: (2048 bit)
+                Modulus:
+                    00:c2:20:7a:76:6b:9b:58:38:22:7f:e7:ef:4a:c8:
+                    cb:5d:80:d2:56:40:02:b1:a3:36:87:65:45:8a:28:
+                    09:c3:32:02:07:43:2b:78:1a:9d:94:15:b7:12:9c:
+                    a8:1a:9c:20:1f:48:83:15:90:d6:8b:8d:73:ec:5d:
+                    07:02:b7:93:c3:23:45:67:21:10:3d:9b:bc:c4:61:
+                    f0:36:d3:8a:21:bf:a3:e6:65:5f:f8:51:9f:22:e7:
+                    c2:a9:1a:f6:e0:6f:7f:c9:1f:90:bc:82:95:22:4f:
+                    8e:47:f5:2a:4a:65:f6:da:e5:6a:6a:ff:14:f1:65:
+                    5a:a2:b0:09:27:dc:bc:ca:18:2d:b3:cd:51:52:0b:
+                    bf:5a:5d:dc:12:ce:3a:02:2f:e1:e2:26:87:db:75:
+                    31:77:c2:a0:31:84:bf:55:d8:a0:25:4a:c0:08:43:
+                    5c:93:28:3b:7e:ed:bc:6a:b1:e9:65:76:f0:9e:b2:
+                    20:87:90:9d:48:03:a8:12:72:04:a9:0b:40:2f:01:
+                    2d:28:b7:07:52:77:8e:39:bf:db:bb:b6:24:12:63:
+                    7b:95:35:e3:28:bd:4d:0c:2b:96:6a:e5:b1:fa:fb:
+                    dd:2d:3e:d9:42:3c:54:27:f2:5e:2b:f7:81:15:cc:
+                    48:be:c9:2a:57:28:78:4b:3a:3e:e0:0b:03:eb:a3:
+                    be:f1
+                Exponent: 65537 (0x10001)
+        X509v3 extensions:
+            X509v3 Basic Constraints: 
+                CA:FALSE
+            Netscape Cert Type: 
+                SSL Server
+            Netscape Comment: 
+                OpenSSL Generated Server Certificate
+            X509v3 Authority Key Identifier: 
+                keyid:AB:C3:47:14:D2:EE:9B:1B:E6:E3:DC:4F:59:70:95:55:C6:06:72:F1
+                DirName:/C=NL/ST=NH/L=Amsterdam/O=HiSPARC, Nikhef/OU=HiSPARC/CN=tietar.nikhef.nl/emailAddress=hisparc@nikhef.nl
+                serial:C5:B6:D3:9D:09:88:66:AD
+
+            X509v3 Subject Key Identifier: 
+                28:1C:70:C6:70:35:71:E0:E3:6D:8A:61:10:F7:4C:EA:5F:4F:A0:21
+            X509v3 Extended Key Usage: 
+                TLS Web Server Authentication
+            X509v3 Key Usage: 
+                Digital Signature, Key Encipherment
+    Signature Algorithm: sha256WithRSAEncryption
+         b9:2a:5f:8a:0e:6c:b1:73:a9:80:55:44:e3:00:24:ed:ff:89:
+         f0:77:09:cd:50:91:79:f1:ad:80:0a:9c:43:57:25:75:08:87:
+         23:d0:07:57:2e:fe:d3:b6:f9:a8:66:63:dc:5c:4a:bf:89:75:
+         7f:25:04:81:b1:3e:39:a4:9e:a9:06:f7:ce:ca:47:de:79:c1:
+         89:8c:2c:49:b4:bb:27:4b:cf:28:78:94:8a:01:41:5c:1b:c7:
+         46:c1:f6:9c:2f:7a:d5:f8:3a:cb:04:7f:62:93:44:48:2f:de:
+         82:8b:68:dd:aa:93:39:fa:2f:08:7e:c9:09:7a:2b:7d:bf:b4:
+         53:01:bf:a6:37:5f:de:b6:95:5e:f9:ba:78:6b:07:e8:e6:45:
+         71:af:42:4a:78:f1:c1:ec:75:18:38:ec:46:32:dc:f2:76:b9:
+         73:26:82:68:be:bb:bf:be:28:94:e3:15:c6:5e:2b:cf:f2:25:
+         e2:a2:1a:97:fe:42:89:de:cd:ad:c7:1e:66:b9:3e:4b:22:fd:
+         4c:54:01:b7:f8:6f:e4:6d:b4:d2:76:04:37:4c:be:1b:9e:1e:
+         15:92:23:92:36:22:ee:d8:db:79:a6:42:fd:5a:9e:59:78:a1:
+         6d:01:f9:6a:08:85:ac:59:46:ba:f2:34:6b:f5:ff:a3:2f:c3:
+         dd:80:89:68
+-----BEGIN CERTIFICATE-----
+MIIE+DCCA+CgAwIBAgICEAEwDQYJKoZIhvcNAQELBQAwgZcxCzAJBgNVBAYTAk5M
+MQswCQYDVQQIEwJOSDESMBAGA1UEBxMJQW1zdGVyZGFtMRgwFgYDVQQKEw9IaVNQ
+QVJDLCBOaWtoZWYxEDAOBgNVBAsTB0hpU1BBUkMxGTAXBgNVBAMTEHRpZXRhci5u
+aWtoZWYubmwxIDAeBgkqhkiG9w0BCQEWEWhpc3BhcmNAbmlraGVmLm5sMCAXDTE4
+MDMyOTEyMTgyNFoYDzIxMTgwMzA1MTIxODI0WjB5MQswCQYDVQQGEwJOTDELMAkG
+A1UECBMCTkgxGDAWBgNVBAoTD0hpU1BBUkMsIE5pa2hlZjEQMA4GA1UECxMHSGlT
+UEFSQzEPMA0GA1UEAxMGc2VydmVyMSAwHgYJKoZIhvcNAQkBFhFoaXNwYXJjQG5p
+a2hlZi5ubDCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAMIgenZrm1g4
+In/n70rIy12A0lZAArGjNodlRYooCcMyAgdDK3ganZQVtxKcqBqcIB9IgxWQ1ouN
+c+xdBwK3k8MjRWchED2bvMRh8DbTiiG/o+ZlX/hRnyLnwqka9uBvf8kfkLyClSJP
+jkf1Kkpl9trlamr/FPFlWqKwCSfcvMoYLbPNUVILv1pd3BLOOgIv4eImh9t1MXfC
+oDGEv1XYoCVKwAhDXJMoO37tvGqx6WV28J6yIIeQnUgDqBJyBKkLQC8BLSi3B1J3
+jjm/27u2JBJje5U14yi9TQwrlmrlsfr73S0+2UI8VCfyXiv3gRXMSL7JKlcoeEs6
+PuALA+ujvvECAwEAAaOCAWcwggFjMAkGA1UdEwQCMAAwEQYJYIZIAYb4QgEBBAQD
+AgZAMDMGCWCGSAGG+EIBDQQmFiRPcGVuU1NMIEdlbmVyYXRlZCBTZXJ2ZXIgQ2Vy
+dGlmaWNhdGUwgcwGA1UdIwSBxDCBwYAUq8NHFNLumxvm49xPWXCVVcYGcvGhgZ2k
+gZowgZcxCzAJBgNVBAYTAk5MMQswCQYDVQQIEwJOSDESMBAGA1UEBxMJQW1zdGVy
+ZGFtMRgwFgYDVQQKEw9IaVNQQVJDLCBOaWtoZWYxEDAOBgNVBAsTB0hpU1BBUkMx
+GTAXBgNVBAMTEHRpZXRhci5uaWtoZWYubmwxIDAeBgkqhkiG9w0BCQEWEWhpc3Bh
+cmNAbmlraGVmLm5sggkAxbbTnQmIZq0wHQYDVR0OBBYEFCgccMZwNXHg422KYRD3
+TOpfT6AhMBMGA1UdJQQMMAoGCCsGAQUFBwMBMAsGA1UdDwQEAwIFoDANBgkqhkiG
+9w0BAQsFAAOCAQEAuSpfig5ssXOpgFVE4wAk7f+J8HcJzVCRefGtgAqcQ1cldQiH
+I9AHVy7+07b5qGZj3FxKv4l1fyUEgbE+OaSeqQb3zspH3nnBiYwsSbS7J0vPKHiU
+igFBXBvHRsH2nC961fg6ywR/YpNESC/egoto3aqTOfovCH7JCXorfb+0UwG/pjdf
+3raVXvm6eGsH6OZFca9CSnjxwex1GDjsRjLc8na5cyaCaL67v74olOMVxl4rz/Il
+4qIal/5Cid7NrcceZrk+SyL9TFQBt/hv5G200nYEN0y+G54eFZIjkjYi7tjbeaZC
+/VqeWXihbQH5agiFrFlGuvI0a/X/oy/D3YCJaA==
+-----END CERTIFICATE-----

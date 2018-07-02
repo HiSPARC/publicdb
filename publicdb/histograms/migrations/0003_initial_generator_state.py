@@ -4,7 +4,6 @@ from __future__ import unicode_literals
 import os
 
 from django.core import serializers
-from django.core.management import call_command
 from django.db import migrations
 
 
@@ -25,8 +24,8 @@ def load_fixture(apps, schema_editor):
 def unload_fixture(apps, schema_editor):
     """Delete all entries from the geenrator state"""
 
-    GeneratorState = apps.get_model('histograms', 'GeneratorState')
-    GeneratorState.objects.all().delete()
+    generator_state_model = apps.get_model('histograms', 'GeneratorState')
+    generator_state_model.objects.all().delete()
 
 
 class Migration(migrations.Migration):

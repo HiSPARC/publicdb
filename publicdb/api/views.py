@@ -12,10 +12,8 @@ from django.http import HttpResponse, HttpResponseNotFound
 
 import datastore
 
-from ..histograms.models import (Configuration, DailyHistogram, HistogramType,
-                                 PulseheightFit, Summary)
-from ..inforecords.models import (Cluster, Country,
-                                  MonitorPulseheightThresholds, Pc, Station)
+from ..histograms.models import Configuration, DailyHistogram, HistogramType, PulseheightFit, Summary
+from ..inforecords.models import Cluster, Country, MonitorPulseheightThresholds, Pc, Station
 from ..station_layout.models import StationLayout
 
 FIRSTDATE = datetime.date(2004, 1, 1)
@@ -52,18 +50,13 @@ def man(request):
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
         "station_info": 'station/{station_number}/{year}/{month}/{day}/',
         "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_number}/weather/'
-                       '{year}/{month}/{day}/',
-        "configuration": 'station/{station_number}/config/'
-                         '{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_number}/num_events/'
-                            '{year}/{month}/{day}/{hour}/',
+        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
+        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
+        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
         "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
-        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/'
-                           'pulseheight/fit/{year}/{month}/{day}/',
-        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/'
-                             'pulseheight/drift/{year}/{month}/{day}/'
-                             '{number_of_days}/'}
+        "pulseheight_fit": 'station/{station_number}/plate/{plate_number}/pulseheight/fit/{year}/{month}/{day}/',
+        "pulseheight_drift": 'station/{station_number}/plate/{plate_number}/pulseheight/drift/'
+                             '{year}/{month}/{day}/{number_of_days}/'}
 
     return json_dict(man)
 
@@ -100,8 +93,7 @@ def station(request, station_number, year=None, month=None, day=None):
     location = station.latest_location(date)
 
     try:
-        layout = StationLayout.objects.filter(station=station,
-                                              active_date__lte=date).latest()
+        layout = StationLayout.objects.filter(station=station, active_date__lte=date).latest()
     except StationLayout.DoesNotExist:
         # Get new StationLayout with all None values
         layout = StationLayout()
@@ -207,8 +199,7 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    stations = [{'number': station.number, 'name': station.name}
-                for station in stations]
+    stations = [{'number': station.number, 'name': station.name} for station in stations]
 
     return json_dict(stations)
 
@@ -307,11 +298,9 @@ def get_subcluster_dict(cluster=None):
     else:
         subclusters = Cluster.objects.all()
 
-    subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name}
-                       for subcluster in subclusters]
+    subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name} for subcluster in subclusters]
     if cluster:
-        subcluster_dict.append({'number': cluster.number,
-                                'name': cluster.name})
+        subcluster_dict.append({'number': cluster.number, 'name': cluster.name})
 
     return sorted(subcluster_dict, key=itemgetter('number'))
 
@@ -322,16 +311,14 @@ def get_cluster_dict(country=None):
     else:
         clusters = Cluster.objects.filter(parent=None)
 
-    cluster_dict = [{'number': cluster.number, 'name': cluster.name}
-                    for cluster in clusters]
+    cluster_dict = [{'number': cluster.number, 'name': cluster.name} for cluster in clusters]
 
     return sorted(cluster_dict, key=itemgetter('number'))
 
 
 def get_country_dict():
     countries = Country.objects.all()
-    country_dict = [{'number': country.number, 'name': country.name}
-                    for country in countries]
+    country_dict = [{'number': country.number, 'name': country.name} for country in countries]
     return sorted(country_dict, key=itemgetter('number'))
 
 
@@ -350,8 +337,7 @@ def gauss(x, n, m, s):
     return n * stats.norm.pdf(x, m, s)
 
 
-def get_pulseheight_drift(request, station_number, plate_number,
-                          year, month, day, number_of_days):
+def get_pulseheight_drift(request, station_number, plate_number, year, month, day, number_of_days):
     """Get pulseheight drift
 
     :param station_number: station number
@@ -381,8 +367,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
         station = Station.objects.get(number=station_number)
         start = requested_date - datetime.timedelta(days=number_of_days - 1)
         date_range = (start, requested_date)
-        summaries = Summary.objects.filter(station=station,
-                                           date__range=date_range)
+        summaries = Summary.objects.filter(station=station, date__range=date_range)
         fits = PulseheightFit.objects.filter(source__in=summaries,
                                              plate=plate_number,
                                              chi_square_reduced__gt=0.01,
@@ -403,8 +388,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
     try:
         # Fit drift
 
-        t_array = numpy.float_([int(fit.source.date.strftime("%s"))
-                                for fit in fits])
+        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
         mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
         # Determine the drift by a linear fit
@@ -430,9 +414,7 @@ def get_pulseheight_drift(request, station_number, plate_number,
         initial_mean = 1
         initial_width = 0.03
 
-        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_n,
-                                                         initial_mean,
-                                                         initial_width))
+        popt, pcov = optimize.curve_fit(gauss, x, y, p0=(initial_n, initial_mean, initial_width))
 
         result.update({'number_of_selected_days': len(t_array),
                        'number_of_requested_days': number_of_days,
@@ -466,8 +448,7 @@ def get_pulseheight_drift_last_30_days(request, station_number, plate_number):
                                  today.year, today.month, today.day, 30)
 
 
-def get_pulseheight_fit(request, station_number, plate_number,
-                        year=None, month=None, day=None):
+def get_pulseheight_fit(request, station_number, plate_number, year=None, month=None, day=None):
     """Get fit values of the pulseheight distribution for a station on a date
 
     Retrieve fit values of the pulseheight distribution. The fitting has
@@ -527,8 +508,7 @@ def get_pulseheight_fit(request, station_number, plate_number,
                        "error_message": fit.error_message})
     except Exception, e:
         result.update({"nagios": Nagios.unknown,
-                       "error": "Data has been found, "
-                                "but error in converting data to numbers",
+                       "error": "Data has been found, but error in converting data to numbers",
                        "exception": str(e)})
         return json_dict(result)
 
@@ -614,15 +594,13 @@ def has_data(request, station_number, type=None, year=None, month=None,
         summaries = summaries.filter(date=date)
     elif month:
         date = datetime.date(int(year), int(month), 1)
-        summaries = summaries.filter(date__year=date.year,
-                                     date__month=date.month)
+        summaries = summaries.filter(date__year=date.year, date__month=date.month)
     elif year:
         date = datetime.date(int(year), 1, 1)
         summaries = summaries.filter(date__year=date.year)
     else:
         date = datetime.date.today()
-        summaries = summaries.filter(date__gte=FIRSTDATE,
-                                     date__lte=date)
+        summaries = summaries.filter(date__gte=FIRSTDATE, date__lte=date)
 
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -661,9 +639,7 @@ def config(request, station_number, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        source = Summary.objects.filter(station=station,
-                                        num_config__isnull=False,
-                                        date__lte=date).latest()
+        source = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
         c = Configuration.objects.filter(source=source).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
@@ -678,8 +654,7 @@ def config(request, station_number, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_number, year=None, month=None, day=None,
-               hour=None):
+def num_events(request, station_number, year=None, month=None, day=None, hour=None):
     """Get number of events for a station
 
     Retrieve the number of events that a station has measured during its
@@ -733,8 +708,7 @@ def num_events(request, station_number, year=None, month=None, day=None,
         except ValueError:
             return HttpResponseNotFound()
         try:
-            histogram_values = DailyHistogram.objects.get(source__date=date,
-                                                          **filters).values
+            histogram_values = DailyHistogram.objects.get(source__date=date, **filters).values
             num_events = histogram_values[int(hour)]
         except DailyHistogram.DoesNotExist:
             num_events = 0

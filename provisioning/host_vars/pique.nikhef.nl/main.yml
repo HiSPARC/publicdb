@@ -20,3 +20,4 @@ media_url: http://data.hisparc.nl/media/
 static_url: http://data.hisparc.nl/static/
 
 secret_key: "{{ vault.secret_key }}"
+sentry_dsn: "{{ vault.sentry_dsn }}"

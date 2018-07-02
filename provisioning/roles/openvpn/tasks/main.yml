@@ -16,7 +16,7 @@
   become: true
   notify: restart dnsmasq
 
-- name: copy openvpn config
+- name: copy openvpn config. Including vendored easy_rsa
   copy:
     src: openvpn/
     dest: /etc/openvpn

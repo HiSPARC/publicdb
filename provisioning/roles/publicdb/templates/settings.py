@@ -118,6 +118,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -127,9 +128,10 @@ INSTALLED_APPS = (
     'publicdb.raw_data',
     'publicdb.api',
     'publicdb.maps',
-    'publicdb.jsparc',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -165,4 +167,8 @@ LOGGING = {
             'propagate': False,
         }
     },
+}
+
+RAVEN_CONFIG = {
+    'dsn': '{{ sentry_dsn }}'
 }
