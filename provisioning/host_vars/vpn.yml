@@ -3,9 +3,9 @@
 private_keys:
   - path: adminkeys/ca.key
     key: fake-admin-ca-key
-  - path: adminkeys/server.key
+  - path: admin/server.key
     key: fake-admin-server-key
   - path: keys/ca.key
     key: fake-keys-ca-key
-  - path: keys/server.key
-    key: fake-keys-server-key
+  - path: client/server.key
+    key: fake-client-server-key
