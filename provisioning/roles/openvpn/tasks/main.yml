@@ -24,6 +24,14 @@
   become: true
   notify: restart openvpn
 
+- name: overwrite systemd openvpn configuration to enable MD5
+  copy:
+    src: openvpn@client.service
+    dest: /etc/systemd/system/openvpn@client.service
+    backup: yes
+  become: true
+  notify: restart openvpn
+
 - name: create private keys
   copy:
     content: "{{ item.key }}"
