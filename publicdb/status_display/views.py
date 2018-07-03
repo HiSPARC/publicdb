@@ -23,6 +23,8 @@ from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
 from .nagios import get_station_status, get_status_counts, status_lists
+from .status import get_status_func
+
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
@@ -82,13 +84,16 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    get_status = get_status_func()
+
     data_stations = stations_with_data()
     down, problem, up = status_lists()
     statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
         link = station in data_stations
-        status = get_station_status(station.number, down, problem, up)
+        # status = get_station_status(station.number, down, problem, up)
+        status = get_status(station.number)
 
         stations.append({'number': station.number,
                          'name': station.name,
