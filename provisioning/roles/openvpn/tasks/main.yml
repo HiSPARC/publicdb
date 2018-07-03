@@ -50,6 +50,7 @@
   become: true
 
 - name: ensure openvpn is started
+  when: is_dev is not defined
   service:
     name: "openvpn@{{ item }}.service"
     enabled: yes
