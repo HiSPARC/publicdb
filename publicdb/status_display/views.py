@@ -88,7 +88,7 @@ def stations_by_number(request):
 
     data_stations = stations_with_data()
     down, problem, up = status_lists()
-    statuscount = get_status_counts(down, problem, up)
+    statuscount = station_status.get_status_counts()
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
         link = station in data_stations

@@ -1,5 +1,6 @@
 import datetime
 
+from publicdb.inforecords.models import Station
 from publicdb.histograms.models import Summary
 
 
@@ -20,6 +21,7 @@ class StationStatus(object):
         yesterday = datetime.date.today() - datetime.timedelta(days=1)
         recent_day = datetime.date.today() - datetime.timedelta(days=RECENT_NUM_DAYS)
 
+        self.stations = Station.objects.values_list('number', flat=True)
         self.stations_with_current_data = [x.station.number for x in Summary.objects.filter(date__exact=yesterday)]
         self.stations_with_recent_data = [x.station.number for x in Summary.objects.filter(date__gte=recent_day)]
 
@@ -37,7 +39,16 @@ class StationStatus(object):
         """
         if station_number in self.stations_with_current_data:
             return 'up'
-        elif self.stations_with_recent_data.count(station_number) > RECENT_THRESHOLD:
+        elif self.stations_with_recent_data.count(station_number) >= RECENT_THRESHOLD:
             return 'problem'
         else:
             return 'down'
+
+    def get_status_counts(self):
+        """Get the status counts for up, problem and down."""
+
+        num_up = [u in self.stations_with_current_data for u in self.stations].count(True)
+        num_problem = [self.stations_with_recent_data.count(u) >= RECENT_THRESHOLD for u in self.stations].count(True)
+        num_down = [self.stations_with_recent_data.count(u) < RECENT_THRESHOLD for u in self.stations].count(True)
+
+        return {'up': num_up, 'problem': num_problem, 'down': num_down}
