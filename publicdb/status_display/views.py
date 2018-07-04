@@ -22,7 +22,7 @@ from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, Da
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
-from .nagios import get_station_status, get_status_counts, status_lists
+from .status import StationStatus
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
@@ -37,9 +37,10 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
     data_stations = stations_with_data()
-    down, problem, up = status_lists()
-    statuscount = get_status_counts(down, problem, up)
 
     countries = OrderedDict()
     test_stations = []
@@ -48,7 +49,7 @@ def stations_by_country(request):
                            .exclude(pc__type__slug='admin')
                            .select_related('cluster__country', 'cluster__parent')):
         link = station in data_stations
-        status = get_station_status(station.number, down, problem, up)
+        status = station_status.get_status(station.number)
 
         station_info = {'number': station.number,
                         'name': station.name,
@@ -82,13 +83,14 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
     data_stations = stations_with_data()
-    down, problem, up = status_lists()
-    statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
         link = station in data_stations
-        status = get_station_status(station.number, down, problem, up)
+        status = station_status.get_status(station.number)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -101,13 +103,14 @@ def stations_by_number(request):
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
     data_stations = stations_with_data()
-    down, problem, up = status_lists()
-    statuscount = get_status_counts(down, problem, up)
     stations = []
     for station in Station.objects.exclude(pc__type__slug='admin'):
         link = station in data_stations
-        status = get_station_status(station.number, down, problem, up)
+        status = station_status.get_status(station.number)
 
         stations.append({'number': station.number,
                          'name': station.name,
@@ -122,9 +125,10 @@ def stations_by_name(request):
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
     data_stations = stations_with_data()
-    down, problem, up = status_lists()
-    statuscount = get_status_counts(down, problem, up)
 
     if country:
         get_object_or_404(Country, name=country)
@@ -158,7 +162,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                .filter(cluster=subcluster, pc__is_test=False)
                                .distinct()):
             link = station in data_stations
-            status = get_station_status(station.number, down, problem, up)
+            status = station_status.get_status(station.number)
             location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
@@ -518,8 +522,8 @@ def station_latest(request, station_number):
                                   station=station)
                           .latest())
 
-    down, problem, up = status_lists()
-    status = get_station_status(station.number, down, problem, up)
+    station_status = StationStatus()
+    status = station_status.get_status(station.number)
 
     date = summary.date
 
