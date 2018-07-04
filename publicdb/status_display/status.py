@@ -22,8 +22,8 @@ class StationStatus(object):
         recent_day = datetime.date.today() - datetime.timedelta(days=RECENT_NUM_DAYS)
 
         self.stations = Station.objects.values_list('number', flat=True)
-        self.stations_with_current_data = [x.station.number for x in Summary.objects.filter(date__exact=yesterday)]
-        self.stations_with_recent_data = [x.station.number for x in Summary.objects.filter(date__gte=recent_day)]
+        self.stations_with_current_data = Summary.objects.filter(date__exact=yesterday).values_list('station__number', flat=True)
+        self.stations_with_recent_data = list(Summary.objects.filter(date__gte=recent_day).values_list('station__number', flat=True))
 
     def get_status(self, station_number):
         """Query station status.
