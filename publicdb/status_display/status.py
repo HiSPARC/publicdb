@@ -29,9 +29,9 @@ class StationStatus(object):
         """Query station status.
 
         If the station has data as recent as yesterday, it is considered 'up'.
-        If it has at least RECENT_THRESHOLD days of data in the last
-        RECENT_NUM_DAYS, it is considered 'problem'. If it has less data than
-        the threshold, it is considered 'down'.
+        If it has data in the last RECENT_NUM_DAYS, it is considered 'problem'.
+        If it has no recent data, it is considered 'down', unless it has no
+        active PC registered, then the status is 'unknown'.
 
         :param station_number: the station for which to get the statuscount
         :return: 'up', 'problem', or 'down'
@@ -47,7 +47,14 @@ class StationStatus(object):
             return 'down'
 
     def get_status_counts(self):
-        """Get the status counts for up, problem and down."""
+        """Get the status counts for up, problem and down.
+
+        Count 'up' as all stations with current data. Count 'problem' as all
+        stations with recent data except for stations that are 'up'. Count
+        'down' as all stations without recent data except for stations that
+        have no active PC.
+
+        """
 
         all_stations = set(self.stations)
         stations_up = set(self.stations_with_current_data)
