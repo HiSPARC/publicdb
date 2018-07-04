@@ -1,8 +1,7 @@
 import datetime
 
-from ..inforecords.models import Station, Pc
 from ..histograms.models import Summary
-
+from ..inforecords.models import Pc, Station
 
 RECENT_NUM_DAYS = 7
 

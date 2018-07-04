@@ -24,7 +24,6 @@ from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
 from .status import StationStatus
 
-
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
 
