@@ -523,8 +523,8 @@ def station_latest(request, station_number):
                                   station=station)
                           .latest())
 
-    down, problem, up = status_lists()
-    status = get_station_status(station.number, down, problem, up)
+    station_status = StationStatus()
+    status = station_status.get_status(station.number)
 
     date = summary.date
 
