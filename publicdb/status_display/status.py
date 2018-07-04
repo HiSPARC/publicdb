@@ -5,7 +5,6 @@ from publicdb.histograms.models import Summary
 
 
 RECENT_NUM_DAYS = 7
-RECENT_THRESHOLD = 4
 
 
 class StationStatus(object):
@@ -40,7 +39,7 @@ class StationStatus(object):
         """
         if station_number in self.stations_with_current_data:
             return 'up'
-        elif self.stations_with_recent_data.count(station_number) >= RECENT_THRESHOLD:
+        elif station_number in self.stations_with_recent_data:
             return 'problem'
         elif station_number not in self.stations_with_pc:
             return 'unknown'
@@ -50,8 +49,13 @@ class StationStatus(object):
     def get_status_counts(self):
         """Get the status counts for up, problem and down."""
 
-        num_up = [u in self.stations_with_current_data for u in self.stations].count(True)
-        num_problem = [self.stations_with_recent_data.count(u) >= RECENT_THRESHOLD for u in self.stations].count(True)
-        num_down = [self.stations_with_recent_data.count(u) < RECENT_THRESHOLD for u in self.stations].count(True)
+        all_stations = set(self.stations)
+        stations_up = set(self.stations_with_current_data)
+        stations_recent = set(self.stations_with_recent_data)
+        stations_unknown = all_stations.difference(self.stations_with_pc)
+
+        num_up = len(stations_up)
+        num_problem = len(stations_recent.difference(stations_up))
+        num_down = len(all_stations.difference(stations_recent).difference(stations_unknown))
 
         return {'up': num_up, 'problem': num_problem, 'down': num_down}
