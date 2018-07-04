@@ -22,7 +22,7 @@ class StationStatus(object):
 
         self.stations = Station.objects.values_list('number', flat=True)
         self.stations_with_current_data = Summary.objects.with_data().filter(date__exact=yesterday).values_list('station__number', flat=True)
-        self.stations_with_recent_data = list(Summary.objects.with_data().filter(date__gte=recent_day).values_list('station__number', flat=True))
+        self.stations_with_recent_data = Summary.objects.with_data().filter(date__gte=recent_day).values_list('station__number', flat=True)
         self.stations_with_pc = Pc.objects.exclude(type__slug='admin').filter(is_active=True).values_list('station__number', flat=True)
 
     def get_status(self, station_number):
