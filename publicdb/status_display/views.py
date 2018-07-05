@@ -107,17 +107,18 @@ def stations_by_status(request):
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
-    stations = []
-    for station in Station.objects.exclude(pc__type__slug='admin'):
+    station_groups = {}
+    for station in Station.objects.all():
         link = station in data_stations
         status = station_status.get_status(station.number)
 
-        stations.append({'number': station.number,
-                         'name': station.name,
-                         'link': link,
-                         'status': status})
+        group = station_groups.setdefault(status, [])
+        group.append({'number': station.number,
+                      'name': station.name,
+                      'link': link,
+                      'status': status})
 
-    return render(request, 'stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
+    return render(request, 'stations_by_status.html', {'station_groups': station_groups, 'statuscount': statuscount})
 
 
 def stations_by_name(request):
