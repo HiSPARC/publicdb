@@ -18,6 +18,7 @@ from ..inforecords.models import Station
 
 
 class AnalysisSession(models.Model):
+    session_request = models.OneToOneField('SessionRequest', models.CASCADE)
     title = models.CharField(max_length=40, blank=False, unique=True)
     slug = models.SlugField(unique=True)
     hash = models.CharField(max_length=32)
@@ -94,6 +95,7 @@ class SessionRequest(models.Model):
         session_length = datetime.timedelta(weeks=4)
         ends = starts + session_length
         session = AnalysisSession(
+            session_request=self,
             starts=starts,
             ends=ends,
             pin=str(self.pin),
