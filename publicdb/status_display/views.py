@@ -100,6 +100,26 @@ def stations_by_number(request):
     return render(request, 'stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
 
 
+def stations_by_status(request):
+    """Show a list of stations, ordered by status"""
+
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
+    data_stations = stations_with_data()
+    stations = []
+    for station in Station.objects.exclude(pc__type__slug='admin'):
+        link = station in data_stations
+        status = station_status.get_status(station.number)
+
+        stations.append({'number': station.number,
+                         'name': station.name,
+                         'link': link,
+                         'status': status})
+
+    return render(request, 'stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
+
+
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
