@@ -76,10 +76,8 @@ def get_events(coincidence):
     for event in coincidence.coincidence.events.all():
         try:
             config = (Configuration.objects
-                                   .filter(source__station=event.station,
-                                           source__date__lte=event.date)
-                                   .exclude(gps_latitude=0,
-                                            gps_longitude=0).latest())
+                                   .filter(source__station=event.station, source__date__lte=event.date)
+                                   .exclude(gps_latitude=0, gps_longitude=0).latest())
         except Configuration.DoesNotExist:
             continue
 
@@ -95,8 +93,7 @@ def get_events(coincidence):
                           traces=event.traces,
                           pulseheights=event.pulseheights,
                           integrals=event.integrals,
-                          mips=[ph / 200. if ph > 0 else ph
-                                for ph in event.pulseheights])
+                          mips=[ph / 200. if ph > 0 else ph for ph in event.pulseheights])
         events.append(event_dict)
     return events
 
@@ -302,12 +299,8 @@ def validate_request_form(request):
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed is False:
-        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
+        sessionrequest.sid = '{school}{id}'.format(school=sessionrequest.school, id=sessionrequest.id)
         sessionrequest.pin = randint(1000, 9999)
-        starts = datetime.now()
-        ends = datetime.now()
-        AnalysisSession(starts=starts, ends=ends, pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
-    return render(request, 'analysissessions/confirm.html',
-                  {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
+    return render(request, 'analysissessions/confirm.html', {'id': sessionrequest.sid, 'pin': sessionrequest.pin})

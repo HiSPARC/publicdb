@@ -29,6 +29,9 @@ class TestManagement(TestCase):
         """The command only processes the confirmed session"""
 
         call_command('createsessions')
+        # The create_session is only called once
         mock_create_session.assert_called_once_with()
+
+        # The only affected session request is updated
         self.confirmed.refresh_from_db()
         self.assertFalse(self.confirmed.session_confirmed)

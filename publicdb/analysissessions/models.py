@@ -93,11 +93,12 @@ class SessionRequest(models.Model):
         starts = datetime.datetime.now()
         session_length = datetime.timedelta(weeks=4)
         ends = starts + session_length
-        session = AnalysisSession(starts=starts,
-                                  ends=ends,
-                                  pin=str(self.pin),
-                                  slug=slugify(self.sid),
-                                  title=self.sid)
+        session = AnalysisSession(
+            starts=starts,
+            ends=ends,
+            pin=str(self.pin),
+            slug=slugify(self.sid),
+            title=self.sid)
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
