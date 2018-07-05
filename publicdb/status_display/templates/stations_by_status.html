@@ -1,0 +1,27 @@
+{% extends 'base_stations.html' %}
+
+{% block current_status %}currentPage{% endblock %}
+
+{% block header %}
+    List of HiSPARC stations, by status
+{% endblock %}
+
+{% block list %}
+  {% for status_group, stations in station_groups.items %}
+    <div class="status_group">
+      <h1>{{ status_group | capfirst }}</h1>
+      <ul>
+        {% for station in stations %}
+          <li>
+              <!--<a href="{% url 'status:station:status' station.number %}">--><span class='statusBall {{ station.status }}'></span></a>
+            {% if station.link %}
+              <a href="{% url 'status:station:data' station.number %}">{{ station.number }} &mdash; {{ station.name }}</a>
+            {% else %}
+              {{ station.number }} &mdash; {{ station.name }}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  {% endfor %}
+{% endblock %}

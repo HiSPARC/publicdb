@@ -100,6 +100,29 @@ def stations_by_number(request):
     return render(request, 'stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
 
 
+def stations_by_status(request):
+    """Show a list of stations, ordered by status"""
+
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
+
+    data_stations = stations_with_data()
+    # keep a specific ordering of the status labels
+    station_groups = OrderedDict([('up', []), ('problem', []), ('down', []), ('unknown', [])])
+    for station in Station.objects.all():
+        link = station in data_stations
+        status = station_status.get_status(station.number)
+
+        # use setdefault() to automatically include unforeseen status labels without crashing
+        group = station_groups.setdefault(status, [])
+        group.append({'number': station.number,
+                      'name': station.name,
+                      'link': link,
+                      'status': status})
+
+    return render(request, 'stations_by_status.html', {'station_groups': station_groups, 'statuscount': statuscount})
+
+
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
