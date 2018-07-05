@@ -30,7 +30,7 @@
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;}
 
-.country h1 {
+.country h1, .status_group h1 {
     font-size: 32px;
     -webkit-column-span: all;
     -moz-column-span: all;

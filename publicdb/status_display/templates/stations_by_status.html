@@ -7,8 +7,9 @@
 {% endblock %}
 
 {% block list %}
-    {% for status_group, stations in station_groups.items %}
-      <h2>{{ status_group | capfirst }}</h2>
+  {% for status_group, stations in station_groups.items %}
+    <div class="status_group">
+      <h1>{{ status_group | capfirst }}</h1>
       <ul>
         {% for station in stations %}
           <li>
@@ -21,5 +22,6 @@
           </li>
         {% endfor %}
       </ul>
-    {% endfor %}
+    </div>
+  {% endfor %}
 {% endblock %}
