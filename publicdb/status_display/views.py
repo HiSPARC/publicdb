@@ -107,11 +107,13 @@ def stations_by_status(request):
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
-    station_groups = {}
+    # keep a specific ordering of the status labels
+    station_groups = OrderedDict([('up', []), ('problem', []), ('down', []), ('unknown', [])])
     for station in Station.objects.all():
         link = station in data_stations
         status = station_status.get_status(station.number)
 
+        # use setdefault() to automatically include unforeseen status labels without crashing
         group = station_groups.setdefault(status, [])
         group.append({'number': station.number,
                       'name': station.name,
