@@ -110,6 +110,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -121,6 +122,8 @@ INSTALLED_APPS = (
     'publicdb.maps',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -157,3 +160,5 @@ LOGGING = {
         }
     },
 }
+
+RAVEN_CONFIG = {}

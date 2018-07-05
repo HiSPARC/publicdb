@@ -20,3 +20,5 @@ media_url: /media/
 static_url: /static/
 
 secret_key: not-very-secret-key-for-development
+
+sentry_dsn: 'https://fakekey@localhost/publicdb'

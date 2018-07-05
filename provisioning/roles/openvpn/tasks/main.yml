@@ -1,10 +1,9 @@
 ---
 
-- name: install openvpn, easy-rsa and dnsmasq
+- name: install openvpn and dnsmasq
   yum:
     name:
       - openvpn
-      - easy-rsa
       - dnsmasq
   become: true
 
@@ -16,7 +15,7 @@
   become: true
   notify: restart dnsmasq
 
-- name: copy openvpn config
+- name: copy openvpn config. Including vendored easy_rsa
   copy:
     src: openvpn/
     dest: /etc/openvpn

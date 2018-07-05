@@ -66,6 +66,7 @@ urlpatterns = [
     url(r'^stations_by_country/$', views.stations_by_country, name="stations_by_country"),
     url(r'^stations_by_name/$', views.stations_by_name, name="stations_by_name"),
     url(r'^stations_by_number/$', views.stations_by_number, name="stations_by_number"),
+    url(r'^stations_by_status/$', views.stations_by_status, name="stations_by_status"),
 
     url(r'^stations_on_map/', include((maps_patterns, 'map'))),
     url(r'^network/', include((network_patterns, 'network'))),

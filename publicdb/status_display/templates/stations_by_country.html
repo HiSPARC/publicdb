@@ -24,7 +24,7 @@
                     <ul>
                       {% for station in stations %}
                         <li>
-                            <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
+                            <!--<a href="{% url 'status:station:status' station.number %}">--><span class='statusBall {{ station.status }}'></span></a>
                           {% if station.link %}
                             <a href="{% url 'status:station:data' station.number %}">
                               {{ station.number }} &mdash; {{ station.name }}

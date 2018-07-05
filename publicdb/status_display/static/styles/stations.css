@@ -4,7 +4,7 @@
 #stationList {
     float: left;
     margin-bottom: 30px;
-    width: 609px;
+    width: 619px;
     font-size: 10pt;
     -webkit-column-count: 2;
     -moz-column-count: 2;
@@ -30,7 +30,7 @@
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;}
 
-.country h1 {
+.country h1, .status_group h1 {
     font-size: 32px;
     -webkit-column-span: all;
     -moz-column-span: all;
@@ -119,7 +119,7 @@ h1 a:hover {
 #help,
 #navigation {
     padding-left: 20px;
-    width: 220px;
+    width: 260px;
     border-left: 1px solid black;}
 
 #navigation .nolink {

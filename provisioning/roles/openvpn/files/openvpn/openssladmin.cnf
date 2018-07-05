@@ -53,9 +53,9 @@ x509_extensions	= usr_cert		# The extentions to add to the cert
 # so this is commented out by default to leave a V1 CRL.
 # crl_extensions	= crl_ext
 
-default_days	= 3650			# how long to certify for
-default_crl_days= 30			# how long before next CRL
-default_md	= md5			# which md to use.
+default_days	= 36500			# how long to certify for
+default_crl_days= 36500			# how long before next CRL
+default_md	= sha256			# which md to use.
 preserve	= no			# keep passed DN ordering
 
 # A few difference way of specifying how similar the request should look
@@ -90,6 +90,7 @@ default_bits		= $ENV::KEY_SIZE
 default_keyfile 	= privkey.pem
 distinguished_name	= req_distinguished_name
 attributes		= req_attributes
+default_md		= sha256
 x509_extensions	= v3_ca	# The extentions to add to the self signed cert
 
 # Passwords for private keys if not present they will be prompted for
@@ -180,6 +181,8 @@ nsComment			= "OpenSSL Generated Certificate"
 # PKIX recommendations harmless if included in all certificates.
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
+extendedKeyUsage = clientAuth
+keyUsage = digitalSignature,keyEncipherment
 
 # This stuff is for subjectAltName and issuerAltname.
 # Import the email address.
@@ -197,12 +200,16 @@ authorityKeyIdentifier=keyid,issuer:always
 
 [ server ]
 
-# JY ADDED -- Make a cert with nsCertType set to "server"
+#Add extendedKeyUsage = ServerAuth to the server cert. This requires
+# `remote-cert-tls server` in the openvpn client config.
+# `ns-cert-type server` is deprecated and not allowed on the Admin VPN.
 basicConstraints=CA:FALSE
-nsCertType			= server
-nsComment			= "OpenSSL Generated Server Certificate"
+nsComment                       = "OpenSSL Generated Server Certificate"
 subjectKeyIdentifier=hash
 authorityKeyIdentifier=keyid,issuer:always
+extendedKeyUsage = serverAuth
+keyUsage = digitalSignature,keyEncipherment
+
 
 [ v3_req ]
 
