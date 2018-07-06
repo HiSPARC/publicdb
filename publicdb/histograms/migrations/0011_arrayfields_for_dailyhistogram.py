@@ -22,7 +22,8 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'DailyHistogram')
     multi_model = apps.get_model('histograms', 'MultiDailyHistogram')
-    print('')
+    if model.objects.all().count():
+        print('')
     for histogram in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         if not histogram.type.has_multiple_datasets:
             histogram.bins = histogram.old_bins

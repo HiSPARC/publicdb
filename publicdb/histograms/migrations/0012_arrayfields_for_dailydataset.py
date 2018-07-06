@@ -14,7 +14,8 @@ def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('histograms', 'DailyDataset')
     multi_model = apps.get_model('histograms', 'MultiDailyDataset')
-    print('')
+    if model.objects.all().count():
+        print('')
     for dataset in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         if dataset.type.slug in ['barometer', 'temperature']:
             dataset.x = dataset.old_x
