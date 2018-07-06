@@ -82,7 +82,7 @@ class ContactInformation(models.Model):
 
 class Contact(models.Model):
     profession = models.ForeignKey(Profession, models.CASCADE)
-    title = models.CharField(max_length=20, null=True, blank=True)
+    title = models.CharField(max_length=20, blank=True)
     first_name = models.CharField(max_length=40)
     prefix_surname = models.CharField(max_length=10, blank=True)
     surname = models.CharField(max_length=40)
@@ -97,9 +97,9 @@ class Contact(models.Model):
 
     @property
     def name(self):
-        return (' '.join((self.title, self.first_name,
-                          self.prefix_surname, self.surname))
-                   .replace('  ', ' ').strip())
+        return (' '.join((self.title, self.first_name, self.prefix_surname, self.surname))
+                   .replace('  ', ' ')
+                   .strip())
 
     def save(self, *args, **kwargs):
         super(Contact, self).save(*args, **kwargs)
