@@ -1,4 +1,9 @@
-.PHONY: test unittests coveragetests flaketest doctest ansibletest
+.PHONY: devinstall test unittests coveragetests flaketest doctest ansibletest
+
+devinstall:
+	pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
+	conda install --yes --file provisioning/roles/publicdb/files/conda.list
+	pip install -r provisioning/roles/publicdb/files/pip.list
 
 test: coveragetests flaketest doctest ansibletest
 

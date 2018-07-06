@@ -16,9 +16,7 @@ before_install:
 install:
   - conda create --yes -n build_env python=$TRAVIS_PYTHON_VERSION
   - source activate build_env
-  - conda install --yes --file provisioning/roles/publicdb/files/conda.list
-  - pip install -r provisioning/roles/publicdb/files/pip.list
-  - pip install -r requirements-dev.txt
+  - make devinstall
 
 script:
   - cp publicdb/settings_develop.py publicdb/settings.py
