@@ -35,8 +35,8 @@ ESD_PATH = os.path.join(PUBLICDB_PATH, 'esd')
 LGT_PATH = os.path.join(PUBLICDB_PATH, 'knmi_lightning')
 
 # VPN and datastore XML-RPC Proxies
-VPN_PROXY = 'http://localhost:8001'
-DATASTORE_PROXY = 'http://localhost:8002'
+VPN_PROXY = None  # 'http://localhost:8001'
+DATASTORE_PROXY = None  # 'http://localhost:8002'
 
 # VPN and datastore host names
 VPN_HOST = 'localhost'

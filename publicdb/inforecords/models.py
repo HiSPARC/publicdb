@@ -385,7 +385,6 @@ class Pc(models.Model):
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
         self.name = unicode(slugify(self.name)).replace('-', '').replace('_', '')
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
 
         if self.id:
             super(Pc, self).save(*args, **kwargs)
@@ -405,24 +404,17 @@ class Pc(models.Model):
             self.ip = self.generate_ip_address(last_ip)
 
             # First create keys, then issue final save
-            proxy.create_key(self.name, self.type.slug, self.ip)
+            create_keys(self)
+
             super(Pc, self).save(*args, **kwargs)
 
             # FIXME this doesn't check for preselected services
             self.install_default_services()
-
-        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
-        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
-        proxy.register_hosts_ip(aliases)
-        proxy.reload_nagios()
+        update_aliases()
 
     def delete(self, *args, **kwargs):
         super(Pc, self).delete(*args, **kwargs)
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
-        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
-        proxy.register_hosts_ip(aliases)
-        proxy.reload_nagios()
+        update_aliases()
 
     def install_default_services(self):
         if self.type.description != "Admin PC":
@@ -499,23 +491,43 @@ class EnabledService(models.Model):
         reload_nagios()
 
 
+def create_keys(pc):
+    """Create VPN keys for the given Pc"""
+
+    if settings.VPN_PROXY is not None:
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy.create_key(pc.name, pc.type.slug, pc.ip)
+
+def update_aliases():
+    """Update VPN aliases"""
+
+    if settings.VPN_PROXY is not None:
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
+        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
+        proxy.register_hosts_ip(aliases)
+        reload_nagios()
+
+
 def reload_nagios():
     """Reload the nagios configuration"""
 
-    try:
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-        transaction.on_commit(proxy.reload_nagios)
-    except Exception:
-        # FIXME logging!
-        pass
+    if settings.VPN_PROXY is not None:
+        try:
+            proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+            transaction.on_commit(proxy.reload_nagios)
+        except Exception:
+            # FIXME logging!
+            pass
 
 
 def reload_datastore():
     """Reload the datastore configuration"""
 
-    try:
-        proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
-        transaction.on_commit(proxy.reload_datastore)
-    except Exception:
-        # FIXME logging!
-        pass
+    if settings.DATASTORE_PROXY is not None:
+        try:
+            proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+            transaction.on_commit(proxy.reload_datastore)
+        except Exception:
+            # FIXME logging!
+            pass

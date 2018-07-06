@@ -19,13 +19,15 @@ def keys(request, host):
 
     host = get_object_or_404(Pc, name=host)
 
-    proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-    key_file = proxy.get_key(host.name, host.type.slug)
-    key_file = base64.b64decode(key_file)
+    if settings.VPN_PROXY is not None:
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        key_file = proxy.get_key(host.name, host.type.slug)
+        key_file = base64.b64decode(key_file)
+    else:
+        key_file = 'dummy'
 
     response = HttpResponse(key_file, content_type='application/zip')
-    response['Content-Disposition'] = ('attachment; filename=%s.zip' %
-                                       host.name)
+    response['Content-Disposition'] = 'attachment; filename={name}.zip'.format(name=host.name)
     return response
 
 
