@@ -1,8 +1,6 @@
 import datetime
 import json
 
-from operator import itemgetter
-
 import numpy
 
 from scipy import optimize, stats
@@ -276,50 +274,34 @@ def get_station_dict(subcluster=None):
     For all non-test stations in the given subcluster
 
     """
+    stations = Station.objects.filter(pc__is_test=False, summary__num_config__isnull=False)
     if subcluster:
-        stations = (Station.objects.filter(cluster=subcluster,
-                                           pc__is_test=False,
-                                           summary__num_config__isnull=False)
-                                   .distinct())
-    else:
-        stations = (Station.objects.filter(pc__is_test=False,
-                                           summary__num_config__isnull=False)
-                                   .distinct())
-
-    station_dict = [{'number': station.number, 'name': station.name}
-                    for station in stations]
-
-    return sorted(station_dict, key=itemgetter('number'))
+        stations = stations.filter(cluster=subcluster)
+    return list(stations.distinct().values('number', 'name'))
 
 
 def get_subcluster_dict(cluster=None):
     if cluster:
-        subclusters = Cluster.objects.filter(parent=cluster)
+        subclusters = Cluster.objects.filter(parent=cluster).order_by('number')
     else:
-        subclusters = Cluster.objects.all()
+        subclusters = Cluster.objects.all().order_by('number')
 
-    subcluster_dict = [{'number': subcluster.number, 'name': subcluster.name} for subcluster in subclusters]
+    subcluster_dict = list(subclusters.values('number', 'name'))
     if cluster:
         subcluster_dict.append({'number': cluster.number, 'name': cluster.name})
 
-    return sorted(subcluster_dict, key=itemgetter('number'))
+    return subcluster_dict
 
 
 def get_cluster_dict(country=None):
+    clusters = Cluster.objects.filter(parent=None)
     if country:
-        clusters = Cluster.objects.filter(country=country, parent=None)
-    else:
-        clusters = Cluster.objects.filter(parent=None)
-
-    cluster_dict = [{'number': cluster.number, 'name': cluster.name} for cluster in clusters]
-
-    return sorted(cluster_dict, key=itemgetter('number'))
+        clusters = clusters.filter(country=country)
+    return list(clusters.order_by('number').values('number', 'name'))
 
 
 def get_country_dict():
-    countries = Country.objects.all()
-    country_dict = [{'number': country.number, 'name': country.name} for country in countries]
-    return sorted(country_dict, key=itemgetter('number'))
+    return list(Country.objects.all().order_by('number').values('number', 'name'))
 
 
 def linear_fit(p, t):
