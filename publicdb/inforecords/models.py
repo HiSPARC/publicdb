@@ -498,6 +498,7 @@ def create_keys(pc):
         proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
         proxy.create_key(pc.name, pc.type.slug, pc.ip)
 
+
 def update_aliases():
     """Update VPN aliases"""
 
