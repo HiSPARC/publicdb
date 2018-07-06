@@ -391,9 +391,17 @@ class Pc(models.Model):
             super(Pc, self).save(*args, **kwargs)
         else:
             if self.type.description == "Admin PC":
-                last_ip = Pc.objects.filter(type__description="Admin PC").latest('id').ip
+                try:
+                    last_ip = Pc.objects.filter(type__description="Admin PC").latest('id').ip
+                except Pc.DoesNotExist:
+                    # Initial Admin IP
+                    last_ip = '172.16.66.1'
             else:
-                last_ip = Pc.objects.exclude(type__description="Admin PC").latest('id').ip
+                try:
+                    last_ip = Pc.objects.exclude(type__description="Admin PC").latest('id').ip
+                except Pc.DoesNotExist:
+                    # Initial station IP
+                    last_ip = '194.171.82.1'
             self.ip = self.generate_ip_address(last_ip)
 
             # First create keys, then issue final save
