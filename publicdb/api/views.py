@@ -192,12 +192,10 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
         date = datetime.date(int(year), int(month), int(day))
         filters['summary__date'] = date
 
-    stations = Station.objects.filter(**filters).distinct()
-
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    stations = [{'number': station.number, 'name': station.name} for station in stations]
+    stations = Station.objects.filter(**filters).distinct().values('number', 'name')
 
     return json_dict(stations)
 
