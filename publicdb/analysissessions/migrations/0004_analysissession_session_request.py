@@ -8,7 +8,19 @@ from django.db import migrations, models
 
 
 def forwards(apps, schema_editor):
-    pass
+    analysis_session_model = apps.get_model('analysissessions', 'AnalysisSession')
+    session_request_model = apps.get_model('analysissessions', 'SessionRequest')
+
+    # Match analysis sessions to session requests based on the title and sid.
+    for analysis_session in analysis_session_model.objects.all():
+        try:
+            session_request = session_request_model.objects.get(sid=analysis_session.title)
+        except session_request_model.DoesNotExist:
+            # Could not find matching request, remove the session.
+            analysis_session.delete()
+        else:
+            analysis_session.session_request = session_request
+            analysis_session.save()
 
 
 class Migration(migrations.Migration):
