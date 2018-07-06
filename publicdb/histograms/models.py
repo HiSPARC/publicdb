@@ -39,8 +39,9 @@ class NetworkSummary(models.Model):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
 
     class Meta:
-        verbose_name_plural = 'network summaries'
-        ordering = ('date',)
+        verbose_name = 'Network summary'
+        verbose_name_plural = 'Network summaries'
+        ordering = ['date']
         get_latest_by = 'date'
 
 
@@ -92,9 +93,10 @@ class Summary(models.Model):
                                      self.date.strftime('%d %b %Y'))
 
     class Meta:
-        verbose_name_plural = 'summaries'
+        verbose_name = 'Summary'
+        verbose_name_plural = 'Summaries'
         unique_together = ('station', 'date')
-        ordering = ('date', 'station')
+        ordering = ['date', 'station']
         get_latest_by = 'date'
 
 
@@ -191,9 +193,10 @@ class Configuration(models.Model):
         return "%d - %s" % (self.source.station.number, self.timestamp)
 
     class Meta:
-        verbose_name_plural = 'configurations'
+        verbose_name = 'Configuration'
+        verbose_name_plural = 'Configurations'
         get_latest_by = 'timestamp'
-        ordering = ('source',)
+        ordering = ['source']
 
     def station(self):
         return self.source.station.number
@@ -269,6 +272,10 @@ class HistogramType(models.Model):
     def __unicode__(self):
         return self.name
 
+    class Meta:
+        verbose_name = 'Histogram type'
+        verbose_name_plural = 'Histogram types'
+
 
 class DatasetType(models.Model):
     name = models.CharField(max_length=40, unique=True)
@@ -280,6 +287,10 @@ class DatasetType(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    class Meta:
+        verbose_name = 'Dataset type'
+        verbose_name_plural = 'Dataset types'
 
 
 class NetworkHistogram(models.Model):
@@ -298,8 +309,10 @@ class NetworkHistogram(models.Model):
         return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
+        verbose_name = 'Network histogram'
+        verbose_name_plural = 'Network histograms'
         unique_together = ('source', 'type')
-        ordering = ('source', 'type')
+        ordering = ['source', 'type']
 
 
 class BaseDailyStationDataMixin(models.Model):
@@ -320,7 +333,7 @@ class BaseDailyStationDataMixin(models.Model):
     class Meta:
         abstract = True
         unique_together = ('source', 'type')
-        ordering = ('source', 'type')
+        ordering = ['source', 'type']
 
 
 class DailyHistogram(BaseDailyStationDataMixin):
@@ -395,9 +408,10 @@ class PulseheightFit(models.Model):
                                  self.plate)
 
     class Meta:
-        verbose_name_plural = 'Pulseheight fit'
+        verbose_name = 'Pulseheight fit'
+        verbose_name_plural = 'Pulseheight fits'
         unique_together = ('source', 'plate')
-        ordering = ('source', 'plate')
+        ordering = ['source', 'plate']
 
 
 class DetectorTimingOffset(models.Model):
@@ -408,7 +422,9 @@ class DetectorTimingOffset(models.Model):
     offset_4 = models.FloatField(blank=True, null=True)
 
     class Meta:
-        ordering = ('source',)
+        verbose_name = 'Detector timing offset'
+        verbose_name_plural = 'Detector timing offsets'
+        ordering = ['source']
 
 
 class StationTimingOffset(models.Model):
@@ -424,5 +440,7 @@ class StationTimingOffset(models.Model):
             raise ValidationError("The summary dates should be the same")
 
     class Meta:
+        verbose_name = 'Station timing offset'
+        verbose_name_plural = 'Station timing offsets'
         unique_together = ('ref_source', 'source')
-        ordering = ('ref_source',)
+        ordering = ['ref_source']

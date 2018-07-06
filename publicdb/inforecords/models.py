@@ -20,6 +20,10 @@ class Profession(models.Model):
     def __unicode__(self):
         return self.description
 
+    class Meta:
+        verbose_name = 'Profession'
+        verbose_name_plural = 'Professions'
+
 
 class ContactInformation(models.Model):
     street_1 = models.CharField(max_length=40)
@@ -75,9 +79,9 @@ class ContactInformation(models.Model):
         reload_nagios()
 
     class Meta:
+        verbose_name = "Contact information"
+        verbose_name_plural = "Contact information"
         ordering = ['city', 'street_1', 'email_work']
-        verbose_name = "Contact Information"
-        verbose_name_plural = "Contact Information"
 
 
 class Contact(models.Model):
@@ -106,8 +110,10 @@ class Contact(models.Model):
         reload_nagios()
 
     class Meta:
-        unique_together = [('first_name', 'prefix_surname', 'surname')]
-        ordering = ('surname', 'first_name')
+        verbose_name = 'contact'
+        verbose_name_plural = 'contacts'
+        unique_together = ('first_name', 'prefix_surname', 'surname')
+        ordering = ['surname', 'first_name']
 
 
 class Country(models.Model):
@@ -137,7 +143,9 @@ class Country(models.Model):
             return self.number - 1000
 
     class Meta:
+        verbose_name = "Country"
         verbose_name_plural = "Countries"
+        ordering = ['number']
 
 
 class Cluster(models.Model):
@@ -207,7 +215,9 @@ class Cluster(models.Model):
             return self.number
 
     class Meta:
-        ordering = ('name',)
+        verbose_name = 'Cluster'
+        verbose_name_plural = 'Clusters'
+        ordering = ['name']
 
 
 class Station(models.Model):
@@ -301,7 +311,9 @@ class Station(models.Model):
                              if config.gps_altitude is not None else None)}
 
     class Meta:
-        ordering = ('number',)
+        verbose_name = 'Station'
+        verbose_name_plural = 'Stations'
+        ordering = ['number']
 
 
 class PcType(models.Model):
@@ -312,7 +324,8 @@ class PcType(models.Model):
         return self.description
 
     class Meta:
-        verbose_name_plural = 'PC Type'
+        verbose_name = 'PC Type'
+        verbose_name_plural = 'PC Types'
 
 
 class Pc(models.Model):
@@ -346,8 +359,9 @@ class Pc(models.Model):
     url.short_description = 'VNC URL'
 
     class Meta:
-        verbose_name_plural = 'PC and Certificates'
-        ordering = ('name',)
+        verbose_name = 'PC and certificates'
+        verbose_name_plural = 'PCs and certificates'
+        ordering = ['name']
 
     def generate_ip_address(self, ipaddress):
         """Generate new IP address
@@ -418,7 +432,8 @@ class MonitorPulseheightThresholds(models.Model):
     mpv_min_allowed_drift = models.FloatField()
 
     class Meta:
-        verbose_name_plural = "Pulseheight thresholds for Nagios monitoring"
+        verbose_name = "Pulseheight threshold for Nagios"
+        verbose_name_plural = "Pulseheight thresholds for Nagios"
 
 
 class MonitorService(models.Model):
@@ -435,8 +450,9 @@ class MonitorService(models.Model):
         return self.description
 
     class Meta:
+        verbose_name = 'Monitor Service'
         verbose_name_plural = 'Monitor Services'
-        ordering = ('description',)
+        ordering = ['description']
 
     def save(self, *args, **kwargs):
         super(MonitorService, self).save(*args, **kwargs)
@@ -462,8 +478,9 @@ class EnabledService(models.Model):
         return '%s - %s' % (self.pc, self.monitor_service)
 
     class Meta:
+        verbose_name = 'Enabled Service'
         verbose_name_plural = 'Enabled Services'
-        ordering = ('pc', 'monitor_service')
+        ordering = ['pc', 'monitor_service']
 
     def save(self, *args, **kwargs):
         super(EnabledService, self).save(*args, **kwargs)

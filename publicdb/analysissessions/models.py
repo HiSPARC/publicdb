@@ -39,6 +39,10 @@ class AnalysisSession(models.Model):
     def __unicode__(self):
         return self.title
 
+    class Meta:
+        verbose_name = 'Analysis session'
+        verbose_name_plural = 'Analysis sessions'
+
 
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession, models.CASCADE)
@@ -46,6 +50,10 @@ class Student(models.Model):
 
     def __unicode__(self):
         return '%s - %s' % (self.session, self.name)
+
+    class Meta:
+        verbose_name = 'Student'
+        verbose_name_plural = 'Students'
 
 
 class AnalyzedCoincidence(models.Model):
@@ -64,7 +72,9 @@ class AnalyzedCoincidence(models.Model):
         return "%s - %s" % (self.coincidence, self.student)
 
     class Meta:
-        ordering = ('coincidence',)
+        verbose_name = 'Analyzed coincidence'
+        verbose_name_plural = 'Analyzed coincidences'
+        ordering = ['coincidence']
 
 
 class SessionRequest(models.Model):
@@ -83,6 +93,10 @@ class SessionRequest(models.Model):
     url = models.CharField(max_length=20)
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Session request'
+        verbose_name_plural = 'Session requests'
 
     @property
     def name(self):
