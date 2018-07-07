@@ -195,7 +195,7 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    stations = Station.objects.filter(**filters).distinct().values('number', 'name')
+    stations = list(Station.objects.filter(**filters).distinct().values('number', 'name'))
 
     return json_dict(stations)
 
