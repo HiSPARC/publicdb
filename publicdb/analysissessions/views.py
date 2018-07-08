@@ -10,6 +10,8 @@ import numpy as np
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
+from sapphire import datetime_to_gps
+
 from ..histograms.models import Configuration
 from .forms import SessionRequestForm
 from .models import AnalysisSession, AnalyzedCoincidence, SessionRequest, Student
@@ -81,7 +83,7 @@ def get_events(coincidence):
         except Configuration.DoesNotExist:
             continue
 
-        timestamp = calendar.timegm(datetime.combine(event.date, event.time).utctimetuple())
+        timestamp = datetime_to_gps(datetime.combine(event.date, event.time))
         event_dict = dict(timestamp=timestamp,
                           nanoseconds=event.nanoseconds,
                           number=event.station.number,
@@ -100,11 +102,9 @@ def get_events(coincidence):
 
 def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
+    timestamp = datetime_to_gps(datetime.combine(coincidence.coincidence.date, coincidence.coincidence.time))
     data = dict(pk=coincidence.pk,
-                timestamp=calendar.timegm(
-                    datetime.combine(coincidence.coincidence.date,
-                                     coincidence.coincidence.time)
-                            .utctimetuple()),
+                timestamp=timestamp,
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
     response = HttpResponse(json.dumps(data), content_type='application/json')

@@ -21,7 +21,7 @@ from django.shortcuts import get_object_or_404, render
 from django.template import loader
 from django.views.decorators.csrf import csrf_exempt
 
-from sapphire import CoincidenceQuery
+from sapphire import CoincidenceQuery, datetime_to_gps
 
 from . import knmi_lightning
 from ..histograms import esd
@@ -341,8 +341,8 @@ def get_events_from_esd_in_range(station, start, end):
                     events = events_table.read()
                     reconstructions = reconstructions_table[events['event_id']]
                 else:
-                    ts0 = calendar.timegm(t0.utctimetuple())  # noqa: F841
-                    ts1 = calendar.timegm(t1.utctimetuple())  # noqa: F841
+                    ts0 = datetime_to_gps(t0)  # noqa: F841
+                    ts1 = datetime_to_gps(t1)  # noqa: F841
                     event_ids = events_table.get_where_list(
                         '(ts0 <= timestamp) & (timestamp < ts1)')
                     events = events_table.read_coordinates(event_ids)
@@ -417,8 +417,8 @@ def get_weather_from_esd_in_range(station, start, end):
                 if (t1 - t0).days == 1:
                     events = station_node.weather.read()
                 else:
-                    ts0 = calendar.timegm(t0.utctimetuple())  # noqa: F841
-                    ts1 = calendar.timegm(t1.utctimetuple())  # noqa: F841
+                    ts0 = datetime_to_gps(t0)  # noqa: F841
+                    ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.weather.read_where(
                         '(ts0 <= timestamp) & (timestamp < ts1)')
         except (IOError, tables.NoSuchNodeError):
@@ -485,8 +485,8 @@ def get_singles_from_esd_in_range(station, start, end):
                 if (t1 - t0).days == 1:
                     events = station_node.singles.read()
                 else:
-                    ts0 = calendar.timegm(t0.utctimetuple())  # noqa: F841
-                    ts1 = calendar.timegm(t1.utctimetuple())  # noqa: F841
+                    ts0 = datetime_to_gps(t0)  # noqa: F841
+                    ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.singles.read_where(
                         '(ts0 <= timestamp) & (timestamp < ts1)')
         except (IOError, tables.NoSuchNodeError):
@@ -542,8 +542,8 @@ def get_lightning_in_range(lightning_type, start, end):
         filepath = knmi_lightning.data_path(t0)
         try:
             with tables.open_file(filepath) as f:
-                ts0 = calendar.timegm(t0.utctimetuple())
-                ts1 = calendar.timegm(t1.utctimetuple())
+                ts0 = datetime_to_gps(t0)
+                ts1 = datetime_to_gps(t1)
                 for event in knmi_lightning.discharges(f, ts0, ts1,
                                                        type=lightning_type):
                     yield event
@@ -735,8 +735,8 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
         with tables.open_file(esd.get_esd_data_path(t0)) as f:
             try:
                 cq = CoincidenceQuery(f)
-                ts0 = calendar.timegm(t0.utctimetuple())
-                ts1 = calendar.timegm(t1.utctimetuple())
+                ts0 = datetime_to_gps(t0)
+                ts1 = datetime_to_gps(t1)
                 if stations:
                     coincidences = cq.at_least(stations, n, start=ts0,
                                                stop=ts1)
