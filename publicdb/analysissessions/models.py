@@ -1,12 +1,10 @@
 import datetime
 import hashlib
 import os
-import re
 import textwrap
 
 import tables
 
-from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
 from django.template.defaultfilters import slugify

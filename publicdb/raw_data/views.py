@@ -1,4 +1,3 @@
-import calendar
 import csv
 import datetime
 import os
