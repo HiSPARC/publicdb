@@ -9,6 +9,9 @@ from ..utils import date_as_kwargs
 
 
 class TestViews(TestCase):
+
+    """Test if all endpoints work and sometimes that the expected data is returned"""
+
     def setUp(self):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
