@@ -9,9 +9,9 @@ from django.core.mail import send_mail
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from sapphire import CoincidenceQuery
+from sapphire import CoincidenceQuery, gps_to_datetime
 
-from ..api.datastore import ext_timestamp_to_datetime, get_event_traces
+from ..api.datastore import split_ext_timestamp, get_event_traces
 from ..coincidences.models import Coincidence, Event
 from ..histograms.esd import get_esd_data_path
 from ..inforecords.models import Station
@@ -167,14 +167,14 @@ class SessionRequest(models.Model):
             station = Station.objects.get(number=station_number)
             traces = get_event_traces(station, event['ext_timestamp'])
 
-            trace_start_ext_timestamp = int(event['ext_timestamp']) - event['t_trigger']
-            trace_start_nanoseconds = int(trace_start_ext_timestamp % int(1e9))
-            event_datetime = ext_timestamp_to_datetime(trace_start_ext_timestamp)
-            event_timestamps.append((event_datetime, trace_start_nanoseconds))
+            trace_ext_timestamp = int(event['ext_timestamp']) - event['t_trigger']
+            trace_timestamp, trace_nanoseconds = split_ext_timestamp(trace_ext_timestamp)
+            event_datetime = gps_to_datetime(trace_timestamp)
+            event_timestamps.append((event_datetime, trace_nanoseconds))
 
             event = Event(date=event_datetime.date(),
                           time=event_datetime.time(),
-                          nanoseconds=trace_start_nanoseconds,
+                          nanoseconds=trace_nanoseconds,
                           station=station,
                           pulseheights=event['pulseheights'].tolist(),
                           integrals=event['integrals'].tolist(),
