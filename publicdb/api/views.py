@@ -8,8 +8,7 @@ from scipy import optimize, stats
 from django.core import serializers
 from django.http import HttpResponse, HttpResponseNotFound
 
-import datastore
-
+from . import datastore
 from ..histograms.models import Configuration, DailyHistogram, HistogramType, PulseheightFit, Summary
 from ..inforecords.models import Cluster, Country, MonitorPulseheightThresholds, Pc, Station
 from ..station_layout.models import StationLayout
