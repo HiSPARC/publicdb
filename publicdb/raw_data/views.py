@@ -18,6 +18,7 @@ from django.db.models import Q
 from django.http import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect, StreamingHttpResponse
 from django.shortcuts import get_object_or_404, render
 from django.template import loader
+from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
 from sapphire import CoincidenceQuery, datetime_to_gps
@@ -159,18 +160,14 @@ def download_form(request, station_number=None, start=None, end=None):
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
             data_type = form.cleaned_data['data_type']
-            query_string = urllib.urlencode({'start': start, 'end': end,
-                                             'download': download})
+            query_string = urllib.urlencode({'start': start, 'end': end, 'download': download})
             if data_type == 'lightning':
                 lightning_type = form.cleaned_data['lightning_type']
-                return HttpResponseRedirect('/data/knmi/%s/%s/?%s' %
-                                            (data_type, lightning_type,
-                                             query_string))
+                url = reverse('data:lightning', lightning_type=lightning_type)
             else:
                 station = form.cleaned_data['station']
-                return HttpResponseRedirect('/data/%d/%s/?%s' %
-                                            (station.number, data_type,
-                                             query_string))
+                url = reverse('data:{data_type}'.format(data_type=data_type), station_number=station.number)
+            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
     else:
         if station_number:
             station = get_object_or_404(Station, number=station_number)
@@ -564,8 +561,8 @@ def coincidences_download_form(request, start=None, end=None):
                                              'stations': stations,
                                              'start': start, 'end': end,
                                              'n': n, 'download': download})
-            return HttpResponseRedirect('/data/network/coincidences/?%s' %
-                                        query_string)
+            url = reverse('data:coincidences')
+            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
     else:
         form = CoincidenceDownloadForm(initial={'filter_by': 'network',
                                                 'start': start, 'end': end,
