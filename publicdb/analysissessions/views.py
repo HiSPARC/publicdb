@@ -25,8 +25,7 @@ def get_coincidence(request):
 
     if session_title.lower() == 'example':
         today = date.today()
-        coincidences = AnalyzedCoincidence.objects.filter(
-            session__ends__gt=today)
+        coincidences = AnalyzedCoincidence.objects.filter(session__ends__gt=today)
         count = coincidences.count()
         if not count:
             return error_json(404, 'No coincidences available.')
@@ -46,35 +45,33 @@ def get_coincidence(request):
         raise
     else:
         if not session.in_progress():
-            return error_json(404, "The requested session has not started yet "
-                                   "or is already expired.")
+            return error_json(404, "The requested session has not started yet or is already expired.")
 
     if not student_name:
         student = Student.objects.get(session=session, name='Test student')
     else:
         student, is_created = Student.objects.get_or_create(session=session, name=student_name)
 
-    coincidences = AnalyzedCoincidence.objects.filter(session=session)
+    analyzed_coincidences = AnalyzedCoincidence.objects.filter(session=session)
     try:
-        coincidence = coincidences.filter(student=student, is_analyzed=False)[0]
+        analyzed_coincidence = analyzed_coincidences.filter(student=student, is_analyzed=False)[0]
     except IndexError:
         try:
-            coincidence = coincidences.filter(student=None, is_analyzed=False)[0]
-            coincidence.student = student
-            coincidence.save()
+            analyzed_coincidence = analyzed_coincidences.filter(student=None, is_analyzed=False)[0]
+            analyzed_coincidence.student = student
+            analyzed_coincidence.save()
         except IndexError:
-            return error_json(404, "No unanalysed coincidences available, "
-                                   "request a new session.")
+            return error_json(404, "No unanalysed coincidences available, request a new session.")
 
-    events = get_events(coincidence)
-    response = data_json(coincidence, events)
+    events = get_events(analyzed_coincidence)
+    response = data_json(analyzed_coincidence, events)
     return response
 
 
-def get_events(coincidence):
+def get_events(analyzed_coincidence):
     """Get events that belong to this coincidence"""
     events = []
-    for event in coincidence.coincidence.events.all():
+    for event in analyzed_coincidence.coincidence.events.all():
         try:
             config = (Configuration.objects
                                    .filter(source__station=event.station, source__date__lte=event.date)
@@ -122,18 +119,18 @@ def error_json(error_code, message):
 def top_lijst(slug):
     coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug, is_analyzed=True)
     scores = []
-    for s in Student.objects.all():
+    for student in Student.objects.all():
         error = []
         num_events = 0
-        for ac in coincidences.filter(student=s):
-            if ac.error_estimate:
-                error.append(ac.error_estimate)
+        for analyzed_coincidence in coincidences.filter(student=student):
+            if analyzed_coincidence.error_estimate:
+                error.append(analyzed_coincidence.error_estimate)
                 num_events += 1
         if error:
             avg_error = np.average(error)
             wgh_error = avg_error / num_events
             min_error = min(error)
-            scores.append({'name': s.name, 'avg_error': avg_error,
+            scores.append({'name': student.name, 'avg_error': avg_error,
                            'wgh_error': wgh_error, 'min_error': min_error,
                            'num_events': num_events})
 
@@ -160,17 +157,20 @@ def result(request):
     longitude = request.GET['longitude']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
+    theta = request.GET.get('theta', 0)
+    phi = request.GET.get('phi', 0)
 
-    assert coincidence.session.title.lower() == session_title.lower()
-    assert coincidence.student.name.lower() == student_name.lower()
+    if (coincidence.session.title.lower() != session_title.lower() or
+            coincidence.student.name.lower() != student_name.lower()):
+        return error_json(401, 'Wrong combination of data.')
 
     coincidence.core_position_x = longitude
     coincidence.core_position_y = latitude
     coincidence.log_energy = log_energy
     coincidence.error_estimate = error_estimate
     coincidence.is_analyzed = True
-    coincidence.theta = 0
-    coincidence.phi = 0
+    coincidence.theta = theta
+    coincidence.phi = phi
     coincidence.save()
 
     ranking = top_lijst(coincidence.session.slug)
