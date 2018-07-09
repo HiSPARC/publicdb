@@ -35,16 +35,14 @@ def update_check(request, queue, admin_version, user_version):
 
     answer = {'mustUpdate': 0b00}
 
-    admin_updates = AdminUpdate.objects.filter(queue=queue,
-                                               version__gt=admin_version)
+    admin_updates = AdminUpdate.objects.filter(queue=queue, version__gt=admin_version)
     if admin_updates:
         answer['mustUpdate'] |= ADMIN_UPDATE
         latest = admin_updates.reverse()[0]
         answer['newVersionAdmin'] = latest.version
         answer['urlAdmin'] = latest.update.url
 
-    user_updates = UserUpdate.objects.filter(queue=queue,
-                                             version__gt=user_version)
+    user_updates = UserUpdate.objects.filter(queue=queue, version__gt=user_version)
     if user_updates:
         answer['mustUpdate'] |= USER_UPDATE
         latest = user_updates.reverse()[0]
