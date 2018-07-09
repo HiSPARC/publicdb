@@ -11,8 +11,7 @@ ADMIN_UPDATE = 0b10
 def get_latest_installer(request):
     """Get latest full HiSPARC installer"""
 
-    installer = (InstallerUpdate.objects.filter(queue__slug='hisparc')
-                 .order_by('version').reverse()[0])
+    installer = InstallerUpdate.objects.filter(queue__slug='hisparc').order_by('-version')[0]
     return http.HttpResponseRedirect(installer.installer.url)
 
 
