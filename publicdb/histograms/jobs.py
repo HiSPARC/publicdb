@@ -104,7 +104,7 @@ def process_possible_stations_for_date(date, station_list):
                          {'[station_number]': {'[table_name]': [n_rows], }, }
 
     """
-    logger.info('Now processing %s' % date)
+    logger.info('Now processing %s', date)
     unique_table_list = {table_name
                          for table_list in station_list.values()
                          for table_name in table_list.keys()}
@@ -123,8 +123,7 @@ def process_possible_tables_for_network(date, table_name):
     """
     try:
         update_flag_attr = 'needs_update_%s' % NETWORK_TABLES[table_name]
-        logger.info("New %s data on %s.", table_name,
-                    date.strftime("%a %b %d %Y"))
+        logger.info("New %s data on %s.", table_name, date.strftime("%a %b %d %Y"))
         network_summary, _ = NetworkSummary.objects.get_or_create(date=date)
         setattr(network_summary, update_flag_attr, True)
         network_summary.needs_update = True
@@ -139,10 +138,9 @@ def process_possible_tables_for_station(station, table_list, date):
     try:
         station = Station.objects.get(number=station)
     except Station.DoesNotExist:
-        logger.error('Unknown station: %s' % station)
+        logger.error('Unknown station: %s', station)
     else:
-        summary, created = Summary.objects.get_or_create(station=station,
-                                                         date=date)
+        summary, created = Summary.objects.get_or_create(station=station, date=date)
         for table, num_events in table_list.iteritems():
             check_table_and_update_flags(table, num_events, summary)
 
@@ -155,7 +153,8 @@ def check_table_and_update_flags(table_name, num_events, summary):
         update_flag_attr = 'needs_update_%s' % table_name
 
         if getattr(summary, number_of_events_attr) != num_events:
-            logger.info("New data (%s) on %s for station %d", table_name,
+            logger.info("New data (%s) on %s for station %d",
+                        table_name,
                         summary.date.strftime("%a %b %d %Y"),
                         summary.station.number)
             # only record number of events for *some* tables at this time
@@ -237,8 +236,7 @@ def update_esd():
     summaries = Summary.objects.filter(needs_update=True).reverse()
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(
-            process_and_store_temporary_esd_for_summary, summaries)
+        results = worker_pool.imap_unordered(process_and_store_temporary_esd_for_summary, summaries)
 
         for summary, tmp_locations in results:
             copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
@@ -247,8 +245,7 @@ def update_esd():
         worker_pool.join()
     else:
         for summary in summaries:
-            summary, tmp_locations = \
-                process_and_store_temporary_esd_for_summary(summary)
+            summary, tmp_locations = process_and_store_temporary_esd_for_summary(summary)
             copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
 
 
@@ -259,13 +256,10 @@ def update_coincidences():
     tasks himself or he grabs some workers and let them do it.
 
     """
-    network_summaries = (NetworkSummary.objects.filter(needs_update=True)
-                                               .reverse())
+    network_summaries = NetworkSummary.objects.filter(needs_update=True).reverse()
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
-        results = worker_pool.imap_unordered(
-            search_and_store_coincidences,
-            network_summaries)
+        results = worker_pool.imap_unordered(search_and_store_coincidences, network_summaries)
 
         for network_summary in results:
             network_summary.needs_update = False
@@ -317,16 +311,11 @@ def search_and_store_coincidences(network_summary):
 def update_histograms():
     """Update new configs, histograms and datasets"""
 
-    perform_tasks_manager(NetworkSummary, "needs_update_coincidences",
-                          perform_coincidences_tasks)
-    perform_tasks_manager(Summary, "needs_update_config",
-                          perform_config_tasks)
-    perform_tasks_manager(Summary, "needs_update_events",
-                          perform_events_tasks)
-    perform_tasks_manager(Summary, "needs_update_weather",
-                          perform_weather_tasks)
-    perform_tasks_manager(Summary, "needs_update_singles",
-                          perform_singles_tasks)
+    perform_tasks_manager(NetworkSummary, "needs_update_coincidences", perform_coincidences_tasks)
+    perform_tasks_manager(Summary, "needs_update_config", perform_config_tasks)
+    perform_tasks_manager(Summary, "needs_update_events", perform_events_tasks)
+    perform_tasks_manager(Summary, "needs_update_weather", perform_weather_tasks)
+    perform_tasks_manager(Summary, "needs_update_singles", perform_singles_tasks)
 
 
 def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
@@ -342,8 +331,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
         required for the given flag.
 
     """
-    summaries = model.objects.filter(**{needs_update_item: True,
-                                        'needs_update': False}).reverse()
+    summaries = model.objects.filter(**{needs_update_item: True, 'needs_update': False}).reverse()
 
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
@@ -356,8 +344,7 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
             if not current_date == summary.date:
                 # Finish delayed store jobs.
                 for summary_res, tmp_locations_res in tmp_results:
-                    copy_temporary_and_set_flag(summary_res, needs_update_item,
-                                                tmp_locations_res)
+                    copy_temporary_and_set_flag(summary_res, needs_update_item, tmp_locations_res)
                 tmp_results = []
                 current_date = summary.date
             if not len(tmp_locations):
@@ -367,20 +354,18 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
                 tmp_results.append((summary, tmp_locations))
         if len(tmp_results):
             for summary, tmp_locations in tmp_results:
-                copy_temporary_and_set_flag(summary, needs_update_item,
-                                            tmp_locations)
+                copy_temporary_and_set_flag(summary, needs_update_item, tmp_locations)
         worker_pool.close()
         worker_pool.join()
     else:
         for summary in summaries:
             summary, tmp_locations = perform_certain_tasks(summary)
-            copy_temporary_and_set_flag(summary, needs_update_item,
-                                        tmp_locations)
+            copy_temporary_and_set_flag(summary, needs_update_item, tmp_locations)
 
 
 def perform_events_tasks(summary):
     django.db.close_old_connections()
-    logger.info("Updating event histograms for %s" % summary)
+    logger.info("Updating event histograms for %s", summary)
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
     update_pulseheight_fit(summary)
@@ -388,25 +373,22 @@ def perform_events_tasks(summary):
     update_detector_timing_offsets(summary)
     tmp_locations = []
     try:
-        layout = summary.station.stationlayout_set.filter(
-            active_date__lte=summary.date).latest()
+        layout = summary.station.stationlayout_set.filter(active_date__lte=summary.date).latest()
     except StationLayout.DoesNotExist:
-        logger.debug("No station layout available for %s" % summary)
+        logger.debug("No station layout available for %s", summary)
     else:
         if layout.has_four_detectors:
-            tmp_locations.append(
-                esd.reconstruct_events_and_store_temporary_esd(summary))
+            tmp_locations.append(esd.reconstruct_events_and_store_temporary_esd(summary))
             update_zenith_histogram(summary, *tmp_locations[-1])
             update_azimuth_histogram(summary, *tmp_locations[-1])
         else:
-            logger.debug("No reconstructions for 2-detector station %s" %
-                         summary)
+            logger.debug("No reconstructions for 2-detector station %s", summary)
     return summary, tmp_locations
 
 
 def perform_config_tasks(summary):
     django.db.close_old_connections()
-    logger.info("Updating configuration messages for %s" % summary)
+    logger.info("Updating configuration messages for %s", summary)
     num_config = update_config(summary)
     summary.num_config = num_config
     return summary, []
@@ -414,7 +396,7 @@ def perform_config_tasks(summary):
 
 def perform_weather_tasks(summary):
     django.db.close_old_connections()
-    logger.info("Updating weather datasets for %s" % summary)
+    logger.info("Updating weather datasets for %s", summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
     return summary, []
@@ -422,7 +404,7 @@ def perform_weather_tasks(summary):
 
 def perform_singles_tasks(summary):
     django.db.close_old_connections()
-    logger.info("Updating singles datasets for %s" % summary)
+    logger.info("Updating singles datasets for %s", summary)
     update_singles_histogram(summary)
     update_singles_rate_dataset(summary)
     return summary, []
@@ -430,7 +412,7 @@ def perform_singles_tasks(summary):
 
 def perform_coincidences_tasks(network_summary):
     django.db.close_old_connections()
-    logger.info("Updating coincidence histograms for %s" % network_summary)
+    logger.info("Updating coincidence histograms for %s", network_summary)
     update_coincidencetime_histogram(network_summary)
     update_coincidencenumber_histogram(network_summary)
     update_station_timing_offsets(network_summary)
@@ -440,51 +422,45 @@ def perform_coincidences_tasks(network_summary):
 def search_coincidences_and_store_esd(network_summary):
     """Search and store coincidences, and store the number of coincidences"""
 
-    logger.info("Processing coincidences and storing ESD for %s" %
-                network_summary)
+    logger.info("Processing coincidences and storing ESD for %s", network_summary)
     t0 = time.time()
-    num_coincidences = \
-        esd.search_coincidences_and_store_in_esd(network_summary)
+    num_coincidences = esd.search_coincidences_and_store_in_esd(network_summary)
     t1 = time.time()
     network_summary.num_coincidences = num_coincidences
-    logger.debug("Processing took %.1f s." % (t1 - t0))
+    logger.debug("Processing took %.1f s.", t1 - t0)
 
 
 def determine_time_delta_and_store_esd(network_summary):
-    logger.info("Processing time deltas and storing ESD for %s" %
-                network_summary)
+    logger.info("Processing time deltas and storing ESD for %s", network_summary)
     t0 = time.time()
     esd.determine_time_delta_and_store_in_esd(network_summary)
     t1 = time.time()
-    logger.debug("Processing took %.1f s." % (t1 - t0))
+    logger.debug("Processing took %.1f s.", t1 - t0)
 
 
 def process_events_and_store_esd(summary):
-    logger.info("Processing events and storing ESD for %s" % summary)
+    logger.info("Processing events and storing ESD for %s", summary)
     t0 = time.time()
-    tmpfile_path, node_path = \
-        esd.process_events_and_store_temporary_esd(summary)
+    tmpfile_path, node_path = esd.process_events_and_store_temporary_esd(summary)
     t1 = time.time()
-    logger.debug("Processing took %.1f s." % (t1 - t0))
+    logger.debug("Processing took %.1f s.", t1 - t0)
     return tmpfile_path, node_path
 
 
 def process_weather_and_store_esd(summary):
-    logger.info("Processing weather and storing ESD for %s" % summary)
-    tmpfile_path, node_path = \
-        esd.process_weather_and_store_temporary_esd(summary)
+    logger.info("Processing weather and storing ESD for %s", summary)
+    tmpfile_path, node_path = esd.process_weather_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
 
 
 def process_singles_and_store_esd(summary):
-    logger.info("Processing singles and storing ESD for %s" % summary)
-    tmpfile_path, node_path = \
-        esd.process_singles_and_store_temporary_esd(summary)
+    logger.info("Processing singles and storing ESD for %s", summary)
+    tmpfile_path, node_path = esd.process_singles_and_store_temporary_esd(summary)
     return tmpfile_path, node_path
 
 
 def update_eventtime_histogram(summary):
-    logger.debug("Updating eventtime histogram for %s" % summary)
+    logger.debug("Updating eventtime histogram for %s", summary)
     timestamps = esd.get_event_timestamps(summary)
 
     # creating a histogram with bins consisting of timestamps instead of
@@ -504,7 +480,7 @@ def update_eventtime_histogram(summary):
 def update_coincidencetime_histogram(network_summary):
     """Histograms that show the number of coincidences per hour"""
 
-    logger.debug("Updating coincidencetime histogram for %s" % network_summary)
+    logger.debug("Updating coincidencetime histogram for %s", network_summary)
     timestamps = esd.get_coincidence_timestamps(network_summary)
 
     # creating a histogram with bins consisting of timestamps instead of
@@ -524,8 +500,7 @@ def update_coincidencetime_histogram(network_summary):
 def update_coincidencenumber_histogram(network_summary):
     """Histograms of the number of stations participating in coincidences"""
 
-    logger.debug("Updating coincidencenumber histogram for %s" %
-                 network_summary)
+    logger.debug("Updating coincidencenumber histogram for %s", network_summary)
     n_stations = esd.get_coincidence_data(network_summary, 'N')
 
     # create bins, don't forget right-most edge
@@ -539,19 +514,18 @@ def update_coincidencenumber_histogram(network_summary):
 def update_pulseheight_histogram(summary):
     """Histograms of pulseheights for each detector individually"""
 
-    logger.debug("Updating pulseheight histogram for %s" % summary)
+    logger.debug("Updating pulseheight histogram for %s", summary)
     pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
 
 
 def update_pulseheight_fit(summary):
-    logger.debug("Updating pulseheight fit for %s" % summary)
+    logger.debug("Updating pulseheight fit for %s", summary)
     try:
         fits = fit_pulseheight_peak.get_pulseheight_fits(summary)
     except Configuration.DoesNotExist:
-        logger.debug("No Configuration for station: %d." %
-                     summary.station.number)
+        logger.debug("No Configuration for station: %d.", summary.station.number)
         return
     save_pulseheight_fits(summary, fits)
 
@@ -559,7 +533,7 @@ def update_pulseheight_fit(summary):
 def update_pulseintegral_histogram(summary):
     """Histograms of pulseintegral for each detector individually"""
 
-    logger.debug("Updating pulseintegral histogram for %s" % summary)
+    logger.debug("Updating pulseintegral histogram for %s", summary)
     integrals = esd.get_integrals(summary)
     bins, histograms = create_histogram(integrals, MAX_IN, BIN_IN_NUM)
     save_histograms(summary, 'pulseintegral', bins, histograms)
@@ -568,22 +542,20 @@ def update_pulseintegral_histogram(summary):
 def update_singles_histogram(summary):
     """Histograms of singles data for each detector individually"""
 
-    logger.debug("Updating singles histograms for %s" % summary)
+    logger.debug("Updating singles histograms for %s", summary)
     _, high, low = esd.get_singles(summary)
 
-    bins, histograms = create_histogram(low, MAX_SINGLES_LOW,
-                                        BIN_SINGLES_LOW_NUM)
+    bins, histograms = create_histogram(low, MAX_SINGLES_LOW, BIN_SINGLES_LOW_NUM)
     save_histograms(summary, 'singleslow', bins, histograms)
 
-    bins, histograms = create_histogram(high, MAX_SINGLES_HIGH,
-                                        BIN_SINGLES_HIGH_NUM)
+    bins, histograms = create_histogram(high, MAX_SINGLES_HIGH, BIN_SINGLES_HIGH_NUM)
     save_histograms(summary, 'singleshigh', bins, histograms)
 
 
 def update_singles_rate_dataset(summary):
     """Singles rate for each detector individually"""
 
-    logger.debug("Updating singles rate datasets for %s" % summary)
+    logger.debug("Updating singles rate datasets for %s", summary)
     ts, high, low = esd.get_singles(summary)
 
     # timestamp at midnight (start of day) of date
@@ -604,7 +576,7 @@ def update_singles_rate_dataset(summary):
 def update_detector_timing_offsets(summary):
     """Determine detector timing offsets"""
 
-    logger.debug("Determining detector timing offsets for %s" % summary)
+    logger.debug("Determining detector timing offsets for %s", summary)
     offsets = esd.determine_detector_timing_offsets_for_summary(summary)
     save_offsets(summary, offsets)
 
@@ -612,8 +584,7 @@ def update_detector_timing_offsets(summary):
 def update_station_timing_offsets(network_summary):
     """Determine which station timing offsets need updating and update"""
 
-    logger.debug("Determining update of station offsets "
-                 "for %s" % network_summary)
+    logger.debug("Determining update of station offsets for %s", network_summary)
     summary_date = network_summary.date
 
     stations = esd.get_station_numbers_from_esd_coincidences(network_summary)
@@ -622,8 +593,7 @@ def update_station_timing_offsets(network_summary):
     for ref_sn, sn in network_off.get_station_pairs_within_max_distance():
         off = esd.DetermineStationTimingOffsetsESD([ref_sn, sn])
         cuts = off._get_cuts(sn, ref_sn)
-        left, right = off.determine_first_and_last_date(summary_date,
-                                                        sn, ref_sn)
+        left, right = off.determine_first_and_last_date(summary_date, sn, ref_sn)
         # To update all affected offsets use:
         # for date, _ in datetime_range(left, right):
         # To only update offset for specific date use:
@@ -635,21 +605,18 @@ def update_station_timing_offsets(network_summary):
             if summary is None:
                 continue
             if date in cuts:
-                logger.debug("Setting offset for config cut to nan for %s"
-                             " ref %s at %s" % (summary, ref_summary, date))
+                logger.debug("Setting offset for config cut to nan for %s ref %s at %s", summary, ref_summary, date)
                 offset, error = np.nan, np.nan
             else:
-                logger.debug("Determining station offset for %s"
-                             " ref %s at %s" % (summary, ref_summary, date))
-                offset, error = off.determine_station_timing_offset(date, sn,
-                                                                    ref_sn)
+                logger.debug("Determining station offset for %s ref %s at %s", summary, ref_summary, date)
+                offset, error = off.determine_station_timing_offset(date, sn, ref_sn)
             save_station_offset(ref_summary, summary, offset, error)
 
 
 def update_zenith_histogram(summary, tempfile_path, node_path):
     """Histogram of the reconstructed azimuth"""
 
-    logger.debug("Updating zenith histogram for %s" % summary)
+    logger.debug("Updating zenith histogram for %s", summary)
     zeniths = esd.get_zeniths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
@@ -663,7 +630,7 @@ def update_zenith_histogram(summary, tempfile_path, node_path):
 def update_azimuth_histogram(summary, tempfile_path, node_path):
     """Histogram of the reconstructed azimuth"""
 
-    logger.debug("Updating azimuth histogram for %s" % summary)
+    logger.debug("Updating azimuth histogram for %s", summary)
     azimuths = esd.get_azimuths(tempfile_path, node_path)
 
     # create bins, don't forget right-most edge
@@ -677,7 +644,7 @@ def update_azimuth_histogram(summary, tempfile_path, node_path):
 def update_temperature_dataset(summary):
     """Create dataset of timestamped temperature data"""
 
-    logger.debug("Updating temperature dataset for %s" % summary)
+    logger.debug("Updating temperature dataset for %s", summary)
     temperature = esd.get_temperature(summary)
     error_values = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in error_values]
@@ -689,7 +656,7 @@ def update_temperature_dataset(summary):
 def update_barometer_dataset(summary):
     """Create dataset of timestamped barometer data"""
 
-    logger.debug("Updating barometer dataset for %s" % summary)
+    logger.debug("Updating barometer dataset for %s", summary)
     barometer = esd.get_barometer(summary)
     error_values = [-999]
     barometer = [(x, y) for x, y in barometer if y not in error_values]
@@ -731,13 +698,10 @@ def shrink(column, bin_idxs, n_bins):
 
 def update_config(summary):
     cluster, station_number = get_station_cluster_number(summary.station)
-    file, configs, blobs = datastore.get_config_messages(cluster,
-                                                         station_number,
-                                                         summary.date)
+    file, configs, blobs = datastore.get_config_messages(cluster, station_number, summary.date)
     num_config = len(configs)
     if num_config > MAX_NUMBER_OF_CONFIGS:
-        logger.error('%s: Too many configs: %d. Skipping.' % (summary,
-                                                              num_config))
+        logger.error('%s: Too many configs: %d. Skipping.', summary, num_config)
         return summary.num_config
 
     for config in configs[summary.num_config:]:
@@ -778,39 +742,34 @@ def create_histogram(data, high, samples):
 
 def save_histograms(summary, slug, bins, values):
     """Store the binned data in database"""
-    logger.debug("Saving histogram %s for %s" % (slug, summary))
+    logger.debug("Saving histogram %s for %s", slug, summary)
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
     if not type.has_multiple_datasets:
-        DailyHistogram.objects.update_or_create(source=summary, type=type,
-                                                defaults=histogram)
+        DailyHistogram.objects.update_or_create(source=summary, type=type, defaults=histogram)
     else:
-        MultiDailyHistogram.objects.update_or_create(source=summary, type=type,
-                                                     defaults=histogram)
+        MultiDailyHistogram.objects.update_or_create(source=summary, type=type, defaults=histogram)
     logger.debug("Saved succesfully")
 
 
 def save_network_histograms(network_summary, slug, bins, values):
     """Store the binned data in database"""
-    logger.debug("Saving histogram %s for %s" % (slug, network_summary))
+    logger.debug("Saving histogram %s for %s", slug, network_summary)
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
-    NetworkHistogram.objects.update_or_create(source=network_summary,
-                                              type=type, defaults=histogram)
+    NetworkHistogram.objects.update_or_create(source=network_summary, type=type, defaults=histogram)
     logger.debug("Saved succesfully")
 
 
 def save_dataset(summary, slug, x, y):
     """Store the data in database"""
-    logger.debug("Saving dataset %s for %s" % (slug, summary))
+    logger.debug("Saving dataset %s for %s", slug, summary)
     type = DatasetType.objects.get(slug=slug)
     dataset = {'x': x, 'y': y}
     if slug in ['barometer', 'temperature']:
-        DailyDataset.objects.update_or_create(source=summary, type=type,
-                                              defaults=dataset)
+        DailyDataset.objects.update_or_create(source=summary, type=type, defaults=dataset)
     else:
-        MultiDailyDataset.objects.update_or_create(source=summary, type=type,
-                                                   defaults=dataset)
+        MultiDailyDataset.objects.update_or_create(source=summary, type=type, defaults=dataset)
     logger.debug("Saved succesfully")
 
 
@@ -818,13 +777,12 @@ def save_pulseheight_fits(summary, fits):
     if len(fits) == 0:
         logger.debug("Empty pulseheight fit results. Nothing to save.")
         return
-    logger.debug("Saving pulseheight fits for %s" % summary)
+    logger.debug("Saving pulseheight fits for %s", summary)
     for fit in fits:
         try:
             fit.save()
         except django.db.IntegrityError:
-            existing_fit = PulseheightFit.objects.get(source=summary,
-                                                      plate=fit.plate)
+            existing_fit = PulseheightFit.objects.get(source=summary, plate=fit.plate)
             fit.id = existing_fit.id
             fit.save()
 
@@ -839,7 +797,7 @@ def save_offsets(summary, offsets):
     :param offsets: list of 4 timing offsets
 
     """
-    logger.debug("Saving detector timing offsets for %s" % summary)
+    logger.debug("Saving detector timing offsets for %s", summary)
     off = {'offset_%d' % i: round_in_base(o, 0.25) if not np.isnan(o) else None
            for i, o in enumerate(offsets, 1)}
     DetectorTimingOffset.objects.update_or_create(source=summary, defaults=off)
@@ -855,8 +813,7 @@ def save_station_offset(ref_summary, summary, offset, error):
     :param error: error of the offset
 
     """
-    logger.debug("Saving station offset for %s ref %s" % (summary,
-                                                          ref_summary))
+    logger.debug("Saving station offset for %s ref %s", summary, ref_summary)
     field = {}
     if not np.isnan(offset):
         field['offset'] = round(offset, 1)
@@ -865,9 +822,7 @@ def save_station_offset(ref_summary, summary, offset, error):
         field['offset'] = None
         field['error'] = None
 
-    StationTimingOffset.objects.update_or_create(source=summary,
-                                                 ref_source=ref_summary,
-                                                 defaults=field)
+    StationTimingOffset.objects.update_or_create(source=summary, ref_source=ref_summary, defaults=field)
     logger.debug("Saved succesfully")
 
 
