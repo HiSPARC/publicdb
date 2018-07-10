@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 
 from sapphire import CoincidenceQuery, gps_to_datetime
 
-from ..api.datastore import split_ext_timestamp, get_event_traces
+from ..api.datastore import get_event_traces, split_ext_timestamp
 from ..coincidences.models import Coincidence, Event
 from ..histograms.esd import get_esd_data_path
 from ..inforecords.models import Station
