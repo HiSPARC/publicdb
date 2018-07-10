@@ -107,7 +107,6 @@ do::
 
 To generate the histograms for the downloaded data::
 
-    $ cd publicdb
     $ ./manage.py updatehistograms
 
 If you have access to a `publicdb_dump.sql` file to fill the database with,

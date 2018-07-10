@@ -13,10 +13,10 @@ alias envpub='source activate {{ publicdb_venv }}'
 alias cdpub='cd /srv/publicdb/www'
 alias cdjsp='cd {{ jsparc_path }}'
 # Collect static files, and reload uwsgi
-alias collectreload='envpub && cdpub && cd publicdb && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
+alias collectreload='envpub && cdpub && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
 # Perform the daily hisparc-update task
-alias uphis='envpub && cdpub && cd publicdb && ./manage.py updatehistograms'
+alias uphis='envpub && cdpub && ./manage.py updatehistograms'
 
 # Update publicdb to latest master
 alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && collectreload'

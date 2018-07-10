@@ -8,7 +8,7 @@ devinstall:
 test: coveragetests flaketest doctest ansibletest
 
 unittests:
-	coverage run ./publicdb/manage.py test tests
+	coverage run ./manage.py test tests
 
 coveragetests: unittests
 	coverage report
