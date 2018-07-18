@@ -45,7 +45,7 @@ class AnalysisSession(models.Model):
 
 
 class Student(models.Model):
-    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
