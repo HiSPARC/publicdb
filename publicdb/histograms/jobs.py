@@ -373,7 +373,7 @@ def perform_events_tasks(summary):
     update_detector_timing_offsets(summary)
     tmp_locations = []
     try:
-        layout = summary.station.stationlayout_set.filter(active_date__lte=summary.date).latest()
+        layout = summary.station.layouts.filter(active_date__lte=summary.date).latest()
     except StationLayout.DoesNotExist:
         logger.debug("No station layout available for %s", summary)
     else:

@@ -57,9 +57,9 @@ class Student(models.Model):
 
 
 class AnalyzedCoincidence(models.Model):
-    session = models.ForeignKey(AnalysisSession, models.CASCADE)
-    coincidence = models.ForeignKey(Coincidence, models.CASCADE)
-    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='analyzed_coincidences')
+    coincidence = models.ForeignKey(Coincidence, models.CASCADE, related_name='analyzed_coincidences')
+    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True, related_name='analyzed_coincidences')
     is_analyzed = models.BooleanField(default=False)
     core_position_x = models.FloatField(null=True, blank=True)
     core_position_y = models.FloatField(null=True, blank=True)
@@ -82,7 +82,7 @@ class SessionRequest(models.Model):
     sur_name = models.CharField(max_length=50)
     email = models.EmailField()
     school = models.CharField(max_length=50)
-    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE)
+    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE, related_name='session_requests')
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
     start_date = models.DateField()
@@ -139,7 +139,7 @@ class SessionRequest(models.Model):
         Then return the number of found coincidences.
 
         """
-        stations = Station.objects.filter(cluster=self.cluster, pc__is_test=False).distinct().values_list('number')
+        stations = Station.objects.filter(cluster=self.cluster, pcs__is_test=False).distinct().values_list('number')
         path = get_esd_data_path(date)
 
         if not os.path.isfile(path):

@@ -55,7 +55,7 @@ def create_nagios_config(request):
                                            'station__contact')):
 
         services = []
-        services_to_check = (host.enabledservice_set.all()
+        services_to_check = (host.enabled_services.all()
                                  .select_related('monitor_service'))
         for service in services_to_check:
             check_command = service.monitor_service.nagios_command

@@ -65,7 +65,7 @@ class SummaryQuerySet(models.QuerySet):
 
 
 class Summary(models.Model):
-    station = models.ForeignKey('inforecords.Station', models.CASCADE)
+    station = models.ForeignKey('inforecords.Station', models.CASCADE, related_name='summaries')
     date = models.DateField()
     num_events = models.IntegerField(blank=True, null=True)
     num_config = models.IntegerField(blank=True, null=True)
@@ -101,7 +101,7 @@ class Summary(models.Model):
 
 
 class Configuration(models.Model):
-    source = models.ForeignKey(Summary, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='configurations')
     timestamp = models.DateTimeField()
     gps_latitude = models.FloatField()
     gps_longitude = models.FloatField()
@@ -294,8 +294,8 @@ class DatasetType(models.Model):
 
 
 class NetworkHistogram(models.Model):
-    source = models.ForeignKey(NetworkSummary, models.CASCADE)
-    type = models.ForeignKey(HistogramType, models.CASCADE)
+    source = models.ForeignKey(NetworkSummary, models.CASCADE, related_name='network_histograms')
+    type = models.ForeignKey(HistogramType, models.CASCADE, related_name='network_histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
@@ -337,29 +337,29 @@ class BaseDailyStationDataMixin(models.Model):
 
 
 class DailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE)
-    type = models.ForeignKey(HistogramType, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='histograms')
+    type = models.ForeignKey(HistogramType, models.CASCADE, related_name='histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
 
 class MultiDailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE)
-    type = models.ForeignKey(HistogramType, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='multi_histograms')
+    type = models.ForeignKey(HistogramType, models.CASCADE, related_name='multi_histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(ArrayField(models.PositiveIntegerField()), size=4)
 
 
 class DailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE)
-    type = models.ForeignKey(DatasetType, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='datasets')
+    type = models.ForeignKey(DatasetType, models.CASCADE, related_name='datasets')
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(models.FloatField())
 
 
 class MultiDailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE)
-    type = models.ForeignKey(DatasetType, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='multi_datasets')
+    type = models.ForeignKey(DatasetType, models.CASCADE, related_name='multi_datasets')
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(ArrayField(models.FloatField()), size=4)
 
@@ -377,7 +377,7 @@ class PulseheightFit(models.Model):
                         (3, 'Scintillator 3'),
                         (4, 'Scintillator 4'))
 
-    source = models.ForeignKey(Summary, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='pulseheight_fits')
     plate = models.IntegerField(choices=DETECTOR_CHOICES)
 
     initial_mpv = models.FloatField()
@@ -415,7 +415,7 @@ class PulseheightFit(models.Model):
 
 
 class DetectorTimingOffset(models.Model):
-    source = models.ForeignKey(Summary, models.CASCADE)
+    source = models.ForeignKey(Summary, models.CASCADE, related_name='detector_timing_offsets')
     offset_1 = models.FloatField(blank=True, null=True)
     offset_2 = models.FloatField(blank=True, null=True)
     offset_3 = models.FloatField(blank=True, null=True)

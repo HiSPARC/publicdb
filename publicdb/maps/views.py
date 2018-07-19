@@ -24,7 +24,7 @@ def station_on_map(request, station_number):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_test=False)
+                                               pcs__is_test=False)
                                        .distinct()):
             link = station in data_stations
             status = get_station_status(station.number, down, problem, up)
@@ -79,7 +79,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in (Station.objects.select_related('cluster__parent',
                                                        'cluster__country')
                                        .filter(cluster=subcluster,
-                                               pc__is_test=False)
+                                               pcs__is_test=False)
                                        .distinct()):
             link = station in data_stations
             status = get_station_status(station.number, down, problem, up)

@@ -167,29 +167,29 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
              station that has measured weather data in the given year.
 
     """
-    filters = {'pc__is_test': False}
+    filters = {'pcs__is_test': False}
 
     if type == 'events':
-        filters['summary__num_events__isnull'] = False
+        filters['summaries__num_events__isnull'] = False
     elif type == 'weather':
-        filters['summary__num_weather__isnull'] = False
+        filters['summaries__num_weather__isnull'] = False
     else:
         return HttpResponseNotFound()
 
     if not year:
         date = datetime.date.today()
-        filters['summary__date__gte'] = FIRSTDATE
-        filters['summary__date__lte'] = date
+        filters['summaries__date__gte'] = FIRSTDATE
+        filters['summaries__date__lte'] = date
     elif not month:
         date = datetime.date(int(year), 1, 1)
-        filters['summary__date__year'] = date.year
+        filters['summaries__date__year'] = date.year
     elif not day:
         date = datetime.date(int(year), int(month), 1)
-        filters['summary__date__year'] = date.year
-        filters['summary__date__month'] = date.month
+        filters['summaries__date__year'] = date.year
+        filters['summaries__date__month'] = date.month
     else:
         date = datetime.date(int(year), int(month), int(day))
-        filters['summary__date'] = date
+        filters['summaries__date'] = date
 
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -271,7 +271,7 @@ def get_station_dict(subcluster=None):
     For all non-test stations in the given subcluster
 
     """
-    stations = Station.objects.filter(pc__is_test=False, summary__num_config__isnull=False)
+    stations = Station.objects.filter(pcs__is_test=False, summaries__num_config__isnull=False)
     if subcluster:
         stations = stations.filter(cluster=subcluster)
     return list(stations.distinct().values('number', 'name'))

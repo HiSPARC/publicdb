@@ -88,7 +88,7 @@ def pc_name_to_station_number(shortnames):
     :return: station numbers that have a pc with name in the shortnames.
 
     """
-    stations = set(Station.objects.filter(pc__name__in=shortnames)
+    stations = set(Station.objects.filter(pcs__name__in=shortnames)
                                   .values_list('number', flat=True))
     return stations
 

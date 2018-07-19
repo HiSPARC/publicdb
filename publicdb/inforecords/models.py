@@ -85,7 +85,7 @@ class ContactInformation(models.Model):
 
 
 class Contact(models.Model):
-    profession = models.ForeignKey(Profession, models.CASCADE)
+    profession = models.ForeignKey(Profession, models.CASCADE, related_name='contacts')
     title = models.CharField(max_length=20, blank=True)
     first_name = models.CharField(max_length=40)
     prefix_surname = models.CharField(max_length=10, blank=True)
@@ -329,8 +329,8 @@ class PcType(models.Model):
 
 
 class Pc(models.Model):
-    station = models.ForeignKey(Station, models.CASCADE)
-    type = models.ForeignKey(PcType, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='pcs')
+    type = models.ForeignKey(PcType, models.CASCADE, related_name='pcs')
     name = models.CharField(max_length=40, unique=True)
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
@@ -423,7 +423,7 @@ class Pc(models.Model):
 
 
 class MonitorPulseheightThresholds(models.Model):
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='pulsehieght_thresholds')
     plate = models.IntegerField()
 
     mpv_mean = models.FloatField()
@@ -467,8 +467,8 @@ class MonitorService(models.Model):
 
 
 class EnabledService(models.Model):
-    pc = models.ForeignKey(Pc, models.CASCADE)
-    monitor_service = models.ForeignKey(MonitorService, models.CASCADE)
+    pc = models.ForeignKey(Pc, models.CASCADE, related_name='enabled_services')
+    monitor_service = models.ForeignKey(MonitorService, models.CASCADE, related_name='enabled_services')
     min_critical = models.FloatField(null=True, blank=True)
     max_critical = models.FloatField(null=True, blank=True)
     min_warning = models.FloatField(null=True, blank=True)

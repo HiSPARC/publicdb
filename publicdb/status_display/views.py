@@ -46,7 +46,7 @@ def stations_by_country(request):
     test_stations = []
 
     for station in (Station.objects
-                           .exclude(pc__type__slug='admin')
+                           .exclude(pcs__type__slug='admin')
                            .select_related('cluster__country', 'cluster__parent')):
         link = station in data_stations
         status = station_status.get_status(station.number)
@@ -63,7 +63,7 @@ def stations_by_country(request):
             cluster = station.cluster.name
         subcluster = station.cluster.name
 
-        if len(station.pc_set.filter(is_test=True)):
+        if len(station.pcs.filter(is_test=True)):
             test_stations.append(station_info)
             continue
         if country not in countries:
@@ -88,7 +88,7 @@ def stations_by_number(request):
 
     data_stations = stations_with_data()
     stations = []
-    for station in Station.objects.exclude(pc__type__slug='admin'):
+    for station in Station.objects.exclude(pcs__type__slug='admin'):
         link = station in data_stations
         status = station_status.get_status(station.number)
 
@@ -131,7 +131,7 @@ def stations_by_name(request):
 
     data_stations = stations_with_data()
     stations = []
-    for station in Station.objects.exclude(pc__type__slug='admin'):
+    for station in Station.objects.exclude(pcs__type__slug='admin'):
         link = station in data_stations
         status = station_status.get_status(station.number)
 
@@ -182,7 +182,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         stations = []
         for station in (Station.objects
                                .select_related('cluster__parent', 'cluster__country')
-                               .filter(cluster=subcluster, pc__is_test=False)
+                               .filter(cluster=subcluster, pcs__is_test=False)
                                .distinct()):
             link = station in data_stations
             status = station_status.get_status(station.number)
@@ -247,12 +247,12 @@ def network_coincidences(request, year=None, month=None, day=None):
         next = None
 
     n_stations = (Station.objects
-                         .filter(summary__date=date, summary__num_events__isnull=False, pc__is_test=False)
+                         .filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
                          .distinct()
                          .count())
     histograms = (DailyHistogram.objects
                                 .filter(source__date=date,
-                                        source__station__pc__is_test=False,
+                                        source__station__pcs__is_test=False,
                                         type__slug='eventtime')
                                 .distinct())
     number_of_events = sum(sum(histogram.values) for histogram in histograms)
@@ -559,8 +559,7 @@ def station_latest(request, station_number):
     extra_station = None
     if barometerdata is None:
         try:
-            sum_weather = Summary.objects.filter(num_weather__isnull=False,
-                                                 date=summary.date)
+            sum_weather = Summary.objects.filter(num_weather__isnull=False, date=summary.date)
             weather_stations = [s[0] for s in sum_weather.values_list('station__number')]
             closest_station = min(weather_stations, key=lambda x: abs(x - station_number))
             summary_weather = sum_weather.get(station__number=closest_station)
@@ -1224,10 +1223,10 @@ def stations_with_data():
 
     """
     stations = (Station.objects
-                       .filter(Q(summary__num_events__isnull=False) |
-                               Q(summary__num_weather__isnull=False),
-                               summary__date__gte=FIRSTDATE,
-                               summary__date__lte=datetime.date.today())
+                       .filter(Q(summaries__num_events__isnull=False) |
+                               Q(summaries__num_weather__isnull=False),
+                               summaries__date__gte=FIRSTDATE,
+                               summaries__date__lte=datetime.date.today())
                        .distinct())
 
     return stations

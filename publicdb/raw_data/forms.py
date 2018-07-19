@@ -21,15 +21,15 @@ FILTER = [('network', 'Network'),
 class DataDownloadForm(forms.Form):
     data_type = forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect())
     station_events = forms.ModelChoiceField(
-        Station.objects.filter(summary__num_events__isnull=False).distinct(),
+        Station.objects.filter(summaries__num_events__isnull=False).distinct(),
         empty_label='---------', required=False)
     station_weather = forms.ModelChoiceField(
-        Station.objects.filter(summary__num_weather__isnull=False).distinct(),
+        Station.objects.filter(summaries__num_weather__isnull=False).distinct(),
         empty_label='---------', required=False)
     lightning_type = forms.ChoiceField(choices=LGT_TYPES, initial=4,
                                        required=False)
     station_singles = forms.ModelChoiceField(
-        Station.objects.filter(summary__num_singles__isnull=False).distinct(),
+        Station.objects.filter(summaries__num_singles__isnull=False).distinct(),
         empty_label='---------', required=False)
     start = forms.DateTimeField(help_text="e.g. '2013-5-17', or "
                                           "'2013-5-17 12:45'")

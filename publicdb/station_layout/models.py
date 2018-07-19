@@ -11,7 +11,7 @@ from ..inforecords.models import Station
 
 
 class StationLayout(models.Model):
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='layouts')
     active_date = models.DateTimeField()
     detector_1_radius = models.FloatField()
     detector_1_alpha = models.FloatField()
@@ -73,7 +73,7 @@ class StationLayoutQuarantine(models.Model):
     hash_submit = models.CharField(max_length=32)
     hash_review = models.CharField(max_length=32)
 
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='quarantined_layouts')
     active_date = models.DateTimeField()
     detector_1_radius = models.FloatField()
     detector_1_alpha = models.FloatField()

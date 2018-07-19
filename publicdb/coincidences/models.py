@@ -38,7 +38,7 @@ class Event(models.Model):
     time = models.TimeField()
     nanoseconds = models.IntegerField()
     coincidence = models.ForeignKey(Coincidence, models.CASCADE, related_name='events')
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='events')
     pulseheights = ArrayField(models.IntegerField(), size=4)
     integrals = ArrayField(models.IntegerField(), size=4)
     traces = ArrayField(ArrayField(models.IntegerField()), size=4)
