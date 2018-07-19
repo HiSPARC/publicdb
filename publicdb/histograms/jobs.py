@@ -705,9 +705,9 @@ def update_config(summary):
         return summary.num_config
 
     for config in configs[summary.num_config:]:
-        new_config = Configuration(source=summary)
+        new_config = Configuration(summary=summary)
         for var in vars(new_config):
-            if var in ['source', 'id', 'source_id'] or var[0] == '_':
+            if var in ['summary', 'id', 'summary_id'] or var[0] == '_':
                 pass
             elif var in ['mas_version', 'slv_version']:
                 vars(new_config)[var] = blobs[config[var]]
@@ -746,9 +746,9 @@ def save_histograms(summary, slug, bins, values):
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
     if not type.has_multiple_datasets:
-        DailyHistogram.objects.update_or_create(source=summary, type=type, defaults=histogram)
+        DailyHistogram.objects.update_or_create(summary=summary, type=type, defaults=histogram)
     else:
-        MultiDailyHistogram.objects.update_or_create(source=summary, type=type, defaults=histogram)
+        MultiDailyHistogram.objects.update_or_create(summary=summary, type=type, defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -757,7 +757,7 @@ def save_network_histograms(network_summary, slug, bins, values):
     logger.debug("Saving histogram %s for %s", slug, network_summary)
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
-    NetworkHistogram.objects.update_or_create(source=network_summary, type=type, defaults=histogram)
+    NetworkHistogram.objects.update_or_create(network_summary=network_summary, type=type, defaults=histogram)
     logger.debug("Saved succesfully")
 
 
@@ -767,9 +767,9 @@ def save_dataset(summary, slug, x, y):
     type = DatasetType.objects.get(slug=slug)
     dataset = {'x': x, 'y': y}
     if slug in ['barometer', 'temperature']:
-        DailyDataset.objects.update_or_create(source=summary, type=type, defaults=dataset)
+        DailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
     else:
-        MultiDailyDataset.objects.update_or_create(source=summary, type=type, defaults=dataset)
+        MultiDailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
     logger.debug("Saved succesfully")
 
 
@@ -782,7 +782,7 @@ def save_pulseheight_fits(summary, fits):
         try:
             fit.save()
         except django.db.IntegrityError:
-            existing_fit = PulseheightFit.objects.get(source=summary, plate=fit.plate)
+            existing_fit = PulseheightFit.objects.get(summary=summary, plate=fit.plate)
             fit.id = existing_fit.id
             fit.save()
 
@@ -800,7 +800,7 @@ def save_offsets(summary, offsets):
     logger.debug("Saving detector timing offsets for %s", summary)
     off = {'offset_%d' % i: round_in_base(o, 0.25) if not np.isnan(o) else None
            for i, o in enumerate(offsets, 1)}
-    DetectorTimingOffset.objects.update_or_create(source=summary, defaults=off)
+    DetectorTimingOffset.objects.update_or_create(summary=summary, defaults=off)
     logger.debug("Saved succesfully")
 
 
@@ -822,7 +822,7 @@ def save_station_offset(ref_summary, summary, offset, error):
         field['offset'] = None
         field['error'] = None
 
-    StationTimingOffset.objects.update_or_create(source=summary, ref_source=ref_summary, defaults=field)
+    StationTimingOffset.objects.update_or_create(summary=summary, ref_summary=ref_summary, defaults=field)
     logger.debug("Saved succesfully")
 
 

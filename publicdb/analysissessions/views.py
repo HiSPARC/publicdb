@@ -74,7 +74,7 @@ def get_events(analyzed_coincidence):
     for event in analyzed_coincidence.coincidence.events.all():
         try:
             config = (Configuration.objects
-                                   .filter(source__station=event.station, source__date__lte=event.date)
+                                   .filter(summary__station=event.station, summary__date__lte=event.date)
                                    .exclude(gps_latitude=0, gps_longitude=0).latest())
         except Configuration.DoesNotExist:
             continue

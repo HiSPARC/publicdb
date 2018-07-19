@@ -251,8 +251,8 @@ def network_coincidences(request, year=None, month=None, day=None):
                          .distinct()
                          .count())
     histograms = (DailyHistogram.objects
-                                .filter(source__date=date,
-                                        source__station__pcs__is_test=False,
+                                .filter(summary__date=date,
+                                        summary__station__pcs__is_test=False,
                                         type__slug='eventtime')
                                 .distinct())
     number_of_events = sum(sum(histogram.values) for histogram in histograms)
@@ -312,11 +312,11 @@ class SummaryDetailView(DateDetailView):
 
         # Get most recent configuration
         try:
-            source = (Summary.objects
+            summary = (Summary.objects
                              .with_config()
                              .filter(station=station, date__lte=date)
                              .latest())
-            config = Configuration.objects.filter(source=source).latest()
+            config = Configuration.objects.filter(summary=summary).latest()
             if config.slave == -1:
                 has_slave = False
             else:
@@ -476,7 +476,7 @@ def station_config(request, station_number):
 
     station = get_object_or_404(Station, number=station_number)
     configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
-                              source__station=station,
+                              summary__station=station,
                               timestamp__gte=FIRSTDATE,
                               timestamp__lte=today)
 
@@ -706,9 +706,9 @@ def get_eventtime_source(request, station_number, start=None, end=None):
 
 def get_eventtime_histogram_sources(station_number, start, end):
     histograms = get_list_or_404(
-        DailyHistogram.objects.select_related('source'),
-        source__station__number=station_number,
-        source__date__gte=start, source__date__lt=end,
+        DailyHistogram.objects.select_related('summary'),
+        summary__station__number=station_number,
+        summary__date__gte=start, summary__date__lt=end,
         type__slug='eventtime')
     bins = []
     values = []
@@ -718,7 +718,7 @@ def get_eventtime_histogram_sources(station_number, start, end):
     for date in daterange(start, end):
         ts = clock.datetime_to_gps(date)
         bins.extend(ts + hours)
-        if histograms[i].source.date == date:
+        if histograms[i].summary.date == date:
             values.extend(histograms[i].values)
             i += 1
             if i == len(histograms):
@@ -894,7 +894,7 @@ def get_histogram_source(year, month, day, type, station_number=None):
         raise Http404
 
     if station_number is None:
-        histogram = get_object_or_404(NetworkHistogram, source__date=date, type__slug=type)
+        histogram = get_object_or_404(NetworkHistogram, network_summary__date=date, type__slug=type)
     else:
         station_number = int(station_number)
         if type in ['eventtime', 'zenith', 'azimuth']:
@@ -903,8 +903,8 @@ def get_histogram_source(year, month, day, type, station_number=None):
             histogram_model = MultiDailyHistogram
 
         histogram = get_object_or_404(histogram_model,
-                                      source__station__number=station_number,
-                                      source__date=date,
+                                      summary__station__number=station_number,
+                                      summary__date=date,
                                       type__slug=type)
 
     if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime',
@@ -935,8 +935,8 @@ def get_dataset_source(year, month, day, type, station_number):
         dataset_model = MultiDailyDataset
 
     dataset = get_object_or_404(dataset_model,
-                                source__station__number=int(station_number),
-                                source__date=date,
+                                summary__station__number=int(station_number),
+                                summary__date=date,
                                 type__slug=type)
 
     if type in ['barometer', 'temperature']:
@@ -972,7 +972,7 @@ def get_config_source(station_number, type):
         return None
 
     configs = (Configuration.objects
-                            .filter(source__station__number=station_number,
+                            .filter(summary__station__number=station_number,
                                     timestamp__gte=FIRSTDATE,
                                     timestamp__lte=datetime.date.today())
                             .order_by('timestamp'))
@@ -992,11 +992,11 @@ def get_config_source(station_number, type):
 def create_histogram_network(type, date):
     """Create a histogram object"""
 
-    source = get_object_or_404(NetworkSummary, date=date)
+    network_summary = get_object_or_404(NetworkSummary, date=date)
     type = HistogramType.objects.get(slug=type)
 
     try:
-        histogram = NetworkHistogram.objects.get(source=source, type=type)
+        histogram = NetworkHistogram.objects.get(network_summary=network_summary, type=type)
     except NetworkHistogram.DoesNotExist:
         return None
 
@@ -1014,9 +1014,9 @@ def create_histogram(summary, type):
 
     try:
         if not type.has_multiple_datasets:
-            histogram = DailyHistogram.objects.get(source=summary, type=type)
+            histogram = DailyHistogram.objects.get(summary=summary, type=type)
         else:
-            histogram = MultiDailyHistogram.objects.get(source=summary, type=type)
+            histogram = MultiDailyHistogram.objects.get(summary=summary, type=type)
     except (DailyHistogram.DoesNotExist, MultiDailyHistogram.DoesNotExist):
         return None
 
@@ -1034,9 +1034,9 @@ def plot_dataset(summary, type):
 
     try:
         if type.slug in ['barometer', 'temperature']:
-            dataset = DailyDataset.objects.get(source=summary, type=type)
+            dataset = DailyDataset.objects.get(summary=summary, type=type)
         else:
-            dataset = MultiDailyDataset.objects.get(source=summary, type=type)
+            dataset = MultiDailyDataset.objects.get(summary=summary, type=type)
     except (DailyDataset.DoesNotExist, MultiDailyDataset.DoesNotExist):
         return None
 
@@ -1095,11 +1095,11 @@ def plot_timing_offsets(station_number):
 
 def get_detector_timing_offsets(station_number):
     offsets = DetectorTimingOffset.objects.filter(
-        source__station__number=station_number,
-        source__date__gte=FIRSTDATE,
-        source__date__lte=datetime.date.today())
+        summary__station__number=station_number,
+        summary__date__gte=FIRSTDATE,
+        summary__date__lte=datetime.date.today())
 
-    data = offsets.values_list('source__date', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
+    data = offsets.values_list('summary__date', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
     return data
 
 
@@ -1111,12 +1111,12 @@ def get_station_timing_offsets(ref_station_number, station_number):
 
     """
     offsets = StationTimingOffset.objects.filter(
-        ref_source__station__number=ref_station_number,
-        source__station__number=station_number,
-        source__date__gte=FIRSTDATE,
-        source__date__lte=datetime.date.today())
+        ref_summary__station__number=ref_station_number,
+        summary__station__number=station_number,
+        summary__date__gte=FIRSTDATE,
+        summary__date__lte=datetime.date.today())
 
-    data = offsets.values_list('source__date', 'offset', 'error')
+    data = offsets.values_list('summary__date', 'offset', 'error')
     return data
 
 

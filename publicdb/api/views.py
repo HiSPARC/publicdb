@@ -347,7 +347,7 @@ def get_pulseheight_drift(request, station_number, plate_number, year, month, da
         start = requested_date - datetime.timedelta(days=number_of_days - 1)
         date_range = (start, requested_date)
         summaries = Summary.objects.filter(station=station, date__range=date_range)
-        fits = PulseheightFit.objects.filter(source__in=summaries,
+        fits = PulseheightFit.objects.filter(summary__in=summaries,
                                              plate=plate_number,
                                              chi_square_reduced__gt=0.01,
                                              chi_square_reduced__lt=8.0,
@@ -367,7 +367,7 @@ def get_pulseheight_drift(request, station_number, plate_number, year, month, da
     try:
         # Fit drift
 
-        t_array = numpy.float_([int(fit.source.date.strftime("%s")) for fit in fits])
+        t_array = numpy.float_([int(fit.summary.date.strftime("%s")) for fit in fits])
         mpv_array = numpy.float_([fit.fitted_mpv for fit in fits])
 
         # Determine the drift by a linear fit
@@ -464,8 +464,8 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
 
     try:
         fit = PulseheightFit.objects.get(
-            source__station__number=station_number,
-            source__date=requested_date,
+            summary__station__number=station_number,
+            summary__date=requested_date,
             plate=plate_number)
     except Exception, e:
         result.update({"nagios": Nagios.unknown,
@@ -474,7 +474,7 @@ def get_pulseheight_fit(request, station_number, plate_number, year=None, month=
         return json_dict(result)
 
     try:
-        result.update({"entries": fit.source.num_events,
+        result.update({"entries": fit.summary.num_events,
                        "initial_mpv": fit.initial_mpv,
                        "initial_width": fit.initial_width,
                        "fitted_mpv": fit.fitted_mpv,
@@ -618,8 +618,8 @@ def config(request, station_number, year=None, month=None, day=None):
         date = datetime.date.today()
 
     try:
-        source = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
-        c = Configuration.objects.filter(source=source).latest()
+        summary = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
+        c = Configuration.objects.filter(summary=summary).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
@@ -653,32 +653,32 @@ def num_events(request, station_number, year=None, month=None, day=None, hour=No
         return HttpResponseNotFound()
 
     histogram_type = HistogramType.objects.get(slug='eventtime')
-    filters = {'type': histogram_type, 'source__station': station}
+    filters = {'type': histogram_type, 'summary__station': station}
 
     if not year:
         # All events
         date = datetime.date.today()
-        filters['source__date__gte'] = FIRSTDATE
-        filters['source__date__lt'] = date
+        filters['summary__date__gte'] = FIRSTDATE
+        filters['summary__date__lt'] = date
     elif not month:
         # Events in specific year
         date = datetime.date(int(year), 1, 1)
-        filters['source__date__year'] = date.year
+        filters['summary__date__year'] = date.year
     elif not day:
         # Events in specific month
         try:
             date = datetime.date(int(year), int(month), 1)
         except ValueError:
             return HttpResponseNotFound()
-        filters['source__date__year'] = date.year
-        filters['source__date__month'] = date.month
+        filters['summary__date__year'] = date.year
+        filters['summary__date__month'] = date.month
     elif not hour:
         # Events on specific day
         try:
             date = datetime.date(int(year), int(month), int(day))
         except ValueError:
             return HttpResponseNotFound()
-        filters['source__date'] = date
+        filters['summary__date'] = date
     else:
         if not 0 <= int(hour) <= 23:
             return HttpResponseNotFound()
@@ -687,7 +687,7 @@ def num_events(request, station_number, year=None, month=None, day=None, hour=No
         except ValueError:
             return HttpResponseNotFound()
         try:
-            histogram_values = DailyHistogram.objects.get(source__date=date, **filters).values
+            histogram_values = DailyHistogram.objects.get(summary__date=date, **filters).values
             num_events = histogram_values[int(hour)]
         except DailyHistogram.DoesNotExist:
             num_events = 0

@@ -101,7 +101,7 @@ class Summary(models.Model):
 
 
 class Configuration(models.Model):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='configurations')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='configurations')
     timestamp = models.DateTimeField()
     gps_latitude = models.FloatField()
     gps_longitude = models.FloatField()
@@ -190,17 +190,17 @@ class Configuration(models.Model):
     slv_ch2_comp_offset = models.FloatField()
 
     def __unicode__(self):
-        return "%d - %s" % (self.source.station.number, self.timestamp)
+        return "%d - %s" % (self.summary.station.number, self.timestamp)
 
     class Meta:
         verbose_name = 'Configuration'
         verbose_name_plural = 'Configurations'
         get_latest_by = 'timestamp'
-        ordering = ['source']
+        ordering = ['summary']
 
     def station(self):
-        return self.source.station.number
-    station.admin_order_field = 'source__station__number'
+        return self.summary.station.number
+    station.admin_order_field = 'summary__station__number'
 
     def _master(self):
         return self.extract_hardware_serial(self.mas_version)
@@ -294,71 +294,71 @@ class DatasetType(models.Model):
 
 
 class NetworkHistogram(models.Model):
-    source = models.ForeignKey(NetworkSummary, models.CASCADE, related_name='network_histograms')
+    network_summary = models.ForeignKey(NetworkSummary, models.CASCADE, related_name='network_histograms')
     type = models.ForeignKey(HistogramType, models.CASCADE, related_name='network_histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
     def get_absolute_url(self):
-        kwargs = {'year': self.source.date.year,
-                  'month': self.source.date.month,
-                  'day': self.source.date.day}
+        kwargs = {'year': self.network_summary.date.year,
+                  'month': self.network_summary.date.month,
+                  'day': self.network_summary.date.day}
         return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
     def __unicode__(self):
-        return '%s - %s' % (self.source.date.strftime('%d %b %Y'), self.type)
+        return '%s - %s' % (self.network_summary.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
         verbose_name = 'Network histogram'
         verbose_name_plural = 'Network histograms'
-        unique_together = ('source', 'type')
-        ordering = ['source', 'type']
+        unique_together = ('network_summary', 'type')
+        ordering = ['network_summary', 'type']
 
 
 class BaseDailyStationDataMixin(models.Model):
     """Base class for daily station data models"""
 
     def get_absolute_url(self):
-        kwargs = {'station_number': self.source.station.number,
-                  'year': self.source.date.year,
-                  'month': self.source.date.month,
-                  'day': self.source.date.day}
+        kwargs = {'station_number': self.summary.station.number,
+                  'year': self.summary.date.year,
+                  'month': self.summary.date.month,
+                  'day': self.summary.date.day}
         return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
 
     def __unicode__(self):
-        return "%d - %s - %s" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
+        return "%d - %s - %s" % (self.summary.station.number,
+                                 self.summary.date.strftime('%d %b %Y'),
                                  self.type)
 
     class Meta:
         abstract = True
-        unique_together = ('source', 'type')
-        ordering = ['source', 'type']
+        unique_together = ('summary', 'type')
+        ordering = ['summary', 'type']
 
 
 class DailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='histograms')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='histograms')
     type = models.ForeignKey(HistogramType, models.CASCADE, related_name='histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
 
 class MultiDailyHistogram(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='multi_histograms')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='multi_histograms')
     type = models.ForeignKey(HistogramType, models.CASCADE, related_name='multi_histograms')
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(ArrayField(models.PositiveIntegerField()), size=4)
 
 
 class DailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='datasets')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='datasets')
     type = models.ForeignKey(DatasetType, models.CASCADE, related_name='datasets')
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(models.FloatField())
 
 
 class MultiDailyDataset(BaseDailyStationDataMixin):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='multi_datasets')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='multi_datasets')
     type = models.ForeignKey(DatasetType, models.CASCADE, related_name='multi_datasets')
     x = ArrayField(models.PositiveIntegerField())
     y = ArrayField(ArrayField(models.FloatField()), size=4)
@@ -377,7 +377,7 @@ class PulseheightFit(models.Model):
                         (3, 'Scintillator 3'),
                         (4, 'Scintillator 4'))
 
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='pulseheight_fits')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='pulseheight_fits')
     plate = models.IntegerField(choices=DETECTOR_CHOICES)
 
     initial_mpv = models.FloatField()
@@ -395,27 +395,27 @@ class PulseheightFit(models.Model):
     error_message = models.TextField(default="")
 
     def station(self):
-        return self.source.station.number
-    station.admin_order_field = 'source__station__number'
+        return self.summary.station.number
+    station.admin_order_field = 'summary__station__number'
 
     def date(self):
-        return self.source.date
-    date.admin_order_field = 'source__date'
+        return self.summary.date
+    date.admin_order_field = 'summary__date'
 
     def __unicode__(self):
-        return "%d - %s - %d" % (self.source.station.number,
-                                 self.source.date.strftime('%d %b %Y'),
+        return "%d - %s - %d" % (self.summary.station.number,
+                                 self.summary.date.strftime('%d %b %Y'),
                                  self.plate)
 
     class Meta:
         verbose_name = 'Pulseheight fit'
         verbose_name_plural = 'Pulseheight fits'
-        unique_together = ('source', 'plate')
-        ordering = ['source', 'plate']
+        unique_together = ('summary', 'plate')
+        ordering = ['summary', 'plate']
 
 
 class DetectorTimingOffset(models.Model):
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='detector_timing_offsets')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='detector_timing_offsets')
     offset_1 = models.FloatField(blank=True, null=True)
     offset_2 = models.FloatField(blank=True, null=True)
     offset_3 = models.FloatField(blank=True, null=True)
@@ -424,23 +424,23 @@ class DetectorTimingOffset(models.Model):
     class Meta:
         verbose_name = 'Detector timing offset'
         verbose_name_plural = 'Detector timing offsets'
-        ordering = ['source']
+        ordering = ['summary']
 
 
 class StationTimingOffset(models.Model):
-    ref_source = models.ForeignKey(Summary, models.CASCADE, related_name='ref_station_offsets')
-    source = models.ForeignKey(Summary, models.CASCADE, related_name='station_offsets')
+    ref_summary = models.ForeignKey(Summary, models.CASCADE, related_name='ref_station_offsets')
+    summary = models.ForeignKey(Summary, models.CASCADE, related_name='station_offsets')
     offset = models.FloatField(blank=True, null=True)
     error = models.FloatField(blank=True, null=True)
 
     def clean(self):
-        if self.ref_source.station == self.source.station:
+        if self.ref_summary.station == self.summary.station:
             raise ValidationError("The stations may not be the same")
-        if self.ref_source.date != self.source.date:
+        if self.ref_summary.date != self.summary.date:
             raise ValidationError("The summary dates should be the same")
 
     class Meta:
         verbose_name = 'Station timing offset'
         verbose_name_plural = 'Station timing offsets'
-        unique_together = ('ref_source', 'source')
-        ordering = ['ref_source']
+        unique_together = ('ref_summary', 'summary')
+        ordering = ['ref_summary']

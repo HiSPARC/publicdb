@@ -18,8 +18,8 @@ class TestViews(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
-        self.data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug='eventtime')
-        self.config = histograms_factories.ConfigurationFactory(source=self.summary)
+        self.data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug='eventtime')
+        self.config = histograms_factories.ConfigurationFactory(summary=self.summary)
         super(TestViews, self).setUp()
 
     def get_html(self, url):
@@ -101,7 +101,7 @@ class TestSourceViews(TestCase):
 
     def test_network_histograms(self):
         for network_histogram_type in ['coincidencetime', 'coincidencenumber']:
-            data = histograms_factories.NetworkHistogramFactory(source=self.network_summary, type__slug=network_histogram_type)
+            data = histograms_factories.NetworkHistogramFactory(network_summary=self.network_summary, type__slug=network_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
@@ -111,7 +111,7 @@ class TestSourceViews(TestCase):
 
     def test_daily_histograms(self):
         for daily_histogram_type in ['eventtime', 'zenith', 'azimuth']:
-            data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
+            data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
@@ -121,7 +121,7 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
         for daily_histogram_type in ['pulseheight', 'pulseintegral', 'singleslow', 'singleshigh']:
-            data = histograms_factories.MultiDailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
+            data = histograms_factories.MultiDailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, *data.values),
@@ -136,7 +136,7 @@ class TestSourceViews(TestCase):
 
     def test_daily_datasets(self):
         for daily_dataset_type in ['barometer', 'temperature']:
-            data = histograms_factories.DailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
+            data = histograms_factories.DailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, data.y),
@@ -146,7 +146,7 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
         for daily_dataset_type in ['singlesratelow', 'singlesratehigh']:
-            data = histograms_factories.MultiDailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
+            data = histograms_factories.MultiDailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, *data.y),
@@ -157,7 +157,7 @@ class TestSourceViews(TestCase):
 
     def test_configs(self):
         kwargs = {'station_number': self.station.number}
-        histograms_factories.ConfigurationFactory(source=self.summary)
+        histograms_factories.ConfigurationFactory(summary=self.summary)
 
         for config_type in ['electronics', 'voltage', 'current', 'gps', 'trigger']:
             response = self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
@@ -174,13 +174,13 @@ class TestSourceViews(TestCase):
 
     def test_detector_offsets(self):
         kwargs = {'station_number': self.station.number}
-        histograms_factories.DetectorTimingOffsetFactory(source=self.summary)
+        histograms_factories.DetectorTimingOffsetFactory(summary=self.summary)
         self.get_tsv(reverse('status:source:detector_offsets', kwargs=kwargs))
 
     def test_station_offsets(self):
         other_station = StationFactory(number=2, cluster__number=0, cluster__country__number=0)
         ref_summary = histograms_factories.SummaryFactory(station=other_station)
-        histograms_factories.StationTimingOffsetFactory(ref_source=ref_summary, source=self.summary)
+        histograms_factories.StationTimingOffsetFactory(ref_summary=ref_summary, summary=self.summary)
 
         kwargs = {
             'ref_station_number': min(other_station.number, self.station.number),

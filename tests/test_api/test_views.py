@@ -15,7 +15,7 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
-        self.config = ConfigurationFactory(source__station=self.station)
+        self.config = ConfigurationFactory(summary__station=self.station)
         self.pc = PcFactory(station=self.station, is_test=False)
         super(TestViews, self).setUp()
 
@@ -60,7 +60,7 @@ class TestViews(TestCase):
         kwargs.update({'hour': 14})
         self.get_json(reverse('api:num_events', kwargs=kwargs))
 
-        config_date = self.config.source.date
+        config_date = self.config.summary.date
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(config_date))
         self.get_json(reverse('api:config', kwargs=kwargs))

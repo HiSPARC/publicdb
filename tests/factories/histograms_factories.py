@@ -42,7 +42,7 @@ class SummaryFactory(factory.DjangoModelFactory):
 
 
 class ConfigurationFactory(factory.DjangoModelFactory):
-    source = factory.SubFactory(SummaryFactory)
+    summary = factory.SubFactory(SummaryFactory)
     timestamp = factory.Faker('past_datetime', start_date=date(2004, 1, 1))
     gps_latitude = factory.Faker('latitude')
     gps_longitude = factory.Faker('longitude')
@@ -160,7 +160,7 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
 
 
 class NetworkHistogramFactory(factory.DjangoModelFactory):
-    source = factory.SubFactory(NetworkSummaryFactory)
+    network_summary = factory.SubFactory(NetworkSummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
     bins = factory.LazyAttribute(lambda o: range(len(o.values)))
     values = factory.Faker('int_list')
@@ -170,7 +170,7 @@ class NetworkHistogramFactory(factory.DjangoModelFactory):
 
 
 class DailyHistogramFactory(factory.DjangoModelFactory):
-    source = factory.SubFactory(SummaryFactory)
+    summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
     bins = factory.LazyAttribute(lambda o: range(len(o.values)))
     values = factory.Faker('int_list')
@@ -187,7 +187,7 @@ class MultiDailyHistogramFactory(DailyHistogramFactory):
 
 
 class DailyDatasetFactory(factory.DjangoModelFactory):
-    source = factory.SubFactory(SummaryFactory)
+    summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(DatasetTypeFactory)
     x = factory.Faker('int_list')
     y = factory.Faker('float_list')
@@ -204,7 +204,7 @@ class MultiDailyDatasetFactory(DailyDatasetFactory):
 
 
 class DetectorTimingOffsetFactory(factory.DjangoModelFactory):
-    source = factory.SubFactory(SummaryFactory)
+    summary = factory.SubFactory(SummaryFactory)
     offset_1 = factory.Faker('float', min=-100, max=100)
     offset_2 = factory.Faker('float', min=-100, max=100)
     offset_3 = factory.Faker('float', min=-100, max=100)
@@ -215,8 +215,8 @@ class DetectorTimingOffsetFactory(factory.DjangoModelFactory):
 
 
 class StationTimingOffsetFactory(factory.DjangoModelFactory):
-    ref_source = factory.SubFactory(SummaryFactory)
-    source = factory.SubFactory(SummaryFactory)
+    ref_summary = factory.SubFactory(SummaryFactory)
+    summary = factory.SubFactory(SummaryFactory)
     offset = factory.Faker('float', min=-1000, max=1000)
     error = factory.Faker('float', min=0, max=100)
 

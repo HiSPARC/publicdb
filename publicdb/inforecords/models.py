@@ -264,7 +264,7 @@ class Station(models.Model):
         today = datetime.datetime.utcnow()
 
         try:
-            config = (Configuration.objects.filter(source__station=self, timestamp__lte=today).latest())
+            config = (Configuration.objects.filter(summary__station=self, timestamp__lte=today).latest())
         except Configuration.DoesNotExist:
             n_detectors = 4
         else:
@@ -293,7 +293,7 @@ class Station(models.Model):
             for summary in summaries:
                 try:
                     config = (Configuration.objects
-                                           .filter(source=summary)
+                                           .filter(summary=summary)
                                            .exclude(gps_latitude=0, gps_longitude=0)
                                            .latest())
                 except Configuration.DoesNotExist:

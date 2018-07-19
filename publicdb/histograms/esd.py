@@ -634,8 +634,8 @@ def get_offset_function(station, date):
 def get_detector_offsets(station, date):
     """Get detector offsets for a station on a specific date"""
 
-    do = DetectorTimingOffset.objects.get(source__station__number=station,
-                                          source__date=date)
+    do = DetectorTimingOffset.objects.get(summary__station__number=station,
+                                          summary__date=date)
     offsets = [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
     return [o if o is not None else np.nan for o in offsets]
 

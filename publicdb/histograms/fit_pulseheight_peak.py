@@ -321,7 +321,7 @@ def get_pulseheight_fits(summary):
             fit.error_type = "Exception"
             fit.error_message = traceback.format_exc()
 
-        fit.source = summary
+        fit.summary = summary
         fit.plate = detector_n
 
         fits.append(fit)
