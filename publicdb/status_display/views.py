@@ -907,8 +907,7 @@ def get_histogram_source(year, month, day, type, station_number=None):
                                       summary__date=date,
                                       type__slug=type)
 
-    if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime',
-                'coincidencenumber']:
+    if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime', 'coincidencenumber']:
         return zip(histogram.bins, histogram.values)
     else:
         # Multiple value columns
@@ -1047,25 +1046,21 @@ def plot_dataset(summary, type):
 def plot_config(type, configs):
     """Create a plot object from station configs"""
 
-    timestamps = [calendar.timegm(config.timestamp.utctimetuple())
-                  for config in configs]
+    timestamps = [calendar.timegm(config.timestamp.utctimetuple()) for config in configs]
     x_label = 'Date (month/year)'
 
     if type == 'voltage':
-        values = [[config.mas_ch1_voltage, config.mas_ch2_voltage,
-                   config.slv_ch1_voltage, config.slv_ch2_voltage]
+        values = [[config.mas_ch1_voltage, config.mas_ch2_voltage, config.slv_ch1_voltage, config.slv_ch2_voltage]
                   for config in configs]
         values = zip(*values)
         y_label = 'PMT Voltage (V)'
     elif type == 'current':
-        values = [[config.mas_ch1_current, config.mas_ch2_current,
-                   config.slv_ch1_current, config.slv_ch2_current]
+        values = [[config.mas_ch1_current, config.mas_ch2_current, config.slv_ch1_current, config.slv_ch2_current]
                   for config in configs]
         values = zip(*values)
         y_label = 'PMT Current (mA)'
     if type == 'altitude':
-        values = [config.gps_altitude for config in configs
-                  if config.gps_altitude != 0.]
+        values = [config.gps_altitude for config in configs if config.gps_altitude != 0.]
         if not len(values):
             return None
         y_label = 'Altitude (m)'
