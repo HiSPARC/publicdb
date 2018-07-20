@@ -202,88 +202,155 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                    'statuscount': statuscount})
 
 
-def network_coincidences(request, year=None, month=None, day=None):
-    """Show daily coincidences histograms for the entire network"""
 
-    # Redirect to latest date with data if no date is given
-    if year is None:
+
+class NetworkSummaryDetailView(DateDetailView):
+    date_field = 'date'
+    http_method_names = [u'get']
+    month_format = '%m'
+    # SingleObjectMixin.get_object requires a lookup by pk or slug,
+    # so reuse part of the date as a 'slug'.
+    slug_field = 'date__year'
+    slug_url_kwarg = 'year'
+    template_name = 'network_coincidences.html'
+
+    def get_queryset(self):
+        return (
+            NetworkSummary.objects.with_coincidences()
+            .prefetch_related('network_histograms', 'network_histograms__type')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super(NetworkSummaryDetailView, self).get_context_data(**kwargs)
+        date = self.object.date
+
+        # Find previous/next dates with data
         try:
-            network_summary = NetworkSummary.objects.with_coincidences().latest()
+            prev = (NetworkSummary.objects
+                                  .with_coincidences()
+                                  .filter(date__lt=date)
+                                  .latest()
+                                  .date)
         except NetworkSummary.DoesNotExist:
-            raise Http404
+            prev = None
 
-        return redirect('status:network:coincidences',
-                        year=str(network_summary.date.year),
-                        month=str(network_summary.date.month),
-                        day=str(network_summary.date.day))
+        try:
+            next = (NetworkSummary.objects
+                                  .with_coincidences()
+                                  .filter(date__gt=date)
+                                  .earliest()
+                                  .date)
+        except NetworkSummary.DoesNotExist:
+            next = None
 
-    year = int(year)
-    month = int(month)
-    day = int(day)
-    try:
-        date = datetime.date(year, month, day)
-    except ValueError:
-        raise Http404
+        n_stations = (Station.objects
+                             .filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
+                             .distinct()
+                             .count())
+        histograms = (DailyHistogram.objects
+                                    .filter(summary__date=date,
+                                            summary__station__pcs__is_test=False,
+                                            type__slug='eventtime')
+                                    .distinct())
+        number_of_events = sum(sum(histogram.values) for histogram in histograms)
+        status = {'station_count': n_stations, 'n_events': number_of_events}
 
-    network_summary = get_object_or_404(
-        NetworkSummary.objects.prefetch_related('network_histograms'),
-        num_coincidences__isnull=False,
-        date=date)
+        # Date navigation
+        thismonth = self.nav_calendar()
+        month_list = self.nav_months()
+        year_list = self.nav_years()
 
-    # Find previous/next dates with data
-    try:
-        prev = (NetworkSummary.objects
-                              .with_coincidences()
-                              .filter(date__lt=date)
-                              .latest()
-                              .date)
-    except NetworkSummary.DoesNotExist:
-        prev = None
+        coincidencetimehistogram = plot_network_histogram(self.object, 'coincidencetime')
+        coincidencenumberhistogram = plot_network_histogram(self.object, 'coincidencenumber')
 
-    try:
-        next = (NetworkSummary.objects
-                              .with_coincidences()
-                              .filter(date__gt=date)
-                              .earliest()
-                              .date)
-    except NetworkSummary.DoesNotExist:
-        next = None
+        context.update({'date': date,
+                        'tomorrow': date + datetime.timedelta(days=1),
+                        'coincidencetimehistogram': coincidencetimehistogram,
+                        'coincidencenumberhistogram': coincidencenumberhistogram,
+                        'status': status,
 
-    n_stations = (Station.objects
-                         .filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
-                         .distinct()
-                         .count())
-    histograms = (DailyHistogram.objects
-                                .filter(summary__date=date,
-                                        summary__station__pcs__is_test=False,
-                                        type__slug='eventtime')
-                                .distinct())
-    number_of_events = sum(sum(histogram.values) for histogram in histograms)
-    status = {'station_count': n_stations, 'n_events': number_of_events}
+                        'thismonth': thismonth,
+                        'month_list': month_list,
+                        'year_list': year_list,
+                        'prev': prev,
+                        'next': next,
+                        'link': (date.year, date.month, date.day)})
+        return context
 
-    thismonth = nav_calendar(year, month)
-    month_list = nav_months_network(year)
-    year_list = nav_years_network()
-    current_date = {'year': year,
-                    'month': calendar.month_name[month][:3],
-                    'day': day}
+    def nav_calendar(self):
+        """Create a month calendar with links"""
 
-    coincidencetimehistogram = plot_network_histogram(network_summary, 'coincidencetime')
-    coincidencenumberhistogram = plot_network_histogram(network_summary, 'coincidencenumber')
+        date = self.object.date
 
-    return render(request, 'network_coincidences.html',
-                  {'date': date,
-                   'tomorrow': date + datetime.timedelta(days=1),
-                   'coincidencetimehistogram': coincidencetimehistogram,
-                   'coincidencenumberhistogram': coincidencenumberhistogram,
-                   'status': status,
-                   'thismonth': thismonth,
-                   'month_list': month_list,
-                   'year_list': year_list,
-                   'current_date': current_date,
-                   'prev': prev,
-                   'next': next,
-                   'link': (year, month, day)})
+        month = calendar.Calendar().monthdatescalendar(date.year, date.month)
+
+        days_with_data = (NetworkSummary.objects.with_coincidences()
+                                        .filter(date__year=date.year, date__month=date.month)
+                                        .values_list('date', flat=True))
+
+        weeks = []
+        for week in month:
+            days = []
+            for day in week:
+                if day.month == date.month:
+                    if day in days_with_data:
+                        link = (date.year, date.month, day.day)
+                    else:
+                        link = None
+                    days.append({'day': day.day, 'link': link})
+                else:
+                    days.append('')
+            weeks.append(days)
+
+        return {'days': calendar.day_abbr[:], 'weeks': weeks}
+
+    def nav_months(self):
+        """Create list of months with links"""
+
+        date = self.object.date
+
+        date_list = (NetworkSummary.objects.with_coincidences()
+                                   .filter(date__year=date.year)
+                                   .dates('date', 'month'))
+
+        month_list = [{'month': month} for month in calendar.month_abbr[1:]]
+
+        for date in date_list:
+            first_day = (NetworkSummary.objects.with_coincidences()
+                                       .filter(date__year=date.year, date__month=date.month)
+                                       .dates('date', 'day')[0])
+            link = (date.year, date.month, first_day.day)
+            month_list[date.month - 1]['link'] = link
+
+        return month_list
+
+    def nav_years(self):
+        """Create list of previous years"""
+
+        years_with_data = NetworkSummary.objects.with_coincidences().dates('date', 'year')
+        years_with_data = [date.year for date in years_with_data]
+
+        year_list = []
+        for year in range(years_with_data[0], years_with_data[-1] + 1):
+            if year in years_with_data:
+                first_day = (NetworkSummary.objects.with_coincidences()
+                                           .filter(date__year=year)
+                                           .dates('date', 'day')[0])
+                link = (year, first_day.month, first_day.day)
+                year_list.append({'year': year, 'link': link})
+            else:
+                year_list.append({'year': year, 'link': None})
+        return year_list
+
+
+class LatestNetworkSummaryRedirectView(RedirectView):
+    """Show most recent coincidence data page"""
+
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            return NetworkSummary.objects.with_coincidences().latest().get_absolute_url()
+        except NetworkSummary.DoesNotExist:
+            return None
 
 
 class SummaryDetailView(DateDetailView):
@@ -378,39 +445,6 @@ class SummaryDetailView(DateDetailView):
                         'coincidences_found': coincidences_found})
         return context
 
-    def nav_years(self):
-        """Create list of previous years"""
-
-        years_with_data = self.get_queryset().filter(station=self.object.station).dates('date', 'year')
-        years_with_data = [date.year for date in years_with_data]
-
-        year_list = []
-        for year in range(years_with_data[0], years_with_data[-1] + 1):
-            if year in years_with_data:
-                first_of_year = (self.get_queryset().filter(station=self.object.station, date__year=year)
-                                     .earliest().get_absolute_url())
-                year_list.append({'year': year, 'link': first_of_year})
-            else:
-                year_list.append({'year': year, 'link': None})
-        return year_list
-
-    def nav_months(self):
-        """Create list of months with links"""
-
-        months_with_data = (self.get_queryset().filter(station=self.object.station,
-                                                       date__year=self.object.date.year)
-                                .dates('date', 'month'))
-        month_list = [{'month': month} for month in calendar.month_abbr[1:]]
-
-        for date in months_with_data:
-            first_of_month = (self.get_queryset().filter(station=self.object.station,
-                                                         date__year=date.year,
-                                                         date__month=date.month)
-                                  .earliest().get_absolute_url())
-            month_list[date.month - 1]['link'] = first_of_month
-
-        return month_list
-
     def nav_calendar(self):
         """Create a month calendar with links"""
 
@@ -437,6 +471,53 @@ class SummaryDetailView(DateDetailView):
             weeks.append(days)
 
         return {'days': calendar.day_abbr[:], 'weeks': weeks}
+
+    def nav_months(self):
+        """Create list of months with links"""
+
+        months_with_data = (self.get_queryset().filter(station=self.object.station,
+                                                       date__year=self.object.date.year)
+                                .dates('date', 'month'))
+        month_list = [{'month': month} for month in calendar.month_abbr[1:]]
+
+        for date in months_with_data:
+            first_of_month = (self.get_queryset().filter(station=self.object.station,
+                                                         date__year=date.year,
+                                                         date__month=date.month)
+                                  .earliest().get_absolute_url())
+            month_list[date.month - 1]['link'] = first_of_month
+
+        return month_list
+
+    def nav_years(self):
+        """Create list of previous years"""
+
+        years_with_data = self.get_queryset().filter(station=self.object.station).dates('date', 'year')
+        years_with_data = [date.year for date in years_with_data]
+
+        year_list = []
+        for year in range(years_with_data[0], years_with_data[-1] + 1):
+            if year in years_with_data:
+                first_of_year = (self.get_queryset().filter(station=self.object.station, date__year=year)
+                                     .earliest().get_absolute_url())
+                year_list.append({'year': year, 'link': first_of_year})
+            else:
+                year_list.append({'year': year, 'link': None})
+        return year_list
+
+
+class LatestSummaryRedirectView(RedirectView):
+    """Show most recent data for a particular station"""
+
+    def get_redirect_url(self, *args, **kwargs):
+        try:
+            return (Summary.objects
+                           .with_data()
+                           .filter(station__number=kwargs['station_number'])
+                           .latest()
+                           .get_absolute_url())
+        except Summary.DoesNotExist:
+            return None
 
 
 def station_status(request, station_number):
@@ -570,20 +651,6 @@ def station_latest(request, station_number):
                    'plots': plots,
                    'extra_station': extra_station,
                    'old_data': old_data})
-
-
-class LatestSummaryRedirectView(RedirectView):
-    """Show most recent data for a particular station"""
-
-    def get_redirect_url(self, *args, **kwargs):
-        try:
-            return (Summary.objects
-                           .with_data()
-                           .filter(station__number=kwargs['station_number'])
-                           .latest()
-                           .get_absolute_url())
-        except Summary.DoesNotExist:
-            return None
 
 
 def get_coincidencetime_histogram_source(request, year, month, day):
@@ -981,15 +1048,13 @@ def get_config_source(station_number, type):
 def plot_network_histogram(network_summary, type):
     """Create a histogram object"""
 
-    type = HistogramType.objects.get(slug=type)
-
     try:
         histogram = network_summary.network_histograms.get(type__slug=type)
     except NetworkHistogram.DoesNotExist:
         return None
 
-    plot_object = create_plot_object(histogram.bins[:-1], histogram.values, type.bin_axis_title, type.value_axis_title)
-    return plot_object
+    type = histogram.type
+    return create_plot_object(histogram.bins[:-1], histogram.values, type.bin_axis_title, type.value_axis_title)
 
 
 def plot_histogram(histogram):
@@ -1092,82 +1157,6 @@ def create_plot_object(x_values, y_series, x_label, y_label):
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
-
-
-def nav_calendar(theyear, themonth):
-    """Create a month calendar with links"""
-
-    month = calendar.Calendar().monthdatescalendar(theyear, themonth)
-    month_name = '%s %d' % (calendar.month_name[themonth], theyear)
-    days_names = calendar.weekheader(3).split(' ')
-
-    days_with_data = (NetworkSummary.objects
-                                    .filter(num_coincidences__isnull=False,
-                                            date__year=theyear,
-                                            date__month=themonth)
-                                    .values_list('date', flat=True))
-
-    weeks = []
-    for week in month:
-        days = []
-        for day in week:
-            if day.month == themonth:
-                if day in days_with_data:
-                    link = (theyear, themonth, day.day)
-                else:
-                    link = None
-                days.append({'day': day.day, 'link': link})
-            else:
-                days.append('')
-        weeks.append(days)
-
-    return {'month': month_name, 'days': days_names, 'weeks': weeks}
-
-
-def nav_months_network(theyear):
-    """Create list of months with links"""
-
-    date_list = (NetworkSummary.objects
-                               .filter(date__year=theyear,
-                                       num_coincidences__isnull=False)
-                               .dates('date', 'month'))
-
-    month_list = [{'month': calendar.month_name[i][:3]} for i in range(1, 13)]
-
-    for date in date_list:
-        first_day = (NetworkSummary.objects
-                                   .filter(date__year=date.year,
-                                           date__month=date.month,
-                                           num_coincidences__isnull=False)
-                                   .dates('date', 'day')[0])
-        link = (date.year, date.month, first_day.day)
-        month_list[date.month - 1]['link'] = link
-
-    return month_list
-
-
-def nav_years_network():
-    """Create list of previous years"""
-
-    valid_years = (NetworkSummary.objects
-                                 .filter(num_coincidences__isnull=False,
-                                         date__gte=FIRSTDATE,
-                                         date__lte=datetime.date.today())
-                                 .dates('date', 'year'))
-    valid_years = [date.year for date in valid_years]
-
-    year_list = []
-    for year in range(valid_years[0], valid_years[-1] + 1):
-        if year in valid_years:
-            first_day = (NetworkSummary.objects
-                                       .filter(date__year=year,
-                                               num_coincidences__isnull=False)
-                                       .dates('date', 'day')[0])
-            link = (year, first_day.month, first_day.day)
-            year_list.append({'year': year, 'link': link})
-        else:
-            year_list.append({'year': year, 'link': None})
-    return year_list
 
 
 def stations_with_data():
