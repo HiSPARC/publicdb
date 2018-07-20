@@ -101,16 +101,16 @@
 
     <div id="graphs">
 
-      {% if eventhistogram %}
+      {% if plots.eventtime %}
         <div id="eventHistogram" class="histogram">
             <h3>Event histogram</h3>
             <div class="plot" id="eh_histogram"></div>
             <script>
-                eh_labels = {yaxis: {axisLabel: "{{ eventhistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ eventhistogram.x_label }}"}}
+                eh_labels = {yaxis: {axisLabel: "{{ plots.eventtime.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.eventtime.x_label }}"}}
                 $.extend(true, eh_options, eh_labels)
                 $.plot($("#eh_histogram"), [
-                  {% for data in eventhistogram.data %}
+                  {% for data in plots.eventtime.data %}
                     {data: {{ data|fix_histogram_data }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], eh_options);
@@ -122,7 +122,7 @@
         </div>
       {% endif %}
 
-      {% if barometerdata %}
+      {% if plots.barometer %}
         <div id="barometerData" class="histogram">
           {% if extra_station %}
             <h3>Barometer data (source: station {{extra_station}})</h3>
@@ -131,11 +131,11 @@
           {% endif %}
             <div class="plot" id="bd_histogram"></div>
             <script>
-                bd_labels = {yaxis: {axisLabel: "{{ barometerdata.y_label }}"},
-                             xaxis: {axisLabel: "{{ barometerdata.x_label }}"}}
+                bd_labels = {yaxis: {axisLabel: "{{ plots.barometer.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.barometer.x_label }}"}}
                 $.extend(true, bd_options, bd_labels)
                 $.plot($("#bd_histogram"), [
-                  {% for data in barometerdata.data %}
+                  {% for data in plots.barometer.data %}
                     {data: {{ data|fix_timestamps_in_data|slice_data:30|round_data:2 }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], bd_options);
@@ -147,16 +147,16 @@
         </div>
       {% endif %}
 
-      {% if pulseheighthistogram %}
+      {% if plots.pulseheight %}
         <div id="pulseheightHistogram" class="histogram">
             <h3>Pulseheight histogram</h3>
             <div class="plot" id="ph_histogram"></div>
             <script>
-                ph_labels = {yaxis: {axisLabel: "{{ pulseheighthistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ pulseheighthistogram.x_label }}"}}
+                ph_labels = {yaxis: {axisLabel: "{{ plots.pulseheight.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.pulseheight.x_label }}"}}
                 $.extend(true, ph_options, ph_labels)
                 $.plot($("#ph_histogram"), [
-                  {% for data in pulseheighthistogram.data %}
+                  {% for data in plots.pulseheight.data %}
                     {data: {{ data|fix_histogram_data }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ph_options);
@@ -164,16 +164,16 @@
         </div>
       {% endif %}
 
-      {% if pulseintegralhistogram %}
+      {% if plots.pulseintegral %}
         <div id="pulseintegralHistogram" class="histogram">
             <h3>Pulseintegral histogram</h3>
             <div class="plot" id="pi_histogram"></div>
             <script>
-                pi_labels = {yaxis: {axisLabel: "{{ pulseintegralhistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ pulseintegralhistogram.x_label }}"}}
+                pi_labels = {yaxis: {axisLabel: "{{ plots.pulseintegral.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.pulseintegral.x_label }}"}}
                 $.extend(true, pi_options, pi_labels)
                 $.plot($("#pi_histogram"), [
-                  {% for data in pulseintegralhistogram.data %}
+                  {% for data in plots.pulseintegral.data %}
                     {data: {{ data|fix_histogram_data }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], pi_options);
