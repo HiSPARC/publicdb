@@ -33,7 +33,7 @@ class AdminUpdate(models.Model):
         verbose_name = 'Admin update'
         verbose_name_plural = 'Admin updates'
         unique_together = ('queue', 'version')
-        ordering = ['version']
+        ordering = ['-version']
 
 
 class UserUpdate(models.Model):
@@ -56,7 +56,7 @@ class UserUpdate(models.Model):
         verbose_name = 'User update'
         verbose_name_plural = 'User updates'
         unique_together = ('queue', 'version')
-        ordering = ['version']
+        ordering = ['-version']
 
 
 class InstallerUpdate(models.Model):
@@ -76,4 +76,4 @@ class InstallerUpdate(models.Model):
         verbose_name = 'Installer update'
         verbose_name_plural = 'Installer updates'
         unique_together = ('queue', 'version')
-        ordering = ['version']
+        ordering = ['-version']
