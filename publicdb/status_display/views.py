@@ -16,9 +16,9 @@ from django.views.generic import DateDetailView, RedirectView
 
 from sapphire.transformations import clock
 
-from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DatasetType,
-                                 DetectorTimingOffset, HistogramType, MultiDailyDataset, MultiDailyHistogram,
-                                 NetworkHistogram, NetworkSummary, StationTimingOffset, Summary)
+from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DetectorTimingOffset,
+                                 HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
+                                 NetworkSummary, StationTimingOffset, Summary)
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
@@ -355,7 +355,7 @@ class SummaryDetailView(DateDetailView):
         plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.histograms.all()}
         plots.update({histogram.type.slug: plot_histogram(histogram) for histogram in self.object.multi_histograms.all()})
         plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.datasets.all()})
-        plots.update({dataset.type.slug: plot_dataset(dataset) for histogram in self.object.multi_datasets.all()})
+        plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.multi_datasets.all()})
 
         context.update({'station': station,
                         'date': date,
@@ -543,10 +543,10 @@ def station_latest(request, station_number):
 
     date = summary.date
 
-    plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.histograms.filter(type__slug='eventtime')}
+    plots = {histogram.type.slug: plot_histogram(histogram) for histogram in summary.histograms.filter(type__slug='eventtime')}
     plots.update({histogram.type.slug: plot_histogram(histogram)
-                  for histogram in self.object.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])})
-    plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.datasets.filter(type__slug='barometer')})
+                  for histogram in summary.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])})
+    plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in summary.datasets.filter(type__slug='barometer')})
 
     # Show alternative
     extra_station = None
