@@ -816,7 +816,7 @@ def get_detector_timing_offsets_source(request, station_number):
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1, 2, 3, 4))]
 
-    data = [(calendar.timegm(r[0].timetuple()), none_to_nan(r[1]),
+    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]),
              none_to_nan(r[2]), none_to_nan(r[3]), none_to_nan(r[4]))
             for r in data]
 
@@ -858,7 +858,7 @@ def get_station_timing_offsets_source(request, ref_station_number,
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1))]
 
-    data = [(calendar.timegm(r[0].timetuple()), none_to_nan(r[1]),
+    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]),
              none_to_nan(r[2]))
             for r in data]
 
@@ -1077,7 +1077,7 @@ def plot_timing_offsets(station_number):
     """Create a plot object from station configs"""
 
     data = get_detector_timing_offsets(station_number)
-    data = [[calendar.timegm(row[0].timetuple()), row[1:]] for row in data]
+    data = [[clock.datetime_to_gps(row[0]), row[1:]] for row in data]
     data = zip(*data)
 
     if not data:
