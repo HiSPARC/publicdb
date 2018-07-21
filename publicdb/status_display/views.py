@@ -653,14 +653,6 @@ def station_latest(request, station_number):
                    'old_data': old_data})
 
 
-def get_coincidencetime_histogram_source(request, year, month, day):
-    return get_specific_network_histogram_source(request, year, month, day, 'coincidencetime')
-
-
-def get_coincidencenumber_histogram_source(request, year, month, day):
-    return get_specific_network_histogram_source(request, year, month, day, 'coincidencenumber')
-
-
 def get_specific_network_histogram_source(request, year, month, day, type):
     data = get_histogram_source(year, month, day, type)
     response = render(request, 'source/%s_histogram.tsv' % type,
@@ -673,36 +665,8 @@ def get_specific_network_histogram_source(request, year, month, day, type):
     return response
 
 
-def get_eventtime_histogram_source(request, station_number, year, month, day):
-    """Get eventtime histogram for a specific date"""
-    return get_specific_histogram_source(request, station_number, year, month, day, 'eventtime')
-
-
-def get_pulseheight_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'pulseheight')
-
-
-def get_pulseintegral_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'pulseintegral')
-
-
-def get_zenith_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'zenith')
-
-
-def get_azimuth_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'azimuth')
-
-
-def get_singlesratelow_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'singleslow')
-
-
-def get_singlesratehigh_histogram_source(request, station_number, year, month, day):
-    return get_specific_histogram_source(request, station_number, year, month, day, 'singleshigh')
-
-
 def get_specific_histogram_source(request, station_number, year, month, day, type):
+    """Get a station histogram for a specific date"""
     data = get_histogram_source(year, month, day, type, station_number)
     response = render(request, 'source/%s_histogram.tsv' % type,
                       {'data': data,
@@ -773,8 +737,9 @@ def get_eventtime_histogram_sources(station_number, start, end):
     no_data = [0] * 24
     i = 0
     for date in daterange(start, end):
-        ts = clock.datetime_to_gps(date)
-        bins.extend(ts + hours)
+        # Add new bins for each hour of the day, in GPS timestamps
+        timestamp = clock.datetime_to_gps(date)
+        bins.extend(timestamp + hours)
         if histograms[i].summary.date == date:
             values.extend(histograms[i].values)
             i += 1
@@ -783,22 +748,6 @@ def get_eventtime_histogram_sources(station_number, start, end):
         else:
             values.extend(no_data)
     return izip(bins, values)
-
-
-def get_barometer_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(request, station_number, year, month, day, 'barometer')
-
-
-def get_temperature_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(request, station_number, year, month, day, 'temperature')
-
-
-def get_singlesratelow_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(request, station_number, year, month, day, 'singlesratelow')
-
-
-def get_singlesratehigh_dataset_source(request, station_number, year, month, day):
-    return get_specific_dataset_source(request, station_number, year, month, day, 'singlesratehigh')
 
 
 def get_specific_dataset_source(request, station_number, year, month, day, type):
@@ -812,26 +761,6 @@ def get_specific_dataset_source(request, station_number, year, month, day, type)
         'attachment; filename=%s-s%s-%d%02d%02d.tsv' %
         (type, station_number, int(year), int(month), int(day)))
     return response
-
-
-def get_electronics_config_source(request, station_number):
-    return get_specific_config_source(request, station_number, 'electronics')
-
-
-def get_voltage_config_source(request, station_number):
-    return get_specific_config_source(request, station_number, 'voltage')
-
-
-def get_current_config_source(request, station_number):
-    return get_specific_config_source(request, station_number, 'current')
-
-
-def get_gps_config_source(request, station_number):
-    return get_specific_config_source(request, station_number, 'gps')
-
-
-def get_trigger_config_source(request, station_number):
-    return get_specific_config_source(request, station_number, 'trigger')
 
 
 def get_specific_config_source(request, station_number, type):
