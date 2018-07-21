@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
 from ..inforecords.models import Cluster, Country, Station
-from ..status_display.nagios import get_station_status, status_lists
+from ..status_display.status import StationStatus
 from ..status_display.views import stations_with_data
 
 
@@ -11,7 +11,7 @@ def station_on_map(request, station_number):
 
     data_stations = stations_with_data()
     station_number = int(station_number)
-    down, problem, up = status_lists()
+    station_status = StationStatus()
 
     station = get_object_or_404(Station, number=station_number)
     center = station.latest_location()
@@ -27,7 +27,7 @@ def station_on_map(request, station_number):
                                                pcs__is_test=False)
                                        .distinct()):
             link = station in data_stations
-            status = get_station_status(station.number, down, problem, up)
+            status = station_status.get_status(station.number)
             location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
@@ -48,7 +48,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
     data_stations = stations_with_data()
-    down, problem, up = status_lists()
+    station_status = StationStatus()
 
     if country:
         get_object_or_404(Country, name=country)
@@ -82,7 +82,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                                                pcs__is_test=False)
                                        .distinct()):
             link = station in data_stations
-            status = get_station_status(station.number, down, problem, up)
+            status = station_status.get_status(station.number)
             location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
