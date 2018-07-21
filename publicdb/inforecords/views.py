@@ -123,7 +123,7 @@ def create_nagios_config(request):
                       'has_data': has_data})
 
     # Render the template
-    return render(request, 'nagios.cfg',
+    return render(request, 'inforecords/nagios.cfg',
                   {'contacts': (Contact.objects.all()
                                 .select_related('contactinformation')),
                    'clusters': Cluster.objects.all(),
@@ -139,7 +139,7 @@ def create_datastore_config(request):
             socket.gethostbyname(settings.DATASTORE_HOST)):
         raise PermissionDenied
 
-    return render(request, 'datastore.cfg',
+    return render(request, 'inforecords/datastore.cfg',
                   {'stations': (Station.objects.all()
                                        .select_related('cluster__parent'))},
                   content_type='text/plain')

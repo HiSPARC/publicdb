@@ -39,7 +39,7 @@ def station_on_map(request, station_number):
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
-    return render(request, 'map.html',
+    return render(request, 'maps/map.html',
                   {'subclusters': subclusters,
                    'center': center})
 
@@ -94,6 +94,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         subclusters.append({'name': subcluster.name,
                             'stations': stations})
 
-    return render(request, 'map.html',
+    return render(request, 'maps/map.html',
                   {'subclusters': subclusters,
                    'focus': focus})

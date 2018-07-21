@@ -74,7 +74,7 @@ def stations_by_country(request):
             countries[country][cluster][subcluster] = []
         countries[country][cluster][subcluster].append(station_info)
 
-    return render(request, 'stations_by_country.html',
+    return render(request, 'status_display/stations_by_country.html',
                   {'countries': countries,
                    'test_stations': test_stations,
                    'statuscount': statuscount})
@@ -97,7 +97,8 @@ def stations_by_number(request):
                          'link': link,
                          'status': status})
 
-    return render(request, 'stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
+    return render(request, 'status_display/stations_by_number.html',
+                  {'stations': stations, 'statuscount': statuscount})
 
 
 def stations_by_status(request):
@@ -120,7 +121,8 @@ def stations_by_status(request):
                       'link': link,
                       'status': status})
 
-    return render(request, 'stations_by_status.html', {'station_groups': station_groups, 'statuscount': statuscount})
+    return render(request, 'status_display/stations_by_status.html',
+                  {'station_groups': station_groups, 'statuscount': statuscount})
 
 
 def stations_by_name(request):
@@ -142,7 +144,8 @@ def stations_by_name(request):
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render(request, 'stations_by_name.html', {'stations': stations, 'statuscount': statuscount})
+    return render(request, 'status_display/stations_by_name.html',
+                  {'stations': stations, 'statuscount': statuscount})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -196,7 +199,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             stations.append(station_data)
         subclusters.append({'name': subcluster.name, 'stations': stations})
 
-    return render(request, 'stations_on_map.html',
+    return render(request, 'status_display/stations_on_map.html',
                   {'subclusters': subclusters,
                    'focus': focus,
                    'statuscount': statuscount})
@@ -210,7 +213,7 @@ class NetworkSummaryDetailView(DateDetailView):
     # so reuse part of the date as a 'slug'.
     slug_field = 'date__year'
     slug_url_kwarg = 'year'
-    template_name = 'network_coincidences.html'
+    template_name = 'status_display/network_coincidences.html'
 
     def get_queryset(self):
         return (
@@ -358,7 +361,7 @@ class SummaryDetailView(DateDetailView):
     month_format = '%m'
     slug_field = 'station__number'
     slug_url_kwarg = 'station_number'
-    template_name = 'station_data.html'
+    template_name = 'status_display/station_data.html'
 
     def get_queryset(self):
         return Summary.objects.with_data()
@@ -533,7 +536,7 @@ def station_status(request, station_number):
     has_data = station_has_data(station)
     has_config = station_has_config(station)
 
-    return render(request, 'station_status.html',
+    return render(request, 'status_display/station_status.html',
                   {'station': station,
                    'pc': pc,
                    'has_data': has_data,
@@ -580,7 +583,7 @@ def station_config(request, station_number):
                                    active_date__lte=today)
                            .last())
 
-    return render(request, 'station_config.html',
+    return render(request, 'status_display/station_config.html',
                   {'station': station,
                    'config': config,
                    'lla': lla,
@@ -643,7 +646,7 @@ def station_latest(request, station_number):
         except IndexError:
             pass
 
-    return render(request, 'station_latest.html',
+    return render(request, 'status_display/station_latest.html',
                   {'station': station,
                    'date': date,
                    'status': status,
@@ -1131,4 +1134,4 @@ def none_to_nan(x):
 
 def help(request):
     """Show the static help page"""
-    return render(request, 'help.html')
+    return render(request, 'status_display/help.html')
