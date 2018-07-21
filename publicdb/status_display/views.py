@@ -151,53 +151,43 @@ def stations_by_name(request):
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
-    station_status = StationStatus()
-    statuscount = station_status.get_status_counts()
+    if not country:
+        focus = Cluster.objects.all().values_list('name', flat=True)
+    else:
+        country = get_object_or_404(Country, name=country)
+        if not cluster:
+            focus = country.clusters.values_list('name', flat=True)
+        else:
+            cluster = get_object_or_404(country.clusters, name=cluster, parent=None)
+            if not subcluster:
+                focus = [cluster.name]
+                focus.extend(cluster.subclusters.values_list('name', flat=True))
+            else:
+                if cluster.name == subcluster:
+                    focus = [cluster.name]
+                else:
+                    focus = [get_object_or_404(cluster.subclusters, name=subcluster).name]
 
     data_stations = stations_with_data()
-
-    if country:
-        get_object_or_404(Country, name=country)
-        if cluster:
-            get_object_or_404(Cluster, name=cluster, parent=None, country__name=country)
-            if subcluster:
-                if cluster == subcluster:
-                    get_object_or_404(Cluster, name=subcluster, parent=None)
-                else:
-                    get_object_or_404(Cluster, name=subcluster, parent__name=cluster)
-                focus = (Cluster.objects
-                                .filter(name=subcluster)
-                                .values_list('name', flat=True))
-            else:
-                focus = [Cluster.objects.get(name=cluster, parent=None).name]
-                focus.extend(Cluster.objects
-                                    .filter(parent__name=cluster)
-                                    .values_list('name', flat=True))
-        else:
-            focus = (Cluster.objects
-                            .filter(country__name=country)
-                            .values_list('name', flat=True))
-    else:
-        focus = Cluster.objects.all().values_list('name', flat=True)
+    station_status = StationStatus()
+    statuscount = station_status.get_status_counts()
 
     subclusters = []
     for subcluster in Cluster.objects.all():
         stations = []
-        for station in (Station.objects
-                               .select_related('cluster__parent', 'cluster__country')
-                               .filter(cluster=subcluster, pcs__is_test=False)
-                               .distinct()):
+        for station in subcluster.stations.filter(pcs__is_test=False).distinct():
             link = station in data_stations
             status = station_status.get_status(station.number)
             location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
-                            'cluster': station.cluster,
+                            'cluster': subcluster,
                             'link': link,
                             'status': status}
             station_data.update(location)
             stations.append(station_data)
-        subclusters.append({'name': subcluster.name, 'stations': stations})
+        subclusters.append({'name': subcluster.name,
+                            'stations': stations})
 
     return render(request, 'status_display/stations_on_map.html',
                   {'subclusters': subclusters,

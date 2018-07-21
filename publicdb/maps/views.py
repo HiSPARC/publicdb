@@ -24,22 +24,22 @@ def station_on_map(request, station_number):
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
     """Show all stations from a subcluster on a map"""
 
-    if country:
+    if not country:
+        focus = Cluster.objects.all().values_list('name', flat=True)
+    else:
         country = get_object_or_404(Country, name=country)
-        if cluster:
+        if not cluster:
+            focus = country.clusters.values_list('name', flat=True)
+        else:
             cluster = get_object_or_404(country.clusters, name=cluster, parent=None)
-            if subcluster:
+            if not subcluster:
+                focus = [cluster.name]
+                focus.extend(cluster.subclusters.values_list('name', flat=True))
+            else:
                 if cluster.name == subcluster:
                     focus = [cluster.name]
                 else:
                     focus = [get_object_or_404(cluster.subclusters, name=subcluster).name]
-            else:
-                focus = [cluster.name]
-                focus.extend(cluster.subclusters.values_list('name', flat=True))
-        else:
-            focus = country.clusters.values_list('name', flat=True)
-    else:
-        focus = Cluster.objects.all().values_list('name', flat=True)
 
     subclusters = get_subclusters()
 
