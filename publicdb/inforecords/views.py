@@ -51,8 +51,7 @@ def create_nagios_config(request):
     hosts = []
     for host in (Pc.objects.exclude(type__description='Admin PC')
                            .filter(is_active=True)
-                           .select_related('station__cluster',
-                                           'station__contact')):
+                           .select_related('station__cluster', 'station__contact')):
 
         services = []
         services_to_check = (host.enabled_services.all()
@@ -74,8 +73,7 @@ def create_nagios_config(request):
                 # assign a value taken from the MonitorService model
                 # associated with the instance.
                 vars = []
-                for var in ('min_critical', 'max_critical', 'min_warning',
-                            'max_warning'):
+                for var in ('min_critical', 'max_critical', 'min_warning', 'max_warning'):
                     if getattr(service, var) is not None:
                         vars.append(getattr(service, var))
                     else:
@@ -124,8 +122,7 @@ def create_nagios_config(request):
 
     # Render the template
     return render(request, 'inforecords/nagios.cfg',
-                  {'contacts': (Contact.objects.all()
-                                .select_related('contactinformation')),
+                  {'contacts': Contact.objects.all().select_related('contactinformation'),
                    'clusters': Cluster.objects.all(),
                    'hosts': hosts},
                   content_type='text/plain')
@@ -140,6 +137,5 @@ def create_datastore_config(request):
         raise PermissionDenied
 
     return render(request, 'inforecords/datastore.cfg',
-                  {'stations': (Station.objects.all()
-                                       .select_related('cluster__parent'))},
+                  {'stations': Station.objects.all().select_related('cluster__parent')},
                   content_type='text/plain')
