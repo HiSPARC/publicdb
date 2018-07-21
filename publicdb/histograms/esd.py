@@ -22,7 +22,7 @@ from . import datastore
 from ..inforecords.models import Station
 from .models import DetectorTimingOffset
 
-logger = logging.getLogger('histograms.esd')
+logger = logging.getLogger(__name__)
 
 # Limit the coincidence window to 10 microseconds,
 COINCIDENCE_WINDOW = 10000  # nanoseconds

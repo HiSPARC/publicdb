@@ -12,7 +12,7 @@ from scipy import optimize, stats
 from . import esd
 from .models import Configuration, PulseheightFit
 
-logger = logging.getLogger('histograms.fit_pulseheight_peak')
+logger = logging.getLogger(__name__)
 
 
 def find_bin_next_minimum(y, start_bin):

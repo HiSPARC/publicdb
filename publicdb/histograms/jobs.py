@@ -25,7 +25,7 @@ from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType, D
                      GeneratorState, HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
                      NetworkSummary, PulseheightFit, StationTimingOffset, Summary)
 
-logger = logging.getLogger('histograms.jobs')
+logger = logging.getLogger(__name__)
 
 # Parameters for the histograms
 MAX_PH = 4096  # max value for 12-bit ADC

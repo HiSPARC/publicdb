@@ -157,6 +157,10 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null_handler'],
             'propagate': False,
+        },
+        'publicdb': {
+            'handlers': ['null_handler'],
+            'propagate': False,
         }
     },
 }

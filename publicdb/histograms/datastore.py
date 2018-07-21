@@ -7,7 +7,7 @@ import tables
 
 from django.conf import settings
 
-logger = logging.getLogger('histograms.datastore')
+logger = logging.getLogger(__name__)
 
 
 def check_for_new_events(last_check_time):

@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 
 from ...jobs import check_for_updates, update_all_histograms
 
-logger = logging.getLogger('histograms.jobs')
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
