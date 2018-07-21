@@ -8,6 +8,7 @@ services:
   - postgresql
 
 cache:
+  pip: true
   directories:
     - $HOME/miniconda
 
@@ -20,6 +21,7 @@ before_install:
       echo "Using cached miniconda";
     else
       wget --no-verbose http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+      rm -rf $HOME/miniconda;
       bash miniconda.sh -b -p $HOME/miniconda;
     fi
   - export PATH=$HOME/miniconda/bin:$PATH
