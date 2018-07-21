@@ -262,14 +262,14 @@ class NetworkSummaryDetailView(DateDetailView):
         month_list = self.nav_months()
         year_list = self.nav_years()
 
-        coincidencetimehistogram = plot_network_histogram(self.object, 'coincidencetime')
-        coincidencenumberhistogram = plot_network_histogram(self.object, 'coincidencenumber')
+        # Data for the plots
+        plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.network_histograms.all()}
 
         context.update({'date': date,
                         'tomorrow': date + datetime.timedelta(days=1),
-                        'coincidencetimehistogram': coincidencetimehistogram,
-                        'coincidencenumberhistogram': coincidencenumberhistogram,
                         'status': status,
+
+                        'plots': plots,
 
                         'thismonth': thismonth,
                         'month_list': month_list,
@@ -973,18 +973,6 @@ def get_config_source(station_number, type):
         data = list(configs.values_list(*fields))
 
     return data
-
-
-def plot_network_histogram(network_summary, type):
-    """Create a histogram object"""
-
-    try:
-        histogram = network_summary.network_histograms.get(type__slug=type)
-    except NetworkHistogram.DoesNotExist:
-        return None
-
-    type = histogram.type
-    return create_plot_object(histogram.bins[:-1], histogram.values, type.bin_axis_title, type.value_axis_title)
 
 
 def plot_histogram(histogram):

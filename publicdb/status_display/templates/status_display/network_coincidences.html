@@ -20,7 +20,7 @@
 {% block data %}
     <div id="graphs">
 
-      {% if coincidencetimehistogram %}
+      {% if plots.coincidencetime %}
         <div id="coincidenceTimeHistogram" class="histogram">
             <h3>Coincidence histogram (number of coincidences per hour)</h3>
             <div class="sourceLink">
@@ -29,11 +29,11 @@
             </div>
             <div class="plot" id="ct_histogram"></div>
             <script>
-                ct_labels = {yaxis: {axisLabel: "{{ coincidencetimehistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ coincidencetimehistogram.x_label }}"}}
+                ct_labels = {yaxis: {axisLabel: "{{ plots.coincidencetime.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.coincidencetime.x_label }}"}}
                 $.extend(true, ct_options, ct_labels)
                 $.plot($("#ct_histogram"), [
-                  {% for data in coincidencetimehistogram.data %}
+                  {% for data in plots.coincidencetime.data %}
                     {data: {{ data|fix_histogram_data }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ct_options);
@@ -41,7 +41,7 @@
         </div>
       {% endif %}
 
-      {% if coincidencenumberhistogram %}
+      {% if plots.coincidencenumber %}
         <div id="coincidenceNumberHistogram" class="histogram">
             <h3>Number of stations histogram</h3>
             <div class="sourceLink">
@@ -50,11 +50,11 @@
             </div>
             <div class="plot" id="cn_histogram"></div>
             <script>
-                cn_labels = {yaxis: {axisLabel: "{{ coincidencenumberhistogram.y_label }}"},
-                             xaxis: {axisLabel: "{{ coincidencenumberhistogram.x_label }}"}}
+                cn_labels = {yaxis: {axisLabel: "{{ plots.coincidencenumber.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.coincidencenumber.x_label }}"}}
                 $.extend(true, cn_options, cn_labels)
                 $.plot($("#cn_histogram"), [
-                  {% for data in coincidencenumberhistogram.data %}
+                  {% for data in plots.coincidencenumber.data %}
                     {data: {{ data|fix_histogram_data|shift_bins:-0.5 }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], cn_options);
