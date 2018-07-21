@@ -5,7 +5,7 @@ from django.test import TestCase
 
 
 class TestManagement(TestCase):
-    @patch('publicdb.histograms.jobs.check_for_updates', return_value=False)
+    @patch('publicdb.histograms.checks.check_for_updates', return_value=False)
     @patch('publicdb.histograms.jobs.update_all_histograms', return_value=False)
     def test_updatehistograms(self, mock_update_histograms, mock_check):
         """The command tried to check for updates and update the histograms"""

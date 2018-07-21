@@ -2,7 +2,8 @@ import logging
 
 from django.core.management.base import BaseCommand
 
-from ...jobs import check_for_updates, update_all_histograms
+from ...checks import check_for_updates
+from ...jobs import update_all_histograms
 
 logger = logging.getLogger(__name__)
 
