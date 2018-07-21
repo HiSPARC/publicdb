@@ -17,8 +17,8 @@ from django.views.generic import DateDetailView, RedirectView
 from sapphire.transformations import clock
 
 from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DetectorTimingOffset,
-                                 HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
-                                 NetworkSummary, StationTimingOffset, Summary)
+                                 MultiDailyDataset, MultiDailyHistogram, NetworkHistogram, NetworkSummary,
+                                 StationTimingOffset, Summary)
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
@@ -202,8 +202,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                    'statuscount': statuscount})
 
 
-
-
 class NetworkSummaryDetailView(DateDetailView):
     date_field = 'date'
     http_method_names = [u'get']
@@ -243,6 +241,7 @@ class NetworkSummaryDetailView(DateDetailView):
         except NetworkSummary.DoesNotExist:
             next = None
 
+        # Number of non-test stations with data on this date
         n_stations = (Station.objects
                              .filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
                              .distinct()
@@ -802,8 +801,7 @@ def get_detector_timing_offsets_source(request, station_number):
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1, 2, 3, 4))]
 
-    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]),
-             none_to_nan(r[2]), none_to_nan(r[3]), none_to_nan(r[4]))
+    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]), none_to_nan(r[2]), none_to_nan(r[3]), none_to_nan(r[4]))
             for r in data]
 
     buffer = StringIO()
@@ -1092,17 +1090,15 @@ def stations_with_data():
     """Get list of station numbers with valid event or weather data
 
     :return: list with station numbers for stations that recorded data, either
-             weather or shower, between 2002 and now.
+             weather or shower, between 2004 and now.
 
     """
-    stations = (Station.objects
-                       .filter(Q(summaries__num_events__isnull=False) |
-                               Q(summaries__num_weather__isnull=False),
-                               summaries__date__gte=FIRSTDATE,
-                               summaries__date__lte=datetime.date.today())
-                       .distinct())
-
-    return stations
+    return (Station.objects
+                   .filter(Q(summaries__num_events__isnull=False) |
+                           Q(summaries__num_weather__isnull=False),
+                           summaries__date__gte=FIRSTDATE,
+                           summaries__date__lte=datetime.date.today())
+                   .distinct())
 
 
 def station_has_config(station):
