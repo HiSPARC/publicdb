@@ -40,8 +40,7 @@ def get_updated_files(rootdir, last_check_time):
                     mtime = os.path.getmtime(file_path)
                     if mtime >= last_check_time:
                         try:
-                            date = datetime.datetime.strptime(
-                                file, '%Y_%m_%d.h5').date()
+                            date = datetime.datetime.strptime(file, '%Y_%m_%d.h5').date()
                         except ValueError:
                             continue
                         if (date != datetime.datetime.utcnow().date() and
@@ -127,8 +126,7 @@ def get_config_messages(cluster, station_number, date):
     path = get_data_path(date)
 
     file = tables.open_file(path, 'r')
-    parent = file.get_node('/hisparc/cluster_%s/station_%d' %
-                           (cluster.lower(), station_number))
+    parent = file.get_node('/hisparc/cluster_%s/station_%d' % (cluster.lower(), station_number))
     config = file.get_node(parent, 'config')
     blobs = file.get_node(parent, 'blobs')
     return file, config, blobs

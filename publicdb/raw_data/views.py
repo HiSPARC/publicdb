@@ -458,8 +458,7 @@ def get_singles_from_esd_in_range(station, start, end):
     """
     for t0, t1 in single_day_ranges(start, end):
         try:
-            Summary.objects.get(station=station, date=t0,
-                                num_singles__isnull=False)
+            Summary.objects.get(station=station, date=t0, num_singles__isnull=False)
         except Summary.DoesNotExist:
             continue
         filepath = esd.get_esd_data_path(t0)
@@ -647,8 +646,7 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
     """Render TSV output as an iterator."""
 
     t = loader.get_template('raw_data/coincidences.tsv')
-    context = {'start': start, 'end': end, 'cluster': cluster,
-               'stations': stations, 'n': n}
+    context = {'start': start, 'end': end, 'cluster': cluster, 'stations': stations, 'n': n}
 
     yield t.render(context)
 

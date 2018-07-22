@@ -26,15 +26,12 @@ class DataDownloadForm(forms.Form):
     station_weather = forms.ModelChoiceField(
         Station.objects.filter(summaries__num_weather__isnull=False).distinct(),
         empty_label='---------', required=False)
-    lightning_type = forms.ChoiceField(choices=LGT_TYPES, initial=4,
-                                       required=False)
+    lightning_type = forms.ChoiceField(choices=LGT_TYPES, initial=4, required=False)
     station_singles = forms.ModelChoiceField(
         Station.objects.filter(summaries__num_singles__isnull=False).distinct(),
         empty_label='---------', required=False)
-    start = forms.DateTimeField(help_text="e.g. '2013-5-17', or "
-                                          "'2013-5-17 12:45'")
-    end = forms.DateTimeField(help_text="e.g. '2013-5-18', or "
-                                        "'2013-5-18 9:05'")
+    start = forms.DateTimeField(help_text="e.g. '2013-5-17', or '2013-5-17 12:45'")
+    end = forms.DateTimeField(help_text="e.g. '2013-5-18', or '2013-5-18 9:05'")
     download = forms.BooleanField(initial=True, required=False)
 
     def clean(self):
@@ -81,14 +78,10 @@ class CoincidenceDownloadForm(forms.Form):
     cluster = forms.ModelChoiceField(Cluster.objects.filter(parent=None),
                                      empty_label='---------',
                                      required=False)
-    stations = forms.CharField(help_text="e.g. '103, 104, 105'",
-                               required=False)
-    start = forms.DateTimeField(help_text="e.g. '2014-4-5', or "
-                                          "'2014-4-18 12:45'")
-    end = forms.DateTimeField(help_text="e.g. '2014-4-29', or "
-                                        "'2014-04-30 9:05'")
-    n = forms.IntegerField(min_value=2, help_text="Minimum number of events "
-                                                  "in a coincidence")
+    stations = forms.CharField(help_text="e.g. '103, 104, 105'", required=False)
+    start = forms.DateTimeField(help_text="e.g. '2014-4-5', or '2014-4-18 12:45'")
+    end = forms.DateTimeField(help_text="e.g. '2014-4-29', or '2014-04-30 9:05'")
+    n = forms.IntegerField(min_value=2, help_text="Minimum number of events in a coincidence")
     download = forms.BooleanField(initial=True, required=False)
 
     def clean(self):
@@ -112,8 +105,7 @@ class CoincidenceDownloadForm(forms.Form):
                 msg = u'A list of stations is required.'
             else:
                 try:
-                    s_numbers = [int(x)
-                                 for x in stations.strip('[]()').split(',')]
+                    s_numbers = [int(x) for x in stations.strip('[]()').split(',')]
                 except Exception:
                     msg = u'Incorrect station entry.'
                 else:
@@ -121,8 +113,7 @@ class CoincidenceDownloadForm(forms.Form):
                         msg = u'Enter at least N stations.'
                     elif len(s_numbers) > 30:
                         msg = u'Exceeded limit of 30 stations.'
-                    elif not (Station.objects.filter(number__in=s_numbers)
-                                     .count() == len(s_numbers)):
+                    elif not Station.objects.filter(number__in=s_numbers).count() == len(s_numbers):
                         msg = u'Invalid station numbers.'
             if msg is not None:
                 self.add_error('stations', msg)

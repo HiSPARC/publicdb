@@ -616,10 +616,12 @@ def station_latest(request, station_number):
 
     date = summary.date
 
-    plots = {histogram.type.slug: plot_histogram(histogram) for histogram in summary.histograms.filter(type__slug='eventtime')}
+    plots = {histogram.type.slug: plot_histogram(histogram)
+             for histogram in summary.histograms.filter(type__slug='eventtime')}
     plots.update({histogram.type.slug: plot_histogram(histogram)
                   for histogram in summary.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])})
-    plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in summary.datasets.filter(type__slug='barometer')})
+    plots.update({dataset.type.slug: plot_dataset(dataset)
+                  for dataset in summary.datasets.filter(type__slug='barometer')})
 
     # Show alternative
     extra_station = None
@@ -678,8 +680,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         try:
             last = (Summary.objects
                            .valid_date()
-                           .filter(station__number=station_number,
-                                   num_events__isnull=False)
+                           .filter(station__number=station_number, num_events__isnull=False)
                            .latest()
                            .date)
         except Summary.DoesNotExist:
@@ -690,9 +691,7 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         try:
             start = (Summary.objects
                             .valid_date()
-                            .filter(station__number=station_number,
-                                    date__lt=end,
-                                    num_events__isnull=False)
+                            .filter(station__number=station_number, date__lt=end, num_events__isnull=False)
                             .earliest()
                             .date)
         except Summary.DoesNotExist:
@@ -812,8 +811,7 @@ def get_detector_timing_offsets_source(request, station_number):
     return response
 
 
-def get_station_timing_offsets_source(request, ref_station_number,
-                                      station_number):
+def get_station_timing_offsets_source(request, ref_station_number, station_number):
     ref_station_number = int(ref_station_number)
     station_number = int(station_number)
 
@@ -835,8 +833,7 @@ def get_station_timing_offsets_source(request, ref_station_number,
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1))]
 
-    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]),
-             none_to_nan(r[2]))
+    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]), none_to_nan(r[2]))
             for r in data]
 
     buffer = StringIO()
