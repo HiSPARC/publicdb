@@ -18,12 +18,12 @@ from django.conf import settings
 # from sapphire.analysis.calibration import datetime_range
 from sapphire.utils import round_in_base
 
-from . import datastore, esd, fit_pulseheight_peak
+from . import datastore, esd
 from ..inforecords.models import Station
 from ..station_layout.models import StationLayout
 from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType, DetectorTimingOffset,
                      GeneratorState, HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
-                     NetworkSummary, PulseheightFit, StationTimingOffset, Summary)
+                     NetworkSummary, StationTimingOffset, Summary)
 
 logger = logging.getLogger(__name__)
 
@@ -248,7 +248,6 @@ def perform_events_tasks(summary):
     logger.info("Updating event histograms for %s", summary)
     update_eventtime_histogram(summary)
     update_pulseheight_histogram(summary)
-    update_pulseheight_fit(summary)
     update_pulseintegral_histogram(summary)
     update_detector_timing_offsets(summary)
     tmp_locations = []
@@ -398,16 +397,6 @@ def update_pulseheight_histogram(summary):
     pulseheights = esd.get_pulseheights(summary)
     bins, histograms = create_histogram(pulseheights, MAX_PH, BIN_PH_NUM)
     save_histograms(summary, 'pulseheight', bins, histograms)
-
-
-def update_pulseheight_fit(summary):
-    logger.debug("Updating pulseheight fit for %s", summary)
-    try:
-        fits = fit_pulseheight_peak.get_pulseheight_fits(summary)
-    except Configuration.DoesNotExist:
-        logger.debug("No Configuration for station: %d.", summary.station.number)
-        return
-    save_pulseheight_fits(summary, fits)
 
 
 def update_pulseintegral_histogram(summary):
@@ -651,22 +640,6 @@ def save_dataset(summary, slug, x, y):
     else:
         MultiDailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
     logger.debug("Saved succesfully")
-
-
-def save_pulseheight_fits(summary, fits):
-    if len(fits) == 0:
-        logger.debug("Empty pulseheight fit results. Nothing to save.")
-        return
-    logger.debug("Saving pulseheight fits for %s", summary)
-    for fit in fits:
-        try:
-            fit.save()
-        except django.db.IntegrityError:
-            existing_fit = PulseheightFit.objects.get(summary=summary, plate=fit.plate)
-            fit.id = existing_fit.id
-            fit.save()
-
-    logger.debug("Saved successfully")
 
 
 def save_offsets(summary, offsets):

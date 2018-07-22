@@ -419,20 +419,6 @@ class Pc(models.Model):
                 EnabledService(pc=self, monitor_service=service).save()
 
 
-class MonitorPulseheightThresholds(models.Model):
-    station = models.ForeignKey(Station, models.CASCADE, related_name='pulsehieght_thresholds')
-    plate = models.IntegerField()
-
-    mpv_mean = models.FloatField()
-    mpv_sigma = models.FloatField()
-    mpv_max_allowed_drift = models.FloatField()
-    mpv_min_allowed_drift = models.FloatField()
-
-    class Meta:
-        verbose_name = "Pulseheight threshold for Nagios"
-        verbose_name_plural = "Pulseheight thresholds for Nagios"
-
-
 class MonitorService(models.Model):
     description = models.CharField(max_length=40, unique=True)
     nagios_command = models.CharField(max_length=70)

@@ -8,9 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from ..histograms.models import Configuration
 from ..status_display.views import station_has_data
-from .models import Cluster, Contact, MonitorPulseheightThresholds, Pc, Station
+from .models import Cluster, Contact, Pc, Station
 
 
 @login_required
@@ -59,11 +58,6 @@ def create_nagios_config(request):
         for service in services_to_check:
             check_command = service.monitor_service.nagios_command
 
-            # Skip pulseheight monitoring here, we will do it somewhere below
-            # because it requires its own custom check interval
-            if check_command.count('check_pulseheight'):
-                continue
-
             # Let's see if we need to pass parameters to this service
             if check_command.count('check_nrpe'):
 
@@ -91,33 +85,9 @@ def create_nagios_config(request):
 
         has_data = station_has_data(host.station)
 
-        # Add the pulseheight monitoring service here
-        # For every plate it retrieves the thresholds values. These are then
-        # passed to the template via the "hosts" variable
-
-        pulseheight_thresholds = []
-
-        try:
-            for service in services_to_check:
-                check_command = service.monitor_service.nagios_command
-
-                if not check_command.count('check_pulseheight_mpv'):
-                    continue
-
-                number_of_detectors = host.station.number_of_detectors()
-
-                pulseheight_thresholds = (
-                    MonitorPulseheightThresholds.objects.filter(
-                        station=host.station, plate__lte=number_of_detectors))
-                break
-
-        except Configuration.DoesNotExist:
-            pass
-
         # Append this host to the hosts list
         hosts.append({'pc': host,
                       'services': services,
-                      'pulseheight_thresholds': pulseheight_thresholds,
                       'has_data': has_data})
 
     # Render the template

@@ -133,13 +133,6 @@ class ConfigurationAdmin(admin.ModelAdmin):
     raw_id_fields = ('summary',)
 
 
-@admin.register(models.PulseheightFit)
-class PulseheightFitAdmin(admin.ModelAdmin):
-    list_display = ('station', 'date', 'plate', 'fitted_mpv')
-    list_filter = ('summary__station__number', 'plate', 'summary__date')
-    raw_id_fields = ('summary',)
-
-
 @admin.register(models.DetectorTimingOffset)
 class DetectorTimingOffsetAdmin(admin.ModelAdmin):
     list_display = ('summary', 'offset_1', 'offset_2', 'offset_3', 'offset_4')

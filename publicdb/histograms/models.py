@@ -371,49 +371,6 @@ class GeneratorState(models.Model):
     update_is_running = models.BooleanField(default=False)
 
 
-class PulseheightFit(models.Model):
-    DETECTOR_CHOICES = ((1, 'Scintillator 1'),
-                        (2, 'Scintillator 2'),
-                        (3, 'Scintillator 3'),
-                        (4, 'Scintillator 4'))
-
-    summary = models.ForeignKey(Summary, models.CASCADE, related_name='pulseheight_fits')
-    plate = models.IntegerField(choices=DETECTOR_CHOICES)
-
-    initial_mpv = models.FloatField()
-    initial_width = models.FloatField()
-
-    fitted_mpv = models.FloatField()
-    fitted_mpv_error = models.FloatField()
-    fitted_width = models.FloatField()
-    fitted_width_error = models.FloatField()
-
-    degrees_of_freedom = models.IntegerField(default=0)
-    chi_square_reduced = models.FloatField()
-
-    error_type = models.CharField(default="", max_length=64)
-    error_message = models.TextField(default="")
-
-    def station(self):
-        return self.summary.station.number
-    station.admin_order_field = 'summary__station__number'
-
-    def date(self):
-        return self.summary.date
-    date.admin_order_field = 'summary__date'
-
-    def __unicode__(self):
-        return "%d - %s - %d" % (self.summary.station.number,
-                                 self.summary.date.strftime('%d %b %Y'),
-                                 self.plate)
-
-    class Meta:
-        verbose_name = 'Pulseheight fit'
-        verbose_name_plural = 'Pulseheight fits'
-        unique_together = ('summary', 'plate')
-        ordering = ['summary', 'plate']
-
-
 class DetectorTimingOffset(models.Model):
     summary = models.ForeignKey(Summary, models.CASCADE, related_name='detector_timing_offsets')
     offset_1 = models.FloatField(blank=True, null=True)
