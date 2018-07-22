@@ -4,7 +4,6 @@ Check for new data, and update summaries and flags.
 """
 import datetime
 import logging
-import multiprocessing
 import time
 
 from . import datastore
