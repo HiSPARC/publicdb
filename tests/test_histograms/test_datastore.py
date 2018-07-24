@@ -45,8 +45,10 @@ class TestDatastore(TestCase):
 
     def test_get_config_messages(self):
         """Get all stations with a node in the test data"""
-        result = datastore.get_config_messages('amsterdam', 501, datetime.date(2017, 1, 1))
-        station_node = result[0].root.hisparc.cluster_amsterdam.station_501
+        try:
+            result = datastore.get_config_messages('amsterdam', 501, datetime.date(2017, 1, 1))
+            station_node = result[0].root.hisparc.cluster_amsterdam.station_501
 
-        self.assertEqual((result[0], station_node.config, station_node.blobs), result)
-
+            self.assertEqual((result[0], station_node.config, station_node.blobs), result)
+        finally:
+            result[0].close()
