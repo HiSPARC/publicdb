@@ -3,6 +3,7 @@ import time
 
 from os.path import abspath, dirname, join
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 
 from publicdb.histograms import datastore
@@ -31,3 +32,21 @@ class TestDatastore(TestCase):
                 }
             },
             event_summary)
+
+    def test_get_stations(self):
+        """Get all stations with a node in the test data"""
+
+        self.assertEqual([501], datastore.get_stations(datetime.date(2017, 1, 1)))
+
+    def test_get_data_path(self):
+        """Get all stations with a node in the test data"""
+
+        self.assertEqual(join(settings.DATASTORE_PATH, '2017/1/2017_1_1.h5'), datastore.get_data_path(datetime.date(2017, 1, 1)))
+
+    def test_get_config_messages(self):
+        """Get all stations with a node in the test data"""
+        result = datastore.get_config_messages('amsterdam', 501, datetime.date(2017, 1, 1))
+        station_node = result[0].root.hisparc.cluster_amsterdam.station_501
+
+        self.assertEqual((result[0], station_node.config, station_node.blobs), result)
+
