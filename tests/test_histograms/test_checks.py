@@ -71,7 +71,7 @@ class TestChecks(TestCase):
         self.assertTrue(network_summary.needs_update_coincidences)
 
     @patch('publicdb.histograms.datastore.check_for_new_events')
-    def test_check_for_new_events_and_update_flags_updates_summaries(self, mock_events):
+    def test_check_for_new_events_and_update_flags_updates_existing_summary(self, mock_events):
         mock_events.return_value = {
             date(2017, 1, 1): {
                 501: {
