@@ -166,11 +166,14 @@ def process_and_store_temporary_esd_for_summary(summary):
     django.db.close_old_connections()
     tmp_locations = []
     if summary.needs_update_events:
-        tmp_locations.append(process_events_and_store_esd(summary))
+        logger.info("Processing events and storing ESD for %s", summary)
+        tmp_locations.append(esd.process_events_and_store_temporary_esd(summary))
     if summary.needs_update_weather:
-        tmp_locations.append(process_weather_and_store_esd(summary))
+        logger.info("Processing weather and storing ESD for %s", summary)
+        tmp_locations.append(esd.process_weather_and_store_temporary_esd(summary))
     if summary.needs_update_singles:
-        tmp_locations.append(process_singles_and_store_esd(summary))
+        logger.info("Processing singles and storing ESD for %s", summary)
+        tmp_locations.append(esd.process_singles_and_store_temporary_esd(summary))
     return summary, tmp_locations
 
 
@@ -182,8 +185,12 @@ def search_and_store_coincidences(network_summary):
     """
     django.db.close_old_connections()
     if network_summary.needs_update_coincidences:
-        search_coincidences_and_store_esd(network_summary)
-        determine_time_delta_and_store_esd(network_summary)
+        logger.info("Processing coincidences and storing ESD for %s", network_summary)
+        num_coincidences = esd.search_coincidences_and_store_in_esd(network_summary)
+        network_summary.num_coincidences = num_coincidences
+
+        logger.info("Processing time deltas and storing ESD for %s", network_summary)
+        esd.determine_time_delta_and_store_in_esd(network_summary)
     return network_summary
 
 
@@ -295,46 +302,6 @@ def perform_coincidences_tasks(network_summary):
     update_coincidencenumber_histogram(network_summary)
     update_station_timing_offsets(network_summary)
     return network_summary, []
-
-
-def search_coincidences_and_store_esd(network_summary):
-    """Search and store coincidences, and store the number of coincidences"""
-
-    logger.info("Processing coincidences and storing ESD for %s", network_summary)
-    t0 = time.time()
-    num_coincidences = esd.search_coincidences_and_store_in_esd(network_summary)
-    t1 = time.time()
-    network_summary.num_coincidences = num_coincidences
-    logger.debug("Processing took %.1f s.", t1 - t0)
-
-
-def determine_time_delta_and_store_esd(network_summary):
-    logger.info("Processing time deltas and storing ESD for %s", network_summary)
-    t0 = time.time()
-    esd.determine_time_delta_and_store_in_esd(network_summary)
-    t1 = time.time()
-    logger.debug("Processing took %.1f s.", t1 - t0)
-
-
-def process_events_and_store_esd(summary):
-    logger.info("Processing events and storing ESD for %s", summary)
-    t0 = time.time()
-    tmpfile_path, node_path = esd.process_events_and_store_temporary_esd(summary)
-    t1 = time.time()
-    logger.debug("Processing took %.1f s.", t1 - t0)
-    return tmpfile_path, node_path
-
-
-def process_weather_and_store_esd(summary):
-    logger.info("Processing weather and storing ESD for %s", summary)
-    tmpfile_path, node_path = esd.process_weather_and_store_temporary_esd(summary)
-    return tmpfile_path, node_path
-
-
-def process_singles_and_store_esd(summary):
-    logger.info("Processing singles and storing ESD for %s", summary)
-    tmpfile_path, node_path = esd.process_singles_and_store_temporary_esd(summary)
-    return tmpfile_path, node_path
 
 
 def update_eventtime_histogram(summary):
