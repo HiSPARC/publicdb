@@ -244,7 +244,7 @@ class SessionRequest(models.Model):
         subject = 'HiSPARC analysis session created with less events'
         message = textwrap.dedent(
             '''\
-            Hello %s,'
+            Hello %s,
 
             Your analysis session for jSparc has been created.
             Title = %s
