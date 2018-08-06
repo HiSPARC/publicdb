@@ -88,10 +88,10 @@ class TestChecks(TestCase):
         self.setup_station()
         summary = histograms_factories.SummaryFactory(
             station=self.station, date=date(2017, 1, 1),
-            num_events=100, needs_update_events=False,
-            num_weather=None, needs_update_weather=False,
-            num_config=None, needs_update_config=False,
-            num_singles=10, needs_update_singles=False,
+            needs_update_events=False, num_events=100,
+            needs_update_weather=False, num_weather=None,
+            needs_update_config=False, num_config=None,
+            needs_update_singles=False, num_singles=10,
         )
 
         state = Mock(check_last_run=datetime(2004, 1, 1, 1, 0, 0))
