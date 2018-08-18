@@ -6,4 +6,4 @@ python-dateutil==2.6.1
 
 raven
 
-hisparc-sapphire==1.7.0
+hisparc-sapphire==1.7.1
