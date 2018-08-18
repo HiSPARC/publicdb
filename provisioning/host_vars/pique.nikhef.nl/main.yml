@@ -16,6 +16,7 @@ email_backend: django.core.mail.backends.smtp.EmailBackend
 email_host: smtp.nikhef.nl
 email_port: 25
 
+publicdb_base: http://data.hisparc.nl
 media_url: http://data.hisparc.nl/media/
 static_url: http://data.hisparc.nl/static/
 
