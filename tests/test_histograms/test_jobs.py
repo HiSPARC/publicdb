@@ -1,4 +1,5 @@
 from datetime import date
+from os import environ
 from os.path import abspath, dirname, join
 from shutil import rmtree
 from tempfile import mkdtemp
@@ -6,7 +7,7 @@ from tempfile import mkdtemp
 from mock import patch
 
 from django.conf import settings
-from django.test import TestCase, override_settings
+from django.test import LiveServerTestCase, override_settings
 
 from sapphire.tests.validate_results import validate_results
 
@@ -16,7 +17,19 @@ from ..factories import histograms_factories, inforecords_factories
 
 
 @override_settings(DATASTORE_PATH=join(dirname(abspath(__file__)), 'test_data/datastore'))
-class TestJobs(TestCase):
+class TestJobs(LiveServerTestCase):
+
+    fixtures = ['initial_generator_state.json']
+
+    def setUp(self):
+        super(TestJobs, self).setUp()
+        self._old_publicdb_base = environ.get('PUBLICDB_BASE')
+        environ['PUBLICDB_BASE'] = self.live_server_url
+
+    def tearDown(self):
+        super(TestJobs, self).tearDown()
+        if self._old_publicdb_base:
+            environ['PUBLICDB_BASE'] = self._old_publicdb_base
 
     @patch('django.db.close_old_connections')
     @patch('publicdb.histograms.jobs.perform_update_tasks')
