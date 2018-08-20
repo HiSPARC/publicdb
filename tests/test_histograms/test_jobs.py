@@ -60,7 +60,7 @@ class TestJobs(LiveServerTestCase):
         """Update the ESD for summaries in need of updates"""
 
         self.setup_station()
-        histograms_factories.SummaryFactory(
+        summary = histograms_factories.SummaryFactory(
             station=self.station, date=date(2017, 1, 1),
             needs_update_events=True, num_events=168,
             needs_update_weather=True, num_weather=60,
@@ -71,9 +71,18 @@ class TestJobs(LiveServerTestCase):
 
         jobs.perform_update_tasks()
 
+        # Created data should equal reference file
         test_data = join(settings.ESD_PATH, '2017/1/2017_1_1.h5')
         reference_path = join(dirname(abspath(__file__)), 'test_data/esd/2017/1/2017_1_1.h5')
         validate_results(self, test_data, reference_path)
         rmtree(settings.ESD_PATH)
 
-        self.assertEqual(1, models.Configuration.objects.all().count())
+        # Procesed configuration from data into database
+        self.assertEqual(1, models.Configuration.objects.filter(summary=summary).count())
+
+        # Calculated detector offsets
+        detector_offset = models.DetectorTimingOffset.objects.get(summary=summary)
+        self.assertEqual(-0.25, detector_offset.offset_1)
+        self.assertEqual(0.0, detector_offset.offset_2)
+        self.assertEqual(1.75, detector_offset.offset_3)
+        self.assertEqual(0.5, detector_offset.offset_4)
