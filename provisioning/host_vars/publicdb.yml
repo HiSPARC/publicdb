@@ -16,7 +16,7 @@ email_backend: django.core.mail.backends.console.EmailBackend
 email_host: smtp.example.com
 email_port: 25
 
-publicdb_base: http://localhost:80/
+publicdb_host: http://localhost:80/
 media_url: /media/
 static_url: /static/
 
