@@ -14,8 +14,8 @@ maps_patterns = [
 ]
 
 network_patterns = [
-    url(r'^network/coincidences/$', views.LatestNetworkSummaryRedirectView.as_view(), name="coincidences"),
-    url(r'^network/coincidences/' + DATE_REGEX, views.NetworkSummaryDetailView.as_view(), name="coincidences"),
+    url(r'^coincidences/$', views.LatestNetworkSummaryRedirectView.as_view(), name="coincidences"),
+    url(r'^coincidences/' + DATE_REGEX, views.NetworkSummaryDetailView.as_view(), name="coincidences"),
 ]
 
 station_patterns = [
