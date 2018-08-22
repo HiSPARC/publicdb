@@ -12,13 +12,10 @@ FIRSTDATE = datetime.date(2004, 1, 1)
 class NetworkSummaryQuerySet(models.QuerySet):
     def valid_date(self):
         """Filter by date to dates between start and today"""
-        return self.filter(
-            date__gte=FIRSTDATE,
-            date__lte=datetime.date.today())
+        return self.filter(date__gte=FIRSTDATE, date__lte=datetime.date.today())
 
     def with_coincidences(self):
-        return self.valid_date().filter(
-            num_coincidences__isnull=False)
+        return self.valid_date().filter(num_coincidences__isnull=False)
 
 
 class NetworkSummary(models.Model):
@@ -89,8 +86,7 @@ class Summary(models.Model):
         return reverse('status:station:data', kwargs=kwargs)
 
     def __unicode__(self):
-        return 'Summary: %d - %s' % (self.station.number,
-                                     self.date.strftime('%d %b %Y'))
+        return 'Summary: %d - %s' % (self.station.number, self.date.strftime('%d %b %Y'))
 
     class Meta:
         verbose_name = 'Summary'
