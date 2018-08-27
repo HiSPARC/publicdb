@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, time, timedelta
 
 from django.test import TestCase
 
@@ -76,3 +76,45 @@ class TestSummary(TestCase):
         # invalid past date
         histograms_factories.SummaryFactory(date=date(2002, 1, 1), station=self.station)
         self.assertEqual(self.batch_size, models.Summary.objects.with_config().count())
+
+
+class TestConfiguration(TestCase):
+    def setUp(self):
+        self.station = inforecords_factories.StationFactory(number=9, cluster__number=0, cluster__country__number=0)
+        self.summary = histograms_factories.SummaryFactory(station=self.station, date=date(2016, 1, 12))
+        self.configuration = histograms_factories.ConfigurationFactory(
+            summary=self.summary, timestamp=datetime.combine(self.summary.date, time(10, 11, 20)))
+
+    def test_str(self):
+        self.assertEqual('9 - 2016-01-12 10:11:20', str(self.configuration))
+
+    def test_station(self):
+        self.assertEqual(9, self.configuration.station())
+
+    def test_master(self):
+        master_version = int(self.configuration.mas_version.split(' ')[1])
+        self.assertEqual(master_version, self.configuration.master)
+        self.assertEqual(self.configuration._master(), self.configuration.master)
+
+    def test_slave(self):
+        slave_version = int(self.configuration.slv_version.split(' ')[1])
+        self.assertEqual(slave_version, self.configuration.slave)
+        self.assertEqual(self.configuration._slave(), self.configuration.slave)
+
+    def test_master_fpga(self):
+        master_fpga_version = int(self.configuration.mas_version.split(' ')[3])
+        self.assertEqual(master_fpga_version, self.configuration.master_fpga)
+
+    def test_slave_fpga(self):
+        slave_fpga_version = int(self.configuration.slv_version.split(' ')[3])
+        self.assertEqual(slave_fpga_version, self.configuration.slave_fpga)
+
+    def test_extract_hardware_serial(self):
+        self.assertEqual(123, self.configuration.extract_hardware_serial('Foo 123 Bar 456'))
+        self.assertEqual(-1, self.configuration.extract_hardware_serial('Foo 0 Bar 456'))
+        self.assertEqual(-1, self.configuration.extract_hardware_serial('Foo'))
+
+    def test_extract_fpga_version(self):
+        self.assertEqual(456, self.configuration.extract_fpga_version('Foo 123 Bar 456'))
+        self.assertEqual(-1, self.configuration.extract_fpga_version('Foo 123 Bar 0'))
+        self.assertEqual(-1, self.configuration.extract_fpga_version('Foo 123 Bar'))
