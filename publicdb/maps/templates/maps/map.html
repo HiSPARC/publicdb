@@ -36,7 +36,7 @@
                             );
                             station.bindTooltip("{{ station.number }}", {direction: 'top'})
                                 {% if station.link %}
-                                   .bindPopup("Station: <a href='{% url 'status:station:data' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
+                                   .bindPopup("Station: <a href='{% url 'status:station:summary' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
                                 {% else %}
                                    .bindPopup("Station: {{ station.number }} - {{ station.name }}<br>" +
                                 {% endif %}

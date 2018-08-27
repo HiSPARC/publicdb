@@ -19,8 +19,8 @@ network_patterns = [
 ]
 
 station_patterns = [
-    url(r'^(?P<station_number>\d+)/$', views.LatestSummaryRedirectView.as_view(), name="data"),
-    url(r'^' + STATION_DATE_REGEX, views.SummaryDetailView.as_view(), name="data"),
+    url(r'^(?P<station_number>\d+)/$', views.LatestSummaryRedirectView.as_view(), name="summary"),
+    url(r'^' + STATION_DATE_REGEX, views.SummaryDetailView.as_view(), name="summary"),
     url(r'^(?P<station_number>\d+)/status/$', views.station_status, name="status"),
     url(r'^(?P<station_number>\d+)/config/$', views.station_config, name="config"),
     url(r'^(?P<station_number>\d+)/latest/$', views.station_latest, name="latest"),

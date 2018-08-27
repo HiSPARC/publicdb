@@ -26,7 +26,7 @@
                         <li>
                             <!--<a href="{% url 'status:station:status' station.number %}">--><span class='statusBall {{ station.status }}'></span></a>
                           {% if station.link %}
-                            <a href="{% url 'status:station:data' station.number %}">
+                            <a href="{% url 'status:station:summary' station.number %}">
                               {{ station.number }} &mdash; {{ station.name }}
                             </a>
                           {% else %}
@@ -49,7 +49,7 @@
             <li>
                 <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.status }}'></span></a>
               {% if station.link %}
-                <a href="{% url 'status:station:data' station.number %}">
+                <a href="{% url 'status:station:summary' station.number %}">
                   {{ station.number }} &mdash; {{ station.name }}
                 </a>
               {% else %}

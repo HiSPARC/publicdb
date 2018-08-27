@@ -83,7 +83,7 @@ class Summary(models.Model):
                   'year': self.date.year,
                   'month': self.date.month,
                   'day': self.date.day}
-        return reverse('status:station:data', kwargs=kwargs)
+        return reverse('status:station:summary', kwargs=kwargs)
 
     def __unicode__(self):
         return 'Summary: %d - %s' % (self.station.number, self.date.strftime('%d %b %Y'))
