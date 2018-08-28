@@ -14,7 +14,7 @@ cache:
 
 before_cache:
   - rm -rf $HOME/miniconda/envs/build_env
-  - conda clean --yes --packages
+  - conda clean --yes --quiet --packages
 
 before_install:
   - if [ -f $HOME/miniconda/bin/conda ] ; then
