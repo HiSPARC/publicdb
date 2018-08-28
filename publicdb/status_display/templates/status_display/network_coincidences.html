@@ -89,7 +89,7 @@
           {% for day in week %}
             <td class="day">
               {% if day.link %}
-                <a {% if date.day == day.day %}class='currentDate'{% endif %} href="{% url 'status:network:coincidences' day.link.0 day.link.1 day.link.2 %}">{{ day.day }}</a>
+                <a {% if date.day == day.day %}class='currentDate'{% endif %} href="{{ day.link }}">{{ day.day }}</a>
               {% else %}
                 <span class="nolink">{{ day.day }}</span>
               {% endif %}
@@ -104,7 +104,7 @@
       {% for month in month_list %}
         <li>
           {% if month.link %}
-            <a {% if date.month == month.month %}class='currentDate'{% endif %} href="{% url 'status:network:coincidences' month.link.0 month.link.1 month.link.2 %}">{{ month.month }}</a>
+            <a {% if date.month == month.month %}class='currentDate'{% endif %} href="{{ month.link }}">{{ month.month }}</a>
           {% else %}
             <span class="nolink">{{ month.month }}</span>
           {% endif %}
@@ -118,7 +118,7 @@
       {% for year in year_list %}
         <li>
           {% if year.link %}
-            <a {% if date.year == year.year %}class='currentDate'{% endif %} href="{% url 'status:network:coincidences' year.link.0 year.link.1 year.link.2 %}">{{ year.year }}</a>
+            <a {% if date.year == year.year %}class='currentDate'{% endif %} href="{{ year.link }}">{{ year.year }}</a>
           {% else %}
             <span class="nolink">{{ year.year }}</span>
           {% endif %}

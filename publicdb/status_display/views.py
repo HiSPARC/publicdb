@@ -276,22 +276,21 @@ class NetworkSummaryDetailView(DateDetailView):
 
         month = calendar.Calendar().monthdatescalendar(date.year, date.month)
 
-        days_with_data = (NetworkSummary.objects.with_coincidences()
-                                        .filter(date__year=date.year, date__month=date.month)
-                                        .values_list('date', flat=True))
+        days_with_data = self.get_queryset().filter(date__year=date.year, date__month=date.month)
+        days_with_data = {day.date: day.get_absolute_url() for day in days_with_data}
 
         weeks = []
         for week in month:
             days = []
             for day in week:
                 if day.month == date.month:
-                    if day in days_with_data:
-                        link = (date.year, date.month, day.day)
-                    else:
+                    try:
+                        link = days_with_data[day]
+                    except KeyError:
                         link = None
                     days.append({'day': day.day, 'link': link})
                 else:
-                    days.append('')
+                    days.append(None)
             weeks.append(days)
 
         return {'days': calendar.day_abbr[:], 'weeks': weeks}
@@ -301,35 +300,29 @@ class NetworkSummaryDetailView(DateDetailView):
 
         date = self.object.date
 
-        date_list = (NetworkSummary.objects.with_coincidences()
-                                   .filter(date__year=date.year)
-                                   .dates('date', 'month'))
+        date_list = self.get_queryset().filter(date__year=date.year).dates('date', 'month')
 
         month_list = [{'month': month} for month in calendar.month_abbr[1:]]
 
         for date in date_list:
-            first_day = (NetworkSummary.objects.with_coincidences()
-                                       .filter(date__year=date.year, date__month=date.month)
-                                       .dates('date', 'day')[0])
-            link = (date.year, date.month, first_day.day)
-            month_list[date.month - 1]['link'] = link
+            first_of_month = (self.get_queryset()
+                                  .filter(date__year=date.year, date__month=date.month)
+                                  .earliest().get_absolute_url())
+            month_list[date.month - 1]['link'] = first_of_month
 
         return month_list
 
     def nav_years(self):
         """Create list of previous years"""
 
-        years_with_data = NetworkSummary.objects.with_coincidences().dates('date', 'year')
+        years_with_data = self.get_queryset().dates('date', 'year')
         years_with_data = [date.year for date in years_with_data]
 
         year_list = []
         for year in range(years_with_data[0], years_with_data[-1] + 1):
             if year in years_with_data:
-                first_day = (NetworkSummary.objects.with_coincidences()
-                                           .filter(date__year=year)
-                                           .dates('date', 'day')[0])
-                link = (year, first_day.month, first_day.day)
-                year_list.append({'year': year, 'link': link})
+                first_of_year = self.get_queryset().filter(date__year=year).earliest().get_absolute_url()
+                year_list.append({'year': year, 'link': first_of_year})
             else:
                 year_list.append({'year': year, 'link': None})
         return year_list
