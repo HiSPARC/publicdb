@@ -103,14 +103,6 @@
   become: true
   notify: restart nagios
 
-- name: copy mpv check script
-  copy:
-    src: check_pulseheight_mpv.py
-    dest: /usr/lib64/nagios/plugins
-    mode: 0755
-  become: true
-  notify: restart nagios
-
 - name: ensure apache is started
   service:
     name: httpd

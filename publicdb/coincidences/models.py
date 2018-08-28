@@ -24,11 +24,12 @@ class Coincidence(models.Model):
         return self.events.count()
 
     def __unicode__(self):
-        return '%d-fold - %s %s %d' % (self.num_events(), self.date,
-                                       self.time, self.nanoseconds)
+        return '%d-fold - %s %s %d' % (self.num_events(), self.date, self.time, self.nanoseconds)
 
     class Meta:
-        ordering = ('date', 'time', 'nanoseconds')
+        verbose_name = 'Coincidence'
+        verbose_name_plural = 'Coincidences'
+        ordering = ['date', 'time', 'nanoseconds']
 
 
 class Event(models.Model):
@@ -36,14 +37,15 @@ class Event(models.Model):
     time = models.TimeField()
     nanoseconds = models.IntegerField()
     coincidence = models.ForeignKey(Coincidence, models.CASCADE, related_name='events')
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='events')
     pulseheights = ArrayField(models.IntegerField(), size=4)
     integrals = ArrayField(models.IntegerField(), size=4)
     traces = ArrayField(ArrayField(models.IntegerField()), size=4)
 
     class Meta:
-        ordering = ('date', 'time', 'nanoseconds', 'station')
+        verbose_name = 'Event'
+        verbose_name_plural = 'Events'
+        ordering = ['date', 'time', 'nanoseconds', 'station']
 
     def __unicode__(self):
-        return '%d - %s %s %d' % (self.station.number, self.date, self.time,
-                                  self.nanoseconds)
+        return '%d - %s %s %d' % (self.station.number, self.date, self.time, self.nanoseconds)

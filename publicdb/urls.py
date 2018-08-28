@@ -15,7 +15,7 @@ urlpatterns = [
     url(r'^layout/', include('publicdb.station_layout.urls')),
     url(r'^analysis-session/', include('publicdb.analysissessions.urls')),
     url(r'^software-updates/', include('publicdb.updates.urls')),
-    url(r'^raw_data/', include('publicdb.raw_data.urls')),
+    url(r'^raw_data/', include('publicdb.raw_data.urls', namespace='raw_data')),
     url(r'^data/', include('publicdb.raw_data.urls')),
 
     url(r'^config/nagios$', create_nagios_config, name='nagios_config'),

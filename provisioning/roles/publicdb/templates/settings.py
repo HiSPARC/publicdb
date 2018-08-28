@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
 # Django settings for publicdb project.
 
-import os.path
+from os import environ, path
 
-dirname = os.path.dirname(__file__)
-PUBLICDB_PATH = os.path.join(dirname, '..')
+dirname = path.dirname(__file__)
+PUBLICDB_PATH = path.join(dirname, '..')
 
 DEBUG = {{ debug }}
 
@@ -29,7 +29,7 @@ DATABASES = {
 
 # Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = '/databases/frome'
-TEST_DATASTORE_PATH = os.path.join(PUBLICDB_PATH, 'datastore_test')
+TEST_DATASTORE_PATH = path.join(PUBLICDB_PATH, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = '/srv/publicdb/www/esd'
@@ -44,6 +44,9 @@ DATASTORE_PROXY = '{{ datastore_proxy }}'
 # VPN and datastore host names
 VPN_HOST = '{{ vpn_host }}'
 DATASTORE_HOST = '{{ datastore_host }}'
+
+# Configure HiSPARC public database url for SAPPHiRE
+environ['PUBLICDB_BASE'] = '{{ publicdb_host }}'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -68,12 +71,6 @@ MEDIA_URL = '{{ media_url }}'
 STATIC_ROOT = '{{ publicdb_static }}'
 STATIC_URL = '{{ static_url }}'
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
 SECRET_KEY = '{{ secret_key }}'
 
 TEMPLATES = [
@@ -90,7 +87,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
-    # 'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',

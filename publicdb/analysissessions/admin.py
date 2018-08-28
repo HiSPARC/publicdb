@@ -26,6 +26,5 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(models.SessionRequest)
 class SessionRequestAdmin(admin.ModelAdmin):
-    list_display = ('cluster', 'school', 'name', 'start_date',
-                    'events_created')
+    list_display = ('cluster', 'school', 'name', 'start_date', 'events_created')
     list_filter = ('cluster', 'start_date')

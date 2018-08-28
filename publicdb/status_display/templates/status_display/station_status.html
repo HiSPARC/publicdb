@@ -1,0 +1,17 @@
+{% extends 'status_display/base_station.html' %}
+
+{% block current_status %}currentPage{% endblock %}
+
+{% block title %}{{ block.super }} - Status{% endblock %}
+
+{% block data %}
+    {% if pc.is_active %}
+    <div id="nagios">
+        <iframe width="100%" height="100%" frameborder="0" scrolling="auto" src="http://vpn.hisparc.nl/cgi-bin/status.cgi?host={{ pc.name }}&style=detail"></iframe>
+    </div>
+    {% else %}
+    <div id="graphs">
+        <p>The current status of this station is not being monitored. It is considered inactive.</p>
+    </div>
+    {% endif %}
+{% endblock %}

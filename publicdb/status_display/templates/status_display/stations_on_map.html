@@ -1,0 +1,63 @@
+{% extends 'status_display/base_stations.html' %}
+
+{% load fix_strings %}
+{% load static %}
+
+{% block current_map %}currentPage{% endblock %}
+
+{% block head %}
+    <script>
+        $(document).ready(function() {
+            var map = createMap("stationMap");
+
+            {% if center %}
+                map.setView(L.latLng({{ center.latitude }}, {{ center.longitude }}), 17);
+            {% endif %}
+
+            var station;
+            {% for subcluster in subclusters %}
+                var {{ subcluster.name|slugify|remove_hyphens }} = L.featureGroup();
+                    {% for station in subcluster.stations %}
+                        {% if station.longitude and station.latitude %}
+                            station = L.circleMarker(
+                                L.latLng({{ station.latitude }}, {{ station.longitude }}),
+                                $.extend({}, pointStyle, {color: statusColors.{{ station.status }}})
+                            );
+                            station.bindTooltip("{{ station.number }}", {direction: 'top'})
+                                {% if station.link %}
+                                   .bindPopup("Station: <a href='{% url 'status:station:summary' station.number %}'>{{ station.number }} - {{ station.name }}</a><br>" +
+                                {% else %}
+                                   .bindPopup("Station: {{ station.number }} - {{ station.name }}<br>" +
+                                {% endif %}
+                                              "Cluster: {{ station.cluster }}");
+                            {{ subcluster.name|slugify|remove_hyphens }}.addLayer(
+                                station
+                            );
+                        {% endif %}
+                    {% endfor %}
+                {{ subcluster.name|slugify|remove_hyphens }}.addTo(map);
+            {% endfor %}
+            // Zoom to fit cluster
+            {% if focus %}
+                {% for layer in focus %}
+                    {% if forloop.first %}
+                        var bounds = {{ layer|slugify|remove_hyphens }}.getBounds();
+                    {% else %}
+                        bounds.extend({{ layer|slugify|remove_hyphens }}.getBounds());
+                    {% endif %}
+                {% endfor %}
+                if (bounds) {
+                    map.fitBounds(bounds, {padding: boundsPadding});
+                }
+            {% endif %}
+        });
+    </script>
+{% endblock %}
+
+{% block header %}
+    Map of HiSPARC stations
+{% endblock %}
+
+{% block map %}
+    <div id="stationMap"></div>
+{% endblock %}

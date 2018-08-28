@@ -24,7 +24,8 @@ def traces_mv_to_adc(traces):
 def serialiseddatafield_to_arrayfield(apps, schema_editor):
     """Forwards migrations"""
     model = apps.get_model('coincidences', 'Event')
-    print('')
+    if model.objects.all().count():
+        print('')
     for event in pbar(model.objects.all().iterator(), length=model.objects.all().count()):
         event.pulseheights = mv_to_adc(event.old_pulseheights)
         event.integrals = mvns_to_adcsample(event.old_integrals)

@@ -105,18 +105,6 @@ class PcFactory(factory.DjangoModelFactory):
         model = models.Pc
 
 
-class MonitorPulseheightThresholdsFactory(factory.DjangoModelFactory):
-    station = factory.SubFactory(StationFactory)
-    plate = factory.Faker('random_int', min=1, max=4)
-    mpv_mean = factory.Faker('float', min=0, max=500)
-    mpv_sigma = factory.Faker('float', min=0, max=10)
-    mpv_max_allowed_drift = factory.Faker('float', min=0, max=100)
-    mpv_min_allowed_drift = factory.Faker('float', min=-100, max=0)
-
-    class Meta:
-        model = models.MonitorPulseheightThresholds
-
-
 class MonitorServiceFactory(factory.DjangoModelFactory):
     description = factory.Faker('word')
     nagios_command = factory.Faker('word')

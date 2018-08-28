@@ -19,7 +19,7 @@ class UpdateQueue(models.Model):
 class AdminUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
     update = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='admin_updates')
 
     def __unicode__(self):
         return 'Queue: %s - Admin Update v%d' % (self.queue, self.version)
@@ -30,14 +30,16 @@ class AdminUpdate(models.Model):
         super(AdminUpdate, self).save(*args, **kwargs)
 
     class Meta:
+        verbose_name = 'Admin update'
+        verbose_name_plural = 'Admin updates'
         unique_together = ('queue', 'version')
-        ordering = ('version',)
+        ordering = ['-version']
 
 
 class UserUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
     update = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='user_updates')
 
     def __unicode__(self):
         return 'Queue: %s - User Update v%d' % (self.queue, self.version)
@@ -51,14 +53,16 @@ class UserUpdate(models.Model):
             return
 
     class Meta:
+        verbose_name = 'User update'
+        verbose_name_plural = 'User updates'
         unique_together = ('queue', 'version')
-        ordering = ('version',)
+        ordering = ['-version']
 
 
 class InstallerUpdate(models.Model):
     version = models.CharField(max_length=5)
     installer = models.FileField(upload_to=upload_queue)
-    queue = models.ForeignKey(UpdateQueue, models.CASCADE)
+    queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='installer_updates')
 
     def __unicode__(self):
         return 'Installer v%s' % self.version
@@ -69,5 +73,7 @@ class InstallerUpdate(models.Model):
         super(InstallerUpdate, self).save(*args, **kwargs)
 
     class Meta:
+        verbose_name = 'Installer update'
+        verbose_name_plural = 'Installer updates'
         unique_together = ('queue', 'version')
-        ordering = ('version',)
+        ordering = ['-version']

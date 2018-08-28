@@ -11,7 +11,7 @@ from ..inforecords.models import Station
 
 
 class StationLayout(models.Model):
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='layouts')
     active_date = models.DateTimeField()
     detector_1_radius = models.FloatField()
     detector_1_alpha = models.FloatField()
@@ -36,8 +36,10 @@ class StationLayout(models.Model):
                 self.detector_4_radius is not None)
 
     class Meta:
-        unique_together = [('station', 'active_date')]
-        ordering = ('station', 'active_date')
+        verbose_name = 'Station layout'
+        verbose_name_plural = 'Station layouts'
+        unique_together = ('station', 'active_date')
+        ordering = ['station', 'active_date']
         get_latest_by = 'active_date'
 
     def save(self, *args, **kwargs):
@@ -71,7 +73,7 @@ class StationLayoutQuarantine(models.Model):
     hash_submit = models.CharField(max_length=32)
     hash_review = models.CharField(max_length=32)
 
-    station = models.ForeignKey(Station, models.CASCADE)
+    station = models.ForeignKey(Station, models.CASCADE, related_name='quarantined_layouts')
     active_date = models.DateTimeField()
     detector_1_radius = models.FloatField()
     detector_1_alpha = models.FloatField()
@@ -89,6 +91,10 @@ class StationLayoutQuarantine(models.Model):
     detector_4_alpha = models.FloatField(null=True, blank=True)
     detector_4_height = models.FloatField(null=True, blank=True)
     detector_4_beta = models.FloatField(null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Station layout quarantine'
+        verbose_name_plural = 'Station layouts quarantine'
 
     def generate_hashes(self):
         hashs = os.urandom(16).encode('hex')
