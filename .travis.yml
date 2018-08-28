@@ -61,4 +61,4 @@ deploy:
   name: HiSPARC-Bot
   on:
     branch: master
-    python: 2.7
+    condition: "$CONDA_PYTHON = 2.7"
