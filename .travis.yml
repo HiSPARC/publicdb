@@ -1,6 +1,14 @@
 language: python
 python:
-  - "2.7"
+  - "3.6"
+
+env:
+  - CONDA_PYTHON="2.7"
+  - CONDA_PYTHON="3.6"
+
+matrix:
+  allow_failures:
+  - env: CONDA_PYTHON="3.6"
 
 sudo: false
 
@@ -20,7 +28,7 @@ before_install:
   - if [ -f $HOME/miniconda/bin/conda ] ; then
       echo "Using cached miniconda";
     else
-      wget --no-verbose http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh;
+      wget --no-verbose https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
       rm -rf $HOME/miniconda;
       bash miniconda.sh -b -p $HOME/miniconda;
     fi
@@ -28,7 +36,7 @@ before_install:
   - conda update --yes conda
 
 install:
-  - conda create --yes -n build_env python=$TRAVIS_PYTHON_VERSION
+  - conda create --yes -n build_env python=$CONDA_PYTHON
   - source activate build_env
   - make devinstall
 
