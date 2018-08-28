@@ -1,5 +1,6 @@
 from datetime import date, datetime, time, timedelta
 
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 
 from publicdb.histograms import models
@@ -118,3 +119,44 @@ class TestConfiguration(TestCase):
         self.assertEqual(456, self.configuration.extract_fpga_version('Foo 123 Bar 456'))
         self.assertEqual(-1, self.configuration.extract_fpga_version('Foo 123 Bar 0'))
         self.assertEqual(-1, self.configuration.extract_fpga_version('Foo 123 Bar'))
+
+
+class TestHistogramType(TestCase):
+    def test_str(self):
+        histogram_type = histograms_factories.HistogramTypeFactory.build()
+        self.assertEqual(histogram_type.name, str(histogram_type))
+
+
+class TestDatasetType(TestCase):
+    def test_str(self):
+        dataset_type = histograms_factories.DatasetTypeFactory.build()
+        self.assertEqual(dataset_type.name, str(dataset_type))
+
+
+class TestStationTimingOffset(TestCase):
+    def setUp(self):
+        self.ref_station = inforecords_factories.StationFactory(number=9, cluster__number=0, cluster__country__number=0)
+        self.ref_summary = histograms_factories.SummaryFactory(station=self.ref_station, date=date(2016, 1, 12))
+        self.ref_summary_date = histograms_factories.SummaryFactory(station=self.ref_station, date=date(2010, 2, 13))
+
+        self.station = inforecords_factories.StationFactory(number=13, cluster__number=0, cluster__country__number=0)
+        self.summary = histograms_factories.SummaryFactory(station=self.station, date=date(2016, 1, 12))
+        self.summary_date = histograms_factories.SummaryFactory(station=self.station, date=date(2010, 2, 13))
+
+    def test_clean(self):
+        offset = histograms_factories.StationTimingOffsetFactory.build(ref_summary=self.ref_summary, summary=self.summary)
+        offset.clean()
+
+    def test_clean_same_station(self):
+        offset = histograms_factories.StationTimingOffsetFactory.build(ref_summary=self.ref_summary, summary=self.ref_summary)
+        with self.assertRaisesMessage(ValidationError, 'stations'):
+            offset.clean()
+
+        offset = histograms_factories.StationTimingOffsetFactory.build(ref_summary=self.ref_summary, summary=self.ref_summary_date)
+        with self.assertRaisesMessage(ValidationError, 'stations'):
+            offset.clean()
+
+    def test_clean_different_date(self):
+        offset = histograms_factories.StationTimingOffsetFactory.build(ref_summary=self.ref_summary, summary=self.summary_date)
+        with self.assertRaisesMessage(ValidationError, 'summary dates'):
+            offset.clean()
