@@ -16,7 +16,7 @@ from publicdb.histograms import jobs, models
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(DATASTORE_PATH=join(dirname(abspath(__file__)), 'test_data/datastore'))
+@override_settings(DATASTORE_PATH=join(dirname(abspath(__file__)), '../data/datastore'))
 class TestJobs(LiveServerTestCase):
 
     fixtures = ['initial_generator_state.json']
@@ -73,7 +73,7 @@ class TestJobs(LiveServerTestCase):
 
         # Created data should equal reference file
         test_data = join(settings.ESD_PATH, '2017/1/2017_1_1.h5')
-        reference_path = join(dirname(abspath(__file__)), 'test_data/esd/2017/1/2017_1_1.h5')
+        reference_path = join(dirname(abspath(__file__)), '../data/esd/2017/1/2017_1_1.h5')
         validate_results(self, test_data, reference_path)
         rmtree(settings.ESD_PATH)
 
