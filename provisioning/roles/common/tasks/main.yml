@@ -10,6 +10,7 @@
     - public_keys/kaspervd.pub
     - public_keys/tkooij.pub
     - public_keys/tond.pub
+    - public_keys/danielk.pub
 
 - name: upgrade all packages
   yum:
