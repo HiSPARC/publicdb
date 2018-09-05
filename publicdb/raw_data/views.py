@@ -159,10 +159,11 @@ def download_form(request, station_number=None, start=None, end=None):
             query_string = urllib.urlencode({'start': start, 'end': end, 'download': download})
             if data_type == 'lightning':
                 lightning_type = form.cleaned_data['lightning_type']
-                url = reverse('data:lightning', lightning_type=lightning_type)
+                url = reverse('data:lightning', kwargs={'lightning_type': lightning_type})
             else:
                 station = form.cleaned_data['station']
-                url = reverse('data:{data_type}'.format(data_type=data_type), station_number=station.number)
+                url = reverse('data:{data_type}'.format(data_type=data_type),
+                              kwargs={'station_number': station.number})
             return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
     else:
         if station_number:
