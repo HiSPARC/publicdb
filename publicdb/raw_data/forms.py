@@ -13,6 +13,7 @@ LGT_TYPES = [('0', 'Single-point'),
              ('3', 'Cloud-cloud end'),
              ('4', 'Cloud-ground'),
              ('5', 'Cloud-ground return')]
+
 FILTER = [('network', 'Network'),
           ('cluster', 'Cluster'),
           ('stations', 'Stations')]
@@ -39,37 +40,17 @@ class DataDownloadForm(forms.Form):
 
         cleaned_data = super(DataDownloadForm, self).clean()
         data_type = cleaned_data.get('data_type')
-        if data_type == 'events':
-            del cleaned_data["station_weather"]
-            del cleaned_data["lightning_type"]
-            del cleaned_data["station_singles"]
-            station = cleaned_data.get('station_events')
-            if not station:
-                self.add_error("station_events", u'Choose a station')
+
+        for station_data_type in ['events', 'weather', 'singles']:
+            station_field = 'station_{}'.format(station_data_type)
+            if data_type == station_data_type:
+                station = cleaned_data.get(station_field)
+                if not station:
+                    self.add_error(station_field, u'Choose a station')
+                else:
+                    cleaned_data["station"] = station
             else:
-                cleaned_data["station"] = station
-        elif data_type == 'weather':
-            del cleaned_data["station_events"]
-            del cleaned_data["lightning_type"]
-            del cleaned_data["station_singles"]
-            station = cleaned_data.get('station_weather')
-            if not station:
-                self.add_error("station_weather", u'Choose a station')
-            else:
-                cleaned_data["station"] = station
-        elif data_type == 'singles':
-            del cleaned_data["station_events"]
-            del cleaned_data["station_weather"]
-            del cleaned_data["lightning_type"]
-            station = cleaned_data.get('station_singles')
-            if not station:
-                self.add_error("station_events", u'Choose a station')
-            else:
-                cleaned_data["station"] = station
-        elif data_type == 'lightning':
-            del cleaned_data["station_events"]
-            del cleaned_data["station_weather"]
-            del cleaned_data["station_singles"]
+                del cleaned_data[station_field]
         return cleaned_data
 
 
