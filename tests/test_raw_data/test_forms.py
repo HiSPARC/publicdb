@@ -1,9 +1,6 @@
 import datetime
 
-from os.path import abspath, dirname, join
-
-from django.test import Client, TestCase, override_settings
-from django.urls import reverse
+from django.test import TestCase
 
 from publicdb.raw_data.forms import CoincidenceDownloadForm, DataDownloadForm
 
