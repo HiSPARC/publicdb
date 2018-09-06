@@ -7,7 +7,7 @@
     line: "{{ item.key }}={{ item.value }}"
   with_dict:
     BOOTPROTO: static
-    IPADDR: 192.16.192.33
+    IPADDR: 192.16.186.201
     NETMASK: 255.255.255.0
     ONBOOT: 'yes'
   become: true
