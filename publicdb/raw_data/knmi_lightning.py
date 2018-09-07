@@ -33,8 +33,7 @@ def discharges(datafile, start, end, type=4):
     cg_idx = numpy.where(discharge_table.event_type[:] == type)
 
     for idx in cg_idx[0]:
-        ts, ns = get_gps_timestamp(reference_date,
-                                   discharge_table.time_offset[idx])
+        ts, ns = get_gps_timestamp(reference_date, discharge_table.time_offset[idx])
         if start <= ts < end:
             yield {'timestamp': ts,
                    'nanoseconds': ns,

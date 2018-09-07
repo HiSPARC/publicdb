@@ -107,7 +107,7 @@ do::
 
 To generate the histograms for the downloaded data::
 
-    $ python scripts/hisparc-update.py
+    $ ./manage.py updatehistograms
 
 If you have access to a `publicdb_dump.sql` file to fill the database with,
 place the file in the publicdb directory, log into the machine, and load the

@@ -1,10 +1,11 @@
-import datetime
 import os
 import zlib
 
 import tables
 
 from django.conf import settings
+
+from sapphire import gps_to_datetime
 
 
 def get_event_traces(station, ext_timestamp, raw=False):
@@ -17,12 +18,12 @@ def get_event_traces(station, ext_timestamp, raw=False):
                 subtracted baseline.
 
     """
-    date = ext_timestamp_to_datetime(ext_timestamp)
-    path = get_data_path(date)
+    timestamp, nanoseconds = split_ext_timestamp(ext_timestamp)
+    dt = gps_to_datetime(timestamp)
+    path = get_data_path(dt)
     with tables.open_file(path, 'r') as file:
         node = get_station_node(file, station)
-        ts, ns = split_ext_timestamp(ext_timestamp)
-        traces = retrieve_traces(node, ts, ns, raw)
+        traces = retrieve_traces(node, timestamp, nanoseconds, raw)
     return traces
 
 
@@ -33,14 +34,14 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
     :param timestamp, nanoseconds: time of the event
 
     """
-    event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' %
-                                   (timestamp, nanoseconds))[0]
+    event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' % (timestamp, nanoseconds))[0]
     traces_idx = event['traces']
     baselines = event['baseline']
     traces_str = [zlib.decompress(node.blobs[trace_idx]).split(',')
                   for trace_idx in traces_idx if trace_idx != -1]
-    traces = [[int(val) if baseline == -999 or raw else int(val) - baseline
-               for val in trace_str if val != '']
+
+    traces = [[int(value) if baseline == -999 or raw else int(value) - baseline
+               for value in trace_str if value != '']
               for baseline, trace_str in zip(baselines, traces_str)]
 
     return traces
@@ -67,14 +68,8 @@ def get_data_path(date):
     return os.path.join(rootdir, filepath)
 
 
-def ext_timestamp_to_datetime(ext_timestamp):
-    """Extract timestamp from ext_timestamp to make datetime object"""
-    timestamp = int(ext_timestamp / 1e9)
-    return datetime.datetime.utcfromtimestamp(timestamp)
-
-
 def split_ext_timestamp(ext_timestamp):
     """Separate timestamp and nanoseconds from ext_timestamp"""
     timestamp = int(ext_timestamp / 1e9)
-    nanoseconds = ext_timestamp % 1000000000
+    nanoseconds = ext_timestamp % int(1e9)
     return timestamp, nanoseconds

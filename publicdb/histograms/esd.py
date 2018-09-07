@@ -22,7 +22,7 @@ from . import datastore
 from ..inforecords.models import Station
 from .models import DetectorTimingOffset
 
-logger = logging.getLogger('histograms.esd')
+logger = logging.getLogger(__name__)
 
 # Limit the coincidence window to 10 microseconds,
 COINCIDENCE_WINDOW = 10000  # nanoseconds
@@ -42,20 +42,17 @@ def search_coincidences_and_store_in_esd(network_summary):
     date = network_summary.date
 
     # Get non-test stations with events on the specified date
-    stations = Station.objects.filter(summary__date=date,
-                                      summary__num_events__isnull=False,
-                                      summary__needs_update=False,
-                                      pc__is_test=False).distinct()
+    stations = Station.objects.filter(summaries__date=date,
+                                      summaries__num_events__isnull=False,
+                                      summaries__needs_update=False,
+                                      pcs__is_test=False).distinct()
 
     station_numbers = [station.number for station in stations]
-    station_groups = ['/hisparc/cluster_%s/station_%d' %
-                      (station.cluster.main_cluster().lower(), station.number)
-                      for station in stations]
+    station_groups = [get_station_node_path(station) for station in stations]
 
     filepath = get_esd_data_path(date)
     with tables.open_file(filepath, 'a') as data:
-        coinc = CoincidencesESD(data, '/coincidences', station_groups,
-                                overwrite=True, progress=False)
+        coinc = CoincidencesESD(data, '/coincidences', station_groups, overwrite=True, progress=False)
         coinc.search_coincidences(window=COINCIDENCE_WINDOW)
         coinc.store_coincidences(station_numbers=station_numbers)
         num_coincidences = len(coinc.coincidences)
@@ -79,8 +76,7 @@ def determine_time_delta_and_store_in_esd(network_summary):
         td = ProcessTimeDeltas(data, progress=False)
         td.find_station_pairs()
         station_numbers = {station for pair in td.pairs for station in pair}
-        td.detector_timing_offsets = {sn: get_offset_function(sn, date)
-                                      for sn in station_numbers}
+        td.detector_timing_offsets = {sn: get_offset_function(sn, date) for sn in station_numbers}
         td.determine_and_store_time_deltas_for_pairs()
 
 
@@ -126,8 +122,7 @@ def process_weather_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process = ProcessWeatherFromSource(source_file, tmp_file,
-                                               source_node, '/')
+            process = ProcessWeatherFromSource(source_file, tmp_file, source_node, '/')
             process.process_and_store_results()
             node_path = process.source._v_pathname
     return tmp_filename, node_path
@@ -150,8 +145,7 @@ def process_singles_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process = ProcessSinglesFromSource(source_file, tmp_file,
-                                               source_node, '/')
+            process = ProcessSinglesFromSource(source_file, tmp_file, source_node, '/')
             process.process_and_store_results()
             node_path = process.source._v_pathname
     return tmp_filename, node_path
@@ -176,8 +170,7 @@ def reconstruct_events_and_store_temporary_esd(summary):
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             reconstruct = ReconstructESDEventsFromSource(
-                source_file, tmp_file, source_path, '/', station.number,
-                progress=False)
+                source_file, tmp_file, source_path, '/', station.number, progress=False)
             reconstruct.reconstruct_and_store()
             node_path = reconstruct.reconstructions._v_pathname
     return tmp_filename, node_path
@@ -225,8 +218,7 @@ def get_station_node_path(station):
 
     """
     cluster = station.cluster.main_cluster()
-    return '/hisparc/cluster_%s/station_%d' % (cluster.lower(),
-                                               station.number)
+    return '/hisparc/cluster_%s/station_%d' % (cluster.lower(), station.number)
 
 
 def create_temporary_file():
@@ -511,10 +503,8 @@ def get_singles(summary):
 
     n_detectors = summary.station.number_of_detectors()
     if n_detectors == 4:
-        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'],
-                         data['slv_ch1_high'], data['slv_ch2_high']))
-        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'],
-                        data['slv_ch1_low'], data['slv_ch2_low']))
+        high = np.stack((data['mas_ch1_high'], data['mas_ch2_high'], data['slv_ch1_high'], data['slv_ch2_high']))
+        low = np.stack((data['mas_ch1_low'], data['mas_ch2_low'], data['slv_ch1_low'], data['slv_ch2_low']))
     else:
         high = np.stack((data['mas_ch1_high'], data['mas_ch2_high']))
         low = np.stack((data['mas_ch1_low'], data['mas_ch2_low']))
@@ -539,8 +529,7 @@ def get_coincidences(network_summary, tablename, quantity):
             coincidences_node = get_coincidences_node(datafile)
             table = datafile.get_node(coincidences_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename,
-                         network_summary)
+            logger.error("Cannot find table %s for %s", tablename, network_summary)
             data = None
         else:
             data = table.col(quantity)
@@ -566,8 +555,7 @@ def get_time_series(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename,
-                         summary)
+            logger.error("Cannot find table %s for %s", tablename, summary)
             data = None
         else:
             col1 = table.col('timestamp')
@@ -590,13 +578,11 @@ def get_timedeltas(date, ref_station, station):
     try:
         with tables.open_file(path, 'r') as datafile:
             try:
-                table_path = '/time_deltas/station_%d/station_%d' % \
-                    (ref_station, station)
+                table_path = '/time_deltas/station_%d/station_%d' % (ref_station, station)
                 tablename = 'time_deltas'
                 table = datafile.get_node(table_path, tablename)
             except tables.NoSuchNodeError:
-                logger.debug("Cannot find table %s %s for %s", table_path,
-                             tablename, date)
+                logger.debug("Cannot find table %s %s for %s", table_path, tablename, date)
                 data = None
             else:
                 data = table.col('delta')
@@ -634,8 +620,7 @@ def get_offset_function(station, date):
 def get_detector_offsets(station, date):
     """Get detector offsets for a station on a specific date"""
 
-    do = DetectorTimingOffset.objects.get(source__station__number=station,
-                                          source__date=date)
+    do = DetectorTimingOffset.objects.get(summary__station__number=station, summary__date=date)
     offsets = [do.offset_1, do.offset_2, do.offset_3, do.offset_4]
     return [o if o is not None else np.nan for o in offsets]
 
@@ -648,8 +633,7 @@ def get_station_numbers_from_esd_coincidences(network_summary):
     with tables.open_file(filepath, 'r') as data:
         s_index = data.root.coincidences.s_index
         re_number = re.compile('[0-9]+$')
-        s_numbers = [int(re_number.search(s_path).group())
-                     for s_path in s_index]
+        s_numbers = [int(re_number.search(s_path).group()) for s_path in s_index]
     return s_numbers
 
 

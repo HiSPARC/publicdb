@@ -1,23 +1,24 @@
 import datetime
 import hashlib
 import os
-import re
 import textwrap
 
 import tables
 
-from django.conf import settings
 from django.core.mail import send_mail
 from django.db import models
 from django.template.defaultfilters import slugify
 
-from sapphire.analysis import coincidences
+from sapphire import CoincidenceQuery, gps_to_datetime
 
+from ..api.datastore import get_event_traces, split_ext_timestamp
 from ..coincidences.models import Coincidence, Event
+from ..histograms.esd import get_esd_data_path
 from ..inforecords.models import Station
 
 
 class AnalysisSession(models.Model):
+    session_request = models.OneToOneField('SessionRequest', models.CASCADE)
     title = models.CharField(max_length=40, blank=False, unique=True)
     slug = models.SlugField(unique=True)
     hash = models.CharField(max_length=32)
@@ -38,19 +39,27 @@ class AnalysisSession(models.Model):
     def __unicode__(self):
         return self.title
 
+    class Meta:
+        verbose_name = 'Analysis session'
+        verbose_name_plural = 'Analysis sessions'
+
 
 class Student(models.Model):
-    session = models.ForeignKey(AnalysisSession, models.CASCADE)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
         return '%s - %s' % (self.session, self.name)
 
+    class Meta:
+        verbose_name = 'Student'
+        verbose_name_plural = 'Students'
+
 
 class AnalyzedCoincidence(models.Model):
-    session = models.ForeignKey(AnalysisSession, models.CASCADE)
-    coincidence = models.ForeignKey(Coincidence, models.CASCADE)
-    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True)
+    session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='analyzed_coincidences')
+    coincidence = models.ForeignKey(Coincidence, models.CASCADE, related_name='analyzed_coincidences')
+    student = models.ForeignKey(Student, models.SET_NULL, null=True, blank=True, related_name='analyzed_coincidences')
     is_analyzed = models.BooleanField(default=False)
     core_position_x = models.FloatField(null=True, blank=True)
     core_position_y = models.FloatField(null=True, blank=True)
@@ -63,7 +72,9 @@ class AnalyzedCoincidence(models.Model):
         return "%s - %s" % (self.coincidence, self.student)
 
     class Meta:
-        ordering = ('coincidence',)
+        verbose_name = 'Analyzed coincidence'
+        verbose_name_plural = 'Analyzed coincidences'
+        ordering = ['coincidence']
 
 
 class SessionRequest(models.Model):
@@ -71,17 +82,21 @@ class SessionRequest(models.Model):
     sur_name = models.CharField(max_length=50)
     email = models.EmailField()
     school = models.CharField(max_length=50)
-    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE)
+    cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE, related_name='session_requests')
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
     start_date = models.DateField()
     mail_send = models.BooleanField(default=False)
     session_confirmed = models.BooleanField(default=False)
-    session_created = models.BooleanField(default=False)
     session_pending = models.BooleanField(default=False)
+    session_created = models.BooleanField(default=False)
     url = models.CharField(max_length=20)
     sid = models.CharField(max_length=50, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        verbose_name = 'Session request'
+        verbose_name_plural = 'Session requests'
 
     @property
     def name(self):
@@ -93,11 +108,13 @@ class SessionRequest(models.Model):
         starts = datetime.datetime.now()
         session_length = datetime.timedelta(weeks=4)
         ends = starts + session_length
-        session = AnalysisSession(starts=starts,
-                                  ends=ends,
-                                  pin=str(self.pin),
-                                  slug=slugify(self.sid),
-                                  title=self.sid)
+        session = AnalysisSession(
+            session_request=self,
+            starts=starts,
+            ends=ends,
+            pin=str(self.pin),
+            slug=slugify(self.sid),
+            title=self.sid)
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
@@ -114,116 +131,71 @@ class SessionRequest(models.Model):
             self.sendmail_created()
             self.session_created = True
         self.save()
-        return [self.sid, self.pin]
 
     def find_coincidence(self, date, session):
-        filepath = date.strftime('%Y/%-m/%Y_%-m_%-d.h5')
-        datastore_path = os.path.join(settings.DATASTORE_PATH, filepath)
-        ndups = 0
-        nvalid = 0
-        if not os.path.isfile(datastore_path):
-            return nvalid
-        with tables.open_file(datastore_path, 'r') as data:
-            try:
-                stations = self.get_stations_for_session(data)
-            except Exception, msg:
-                print("Error in get_stations_for_session(data)")
-                print("Error:", msg)
-                return nvalid
+        """Find coincidences for the given cluster on the given date
 
-            coinc = coincidences.Coincidences(
-                data, None, stations, progress=False)
-            c_list, timestamps = coinc._search_coincidences()
-            for coincidence in c_list:
-                if len(coincidence) >= 3:
-                    event_list = coincidences.get_events(
-                        data, stations, coincidence, timestamps)
-                    station_list = [x[0] for x in event_list]
-                    if len(set(station_list)) == len(station_list):
-                        self.save_coincidence(event_list, session)
-                        nvalid += 1
-                    else:
-                        ndups += 1
-        if ndups:
-            print('%d duplicate stations dropped' % ndups)
-        print("Succesfully stored %d coincidences" % nvalid)
-        return nvalid
+        Store the found coincidences and events in the database.
+        Then return the number of found coincidences.
 
-    def get_stations_for_session(self, data):
-        main_cluster = self.cluster.main_cluster()
-        cluster_group_name = '/hisparc/cluster_' + main_cluster.lower()
+        """
+        stations = Station.objects.filter(cluster=self.cluster, pcs__is_test=False).distinct().values_list('number')
+        path = get_esd_data_path(date)
 
-        try:
-            cluster_group = data.get_node(cluster_group_name)
-        except tables.NodeError:
-            return []
+        if not os.path.isfile(path):
+            # No data file, so no coincidences
+            return 0
 
-        stations = []
-        for station in Station.objects.filter(cluster=self.cluster,
-                                              pc__is_test=False).distinct():
-            station_group_name = 'station_%d' % station.number
+        number_of_coincidences = 0
 
-            if station_group_name in cluster_group:
-                station_group = data.get_node(cluster_group_name,
-                                              station_group_name)
-                stations.append(station_group)
-        return stations
+        # Get all coincidences containing stations in the requested cluster
+        with tables.open_file(path, 'r') as data:
+            cq = CoincidenceQuery(data)
+            coincidences = cq.any(stations)
+            events = cq.events_from_stations(coincidences, stations, n=3)
+            # Todo: Double check for multiple events from same station,
+            self.save_coincidence(events, session)
+            number_of_coincidences += 1
 
-    def save_coincidence(self, event_list, session):
-        timestamps = []
-        events = []
+        return number_of_coincidences
 
-        for station, event, traces in event_list:
-            station = int(re.match('station_(\d+)', station._v_name).group(1))
-            date_time = datetime.datetime.utcfromtimestamp(event['timestamp'])
-            timestamps.append((date_time, event['nanoseconds']))
+    def save_coincidence(self, events, session):
+        event_timestamps = []
+        event_objects = []
 
-            traces = traces.tolist()
-            dt = self.analyze_traces(traces)
-            event = Event(date=date_time.date(),
-                          time=date_time.time(),
-                          nanoseconds=event['nanoseconds'] - dt,
-                          station=Station.objects.get(number=station),
+        for station_number, event in events:
+            station = Station.objects.get(number=station_number)
+            traces = get_event_traces(station, event['ext_timestamp'])
+
+            trace_ext_timestamp = int(event['ext_timestamp']) - event['t_trigger']
+            trace_timestamp, trace_nanoseconds = split_ext_timestamp(trace_ext_timestamp)
+            event_datetime = gps_to_datetime(trace_timestamp)
+            event_timestamps.append((event_datetime, trace_nanoseconds))
+
+            event = Event(date=event_datetime.date(),
+                          time=event_datetime.time(),
+                          nanoseconds=trace_nanoseconds,
+                          station=station,
                           pulseheights=event['pulseheights'].tolist(),
                           integrals=event['integrals'].tolist(),
                           traces=traces)
-            events.append(event)
 
-        first_timestamp = sorted(timestamps)[0]
+        first_timestamp = min(event_timestamps)
         coincidence = Coincidence(date=first_timestamp[0].date(),
                                   time=first_timestamp[0].time(),
                                   nanoseconds=first_timestamp[1])
         coincidence.save()
 
-        for event in events:
+        for event in event_objects:
             event.coincidence = coincidence
             event.save()
 
-        analyzed_coincidence = AnalyzedCoincidence(session=session,
-                                                   coincidence=coincidence)
+        analyzed_coincidence = AnalyzedCoincidence(session=session, coincidence=coincidence)
         analyzed_coincidence.save()
-
-    def analyze_traces(self, traces):
-        """Analyze traces and determine time of first particle"""
-
-        arrival_times = []
-        for trace in traces:
-            if not max(trace) < 20:
-                # No significant pulse (not more than 20 ADC over baseline)
-                continue
-            for index, v in enumerate(trace):
-                if v >= 20:
-                    break
-            arrival_times.append(index * 2.5)
-        if len(arrival_times) > 0:
-            trace_timing = min(arrival_times)
-        else:
-            trace_timing = -999
-        return trace_timing
 
     def generate_url(self):
         newurl = os.urandom(10).encode('hex')
-        if SessionRequest.objects.filter(url=newurl):
+        if SessionRequest.objects.filter(url=newurl).exists():
             self.generate_url()
         else:
             self.url = newurl
@@ -267,14 +239,12 @@ class SessionRequest(models.Model):
             (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()
 
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
         message = textwrap.dedent(
             '''\
-            Hello %s,'
+            Hello %s,
 
             Your analysis session for jSparc has been created.
             Title = %s
@@ -294,8 +264,6 @@ class SessionRequest(models.Model):
             (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()
 
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
@@ -312,5 +280,3 @@ class SessionRequest(models.Model):
             self.name)
         sender = 'info@hisparc.nl'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
-        self.mail_send = True
-        self.save()

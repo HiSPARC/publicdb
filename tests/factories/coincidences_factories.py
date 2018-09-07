@@ -4,7 +4,7 @@ import factory
 
 from publicdb.coincidences import models
 
-from .inforrecords_factories import StationFactory
+from .inforecords_factories import StationFactory
 from .providers import DataProvider
 
 factory.Faker.add_provider(DataProvider)

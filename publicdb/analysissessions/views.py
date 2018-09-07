@@ -1,4 +1,3 @@
-import calendar
 import json
 import operator
 
@@ -9,6 +8,8 @@ import numpy as np
 
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
+
+from sapphire import datetime_to_gps
 
 from ..histograms.models import Configuration
 from .forms import SessionRequestForm
@@ -24,8 +25,7 @@ def get_coincidence(request):
 
     if session_title.lower() == 'example':
         today = date.today()
-        coincidences = AnalyzedCoincidence.objects.filter(
-            session__ends__gt=today)
+        coincidences = AnalyzedCoincidence.objects.filter(session__ends__gt=today)
         count = coincidences.count()
         if not count:
             return error_json(404, 'No coincidences available.')
@@ -45,45 +45,41 @@ def get_coincidence(request):
         raise
     else:
         if not session.in_progress():
-            return error_json(404, "The requested session has not started yet "
-                                   "or is already expired.")
+            return error_json(404, "The requested session has not started yet or is already expired.")
 
     if not student_name:
         student = Student.objects.get(session=session, name='Test student')
     else:
         student, is_created = Student.objects.get_or_create(session=session, name=student_name)
 
-    coincidences = AnalyzedCoincidence.objects.filter(session=session)
+    analyzed_coincidences = AnalyzedCoincidence.objects.filter(session=session)
     try:
-        coincidence = coincidences.filter(student=student, is_analyzed=False)[0]
+        analyzed_coincidence = analyzed_coincidences.filter(student=student, is_analyzed=False)[0]
     except IndexError:
         try:
-            coincidence = coincidences.filter(student=None, is_analyzed=False)[0]
-            coincidence.student = student
-            coincidence.save()
+            analyzed_coincidence = analyzed_coincidences.filter(student=None, is_analyzed=False)[0]
+            analyzed_coincidence.student = student
+            analyzed_coincidence.save()
         except IndexError:
-            return error_json(404, "No unanalysed coincidences available, "
-                                   "request a new session.")
+            return error_json(404, "No unanalysed coincidences available, request a new session.")
 
-    events = get_events(coincidence)
-    response = data_json(coincidence, events)
+    events = get_events(analyzed_coincidence)
+    response = data_json(analyzed_coincidence, events)
     return response
 
 
-def get_events(coincidence):
+def get_events(analyzed_coincidence):
     """Get events that belong to this coincidence"""
     events = []
-    for event in coincidence.coincidence.events.all():
+    for event in analyzed_coincidence.coincidence.events.all():
         try:
             config = (Configuration.objects
-                                   .filter(source__station=event.station,
-                                           source__date__lte=event.date)
-                                   .exclude(gps_latitude=0,
-                                            gps_longitude=0).latest())
+                                   .filter(summary__station=event.station, summary__date__lte=event.date)
+                                   .exclude(gps_latitude=0, gps_longitude=0).latest())
         except Configuration.DoesNotExist:
             continue
 
-        timestamp = calendar.timegm(datetime.combine(event.date, event.time).utctimetuple())
+        timestamp = datetime_to_gps(datetime.combine(event.date, event.time))
         event_dict = dict(timestamp=timestamp,
                           nanoseconds=event.nanoseconds,
                           number=event.station.number,
@@ -95,19 +91,16 @@ def get_events(coincidence):
                           traces=event.traces,
                           pulseheights=event.pulseheights,
                           integrals=event.integrals,
-                          mips=[ph / 200. if ph > 0 else ph
-                                for ph in event.pulseheights])
+                          mips=[ph / 200. if ph > 0 else ph for ph in event.pulseheights])
         events.append(event_dict)
     return events
 
 
 def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
+    timestamp = datetime_to_gps(datetime.combine(coincidence.coincidence.date, coincidence.coincidence.time))
     data = dict(pk=coincidence.pk,
-                timestamp=calendar.timegm(
-                    datetime.combine(coincidence.coincidence.date,
-                                     coincidence.coincidence.time)
-                            .utctimetuple()),
+                timestamp=timestamp,
                 nanoseconds=coincidence.coincidence.nanoseconds,
                 events=events)
     response = HttpResponse(json.dumps(data), content_type='application/json')
@@ -126,18 +119,18 @@ def error_json(error_code, message):
 def top_lijst(slug):
     coincidences = AnalyzedCoincidence.objects.filter(session__slug=slug, is_analyzed=True)
     scores = []
-    for s in Student.objects.all():
+    for student in Student.objects.all():
         error = []
         num_events = 0
-        for ac in coincidences.filter(student=s):
-            if ac.error_estimate:
-                error.append(ac.error_estimate)
+        for analyzed_coincidence in coincidences.filter(student=student):
+            if analyzed_coincidence.error_estimate:
+                error.append(analyzed_coincidence.error_estimate)
                 num_events += 1
         if error:
             avg_error = np.average(error)
             wgh_error = avg_error / num_events
             min_error = min(error)
-            scores.append({'name': s.name, 'avg_error': avg_error,
+            scores.append({'name': student.name, 'avg_error': avg_error,
                            'wgh_error': wgh_error, 'min_error': min_error,
                            'num_events': num_events})
 
@@ -164,17 +157,20 @@ def result(request):
     longitude = request.GET['longitude']
     log_energy = request.GET['logEnergy']
     error_estimate = request.GET['error']
+    theta = request.GET.get('theta', 0)
+    phi = request.GET.get('phi', 0)
 
-    assert coincidence.session.title.lower() == session_title.lower()
-    assert coincidence.student.name.lower() == student_name.lower()
+    if (coincidence.session.title.lower() != session_title.lower() or
+            coincidence.student.name.lower() != student_name.lower()):
+        return error_json(401, 'Wrong combination of data.')
 
     coincidence.core_position_x = longitude
     coincidence.core_position_y = latitude
     coincidence.log_energy = log_energy
     coincidence.error_estimate = error_estimate
     coincidence.is_analyzed = True
-    coincidence.theta = 0
-    coincidence.phi = 0
+    coincidence.theta = theta
+    coincidence.phi = phi
     coincidence.save()
 
     ranking = top_lijst(coincidence.session.slug)
@@ -302,23 +298,8 @@ def validate_request_form(request):
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed is False:
-        sessionrequest.sid = sessionrequest.school + str(sessionrequest.id)
+        sessionrequest.sid = '{school}{id}'.format(school=sessionrequest.school, id=sessionrequest.id)
         sessionrequest.pin = randint(1000, 9999)
-        starts = datetime.now()
-        ends = datetime.now()
-        AnalysisSession(starts=starts, ends=ends, pin=str(sessionrequest.id), title=sessionrequest.sid)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
-    return render(request, 'analysissessions/confirm.html',
-                  {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
-
-
-def create_session(request):
-    sessionlist = SessionRequest.objects.filter(session_confirmed=True, session_pending=True)
-    for sessionrequest in sessionlist:
-        sessionrequest.session_confirmed = False
-        sessionrequest.save()
-
-    for sessionrequest in sessionlist:
-        sessionrequest.create_session()
-    return HttpResponse('')
+    return render(request, 'analysissessions/confirm.html', {'id': sessionrequest.sid, 'pin': sessionrequest.pin})

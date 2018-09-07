@@ -8,9 +8,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, render
 
-from ..histograms.models import Configuration
 from ..status_display.views import station_has_data
-from .models import Cluster, Contact, MonitorPulseheightThresholds, Pc, Station
+from .models import Cluster, Contact, Pc, Station
 
 
 @login_required
@@ -19,13 +18,15 @@ def keys(request, host):
 
     host = get_object_or_404(Pc, name=host)
 
-    proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
-    key_file = proxy.get_key(host.name, host.type.slug)
-    key_file = base64.b64decode(key_file)
+    if settings.VPN_PROXY is not None:
+        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        key_file = proxy.get_key(host.name, host.type.slug)
+        key_file = base64.b64decode(key_file)
+    else:
+        key_file = 'dummy'
 
     response = HttpResponse(key_file, content_type='application/zip')
-    response['Content-Disposition'] = ('attachment; filename=%s.zip' %
-                                       host.name)
+    response['Content-Disposition'] = 'attachment; filename={name}.zip'.format(name=host.name)
     return response
 
 
@@ -49,19 +50,13 @@ def create_nagios_config(request):
     hosts = []
     for host in (Pc.objects.exclude(type__description='Admin PC')
                            .filter(is_active=True)
-                           .select_related('station__cluster',
-                                           'station__contact')):
+                           .select_related('station__cluster', 'station__contact')):
 
         services = []
-        services_to_check = (host.enabledservice_set.all()
+        services_to_check = (host.enabled_services.all()
                                  .select_related('monitor_service'))
         for service in services_to_check:
             check_command = service.monitor_service.nagios_command
-
-            # Skip pulseheight monitoring here, we will do it somewhere below
-            # because it requires its own custom check interval
-            if check_command.count('check_pulseheight'):
-                continue
 
             # Let's see if we need to pass parameters to this service
             if check_command.count('check_nrpe'):
@@ -72,8 +67,7 @@ def create_nagios_config(request):
                 # assign a value taken from the MonitorService model
                 # associated with the instance.
                 vars = []
-                for var in ('min_critical', 'max_critical', 'min_warning',
-                            'max_warning'):
+                for var in ('min_critical', 'max_critical', 'min_warning', 'max_warning'):
                     if getattr(service, var) is not None:
                         vars.append(getattr(service, var))
                     else:
@@ -91,39 +85,14 @@ def create_nagios_config(request):
 
         has_data = station_has_data(host.station)
 
-        # Add the pulseheight monitoring service here
-        # For every plate it retrieves the thresholds values. These are then
-        # passed to the template via the "hosts" variable
-
-        pulseheight_thresholds = []
-
-        try:
-            for service in services_to_check:
-                check_command = service.monitor_service.nagios_command
-
-                if not check_command.count('check_pulseheight_mpv'):
-                    continue
-
-                number_of_detectors = host.station.number_of_detectors()
-
-                pulseheight_thresholds = (
-                    MonitorPulseheightThresholds.objects.filter(
-                        station=host.station, plate__lte=number_of_detectors))
-                break
-
-        except Configuration.DoesNotExist:
-            pass
-
         # Append this host to the hosts list
         hosts.append({'pc': host,
                       'services': services,
-                      'pulseheight_thresholds': pulseheight_thresholds,
                       'has_data': has_data})
 
     # Render the template
-    return render(request, 'nagios.cfg',
-                  {'contacts': (Contact.objects.all()
-                                .select_related('contactinformation')),
+    return render(request, 'inforecords/nagios.cfg',
+                  {'contacts': Contact.objects.all().select_related('contactinformation'),
                    'clusters': Cluster.objects.all(),
                    'hosts': hosts},
                   content_type='text/plain')
@@ -137,7 +106,6 @@ def create_datastore_config(request):
             socket.gethostbyname(settings.DATASTORE_HOST)):
         raise PermissionDenied
 
-    return render(request, 'datastore.cfg',
-                  {'stations': (Station.objects.all()
-                                       .select_related('cluster__parent'))},
+    return render(request, 'inforecords/datastore.cfg',
+                  {'stations': Station.objects.all().select_related('cluster__parent')},
                   content_type='text/plain')

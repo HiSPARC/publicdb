@@ -9,7 +9,6 @@ urlpatterns = [
     url(r'^request/$', views.request_form, name="request"),
     url(r'^request/validate$', views.validate_request_form, name="validate"),
     url(r'^request/(?P<url>[a-zA-Z0-9]{20})/$', views.confirm_request, name="confirm"),
-    url(r'^request/create', views.create_session, name="create"),
 
     url(r'^get_coincidence/$', views.get_coincidence, name="get_coincidence"),
     url(r'^result/$', views.result, name="result"),

@@ -76,13 +76,6 @@ class EnabledServiceInline(admin.TabularInline):
     extra = 10
 
 
-@admin.register(models.MonitorPulseheightThresholds)
-class MonitorPulseheightThresholdsAdmin(admin.ModelAdmin):
-    list_display = ('station', 'plate', 'mpv_mean', 'mpv_sigma')
-    list_filter = ('station',)
-    list_per_page = 200
-
-
 @admin.register(models.MonitorService)
 class MonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('description', 'is_default_service', 'nagios_command')

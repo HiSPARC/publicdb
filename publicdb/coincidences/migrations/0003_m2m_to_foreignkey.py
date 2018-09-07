@@ -13,8 +13,9 @@ from sapphire.utils import pbar
 def m2m_to_foreignkey(apps, schema_editor):
     """Forwards migrations"""
     m2m_model = apps.get_model('coincidences', 'Coincidence')
-    print('')
     coincidences = m2m_model.objects.all().annotate(n_events=Count('events')).exclude(n_events=0)
+    if coincidences.count():
+        print('')
     for coincidence in pbar(coincidences.iterator(), length=coincidences.count()):
         for event in coincidence.events.all():
             event.coinc = coincidence
@@ -24,7 +25,8 @@ def m2m_to_foreignkey(apps, schema_editor):
 def foreignkey_to_m2m(apps, schema_editor):
     """Backwards migrations"""
     fk_model = apps.get_model('coincidences', 'Event')
-    print('')
+    if fk_model.objects.all().count():
+        print('')
     for event in pbar(fk_model.objects.all().iterator(), length=fk_model.objects.all().count()):
         event.coincidence.events.add(event)
 

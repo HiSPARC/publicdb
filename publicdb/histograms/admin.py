@@ -11,17 +11,17 @@ class GeneratorStateAdmin(admin.ModelAdmin):
 
 @admin.register(models.NetworkHistogram)
 class NetworkHistogramAdmin(admin.ModelAdmin):
-    list_display = ('source', 'type',)
-    list_filter = ('type', 'source__date',)
-    raw_id_fields = ('source',)
+    list_display = ('network_summary', 'type',)
+    list_filter = ('type', 'network_summary__date',)
+    raw_id_fields = ('network_summary',)
 
 
 @admin.register(models.DailyHistogram, models.MultiDailyHistogram,
                 models.DailyDataset, models.MultiDailyDataset)
 class DailyStationDataAdmin(admin.ModelAdmin):
-    list_display = ('source', 'type',)
-    list_filter = ('type', 'source__station__number',)
-    raw_id_fields = ('source',)
+    list_display = ('summary', 'type',)
+    list_filter = ('type', 'summary__station__number',)
+    raw_id_fields = ('summary',)
 
 
 class DailyHistogramInline(admin.StackedInline):
@@ -129,30 +129,23 @@ class SummaryAdmin(admin.ModelAdmin):
 @admin.register(models.Configuration)
 class ConfigurationAdmin(admin.ModelAdmin):
     list_display = ('station', 'master', 'slave', 'timestamp')
-    list_filter = ('timestamp', 'source__station__number')
-    raw_id_fields = ('source',)
-
-
-@admin.register(models.PulseheightFit)
-class PulseheightFitAdmin(admin.ModelAdmin):
-    list_display = ('station', 'date', 'plate', 'fitted_mpv')
-    list_filter = ('source__station__number', 'plate', 'source__date')
-    raw_id_fields = ('source',)
+    list_filter = ('timestamp', 'summary__station__number')
+    raw_id_fields = ('summary',)
 
 
 @admin.register(models.DetectorTimingOffset)
 class DetectorTimingOffsetAdmin(admin.ModelAdmin):
-    list_display = ('source', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
-    list_filter = ('source__station__number',)
-    raw_id_fields = ('source',)
+    list_display = ('summary', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
+    list_filter = ('summary__station__number',)
+    raw_id_fields = ('summary',)
 
 
 @admin.register(models.StationTimingOffset)
 class StationTimingOffsetAdmin(admin.ModelAdmin):
-    list_display = ('ref_source', 'source', 'offset', 'error')
-    list_filter = ('ref_source__station__number', 'source__station__number',
-                   'ref_source__date')
-    raw_id_fields = ('ref_source', 'source')
+    list_display = ('ref_summary', 'summary', 'offset', 'error')
+    list_filter = ('ref_summary__station__number', 'summary__station__number',
+                   'ref_summary__date')
+    raw_id_fields = ('ref_summary', 'summary')
 
 
 admin.site.register(models.HistogramType)
