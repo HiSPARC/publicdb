@@ -69,10 +69,6 @@ class TestContact(TestCase):
         contact = inforecords_factories.ContactFactory()
         self.assertEqual(contact.contactinformation.email_work, contact.email_work)
 
-    def test_email_work(self):
-        contact = inforecords_factories.ContactFactory()
-        self.assertEqual(contact.contactinformation.email_work, contact.email_work)
-
 
 class TestCountry(TestCase):
     def test_str(self):
