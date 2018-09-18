@@ -2,7 +2,7 @@
 
 - name: Set static networking
   lineinfile:
-    dest: /etc/sysconfig/network-scripts/ifcfg-em1
+    dest: /etc/sysconfig/network-scripts/ifcfg-eth0
     regexp: "^{{ item.key }}"
     line: "{{ item.key }}={{ item.value }}"
   with_dict:
