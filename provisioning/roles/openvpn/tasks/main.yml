@@ -62,7 +62,7 @@
   service:
     name: "openvpn@{{ item }}.service"
     enabled: yes
-    state: started
+    state: restarted
   with_items:
     - admin
     - client
