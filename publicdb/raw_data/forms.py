@@ -1,4 +1,5 @@
 from django import forms
+from django.core.exceptions import ValidationError
 
 from ..inforecords.models import Cluster, Station
 
@@ -77,25 +78,25 @@ class CoincidenceDownloadForm(forms.Form):
             del cleaned_data["stations"]
             cluster = cleaned_data.get('cluster')
             if not cluster:
-                self.add_error("cluster", u'Choose a cluster.')
+                self.add_error("cluster", ValidationError(u'Choose a cluster.', 'invalid_choice'))
         elif filter_by == 'stations':
             del cleaned_data["cluster"]
             msg = None
             stations = cleaned_data.get('stations')
             if not stations:
-                msg = u'A list of stations is required.'
+                msg = ValidationError(u'A list of stations is required.', 'required')
             else:
                 try:
                     s_numbers = [int(x) for x in stations.strip('[]()').split(',')]
                 except Exception:
-                    msg = u'Incorrect station entry.'
+                    msg = ValidationError(u'Incorrect station entry.', 'incorrect_entry')
                 else:
                     if len(s_numbers) < cleaned_data.get('n'):
-                        msg = u'Enter at least N stations.'
+                        msg = ValidationError(u'Enter at least N stations.', 'too_few')
                     elif len(s_numbers) > 30:
-                        msg = u'Exceeded limit of 30 stations.'
+                        msg = ValidationError(u'Exceeded limit of 30 stations.', 'too_many')
                     elif not Station.objects.filter(number__in=s_numbers).count() == len(s_numbers):
-                        msg = u'Invalid station numbers.'
+                        msg = ValidationError(u'Invalid station numbers.', 'invalid_choices')
             if msg is not None:
                 self.add_error('stations', msg)
 

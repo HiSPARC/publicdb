@@ -45,9 +45,9 @@ class ContactInformation(models.Model):
 
     @property
     def type(self):
-        if self.contacts.all():
+        if self.contacts.exists():
             type = 'Contact'
-        elif self.stations.all():
+        elif self.stations.exists():
             type = 'Station'
         else:
             type = 'no owner'
@@ -60,19 +60,14 @@ class ContactInformation(models.Model):
 
         contact_str = []
         if contacts:
-            contact_str.extend([contact.name for contact in contacts])
+            contact_str.extend([str(contact) for contact in contacts])
         if stations:
-            contact_str.extend(['%s (%d)' % (station.name, station.number)
-                                for station in stations])
-        return ', '.join(contact_str)
+            contact_str.extend([str(station) for station in stations])
 
-        if contacts:
-            contact_owner = self.contacts.get().name
-        elif self.stations.all():
-            contact_owner = self.stations.all()[0].name
+        if contact_str:
+            return ', '.join(contact_str)
         else:
-            contact_owner = 'no owner'
-        return contact_owner
+            return 'no owner'
 
     def save(self, *args, **kwargs):
         super(ContactInformation, self).save(*args, **kwargs)

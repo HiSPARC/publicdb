@@ -25,7 +25,7 @@ class AdminUpdate(models.Model):
         return 'Queue: %s - Admin Update v%d' % (self.queue, self.version)
 
     def save(self, *args, **kwargs):
-        match = re.search('_v(\d+)', self.update.name)
+        match = re.search(r'_v(\d+)', self.update.name)
         self.version = int(match.group(1))
         super(AdminUpdate, self).save(*args, **kwargs)
 
@@ -45,7 +45,7 @@ class UserUpdate(models.Model):
         return 'Queue: %s - User Update v%d' % (self.queue, self.version)
 
     def save(self, *args, **kwargs):
-        match = re.search('_v(\d+)', self.update.name)
+        match = re.search(r'_v(\d+)', self.update.name)
         self.version = int(match.group(1))
         try:
             super(UserUpdate, self).save(*args, **kwargs)
@@ -68,7 +68,7 @@ class InstallerUpdate(models.Model):
         return 'Installer v%s' % self.version
 
     def save(self, *args, **kwargs):
-        match = re.search('_v(\d+\.\d+)', self.installer.name)
+        match = re.search(r'_v(\d+\.\d+)', self.installer.name)
         self.version = match.group(1)
         super(InstallerUpdate, self).save(*args, **kwargs)
 
