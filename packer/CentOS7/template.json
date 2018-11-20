@@ -3,8 +3,8 @@
     {
       "type": "virtualbox-iso",
       "guest_os_type": "RedHat_64",
-      "iso_url": "http://ftp.tudelft.nl/centos.org/6/isos/x86_64/CentOS-6.9-x86_64-netinstall.iso",
-      "iso_checksum": "6b2cbec908708476389b143841a8e73462506de0744bda8b4192d3655d5bb8d2",
+      "iso_url": "http://ftp.tudelft.nl/centos.org/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1804.iso",
+      "iso_checksum": "937bf0a7b0932817f84f7230f15ed88911bbbd85c0c958680792b7f8d8f9c1a9",
       "iso_checksum_type": "sha256",
 
       "disk_size": 10000,
@@ -45,6 +45,7 @@
       "scripts": [
         "scripts/virtualbox.sh",
         "scripts/cleanup.sh",
+        "scripts/ssh_usedns_no.sh",
         "scripts/zerodisk.sh"
       ],
       "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"

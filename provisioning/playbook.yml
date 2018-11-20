@@ -25,6 +25,8 @@
 - hosts: tietar.nikhef.nl
   roles:
     - network-tietar
+  handlers:
+    - include: roles/network-tietar/handlers/main.yml
 
 - hosts: vpn_group
   roles:
