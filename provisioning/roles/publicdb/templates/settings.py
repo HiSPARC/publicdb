@@ -51,7 +51,7 @@ environ['PUBLICDB_BASE'] = '{{ publicdb_host }}'
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
-USE_MULTIPROCESSING = True
+USE_MULTIPROCESSING = False
 
 EMAIL_BACKEND = '{{ email_backend }}'
 EMAIL_HOST = '{{ email_host }}'
@@ -133,10 +133,15 @@ INSTALLED_APPS = (
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s %(module)s %(levelname)s %(message)s',
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
-        }
+        },
     },
     'handlers': {
         'mail_admins': {
@@ -147,10 +152,22 @@ LOGGING = {
         'null_handler': {
             'class': 'logging.NullHandler',
         },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/hisparc-update.log',
+            'formatter': 'verbose',
+        },
+        'file2': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/hisparc-django-errors.log',
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'file2'],
             'level': 'ERROR',
             'propagate': True,
         },
@@ -161,7 +178,22 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null_handler'],
             'propagate': False,
-        }
+        },
+        'publicdb.histograms.management.commands.updatehistograms': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'publicdb.histograms.checks': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'publicdb.histograms.jobs': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     },
 }
 

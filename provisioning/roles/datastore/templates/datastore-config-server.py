@@ -36,7 +36,7 @@ def reload_datastore():
     if new_hash == old_hash:
         return True
     else:
-        with open(DATASTORE_CFG, 'w') as file:
+        with open(DATASTORE_CFG, 'wb') as file:
             file.write(datastore_cfg)
 
         # reload uWSGI
