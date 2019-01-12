@@ -52,4 +52,6 @@
       - nmap
       - tcpdump
       - conntrack-tools
+      - setroubleshoot
+      - setools
   become: true
