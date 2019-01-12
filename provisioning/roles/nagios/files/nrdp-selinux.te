@@ -5,10 +5,7 @@
 module nagios-spool-httpd 1.0;
 
 require {
-        type openvpn_t;
         type nagios_spool_t;
-        type openvpn_etc_t;
-        type etc_t;
         type httpd_t;
         class dir { add_name write };
         class file { create getattr open read setattr write };
