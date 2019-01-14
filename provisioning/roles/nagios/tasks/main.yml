@@ -17,7 +17,7 @@
     mode: 0755
   become: true
 
-- name: Download and install Nagios NRDP
+- name: download and install Nagios NRDP
   unarchive:
     src: "https://github.com/NagiosEnterprises/nrdp/archive/1.5.2.tar.gz"
     dest: "/usr/local/nrdp"
@@ -26,6 +26,35 @@
     remote_src: yes
     extra_opts:
     - --strip=1   # remove the folder nrdp-1.5.x.
+  become: true
+
+- name: ensure /var/lib/selinux exists
+  file:
+    path: /var/lib/selinux
+    state: directory
+    mode: 0755
+  become: true
+
+- name: copy nagios-spool-httpd SELinux type enforcement module
+  copy:
+    src: nagios-spool-httpd.te
+    dest: /var/lib/selinux/
+  become: true
+
+- name: check if custom SELinux module (nagios-spool-httpd) is installed
+  shell: "semodule --list-modules | grep nagios-spool-httpd | cat"
+  register: module_installed
+  become: true
+
+- name: build and install custom SELinux module
+  command: "{{ item }}"
+  args:
+    chdir: /var/lib/selinux
+  with_items:
+    - "checkmodule -M -m -o nagios-spool-httpd.mod nagios-spool-httpd.te"
+    - "semodule_package -o nagios-spool-httpd.pp -m nagios-spool-httpd.mod"
+    - "semodule -i nagios-spool-httpd.pp"
+  when: not module_installed.stdout
   become: true
 
 - name: set nrdp token
