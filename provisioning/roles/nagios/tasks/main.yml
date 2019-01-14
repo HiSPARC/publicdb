@@ -52,14 +52,19 @@
     backup: yes
   become: true
 
-- name: copy apache nagios and nrdp config
+- name: overwrite apache nagios config
   copy:
-    src: "{{ item }}"
+    src: apache-nagios.conf
+    dest: /etc/httpd/conf.d/nagios.conf
+    backup: yes
+  become: true
+  notify: restart apache
+
+- name: copy apache nagios NRDP plugin config
+  copy:
+    src: apache-nrdp.conf
     dest: /etc/httpd/conf.d/
     backup: yes
-  with_items:
-    - apache-nagios.conf
-    - apache-nrdp.conf
   become: true
   notify: restart apache
 
