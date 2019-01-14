@@ -3,9 +3,10 @@
     {
       "type": "virtualbox-iso",
       "guest_os_type": "RedHat_64",
-      "iso_url": "http://ftp.tudelft.nl/centos.org/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1804.iso",
-      "iso_checksum": "937bf0a7b0932817f84f7230f15ed88911bbbd85c0c958680792b7f8d8f9c1a9",
+      "iso_url": "http://ftp.tudelft.nl/centos.org/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1810.iso",
+      "iso_checksum": "19d94274ef856c4dfcacb2e7cfe4be73e442a71dd65cc3fb6e46db826040b56e",
       "iso_checksum_type": "sha256",
+      "guest_additions_url": "https://download.virtualbox.org/virtualbox/6.0.0/VBoxGuestAdditions_6.0.0.iso",
 
       "disk_size": 10000,
 
