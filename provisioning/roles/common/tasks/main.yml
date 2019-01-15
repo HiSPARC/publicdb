@@ -52,6 +52,12 @@
       - nmap
       - tcpdump
       - conntrack-tools
-      - setroubleshoot
-      - setools
   become: true
+
+- name: install SELinux tools
+    yum:
+      name:
+        - setroubleshoot
+        - setools
+        - policycoreutils-python
+    become: true
