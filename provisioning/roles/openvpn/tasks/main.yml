@@ -74,8 +74,8 @@
     dest: /etc/resolv.conf-nikhef
     line: "nameserver {{ item }}"
   with_items:
-    - 192.16.199.17
-    - 192.16.185.12
+    - 8.8.8.8
+    - 8.8.4.4
   become: true
 
 - name: copy resolv.conf
