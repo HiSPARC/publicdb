@@ -21,13 +21,16 @@
     mode: 02775
   become: true
 
-- name: ensure /var/log/hisparc-update.log exists
+- name: ensure /var/log/hisparc-*.log exists
   file:
-    path: /var/log/hisparc-update.log
+    path: "/var/log/{{ item }}"
     state: touch
     owner: hisparc
     group: hisparc
     mode: 0644
+  with_items:
+    - hisparc-update.log
+    - hisparc-django-errors.log
   become: true
 
 - name: set default group write ACLs on /srv/publicdb
