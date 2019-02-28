@@ -129,6 +129,8 @@ computer/browsers trusted certificates::
 
     /etc/nginx/ssl/ca.crt
 
+(Chrome: Go to settings: Manage Certificates. Import certificate to trusted root CAs)
+
 As the private key of the fake root CA has been deleted during provisioning,
 this is fairly safe: No new certificates can be issued by this CA.
 
