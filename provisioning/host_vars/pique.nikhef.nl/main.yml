@@ -12,15 +12,13 @@ vpn_proxy: http://tietar.nikhef.nl:8001
 datastore_host: frome.nikhef.nl
 datastore_proxy: http://frome.nikhef.nl:8001
 
-recaptcha_enabled: True
-recaptcha_pub_key: 6LdhThsUAAAAALS6fEub7x77msbic1VHlECX7pBw
-recaptcha_private_key: "{{ vault.recaptcha_private_key }}"
-
 email_backend: django.core.mail.backends.smtp.EmailBackend
 email_host: smtp.nikhef.nl
 email_port: 25
 
+publicdb_host: http://data.hisparc.nl
 media_url: http://data.hisparc.nl/media/
 static_url: http://data.hisparc.nl/static/
 
 secret_key: "{{ vault.secret_key }}"
+sentry_dsn: "{{ vault.sentry_dsn }}"

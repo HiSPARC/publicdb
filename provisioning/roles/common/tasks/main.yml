@@ -10,6 +10,7 @@
     - public_keys/kaspervd.pub
     - public_keys/tkooij.pub
     - public_keys/tond.pub
+    - public_keys/danielk.pub
 
 - name: upgrade all packages
   yum:
@@ -51,4 +52,12 @@
       - nmap
       - tcpdump
       - conntrack-tools
+  become: true
+
+- name: install SELinux tools
+  yum:
+    name:
+      - setroubleshoot
+      - setools
+      - policycoreutils-python
   become: true

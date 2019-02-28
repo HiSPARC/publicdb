@@ -44,7 +44,7 @@ def register_hosts_ip(host_list):
     with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
             file.write('%s\t%s.his\n' % (ip, host))
-    subprocess.check_call(['/sbin/service', 'dnsmasq', 'reload'])
+    subprocess.check_call(['/usr/bin/systemctl', 'restart', 'dnsmasq.service'])
 
     return True
 

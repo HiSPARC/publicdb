@@ -130,13 +130,13 @@
 - name: migrate Django apps
   django_manage:
     command: migrate
-    app_path: "{{ publicdb_code }}publicdb"
+    app_path: "{{ publicdb_code }}"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: collect static files of Django apps
   django_manage:
     command: collectstatic
-    app_path: "{{ publicdb_code }}publicdb"
+    app_path: "{{ publicdb_code }}"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: copy uwsgi.ini
@@ -199,7 +199,7 @@
     hour: 4
     state: present
     user: hisparc
-    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}scripts/hisparc-update.py >> /var/log/hisparc-update.log 2>&1"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py updatehistograms"
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files
@@ -219,7 +219,7 @@
     minute: "*/2"
     state: present
     user: hisparc
-    job: "curl --silent --show-error http://data.hisparc.nl/analysis-session/request/create/"
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py createsessions"
   become: true
 
 - name: enable cron job for daily backup of publicdb database

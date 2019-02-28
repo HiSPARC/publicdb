@@ -35,8 +35,8 @@ ESD_PATH = os.path.join(PUBLICDB_PATH, 'esd')
 LGT_PATH = os.path.join(PUBLICDB_PATH, 'knmi_lightning')
 
 # VPN and datastore XML-RPC Proxies
-VPN_PROXY = 'http://localhost:8001'
-DATASTORE_PROXY = 'http://localhost:8002'
+VPN_PROXY = None  # 'http://localhost:8001'
+DATASTORE_PROXY = None  # 'http://localhost:8002'
 
 # VPN and datastore host names
 VPN_HOST = 'localhost'
@@ -44,11 +44,6 @@ DATASTORE_HOST = 'localhost'
 
 # Webserver of the publicdb where Nagios will retrieve active check results
 PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
-
-# reCAPTCHA settings
-RECAPTCHA_ENABLED = False
-RECAPTCHA_PUB_KEY = 'foobar'
-RECAPTCHA_PRIVATE_KEY = 'foobaz'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -72,12 +67,6 @@ MEDIA_URL = '/media/'
 STATIC_ROOT = os.path.join(PUBLICDB_PATH, 'staticroot/')
 STATIC_URL = '/static/'
 
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
-
 SECRET_KEY = 'Make-this-unique-and-do-not-share-it-with-anybody'
 
 SESSION_COOKIE_SECURE = True
@@ -99,7 +88,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
-    # 'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,6 +115,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -136,9 +125,10 @@ INSTALLED_APPS = (
     'publicdb.raw_data',
     'publicdb.api',
     'publicdb.maps',
-    'publicdb.jsparc',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -172,6 +162,12 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null_handler'],
             'propagate': False,
+        },
+        'publicdb': {
+            'handlers': ['null_handler'],
+            'propagate': False,
         }
     },
 }
+
+RAVEN_CONFIG = {}

@@ -34,9 +34,11 @@ Thumbs.db
 # Vim
 *.swp
 
-# Vagrant
+# Vagrant / Packer
 .vagrant
 vagrant_ansible_inventory_default
+*.iso
+*.box
 
 # Ansible
 *.retry

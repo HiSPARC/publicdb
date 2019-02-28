@@ -1,0 +1,13 @@
+module nagios-spool-httpd 1.0;
+
+require {
+        type nagios_spool_t;
+        type httpd_t;
+        class dir { add_name write };
+        class file { create getattr open read setattr write };
+}
+
+#============= httpd_t ==============
+allow httpd_t nagios_spool_t:dir { add_name write };
+allow httpd_t nagios_spool_t:file { create getattr open read setattr write };
+

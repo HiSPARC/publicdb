@@ -15,15 +15,13 @@ vpn_proxy: http://192.168.99.12:8001
 datastore_host: 192.168.99.13
 datastore_proxy: http://192.168.99.13:8001
 
-recaptcha_enabled: False
-recaptcha_pub_key: foobar
-recaptcha_private_key: foobaz
-
 email_backend: django.core.mail.backends.console.EmailBackend
 email_host: smtp.example.com
 email_port: 25
 
+publicdb_host: http://localhost:80/
 media_url: /media/
 static_url: /static/
 
 secret_key: not-very-secret-key-for-development
+sentry_dsn: 'https://fakekey@localhost/publicdb'

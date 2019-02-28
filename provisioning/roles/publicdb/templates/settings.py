@@ -1,10 +1,10 @@
 # {{ ansible_managed }}
 # Django settings for publicdb project.
 
-import os.path
+from os import environ, path
 
-dirname = os.path.dirname(__file__)
-PUBLICDB_PATH = os.path.join(dirname, '..')
+dirname = path.dirname(__file__)
+PUBLICDB_PATH = path.join(dirname, '..')
 
 DEBUG = {{ debug }}
 
@@ -29,7 +29,7 @@ DATABASES = {
 
 # Path of the mounted HiSPARC datastore root folder
 DATASTORE_PATH = '/databases/frome'
-TEST_DATASTORE_PATH = os.path.join(PUBLICDB_PATH, 'datastore_test')
+TEST_DATASTORE_PATH = path.join(PUBLICDB_PATH, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
 ESD_PATH = '/srv/publicdb/www/esd'
@@ -45,14 +45,13 @@ DATASTORE_PROXY = '{{ datastore_proxy }}'
 VPN_HOST = '{{ vpn_host }}'
 DATASTORE_HOST = '{{ datastore_host }}'
 
-RECAPTCHA_ENABLED = {{ recaptcha_enabled }}
-RECAPTCHA_PUB_KEY = '{{ recaptcha_pub_key }}'
-RECAPTCHA_PRIVATE_KEY = '{{ recaptcha_private_key }}'
+# Configure HiSPARC public database url for SAPPHiRE
+environ['PUBLICDB_BASE'] = '{{ publicdb_host }}'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
-USE_MULTIPROCESSING = True
+USE_MULTIPROCESSING = False
 
 EMAIL_BACKEND = '{{ email_backend }}'
 EMAIL_HOST = '{{ email_host }}'
@@ -71,12 +70,6 @@ MEDIA_URL = '{{ media_url }}'
 
 STATIC_ROOT = '{{ publicdb_static }}'
 STATIC_URL = '{{ static_url }}'
-
-STATICFILES_FINDERS = (
-    'django.contrib.staticfiles.finders.FileSystemFinder',
-    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
-)
 
 SECRET_KEY = '{{ secret_key }}'
 
@@ -99,7 +92,6 @@ TEMPLATES = [
 ]
 
 MIDDLEWARE = (
-    # 'django.middleware.gzip.GZipMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -127,6 +119,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.admin',
+
     'publicdb.inforecords',
     'publicdb.histograms',
     'publicdb.coincidences',
@@ -136,18 +129,24 @@ INSTALLED_APPS = (
     'publicdb.raw_data',
     'publicdb.api',
     'publicdb.maps',
-    'publicdb.jsparc',
     'publicdb.station_layout',
     'publicdb.default',
+
+    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '%(asctime)s - %(levelname)s - [%(process)d] - %(module)s - %(message)s',
+        },
+    },
     'filters': {
         'require_debug_false': {
             '()': 'django.utils.log.RequireDebugFalse'
-        }
+        },
     },
     'handlers': {
         'mail_admins': {
@@ -158,10 +157,22 @@ LOGGING = {
         'null_handler': {
             'class': 'logging.NullHandler',
         },
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/hisparc-update.log',
+            'formatter': 'verbose',
+        },
+        'file2': {
+            'level': 'ERROR',
+            'class': 'logging.FileHandler',
+            'filename': '/var/log/hisparc-django-errors.log',
+            'formatter': 'verbose',
+        },
     },
     'loggers': {
         'django.request': {
-            'handlers': ['mail_admins'],
+            'handlers': ['mail_admins', 'file2'],
             'level': 'ERROR',
             'propagate': True,
         },
@@ -172,6 +183,25 @@ LOGGING = {
         'django.db.backends': {
             'handlers': ['null_handler'],
             'propagate': False,
-        }
+        },
+        'publicdb.histograms.management.commands.updatehistograms': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'publicdb.histograms.checks': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+        'publicdb.histograms.jobs': {
+            'handlers': ['file'],
+            'level': 'INFO',
+            'propagate': True,
+        },
     },
+}
+
+RAVEN_CONFIG = {
+    'dsn': '{{ sentry_dsn }}'
 }

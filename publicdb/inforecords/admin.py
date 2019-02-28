@@ -1,11 +1,10 @@
 from django.contrib import admin
 from django.utils.safestring import mark_safe
 
-from .models import (Cluster, Contact, ContactInformation, Country,
-                     EnabledService, MonitorPulseheightThresholds,
-                     MonitorService, Pc, PcType, Profession, Station)
+from . import models
 
 
+@admin.register(models.Cluster)
 class ClusterAdmin(admin.ModelAdmin):
     list_display = ('number', 'name', 'parent', 'country')
     list_filter = ('country',)
@@ -13,19 +12,20 @@ class ClusterAdmin(admin.ModelAdmin):
 
 
 class ContactInline(admin.StackedInline):
-    model = Contact
+    model = models.Contact
     extra = 0  # this stops empty forms being shown
     max_num = 0  # this removes the add more button
     can_delete = False
 
 
 class StationInline(admin.StackedInline):
-    model = Station
+    model = models.Station
     extra = 0  # this stops empty forms being shown
     max_num = 0  # this removes the add more button
     can_delete = False
 
 
+@admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email_work_link')
     list_max_show_all = 400
@@ -40,11 +40,13 @@ class ContactAdmin(admin.ModelAdmin):
         return mark_safe("<a href='mailto:{email}'>{email}</a>".format(email=obj.email_work))
 
 
+@admin.register(models.Country)
 class CountryAdmin(admin.ModelAdmin):
     list_display = ('number', 'name')
     ordering = ['number']
 
 
+@admin.register(models.Station)
 class StationAdmin(admin.ModelAdmin):
     list_display = ('number', 'name', 'cluster', 'contactinformation',
                     'contact')
@@ -53,6 +55,7 @@ class StationAdmin(admin.ModelAdmin):
     list_per_page = 200
 
 
+@admin.register(models.ContactInformation)
 class ContactInformationAdmin(admin.ModelAdmin):
 
     def owner_name(self, obj):
@@ -69,21 +72,17 @@ class ContactInformationAdmin(admin.ModelAdmin):
 
 
 class EnabledServiceInline(admin.TabularInline):
-    model = EnabledService
+    model = models.EnabledService
     extra = 10
 
 
-class MonitorPulseheightThresholdsAdmin(admin.ModelAdmin):
-    list_display = ('station', 'plate', 'mpv_mean', 'mpv_sigma')
-    list_filter = ('station',)
-    list_per_page = 200
-
-
+@admin.register(models.MonitorService)
 class MonitorServiceAdmin(admin.ModelAdmin):
     list_display = ('description', 'is_default_service', 'nagios_command')
     inlines = (EnabledServiceInline,)
 
 
+@admin.register(models.Pc)
 class PcAdmin(admin.ModelAdmin):
     list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url',
                     'keys')
@@ -93,21 +92,12 @@ class PcAdmin(admin.ModelAdmin):
     list_per_page = 200
 
 
+@admin.register(models.EnabledService)
 class EnabledServiceAdmin(admin.ModelAdmin):
     list_display = ('pc', 'monitor_service', 'min_critical', 'max_critical',
                     'min_warning', 'max_warning')
     list_filter = ('pc', 'monitor_service')
 
 
-admin.site.register(Profession)
-admin.site.register(Contact, ContactAdmin)
-admin.site.register(ContactInformation, ContactInformationAdmin)
-admin.site.register(Cluster, ClusterAdmin)
-admin.site.register(Station, StationAdmin)
-admin.site.register(Country, CountryAdmin)
-admin.site.register(PcType)
-admin.site.register(Pc, PcAdmin)
-admin.site.register(MonitorPulseheightThresholds,
-                    MonitorPulseheightThresholdsAdmin)
-admin.site.register(MonitorService, MonitorServiceAdmin)
-admin.site.register(EnabledService, EnabledServiceAdmin)
+admin.site.register(models.Profession)
+admin.site.register(models.PcType)

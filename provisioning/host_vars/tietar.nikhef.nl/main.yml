@@ -2,10 +2,12 @@
 
 private_keys:
   - path: adminkeys/ca.key
-    key: "{{ vault.admin_ca_key }}"
+    key: "{{ vault.adminkeys_ca_key }}"
   - path: admin/server.key
     key: "{{ vault.admin_server_key }}"
-  - path: keys/ta.key
-    key: "{{ vault.keys_ta_key }}"
-  - path: keys/server.key
-    key: "{{ vault.keys_server_key }}"
+  - path: client/ta.key
+    key: "{{ vault.client_ta_key }}"
+  - path: keys/ca.key
+    key: "{{ vault.keys_ca_key }}"
+  - path: client/server.key
+    key: "{{ vault.client_server_key }}"

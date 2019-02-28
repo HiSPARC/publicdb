@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% load static %}
+
+{% block title %}jSparc | Session request{% endblock %}
+
+{% block head_styles %}
+<link rel="stylesheet" type="text/css" media="all" href="{% static 'styles/request_form.css' %}">
+{% endblock %}
+
+
+{% block content %}
+
+<div id="header">
+    <h2>jSparc Session Request Form</h2>
+</div>
+
+<div id='reqform'>
+    <form action="{% url 'sessions:validate' %}" method="post">
+    {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+{% endblock %}

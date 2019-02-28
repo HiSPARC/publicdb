@@ -18,8 +18,8 @@ class TestViews(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
-        self.data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug='eventtime')
-        self.config = histograms_factories.ConfigurationFactory(source=self.summary)
+        self.data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug='eventtime')
+        self.config = histograms_factories.ConfigurationFactory(summary=self.summary)
         super(TestViews, self).setUp()
 
     def get_html(self, url):
@@ -54,22 +54,22 @@ class TestViews(TestCase):
 
     def test_station_redirect_to_latest(self):
         kwargs = {'station_number': self.station.number}
-        response = self.client.get(reverse('status:station:data', kwargs=kwargs))
+        response = self.client.get(reverse('status:station:summary', kwargs=kwargs))
         self.assertEqual(302, response.status_code)
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(self.summary.date))
-        self.assertEqual(reverse('status:station:data', kwargs=kwargs), response['Location'])
+        self.assertEqual(reverse('status:station:summary', kwargs=kwargs), response['Location'])
 
     def test_stations_data(self):
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(self.summary.date))
-        self.get_html(reverse('status:station:data', kwargs=kwargs))
+        self.get_html(reverse('status:station:summary', kwargs=kwargs))
 
     def test_stations_data_invalid_date(self):
         kwargs = {'station_number': self.station.number}
         kwargs.update(date_as_kwargs(self.summary.date))
         kwargs['month'] = 13
-        response = self.client.get(reverse('status:station:data', kwargs=kwargs))
+        response = self.client.get(reverse('status:station:summary', kwargs=kwargs))
         self.assertEqual(404, response.status_code)
 
     def test_help(self):
@@ -100,11 +100,9 @@ class TestSourceViews(TestCase):
             self.assertEqual(value, context[key])
 
     def test_network_histograms(self):
-        kwargs = date_as_kwargs(self.network_summary.date)
-
         for network_histogram_type in ['coincidencetime', 'coincidencenumber']:
-            data = histograms_factories.NetworkHistogramFactory(source=self.network_summary, type__slug=network_histogram_type)
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=network_histogram_type), kwargs=kwargs))
+            data = histograms_factories.NetworkHistogramFactory(network_summary=self.network_summary, type__slug=network_histogram_type)
+            response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
                 'date': self.network_summary.date.strftime('%-Y-%-m-%-d'),
@@ -112,12 +110,9 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
     def test_daily_histograms(self):
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(self.summary.date))
-
         for daily_histogram_type in ['eventtime', 'zenith', 'azimuth']:
-            data = histograms_factories.DailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
+            response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
@@ -126,8 +121,8 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
         for daily_histogram_type in ['pulseheight', 'pulseintegral', 'singleslow', 'singleshigh']:
-            data = histograms_factories.MultiDailyHistogramFactory(source=self.summary, type__slug=daily_histogram_type)
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_histogram_type), kwargs=kwargs))
+            data = histograms_factories.MultiDailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
+            response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, *data.values),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
@@ -140,12 +135,9 @@ class TestSourceViews(TestCase):
         self.get_tsv(reverse('status:source:eventtime', kwargs=kwargs))
 
     def test_daily_datasets(self):
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(self.summary.date))
-
         for daily_dataset_type in ['barometer', 'temperature']:
-            data = histograms_factories.DailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            data = histograms_factories.DailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
+            response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, data.y),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
@@ -154,8 +146,8 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
         for daily_dataset_type in ['singlesratelow', 'singlesratehigh']:
-            data = histograms_factories.MultiDailyDatasetFactory(source=self.summary, type__slug=daily_dataset_type)
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=daily_dataset_type), kwargs=kwargs))
+            data = histograms_factories.MultiDailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
+            response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, *data.y),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
@@ -165,7 +157,7 @@ class TestSourceViews(TestCase):
 
     def test_configs(self):
         kwargs = {'station_number': self.station.number}
-        histograms_factories.ConfigurationFactory(source=self.summary)
+        histograms_factories.ConfigurationFactory(summary=self.summary)
 
         for config_type in ['electronics', 'voltage', 'current', 'gps', 'trigger']:
             response = self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
@@ -182,23 +174,17 @@ class TestSourceViews(TestCase):
 
     def test_detector_offsets(self):
         kwargs = {'station_number': self.station.number}
-        histograms_factories.DetectorTimingOffsetFactory(source=self.summary)
+        histograms_factories.DetectorTimingOffsetFactory(summary=self.summary)
         self.get_tsv(reverse('status:source:detector_offsets', kwargs=kwargs))
 
     def test_station_offsets(self):
         other_station = StationFactory(number=2, cluster__number=0, cluster__country__number=0)
         ref_summary = histograms_factories.SummaryFactory(station=other_station)
-        histograms_factories.StationTimingOffsetFactory(ref_source=ref_summary, source=self.summary)
+        histograms_factories.StationTimingOffsetFactory(ref_summary=ref_summary, summary=self.summary)
 
-        if other_station.number < self.station.number:
-            kwargs = {
-                'ref_station_number': other_station.number,
-                'station_number': self.station.number
-            }
-        else:
-            kwargs = {
-                'ref_station_number': self.station.number,
-                'station_number': other_station.number
-            }
+        kwargs = {
+            'ref_station_number': min(other_station.number, self.station.number),
+            'station_number': max(other_station.number, self.station.number)
+        }
 
         self.get_tsv(reverse('status:source:station_offsets', kwargs=kwargs))

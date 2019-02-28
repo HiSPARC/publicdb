@@ -1,0 +1,61 @@
+{
+  "builders": [
+    {
+      "type": "virtualbox-iso",
+      "guest_os_type": "RedHat_64",
+      "iso_url": "http://ftp.tudelft.nl/centos.org/7/isos/x86_64/CentOS-7-x86_64-NetInstall-1810.iso",
+      "iso_checksum": "19d94274ef856c4dfcacb2e7cfe4be73e442a71dd65cc3fb6e46db826040b56e",
+      "iso_checksum_type": "sha256",
+      "guest_additions_url": "https://download.virtualbox.org/virtualbox/6.0.0/VBoxGuestAdditions_6.0.0.iso",
+
+      "disk_size": 10000,
+
+      "http_directory": "http",
+      "boot_command": [
+        "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+      ],
+      "shutdown_command": "echo '!Usr4hisp' | sudo -S shutdown -P now",
+
+      "ssh_username": "hisparc",
+      "ssh_password": "!Usr4hisp",
+      "ssh_wait_timeout": "10000s",
+      "ssh_pty" : "true"
+    }
+  ],
+  "provisioners": [
+    {
+      "only": ["virtualbox-iso"],
+      "type": "shell",
+      "scripts": [
+        "scripts/base.sh",
+        "scripts/vagrant.sh"
+      ],
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
+    },
+    {
+      "only": ["virtualbox-iso"],
+      "type": "shell",
+      "inline": [
+        "sudo yum -y install epel-release",
+        "sudo yum -y install ansible"
+      ]
+    },
+    {
+      "only": ["virtualbox-iso"],
+      "type": "shell",
+      "scripts": [
+        "scripts/virtualbox.sh",
+        "scripts/cleanup.sh",
+        "scripts/ssh_usedns_no.sh",
+        "scripts/zerodisk.sh"
+      ],
+      "execute_command": "{{ .Vars }} sudo -E sh '{{ .Path }}'"
+    }
+  ],
+  "post-processors": [
+    {
+      "only": ["virtualbox-iso"],
+      "type": "vagrant"
+    }
+  ]
+}

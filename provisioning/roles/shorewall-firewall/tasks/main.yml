@@ -13,6 +13,11 @@
   become: true
   notify: restart shorewall
 
+- name: update shorewall configuration
+  command: shorewall update -A
+  become: true
+  notify: restart shorewall
+
 - name: ensure shorewall is started
   service:
     name: shorewall

@@ -1,8 +1,5 @@
 import datetime
 
-from recaptcha.client import captcha
-
-from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 
@@ -19,27 +16,12 @@ def layout_submit(request):
     else:
         form = StationLayoutQuarantineForm()
 
-    if settings.RECAPTCHA_ENABLED:
-        html_captcha = captcha.displayhtml(settings.RECAPTCHA_PUB_KEY)
-    else:
-        html_captcha = "reCAPTCHA disabled"
-
-    return render(request, 'layout_submit.html',
-                  {'form': form, 'html_captcha': html_captcha})
+    return render(request, 'station_layout/submit.html', {'form': form})
 
 
 def validate_layout_submit(request):
     if request.method != 'POST':
         return redirect('layout:submit')
-
-    if settings.RECAPTCHA_ENABLED:
-        check_captcha = captcha.submit(
-            request.POST['recaptcha_challenge_field'],
-            request.POST['recaptcha_response_field'],
-            settings.RECAPTCHA_PRIVATE_KEY,
-            request.META['REMOTE_ADDR'])
-        if not check_captcha.is_valid:
-            return layout_submit(request)
 
     form = StationLayoutQuarantineForm(request.POST)
 
@@ -72,7 +54,7 @@ def validate_layout_submit(request):
     new_layout.save()
     new_layout.sendmail_submit()
 
-    return render(request, 'layout_submitted.html',
+    return render(request, 'station_layout/submitted.html',
                   {'name': form.cleaned_data['name'],
                    'email': form.cleaned_data['email'],
                    'station': form.cleaned_data['station']})
@@ -85,7 +67,7 @@ def confirmed_layout(request, hash):
     submitted_layout.email_verified = True
     submitted_layout.save()
     submitted_layout.sendmail_review()
-    return render(request, 'layout_confirm.html')
+    return render(request, 'station_layout/confirm.html')
 
 
 def review_layout(request, hash):
@@ -100,24 +82,21 @@ def review_layout(request, hash):
 
     try:
         station = submitted_layout.station
-        active_date = submitted_layout.active_date.replace(hour=23, minute=59,
-                                                           second=59)
-        config = (Configuration.objects.filter(source__station=station,
+        active_date = submitted_layout.active_date.replace(hour=23, minute=59, second=59)
+        config = (Configuration.objects.filter(summary__station=station,
                                                timestamp__gte=FIRSTDATE,
                                                timestamp__lte=active_date)
                                        .exclude(gps_latitude=0.)).latest()
     except Configuration.DoesNotExist:
         try:
-            configs = (Configuration.objects.filter(source__station=station,
-                                                    timestamp__gte=active_date)
+            configs = (Configuration.objects.filter(summary__station=station, timestamp__gte=active_date)
                                             .exclude(gps_latitude=0.))
             config = configs.earliest()
         except Configuration.DoesNotExist:
             config = None
 
-    return render(request, 'layout_review.html',
-                  {'layout': submitted_layout, 'form': form, 'hash': hash,
-                   'config': config})
+    return render(request, 'station_layout/review.html',
+                  {'layout': submitted_layout, 'form': form, 'hash': hash, 'config': config})
 
 
 def validate_review_layout(request, hash):
@@ -162,4 +141,4 @@ def validate_review_layout(request, hash):
     else:
         submitted_layout.sendmail_declined()
 
-    return render(request, 'layout_reviewed.html')
+    return render(request, 'station_layout/reviewed.html')

@@ -45,10 +45,4 @@ urlpatterns = [
     url(r'^station/(?P<station_number>\d+)/num_events/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/(?P<hour>\d+)/$', views.num_events, name="num_events"),
 
     url(r'^station/(?P<station_number>\d+)/trace/(?P<ext_timestamp>\d+)/$', views.get_event_traces, name="event_traces"),
-
-    url(r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/$', views.get_pulseheight_fit, name="pulseheight_fit"),
-    url(r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/fit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.get_pulseheight_fit, name="pulseheight_fit"),
-    url(r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/(?P<number_of_days>\d+)/$', views.get_pulseheight_drift, name="pulseheight_drift"),
-    url(r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_14_days/$', views.get_pulseheight_drift_last_14_days, name="pulseheight_drift_!4"),
-    url(r'^station/(?P<station_number>\d+)/plate/(?P<plate_number>\d+)/pulseheight/drift/last_30_days/$', views.get_pulseheight_drift_last_30_days, name="pulseheight_drift_30"),
 ]

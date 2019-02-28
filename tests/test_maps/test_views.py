@@ -13,7 +13,7 @@ class TestViews(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
-        self.config = histograms_factories.ConfigurationFactory(source=self.summary)
+        self.config = histograms_factories.ConfigurationFactory(summary=self.summary)
         super(TestViews, self).setUp()
 
     def get_html(self, url):

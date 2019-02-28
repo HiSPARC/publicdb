@@ -7,10 +7,13 @@
   become: true
 
 - name: restart openvpn
+  when: is_dev is not defined
   service:
-    name: openvpn
+    name: "openvpn@{{ item }}.service"
     state: restarted
-    sleep: 3
+  with_items:
+    - admin
+    - client
   become: true
   notify: restart shorewall
 

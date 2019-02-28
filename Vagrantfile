@@ -8,8 +8,8 @@ MACHINES = {
 
 Vagrant.configure("2") do |config|
 
-  config.vm.box = "CentOS6"
-  config.vm.box_url = "packer/CentOS6/packer_virtualbox-iso_virtualbox.box"
+  config.vm.box = "CentOS7"
+  config.vm.box_url = "packer/CentOS7/packer_virtualbox-iso_virtualbox.box"
 
   MACHINES.each do | ansible_host, values |
     config.vm.define ansible_host do |machine|
