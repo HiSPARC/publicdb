@@ -36,19 +36,18 @@
 
 - name: install libraries
   yum:
-    name: "{{ item }}"
+    name:
+      - gcc
+      - bzip2
+      - make
+      - gcc-c++
+      - libSM
+      - libXrender
+      - libXext
+      - fontconfig
+      - pcre-devel
     state: present
   become: true
-  with_items:
-    - gcc
-    - bzip2
-    - make
-    - gcc-c++
-    - libSM
-    - libXrender
-    - libXext
-    - fontconfig
-    - pcre-devel
 
 - name: download miniconda installer
   get_url:

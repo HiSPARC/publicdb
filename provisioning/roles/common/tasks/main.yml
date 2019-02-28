@@ -53,3 +53,11 @@
       - tcpdump
       - conntrack-tools
   become: true
+
+- name: install SELinux tools
+  yum:
+    name:
+      - setroubleshoot
+      - setools
+      - policycoreutils-python
+  become: true
