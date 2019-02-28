@@ -84,7 +84,7 @@
 - name: overwrite apache nagios config
   copy:
     src: apache-nagios.conf
-    dest: /etc/httpd/conf.d/nagios.conf
+    dest: /etc/httpd/conf.d/
     backup: yes
   become: true
   notify: restart apache
@@ -136,7 +136,7 @@
 - name: set correct corewindow for nagios index.php
   replace:
     dest: /usr/share/nagios/html/index.php
-    regexp: 'url[ ]=[ ]"main.php"'
+    regexp: "url[ ]=[ ][\"|']main.php[\"|']"
     replace: 'url="/cgi-bin/status.cgi?hostgroup=all"'
     backup: yes
   become: true
