@@ -83,7 +83,7 @@
 
 - name: overwrite apache nagios config
   copy:
-    src: apache-nagios.conf
+    src: nagios.conf
     dest: /etc/httpd/conf.d/
     backup: yes
   become: true
