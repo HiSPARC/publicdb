@@ -41,8 +41,8 @@ ACCEPT         net:192.16.186.202       $FW             tcp     8001
 #
 # NRPE, NSClient running on detector pc's
 ACCEPT         $FW             det     tcp     5666,12489
-# NSCA running on detector pc's
-ACCEPT         det             $FW     tcp     5667
+# NRDP communication from detector pc's using HTTP
+Web(ACCEPT)    det             $FW
 
 #
 # Admin access to detector pc's

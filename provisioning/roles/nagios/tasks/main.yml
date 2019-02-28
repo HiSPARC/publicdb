@@ -6,15 +6,93 @@
       - nagios
       - nagios-plugins-all
       - nagios-plugins-nrpe
-      - nsca
       - nrpe
       - httpd
   become: true
 
-- name: copy apache nagios config
+- name: ensure /usr/local/nrdp exists
+  file:
+    path: /usr/local/nrdp
+    state: directory
+    mode: 0755
+  become: true
+
+- name: download and install Nagios NRDP
+  unarchive:
+    src: "https://github.com/NagiosEnterprises/nrdp/archive/1.5.2.tar.gz"
+    dest: "/usr/local/nrdp"
+    owner: nagios
+    group: nagios
+    remote_src: yes
+    extra_opts:
+    - --strip=1   # remove the folder nrdp-1.5.x.
+  become: true
+
+- name: ensure /var/lib/selinux exists
+  file:
+    path: /var/lib/selinux
+    state: directory
+    mode: 0755
+  become: true
+
+- name: copy nagios-spool-httpd SELinux type enforcement module
+  copy:
+    src: nagios-spool-httpd.te
+    dest: /var/lib/selinux/
+  become: true
+
+- name: check if custom SELinux module (nagios-spool-httpd) is installed
+  shell: "semodule --list-modules | grep nagios-spool-httpd | cat"
+  register: module_installed
+  become: true
+
+- name: build and install custom SELinux module
+  command: "{{ item }}"
+  args:
+    chdir: /var/lib/selinux
+  with_items:
+    - "checkmodule -M -m -o nagios-spool-httpd.mod nagios-spool-httpd.te"
+    - "semodule_package -o nagios-spool-httpd.pp -m nagios-spool-httpd.mod"
+    - "semodule -i nagios-spool-httpd.pp"
+  when: not module_installed.stdout
+  become: true
+
+- name: set nrdp token
+  lineinfile:
+    dest: /usr/local/nrdp/server/config.inc.php
+    insertafter: 'authorized_tokens'
+    line: '"nrdp4hisp"  // does not have to be secret - NRDP inside VPN'
+    backup: yes
+  become: true
+
+- name: set nagios checkresults folder in nrdp config
+  lineinfile:
+    dest: /usr/local/nrdp/server/config.inc.php
+    regexp: 'check_results_dir'
+    line: '$cfg["check_results_dir"] = "/var/spool/nagios/checkresults";'
+    backup: yes
+  become: true
+
+- name: set nagios command group in nrdp config
+  lineinfile:
+    dest: /usr/local/nrdp/server/config.inc.php
+    regexp: 'nagios_command_group'
+    line: '$cfg["nagios_command_group"] = "nagios";'
+    backup: yes
+  become: true
+
+- name: overwrite apache nagios config
   copy:
     src: apache-nagios.conf
-    dest: /etc/httpd/conf.d/nagios.conf
+    dest: /etc/httpd/conf.d/
+    backup: yes
+  become: true
+  notify: restart apache
+
+- name: copy apache nagios NRDP plugin config
+  copy:
+    src: apache-nrdp.conf
+    dest: /etc/httpd/conf.d/
     backup: yes
   become: true
   notify: restart apache
@@ -31,7 +109,7 @@
 - name: remove scriptalias setting from apache default settings
   replace:
     dest: /etc/httpd/conf/httpd.conf
-    regexp: "^ScriptAlias"
+    regexp: "^[ \t]{1,}ScriptAlias"
     replace: "#ScriptAlias"
     backup: yes
   become: true
@@ -48,8 +126,8 @@
 - name: fix cgi_base_url path for nagios
   replace:
     dest: /usr/share/nagios/html/config.inc.php
-    regexp: "/nagios/cgi-bin/"
-    replace: "/cgi-bin/"
+    regexp: "/nagios/cgi-bin"
+    replace: "/cgi-bin"
     backup: yes
     mode: 0644
   become: true
@@ -58,8 +136,8 @@
 - name: set correct corewindow for nagios index.php
   replace:
     dest: /usr/share/nagios/html/index.php
-    regexp: 'corewindow="main.php"'
-    replace: 'corewindow="cgi-bin/status.cgi?hostgroup=all"'
+    regexp: "url[ ]=[ ][\"|']main.php[\"|']"
+    replace: 'url="/cgi-bin/status.cgi?hostgroup=all"'
     backup: yes
   become: true
   notify: restart apache
@@ -76,14 +154,6 @@
 - name: copy nagios config
   copy:
     src: nagios.cfg
-    dest: /etc/nagios
-    backup: yes
-  become: true
-  notify: restart nagios
-
-- name: copy nagios nsca config
-  copy:
-    src: nsca.cfg
     dest: /etc/nagios
     backup: yes
   become: true
@@ -125,13 +195,6 @@
 - name: ensure nrpe is started
   service:
     name: nrpe
-    enabled: yes
-    state: started
-  become: true
-
-- name: ensure nsca is started
-  service:
-    name: nsca
     enabled: yes
     state: started
   become: true
