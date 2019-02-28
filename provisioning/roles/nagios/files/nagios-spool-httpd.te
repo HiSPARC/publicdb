@@ -3,6 +3,8 @@ module nagios-spool-httpd 1.0;
 require {
         type nagios_spool_t;
         type httpd_t;
+        type nagios_t;
+        class capability chown;
         class dir { add_name write };
         class file { create getattr open read setattr write };
 }
@@ -11,3 +13,5 @@ require {
 allow httpd_t nagios_spool_t:dir { add_name write };
 allow httpd_t nagios_spool_t:file { create getattr open read setattr write };
 
+#============= nagios_t ==============
+allow nagios_t self:capability chown;
