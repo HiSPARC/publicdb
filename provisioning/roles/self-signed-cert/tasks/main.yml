@@ -1,5 +1,11 @@
 ---
 
+- name: install openssl
+  yum:
+    name: openssl
+    state: present
+  become: true
+
 - name: directory for certs
   file:
     path: "{{ certificate_root }}"
@@ -13,14 +19,14 @@
   become: true
 
 - name: generate fake CA private key
-  command: openssl genrsa \
+  command: /usr/bin/openssl genrsa \
     -out "{{ certificate_CA_private_key }}" 1024
   args:
     creates: "{{ certificate_CA_private_key }}"
   become: true
 
 - name: generate fake CA certificate
-  command: openssl req -config "{{ certificate_root }}/san.cnf" \
+  command: /usr/bin/openssl req -config "{{ certificate_root }}/san.cnf" \
      -x509 -new \
      -days 3650 -key {{certificate_CA_private_key}} \
      -subj "/C=NL/L=Amsterdam/O=HiSPARC Fake CA/CN=HiSPARC Fake ROOT CA" \
@@ -32,14 +38,14 @@
   become: true
 
 - name: generate RSA private key
-  command: openssl genrsa \
+  command: /usr/bin/openssl genrsa \
     -out "{{ certificate_private_key }}" 1024
   args:
     creates: "{{ certificate_private_key }}"
   become: true
 
 - name: generate csr
-  command: openssl req \
+  command: /usr/bin/openssl req \
     -new \
     -subj '/C=NL/L=Amsterdam/O=HiSPARC/CN={{ cert_hostname }}'
     -key "{{ certificate_private_key }}" \
@@ -49,7 +55,7 @@
   become: true
 
 - name: generate self-signed certificate
-  command: openssl x509 \
+  command: /usr/bin/openssl x509 \
     -req \
     -days 3650 \
     -extfile "{{ certificate_root }}/san.cnf" \
