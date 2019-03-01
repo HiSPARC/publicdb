@@ -1,4 +1,3 @@
-uWSGI>=2.0,<2.1
 uwsgitop==0.10
 
 Django>=1.11,<2.0

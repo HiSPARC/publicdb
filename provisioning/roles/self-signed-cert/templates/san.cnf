@@ -1,0 +1,21 @@
+[req]
+distinguished_name = req_distinguished_name
+
+[req_distinguished_name]
+CN = {{ cert_hostname }}
+
+[v3_ca]
+subjectKeyIdentifier   = hash
+authorityKeyIdentifier = keyid:always,issuer:always
+basicConstraints       = critical, CA:TRUE
+keyUsage               = cRLSign, digitalSignature, keyCertSign
+
+[v3_req]
+authorityKeyIdentifier=keyid:always, issuer:always
+subjectKeyIdentifier = hash
+basicConstraints     = critical, CA:FALSE
+subjectAltName       = @alt_names
+keyUsage             = digitalSignature,keyEncipherment
+
+[alt_names]
+DNS.1 = {{ cert_hostname }}

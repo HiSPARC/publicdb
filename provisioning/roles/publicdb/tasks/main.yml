@@ -21,13 +21,16 @@
     mode: 02775
   become: true
 
-- name: ensure /var/log/hisparc-update.log exists
+- name: ensure /var/log/hisparc-*.log exists
   file:
-    path: /var/log/hisparc-update.log
+    path: "/var/log/{{ item }}"
     state: touch
     owner: hisparc
     group: hisparc
     mode: 0644
+  with_items:
+    - hisparc-update.log
+    - hisparc-django-errors.log
   become: true
 
 - name: set default group write ACLs on /srv/publicdb
@@ -92,6 +95,10 @@
 - name: install conda packages in conda environment
   command: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --file ~/conda.list --yes"
 
+# uwsgi fails to build from pip due to SSL version swamp
+- name: install uwsgi from conda-forge
+  command: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge uwsgi --yes"
+
 - name: install packages in conda environment using pip
   pip:
     requirements: ~/pip.list
@@ -145,6 +152,54 @@
     dest: "{{ publicdb_code }}uwsgi.ini"
     backup: yes
   notify: restart uWSGI
+
+- name: install nginx
+  yum:
+    name: nginx
+    state: present
+  become: true
+
+- name: copy nginx configuration
+  template:
+    src: nginx-default.conf
+    dest: /etc/nginx/conf.d/default.conf
+  notify: restart nginx
+  become: true
+
+#
+# SELinux stuff
+#
+- name: ensure /var/lib/selinux exists
+  file:
+    path: /var/lib/selinux
+    state: directory
+    mode: 0755
+  become: true
+
+- name: copy SELinux type enforcement module
+  copy:
+    src: nginx-publicdb.te
+    dest: /var/lib/selinux/
+  become: true
+
+- name: check if custom SELinux module (nginx-publicdb) is installed
+  shell: "semodule --list-modules | grep nginx-publicdb | cat"
+  register: module_nginx_installed
+  become: true
+
+- name: build and install custom SELinux module
+  command: "{{ item }}"
+  args:
+    chdir: /var/lib/selinux
+  with_items:
+    - "checkmodule -M -m -o nginx-publicdb.mod nginx-publicdb.te"
+    - "semodule_package -o nginx-publicdb.pp -m nginx-publicdb.mod"
+    - "semodule -i nginx-publicdb.pp"
+  when: not module_nginx_installed.stdout
+  become: true
+#
+# End of SELinux stuff
+#
 
 - name: install supervisor daemon
   pip:

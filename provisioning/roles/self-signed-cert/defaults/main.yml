@@ -1,0 +1,9 @@
+---
+
+certificate_root: "/etc/nginx/ssl"
+certificate_CA_private_key: "{{ certificate_root }}/ca.key"
+certificate_CA_cert: "{{ certificate_root }}/ca.crt"
+certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.crt"
+certificate_private_key: "{{ certificate_root }}/private_key.key"
+certificate_csr: "{{ certificate_root }}/{{ cert_name }}.csr"
+certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.crt"

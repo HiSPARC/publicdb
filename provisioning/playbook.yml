@@ -16,7 +16,12 @@
 - hosts: publicdb_group
   roles:
     - postgresql
+    - self-signed-cert
     - publicdb
+
+- hosts: pique.nikhef.nl
+  roles:
+    - letsencrypt
 
 - hosts: datastore_group
   roles:

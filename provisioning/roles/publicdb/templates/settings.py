@@ -73,6 +73,11 @@ STATIC_URL = '{{ static_url }}'
 
 SECRET_KEY = '{{ secret_key }}'
 
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = True
+SECURE_REDIRECT_EXEMPT = [r'^(?!admin/).*']
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
