@@ -166,6 +166,41 @@
   notify: restart nginx
   become: true
 
+#
+# SELinux stuff
+#
+- name: ensure /var/lib/selinux exists
+  file:
+    path: /var/lib/selinux
+    state: directory
+    mode: 0755
+  become: true
+
+- name: copy SELinux type enforcement module
+  copy:
+    src: nginx-publicdb.te
+    dest: /var/lib/selinux/
+  become: true
+
+- name: check if custom SELinux module (nginx-publicdb) is installed
+  shell: "semodule --list-modules | grep nginx-publicdb | cat"
+  register: module_nginx_installed
+  become: true
+
+- name: build and install custom SELinux module
+  command: "{{ item }}"
+  args:
+    chdir: /var/lib/selinux
+  with_items:
+    - "checkmodule -M -m -o nginx-publicdb.mod nginx-publicdb.te"
+    - "semodule_package -o nginx-publicdb.pp -m nginx-publicdb.mod"
+    - "semodule -i nginx-publicdb.pp"
+  when: not module_nginx_installed.stdout
+  become: true
+#
+# End of SELinux stuff
+#
+
 - name: install supervisor daemon
   pip:
     name: supervisor
