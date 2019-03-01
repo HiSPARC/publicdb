@@ -8,7 +8,7 @@
   become: true
 
 - name: generate certificate
-  command: "certbot --nginx -n --cert-name data.hisparc.nl -d pique.nikhef.nl,d data.hisparc.nl"
+  command: "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
   become: true
 
 - name: enable cron job for certificate renewal
