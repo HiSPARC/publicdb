@@ -1,0 +1,23 @@
+---
+
+- name: install certbot
+  yum:
+    name:
+      - certbot
+      - python2-certbot-nginx
+  become: true
+
+- name: generate certificate
+  command: "certbot --nginx -n --cert-name data.hisparc.nl -d pique.nikhef.nl,d data.hisparc.nl"
+  become: true
+
+- name: enable cron job for certificate renewal
+  cron:
+    name: "certbot renew twice a day"
+    cron_file: hisparc
+    minute: "0"
+    hour: "0,12"
+    state: present
+    user: root
+    job: "python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew"
+  become: true
