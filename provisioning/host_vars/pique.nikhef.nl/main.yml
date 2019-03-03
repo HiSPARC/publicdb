@@ -20,7 +20,7 @@ email_host: smtp.nikhef.nl
 email_port: 25
 
 publicdb_host: https://data.hisparc.nl
-media_url: https://data.hisparc.nl/media/
+media_url: http://data.hisparc.nl/media/
 static_url: https://data.hisparc.nl/static/
 
 secret_key: "{{ vault.secret_key }}"

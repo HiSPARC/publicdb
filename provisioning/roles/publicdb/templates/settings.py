@@ -78,6 +78,8 @@ CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
 SECURE_REDIRECT_EXEMPT = [r'^(?!admin/).*']
 
+FILE_UPLOAD_PERMISSIONS = 0644
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
