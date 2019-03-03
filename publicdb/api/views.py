@@ -31,7 +31,7 @@ def man(request):
     """Give overview of the possible urls"""
 
     man = {
-        "base_url": 'http://data.hisparc.nl/api/',
+        "base_url": 'https://data.hisparc.nl/api/',
         "stations": 'stations/',
         "stations_in_subcluster": 'subclusters/{subcluster_number}/',
         "subclusters": 'subclusters/',
