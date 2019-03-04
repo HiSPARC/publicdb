@@ -7,9 +7,20 @@
       - python2-certbot-nginx
   become: true
 
-- name: generate certificate
-  command: "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
-  become: true
+# run "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
+# or restore /etc/letsencrypt from backup
+- name: check if letsencrypt is installed or restored from backup
+  stat:
+    path: /etc/letsencrypt
+  register: le_dir
+- fail:
+    msg: "/etc/letsencrypt folder not found. Run certbot or restore backup"
+  when: le_dir.stat.isdir is defined and le_dir.stat.isdir
+
+- name: copy letsencrypt https 443 configuration
+  copy:
+    src: nginx-https.conf
+    dest: /etc/nginx/conf.d/
 
 - name: enable cron job for certificate renewal
   cron:
