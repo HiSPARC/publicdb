@@ -161,11 +161,13 @@
 
 - name: copy nginx configuration
   template:
-    src: nginx-default.conf
-    dest: /etc/nginx/conf.d/default.conf
+    src: "{{ item }}"
+    dest: /etc/nginx/conf.d/
   notify: restart nginx
   become: true
-
+  with_items:
+    - nginx-http.conf
+    - nginx-https.conf
 #
 # SELinux stuff
 #
