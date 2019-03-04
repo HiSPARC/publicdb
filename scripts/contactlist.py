@@ -21,7 +21,7 @@ for pc in active_pcs:
     sname = pc.station.name
     sn = str(pc.station.number)
     if pc.station.contact is None:
-        continue:
+        continue
     contact_info = pc.station.contact.contactinformation
     email1 = contact_info.email_work.lower() if contact_info.email_work else ''
     email1 = contact_info.email_private.lower() if contact_info.email_private else ''
