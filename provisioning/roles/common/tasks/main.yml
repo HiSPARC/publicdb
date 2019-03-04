@@ -1,5 +1,16 @@
 ---
 
+# hisparc needs specific uid:gid for NFS to work.
+- name: check if hisparc has uid=7712
+  shell: "id -u hisparc"
+  register: hisparc_uid
+  failed_when: hisparc_uid.stdout != "7712"
+
+- name: check if hisparc has gid=7100
+  shell: "id -g hisparc"
+  register: hisparc_gid
+  failed_when: hisparc_gid.stdout != "7100"
+
 - name: add SSH keys for hisparc user
   authorized_key:
     user: hisparc
