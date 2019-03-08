@@ -55,6 +55,11 @@ class SummaryQuerySet(models.QuerySet):
             models.Q(num_events__isnull=False) |
             models.Q(num_weather__isnull=False))
 
+    def with_events(self):
+        """Filter with at least events"""
+        return self.valid_date().filter(
+            num_events__isnull=False)
+
     def with_config(self):
         """Filter with at least configurations"""
         return self.valid_date().filter(
