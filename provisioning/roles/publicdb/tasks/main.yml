@@ -159,15 +159,22 @@
     state: present
   become: true
 
-- name: copy nginx configuration
+- name: copy nginx HTTP configuration
   template:
-    src: "{{ item }}"
+    src: nginx-http.conf
     dest: /etc/nginx/conf.d/
   notify: restart nginx
   become: true
-  with_items:
-    - nginx-http.conf
-    - nginx-https.conf
+
+# do not overwrite let's encrypt https config on pique
+- name: copy nginx HTTPS configuration
+  template:
+    src: nginx-https.conf
+    dest: /etc/nginx/conf.d/
+  notify: restart nginx
+  become: true
+  when: is_dev is defined
+
 #
 # SELinux stuff
 #
