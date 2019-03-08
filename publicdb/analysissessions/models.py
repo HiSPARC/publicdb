@@ -207,7 +207,7 @@ class SessionRequest(models.Model):
             Hello %s,
 
             Please click on this link to confirm your request for an analysis session with jSparc:
-            http://data.hisparc.nl/analysis-session/request/%s/
+            https://data.hisparc.nl/analysis-session/request/%s/
 
             Greetings,
             The HiSPARC Team''' %
@@ -229,10 +229,10 @@ class SessionRequest(models.Model):
             Events created = %d
 
             Go here to start analysing events:
-            http://data.hisparc.nl/media/jsparc/jsparc.html
+            https://data.hisparc.nl/media/jsparc/jsparc.html
 
             During the session you can view the results at:
-            http://data.hisparc.nl/analysis-session/%s/data/
+            https://data.hisparc.nl/analysis-session/%s/data/
 
             Greetings,
             The HiSPARC Team''' %
@@ -254,10 +254,10 @@ class SessionRequest(models.Model):
             Events created = %d
 
             Go here to start analysing events:
-            http://data.hisparc.nl/media/jsparc/jsparc.html
+            https://data.hisparc.nl/media/jsparc/jsparc.html
 
             During the session you can view the results at:
-            http://data.hisparc.nl/analysis-session/%s/data/
+            https://data.hisparc.nl/analysis-session/%s/data/
 
             Greetings,
             The HiSPARC Team''' %

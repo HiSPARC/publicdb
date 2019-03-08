@@ -1,5 +1,6 @@
 pip
 ipython
+numpy==1.15.4
 pytables
 scipy
 psycopg2

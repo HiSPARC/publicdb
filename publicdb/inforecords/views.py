@@ -42,8 +42,9 @@ def create_nagios_config(request):
     EnabledService model.
 
     """
+
     # Limit access to only allow access from VPN server
-    if request.META["REMOTE_ADDR"] != socket.gethostbyname(settings.VPN_HOST):
+    if socket.gethostbyaddr(request.META["REMOTE_ADDR"])[0] != settings.VPN_HOST:
         raise PermissionDenied
 
     # Start building the host list
@@ -102,8 +103,7 @@ def create_datastore_config(request):
     """Create the datastore configuration"""
 
     # Limit access to only allow access from the Datastore server
-    if (request.META["REMOTE_ADDR"] !=
-            socket.gethostbyname(settings.DATASTORE_HOST)):
+    if socket.gethostbyaddr(request.META["REMOTE_ADDR"])[0] != settings.DATASTORE_HOST:
         raise PermissionDenied
 
     return render(request, 'inforecords/datastore.cfg',

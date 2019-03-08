@@ -7,9 +7,20 @@
       - python2-certbot-nginx
   become: true
 
-- name: generate certificate
-  command: "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
-  become: true
+# run "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
+# or restore /etc/letsencrypt from backup
+- name: check if letsencrypt is installed or restored from backup
+  stat:
+    path: /etc/letsencrypt
+  register: le_dir
+- fail:
+    msg: "/etc/letsencrypt folder not found. Run certbot or restore backup"
+  when: le_dir.stat.isdir is defined and le_dir.stat.isdir
+
+- name: copy letsencrypt https 443 configuration
+  copy:
+    src: nginx-https.conf
+    dest: /etc/nginx/conf.d/
 
 - name: enable cron job for certificate renewal
   cron:
@@ -20,4 +31,27 @@
     state: present
     user: root
     job: "python -c 'import random; import time; time.sleep(random.random() * 3600)' && certbot renew"
+  become: true
+
+- name: enable cron job for daily backup of letsencrypt
+  cron:
+    name: "Daily /etc/letsencrypt backup"
+    cron_file: hisparc
+    minute: 0
+    hour: 2
+    state: present
+    user: root
+    job: "if [ -f '/mysqldumps/letsencrypt.tgz' ]; then mv /mysqldumps/letsencrypt.tgz /mysqldumps/letsencrypt_yesterday.tgz; fi; tar czfP /mysqldumps/letsencrypt.tgz /etc/letsencrypt"
+  become: true
+
+- name: enable cron job for monthly backup of letsencrypt
+  cron:
+    name: "Monthly /etc/letsencrypt backup"
+    cron_file: hisparc
+    minute: 0
+    hour: 21
+    day: 1
+    state: present
+    user: root
+    job: "if [ -f '/mysqldumps/letsencrypt_this_month.tgz' ]; then mv /mysqldumps/letsencrypt_this_month.tgz /mysqldumps/letsencrypt_prev_month.tgz; fi; tar czfP /mysqldumps/letsencrypt_this_month.tgz /etc/letsencrypt"
   become: true

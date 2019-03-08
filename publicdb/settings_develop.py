@@ -43,7 +43,7 @@ VPN_HOST = 'localhost'
 DATASTORE_HOST = 'localhost'
 
 # Webserver of the publicdb where Nagios will retrieve active check results
-PUBLICDB_HOST_FOR_NAGIOS = 'http://data.hisparc.nl'
+PUBLICDB_HOST_FOR_NAGIOS = 'https://data.hisparc.nl'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -73,6 +73,8 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
 SECURE_REDIRECT_EXEMPT = [r'^(?!admin/).*']
+
+FILE_UPLOAD_PERMISSIONS = 0644
 
 TEMPLATES = [
     {

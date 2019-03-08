@@ -11,9 +11,9 @@
 
 - name: add nagios config script to cron
   cron:
-    name: hisparc-nagios
+    name: check if nagios config needs to be updated (run every minute)
     cron_file: hisparc-nagios
-    user: nagios
+    user: root
     job: /usr/local/bin/hisparc-nagios
   become: true
 

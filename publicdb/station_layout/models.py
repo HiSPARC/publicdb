@@ -114,7 +114,7 @@ class StationLayoutQuarantine(models.Model):
 
             Please click on this link to confirm your submission
             of a new layout for station %s.
-            http://data.hisparc.nl/layout/confirm/%s/
+            https://data.hisparc.nl/layout/confirm/%s/
 
             Greetings,
             The HiSPARC Team''' %
@@ -133,7 +133,7 @@ class StationLayoutQuarantine(models.Model):
             review the validity of the submission.
             Use the following link to view and either approve or
             decline the submission:
-            http://data.hisparc.nl/layout/review/%s/
+            https://data.hisparc.nl/layout/review/%s/
 
             Greetings,
             The HiSPARC Team''' %
