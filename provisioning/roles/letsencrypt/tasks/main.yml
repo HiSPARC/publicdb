@@ -13,14 +13,14 @@
   stat:
     path: /etc/letsencrypt
   register: le_dir
-- fail:
-    msg: "/etc/letsencrypt folder not found. Run certbot or restore backup"
-  when: le_dir.stat.isdir is defined and le_dir.stat.isdir
+  failed_when: le_dir.stat.isdir is defined and not le_dir.stat.isdir
 
 - name: copy letsencrypt https 443 configuration
   copy:
     src: nginx-https.conf
     dest: /etc/nginx/conf.d/
+  notify: restart nginx
+  become: true
 
 - name: enable cron job for certificate renewal
   cron:
