@@ -83,7 +83,8 @@ def stations_by_country(request):
     return render(request, 'status_display/stations_by_country.html',
                   {'countries': countries,
                    'test_stations': test_stations,
-                   'statuscount': statuscount})
+                   'statuscount': statuscount,
+                   'nagios_statuscount': nagios_statuscount})
 
 
 def stations_by_number(request):
