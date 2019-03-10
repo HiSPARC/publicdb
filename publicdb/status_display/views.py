@@ -203,7 +203,6 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in subcluster.stations.filter(pcs__is_test=False).distinct():
             link = station in data_stations
             status = station_status.get_status(station.number)
-            nagios_status = nagios_station_status.get_status(station.number)
 
             location = station.latest_location()
             station_data = {'number': station.number,
