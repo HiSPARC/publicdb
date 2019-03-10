@@ -22,7 +22,7 @@ from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, De
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
-from .status import StationStatus, NagiosStatus
+from .status import DataStatus, NagiosStatus
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
@@ -41,7 +41,7 @@ def stations_by_country(request):
     station_nagios_status = NagiosStatus()
     nagios_statuscount = station_nagios_status.get_status_counts()
 
-    station_status = StationStatus()
+    station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
@@ -90,7 +90,7 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
-    station_status = StationStatus()
+    station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
@@ -111,7 +111,7 @@ def stations_by_number(request):
 def stations_by_status(request):
     """Show a list of stations, ordered by status"""
 
-    station_status = StationStatus()
+    station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
@@ -135,7 +135,7 @@ def stations_by_status(request):
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
 
-    station_status = StationStatus()
+    station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
     data_stations = stations_with_data()
@@ -176,7 +176,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
                     focus = [get_object_or_404(cluster.subclusters, name=subcluster).name]
 
     data_stations = stations_with_data()
-    station_status = StationStatus()
+    station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
     subclusters = []
@@ -611,7 +611,7 @@ def station_latest(request, station_number):
                                   station=station)
                           .latest())
 
-    station_status = StationStatus()
+    station_status = DataStatus()
     status = station_status.get_status(station.number)
 
     date = summary.date

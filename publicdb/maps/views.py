@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
 from ..inforecords.models import Cluster, Country, Station
-from ..status_display.status import StationStatus
+from ..status_display.status import DataStatus
 from ..status_display.views import stations_with_data
 
 
@@ -50,7 +50,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 
 def get_subclusters():
     data_stations = stations_with_data()
-    station_status = StationStatus()
+    station_status = DataStatus()
 
     subclusters = []
     for subcluster in Cluster.objects.all():

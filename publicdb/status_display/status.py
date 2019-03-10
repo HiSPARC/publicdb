@@ -7,7 +7,7 @@ from .nagios import status_lists
 RECENT_NUM_DAYS = 7
 
 
-class StationStatus(object):
+class DataStatus(object):
 
     """Query the status of a station.
 
