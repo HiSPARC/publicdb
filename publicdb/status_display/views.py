@@ -37,9 +37,8 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
-
-    station_nagios_status = NagiosStatus()
-    nagios_statuscount = station_nagios_status.get_status_counts()
+    nagios_station_status = NagiosStatus()
+    nagios_statuscount = nagios_station_status.get_status_counts()
 
     station_status = DataStatus()
     statuscount = station_status.get_status_counts()
@@ -54,7 +53,7 @@ def stations_by_country(request):
                            .select_related('cluster__country', 'cluster__parent')):
         link = station in data_stations
         status = station_status.get_status(station.number)
-        nagios_status = station_nagios_status.get_status(station.number)
+        nagios_status = nagios_station_status.get_status(station.number)
 
         station_info = {'number': station.number,
                         'name': station.name,
@@ -90,6 +89,9 @@ def stations_by_country(request):
 def stations_by_number(request):
     """Show a list of stations, ordered by number"""
 
+    nagios_station_status = NagiosStatus()
+    nagios_statuscount = nagios_station_status.get_status_counts()
+
     station_status = DataStatus()
     statuscount = station_status.get_status_counts()
 
@@ -98,18 +100,24 @@ def stations_by_number(request):
     for station in Station.objects.exclude(pcs__type__slug='admin'):
         link = station in data_stations
         status = station_status.get_status(station.number)
+        nagios_status = nagios_station_status.get_status(station.number)
 
         stations.append({'number': station.number,
                          'name': station.name,
                          'link': link,
-                         'status': status})
+                         'status': status,
+                         'nagios_status': nagios_status})
 
     return render(request, 'status_display/stations_by_number.html',
-                  {'stations': stations, 'statuscount': statuscount})
+                  {'stations': stations, 'statuscount': statuscount,
+                   'nagios_statuscount': nagios_statuscount})
 
 
 def stations_by_status(request):
     """Show a list of stations, ordered by status"""
+
+    nagios_station_status = NagiosStatus()
+    nagios_statuscount = nagios_station_status.get_status_counts()
 
     station_status = DataStatus()
     statuscount = station_status.get_status_counts()
@@ -120,20 +128,27 @@ def stations_by_status(request):
     for station in Station.objects.all():
         link = station in data_stations
         status = station_status.get_status(station.number)
+        nagios_status = nagios_station_status.get_status(station.number)
 
         # use setdefault() to automatically include unforeseen status labels without crashing
         group = station_groups.setdefault(status, [])
         group.append({'number': station.number,
                       'name': station.name,
                       'link': link,
-                      'status': status})
+                      'status': status,
+                      'nagios_status': nagios_status})
 
     return render(request, 'status_display/stations_by_status.html',
-                  {'station_groups': station_groups, 'statuscount': statuscount})
+                  {'station_groups': station_groups,
+                   'statuscount': statuscount,
+                   'nagios_statuscount': nagios_statuscount})
 
 
 def stations_by_name(request):
     """Show a list of stations, ordered by station name"""
+
+    nagios_station_status = NagiosStatus()
+    nagios_statuscount = nagios_station_status.get_status_counts()
 
     station_status = DataStatus()
     statuscount = station_status.get_status_counts()
@@ -143,16 +158,19 @@ def stations_by_name(request):
     for station in Station.objects.exclude(pcs__type__slug='admin'):
         link = station in data_stations
         status = station_status.get_status(station.number)
+        nagios_status = nagios_station_status.get_status(station.number)
 
         stations.append({'number': station.number,
                          'name': station.name,
                          'link': link,
-                         'status': status})
+                         'status': status,
+                         'nagios_status': nagios_status})
 
     stations = sorted(stations, key=itemgetter('name'))
 
     return render(request, 'status_display/stations_by_name.html',
-                  {'stations': stations, 'statuscount': statuscount})
+                  {'stations': stations, 'statuscount': statuscount,
+                   'nagios_statuscount': nagios_statuscount})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -185,6 +203,8 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
         for station in subcluster.stations.filter(pcs__is_test=False).distinct():
             link = station in data_stations
             status = station_status.get_status(station.number)
+            nagios_status = nagios_station_status.get_status(station.number)
+
             location = station.latest_location()
             station_data = {'number': station.number,
                             'name': station.name,
