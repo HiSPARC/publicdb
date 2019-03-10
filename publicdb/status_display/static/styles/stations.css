@@ -90,6 +90,13 @@ h1 a:hover {
     border-radius: 50%;
     background-color: grey;}
 
+.statusCube {
+    display: inline-block;
+    width: 6px;
+    height: 8px;
+    border-radius: 30%;
+    background-color: grey;}
+
 .down {background-color: rgba(255, 0, 0, 0.3);}
 .down:hover {background-color: rgba(255, 0, 0, 0.8);}
 

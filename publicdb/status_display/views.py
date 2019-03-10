@@ -22,7 +22,7 @@ from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, De
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
-from .status import StationStatus
+from .status import StationStatus, NagiosStatus
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 MIME_TSV = 'text/tab-separated-values'
@@ -37,6 +37,10 @@ def stations(request):
 def stations_by_country(request):
     """Show a list of stations, ordered by country, cluster and subcluster"""
 
+
+    station_nagios_status = NagiosStatus()
+    nagios_statuscount = station_nagios_status.get_status_counts()
+
     station_status = StationStatus()
     statuscount = station_status.get_status_counts()
 
@@ -50,11 +54,13 @@ def stations_by_country(request):
                            .select_related('cluster__country', 'cluster__parent')):
         link = station in data_stations
         status = station_status.get_status(station.number)
+        nagios_status = station_nagios_status.get_status(station.number)
 
         station_info = {'number': station.number,
                         'name': station.name,
                         'link': link,
-                        'status': status}
+                        'status': status,
+                        'nagios_status': nagios_status}
 
         country = station.cluster.country.name
         if station.cluster.parent:
