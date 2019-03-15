@@ -9,14 +9,18 @@
 {% block list %}
     <ul>
       {% for station in stations %}
-        <li>
-            <!--<a href="{% url 'status:station:status' station.number %}">--><span class='statusBall {{ station.status }}'></span></a>
-          {% if station.link %}
-            <a href="{% url 'status:station:summary' station.number %}">{{ station.name }} ({{ station.number }})</a>
-          {% else %}
-            {{ station.name }} ({{ station.number }})
-          {% endif %}
-        </li>
+      <li>
+          <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.nagios_status }}'></span></a>
+        {% if station.link %}
+          <a href="{% url 'status:station:summary' station.number %}">
+            <span class='statusCube {{ station.status }}'></span>
+            {{ station.number }} &mdash; {{ station.name }}
+          </a>
+        {% else %}
+            <span class='statusCube {{ station.status }}'></span>
+            {{ station.number }} &mdash; {{ station.name }}
+        {% endif %}
+      </li>
       {% endfor %}
     </ul>
 {% endblock %}

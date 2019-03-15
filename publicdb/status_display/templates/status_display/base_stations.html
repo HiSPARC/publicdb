@@ -42,6 +42,28 @@
 
         <div id="legend">
           {% block legend %}
+            <div class="sectionTitle">Station PC status</div>
+            <div class="keyvalue">
+                <span class='key statusBall up'></span>
+                <span class="value">Up {% if nagios_statuscount %}({{ nagios_statuscount.up }}){% endif %}</span><br>
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall problem'></span>
+                <span class="value">Problem {% if nagios_statuscount %}({{ nagios_statuscount.problem }}){% endif %}</span><br>
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall down'></span>
+                <span class="value">Down {% if nagios_statuscount %}({{ nagios_statuscount.down }}){% endif %}</span><br>
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall unknown'></span>
+                <span class="value">Unknown</span><br>
+            </div>
+            <div class="keyvalue">
+                <span class='key statusBall'></span>
+                <span class="value">&larr; Link to nagios status</span>
+            </div>
+
             <div class="sectionTitle">Data availability</div>
             <div class="keyvalue">
                 <span class="key thin" style='color: #23B;'>Station</span>
@@ -53,26 +75,26 @@
             </div>
 
 
-            <div class="sectionTitle">Current status</div>
+            <div class="sectionTitle">Recent data</div>
             <div class="keyvalue">
-                <span class='key statusBall up'></span>
-                <span class="value">Up {% if statuscount %}({{ statuscount.up }}){% endif %}</span><br>
+                <span class='key statusCube up'></span>
+                <span class="value">Up: Recieved data yesterday {% if statuscount %}({{ statuscount.up }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
-                <span class='key statusBall problem'></span>
-                <span class="value">Problem {% if statuscount %}({{ statuscount.problem }}){% endif %}</span><br>
+                <span class='key statusCube problem'></span>
+                <span class="value">Problem: No data yesterday {% if statuscount %}({{ statuscount.problem }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
-                <span class='key statusBall down'></span>
-                <span class="value">Down {% if statuscount %}({{ statuscount.down }}){% endif %}</span><br>
+                <span class='key statusCube down'></span>
+                <span class="value">Down: No recent data {% if statuscount %}({{ statuscount.down }}){% endif %}</span><br>
             </div>
             <div class="keyvalue">
-                <span class='key statusBall unknown'></span>
+                <span class='key statusCube unknown'></span>
                 <span class="value">Unknown</span><br>
             </div>
             <div class="keyvalue">
-                <span class='key statusBall'></span>
-                <span class="value">&larr; Link to status</span>
+                <span class='key statusCube'></span>
+                <span class="value">&larr; Link to most recent data</span>
             </div>
 
             <div class="sectionTitle">Region map</div>
