@@ -65,6 +65,10 @@ class SummaryQuerySet(models.QuerySet):
         return self.valid_date().filter(
             num_config__isnull=False)
 
+    def with_events_in_last_hour(self):
+        """Filter with events in last hour"""
+        return self.valid_date().filter(
+            events_in_last_hour=True)
 
 class Summary(models.Model):
     station = models.ForeignKey('inforecords.Station', models.CASCADE, related_name='summaries')
@@ -80,6 +84,7 @@ class Summary(models.Model):
     needs_update_errors = models.BooleanField(default=False)
     needs_update_weather = models.BooleanField(default=False)
     needs_update_singles = models.BooleanField(default=False)
+    events_in_last_hour = models.BooleanField(default=False)
 
     objects = SummaryQuerySet.as_manager()
 
