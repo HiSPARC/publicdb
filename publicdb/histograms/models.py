@@ -371,6 +371,17 @@ class GeneratorState(models.Model):
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField(default=False)
 
+    def update_has_finished(self, day=datetime.date.today()):
+        """Determine if the daily update at date has finished successfully
+
+        :param day: datetime.date
+
+        """
+        if self.update_last_run.date() >= day and not self.update_is_running:
+            return True
+        else:
+            return False
+
 
 class DetectorTimingOffset(models.Model):
     summary = models.ForeignKey(Summary, models.CASCADE, related_name='detector_timing_offsets')

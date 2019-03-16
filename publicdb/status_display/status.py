@@ -1,10 +1,11 @@
 import datetime
 
-from ..histograms.models import Summary
+from ..histograms.models import GeneratorState, Summary
 from ..inforecords.models import Pc, Station
 from .nagios import status_lists
 
 RECENT_NUM_DAYS = 7
+UPDATE_STARTS_AT_HOUR = 3  # am UTC
 
 
 class DataStatus(object):
@@ -17,13 +18,31 @@ class DataStatus(object):
     """
 
     def __init__(self):
-        yesterday = datetime.date.today() - datetime.timedelta(days=1)
-        recent_day = datetime.date.today() - datetime.timedelta(days=RECENT_NUM_DAYS)
+        yesterday = self._get_datetime_yesterday()
+        recent_day = yesterday - datetime.timedelta(days=RECENT_NUM_DAYS - 1)
+
+        update_state = GeneratorState.objects.last()
+        self.status_available = update_state.update_has_finished(yesterday)
 
         self.stations = Station.objects.values_list('number', flat=True)
         self.stations_with_current_data = Summary.objects.with_events().filter(date__exact=yesterday).values_list('station__number', flat=True)
         self.stations_with_recent_data = Summary.objects.with_events().filter(date__gte=recent_day).values_list('station__number', flat=True)
         self.stations_with_pc = Pc.objects.exclude(type__slug='admin').filter(is_active=True).values_list('station__number', flat=True)
+
+    def _get_datetime_yesterday(self):
+        """Determine the datetime of `yesterday`
+
+        The daily update starts at UPDATE_STARTS_AT_HOUR. Before that hour
+        `yesterday` should be the day before yesterday, because yesterdays
+        status is not yet available. Add an extra hour for the update to
+        finish.
+
+        """
+        now = datetime.datetime.utcnow()
+        if now.hour > UPDATE_STARTS_AT_HOUR:  # add extra hour for update
+            return datetime.date.today() - datetime.timedelta(days=1)
+        else:
+            return datetime.date.today() - datetime.timedelta(days=2)
 
     def get_status(self, station_number):
         """Query station status.
@@ -37,6 +56,9 @@ class DataStatus(object):
         :return: 'up', 'problem', or 'down'
 
         """
+        if not self.status_available:
+            return 'unknown'
+
         if station_number in self.stations_with_current_data:
             return 'up'
         elif station_number in self.stations_with_recent_data:
