@@ -6,8 +6,8 @@ import datetime
 import logging
 import time
 
-from . import datastore
 from ..inforecords.models import Station
+from . import datastore
 from .models import GeneratorState, NetworkSummary, Summary
 
 logger = logging.getLogger(__name__)
