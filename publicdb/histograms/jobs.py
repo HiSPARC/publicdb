@@ -320,6 +320,12 @@ def update_eventtime_histogram(summary):
     hist = hist.tolist()
     save_histograms(summary, 'eventtime', bins, hist)
 
+    # if events in last hour of the day, set the `events_in_last_hour` flag
+    # of the summary.
+    if hist[-1] > 0:
+        summary.events_in_last_hour = True
+        summary.save()
+
 
 def update_coincidencetime_histogram(network_summary):
     """Histograms that show the number of coincidences per hour"""
