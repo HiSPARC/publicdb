@@ -18,8 +18,8 @@ from sapphire import (CoincidencesESD, DetermineStationTimingOffsets, HiSPARCSta
                       determine_detector_timing_offsets)
 from sapphire.analysis.calibration import datetime_range
 
-from . import datastore
 from ..inforecords.models import Station
+from . import datastore
 from .models import DetectorTimingOffset
 
 logger = logging.getLogger(__name__)

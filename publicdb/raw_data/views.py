@@ -23,10 +23,10 @@ from django.views.decorators.csrf import csrf_exempt
 
 from sapphire import CoincidenceQuery, datetime_to_gps
 
-from . import knmi_lightning
 from ..histograms import esd
 from ..histograms.models import NetworkSummary, Summary
 from ..inforecords.models import Cluster, Station
+from . import knmi_lightning
 from .date_generator import single_day_ranges
 from .forms import CoincidenceDownloadForm, DataDownloadForm
 
