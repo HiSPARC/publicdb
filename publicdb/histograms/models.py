@@ -70,6 +70,7 @@ class SummaryQuerySet(models.QuerySet):
         return self.valid_date().filter(
             events_in_last_hour=True)
 
+
 class Summary(models.Model):
     station = models.ForeignKey('inforecords.Station', models.CASCADE, related_name='summaries')
     date = models.DateField()
