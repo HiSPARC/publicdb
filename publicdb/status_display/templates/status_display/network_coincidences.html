@@ -62,6 +62,22 @@
         </div>
       {% endif %}
 
+    {% for station_number, plot in singles_plots %}
+      <div id="singlesratelowData_{{ station_number }}" class="histogram">
+          <h3>Station {{ station_number }}: Singles (per second above low threshold)</h3>
+          <div class="singlesplot" id="srl_{{ station_number }}"></div>
+          <script>
+              srl_labels = {yaxis: {axisLabel: "{{ plot.y_label }}"},
+                           xaxis: {axisLabel: "{{ plot.x_label }}"}}
+              $.extend(true, srl_options, srl_labels)
+              $.plot($("#srl_{{ station_number }}"), [
+                {% for data in plot.data %}
+                  {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                {% endfor %}
+                  {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], srl_options);
+          </script>
+      </div>
+    {% endfor %}
     </div>
 {% endblock %}
 

@@ -68,6 +68,11 @@
     display: block;
     clear: both;}
 
+.singlesplot {
+    display: block;
+    clear: both;
+    height: 250px;}
+
 #gpsMap {
     clear: both;
     width: 585px;
