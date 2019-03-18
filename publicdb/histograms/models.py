@@ -65,6 +65,11 @@ class SummaryQuerySet(models.QuerySet):
         return self.valid_date().filter(
             num_config__isnull=False)
 
+    def with_events_in_last_hour(self):
+        """Filter with events in last hour"""
+        return self.valid_date().filter(
+            events_in_last_hour=True)
+
 
 class Summary(models.Model):
     station = models.ForeignKey('inforecords.Station', models.CASCADE, related_name='summaries')
@@ -80,6 +85,7 @@ class Summary(models.Model):
     needs_update_errors = models.BooleanField(default=False)
     needs_update_weather = models.BooleanField(default=False)
     needs_update_singles = models.BooleanField(default=False)
+    events_in_last_hour = models.BooleanField(default=False)
 
     objects = SummaryQuerySet.as_manager()
 
@@ -370,6 +376,17 @@ class GeneratorState(models.Model):
     check_is_running = models.BooleanField(default=False)
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField(default=False)
+
+    def update_has_finished(self, day=datetime.date.today()):
+        """Determine if the daily update at date has finished successfully
+
+        :param day: datetime.date
+
+        """
+        if self.update_last_run.date() >= day and not self.update_is_running:
+            return True
+        else:
+            return False
 
 
 class DetectorTimingOffset(models.Model):
