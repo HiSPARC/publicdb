@@ -120,7 +120,7 @@
         </div>
       {% endif %}
 
-      {% if plots.singlesratehight %}
+      {% if plots.singlesratehigh %}
         <div id="singlesratehighData" class="histogram">
             <h3>Singles (per second above high threshold)</h3>
             <div class="sourceLink">
@@ -129,11 +129,11 @@
             </div>
             <div class="plot" id="srh_histogram"></div>
             <script>
-                srh_labels = {yaxis: {axisLabel: "{{ plots.singlesratehight.y_label }}"},
-                              xaxis: {axisLabel: "{{ plots.singlesratehight.x_label }}"}}
+                srh_labels = {yaxis: {axisLabel: "{{ plots.singlesratehigh.y_label }}"},
+                              xaxis: {axisLabel: "{{ plots.singlesratehigh.x_label }}"}}
                 $.extend(true, srh_options, srh_labels)
                 $.plot($("#srh_histogram"), [
-                  {% for data in plots.singlesratehight.data %}
+                  {% for data in plots.singlesratehigh.data %}
                     {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
                   {% endfor %}
                     {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], srh_options);
