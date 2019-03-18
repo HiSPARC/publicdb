@@ -20,7 +20,6 @@
     margin-bottom: 20px;}
 
 #nagios {
-    margin-top: 140px;
     position: absolute;
     z-index: -1;
     width: 850px;
@@ -96,6 +95,30 @@ h3 {
     padding: 3px;
     cursor: pointer;}
 
+.statusBall {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: grey;}
+
+.statusCube {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    background-color: grey;}
+
+.down {background-color: rgba(255, 0, 0, 0.3);}
+.down:hover {background-color: rgba(255, 0, 0, 0.8);}
+
+.problem {background-color: rgba(255, 215, 0, 0.5);}
+.problem:hover {background-color: rgba(255, 215, 0, 0.9);}
+
+.up {background-color: rgba(0, 180, 0, 0.3);}
+.up:hover {background-color: rgba(0, 180, 0, 0.8);}
+
+.unknown {background-color: rgba(180, 180, 180, 0.3);}
+.unknown:hover {background-color: rgba(128, 128, 128, 0.8);}
 
 /* Sidebar */
 

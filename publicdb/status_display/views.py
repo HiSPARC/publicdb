@@ -545,11 +545,19 @@ def station_status(request, station_number):
     has_data = station_has_data(station)
     has_config = station_has_config(station)
 
+    station_status = DataStatus()
+    status = station_status.get_status(station_number)
+
+    nagios_station_status = NagiosStatus()
+    nagios_status = nagios_station_status.get_status(station_number)
+
     return render(request, 'status_display/station_status.html',
                   {'station': station,
                    'pc': pc,
                    'has_data': has_data,
                    'has_config': has_config,
+                   'status': status,
+                   'nagios_status': nagios_status,
                    'coincidences_found': True})
 
 
