@@ -281,12 +281,21 @@ class NetworkSummaryDetailView(DateDetailView):
         # Data for the plots
         plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.network_histograms.all()}
 
+        # data for singles plots
+        singles_datasets = (MultiDailyDataset.objects
+                                             .filter(summary__date=date,
+                                                     summary__station__pcs__is_test=False,
+                                                     type__slug='singlesratelow')
+                                             .distinct())
+        singles_plots = [(dataset.summary.station.number, plot_dataset(dataset)) for dataset in singles_datasets]
+        singles_plots = sorted(singles_plots)
+
         context.update({'date': date,
                         'tomorrow': date + datetime.timedelta(days=1),
                         'status': status,
 
                         'plots': plots,
-
+                        'singles_plots': singles_plots,
                         'thismonth': thismonth,
                         'month_list': month_list,
                         'year_list': year_list,
