@@ -119,7 +119,7 @@ class StationLayoutQuarantine(models.Model):
             Greetings,
             The HiSPARC Team''' %
             (self.name, self.station, self.hash_submit))
-        sender = 'info@hisparc.nl'
+        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_review(self):
@@ -138,7 +138,7 @@ class StationLayoutQuarantine(models.Model):
             Greetings,
             The HiSPARC Team''' %
             (self.station, self.hash_review))
-        sender = 'info@hisparc.nl'
+        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, ['beheer@hisparc.nl'],
                   fail_silently=False)
 
@@ -154,7 +154,7 @@ class StationLayoutQuarantine(models.Model):
             Greetings,
             The HiSPARC Team''' %
             (self.name, self.station))
-        sender = 'info@hisparc.nl'
+        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_declined(self):
@@ -169,5 +169,5 @@ class StationLayoutQuarantine(models.Model):
             Greetings,
             The HiSPARC Team''' %
             (self.name, self.station))
-        sender = 'info@hisparc.nl'
+        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
