@@ -70,6 +70,7 @@ def get_data_path(date):
 
 def split_ext_timestamp(ext_timestamp):
     """Separate timestamp and nanoseconds from ext_timestamp"""
+    ext_timestamp = int(ext_timestamp)  # cast numpy.uint64 (if read from datastore hdf5) to int
     timestamp = int(ext_timestamp / 1e9)
     nanoseconds = ext_timestamp % int(1e9)
     return timestamp, nanoseconds
