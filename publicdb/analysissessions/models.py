@@ -139,7 +139,8 @@ class SessionRequest(models.Model):
         Then return the number of found coincidences.
 
         """
-        stations = Station.objects.filter(cluster=self.cluster, pcs__is_test=False).distinct().values_list('number')
+        stations = Station.objects.filter(cluster=self.cluster,
+                                          pcs__is_test=False).distinct().values_list('number', flat=True)
         path = get_esd_data_path(date)
 
         if not os.path.isfile(path):
@@ -151,19 +152,20 @@ class SessionRequest(models.Model):
         # Get all coincidences containing stations in the requested cluster
         with tables.open_file(path, 'r') as data:
             cq = CoincidenceQuery(data)
-            coincidences = cq.any(stations)
-            events = cq.events_from_stations(coincidences, stations, n=3)
-            # Todo: Double check for multiple events from same station,
-            self.save_coincidence(events, session)
-            number_of_coincidences += 1
+            all_coincidences = cq.any(stations)
+            coincidences = cq.events_from_stations(all_coincidences, stations, n=3)
+            for coincidence in coincidences:
+                # Todo: Double check for multiple events from same station,
+                self.save_coincidence(coincidence, session)
+                number_of_coincidences += 1
 
         return number_of_coincidences
 
-    def save_coincidence(self, events, session):
+    def save_coincidence(self, esd_coincidence, session):
         event_timestamps = []
         event_objects = []
 
-        for station_number, event in events:
+        for station_number, event in esd_coincidence:
             station = Station.objects.get(number=station_number)
             traces = get_event_traces(station, event['ext_timestamp'])
 
@@ -179,6 +181,7 @@ class SessionRequest(models.Model):
                           pulseheights=event['pulseheights'].tolist(),
                           integrals=event['integrals'].tolist(),
                           traces=traces)
+            event_objects.append(event)
 
         first_timestamp = min(event_timestamps)
         coincidence = Coincidence(date=first_timestamp[0].date(),
