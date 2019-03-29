@@ -1,0 +1,33 @@
+version: '3.3'
+services:
+
+  postgres:
+    image: 'postgres:9.6-alpine'
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: publicdb
+    volumes:
+      - 'pgdata:/var/lib/postgresql/data'
+    ports:
+      - '54321:5432'
+
+  publicdb:
+    image: publicdb
+    build: .
+    restart: unless-stopped
+    volumes:
+      - '.:/base:ro'
+    ports:
+      - '8000:8000'
+    working_dir: '/base'
+    command: './manage.py runserver 0:8000'
+    stdin_open: true
+    tty: true
+    depends_on:
+      - postgres
+    ports:
+      - '8000:8000'
+
+volumes:
+  pgdata:
