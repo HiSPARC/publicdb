@@ -2,10 +2,11 @@ import factory
 
 from publicdb.inforecords import models
 
-from .providers import DataProvider, UrlSafeProvider
+from .providers import DataProvider, NlUrlSafeProvider, UrlSafeProvider
 
 factory.Faker.add_provider(DataProvider)
 factory.Faker.add_provider(UrlSafeProvider)
+factory.Faker.add_provider(NlUrlSafeProvider, 'nl_NL')
 
 
 class ProfessionFactory(factory.DjangoModelFactory):
@@ -19,7 +20,7 @@ class ProfessionFactory(factory.DjangoModelFactory):
 class ContactInformationFactory(factory.DjangoModelFactory):
     street_1 = factory.Faker('street_address')
     street_2 = factory.Faker('street_address')
-    postalcode = factory.Faker('postalcode')
+    postalcode = factory.Faker('postcode')
     city = factory.Faker('city')
     pobox = ''
     pobox_postalcode = ''
@@ -89,20 +90,22 @@ class PcTypeFactory(factory.DjangoModelFactory):
 
     class Meta:
         model = models.PcType
+        django_get_or_create = ('slug',)
 
 
 class PcFactory(factory.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
     type = factory.SubFactory(PcTypeFactory)
     name = factory.Faker('word')
-    is_active = factory.Faker('boolean')
-    is_test = factory.Faker('boolean')
+    is_active = factory.Faker('boolean', chance_of_getting_true=90)
+    is_test = factory.Faker('boolean', chance_of_getting_true=5)
     ip = factory.Faker('ipv4')
     notes = factory.Faker('sentence')
     # services - many to many
 
     class Meta:
         model = models.Pc
+        django_get_or_create = ('station',)
 
 
 class MonitorServiceFactory(factory.DjangoModelFactory):
