@@ -18,8 +18,8 @@ class TestViews(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
-        self.data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug='eventtime')
-        self.config = histograms_factories.ConfigurationFactory(summary=self.summary)
+        histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug='eventtime')
+        histograms_factories.ConfigurationFactory(summary=self.summary)
         super(TestViews, self).setUp()
 
     def get_html(self, url):
