@@ -18,7 +18,7 @@ class TestViews(TestCase):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
-        histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug='eventtime')
+        histograms_factories.EventtimeHistogramFactory(summary=self.summary)
         histograms_factories.ConfigurationFactory(summary=self.summary)
         super(TestViews, self).setUp()
 
@@ -100,8 +100,12 @@ class TestSourceViews(TestCase):
             self.assertEqual(value, context[key])
 
     def test_network_histograms(self):
-        for network_histogram_type in ['coincidencetime', 'coincidencenumber']:
-            data = histograms_factories.NetworkHistogramFactory(network_summary=self.network_summary, type__slug=network_histogram_type)
+        factories = [
+            histograms_factories.CoincidencetimeHistogramFactory,
+            histograms_factories.CoincidencenumberHistogramFactory
+        ]
+        for factory in factories:
+            data = factory(network_summary=self.network_summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
@@ -110,8 +114,13 @@ class TestSourceViews(TestCase):
             self.assert_context_contains(expected_context, response.context)
 
     def test_daily_histograms(self):
-        for daily_histogram_type in ['eventtime', 'zenith', 'azimuth']:
-            data = histograms_factories.DailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
+        factories = [
+            histograms_factories.EventtimeHistogramFactory,
+            histograms_factories.AzimuthHistogramFactory,
+            histograms_factories.ZenithHistogramFactory
+        ]
+        for factory in factories:
+            data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, data.values),
@@ -120,8 +129,15 @@ class TestSourceViews(TestCase):
             }
             self.assert_context_contains(expected_context, response.context)
 
-        for daily_histogram_type in ['pulseheight', 'pulseintegral', 'singleslow', 'singleshigh']:
-            data = histograms_factories.MultiDailyHistogramFactory(summary=self.summary, type__slug=daily_histogram_type)
+    def test_multi_daily_histograms(self):
+        factories = [
+            histograms_factories.PulseintegralHistogramFactory,
+            histograms_factories.PulseheightHistogramFactory,
+            histograms_factories.SingleslowHistogramFactory,
+            histograms_factories.SingleshighHistogramFactory
+        ]
+        for factory in factories:
+            data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.bins, *data.values),
@@ -130,13 +146,18 @@ class TestSourceViews(TestCase):
             }
             self.assert_context_contains(expected_context, response.context)
 
-        # Get full eventtime data for the station
+    def test_full_eventtime_data(self):
+        histograms_factories.EventtimeHistogramFactory(summary=self.summary)
         kwargs = {'station_number': self.station.number}
         self.get_tsv(reverse('status:source:eventtime', kwargs=kwargs))
 
     def test_daily_datasets(self):
-        for daily_dataset_type in ['barometer', 'temperature']:
-            data = histograms_factories.DailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
+        factories = [
+            histograms_factories.BarometerDatasetFactory,
+            histograms_factories.TemperatureDatasetFactory,
+        ]
+        for factory in factories:
+            data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, data.y),
@@ -145,8 +166,13 @@ class TestSourceViews(TestCase):
             }
             self.assert_context_contains(expected_context, response.context)
 
-        for daily_dataset_type in ['singlesratelow', 'singlesratehigh']:
-            data = histograms_factories.MultiDailyDatasetFactory(summary=self.summary, type__slug=daily_dataset_type)
+    def test_multi_daily_datasets(self):
+        factories = [
+            histograms_factories.SinglesratelowDatasetFactory,
+            histograms_factories.SinglesratehighDatasetFactory,
+        ]
+        for factory in factories:
+            data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
                 'data': zip(data.x, *data.y),
