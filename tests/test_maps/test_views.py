@@ -7,7 +7,7 @@ from ..factories import histograms_factories
 from ..factories.inforecords_factories import StationFactory
 
 
-@patch('publicdb.status_display.nagios.retrieve_station_status', new=lambda q: [])
+@patch('publicdb.status_display.nagios.status_lists', return_value=([], [], []))
 class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
@@ -23,14 +23,14 @@ class TestViews(TestCase):
         self.assertIn('text/html', response['Content-Type'])
         return response
 
-    def test_station_on_map(self):
+    def test_station_on_map(self, mock_status):
         kwargs = {'station_number': self.station.number}
         self.get_html(reverse('maps:map', kwargs=kwargs))
 
-    def test_all_stations_on_map(self):
+    def test_all_stations_on_map(self, mock_status):
         self.get_html(reverse('maps:map'))
 
-    def test_stations_on_map(self):
+    def test_stations_on_map(self, mock_status):
         kwargs = {'country': self.station.cluster.country.name}
         self.get_html(reverse('maps:map', kwargs=kwargs))
         kwargs.update({'cluster': self.station.cluster.main_cluster()})

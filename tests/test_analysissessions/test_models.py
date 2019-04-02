@@ -69,5 +69,7 @@ class TestAnalyzedCoincidence(TestCase):
 class TestSessionRequest(TestCase):
     def setUp(self):
         super(TestSessionRequest, self).setUp()
-        cluster = ClusterFactory(number=0, country__number=0)
-        self.session_request = SessionRequestFactory(cluster=cluster)
+        self.cluster = ClusterFactory(number=0, country__number=0)
+
+    def test_session_request(self):
+        self.session_request = SessionRequestFactory(cluster=self.cluster)
