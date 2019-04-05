@@ -40,7 +40,9 @@ class Command(BaseCommand):
 
             for station in stations:
                 inforecords_factories.PcFactory(station=station, type=pc_type, name='pc{number}'.format(number=station.number))
-                station_layout_factories.StationLayoutFactory(station=station)
+
+        for station in stations:
+            station_layout_factories.StationLayoutFactory(station=station)
 
         dates = [date(2017, 1, 1), date(2017, 1, 2), date(2017, 2, 10), date(2018, 4, 1)]
 
