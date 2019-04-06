@@ -1,4 +1,5 @@
 # Specific
+/publicdb/settings.py
 /uwsgi.ini
 HiSPARC_coincidences.db
 public.db
