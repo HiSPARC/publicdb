@@ -248,3 +248,26 @@ Provisioning might stop if the kernel of the guest VM is upgraded, because
 this will trigger a reboot. Reload and restart provisioning::
 
    $ vagrant reload publicdb --provision
+
+
+Running with Docker-compose
+---------------------------
+
+Install and start Docker, then in this directory do::
+
+    $ docker-compose up -d
+
+If this is the first run you should now run database migrations::
+
+    $ docker-compose exec publicdb ./manage.py migrate
+
+In order to populate the database you can use a dump of the production
+database, or create some fake data:
+
+    $ docker-compose exec publicdb ./manage.py createfakedata
+
+To clean the database again to fill it with new fake data use::
+
+    $ docker-compose exec publicdb ./manage.py flush --noinput
+    $ docker-compose exec publicdb ./manage.py loaddata publicdb/histograms/fixtures/initial_generator_state.json
+    $ docker-compose exec publicdb ./manage.py loaddata publicdb/histograms/fixtures/initial_types.json

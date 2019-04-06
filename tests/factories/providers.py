@@ -2,6 +2,7 @@ import re
 
 from faker.providers import BaseProvider
 from faker.providers.address import Provider as AddressProvider
+from faker.providers.address.nl_NL import Provider as NlAddressProvider
 
 
 def make_urlsafe(value):
@@ -29,6 +30,16 @@ class DataProvider(BaseProvider):
 
 
 class UrlSafeProvider(AddressProvider):
+    """Provider for safe country and city names"""
+
+    def country_urlsafe(self):
+        return make_urlsafe(self.country())
+
+    def city_urlsafe(self):
+        return make_urlsafe(self.city())
+
+
+class NlUrlSafeProvider(NlAddressProvider):
     """Provider for safe country and city names"""
 
     def country_urlsafe(self):

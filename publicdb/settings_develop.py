@@ -35,6 +35,7 @@ ESD_PATH = os.path.join(PUBLICDB_PATH, 'esd')
 LGT_PATH = os.path.join(PUBLICDB_PATH, 'knmi_lightning')
 
 # VPN and datastore XML-RPC Proxies
+# These are None in tests/development to disable attempts at connections
 VPN_PROXY = None  # 'http://localhost:8001'
 DATASTORE_PROXY = None  # 'http://localhost:8002'
 
@@ -74,7 +75,7 @@ CSRF_COOKIE_SECURE = True
 SECURE_SSL_REDIRECT = True
 SECURE_REDIRECT_EXEMPT = [r'^(?!admin/).*']
 
-FILE_UPLOAD_PERMISSIONS = 0644
+FILE_UPLOAD_PERMISSIONS = 0o644
 
 TEMPLATES = [
     {

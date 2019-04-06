@@ -341,7 +341,7 @@ class Pc(models.Model):
     keys.short_description = 'Certificates'
 
     def url(self):
-        if self.type.description == 'Admin PC':
+        if self.type.slug == 'admin':
             return ''
         else:
             return mark_safe(
@@ -381,15 +381,15 @@ class Pc(models.Model):
         if self.id:
             super(Pc, self).save(*args, **kwargs)
         else:
-            if self.type.description == "Admin PC":
+            if self.type.slug == "admin":
                 try:
-                    last_ip = Pc.objects.filter(type__description="Admin PC").latest('id').ip
+                    last_ip = Pc.objects.filter(type__slug="admin").latest('id').ip
                 except Pc.DoesNotExist:
                     # Initial Admin IP
                     last_ip = '172.16.66.1'
             else:
                 try:
-                    last_ip = Pc.objects.exclude(type__description="Admin PC").latest('id').ip
+                    last_ip = Pc.objects.exclude(type__slug="admin").latest('id').ip
                 except Pc.DoesNotExist:
                     # Initial station IP
                     last_ip = '194.171.82.1'
@@ -409,7 +409,7 @@ class Pc(models.Model):
         update_aliases()
 
     def install_default_services(self):
-        if self.type.description != "Admin PC":
+        if self.type.slug != "admin":
             for service in MonitorService.objects.filter(is_default_service=True):
                 EnabledService(pc=self, monitor_service=service).save()
 
@@ -436,7 +436,7 @@ class MonitorService(models.Model):
         super(MonitorService, self).save(*args, **kwargs)
 
         if self.is_default_service:
-            for pc in Pc.objects.exclude(type__description="Admin PC"):
+            for pc in Pc.objects.exclude(type__slug="admin"):
                 try:
                     service = EnabledService.objects.get(pc=pc, monitor_service=self)
                 except EnabledService.DoesNotExist:

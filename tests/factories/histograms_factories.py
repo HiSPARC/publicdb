@@ -1,8 +1,9 @@
 from datetime import date
 
 import factory
+import numpy
 
-from publicdb.histograms import models
+from publicdb.histograms import jobs, models
 
 from . import inforecords_factories
 from .providers import DataProvider
@@ -162,21 +163,51 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
 class NetworkHistogramFactory(factory.DjangoModelFactory):
     network_summary = factory.SubFactory(NetworkSummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values)))
+    bins = factory.LazyAttribute(lambda o: range(len(o.values) + 1))
     values = factory.Faker('int_list')
 
     class Meta:
         model = models.NetworkHistogram
 
 
+class CoincidencetimeHistogramFactory(NetworkHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='coincidencetime')
+    bins = numpy.linspace(0, 24, 24 + 1).tolist()
+    values = factory.Faker('int_list', n=24, min=0, max=10000)
+
+
+class CoincidencenumberHistogramFactory(NetworkHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='coincidencenumber')
+    bins = numpy.linspace(0, 100, 100 + 1).tolist()
+    values = factory.Faker('int_list', n=100, min=0, max=10000)
+
+
 class DailyHistogramFactory(factory.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values)))
+    bins = factory.LazyAttribute(lambda o: range(len(o.values) + 1))
     values = factory.Faker('int_list')
 
     class Meta:
         model = models.DailyHistogram
+
+
+class EventtimeHistogramFactory(DailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='eventtime')
+    bins = numpy.linspace(0, 24, 24 + 1).tolist()
+    values = factory.Faker('int_list', n=24, min=0, max=10000)
+
+
+class AzimuthHistogramFactory(DailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='azimuth')
+    bins = numpy.linspace(-180, 180, 30 + 1).tolist()
+    values = factory.Faker('int_list', n=30, min=0, max=600)
+
+
+class ZenithHistogramFactory(DailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='zenith')
+    bins = numpy.linspace(0, 90, 30 + 1).tolist()
+    values = factory.Faker('int_list', n=jobs.BIN_PH_NUM, min=0, max=1000)
 
 
 class MultiDailyHistogramFactory(DailyHistogramFactory):
@@ -184,6 +215,30 @@ class MultiDailyHistogramFactory(DailyHistogramFactory):
 
     class Meta:
         model = models.MultiDailyHistogram
+
+
+class PulseintegralHistogramFactory(MultiDailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='pulseintegral')
+    bins = numpy.linspace(0, jobs.MAX_IN, jobs.BIN_IN_NUM + 1).tolist()
+    values = factory.Faker('multi_int_list', n=jobs.BIN_IN_NUM, min=0, max=10000)
+
+
+class PulseheightHistogramFactory(MultiDailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='pulseheight')
+    bins = numpy.linspace(0, jobs.MAX_PH, jobs.BIN_PH_NUM + 1).tolist()
+    values = factory.Faker('multi_int_list', n=jobs.BIN_PH_NUM, min=0, max=10000)
+
+
+class SingleslowHistogramFactory(MultiDailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='singleslow')
+    bins = numpy.linspace(0, jobs.MAX_SINGLES_LOW, jobs.BIN_SINGLES_LOW_NUM + 1).tolist()
+    values = factory.Faker('multi_int_list', n=jobs.BIN_SINGLES_LOW_NUM, min=0, max=40000)
+
+
+class SingleshighHistogramFactory(MultiDailyHistogramFactory):
+    type = factory.SubFactory(HistogramTypeFactory, slug='singleshigh')
+    bins = numpy.linspace(0, jobs.MAX_SINGLES_HIGH, jobs.BIN_SINGLES_HIGH_NUM + 1).tolist()
+    values = factory.Faker('multi_int_list', n=jobs.BIN_SINGLES_HIGH_NUM, min=0, max=20000)
 
 
 class DailyDatasetFactory(factory.DjangoModelFactory):
@@ -196,11 +251,35 @@ class DailyDatasetFactory(factory.DjangoModelFactory):
         model = models.DailyDataset
 
 
+class TemperatureDatasetFactory(DailyDatasetFactory):
+    type = factory.SubFactory(DatasetTypeFactory, slug='temperature')
+    x = numpy.arange(0, 86401, jobs.INTERVAL_TEMP).tolist()
+    y = factory.Faker('float_list', n=(86400 // jobs.INTERVAL_TEMP), min=-20, max=40)
+
+
+class BarometerDatasetFactory(DailyDatasetFactory):
+    type = factory.SubFactory(DatasetTypeFactory, slug='barometer')
+    x = numpy.arange(0, 86401, jobs.INTERVAL_BARO).tolist()
+    y = factory.Faker('float_list', n=(86400 // jobs.INTERVAL_BARO), min=900, max=1200)
+
+
 class MultiDailyDatasetFactory(DailyDatasetFactory):
     y = factory.Faker('multi_float_list')
 
     class Meta:
         model = models.MultiDailyDataset
+
+
+class SinglesratelowDatasetFactory(MultiDailyDatasetFactory):
+    type = factory.SubFactory(DatasetTypeFactory, slug='singlesratelow')
+    x = numpy.arange(0, 86401, jobs.BIN_SINGLES_RATE).tolist()
+    y = factory.Faker('multi_float_list', n=(86400 // jobs.BIN_SINGLES_RATE), min=0, max=400)
+
+
+class SinglesratehighDatasetFactory(MultiDailyDatasetFactory):
+    type = factory.SubFactory(DatasetTypeFactory, slug='singlesratehigh')
+    x = numpy.arange(0, 86401, jobs.BIN_SINGLES_RATE).tolist()
+    y = factory.Faker('multi_float_list', n=(86400 // jobs.BIN_SINGLES_RATE), min=0, max=200)
 
 
 class DetectorTimingOffsetFactory(factory.DjangoModelFactory):

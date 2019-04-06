@@ -49,7 +49,7 @@ def create_nagios_config(request):
 
     # Start building the host list
     hosts = []
-    for host in (Pc.objects.exclude(type__description='Admin PC')
+    for host in (Pc.objects.exclude(type__slug='admin')
                            .filter(is_active=True)
                            .select_related('station__cluster', 'station__contact')):
 
