@@ -16,6 +16,8 @@ services:
     image: publicdb
     build: .
     restart: unless-stopped
+    environment:
+      DJANGO_SETTINGS_MODULE: publicdb.settings_docker
     volumes:
       - '.:/base:ro'
     ports:
