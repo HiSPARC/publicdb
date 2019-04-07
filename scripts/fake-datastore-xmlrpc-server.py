@@ -16,7 +16,7 @@ import hashlib
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
-CFG_URL = 'http://localhost:8003/config/datastore'
+CFG_URL = 'http://publicdb:8000/config/datastore'
 
 
 def reload_datastore():

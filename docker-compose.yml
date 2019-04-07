@@ -28,8 +28,26 @@ services:
     tty: true
     depends_on:
       - postgres
+
+  vpn:
+    image: 'python:2.7-alpine'
+    restart: unless-stopped
+    volumes:
+      - './scripts:/base:ro'
     ports:
-      - '8000:8000'
+      - '8001:8001'
+    working_dir: '/base'
+    command: 'python fake-vpn-xmlrpc-server.py'
+
+  datastore:
+    image: 'python:2.7-alpine'
+    restart: unless-stopped
+    volumes:
+      - './scripts:/base:ro'
+    ports:
+      - '8002:8002'
+    working_dir: '/base'
+    command: 'python fake-datastore-xmlrpc-server.py'
 
 volumes:
   pgdata:
