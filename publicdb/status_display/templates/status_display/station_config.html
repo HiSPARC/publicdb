@@ -53,6 +53,74 @@
 
 {% block data %}
     <div id="graphs">
+
+      {% if lla %}
+        <div id="gpsPositions">
+            <h3>GPS positions</h3>
+            <div class="sourceLink">
+                <a href="{% url 'status:source:gps' station.number %}">Source</a>
+            </div>
+            <div id="gpsMap"></div>
+            {% if altitudegraph %}
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#ag_histogram')">Image</a>
+            </div>
+            <div class="plot" id="ag_histogram"></div>
+            <script>
+                ag_labels = {yaxis: {axisLabel: "{{ altitudegraph.y_label }}"},
+                             xaxis: {axisLabel: "{{ altitudegraph.x_label }}"}}
+                $.extend(true, ag_options, ag_labels)
+                $.plot($("#ag_histogram"), [
+                  {% for data in altitudegraph.data %}
+                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ag_options);
+            </script>
+            {% endif %}
+        </div>
+      {% endif %}
+
+      <div id="stationLayout">
+          <h3>Station layout</h3>
+        {% if layout %}
+          <div class="sourceLink">
+              <a href="{% url 'layout:submit' %}">Submit layout</a> |
+              <a href="{% url 'status:source:layout' station.number %}">Source</a>
+          </div>
+          {% include "station_layout/canvas.html" %}
+          <script>
+              {% if layout.has_four_detectors %}
+                  var radius = [{{ layout.detector_1_radius }},
+                                {{ layout.detector_2_radius }},
+                                {{ layout.detector_3_radius }},
+                                {{ layout.detector_4_radius }}]
+                  var alpha = [{{ layout.detector_1_alpha }},
+                               {{ layout.detector_2_alpha }},
+                               {{ layout.detector_3_alpha }},
+                               {{ layout.detector_4_alpha }}]
+                  var beta = [{{ layout.detector_1_beta }},
+                              {{ layout.detector_2_beta }},
+                              {{ layout.detector_3_beta }},
+                              {{ layout.detector_4_beta }}]
+              {% else %}
+                  var radius = [{{ layout.detector_1_radius }},
+                                {{ layout.detector_2_radius }}]
+                  var alpha = [{{ layout.detector_1_alpha }},
+                               {{ layout.detector_2_alpha }}]
+                  var beta = [{{ layout.detector_1_beta }},
+                              {{ layout.detector_2_beta }}]
+              {% endif %}
+              draw_station(context, radius, alpha, beta);
+          </script>
+        {% else %}
+          <p>
+              No detector positions available yet for this station.<br>
+              A layout can be submitted on the <a href="{% url 'layout:submit' %}">Submit layout</a> page.
+          </p>
+        {% endif %}
+
+      </div>
+
       {% if voltagegraph %}
         <div id="voltageGraph" class="histogram">
             <h3>PMT voltage</h3>
@@ -116,71 +184,6 @@
         </div>
       {% endif %}
 
-      {% if lla %}
-        <div id="gpsPositions">
-            <h3>GPS positions</h3>
-            <div class="sourceLink">
-                <a href="{% url 'status:source:gps' station.number %}">Source</a>
-            </div>
-            <div id="gpsMap"></div>
-            {% if altitudegraph %}
-            <div class="sourceLink">
-                <a onclick="downloadGraph('#ag_histogram')">Image</a>
-            </div>
-            <div class="plot" id="ag_histogram"></div>
-            <script>
-                ag_labels = {yaxis: {axisLabel: "{{ altitudegraph.y_label }}"},
-                             xaxis: {axisLabel: "{{ altitudegraph.x_label }}"}}
-                $.extend(true, ag_options, ag_labels)
-                $.plot($("#ag_histogram"), [
-                  {% for data in altitudegraph.data %}
-                    {data: {{ data|fix_histogram_time|fix_timestamps }}, yaxis: 1},
-                  {% endfor %}
-                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], ag_options);
-            </script>
-            {% endif %}
-        </div>
-      {% endif %}
-
-        <div id="stationLayout">
-            <h3>Station layout</h3>
-          {% if layout %}
-            <div class="sourceLink">
-                <a href="{% url 'layout:submit' %}">Submit layout</a> |
-                <a href="{% url 'status:source:layout' station.number %}">Source</a>
-            </div>
-            {% include "station_layout/canvas.html" %}
-            <script>
-                {% if layout.has_four_detectors %}
-                    var radius = [{{ layout.detector_1_radius }},
-                                  {{ layout.detector_2_radius }},
-                                  {{ layout.detector_3_radius }},
-                                  {{ layout.detector_4_radius }}]
-                    var alpha = [{{ layout.detector_1_alpha }},
-                                 {{ layout.detector_2_alpha }},
-                                 {{ layout.detector_3_alpha }},
-                                 {{ layout.detector_4_alpha }}]
-                    var beta = [{{ layout.detector_1_beta }},
-                                {{ layout.detector_2_beta }},
-                                {{ layout.detector_3_beta }},
-                                {{ layout.detector_4_beta }}]
-                {% else %}
-                    var radius = [{{ layout.detector_1_radius }},
-                                  {{ layout.detector_2_radius }}]
-                    var alpha = [{{ layout.detector_1_alpha }},
-                                 {{ layout.detector_2_alpha }}]
-                    var beta = [{{ layout.detector_1_beta }},
-                                {{ layout.detector_2_beta }}]
-                {% endif %}
-                draw_station(context, radius, alpha, beta);
-            </script>
-          {% else %}
-            <p>
-                No detector positions available yet for this station.<br>
-                A layout can be submitted on the <a href="{% url 'layout:submit' %}">Submit layout</a> page.
-            </p>
-          {% endif %}
-        </div>
     </div>
 {% endblock %}
 
