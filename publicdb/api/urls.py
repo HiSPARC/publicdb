@@ -6,6 +6,8 @@ app_name = 'api'
 urlpatterns = [
     url(r'^$', views.man, name="man"),
 
+    url(r'^network/status/$', views.network_status),
+
     url(r'^stations/$', views.stations, name="stations"),
     url(r'^subclusters/$', views.subclusters, name="subclusters"),
     url(r'^clusters/$', views.clusters, name="clusters"),
