@@ -23,6 +23,10 @@ urlpatterns = [
     url(r'^stations/weather/(?P<year>\d{4})/$', views.stations_with_data, {'type': 'weather'}, name="weather_stations"),
     url(r'^stations/weather/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.stations_with_data, {'type': 'weather'}, name="weather_stations"),
     url(r'^stations/weather/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.stations_with_data, {'type': 'weather'}, name="weather_stations"),
+    url(r'^stations/singles/$', views.stations_with_data, {'type': 'singles'}, name="singles_stations"),
+    url(r'^stations/singles/(?P<year>\d{4})/$', views.stations_with_data, {'type': 'singles'}, name="singles_stations"),
+    url(r'^stations/singles/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.stations_with_data, {'type': 'singles'}, name="singles_stations"),
+    url(r'^stations/singles/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.stations_with_data, {'type': 'singles'}, name="singles_stations"),
 
     url(r'^station/(?P<station_number>\d+)/$', views.station, name="station"),
     url(r'^station/(?P<station_number>\d+)/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.station, name="station"),
@@ -35,6 +39,10 @@ urlpatterns = [
     url(r'^station/(?P<station_number>\d+)/weather/(?P<year>\d{4})/$', views.has_data, {'type': 'weather'}, name="has_weather"),
     url(r'^station/(?P<station_number>\d+)/weather/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.has_data, {'type': 'weather'}, name="has_weather"),
     url(r'^station/(?P<station_number>\d+)/weather/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.has_data, {'type': 'weather'}, name="has_weather"),
+    url(r'^station/(?P<station_number>\d+)/singles/$', views.has_data, {'type': 'singles'}, name="has_singles"),
+    url(r'^station/(?P<station_number>\d+)/singles/(?P<year>\d{4})/$', views.has_data, {'type': 'singles'}, name="has_singles"),
+    url(r'^station/(?P<station_number>\d+)/singles/(?P<year>\d{4})/(?P<month>\d{1,2})/$', views.has_data, {'type': 'singles'}, name="has_singles"),
+    url(r'^station/(?P<station_number>\d+)/singles/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.has_data, {'type': 'singles'}, name="has_singles"),
     url(r'^station/(?P<station_number>\d+)/config/$', views.config, name="config"),
     url(r'^station/(?P<station_number>\d+)/config/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/$', views.config, name="config"),
 

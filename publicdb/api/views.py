@@ -41,9 +41,11 @@ def man(request):
         "countries": 'countries/',
         "stations_with_data": 'stations/data/{year}/{month}/{day}/',
         "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
+        "stations_with_singles": 'stations/singles/{year}/{month}/{day}/',
         "station_info": 'station/{station_number}/{year}/{month}/{day}/',
         "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
         "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
+        "has_singles": 'station/{station_number}/singles/{year}/{month}/{day}/',
         "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
         "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
         "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
@@ -150,10 +152,10 @@ def stations(request, subcluster_number=None):
 def stations_with_data(request, type=None, year=None, month=None, day=None):
     """Get stations with event or weather data
 
-    Retrieve a list of all stations which have recorded events or
+    Retrieve a list of all stations which have recorded events, singles or
     weather data in the given year, month, day or at all.
 
-    :param type: data type to check for, either weather or events.
+    :param type: data type to check for: events, singles or weather.
     :param year,month,day: the date, this has to be within the time
         HiSPARC has been operational and can be as specific as you desire.
 
@@ -167,6 +169,8 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
         filters['summaries__num_events__isnull'] = False
     elif type == 'weather':
         filters['summaries__num_weather__isnull'] = False
+    elif type == 'singles':
+        filters['summaries__num_singles__isnull'] = False
     else:
         return HttpResponseNotFound()
 
@@ -303,7 +307,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
     specific date, or at all.
 
     :param station_number: a stationn number identifier.
-    :param type: the data type, either events or weather.
+    :param type: the data type: events, singles or weather.
     :param year,month,day: the date, this has to be within the time
             HiSPARC has been operational and can be as specific as
             you desire.
@@ -322,6 +326,8 @@ def has_data(request, station_number, type=None, year=None, month=None,
         summaries = summaries.filter(num_events__isnull=False)
     elif type == 'weather':
         summaries = summaries.filter(num_weather__isnull=False)
+    elif type == 'singles':
+        summaries = summaries.filter(num_singles__isnull=False)
 
     if day:
         date = datetime.date(int(year), int(month), int(day))
