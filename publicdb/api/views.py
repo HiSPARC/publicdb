@@ -7,6 +7,7 @@ from django.http import HttpResponse, HttpResponseNotFound
 from ..histograms.models import Configuration, DailyHistogram, HistogramType, Summary
 from ..inforecords.models import Cluster, Country, Pc, Station
 from ..station_layout.models import StationLayout
+from ..status_display.status import DataStatus
 from . import datastore
 
 FIRSTDATE = datetime.date(2004, 1, 1)
@@ -52,6 +53,24 @@ def man(request):
     }
 
     return json_dict(man)
+
+
+def network_status(request):
+    """Get status of the network
+
+    :return: dictionary containing status info for each station.
+
+    """
+    station_status = DataStatus()
+    stations = []
+    for station in Station.objects.exclude(pcs__type__slug='admin'):
+        status = station_status.get_status(station.number)
+        nagios_status = 'unknown'
+
+        stations.append({'number': station.number,
+                         'status': status,
+                         'nagios_status': nagios_status})
+    return json_dict(stations)
 
 
 def station(request, station_number, year=None, month=None, day=None):
