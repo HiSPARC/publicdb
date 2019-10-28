@@ -3,7 +3,17 @@
 # Station: {{ station_number }}
 # Data from {{ date }}
 #
-# HiSPARC data is licensed under Creative Commons Attribution-ShareAlike 4.0.
+#
+# HiSPARC data and HiSPARC software is licensed for use within the HiSPARC collaboration
+# and for educational purposes. Commercial use is prohibited.
+#
+# Academic publishing including, but not limited to preprints, journal articles, theses
+# and books using HiSPARC data, is prohibited unless permission is explicitly granted by
+# the HiSPARC management (beheer@hisparc.nl)
+#
+# For information about HiSPARC data usage and HiSPARC software application
+# please contact: beheer@hisparc.nl or consult www.hisparc.nl
+#
 #
 #
 # Please note: the 'bin' is the left bin edge.  The width of the bin is
