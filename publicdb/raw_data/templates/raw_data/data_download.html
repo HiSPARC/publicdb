@@ -63,6 +63,18 @@ HiSPARC data download form
 
 <div id="header"><h2>Data download form</h2></div>
 
+<div id="copyright"><i>
+HiSPARC data and HiSPARC software is licensed for use within the HiSPARC collaboration<br>
+and for educational purposes. Commercial use is prohibited.<br>
+<br>
+Academic publishing including, but not limited to preprints, journal articles, theses<br>
+and books using HiSPARC data, is prohibited unless permission is explicitly granted by<br>
+the HiSPARC management (beheer@hisparc.nl)<br>
+<br>
+For information about HiSPARC data usage and HiSPARC software application<br>
+please contact: beheer@hisparc.nl or consult www.hisparc.nl<br>
+</i></div>
+
 <form action="{% url 'data:download_form' %}" method="get">
     {{ form.as_p }}
     <input type="submit" value="Submit">
