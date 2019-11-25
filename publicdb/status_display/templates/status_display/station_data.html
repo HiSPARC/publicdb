@@ -120,6 +120,27 @@
         </div>
       {% endif %}
 
+      {% if plots.rain_rate %}
+        <div id="rainRateData" class="histogram">
+            <h3>Rain rate data</h3>
+            <div class="sourceLink">
+                <a onclick="downloadGraph('#rd_histogram')">Image</a> |
+                <a href="{% url 'status:source:rain_rate' link.0 link.1 link.2 link.3 %}">Source</a>
+            </div>
+            <div class="plot" id="rd_histogram"></div>
+            <script>
+                rd_labels = {yaxis: {axisLabel: "{{ plots.rain_rate.y_label }}"},
+                             xaxis: {axisLabel: "{{ plots.rain_rate.x_label }}"}}
+                $.extend(true, rd_options, rd_labels)
+                $.plot($("#rd_histogram"), [
+                  {% for data in plots.rain_rate.data %}
+                    {data: {{ data|fix_timestamps_in_data|slice_data:50|round_data:2 }}, yaxis: 1},
+                  {% endfor %}
+                    {data: [0, 0], lines: {show: false}, xaxis: 2, yaxis: 2},], rd_options);
+            </script>
+        </div>
+      {% endif %}
+
       {% if plots.singlesratehigh %}
         <div id="singlesratehighData" class="histogram">
             <h3>Singles (per second above high threshold)</h3>

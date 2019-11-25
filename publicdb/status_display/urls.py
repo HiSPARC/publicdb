@@ -37,7 +37,7 @@ source_patterns = [
 ] + [
     # Datasets
     url(r'^{type}/'.format(type=type) + STATION_DATE_REGEX, views.get_specific_dataset_source, {'type': type}, name=type)
-    for type in ['barometer', 'temperature', 'singlesratelow', 'singlesratehigh']
+    for type in ['barometer', 'temperature', 'rain_rate', 'singlesratelow', 'singlesratehigh']
 ] + [
     # Configurations
     url(r'^{type}/(?P<station_number>\d+)/$'.format(type=type), views.get_specific_config_source, {'type': type}, name=type)

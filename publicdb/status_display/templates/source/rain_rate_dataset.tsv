@@ -1,0 +1,27 @@
+# HiSPARC rain rate dataset source
+#
+# Station: {{ station_number }}
+# Data from {{ date }}
+#
+#
+# HiSPARC data and HiSPARC software is licensed for use within the HiSPARC collaboration
+# and for educational purposes. Commercial use is prohibited.
+#
+# Academic publishing including, but not limited to preprints, journal articles, theses
+# and books using HiSPARC data, is prohibited unless permission is explicitly granted by
+# the HiSPARC management (beheer@hisparc.nl)
+#
+# For information about HiSPARC data usage and HiSPARC software application
+# please contact: beheer@hisparc.nl or consult www.hisparc.nl
+#
+#
+#
+# This data contains the following columns:
+#
+# timestamp: time of measurement in seconds after 1970-1-1 [UNIX timestamp]
+# value:     rain rate [mm/h]
+#
+#
+# timestamp	value
+{% for row in data %}{{ row.0 }}	{{ row.1 }}
+{% endfor %}

@@ -938,7 +938,7 @@ def get_dataset_source(year, month, day, type, station_number):
     except ValueError:
         raise Http404
 
-    if type in ['barometer', 'temperature']:
+    if type in ['barometer', 'temperature', 'rain_rate']:
         dataset_model = DailyDataset
     else:
         dataset_model = MultiDailyDataset
@@ -948,7 +948,7 @@ def get_dataset_source(year, month, day, type, station_number):
                                 summary__date=date,
                                 type__slug=type)
 
-    if type in ['barometer', 'temperature']:
+    if type in ['barometer', 'temperature', 'rain_rate']:
         return zip(dataset.x, dataset.y)
     else:
         # Multiple value columns

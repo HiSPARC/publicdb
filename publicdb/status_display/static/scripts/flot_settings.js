@@ -189,6 +189,19 @@ var _barometerdata = {
         max: 24}
 };
 
+var _rain_ratedata = {
+    lines: {
+          show: true},
+    yaxis: {
+        axisLabel: 'Rain rate (mm/h)'},
+    xaxis: {
+        axisLabel: 'Hour of day (GPS)',
+        ticks: [0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24],
+        min: 0,
+        max: 24},
+    colors: ["#0066FF"],
+};
+
 var _singleslowhistogram = {
     yaxis: {
         axisLabel: 'Counts',
@@ -286,6 +299,7 @@ var srl_options = $.extend(true, {}, _base, _singlesdata);
 var srh_options = $.extend(true, {}, _base, _singlesdata);
 var td_options = $.extend(true, {}, _base, _temperaturedata);
 var bd_options = $.extend(true, {}, _base, _barometerdata);
+var rd_options = $.extend(true, {}, _base, _rain_ratedata);
 var vg_options = $.extend(true, {}, _base, _voltagegraph);
 var cg_options = $.extend(true, {}, _base, _currentgraph);
 var to_options = $.extend(true, {}, _base, _timingoffsetgraph);
