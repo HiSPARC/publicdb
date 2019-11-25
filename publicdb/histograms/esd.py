@@ -423,6 +423,16 @@ def get_barometer(summary):
     return get_time_series(summary, 'weather', 'barometer')
 
 
+def get_rain_rate(summary):
+    """Get rain_rate data
+
+    :param summary: summary of data source (station and date)
+    :type summary: histograms.models.Summary instance
+
+    """
+    return get_time_series(summary, 'weather', 'rain_rate')
+
+
 def get_event_data(summary, quantity):
     """Get event data of a specific quantity
 

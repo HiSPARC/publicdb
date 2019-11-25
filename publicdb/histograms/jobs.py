@@ -37,8 +37,7 @@ BIN_SINGLES_HIGH_NUM = 100  # bin width = 3 Hz
 
 # Parameters for the datasets, intervals in seconds
 BIN_SINGLES_RATE = 180
-INTERVAL_TEMP = 150
-INTERVAL_BARO = 150
+INTERVAL_WEATHER = 150
 
 # Maximum number of configs per station per day. If more configs are found
 # for a single day, all (new) configs will be treated as erroneous and skipped.
@@ -283,6 +282,7 @@ def perform_weather_tasks(summary):
     logger.info("Updating weather datasets for %s", summary)
     update_temperature_dataset(summary)
     update_barometer_dataset(summary)
+    update_rain_rate_dataset(summary)
     return summary, []
 
 
@@ -431,7 +431,7 @@ def update_station_timing_offsets(network_summary):
     network_off = esd.DetermineStationTimingOffsetsESD(stations)
 
     for ref_sn, sn in network_off.get_station_pairs_within_max_distance():
-        off = esd.DetermineStationTimingOffsetsESD([ref_sn, sn])
+        off = esd.varm([ref_sn, sn])
         cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date, sn, ref_sn)
         # To update all affected offsets use:
@@ -489,7 +489,7 @@ def update_temperature_dataset(summary):
     error_values = [-999, -2 ** 15]
     temperature = [(x, y) for x, y in temperature if y not in error_values]
     if temperature != []:
-        temperature = shrink_dataset(temperature, INTERVAL_TEMP)
+        temperature = shrink_dataset(temperature, INTERVAL_WEATHER)
         save_dataset(summary, 'temperature', *zip(*temperature))
 
 
@@ -501,8 +501,20 @@ def update_barometer_dataset(summary):
     error_values = [-999]
     barometer = [(x, y) for x, y in barometer if y not in error_values]
     if barometer != []:
-        barometer = shrink_dataset(barometer, INTERVAL_BARO)
+        barometer = shrink_dataset(barometer, INTERVAL_WEATHER)
         save_dataset(summary, 'barometer', *zip(*barometer))
+
+
+def update_rain_rate_dataset(summary):
+    """Create dataset of timestamped rain-rate data"""
+
+    logger.debug("Updating rain-rate dataset for %s", summary)
+    rain_rate = esd.get_rain_rate(summary)
+    error_values = [-999]
+    rain_rate = [(x, y.astype(float)) for x, y in rain_rate if y not in error_values]
+    if rain_rate != []:
+        rain_rate = shrink_dataset(rain_rate, INTERVAL_WEATHER)
+        save_dataset(summary, 'rain_rate', *zip(*rain_rate))
 
 
 def shrink_dataset(dataset, interval):
@@ -606,7 +618,7 @@ def save_dataset(summary, slug, x, y):
     logger.debug("Saving dataset %s for %s", slug, summary)
     type = DatasetType.objects.get(slug=slug)
     dataset = {'x': x, 'y': y}
-    if slug in ['barometer', 'temperature']:
+    if slug in ['barometer', 'temperature', 'rain_rate']:
         DailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
     else:
         MultiDailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
