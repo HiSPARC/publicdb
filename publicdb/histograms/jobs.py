@@ -431,7 +431,7 @@ def update_station_timing_offsets(network_summary):
     network_off = esd.DetermineStationTimingOffsetsESD(stations)
 
     for ref_sn, sn in network_off.get_station_pairs_within_max_distance():
-        off = esd.varm([ref_sn, sn])
+        off = esd.DetermineStationTimingOffsetsESD([ref_sn, sn])
         cuts = off._get_cuts(sn, ref_sn)
         left, right = off.determine_first_and_last_date(summary_date, sn, ref_sn)
         # To update all affected offsets use:
