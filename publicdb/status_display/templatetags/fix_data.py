@@ -113,3 +113,10 @@ def mv_to_adc(value):
             return value
     else:
         return int(round(value / -0.57 + 200))
+
+
+@register.filter
+def scale_rain_rate(values, factor=10):
+    """Scale rain rate to singlerate (low threshold) plot"""
+
+    return [[x, min(150, factor * y)] for x, y in values]

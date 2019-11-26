@@ -2,7 +2,7 @@ function HideTickLabels(v, axis) {
     return " ";}
 
 var _base = {
-    colors: ["#222", "#D22", "#1C2", "#1CC"],
+    colors: ["#222", "#D22", "#1C2", "#1CC", "#0066FF"],
     series: {
         lines: {
             lineWidth: 1.25,
