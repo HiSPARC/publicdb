@@ -21,7 +21,11 @@ FILTER = [('network', 'Network'),
 
 
 class DataDownloadForm(forms.Form):
-    _ = forms.BooleanField(label='I have read and agree to the terms and conditions above', initial=False, required=True)
+    agree = forms.BooleanField(
+        label='I have read and agree to the terms and conditions above',
+        initial=False,
+        required=True
+    )
 
     data_type = forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect())
     station_events = forms.ModelChoiceField(
@@ -58,7 +62,11 @@ class DataDownloadForm(forms.Form):
 
 
 class CoincidenceDownloadForm(forms.Form):
-    agree = forms.BooleanField(label='I have read and agree to the terms and conditions above', initial=False, required=True)
+    agree = forms.BooleanField(
+        label='I have read and agree to the terms and conditions above',
+        initial=False,
+        required=True
+    )
 
     filter_by = forms.ChoiceField(choices=FILTER, widget=forms.RadioSelect())
     cluster = forms.ModelChoiceField(Cluster.objects.filter(parent=None),
