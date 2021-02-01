@@ -1,0 +1,214 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HiSPARC maps &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HiSPARC station layout" href="station_layout.html" />
+    <link rel="prev" title="API Tutorial" href="api_tutorial.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="station_layout.html" title="HiSPARC station layout"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api_tutorial.html" title="API Tutorial"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="hisparc-maps">
+<h1>HiSPARC maps<a class="headerlink" href="#hisparc-maps" title="Permalink to this headline">¶</a></h1>
+<p>Each HiSPARC station is equipped with a GPS antenne. This GPS is used
+to for time synchronization between stations and to determine the exact
+location of each station. All these locations are stored in our
+database. The GPS positions can be found on the data pages of stations,
+via the API (<a class="reference internal" href="api.html"><span class="doc">API Reference</span></a>) and in the raw data.</p>
+<div class="section" id="map">
+<h2>Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h2>
+<p>Using the <a class="reference external" href="http://leafletjs.com">Leafet</a> library with <a class="reference external" href="https://carto.com">CARTO</a> maps tiles (based on <a class="reference external" href="http://www.openstreetmap.org">OpenStreetMap</a> data) we are able to visualize the
+detector network by showing the locations of the stations on a map.</p>
+<p>Here is an overview of the network: <a class="reference external" href="http://data.hisparc.nl/show/stations_on_map/">Stations on map</a></p>
+<div class="section" id="station-info">
+<h3>Station info<a class="headerlink" href="#station-info" title="Permalink to this headline">¶</a></h3>
+<p>When you click on a station marker a popup will show information about
+that station, its name and cluster. If the station has data the name of
+the station will be a link to its data page.</p>
+</div>
+<div class="section" id="status">
+<h3>Status<a class="headerlink" href="#status" title="Permalink to this headline">¶</a></h3>
+<p>The stations on the map can have one of 4 colors to indicate the current
+status of that station.</p>
+<ul class="simple">
+<li>Green: when a station is operating properly</li>
+<li>Yellow: it is responding to the server but has a problem</li>
+<li>Red: it is completely unresponsive (offline)</li>
+<li>Gray: it is is no longer active or the status can’t be determined.</li>
+</ul>
+</div>
+</div>
+<div class="section" id="embedding">
+<h2>Embedding<a class="headerlink" href="#embedding" title="Permalink to this headline">¶</a></h2>
+<p>On several public database pages a map is embedded to show the station
+location or provide an overview of multiple stations. Moreover, maps are
+also used on our main website to give an overview of the station
+organization and clustering (e.g. <a class="reference external" href="http://www.hisparc.nl/over-hisparc/organisatie/bristol-uk/">Bristol</a>, <a class="reference external" href="http://www.hisparc.nl/over-hisparc/organisatie/amsterdam/science-park/">Science
+Park</a>
+). This is accomplished by placing an iframe on those pages that
+shows another page which only has the map as its content. Example code:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">iframe</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;http://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/&quot;</span>
+        <span class="na">scrolling</span><span class="o">=</span><span class="s">&quot;no&quot;</span> <span class="na">frameborder</span><span class="o">=</span><span class="s">&quot;0&quot;</span> <span class="na">width</span><span class="o">=</span><span class="s">&quot;600&quot;</span> <span class="na">height</span><span class="o">=</span><span class="s">&quot;300&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">iframe</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+<p>Result:</p>
+<div style="margin-top:10px;">
+  <iframe src="http://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/"
+        scrolling="no" frameborder="0" width="600" height="300"></iframe>
+</div><div class="section" id="syntax">
+<h3>Syntax<a class="headerlink" href="#syntax" title="Permalink to this headline">¶</a></h3>
+<p>To show a map of a specific region or location, use the syntax explained
+here. First start with the base url:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">hisparc</span><span class="o">.</span><span class="n">nl</span><span class="o">/</span><span class="n">maps</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>When no extra options are given the page zooms and positions the map
+such that all stations fit in the window. But you can also focus on a
+specific region or station. Several levels of regions are possible:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">hisparc</span><span class="o">.</span><span class="n">nl</span><span class="o">/</span><span class="n">maps</span><span class="o">/</span><span class="p">[</span><span class="n">Country</span><span class="p">]</span><span class="o">/</span><span class="p">[</span><span class="n">Cluster</span><span class="p">]</span><span class="o">/</span><span class="p">[</span><span class="n">Subcluster</span><span class="p">]</span><span class="o">/</span>
+<span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">data</span><span class="o">.</span><span class="n">hisparc</span><span class="o">.</span><span class="n">nl</span><span class="o">/</span><span class="n">maps</span><span class="o">/</span><span class="p">[</span><span class="n">Station</span> <span class="n">number</span><span class="p">]</span><span class="o">/</span>
+</pre></div>
+</div>
+<p>An overview of countries, clusters and subclusters can be found on
+<a class="reference external" href="http://data.hisparc.nl/">http://data.hisparc.nl/</a> . First you can choose to focus on a Country:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Netherlands/">http://data.hisparc.nl/maps/Netherlands/</a></li>
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Denmark/">http://data.hisparc.nl/maps/Denmark/</a></li>
+</ul>
+<p>Then focus more closely on a cluster, note that you also need to give
+the country:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Netherlands/Enschede/">http://data.hisparc.nl/maps/Netherlands/Enschede/</a></li>
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Netherlands/Utrecht/">http://data.hisparc.nl/maps/Netherlands/Utrecht/</a></li>
+<li><a class="reference external" href="http://data.hisparc.nl/maps/United%20Kingdom/Bristol/">http://data.hisparc.nl/maps/United%20Kingdom/Bristol/</a></li>
+</ul>
+<p>And to focus on a subcluster, also specifying the country and cluster:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Netherlands/Amsterdam/Zaanstad/">http://data.hisparc.nl/maps/Netherlands/Amsterdam/Zaanstad/</a></li>
+<li><a class="reference external" href="http://data.hisparc.nl/maps/Netherlands/Enschede/Enschede/">http://data.hisparc.nl/maps/Netherlands/Enschede/Enschede/</a></li>
+</ul>
+<p>Finally you can also focus on one specific station by simply giving its
+station number:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://data.hisparc.nl/maps/8005/">http://data.hisparc.nl/maps/8005/</a></li>
+<li><a class="reference external" href="http://data.hisparc.nl/maps/8103/">http://data.hisparc.nl/maps/8103/</a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">HiSPARC maps</a><ul>
+<li><a class="reference internal" href="#map">Map</a><ul>
+<li><a class="reference internal" href="#station-info">Station info</a></li>
+<li><a class="reference internal" href="#status">Status</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#embedding">Embedding</a><ul>
+<li><a class="reference internal" href="#syntax">Syntax</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="api_tutorial.html"
+                        title="previous chapter">API Tutorial</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="station_layout.html"
+                        title="next chapter">HiSPARC station layout</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/hisparc_maps.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="station_layout.html" title="HiSPARC station layout"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api_tutorial.html" title="API Tutorial"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, HiSPARC.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>

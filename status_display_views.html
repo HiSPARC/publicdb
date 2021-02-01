@@ -1,0 +1,562 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Status Display Views Reference &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" href="_static/nature.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css" />
+    <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/language_data.js"></script>
+    <link rel="shortcut icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Nagios Status Reference" href="status_display_nagios.html" />
+    <link rel="prev" title="Status Display Reference" href="status_display.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display_nagios.html" title="Nagios Status Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="status_display.html" accesskey="U">Status Display Reference</a> &#187;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="module-publicdb.status_display.views">
+<span id="status-display-views-reference"></span><h1>Status Display Views Reference<a class="headerlink" href="#module-publicdb.status_display.views" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="publicdb.status_display.views.LatestNetworkSummaryRedirectView">
+<em class="property">class </em><code class="descname">LatestNetworkSummaryRedirectView</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show most recent coincidence data page</p>
+<p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="method">
+<dt id="publicdb.status_display.views.LatestNetworkSummaryRedirectView.get_redirect_url">
+<code class="descname">get_redirect_url</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView.get_redirect_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="publicdb.status_display.views.LatestSummaryRedirectView">
+<em class="property">class </em><code class="descname">LatestSummaryRedirectView</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestSummaryRedirectView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show most recent data for a particular station</p>
+<p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="method">
+<dt id="publicdb.status_display.views.LatestSummaryRedirectView.get_redirect_url">
+<code class="descname">get_redirect_url</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestSummaryRedirectView.get_redirect_url" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView">
+<em class="property">class </em><code class="descname">NetworkSummaryDetailView</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.date_field">
+<code class="descname">date_field</code><em class="property"> = 'date'</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.date_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.get_context_data">
+<code class="descname">get_context_data</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_context_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.get_queryset">
+<code class="descname">get_queryset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.http_method_names">
+<code class="descname">http_method_names</code><em class="property"> = [u'get']</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.http_method_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.month_format">
+<code class="descname">month_format</code><em class="property"> = '%m'</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.month_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.nav_calendar">
+<code class="descname">nav_calendar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_calendar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a month calendar with links</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.nav_months">
+<code class="descname">nav_months</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_months" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of months with links</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.nav_years">
+<code class="descname">nav_years</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_years" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of previous years</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.slug_field">
+<code class="descname">slug_field</code><em class="property"> = 'date__year'</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.slug_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.slug_url_kwarg">
+<code class="descname">slug_url_kwarg</code><em class="property"> = 'year'</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.slug_url_kwarg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.NetworkSummaryDetailView.template_name">
+<code class="descname">template_name</code><em class="property"> = 'status_display/network_coincidences.html'</em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.template_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="publicdb.status_display.views.SummaryDetailView">
+<em class="property">class </em><code class="descname">SummaryDetailView</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.date_field">
+<code class="descname">date_field</code><em class="property"> = 'date'</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.date_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.get_context_data">
+<code class="descname">get_context_data</code><span class="sig-paren">(</span><em>**kwargs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_context_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.get_object">
+<code class="descname">get_object</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.get_queryset">
+<code class="descname">get_queryset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_queryset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.http_method_names">
+<code class="descname">http_method_names</code><em class="property"> = [u'get']</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.http_method_names" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.month_format">
+<code class="descname">month_format</code><em class="property"> = '%m'</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.month_format" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.nav_calendar">
+<code class="descname">nav_calendar</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_calendar" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a month calendar with links</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.nav_months">
+<code class="descname">nav_months</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_months" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of months with links</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="publicdb.status_display.views.SummaryDetailView.nav_years">
+<code class="descname">nav_years</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_years" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create list of previous years</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.slug_field">
+<code class="descname">slug_field</code><em class="property"> = 'station__number'</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.slug_field" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.slug_url_kwarg">
+<code class="descname">slug_url_kwarg</code><em class="property"> = 'station_number'</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.slug_url_kwarg" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="publicdb.status_display.views.SummaryDetailView.template_name">
+<code class="descname">template_name</code><em class="property"> = 'status_display/station_data.html'</em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.template_name" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.create_plot_object">
+<code class="descname">create_plot_object</code><span class="sig-paren">(</span><em>x_values</em>, <em>y_series</em>, <em>x_label</em>, <em>y_label</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.create_plot_object" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_config_source">
+<code class="descname">get_config_source</code><span class="sig-paren">(</span><em>station_number</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_config_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get configuration data for a specific station</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>station_number</strong> – station for which to get the configuration data.</li>
+<li><strong>type</strong> – the type of configuration data to get. The following
+are supported: voltage, current, gps, trigger.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of lists containing the configuration history.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_dataset_source">
+<code class="descname">get_dataset_source</code><span class="sig-paren">(</span><em>year</em>, <em>month</em>, <em>day</em>, <em>type</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_dataset_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a dataset for a specific date and station</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>year</strong><strong>,</strong><strong>month</strong><strong>,</strong><strong>day</strong> – the date for which to get the dataset.</li>
+<li><strong>type</strong> – the type of dataset to retrieve.</li>
+<li><strong>station_number</strong> – the station to which the data belongs.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of tuples containing (x, y) pairs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_detector_timing_offsets">
+<code class="descname">get_detector_timing_offsets</code><span class="sig-paren">(</span><em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_detector_timing_offsets" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_detector_timing_offsets_source">
+<code class="descname">get_detector_timing_offsets_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_detector_timing_offsets_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_eventtime_histogram_sources">
+<code class="descname">get_eventtime_histogram_sources</code><span class="sig-paren">(</span><em>station_number</em>, <em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_eventtime_histogram_sources" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_eventtime_source">
+<code class="descname">get_eventtime_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em>, <em>start=None</em>, <em>end=None</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_eventtime_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all eventtime data from start to end</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_gpslocations">
+<code class="descname">get_gpslocations</code><span class="sig-paren">(</span><em>configs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_gpslocations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all valid GPS locations from the configs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_histogram_source">
+<code class="descname">get_histogram_source</code><span class="sig-paren">(</span><em>year</em>, <em>month</em>, <em>day</em>, <em>type</em>, <em>station_number=None</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_histogram_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get histogram data for a specific date</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>year</strong><strong>,</strong><strong>month</strong><strong>,</strong><strong>day</strong> – the date for which to get the histogram data.</li>
+<li><strong>type</strong> – the type of histogram to retrieve.</li>
+<li><strong>station_number</strong> – if None a NetworkHistogram is looked for, otherwise
+a DailyHistogram for a specific station is looked for.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">list of tuples containing (bin, value) pairs.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_specific_config_source">
+<code class="descname">get_specific_config_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_config_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_specific_dataset_source">
+<code class="descname">get_specific_dataset_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em>, <em>year</em>, <em>month</em>, <em>day</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_dataset_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_specific_histogram_source">
+<code class="descname">get_specific_histogram_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em>, <em>year</em>, <em>month</em>, <em>day</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_histogram_source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a station histogram for a specific date</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_specific_network_histogram_source">
+<code class="descname">get_specific_network_histogram_source</code><span class="sig-paren">(</span><em>request</em>, <em>year</em>, <em>month</em>, <em>day</em>, <em>type</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_network_histogram_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_station_layout_source">
+<code class="descname">get_station_layout_source</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_layout_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_station_timing_offsets">
+<code class="descname">get_station_timing_offsets</code><span class="sig-paren">(</span><em>ref_station_number</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_timing_offsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get all station timing offsets for a station pair</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ref_station_number</strong><strong>,</strong><strong>station_number</strong> – station numbers.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">list of tuples with date, offset, and error.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.get_station_timing_offsets_source">
+<code class="descname">get_station_timing_offsets_source</code><span class="sig-paren">(</span><em>request</em>, <em>ref_station_number</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_timing_offsets_source" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.help">
+<code class="descname">help</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.help" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the static help page</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.none_to_nan">
+<code class="descname">none_to_nan</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.none_to_nan" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.plot_config">
+<code class="descname">plot_config</code><span class="sig-paren">(</span><em>type</em>, <em>configs</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a plot object from station configs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.plot_dataset">
+<code class="descname">plot_dataset</code><span class="sig-paren">(</span><em>dataset</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a dataset plot object</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.plot_histogram">
+<code class="descname">plot_histogram</code><span class="sig-paren">(</span><em>histogram</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_histogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a histogram object</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.plot_timing_offsets">
+<code class="descname">plot_timing_offsets</code><span class="sig-paren">(</span><em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_timing_offsets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a plot object from station configs</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.station_config">
+<code class="descname">station_config</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show configuration history for a particular station</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.station_has_config">
+<code class="descname">station_has_config</code><span class="sig-paren">(</span><em>station</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_has_config" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if there is a valid configuration for the given station</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station</strong> – Station object for which to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">boolean indicating if the station has a configuration available.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.station_has_data">
+<code class="descname">station_has_data</code><span class="sig-paren">(</span><em>station</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_has_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check if there is valid event or weather data for the given station</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>station</strong> – Station object for which to check.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">boolean indicating if the station has recorded data, either
+weather or shower, between 2002 and now.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.station_latest">
+<code class="descname">station_latest</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show daily histograms for a particular station</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.station_status">
+<code class="descname">station_status</code><span class="sig-paren">(</span><em>request</em>, <em>station_number</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show Nagios status for a particular station</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations">
+<code class="descname">stations</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show the default station list</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_by_country">
+<code class="descname">stations_by_country</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_country" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by country, cluster and subcluster</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_by_name">
+<code class="descname">stations_by_name</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by station name</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_by_number">
+<code class="descname">stations_by_number</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_number" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by number</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_by_status">
+<code class="descname">stations_by_status</code><span class="sig-paren">(</span><em>request</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by status</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_on_map">
+<code class="descname">stations_on_map</code><span class="sig-paren">(</span><em>request</em>, <em>country=None</em>, <em>cluster=None</em>, <em>subcluster=None</em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_on_map" title="Permalink to this definition">¶</a></dt>
+<dd><p>Show all stations from a subcluster on a map</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="publicdb.status_display.views.stations_with_data">
+<code class="descname">stations_with_data</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_with_data" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of station numbers with valid event or weather data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list with station numbers for stations that recorded data, either
+weather or shower, between 2004 and now.</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo"/>
+            </a></p>
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="status_display.html"
+                        title="previous chapter">Status Display Reference</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="status_display_nagios.html"
+                        title="next chapter">Nagios Status Reference</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/status_display_views.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display_nagios.html" title="Nagios Status Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="status_display.html" >Status Display Reference</a> &#187;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2015, HiSPARC.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.8.5.
+    </div>
+  </body>
+</html>
