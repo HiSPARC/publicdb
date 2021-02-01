@@ -588,7 +588,7 @@ def download_coincidences(request):
         n = int(request.GET.get('n') if request.GET.get('n') not in [None, 'None'] else '2')
     except ValueError:
         return HttpResponseBadRequest('Invalid value for n', content_type=MIME_PLAIN)
-        
+
     stations = request.GET.get('stations', None)
     if stations == 'None':
         stations = None
