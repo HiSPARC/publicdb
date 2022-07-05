@@ -166,6 +166,13 @@
   notify: restart nginx
   become: true
 
+- name: start nginx on boot
+  service:
+    name: nginx
+    state: started
+    enabled: yes
+  become: true
+
 # do not overwrite let's encrypt https config on pique
 - name: copy nginx HTTPS configuration
   template:

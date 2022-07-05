@@ -11,7 +11,7 @@ DEBUG = {{ debug }}
 ADMINS = (
     ('Kasper van Dam', 'kaspervd@nikhef.nl'),
     ('Arne de Laat', 'arne@delaat.net'),
-    ('Tom Kooij', 'tkooij@nikhef.nl'),
+    ('Tom Kooij', 'hisparc@tomkooij.nl'),
 )
 MANAGERS = ADMINS
 
