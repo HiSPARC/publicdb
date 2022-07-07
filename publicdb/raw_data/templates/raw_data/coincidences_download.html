@@ -36,69 +36,52 @@ HiSPARC coincidences download form
 
 <div id="header"><h2>Coincidences download form</h2></div>
 
-<div id="copyright"><i>
-HiSPARC data and HiSPARC software is licensed for use within the HiSPARC collaboration<br>
-and for educational purposes. Commercial use is prohibited.<br>
-<br>
-Academic publishing including, but not limited to preprints, journal articles, theses<br>
-and books using HiSPARC data, is prohibited unless permission is explicitly granted by<br>
-the HiSPARC management (beheer@hisparc.nl)<br>
-<br>
-For information about HiSPARC data usage and HiSPARC software application<br>
-please contact: beheer@hisparc.nl or consult www.hisparc.nl<br>
-</i></div>
-
 <form action="{% url 'data:coincidences_download_form' %}" method="get">
-  <p>
-      {{ form.agree.errors }}
-      {{ form.agree.label_tag }}
-      {{ form.agree }}
-      <span class="helptext">{{ form.agree.help_text }}</span>
-  </p>
-  <p>
-      {{ form.filter_by.errors }}
-      {{ form.cluster.errors }}
-      {{ form.stations.errors }}
-      {{ form.filter_by.label_tag }}
-  </p>
-  <ul>
-      <li>{{ form.filter_by.0 }}</li>
-      <li>
-          {{ form.filter_by.1 }}:
-          {{ form.cluster }}
-          <span class="helptext">{{ form.cluster.help_text }}</span>
-      </li>
-      <li>
-          {{ form.filter_by.2 }}:
-          {{ form.stations }}
-          <span class="helptext">{{ form.stations.help_text }}</span>
-      </li>
-  </ul>
-  <p>
-      {{ form.start.errors }}
-      {{ form.start.label_tag }}
-      {{ form.start }}
-      <span class="helptext">{{ form.start.help_text }}</span>
-  </p>
-  <p>
-      {{ form.end.errors }}
-      {{ form.end.label_tag }}
-      {{ form.end }}
-      <span class="helptext">{{ form.end.help_text }}</span>
-  </p>
-  <p>
-      {{ form.n.errors }}
-      {{ form.n.label_tag }}
-      {{ form.n }}
-      <span class="helptext">{{ form.n.help_text }}</span>
-  </p>
-  <p>
-      {{ form.download.errors }}
-      {{ form.download.label_tag }}
-      {{ form.download }}
-      <span class="helptext">{{ form.download.help_text }}</span>
-  </p>
-  <input type="submit" value="Submit">
+    <p>
+        {{ form.filter_by.errors }}
+        {{ form.cluster.errors }}
+        {{ form.stations.errors }}
+        {{ form.filter_by.label_tag }}
+    </p>
+    <ul>
+        <li>{{ form.filter_by.0 }}</li>
+        <li>
+            {{ form.filter_by.1 }}:
+            {{ form.cluster }}
+            <span class="helptext">{{ form.cluster.help_text }}</span>
+        </li>
+        <li>
+            {{ form.filter_by.2 }}:
+            {{ form.stations }}
+            <span class="helptext">{{ form.stations.help_text }}</span>
+        </li>
+    </ul>
+    <p>
+        {{ form.start.errors }}
+        {{ form.start.label_tag }}
+        {{ form.start }}
+        <span class="helptext">{{ form.start.help_text }}</span>
+    </p>
+    <p>
+        {{ form.end.errors }}
+        {{ form.end.label_tag }}
+        {{ form.end }}
+        <span class="helptext">{{ form.end.help_text }}</span>
+    </p>
+    <p>
+        {{ form.n.errors }}
+        {{ form.n.label_tag }}
+        {{ form.n }}
+        <span class="helptext">{{ form.n.help_text }}</span>
+    </p>
+    <p>
+        {{ form.download.errors }}
+        {{ form.download.label_tag }}
+        {{ form.download }}
+        <span class="helptext">{{ form.download.help_text }}</span>
+    </p>
+
+    <input type="submit" value="Submit">
 </form>
 
 <p class="small">
