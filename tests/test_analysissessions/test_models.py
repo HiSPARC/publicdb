@@ -32,7 +32,7 @@ class TestAnalysisSession(TestCase):
         self.assertFalse(analysis_session.in_progress())
 
     def test_hash(self):
-        self.assertEqual(hashlib.md5(self.analysis_session.slug).hexdigest(), self.analysis_session.hash)
+        self.assertEqual(hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(), self.analysis_session.hash)
 
     def test_str(self):
         self.assertEqual(self.analysis_session.title, str(self.analysis_session))

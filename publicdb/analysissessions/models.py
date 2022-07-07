@@ -32,7 +32,7 @@ class AnalysisSession(models.Model):
     in_progress.boolean = True
 
     def save(self, *args, **kwargs):
-        self.hash = hashlib.md5(self.slug).hexdigest()
+        self.hash = hashlib.md5(self.slug.encode('utf-8')).hexdigest()
         super().save(*args, **kwargs)
         Student(session=self, name='Test student').save()
 
