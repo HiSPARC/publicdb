@@ -58,7 +58,7 @@ jobs:
 
   docs:
     if: github.ref == 'refs/heads/master'
-    needs: [tests, flake]
+    needs: [tests, flake, ansible-lint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
