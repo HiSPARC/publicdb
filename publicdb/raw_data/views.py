@@ -2,7 +2,7 @@ import csv
 import datetime
 import os
 import tempfile
-import urllib
+import urllib.request, urllib.parse, urllib.error
 
 from io import StringIO
 from urllib.parse import urljoin
@@ -156,7 +156,7 @@ def download_form(request, station_number=None, start=None, end=None):
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
             data_type = form.cleaned_data['data_type']
-            query_string = urllib.urlencode({'start': start, 'end': end, 'download': download})
+            query_string = urllib.parse.urlencode({'start': start, 'end': end, 'download': download})
             if data_type == 'lightning':
                 lightning_type = form.cleaned_data['lightning_type']
                 url = reverse('data:lightning', kwargs={'lightning_type': lightning_type})
@@ -231,7 +231,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'lightning':
         lightning_type = int(lightning_type)
-        if lightning_type not in range(6):
+        if lightning_type not in list(range(6)):
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
@@ -542,7 +542,7 @@ def coincidences_download_form(request, start=None, end=None):
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
-            query_string = urllib.urlencode({'cluster': cluster, 'stations': stations,
+            query_string = urllib.parse.urlencode({'cluster': cluster, 'stations': stations,
                                              'start': start, 'end': end,
                                              'n': n, 'download': download})
             url = reverse('data:coincidences')

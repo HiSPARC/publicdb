@@ -5,7 +5,7 @@ from django.forms.extras.widgets import SelectDateWidget
 
 from ..inforecords.models import Cluster
 
-todays_year = range(2004, date.today().year + 1)
+todays_year = list(range(2004, date.today().year + 1))
 
 
 class SessionRequestForm(forms.Form):

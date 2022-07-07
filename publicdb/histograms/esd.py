@@ -560,7 +560,7 @@ def get_time_series(summary, tablename, quantity):
         else:
             col1 = table.col('timestamp')
             col2 = table.col(quantity)
-            data = zip(col1, col2)
+            data = list(zip(col1, col2))
             data.sort(key=itemgetter(0))
 
     return data

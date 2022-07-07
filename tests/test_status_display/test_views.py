@@ -108,7 +108,7 @@ class TestSourceViews(TestCase):
             data = factory(network_summary=self.network_summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, data.values),
+                'data': list(zip(data.bins, data.values)),
                 'date': self.network_summary.date.strftime('%-Y-%-m-%-d'),
             }
             self.assert_context_contains(expected_context, response.context)
@@ -123,7 +123,7 @@ class TestSourceViews(TestCase):
             data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, data.values),
+                'data': list(zip(data.bins, data.values)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -140,7 +140,7 @@ class TestSourceViews(TestCase):
             data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.bins, *data.values),
+                'data': list(zip(data.bins, *data.values)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -160,7 +160,7 @@ class TestSourceViews(TestCase):
             data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.x, data.y),
+                'data': list(zip(data.x, data.y)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }
@@ -175,7 +175,7 @@ class TestSourceViews(TestCase):
             data = factory(summary=self.summary)
             response = self.get_tsv(data.get_absolute_url())
             expected_context = {
-                'data': zip(data.x, *data.y),
+                'data': list(zip(data.x, *data.y)),
                 'date': self.summary.date.strftime('%-Y-%-m-%-d'),
                 'station_number': str(self.station.number)
             }

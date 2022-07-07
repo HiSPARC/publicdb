@@ -54,7 +54,7 @@ def check_for_new_events_and_update_flags(state):
         possibly_new = datastore.check_for_new_events(last_check_time)
 
         # perform a thorough check for each possible date
-        for date, station_list in possibly_new.iteritems():
+        for date, station_list in possibly_new.items():
             process_possible_stations_for_date(date, station_list)
         state.check_last_run = check_last_run
     finally:
@@ -77,7 +77,7 @@ def process_possible_stations_for_date(date, station_list):
                          for table_name in table_list.keys()}
     for table_name in unique_table_list:
         process_possible_tables_for_network(date, table_name)
-    for station, table_list in station_list.iteritems():
+    for station, table_list in station_list.items():
         process_possible_tables_for_station(station, table_list, date)
 
 
@@ -108,7 +108,7 @@ def process_possible_tables_for_station(station, table_list, date):
         logger.error('Unknown station: %s', station)
     else:
         summary, created = Summary.objects.get_or_create(station=station, date=date)
-        for table, num_events in table_list.iteritems():
+        for table, num_events in table_list.items():
             check_table_and_update_flags(table, num_events, summary)
 
 

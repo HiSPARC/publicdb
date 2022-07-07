@@ -163,7 +163,7 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
 class NetworkHistogramFactory(factory.DjangoModelFactory):
     network_summary = factory.SubFactory(NetworkSummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values) + 1))
+    bins = factory.LazyAttribute(lambda o: list(range(len(o.values) + 1)))
     values = factory.Faker('int_list')
 
     class Meta:
@@ -185,7 +185,7 @@ class CoincidencenumberHistogramFactory(NetworkHistogramFactory):
 class DailyHistogramFactory(factory.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
-    bins = factory.LazyAttribute(lambda o: range(len(o.values) + 1))
+    bins = factory.LazyAttribute(lambda o: list(range(len(o.values) + 1)))
     values = factory.Faker('int_list')
 
     class Meta:

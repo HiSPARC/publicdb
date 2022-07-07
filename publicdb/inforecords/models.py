@@ -363,8 +363,8 @@ class Pc(models.Model):
         Source: http://code.activestate.com/recipes/65219/
 
         """
-        hexn = ''.join(["%02X" % long(i) for i in ipaddress.split('.')])
-        n = long(hexn, 16) + 1
+        hexn = ''.join(["%02X" % int(i) for i in ipaddress.split('.')])
+        n = int(hexn, 16) + 1
 
         d = 256 * 256 * 256
         q = []
@@ -377,7 +377,7 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
-        self.name = unicode(slugify(self.name)).replace('-', '').replace('_', '')
+        self.name = str(slugify(self.name)).replace('-', '').replace('_', '')
 
         if self.id:
             super().save(*args, **kwargs)
