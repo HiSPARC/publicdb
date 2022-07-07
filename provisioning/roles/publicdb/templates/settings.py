@@ -3,6 +3,10 @@
 
 from os import environ, path
 
+import sentry_sdk
+
+from sentry_sdk.integrations.django import DjangoIntegration
+
 dirname = path.dirname(__file__)
 PUBLICDB_PATH = path.join(dirname, '..')
 
@@ -134,8 +138,6 @@ INSTALLED_APPS = (
     'publicdb.maps',
     'publicdb.station_layout',
     'publicdb.default',
-
-    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -205,6 +207,8 @@ LOGGING = {
     },
 }
 
-RAVEN_CONFIG = {
-    'dsn': '{{ sentry_dsn }}'
-}
+sentry_sdk.init(
+    dsn='https://806a6e3a260f422f861fa7d418a2090e@o164994.ingest.sentry.io/1235692',
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=0,
+)

@@ -3,6 +3,6 @@ uwsgitop==0.10
 Django>=1.11,<2.0
 python-dateutil==2.6.1
 
-raven
+sentry-sdk
 
 hisparc-sapphire==1.7.1
