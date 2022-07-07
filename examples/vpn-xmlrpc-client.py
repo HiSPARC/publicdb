@@ -3,10 +3,11 @@
     This client can be used to test the VPN XML-RPC server.
 
 """
-import xmlrpclib
 import base64
 
-s = xmlrpclib.ServerProxy('http://localhost:8001')
+from xmlrpc.client import ServerProxy
+
+s = ServerProxy('http://localhost:8001')
 print(s.system.listMethods())
 print(s.create_key('sciencepark501', 'client', '192.168.0.1'))
 print(s.register_hosts_ip([('nikhef1', '192.168.0.1'),

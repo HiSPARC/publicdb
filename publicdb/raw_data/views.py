@@ -85,7 +85,7 @@ def get_data_url(station_number, date, get_blobs=False):
     and provide a link to download that file.
 
     :param station_number: the HiSPARC station number
-    :param date: a xmlrpclib.DateTime instance; retrieve events from this day
+    :param date: a xmlrpc.client.DateTime instance; retrieve events from this day
 
     """
     date = date.timetuple()

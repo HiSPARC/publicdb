@@ -1,6 +1,7 @@
 import base64
 import socket
-import xmlrpclib
+
+from xmlrpc.client import ServerProxy
 
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,7 @@ def keys(request, host):
     host = get_object_or_404(Pc, name=host)
 
     if settings.VPN_PROXY is not None:
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = ServerProxy(settings.VPN_PROXY)
         key_file = proxy.get_key(host.name, host.type.slug)
         key_file = base64.b64decode(key_file)
     else:

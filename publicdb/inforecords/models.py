@@ -1,5 +1,6 @@
 import datetime
-import xmlrpclib
+
+from xmlrpc.client import ServerProxy
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
@@ -473,7 +474,7 @@ def create_keys(pc):
     """Create VPN keys for the given Pc"""
 
     if settings.VPN_PROXY is not None:
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = ServerProxy(settings.VPN_PROXY)
         proxy.create_key(pc.name, pc.type.slug, pc.ip)
 
 
@@ -481,7 +482,7 @@ def update_aliases():
     """Update VPN aliases"""
 
     if settings.VPN_PROXY is not None:
-        proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+        proxy = ServerProxy(settings.VPN_PROXY)
         aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
         aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
         proxy.register_hosts_ip(aliases)
@@ -493,7 +494,7 @@ def reload_nagios():
 
     if settings.VPN_PROXY is not None:
         try:
-            proxy = xmlrpclib.ServerProxy(settings.VPN_PROXY)
+            proxy = ServerProxy(settings.VPN_PROXY)
             transaction.on_commit(proxy.reload_nagios)
         except Exception:
             # FIXME logging!
@@ -505,7 +506,7 @@ def reload_datastore():
 
     if settings.DATASTORE_PROXY is not None:
         try:
-            proxy = xmlrpclib.ServerProxy(settings.DATASTORE_PROXY)
+            proxy = ServerProxy(settings.DATASTORE_PROXY)
             transaction.on_commit(proxy.reload_datastore)
         except Exception:
             # FIXME logging!
