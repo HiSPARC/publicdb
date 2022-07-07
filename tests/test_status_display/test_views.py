@@ -1,6 +1,6 @@
 from io import BytesIO
-
 from unittest.mock import patch
+
 from numpy import genfromtxt
 
 from django.test import Client, TestCase

@@ -11,7 +11,7 @@
 """
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
-import urllib2
+from urllib.request import urlopen
 import hashlib
 import subprocess
 
@@ -23,7 +23,7 @@ CFG_URL = 'http://data.hisparc.nl/config/datastore'
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
-    datastore_cfg = urllib2.urlopen(CFG_URL).read()
+    datastore_cfg = urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:

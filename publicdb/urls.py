@@ -1,5 +1,5 @@
-from django.urls import include, path, re_path
 from django.contrib import admin
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 
 from .inforecords.views import create_datastore_config, create_nagios_config, keys

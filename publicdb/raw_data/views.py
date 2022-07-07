@@ -3,9 +3,9 @@ import datetime
 import os
 import tempfile
 import urllib
-import urlparse
 
 from io import StringIO
+from urllib.parse import urljoin
 from xmlrpc.server import SimpleXMLRPCDispatcher
 
 import dateutil.parser
@@ -103,8 +103,8 @@ def get_data_url(station_number, date, get_blobs=False):
             if node.name != 'blobs':
                 datafile.copy_node(node, target_node)
 
-    url = urlparse.urljoin(settings.MEDIA_URL, 'raw_data/')
-    url = urlparse.urljoin(url, os.path.basename(target.filename))
+    url = urljoin(settings.MEDIA_URL, 'raw_data/')
+    url = urljoin(url, os.path.basename(target.filename))
 
     datafile.close()
     target.close()

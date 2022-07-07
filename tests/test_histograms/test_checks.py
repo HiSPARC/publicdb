@@ -1,5 +1,4 @@
 from datetime import date, datetime
-
 from unittest.mock import Mock, patch
 
 from django.test import TestCase

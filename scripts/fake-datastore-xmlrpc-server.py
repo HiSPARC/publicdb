@@ -9,7 +9,7 @@
     library documentation and extended.
 
 """
-import urllib2
+from urllib.request import urlopen
 import hashlib
 
 from xmlrpc.server import SimpleXMLRPCServer
@@ -23,7 +23,7 @@ CFG_URL = 'http://localhost:8003/config/datastore'
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
-    datastore_cfg = urllib2.urlopen(CFG_URL).read()
+    datastore_cfg = urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:

@@ -3,7 +3,6 @@ from os import environ
 from os.path import abspath, dirname, join
 from shutil import rmtree
 from tempfile import mkdtemp
-
 from unittest.mock import patch
 
 from django.conf import settings

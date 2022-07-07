@@ -1,5 +1,5 @@
 from tempfile import mkdtemp
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
