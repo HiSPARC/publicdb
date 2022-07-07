@@ -1,7 +1,6 @@
 from datetime import date
 
 from django import forms
-from django.forms.extras.widgets import SelectDateWidget
 
 from ..inforecords.models import Cluster
 
@@ -14,5 +13,5 @@ class SessionRequestForm(forms.Form):
     email = forms.EmailField()
     school = forms.CharField(max_length=50)
     cluster = forms.ModelChoiceField(queryset=Cluster.objects.all())
-    start_date = forms.DateField(widget=SelectDateWidget(years=todays_year))
+    start_date = forms.DateField(widget=forms.SelectDateWidget(years=todays_year))
     number_of_events = forms.IntegerField()
