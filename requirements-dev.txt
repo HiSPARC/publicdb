@@ -10,7 +10,6 @@ pep8-naming
 
 # Docs
 sphinx
-mock
 
 # Provisioning tests
 ansible-lint
