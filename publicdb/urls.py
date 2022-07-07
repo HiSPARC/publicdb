@@ -23,5 +23,5 @@ urlpatterns = [
 
     re_path(r'^keys/(?P<host>[a-zA-Z0-9_]+)/$', keys, name='keys'),
 
-    re_path(r'^admin/', include(admin.site.urls)),
+    path('admin/', admin.site.urls),
 ]
