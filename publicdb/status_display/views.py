@@ -4,7 +4,7 @@ import datetime
 
 from collections import OrderedDict
 from io import StringIO
-from itertools import groupby, izip
+from itertools import groupby
 from operator import itemgetter
 
 from numpy import arange, nan
@@ -774,7 +774,7 @@ def get_eventtime_histogram_sources(station_number, start, end):
                 break
         else:
             values.extend(no_data)
-    return izip(bins, values)
+    return zip(bins, values)
 
 
 def get_specific_dataset_source(request, station_number, year, month, day, type):
