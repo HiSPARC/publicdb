@@ -1,4 +1,4 @@
-FROM python:2.7
+FROM python:3.7
 
 RUN \
   apt-get update \
@@ -10,7 +10,7 @@ WORKDIR /publicdb
 
 # Install miniconda
 RUN \
-  wget --no-verbose https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh \
+  wget --no-verbose https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh \
   && bash miniconda.sh -b -p /opt/miniconda;
 
 # Use conda Python
