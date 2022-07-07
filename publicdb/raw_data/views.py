@@ -5,8 +5,8 @@ import tempfile
 import urllib
 import urlparse
 
-from cStringIO import StringIO
-from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
+from io import StringIO
+from xmlrpc.server import SimpleXMLRPCDispatcher
 
 import dateutil.parser
 import tables

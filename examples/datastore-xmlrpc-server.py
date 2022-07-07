@@ -9,8 +9,8 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 import urllib2
 import hashlib
 import subprocess

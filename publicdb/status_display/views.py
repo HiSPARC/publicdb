@@ -3,7 +3,7 @@ import csv
 import datetime
 
 from collections import OrderedDict
-from cStringIO import StringIO
+from io import StringIO
 from itertools import groupby, izip
 from operator import itemgetter
 

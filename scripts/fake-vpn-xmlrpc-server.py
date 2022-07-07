@@ -9,8 +9,8 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 import base64
 
 HOSTS_FILE = '/tmp/hosts-hisparc'
