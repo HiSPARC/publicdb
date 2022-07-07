@@ -18,7 +18,7 @@ FIRSTDATE = datetime.date(2004, 1, 1)
 class Profession(models.Model):
     description = models.CharField(max_length=40, unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
     class Meta:
@@ -41,7 +41,7 @@ class ContactInformation(models.Model):
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return f"{self.city} {self.street_1} {self.email_work}"
 
     @property
@@ -88,7 +88,7 @@ class Contact(models.Model):
     surname = models.CharField(max_length=40)
     contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='contacts')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     @property
@@ -116,7 +116,7 @@ class Country(models.Model):
     name = models.CharField(max_length=70, unique=True)
     number = models.IntegerField(unique=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def clean(self):
@@ -151,7 +151,7 @@ class Cluster(models.Model):
     country = models.ForeignKey(Country, models.CASCADE, related_name='clusters')
     url = models.URLField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def clean(self):
@@ -226,7 +226,7 @@ class Station(models.Model):
     password = models.CharField(max_length=40)
     info_page = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%5d: %s' % (self.number, self.name)
 
     def clean(self):
@@ -313,7 +313,7 @@ class PcType(models.Model):
     description = models.CharField(max_length=40, unique=True)
     slug = models.CharField(max_length=20)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
     class Meta:
@@ -331,7 +331,7 @@ class Pc(models.Model):
     notes = models.TextField(blank=True)
     services = models.ManyToManyField('MonitorService', through='EnabledService')
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def keys(self):
@@ -425,7 +425,7 @@ class MonitorService(models.Model):
     min_warning = models.FloatField(null=True, blank=True)
     max_warning = models.FloatField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.description
 
     class Meta:
@@ -453,7 +453,7 @@ class EnabledService(models.Model):
     min_warning = models.FloatField(null=True, blank=True)
     max_warning = models.FloatField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return f'{self.pc} - {self.monitor_service}'
 
     class Meta:

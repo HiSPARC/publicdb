@@ -12,7 +12,7 @@ def upload_queue(instance, filename):
 class UpdateQueue(models.Model):
     slug = models.SlugField(unique=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.slug
 
 
@@ -21,7 +21,7 @@ class AdminUpdate(models.Model):
     update = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='admin_updates')
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Queue: %s - Admin Update v%d' % (self.queue, self.version)
 
     def save(self, *args, **kwargs):
@@ -41,7 +41,7 @@ class UserUpdate(models.Model):
     update = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='user_updates')
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Queue: %s - User Update v%d' % (self.queue, self.version)
 
     def save(self, *args, **kwargs):
@@ -64,7 +64,7 @@ class InstallerUpdate(models.Model):
     installer = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='installer_updates')
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Installer v%s' % self.version
 
     def save(self, *args, **kwargs):

@@ -32,7 +32,7 @@ class NetworkSummary(models.Model):
                   'day': self.date.day}
         return reverse('status:network:coincidences', kwargs=kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
 
     class Meta:
@@ -96,7 +96,7 @@ class Summary(models.Model):
                   'day': self.date.day}
         return reverse('status:station:summary', kwargs=kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Summary: %d - %s' % (self.station.number, self.date.strftime('%d %b %Y'))
 
     class Meta:
@@ -196,7 +196,7 @@ class Configuration(models.Model):
     slv_ch2_comp_gain = models.FloatField()
     slv_ch2_comp_offset = models.FloatField()
 
-    def __unicode__(self):
+    def __str__(self):
         return "%d - %s" % (self.summary.station.number, self.timestamp)
 
     class Meta:
@@ -276,7 +276,7 @@ class HistogramType(models.Model):
     value_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -292,7 +292,7 @@ class DatasetType(models.Model):
     y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -312,7 +312,7 @@ class NetworkHistogram(models.Model):
                   'day': self.network_summary.date.day}
         return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return '{} - {}'.format(self.network_summary.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
@@ -332,7 +332,7 @@ class BaseDailyStationDataMixin(models.Model):
                   'day': self.summary.date.day}
         return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%d - %s - %s" % (self.summary.station.number,
                                  self.summary.date.strftime('%d %b %Y'),
                                  self.type)

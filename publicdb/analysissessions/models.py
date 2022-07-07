@@ -36,7 +36,7 @@ class AnalysisSession(models.Model):
         super().save(*args, **kwargs)
         Student(session=self, name='Test student').save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -48,7 +48,7 @@ class Student(models.Model):
     session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
     name = models.CharField(max_length=40)
 
-    def __unicode__(self):
+    def __str__(self):
         return f'{self.session} - {self.name}'
 
     class Meta:
@@ -68,7 +68,7 @@ class AnalyzedCoincidence(models.Model):
     phi = models.FloatField(null=True, blank=True)
     error_estimate = models.FloatField(null=True, blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return f"{self.coincidence} - {self.student}"
 
     class Meta:
