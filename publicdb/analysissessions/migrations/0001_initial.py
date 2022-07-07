@@ -35,8 +35,8 @@ class Migration(migrations.Migration):
                 ('theta', models.FloatField(null=True, blank=True)),
                 ('phi', models.FloatField(null=True, blank=True)),
                 ('error_estimate', models.FloatField(null=True, blank=True)),
-                ('coincidence', models.ForeignKey(to='coincidences.Coincidence')),
-                ('session', models.ForeignKey(to='analysissessions.AnalysisSession')),
+                ('coincidence', models.ForeignKey(on_delete=models.CASCADE, to='coincidences.Coincidence')),
+                ('session', models.ForeignKey(on_delete=models.CASCADE, to='analysissessions.AnalysisSession')),
             ],
             options={
                 'ordering': ('coincidence',),
@@ -61,7 +61,7 @@ class Migration(migrations.Migration):
                 ('url', models.CharField(max_length=20)),
                 ('sid', models.CharField(max_length=50, null=True, blank=True)),
                 ('pin', models.IntegerField(null=True, blank=True)),
-                ('cluster', models.ForeignKey(to='inforecords.Cluster')),
+                ('cluster', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Cluster')),
             ],
             options={
             },
@@ -72,7 +72,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=40)),
-                ('session', models.ForeignKey(to='analysissessions.AnalysisSession')),
+                ('session', models.ForeignKey(on_delete=models.CASCADE, to='analysissessions.AnalysisSession')),
             ],
             options={
             },
@@ -81,7 +81,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='analyzedcoincidence',
             name='student',
-            field=models.ForeignKey(blank=True, to='analysissessions.Student', null=True),
+            field=models.ForeignKey(on_delete=models.CASCADE, blank=True, to='analysissessions.Student', null=True),
             preserve_default=True,
         ),
     ]

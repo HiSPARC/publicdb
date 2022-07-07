@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                 ('detector_4_alpha', models.FloatField(null=True, blank=True)),
                 ('detector_4_beta', models.FloatField(null=True, blank=True)),
                 ('detector_4_height', models.FloatField(null=True, blank=True)),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
             },
@@ -64,7 +64,7 @@ class Migration(migrations.Migration):
                 ('detector_4_alpha', models.FloatField(null=True, blank=True)),
                 ('detector_4_beta', models.FloatField(null=True, blank=True)),
                 ('detector_4_height', models.FloatField(null=True, blank=True)),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
             },

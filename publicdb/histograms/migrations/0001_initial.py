@@ -247,7 +247,7 @@ class Migration(migrations.Migration):
                 ('needs_update_config', models.BooleanField(default=False)),
                 ('needs_update_errors', models.BooleanField(default=False)),
                 ('needs_update_weather', models.BooleanField(default=False)),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
                 'ordering': ('date', 'station'),
@@ -262,7 +262,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='pulseheightfit',
             name='source',
-            field=models.ForeignKey(to='histograms.Summary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.Summary'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -272,13 +272,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='networkhistogram',
             name='source',
-            field=models.ForeignKey(to='histograms.NetworkSummary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.NetworkSummary'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='networkhistogram',
             name='type',
-            field=models.ForeignKey(to='histograms.HistogramType'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.HistogramType'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -288,19 +288,19 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='detectortimingoffset',
             name='source',
-            field=models.ForeignKey(to='histograms.Summary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.Summary'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='dailyhistogram',
             name='source',
-            field=models.ForeignKey(to='histograms.Summary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.Summary'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='dailyhistogram',
             name='type',
-            field=models.ForeignKey(to='histograms.HistogramType'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.HistogramType'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -310,13 +310,13 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='dailydataset',
             name='source',
-            field=models.ForeignKey(to='histograms.Summary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.Summary'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='dailydataset',
             name='type',
-            field=models.ForeignKey(to='histograms.DatasetType'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.DatasetType'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
@@ -326,7 +326,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='configuration',
             name='source',
-            field=models.ForeignKey(to='histograms.Summary'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='histograms.Summary'),
             preserve_default=True,
         ),
     ]
