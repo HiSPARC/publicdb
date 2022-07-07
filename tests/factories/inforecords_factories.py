@@ -9,7 +9,7 @@ factory.Faker.add_provider(UrlSafeProvider)
 factory.Faker.add_provider(NlUrlSafeProvider, 'nl_NL')
 
 
-class ProfessionFactory(factory.DjangoModelFactory):
+class ProfessionFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('word')
 
     class Meta:
@@ -17,7 +17,7 @@ class ProfessionFactory(factory.DjangoModelFactory):
         django_get_or_create = ('description',)
 
 
-class ContactInformationFactory(factory.DjangoModelFactory):
+class ContactInformationFactory(factory.django.DjangoModelFactory):
     street_1 = factory.Faker('street_address')
     street_2 = factory.Faker('street_address')
     postalcode = factory.Faker('postcode')
@@ -36,7 +36,7 @@ class ContactInformationFactory(factory.DjangoModelFactory):
         model = models.ContactInformation
 
 
-class ContactFactory(factory.DjangoModelFactory):
+class ContactFactory(factory.django.DjangoModelFactory):
     profession = factory.SubFactory(ProfessionFactory)
     title = factory.Faker('word')
     first_name = factory.Faker('first_name')
@@ -48,7 +48,7 @@ class ContactFactory(factory.DjangoModelFactory):
         django_get_or_create = ('first_name', 'surname')
 
 
-class CountryFactory(factory.DjangoModelFactory):
+class CountryFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('country_urlsafe')
     # number - set manually
 
@@ -57,7 +57,7 @@ class CountryFactory(factory.DjangoModelFactory):
         django_get_or_create = ('number',)
 
 
-class ClusterFactory(factory.DjangoModelFactory):
+class ClusterFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('city_urlsafe')
     # number - set manually
     # parent - set to another Cluster object
@@ -69,7 +69,7 @@ class ClusterFactory(factory.DjangoModelFactory):
         django_get_or_create = ('number',)
 
 
-class StationFactory(factory.DjangoModelFactory):
+class StationFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('company')
     # number - set manually
     contactinformation = factory.SubFactory(ContactInformationFactory)
@@ -84,7 +84,7 @@ class StationFactory(factory.DjangoModelFactory):
         django_get_or_create = ('number',)
 
 
-class PcTypeFactory(factory.DjangoModelFactory):
+class PcTypeFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('word')
     slug = factory.Faker('slug')
 
@@ -93,7 +93,7 @@ class PcTypeFactory(factory.DjangoModelFactory):
         django_get_or_create = ('slug',)
 
 
-class PcFactory(factory.DjangoModelFactory):
+class PcFactory(factory.django.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
     type = factory.SubFactory(PcTypeFactory)
     name = factory.Faker('word')
@@ -108,7 +108,7 @@ class PcFactory(factory.DjangoModelFactory):
         django_get_or_create = ('station',)
 
 
-class MonitorServiceFactory(factory.DjangoModelFactory):
+class MonitorServiceFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('word')
     nagios_command = factory.Faker('word')
     is_default_service = factory.Faker('boolean')
@@ -122,7 +122,7 @@ class MonitorServiceFactory(factory.DjangoModelFactory):
         model = models.MonitorService
 
 
-class EnabledServiceFactory(factory.DjangoModelFactory):
+class EnabledServiceFactory(factory.django.DjangoModelFactory):
     pc = factory.SubFactory(PcFactory)
     monitor_service = factory.SubFactory(MonitorServiceFactory)
     min_critical = factory.Faker('float', min=0, max=10000)

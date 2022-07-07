@@ -10,7 +10,7 @@ from .providers import DataProvider
 factory.Faker.add_provider(DataProvider)
 
 
-class CoincidenceFactory(factory.DjangoModelFactory):
+class CoincidenceFactory(factory.django.DjangoModelFactory):
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     time = factory.Faker('time_object')
     nanoseconds = factory.Faker('random_int', min=0, max=int(1e9) - 1)
@@ -19,7 +19,7 @@ class CoincidenceFactory(factory.DjangoModelFactory):
         model = models.Coincidence
 
 
-class EventFactory(factory.DjangoModelFactory):
+class EventFactory(factory.django.DjangoModelFactory):
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     time = factory.Faker('time_object')
     nanoseconds = factory.Faker('random_int', min=0, max=int(1e9) - 1)

@@ -11,7 +11,7 @@ from .providers import DataProvider
 factory.Faker.add_provider(DataProvider)
 
 
-class NetworkSummaryFactory(factory.DjangoModelFactory):
+class NetworkSummaryFactory(factory.django.DjangoModelFactory):
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     num_coincidences = factory.Faker('random_int', min=0, max=30000)
     needs_update = factory.Faker('boolean')
@@ -22,7 +22,7 @@ class NetworkSummaryFactory(factory.DjangoModelFactory):
         django_get_or_create = ('date',)
 
 
-class SummaryFactory(factory.DjangoModelFactory):
+class SummaryFactory(factory.django.DjangoModelFactory):
     station = factory.SubFactory(inforecords_factories.StationFactory)
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     num_events = factory.Faker('random_int', min=0, max=3000)
@@ -42,7 +42,7 @@ class SummaryFactory(factory.DjangoModelFactory):
         django_get_or_create = ('station', 'date')
 
 
-class ConfigurationFactory(factory.DjangoModelFactory):
+class ConfigurationFactory(factory.django.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     timestamp = factory.Faker('past_datetime', start_date=date(2004, 1, 1))
     gps_latitude = factory.Faker('latitude')
@@ -135,7 +135,7 @@ class ConfigurationFactory(factory.DjangoModelFactory):
         model = models.Configuration
 
 
-class HistogramTypeFactory(factory.DjangoModelFactory):
+class HistogramTypeFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('word')
     slug = factory.Faker('slug')
     has_multiple_datasets = factory.Faker('boolean')
@@ -148,7 +148,7 @@ class HistogramTypeFactory(factory.DjangoModelFactory):
         django_get_or_create = ('slug',)
 
 
-class DatasetTypeFactory(factory.DjangoModelFactory):
+class DatasetTypeFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('word')
     slug = factory.Faker('slug')
     x_axis_title = factory.Faker('word')
@@ -160,7 +160,7 @@ class DatasetTypeFactory(factory.DjangoModelFactory):
         django_get_or_create = ('slug',)
 
 
-class NetworkHistogramFactory(factory.DjangoModelFactory):
+class NetworkHistogramFactory(factory.django.DjangoModelFactory):
     network_summary = factory.SubFactory(NetworkSummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
     bins = factory.LazyAttribute(lambda o: list(range(len(o.values) + 1)))
@@ -182,7 +182,7 @@ class CoincidencenumberHistogramFactory(NetworkHistogramFactory):
     values = factory.Faker('int_list', n=100, min=0, max=10000)
 
 
-class DailyHistogramFactory(factory.DjangoModelFactory):
+class DailyHistogramFactory(factory.django.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(HistogramTypeFactory)
     bins = factory.LazyAttribute(lambda o: list(range(len(o.values) + 1)))
@@ -241,7 +241,7 @@ class SingleshighHistogramFactory(MultiDailyHistogramFactory):
     values = factory.Faker('multi_int_list', n=jobs.BIN_SINGLES_HIGH_NUM, min=0, max=20000)
 
 
-class DailyDatasetFactory(factory.DjangoModelFactory):
+class DailyDatasetFactory(factory.django.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     type = factory.SubFactory(DatasetTypeFactory)
     x = factory.Faker('int_list')
@@ -282,7 +282,7 @@ class SinglesratehighDatasetFactory(MultiDailyDatasetFactory):
     y = factory.Faker('multi_float_list', n=(86400 // jobs.BIN_SINGLES_RATE), min=0, max=200)
 
 
-class DetectorTimingOffsetFactory(factory.DjangoModelFactory):
+class DetectorTimingOffsetFactory(factory.django.DjangoModelFactory):
     summary = factory.SubFactory(SummaryFactory)
     offset_1 = factory.Faker('float', min=-100, max=100)
     offset_2 = factory.Faker('float', min=-100, max=100)
@@ -293,7 +293,7 @@ class DetectorTimingOffsetFactory(factory.DjangoModelFactory):
         model = models.DetectorTimingOffset
 
 
-class StationTimingOffsetFactory(factory.DjangoModelFactory):
+class StationTimingOffsetFactory(factory.django.DjangoModelFactory):
     ref_summary = factory.SubFactory(SummaryFactory)
     summary = factory.SubFactory(SummaryFactory)
     offset = factory.Faker('float', min=-1000, max=1000)

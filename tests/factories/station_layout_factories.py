@@ -10,7 +10,7 @@ from .providers import DataProvider
 factory.Faker.add_provider(DataProvider)
 
 
-class StationLayoutFactory(factory.DjangoModelFactory):
+class StationLayoutFactory(factory.django.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
     active_date = factory.Faker('past_datetime', start_date=date(2004, 1, 1))
     detector_1_radius = factory.Faker('float', min=-60, max=60)
