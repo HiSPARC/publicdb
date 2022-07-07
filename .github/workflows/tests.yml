@@ -1,0 +1,77 @@
+name: Run tests
+
+on:
+  push:
+
+defaults:
+  run:
+    shell: bash -l {0}
+
+jobs:
+  tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [
+            '3.8',
+            '3.9',
+            '3.10',
+        ]
+    services:
+      postgres:
+        image: postgres:9.6-alpine
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: publicdb
+        ports:
+          - 5432:5432
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+          auto-update-conda: true
+      - run: make devinstall
+      - run: cp publicdb/settings_develop.py publicdb/settings.py
+      - run: make coveragetests
+
+  flake:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
+      - run: make flaketest
+
+  ansible-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - run: pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
+      - run: make ansibletest
+
+  docs:
+    if: github.ref == 'refs/heads/master'
+    needs: [tests, flake]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          python-version: '3.10'
+          auto-update-conda: true
+      - run: make devinstall
+      - run: pip install Sphinx
+      - run: make doctest
+      - uses: peaceiris/actions-gh-pages@v3.8.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: doc/_build/html
+          publish_branch: gh-pages
+          force_orphan: true
