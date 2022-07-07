@@ -2,7 +2,9 @@ import csv
 import datetime
 import os
 import tempfile
-import urllib.request, urllib.parse, urllib.error
+import urllib.error
+import urllib.parse
+import urllib.request
 
 from io import StringIO
 from urllib.parse import urljoin
@@ -542,9 +544,11 @@ def coincidences_download_form(request, start=None, end=None):
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
-            query_string = urllib.parse.urlencode({'cluster': cluster, 'stations': stations,
-                                             'start': start, 'end': end,
-                                             'n': n, 'download': download})
+            query_string = urllib.parse.urlencode({
+                'cluster': cluster, 'stations': stations,
+                'start': start, 'end': end,
+                'n': n, 'download': download
+            })
             url = reverse('data:coincidences')
             return HttpResponseRedirect(f'{url}?{query_string}')
     else:
