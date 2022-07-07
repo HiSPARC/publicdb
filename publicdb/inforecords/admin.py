@@ -32,7 +32,7 @@ class ContactAdmin(admin.ModelAdmin):
 
     def last_name(self, obj):
         if obj.prefix_surname:
-            return "%s, %s" % (obj.surname, obj.prefix_surname)
+            return f"{obj.surname}, {obj.prefix_surname}"
         else:
             return "%s" % obj.surname
 

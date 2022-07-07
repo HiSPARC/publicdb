@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -75,6 +72,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='stationlayout',
-            unique_together=set([('station', 'active_date')]),
+            unique_together={('station', 'active_date')},
         ),
     ]

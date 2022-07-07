@@ -298,7 +298,7 @@ def validate_request_form(request):
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed is False:
-        sessionrequest.sid = '{school}{id}'.format(school=sessionrequest.school, id=sessionrequest.id)
+        sessionrequest.sid = f'{sessionrequest.school}{sessionrequest.id}'
         sessionrequest.pin = randint(1000, 9999)
         sessionrequest.session_confirmed = True
         sessionrequest.save()

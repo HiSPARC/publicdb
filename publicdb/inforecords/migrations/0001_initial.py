@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -336,7 +333,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='detectorhisparc',
-            unique_together=set([('station', 'startdate')]),
+            unique_together={('station', 'startdate')},
         ),
         migrations.AddField(
             model_name='contact',
@@ -352,7 +349,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='contact',
-            unique_together=set([('first_name', 'prefix_surname', 'surname')]),
+            unique_together={('first_name', 'prefix_surname', 'surname')},
         ),
         migrations.AddField(
             model_name='cluster',

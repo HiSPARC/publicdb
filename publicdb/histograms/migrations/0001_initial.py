@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 import publicdb.histograms.models
@@ -260,7 +257,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='summary',
-            unique_together=set([('station', 'date')]),
+            unique_together={('station', 'date')},
         ),
         migrations.AddField(
             model_name='pulseheightfit',
@@ -270,7 +267,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='pulseheightfit',
-            unique_together=set([('source', 'plate')]),
+            unique_together={('source', 'plate')},
         ),
         migrations.AddField(
             model_name='networkhistogram',
@@ -286,7 +283,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='networkhistogram',
-            unique_together=set([('source', 'type')]),
+            unique_together={('source', 'type')},
         ),
         migrations.AddField(
             model_name='detectortimingoffset',
@@ -308,7 +305,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='dailyhistogram',
-            unique_together=set([('source', 'type')]),
+            unique_together={('source', 'type')},
         ),
         migrations.AddField(
             model_name='dailydataset',
@@ -324,7 +321,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='dailydataset',
-            unique_together=set([('source', 'type')]),
+            unique_together={('source', 'type')},
         ),
         migrations.AddField(
             model_name='configuration',

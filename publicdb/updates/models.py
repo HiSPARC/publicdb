@@ -6,7 +6,7 @@ from django.db import IntegrityError, models
 def upload_queue(instance, filename):
     """Return an upload_to value based on the upload queue"""
 
-    return 'uploads/%s/%s' % (instance.queue, filename)
+    return f'uploads/{instance.queue}/{filename}'
 
 
 class UpdateQueue(models.Model):
@@ -27,7 +27,7 @@ class AdminUpdate(models.Model):
     def save(self, *args, **kwargs):
         match = re.search(r'_v(\d+)', self.update.name)
         self.version = int(match.group(1))
-        super(AdminUpdate, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Admin update'
@@ -48,7 +48,7 @@ class UserUpdate(models.Model):
         match = re.search(r'_v(\d+)', self.update.name)
         self.version = int(match.group(1))
         try:
-            super(UserUpdate, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
         except IntegrityError:
             return
 
@@ -70,7 +70,7 @@ class InstallerUpdate(models.Model):
     def save(self, *args, **kwargs):
         match = re.search(r'_v(\d+\.\d+)', self.installer.name)
         self.version = match.group(1)
-        super(InstallerUpdate, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Installer update'

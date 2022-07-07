@@ -1,4 +1,4 @@
-from mock import patch
+from unittest.mock import patch
 
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -14,7 +14,7 @@ class TestViews(TestCase):
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.config = histograms_factories.ConfigurationFactory(summary=self.summary)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_html(self, url):
         """Get url and check if the response is OK and valid json"""

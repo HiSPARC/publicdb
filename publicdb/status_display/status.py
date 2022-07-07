@@ -8,7 +8,7 @@ RECENT_NUM_DAYS = 7
 UPDATE_STARTS_AT_HOUR = 3  # am UTC
 
 
-class DataStatus(object):
+class DataStatus:
 
     """Query the status of a station.
 
@@ -90,7 +90,7 @@ class DataStatus(object):
         return {'up': num_up, 'problem': num_problem, 'down': num_down}
 
 
-class NagiosStatus(object):
+class NagiosStatus:
 
     """Query the nagios monitoring status of a station.
 

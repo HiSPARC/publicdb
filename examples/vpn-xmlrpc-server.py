@@ -9,8 +9,8 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
+from xmlrpc.serverimport SimpleXMLRPCServer
+from xmlrpc.serverimport SimpleXMLRPCRequestHandler
 import subprocess
 import cStringIO as StringIO
 import zipfile
@@ -42,7 +42,7 @@ def register_hosts_ip(host_list):
 
     with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
-            file.write('%s\t%s.his\n' % (ip, host))
+            file.write(f'{ip}\t{host}.his\n')
     subprocess.check_call(['/sbin/service', 'dnsmasq', 'reload'])
 
     return True
@@ -56,13 +56,13 @@ def get_key(host, type):
 
     if type == 'client':
         key_dir = os.path.join(OPENVPN_DIR, 'keys')
-        zip_file.write('%s/%s.crt' % (key_dir, host), 'hisparc.crt')
-        zip_file.write('%s/%s.key' % (key_dir, host), 'hisparc.key')
+        zip_file.write(f'{key_dir}/{host}.crt', 'hisparc.crt')
+        zip_file.write(f'{key_dir}/{host}.key', 'hisparc.key')
         zip_file.write('%s/ca.crt' % key_dir, 'ca.crt')
     elif type == 'admin':
         key_dir = os.path.join(OPENVPN_DIR, 'adminkeys')
-        zip_file.write('%s/%s.crt' % (key_dir, host), 'hisparc_admin.crt')
-        zip_file.write('%s/%s.key' % (key_dir, host), 'hisparc_admin.key')
+        zip_file.write(f'{key_dir}/{host}.crt', 'hisparc_admin.crt')
+        zip_file.write(f'{key_dir}/{host}.key', 'hisparc_admin.key')
         zip_file.write('%s/ca.crt' % key_dir, 'ca_admin.crt')
     else:
         raise Exception('Unknown type %s' % type)

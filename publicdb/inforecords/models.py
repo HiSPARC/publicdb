@@ -41,7 +41,7 @@ class ContactInformation(models.Model):
     url = models.URLField(null=True, blank=True)
 
     def __unicode__(self):
-        return "%s %s %s" % (self.city, self.street_1, self.email_work)
+        return f"{self.city} {self.street_1} {self.email_work}"
 
     @property
     def type(self):
@@ -70,7 +70,7 @@ class ContactInformation(models.Model):
             return 'no owner'
 
     def save(self, *args, **kwargs):
-        super(ContactInformation, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         reload_nagios()
 
     class Meta:
@@ -101,7 +101,7 @@ class Contact(models.Model):
                    .strip())
 
     def save(self, *args, **kwargs):
-        super(Contact, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         reload_nagios()
 
     class Meta:
@@ -180,11 +180,11 @@ class Cluster(models.Model):
                                       (self.parent.number, self.parent.number + 1000))
 
     def save(self, *args, **kwargs):
-        super(Cluster, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         reload_datastore()
 
     def delete(self, *args, **kwargs):
-        super(Cluster, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         reload_datastore()
 
     def main_cluster(self):
@@ -242,11 +242,11 @@ class Station(models.Model):
         self.name = self.name.replace('"', '').replace("'", '')
         if self.number is None:
             self.number = self.cluster.last_station_number() + 1
-        super(Station, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         reload_datastore()
 
     def delete(self, *args, **kwargs):
-        super(Station, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         reload_datastore()
 
     def number_of_detectors(self):
@@ -379,7 +379,7 @@ class Pc(models.Model):
         self.name = unicode(slugify(self.name)).replace('-', '').replace('_', '')
 
         if self.id:
-            super(Pc, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
         else:
             if self.type.slug == "admin":
                 try:
@@ -398,14 +398,14 @@ class Pc(models.Model):
             # First create keys, then issue final save
             create_keys(self)
 
-            super(Pc, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
             # FIXME this doesn't check for preselected services
             self.install_default_services()
         update_aliases()
 
     def delete(self, *args, **kwargs):
-        super(Pc, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         update_aliases()
 
     def install_default_services(self):
@@ -433,7 +433,7 @@ class MonitorService(models.Model):
         ordering = ['description']
 
     def save(self, *args, **kwargs):
-        super(MonitorService, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
         if self.is_default_service:
             for pc in Pc.objects.exclude(type__slug="admin"):
@@ -453,7 +453,7 @@ class EnabledService(models.Model):
     max_warning = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
-        return '%s - %s' % (self.pc, self.monitor_service)
+        return f'{self.pc} - {self.monitor_service}'
 
     class Meta:
         verbose_name = 'Enabled Service'
@@ -461,11 +461,11 @@ class EnabledService(models.Model):
         ordering = ['pc', 'monitor_service']
 
     def save(self, *args, **kwargs):
-        super(EnabledService, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         reload_nagios()
 
     def delete(self, *args, **kwargs):
-        super(EnabledService, self).delete(*args, **kwargs)
+        super().delete(*args, **kwargs)
         reload_nagios()
 
 

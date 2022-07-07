@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 import publicdb.updates.models
@@ -61,7 +58,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='userupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
         migrations.AddField(
             model_name='installerupdate',
@@ -71,7 +68,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='installerupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
         migrations.AddField(
             model_name='adminupdate',
@@ -81,6 +78,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='adminupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
     ]

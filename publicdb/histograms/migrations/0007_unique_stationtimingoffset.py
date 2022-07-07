@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations
 
 
@@ -13,6 +10,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AlterUniqueTogether(
             name='stationtimingoffset',
-            unique_together=set([('ref_source', 'source')]),
+            unique_together={('ref_source', 'source')},
         ),
     ]

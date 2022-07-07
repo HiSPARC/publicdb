@@ -43,7 +43,7 @@ class StationLayout(models.Model):
         get_latest_by = 'active_date'
 
     def save(self, *args, **kwargs):
-        super(StationLayout, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         try:
             next_layout = StationLayout.objects.filter(
                 station=self.station,

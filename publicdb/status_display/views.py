@@ -223,7 +223,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 
 class NetworkSummaryDetailView(DateDetailView):
     date_field = 'date'
-    http_method_names = [u'get']
+    http_method_names = ['get']
     month_format = '%m'
     # SingleObjectMixin.get_object requires a lookup by pk or slug,
     # so reuse part of the date as a 'slug'.
@@ -238,7 +238,7 @@ class NetworkSummaryDetailView(DateDetailView):
         )
 
     def get_context_data(self, **kwargs):
-        context = super(NetworkSummaryDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         date = self.object.date
 
         # Find previous/next dates with data
@@ -375,7 +375,7 @@ class LatestNetworkSummaryRedirectView(RedirectView):
 
 class SummaryDetailView(DateDetailView):
     date_field = 'date'
-    http_method_names = [u'get']
+    http_method_names = ['get']
     month_format = '%m'
     slug_field = 'station__number'
     slug_url_kwarg = 'station_number'
@@ -391,10 +391,10 @@ class SummaryDetailView(DateDetailView):
             .prefetch_related('histograms', 'histograms__type', 'multi_histograms', 'multi_histograms__type',
                               'datasets', 'datasets__type', 'multi_datasets', 'multi_datasets__type')
         )
-        return super(SummaryDetailView, self).get_object(queryset=qs)
+        return super().get_object(queryset=qs)
 
     def get_context_data(self, **kwargs):
-        context = super(SummaryDetailView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         station = self.object.station
         date = self.object.date
 
@@ -797,7 +797,7 @@ def get_specific_config_source(request, station_number, type):
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
-        'attachment; filename=%s-s%s.tsv' % (type, station_number))
+        f'attachment; filename={type}-s{station_number}.tsv')
     return response
 
 

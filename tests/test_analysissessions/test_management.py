@@ -1,4 +1,4 @@
-from mock import patch
+from unittest.mock import patch
 
 from django.core.management import call_command
 from django.test import TestCase
@@ -9,7 +9,7 @@ from ..factories.inforecords_factories import ClusterFactory
 
 class TestManagement(TestCase):
     def setUp(self):
-        super(TestManagement, self).setUp()
+        super().setUp()
 
         cluster = ClusterFactory(number=0, country__number=0)
 

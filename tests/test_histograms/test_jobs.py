@@ -4,7 +4,7 @@ from os.path import abspath, dirname, join
 from shutil import rmtree
 from tempfile import mkdtemp
 
-from mock import patch
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import LiveServerTestCase, override_settings
@@ -22,12 +22,12 @@ class TestJobs(LiveServerTestCase):
     fixtures = ['initial_generator_state.json']
 
     def setUp(self):
-        super(TestJobs, self).setUp()
+        super().setUp()
         self._old_publicdb_base = environ.get('PUBLICDB_BASE')
         environ['PUBLICDB_BASE'] = self.live_server_url
 
     def tearDown(self):
-        super(TestJobs, self).tearDown()
+        super().tearDown()
         if self._old_publicdb_base:
             environ['PUBLICDB_BASE'] = self._old_publicdb_base
 

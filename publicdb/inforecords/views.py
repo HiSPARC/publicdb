@@ -26,7 +26,7 @@ def keys(request, host):
         key_file = 'dummy'
 
     response = HttpResponse(key_file, content_type='application/zip')
-    response['Content-Disposition'] = 'attachment; filename={name}.zip'.format(name=host.name)
+    response['Content-Disposition'] = f'attachment; filename={host.name}.zip'
     return response
 
 

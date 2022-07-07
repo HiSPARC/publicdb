@@ -119,7 +119,7 @@ def get_raw_datafile(date):
     name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon, date.tm_mday))
     try:
         datafile = tables.open_file(name, 'r')
-    except IOError:
+    except OSError:
         raise Exception("No data for that date")
 
     return datafile
@@ -162,9 +162,9 @@ def download_form(request, station_number=None, start=None, end=None):
                 url = reverse('data:lightning', kwargs={'lightning_type': lightning_type})
             else:
                 station = form.cleaned_data['station']
-                url = reverse('data:{data_type}'.format(data_type=data_type),
+                url = reverse(f'data:{data_type}',
                               kwargs={'station_number': station.number})
-            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
+            return HttpResponseRedirect(f'{url}?{query_string}')
     else:
         if station_number:
             station = get_object_or_404(Station, number=station_number)
@@ -334,7 +334,7 @@ def get_events_from_esd_in_range(station, start, end):
                     event_ids = events_table.get_where_list('(ts0 <= timestamp) & (timestamp < ts1)')
                     events = events_table.read_coordinates(event_ids)
                     reconstructions = reconstructions_table[event_ids]
-        except IOError:
+        except OSError:
             continue
         else:
             yield events, reconstructions
@@ -406,7 +406,7 @@ def get_weather_from_esd_in_range(station, start, end):
                     ts0 = datetime_to_gps(t0)  # noqa: F841
                     ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.weather.read_where('(ts0 <= timestamp) & (timestamp < ts1)')
-        except (IOError, tables.NoSuchNodeError):
+        except (OSError, tables.NoSuchNodeError):
             continue
         else:
             yield events
@@ -472,7 +472,7 @@ def get_singles_from_esd_in_range(station, start, end):
                     ts0 = datetime_to_gps(t0)  # noqa: F841
                     ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.singles.read_where('(ts0 <= timestamp) & (timestamp < ts1)')
-        except (IOError, tables.NoSuchNodeError):
+        except (OSError, tables.NoSuchNodeError):
             continue
         else:
             yield events
@@ -527,9 +527,8 @@ def get_lightning_in_range(lightning_type, start, end):
             with tables.open_file(filepath) as f:
                 ts0 = datetime_to_gps(t0)
                 ts1 = datetime_to_gps(t1)
-                for event in knmi_lightning.discharges(f, ts0, ts1, type=lightning_type):
-                    yield event
-        except (IOError, tables.NoSuchNodeError):
+                yield from knmi_lightning.discharges(f, ts0, ts1, type=lightning_type)
+        except (OSError, tables.NoSuchNodeError):
             continue
 
 
@@ -547,7 +546,7 @@ def coincidences_download_form(request, start=None, end=None):
                                              'start': start, 'end': end,
                                              'n': n, 'download': download})
             url = reverse('data:coincidences')
-            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
+            return HttpResponseRedirect(f'{url}?{query_string}')
     else:
         form = CoincidenceDownloadForm(initial={'filter_by': 'network', 'start': start, 'end': end, 'n': 2})
 
@@ -723,7 +722,7 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
                 for id, coin in enumerate(events, id + 1):
                     for number, event in coin:
                         yield id, number, event
-            except (IOError, tables.NoSuchNodeError):
+            except (OSError, tables.NoSuchNodeError):
                 continue
 
 
@@ -796,17 +795,17 @@ def prettyprint_timerange(t0, t1):
 
     duration = t1 - t0
     if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or t0.hour > 0):
-        timerange = '%s %s' % (t0, t1)
+        timerange = f'{t0} {t1}'
     elif duration.days == 1:
         timerange = str(t0.date())
     else:
-        timerange = '%s %s' % (t0.date(), t1.date())
+        timerange = f'{t0.date()} {t1.date()}'
 
     timerange = timerange.replace('-', '').replace(' ', '_').replace(':', '')
     return timerange
 
 
-class FakeReconstructionsTable(object):
+class FakeReconstructionsTable:
 
     """Used as standin for a missing reconstruction table
 

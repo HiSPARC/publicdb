@@ -28,19 +28,19 @@ station_patterns = [
 
 source_patterns = [
     # Network histograms
-    url(r'^{type}/'.format(type=type) + DATE_REGEX, views.get_specific_network_histogram_source, {'type': type}, name=type)
+    url(fr'^{type}/' + DATE_REGEX, views.get_specific_network_histogram_source, {'type': type}, name=type)
     for type in ['coincidencetime', 'coincidencenumber']
 ] + [
     # Histograms
-    url(r'^{type}/'.format(type=type) + STATION_DATE_REGEX, views.get_specific_histogram_source, {'type': type}, name=type)
+    url(fr'^{type}/' + STATION_DATE_REGEX, views.get_specific_histogram_source, {'type': type}, name=type)
     for type in ['eventtime', 'pulseheight', 'pulseintegral', 'singleslow', 'singleshigh', 'zenith', 'azimuth']
 ] + [
     # Datasets
-    url(r'^{type}/'.format(type=type) + STATION_DATE_REGEX, views.get_specific_dataset_source, {'type': type}, name=type)
+    url(fr'^{type}/' + STATION_DATE_REGEX, views.get_specific_dataset_source, {'type': type}, name=type)
     for type in ['barometer', 'temperature', 'singlesratelow', 'singlesratehigh']
 ] + [
     # Configurations
-    url(r'^{type}/(?P<station_number>\d+)/$'.format(type=type), views.get_specific_config_source, {'type': type}, name=type)
+    url(fr'^{type}/(?P<station_number>\d+)/$', views.get_specific_config_source, {'type': type}, name=type)
     for type in ['electronics', 'voltage', 'current', 'gps', 'trigger']
 ] + [
     # Histograms

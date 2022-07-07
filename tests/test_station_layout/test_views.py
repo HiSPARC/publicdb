@@ -10,7 +10,7 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_html(self, url):
         """Get url and check if the response is OK and valid json"""

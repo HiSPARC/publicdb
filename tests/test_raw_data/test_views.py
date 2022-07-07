@@ -27,13 +27,12 @@ class TestDownload(TestCase):
 
     def assert_download_equal_to_reference_tsv(self, data_type):
         # Expected data
-        reference_path = join(dirname(abspath(__file__)),
-                              '../data/tsv/{data_type}-s501-20170101.tsv'.format(data_type=data_type))
-        with open(reference_path, 'r') as reference_file:
+        reference_path = join(dirname(abspath(__file__)), f'../data/tsv/{data_type}-s501-20170101.tsv')
+        with open(reference_path) as reference_file:
             reference_tsv = reference_file.read()
         # Get actual data
         kwargs = {'station_number': self.station.number}
-        url = reverse('data:{data_type}'.format(data_type=data_type), kwargs=kwargs)
+        url = reverse(f'data:{data_type}', kwargs=kwargs)
         response = self.client.get(url, {'start': self.summary.date.isoformat()})
         tsv = ''.join(response.streaming_content)
         self.assertEqual(reference_tsv.strip(), tsv.strip())

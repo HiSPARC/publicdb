@@ -17,7 +17,7 @@ class TestViews(TestCase):
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.config = ConfigurationFactory(summary__station=self.station)
         self.pc = PcFactory(station=self.station, is_test=False)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_json(self, url):
         """Get url and check if the response is OK and valid json"""

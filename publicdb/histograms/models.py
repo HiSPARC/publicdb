@@ -310,10 +310,10 @@ class NetworkHistogram(models.Model):
         kwargs = {'year': self.network_summary.date.year,
                   'month': self.network_summary.date.month,
                   'day': self.network_summary.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
     def __unicode__(self):
-        return '%s - %s' % (self.network_summary.date.strftime('%d %b %Y'), self.type)
+        return '{} - {}'.format(self.network_summary.date.strftime('%d %b %Y'), self.type)
 
     class Meta:
         verbose_name = 'Network histogram'
@@ -330,7 +330,7 @@ class BaseDailyStationDataMixin(models.Model):
                   'year': self.summary.date.year,
                   'month': self.summary.date.month,
                   'day': self.summary.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
     def __unicode__(self):
         return "%d - %s - %s" % (self.summary.station.number,

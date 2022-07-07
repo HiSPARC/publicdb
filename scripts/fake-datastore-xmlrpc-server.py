@@ -9,10 +9,11 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
 import urllib2
 import hashlib
+
+from xmlrpc.server import SimpleXMLRPCServer
+from xmlrpc.server import SimpleXMLRPCRequestHandler
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
@@ -26,9 +27,9 @@ def reload_datastore():
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:
-        with open(HASH, 'r') as file:
+        with open(HASH) as file:
             old_hash = file.readline()
-    except IOError:
+    except OSError:
         old_hash = None
 
     if new_hash == old_hash:

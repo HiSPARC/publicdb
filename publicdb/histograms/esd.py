@@ -292,7 +292,7 @@ def get_or_create_esd_data_path(date):
 
     if not os.path.exists(dirpath):
         # create dir and parent dirs with mode rwxr-xr-x
-        os.makedirs(dirpath, 0755)
+        os.makedirs(dirpath, 0o755)
 
     return filepath
 
@@ -586,7 +586,7 @@ def get_timedeltas(date, ref_station, station):
                 data = None
             else:
                 data = table.col('delta')
-    except IOError:
+    except OSError:
         logger.debug("ESD file %s does not exists", path)
         return None
     return data

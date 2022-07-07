@@ -1,6 +1,6 @@
 from io import BytesIO
 
-from mock import patch
+from unittest.mock import patch
 from numpy import genfromtxt
 
 from django.test import Client, TestCase
@@ -20,7 +20,7 @@ class TestViews(TestCase):
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         histograms_factories.EventtimeHistogramFactory(summary=self.summary)
         histograms_factories.ConfigurationFactory(summary=self.summary)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_html(self, url):
         """Get url and check if the response is OK and valid json"""
@@ -82,7 +82,7 @@ class TestSourceViews(TestCase):
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.network_summary = histograms_factories.NetworkSummaryFactory(date=self.summary.date)
-        super(TestSourceViews, self).setUp()
+        super().setUp()
 
     def get_tsv(self, url):
         """Get url and check if the response is OK and valid TSV"""
@@ -186,7 +186,7 @@ class TestSourceViews(TestCase):
         histograms_factories.ConfigurationFactory(summary=self.summary)
 
         for config_type in ['electronics', 'voltage', 'current', 'gps', 'trigger']:
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
+            response = self.get_tsv(reverse(f'status:source:{config_type}', kwargs=kwargs))
             expected_context = {
                 'station_number': str(self.station.number)
                 # data structures are a bit more work to check.

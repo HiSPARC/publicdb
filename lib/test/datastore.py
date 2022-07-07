@@ -14,7 +14,7 @@ def setup_test_datastore_directory(datastore_path):
         with open(test_file, 'w') as f:
             f.write("test")
 
-        with open(test_file, 'r') as f:
+        with open(test_file) as f:
             f.read()
 
         os.remove(test_file)

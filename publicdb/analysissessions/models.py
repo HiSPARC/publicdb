@@ -33,7 +33,7 @@ class AnalysisSession(models.Model):
 
     def save(self, *args, **kwargs):
         self.hash = hashlib.md5(self.slug).hexdigest()
-        super(AnalysisSession, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
         Student(session=self, name='Test student').save()
 
     def __unicode__(self):
@@ -49,7 +49,7 @@ class Student(models.Model):
     name = models.CharField(max_length=40)
 
     def __unicode__(self):
-        return '%s - %s' % (self.session, self.name)
+        return f'{self.session} - {self.name}'
 
     class Meta:
         verbose_name = 'Student'
@@ -69,7 +69,7 @@ class AnalyzedCoincidence(models.Model):
     error_estimate = models.FloatField(null=True, blank=True)
 
     def __unicode__(self):
-        return "%s - %s" % (self.coincidence, self.student)
+        return f"{self.coincidence} - {self.student}"
 
     class Meta:
         verbose_name = 'Analyzed coincidence'
@@ -100,7 +100,7 @@ class SessionRequest(models.Model):
 
     @property
     def name(self):
-        return "%s %s" % (self.first_name, self.sur_name)
+        return f"{self.first_name} {self.sur_name}"
 
     def create_session(self):
         self.session_pending = False

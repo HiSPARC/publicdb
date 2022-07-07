@@ -39,7 +39,7 @@ class Command(BaseCommand):
             pc_type = inforecords_factories.PcTypeFactory(slug='client')
 
             for station in stations:
-                inforecords_factories.PcFactory(station=station, type=pc_type, name='pc{number}'.format(number=station.number))
+                inforecords_factories.PcFactory(station=station, type=pc_type, name=f'pc{station.number}')
 
         for station in stations:
             station_layout_factories.StationLayoutFactory(station=station)
