@@ -63,7 +63,7 @@ class StationLayout(models.Model):
 
 
 class StationLayoutQuarantine(models.Model):
-    name = models.CharField(max_length=50)
+    name = models.CharField(max_length=255)
     email = models.EmailField()
     submit_date = models.DateTimeField(auto_now_add=True)
     email_verified = models.BooleanField(default=False)

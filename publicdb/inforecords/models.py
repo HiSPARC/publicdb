@@ -16,7 +16,7 @@ FIRSTDATE = datetime.date(2004, 1, 1)
 
 
 class Profession(models.Model):
-    description = models.CharField(max_length=40, unique=True)
+    description = models.CharField(max_length=255, unique=True)
 
     def __str__(self):
         return self.description
@@ -27,16 +27,16 @@ class Profession(models.Model):
 
 
 class ContactInformation(models.Model):
-    street_1 = models.CharField(max_length=40)
-    street_2 = models.CharField(max_length=40, null=True, blank=True)
-    postalcode = models.CharField(max_length=12)
-    city = models.CharField(max_length=40)
-    pobox = models.CharField(max_length=12, null=True, blank=True)
-    pobox_postalcode = models.CharField(max_length=12, null=True, blank=True)
-    pobox_city = models.CharField(max_length=40, null=True, blank=True)
-    phone_work = models.CharField(max_length=20)
-    phone_home = models.CharField(max_length=20, null=True, blank=True)
-    fax = models.CharField(max_length=20, null=True, blank=True)
+    street_1 = models.CharField(max_length=255)
+    street_2 = models.CharField(max_length=255, null=True, blank=True)
+    postalcode = models.CharField(max_length=255)
+    city = models.CharField(max_length=255)
+    pobox = models.CharField(max_length=255, null=True, blank=True)
+    pobox_postalcode = models.CharField(max_length=255, null=True, blank=True)
+    pobox_city = models.CharField(max_length=255, null=True, blank=True)
+    phone_work = models.CharField(max_length=255)
+    phone_home = models.CharField(max_length=255, null=True, blank=True)
+    fax = models.CharField(max_length=255, null=True, blank=True)
     email_work = models.EmailField()
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
@@ -78,10 +78,10 @@ class ContactInformation(models.Model):
 
 class Contact(models.Model):
     profession = models.ForeignKey(Profession, models.CASCADE, related_name='contacts')
-    title = models.CharField(max_length=20, blank=True)
-    first_name = models.CharField(max_length=40)
-    prefix_surname = models.CharField(max_length=10, blank=True)
-    surname = models.CharField(max_length=40)
+    title = models.CharField(max_length=255, blank=True)
+    first_name = models.CharField(max_length=255)
+    prefix_surname = models.CharField(max_length=255, blank=True)
+    surname = models.CharField(max_length=255)
     contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='contacts')
 
     def __str__(self):
@@ -105,7 +105,7 @@ class Contact(models.Model):
 
 
 class Country(models.Model):
-    name = models.CharField(max_length=70, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     number = models.IntegerField(unique=True, blank=True)
 
     def __str__(self):
@@ -137,7 +137,7 @@ class Country(models.Model):
 
 
 class Cluster(models.Model):
-    name = models.CharField(max_length=70, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     number = models.IntegerField(unique=True, blank=True)
     parent = models.ForeignKey('self', models.CASCADE, null=True, blank=True, related_name='subclusters')
     country = models.ForeignKey(Country, models.CASCADE, related_name='clusters')
@@ -209,13 +209,13 @@ class Cluster(models.Model):
 
 
 class Station(models.Model):
-    name = models.CharField(max_length=70)
+    name = models.CharField(max_length=255)
     number = models.IntegerField(unique=True, blank=True)
     contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='stations')
     cluster = models.ForeignKey(Cluster, models.CASCADE, related_name='stations')
     contact = models.ForeignKey(Contact, models.SET_NULL, related_name='stations_contact', null=True)
     ict_contact = models.ForeignKey(Contact, models.SET_NULL, related_name='stations_ict_contact', null=True)
-    password = models.CharField(max_length=40)
+    password = models.CharField(max_length=255)
     info_page = models.TextField(blank=True)
 
     def __str__(self):
@@ -302,8 +302,8 @@ class Station(models.Model):
 
 
 class PcType(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-    slug = models.CharField(max_length=20)
+    description = models.CharField(max_length=255, unique=True)
+    slug = models.CharField(max_length=255)
 
     def __str__(self):
         return self.description
@@ -316,7 +316,7 @@ class PcType(models.Model):
 class Pc(models.Model):
     station = models.ForeignKey(Station, models.CASCADE, related_name='pcs')
     type = models.ForeignKey(PcType, models.CASCADE, related_name='pcs')
-    name = models.CharField(max_length=40, unique=True)
+    name = models.CharField(max_length=255, unique=True)
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
     ip = models.GenericIPAddressField(unique=True, blank=True, null=True, protocol='ipv4')

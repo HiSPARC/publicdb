@@ -15,7 +15,7 @@ beta_field = partial(forms.FloatField, **ANGLE_LIMITS)
 
 
 class StationLayoutQuarantineForm(forms.Form):
-    name = forms.CharField(max_length=50)
+    name = forms.CharField(max_length=255)
     email = forms.EmailField()
 
     station = forms.ModelChoiceField(

@@ -19,7 +19,7 @@ from ..inforecords.models import Station
 
 class AnalysisSession(models.Model):
     session_request = models.OneToOneField('SessionRequest', models.CASCADE)
-    title = models.CharField(max_length=40, blank=False, unique=True)
+    title = models.CharField(max_length=255, blank=False, unique=True)
     slug = models.SlugField(unique=True)
     hash = models.CharField(max_length=32)
     pin = models.CharField(max_length=4)
@@ -46,7 +46,7 @@ class AnalysisSession(models.Model):
 
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=255)
 
     def __str__(self):
         return f'{self.session} - {self.name}'
@@ -78,10 +78,10 @@ class AnalyzedCoincidence(models.Model):
 
 
 class SessionRequest(models.Model):
-    first_name = models.CharField(max_length=50)
-    sur_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=255)
+    sur_name = models.CharField(max_length=255)
     email = models.EmailField()
-    school = models.CharField(max_length=50)
+    school = models.CharField(max_length=255)
     cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE, related_name='session_requests')
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
@@ -91,7 +91,7 @@ class SessionRequest(models.Model):
     session_pending = models.BooleanField(default=False)
     session_created = models.BooleanField(default=False)
     url = models.CharField(max_length=20)
-    sid = models.CharField(max_length=50, blank=True, null=True)
+    sid = models.CharField(max_length=255, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
 
     class Meta:
