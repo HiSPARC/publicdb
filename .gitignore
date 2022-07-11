@@ -11,6 +11,7 @@ public.db
 *.sql
 /mediaroot/
 /staticroot/
+docker-compose.override.yml
 
 # Coverage
 /htmlcov/
