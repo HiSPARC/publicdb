@@ -1,5 +1,5 @@
 from django.core import mail
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories.inforecords_factories import StationFactory
@@ -8,7 +8,6 @@ from ..factories.station_layout_factories import StationLayoutQuarantineFactory
 
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         super().setUp()
 

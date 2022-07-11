@@ -1,7 +1,7 @@
 from tempfile import mkdtemp
 from urllib.parse import parse_qs
 
-from django.test import Client, TestCase, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFactory, UserUpdateFactory
@@ -10,7 +10,6 @@ from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFac
 @override_settings(MEDIA_ROOT=mkdtemp(prefix='mediaroot'))
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.admin_update = AdminUpdateFactory(queue__slug='hisparc')
         self.user_update = UserUpdateFactory(queue__slug='hisparc')
         self.installer_update = InstallerUpdateFactory(queue__slug='hisparc')

@@ -2,7 +2,7 @@ import datetime
 
 from os.path import abspath, dirname, join
 
-from django.test import Client, TestCase, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from ..factories import histograms_factories, inforecords_factories
@@ -12,7 +12,6 @@ from ..factories import histograms_factories, inforecords_factories
 class TestDownload(TestCase):
 
     def setUp(self):
-        self.client = Client()
         # Required models
         cluster = inforecords_factories.ClusterFactory(name='Amsterdam', number=0, country__number=0)
         self.station = inforecords_factories.StationFactory(name='Nikhef', number=501, cluster=cluster)

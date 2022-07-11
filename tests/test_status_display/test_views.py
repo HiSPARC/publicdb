@@ -2,7 +2,7 @@ from io import BytesIO
 
 from numpy import genfromtxt
 
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories import histograms_factories
@@ -13,7 +13,6 @@ from ..utils import date_as_kwargs
 
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         histograms_factories.EventtimeHistogramFactory(summary=self.summary)
@@ -76,7 +75,6 @@ class TestViews(TestCase):
 
 class TestSourceViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.network_summary = histograms_factories.NetworkSummaryFactory(date=self.summary.date)

@@ -1,4 +1,4 @@
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories import histograms_factories
@@ -7,7 +7,6 @@ from ..factories.inforecords_factories import StationFactory
 
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.config = histograms_factories.ConfigurationFactory(summary=self.summary)

@@ -1,6 +1,6 @@
 from datetime import date, timedelta
 
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories.histograms_factories import ConfigurationFactory
@@ -13,7 +13,6 @@ class TestViews(TestCase):
     """Test if all endpoints work and sometimes that the expected data is returned"""
 
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.config = ConfigurationFactory(summary__station=self.station)
         self.pc = PcFactory(station=self.station, is_test=False)
