@@ -1,4 +1,5 @@
 import datetime
+import ipaddress
 
 from xmlrpc.client import ServerProxy
 
@@ -347,24 +348,13 @@ class Pc(models.Model):
         verbose_name_plural = 'PCs and certificates'
         ordering = ['name']
 
-    def generate_ip_address(self, ipaddress):
+    def get_next_ip_address(self, ip):
         """Generate new IP address
 
         Increments given IP address by 1.
-        Source: http://code.activestate.com/recipes/65219/
 
         """
-        hexn = ''.join(["%02X" % int(i) for i in ipaddress.split('.')])
-        n = int(hexn, 16) + 1
-
-        d = 256 * 256 * 256
-        q = []
-        while d > 0:
-            m, n = divmod(n, d)
-            q.append(str(m))
-            d = d / 256
-
-        return '.'.join(q)
+        return str(ipaddress.ip_address(ip) + 1)
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
@@ -385,7 +375,7 @@ class Pc(models.Model):
                 except Pc.DoesNotExist:
                     # Initial station IP
                     last_ip = '194.171.82.1'
-            self.ip = self.generate_ip_address(last_ip)
+            self.ip = self.get_next_ip_address(last_ip)
 
             # First create keys, then issue final save
             create_keys(self)
