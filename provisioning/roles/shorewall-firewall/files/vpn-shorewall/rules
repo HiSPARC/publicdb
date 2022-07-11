@@ -37,14 +37,6 @@ Web(ACCEPT)    net             $FW
 ACCEPT         net:192.16.186.202       $FW             tcp     8001
 
 #
-# Nagios traffic
-#
-# NRPE, NSClient running on detector pc's
-ACCEPT         $FW             det     tcp     5666,12489
-# NRDP communication from detector pc's using HTTP
-Web(ACCEPT)    det             $FW
-
-#
 # Admin access to detector pc's
 #
 # VNC

@@ -15,4 +15,3 @@ print(s.register_hosts_ip([('nikhef1', '192.168.0.1'),
 zip = base64.b64decode(s.get_key('sciencepark501', 'client'))
 with open('/tmp/test.zip', 'w') as file:
     file.write(zip)
-print(s.reload_nagios())

@@ -2,8 +2,7 @@
 """ Simple XML-RPC Server to run on the VPN server
 
     This daemon should be run on HiSPARC's VPN server.  It will handle the
-    creation of hosts and keys, the reloading of nagios and the retrieval
-    of HiSPARC certificates.
+    creation of hosts and keys and the retrieval of HiSPARC certificates.
 
     The basis for this code was ripped from the python SimpleXMLRPCServer
     library documentation and extended.
@@ -19,7 +18,6 @@ import base64
 
 OPENVPN_DIR = '/home/david/tmp/openvpn'
 HOSTS_FILE = '/tmp/hosts-hisparc'
-FLAG = '/tmp/flag_nagios_reload'
 
 
 def create_key(host, type, ip):
@@ -77,14 +75,6 @@ def get_key(host, type):
     return base64.b64encode(zip_file)
 
 
-def reload_nagios():
-    """Signal a reload of nagios"""
-
-    with open(FLAG, 'a') as file:
-        pass
-    return True
-
-
 if __name__ == '__main__':
     # Restrict to a particular path.
     class RequestHandler(SimpleXMLRPCRequestHandler):
@@ -98,7 +88,6 @@ if __name__ == '__main__':
     server.register_function(create_key)
     server.register_function(register_hosts_ip)
     server.register_function(get_key)
-    server.register_function(reload_nagios)
 
     # Run the server's main loop
     server.serve_forever()

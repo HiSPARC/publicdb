@@ -45,9 +45,6 @@ DATASTORE_PROXY = None  # 'http://localhost:8002'
 VPN_HOST = 'localhost'
 DATASTORE_HOST = 'localhost'
 
-# Webserver of the publicdb where Nagios will retrieve active check results
-PUBLICDB_HOST_FOR_NAGIOS = 'https://data.hisparc.nl'
-
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.

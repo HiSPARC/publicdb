@@ -106,29 +106,3 @@ class PcFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Pc
         django_get_or_create = ('station',)
-
-
-class MonitorServiceFactory(factory.django.DjangoModelFactory):
-    description = factory.Faker('word')
-    nagios_command = factory.Faker('word')
-    is_default_service = factory.Faker('boolean')
-    enable_active_checks = factory.Faker('boolean')
-    min_critical = factory.Faker('float', min=0, max=10000)
-    max_critical = factory.Faker('float', min=0, max=10000)
-    min_warning = factory.Faker('float', min=0, max=10000)
-    max_warning = factory.Faker('float', min=0, max=10000)
-
-    class Meta:
-        model = models.MonitorService
-
-
-class EnabledServiceFactory(factory.django.DjangoModelFactory):
-    pc = factory.SubFactory(PcFactory)
-    monitor_service = factory.SubFactory(MonitorServiceFactory)
-    min_critical = factory.Faker('float', min=0, max=10000)
-    max_critical = factory.Faker('float', min=0, max=10000)
-    min_warning = factory.Faker('float', min=0, max=10000)
-    max_warning = factory.Faker('float', min=0, max=10000)
-
-    class Meta:
-        model = models.EnabledService

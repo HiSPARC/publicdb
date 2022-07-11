@@ -10,7 +10,6 @@
     <ul>
       {% for station in stations %}
         <li>
-            <a href="{% url 'status:station:status' station.number %}"><span class='statusBall {{ station.nagios_status }}'></span></a>
           {% if station.link %}
             <a href="{% url 'status:station:summary' station.number %}">
               <span class='statusCube {{ station.status }}'></span>

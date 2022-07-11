@@ -71,32 +71,13 @@ class ContactInformationAdmin(admin.ModelAdmin):
     inlines = (ContactInline, StationInline)
 
 
-class EnabledServiceInline(admin.TabularInline):
-    model = models.EnabledService
-    extra = 10
-
-
-@admin.register(models.MonitorService)
-class MonitorServiceAdmin(admin.ModelAdmin):
-    list_display = ('description', 'is_default_service', 'nagios_command')
-    inlines = (EnabledServiceInline,)
-
-
 @admin.register(models.Pc)
 class PcAdmin(admin.ModelAdmin):
     list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url',
                     'keys')
     list_filter = ('is_active', 'is_test')
     ordering = ('station',)
-    inlines = (EnabledServiceInline,)
     list_per_page = 200
-
-
-@admin.register(models.EnabledService)
-class EnabledServiceAdmin(admin.ModelAdmin):
-    list_display = ('pc', 'monitor_service', 'min_critical', 'max_critical',
-                    'min_warning', 'max_warning')
-    list_filter = ('pc', 'monitor_service')
 
 
 admin.site.register(models.Profession)

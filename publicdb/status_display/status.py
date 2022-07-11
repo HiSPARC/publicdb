@@ -2,7 +2,6 @@ import datetime
 
 from ..histograms.models import GeneratorState, Summary
 from ..inforecords.models import Pc, Station
-from .nagios import status_lists
 
 RECENT_NUM_DAYS = 7
 UPDATE_STARTS_AT_HOUR = 3  # am UTC
@@ -88,37 +87,3 @@ class DataStatus:
         num_down = len(all_stations.difference(stations_recent).difference(stations_unknown))
 
         return {'up': num_up, 'problem': num_problem, 'down': num_down}
-
-
-class NagiosStatus:
-
-    """Query the nagios monitoring status of a station.
-
-    You can query the status of a single station, or get the status counts for
-    all stations.
-
-    """
-
-    def __init__(self):
-        self.down, self.problem, self.up = status_lists()
-
-    def get_status(self, station_number):
-        """Query station status.
-
-        :param station_number: the station for which to get the status
-        :return: 'up', 'problem', or 'down'
-
-        """
-        if station_number in self.up:
-            return 'up'
-        elif station_number in self.problem:
-            return 'problem'
-        elif station_number in self.down:
-            return 'down'
-        else:
-            return 'unknown'
-
-    def get_status_counts(self):
-        """Get the status counts for up, problem and down."""
-
-        return {'up': len(self.up), 'problem': len(self.problem), 'down': len(self.down)}

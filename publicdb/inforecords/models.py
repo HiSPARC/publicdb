@@ -70,10 +70,6 @@ class ContactInformation(models.Model):
         else:
             return 'no owner'
 
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        reload_nagios()
-
     class Meta:
         verbose_name = "Contact information"
         verbose_name_plural = "Contact information"
@@ -100,10 +96,6 @@ class Contact(models.Model):
         return (' '.join((self.title, self.first_name, self.prefix_surname, self.surname))
                    .replace('  ', ' ')
                    .strip())
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        reload_nagios()
 
     class Meta:
         verbose_name = 'contact'
@@ -329,7 +321,6 @@ class Pc(models.Model):
     is_test = models.BooleanField(default=False)
     ip = models.GenericIPAddressField(unique=True, blank=True, null=True, protocol='ipv4')
     notes = models.TextField(blank=True)
-    services = models.ManyToManyField('MonitorService', through='EnabledService')
 
     def __str__(self):
         return self.name
@@ -401,74 +392,6 @@ class Pc(models.Model):
 
             super().save(*args, **kwargs)
 
-            # FIXME this doesn't check for preselected services
-            self.install_default_services()
-        update_aliases()
-
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-        update_aliases()
-
-    def install_default_services(self):
-        if self.type.slug != "admin":
-            for service in MonitorService.objects.filter(is_default_service=True):
-                EnabledService(pc=self, monitor_service=service).save()
-
-
-class MonitorService(models.Model):
-    description = models.CharField(max_length=40, unique=True)
-    nagios_command = models.CharField(max_length=70)
-    is_default_service = models.BooleanField(default=False)
-    enable_active_checks = models.BooleanField(default=True)
-    min_critical = models.FloatField(null=True, blank=True)
-    max_critical = models.FloatField(null=True, blank=True)
-    min_warning = models.FloatField(null=True, blank=True)
-    max_warning = models.FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return self.description
-
-    class Meta:
-        verbose_name = 'Monitor Service'
-        verbose_name_plural = 'Monitor Services'
-        ordering = ['description']
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-
-        if self.is_default_service:
-            for pc in Pc.objects.exclude(type__slug="admin"):
-                try:
-                    service = EnabledService.objects.get(pc=pc, monitor_service=self)
-                except EnabledService.DoesNotExist:
-                    service = EnabledService(pc=pc, monitor_service=self)
-                    service.save()
-
-
-class EnabledService(models.Model):
-    pc = models.ForeignKey(Pc, models.CASCADE, related_name='enabled_services')
-    monitor_service = models.ForeignKey(MonitorService, models.CASCADE, related_name='enabled_services')
-    min_critical = models.FloatField(null=True, blank=True)
-    max_critical = models.FloatField(null=True, blank=True)
-    min_warning = models.FloatField(null=True, blank=True)
-    max_warning = models.FloatField(null=True, blank=True)
-
-    def __str__(self):
-        return f'{self.pc} - {self.monitor_service}'
-
-    class Meta:
-        verbose_name = 'Enabled Service'
-        verbose_name_plural = 'Enabled Services'
-        ordering = ['pc', 'monitor_service']
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        reload_nagios()
-
-    def delete(self, *args, **kwargs):
-        super().delete(*args, **kwargs)
-        reload_nagios()
-
 
 def create_keys(pc):
     """Create VPN keys for the given Pc"""
@@ -486,19 +409,6 @@ def update_aliases():
         aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
         aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
         proxy.register_hosts_ip(aliases)
-        reload_nagios()
-
-
-def reload_nagios():
-    """Reload the nagios configuration"""
-
-    if settings.VPN_PROXY is not None:
-        try:
-            proxy = ServerProxy(settings.VPN_PROXY)
-            transaction.on_commit(proxy.reload_nagios)
-        except Exception:
-            # FIXME logging!
-            pass
 
 
 def reload_datastore():

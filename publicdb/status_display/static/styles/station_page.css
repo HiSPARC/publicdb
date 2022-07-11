@@ -19,12 +19,6 @@
     width: 609px;
     margin-bottom: 20px;}
 
-#nagios {
-    position: absolute;
-    z-index: -1;
-    width: 850px;
-    height: 600px;}
-
 #ct_histogram,
 #cn_histogram {
     height: 250px;}

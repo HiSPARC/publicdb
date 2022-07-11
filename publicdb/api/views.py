@@ -13,13 +13,6 @@ from . import datastore
 FIRSTDATE = datetime.date(2004, 1, 1)
 
 
-class Nagios:
-    ok = (0, 'OK')
-    warning = (1, 'WARNING')
-    critical = (2, 'CRITICAL')
-    unknown = (3, 'UNKNOWN')
-
-
 def json_dict(result):
     """Create a json HTTPResponse"""
     response = HttpResponse(json.dumps(result, sort_keys=True),
@@ -65,11 +58,9 @@ def network_status(request):
     stations = []
     for station in Station.objects.exclude(pcs__type__slug='admin'):
         status = station_status.get_status(station.number)
-        nagios_status = 'unknown'
 
         stations.append({'number': station.number,
-                         'status': status,
-                         'nagios_status': nagios_status})
+                         'status': status})
     return json_dict(stations)
 
 

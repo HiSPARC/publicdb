@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 
-from .inforecords.views import create_datastore_config, create_nagios_config, keys
+from .inforecords.views import create_datastore_config, keys
 
 urlpatterns = [
     path('', RedirectView.as_view(url='show/stations', permanent=False)),
@@ -18,7 +18,6 @@ urlpatterns = [
     re_path(r'^raw_data/', include('publicdb.raw_data.urls', namespace='raw_data')),
     re_path(r'^data/', include('publicdb.raw_data.urls')),
 
-    path('config/nagios', create_nagios_config, name='nagios_config'),
     path('config/datastore', create_datastore_config, name='datatore_config'),
 
     re_path(r'^keys/(?P<host>[a-zA-Z0-9_]+)/$', keys, name='keys'),

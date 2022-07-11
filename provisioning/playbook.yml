@@ -39,5 +39,4 @@
     - postfix
     - shorewall-firewall
     - openvpn
-    - nagios
     - vpn-scripts
