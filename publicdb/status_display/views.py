@@ -19,7 +19,7 @@ from sapphire.transformations import clock
 from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DetectorTimingOffset,
                                  MultiDailyDataset, MultiDailyHistogram, NetworkHistogram, NetworkSummary,
                                  StationTimingOffset, Summary)
-from ..inforecords.models import Cluster, Country, Pc, Station
+from ..inforecords.models import Cluster, Country, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
 from .status import DataStatus
