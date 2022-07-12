@@ -33,7 +33,7 @@ class TestDownload(TestCase):
         kwargs = {'station_number': self.station.number}
         url = reverse(f'data:{data_type}', kwargs=kwargs)
         response = self.client.get(url, {'start': self.summary.date.isoformat()})
-        tsv = ''.join(response.streaming_content)
+        tsv = b''.join(response.streaming_content).decode('utf-8')
         self.assertEqual(reference_tsv.strip(), tsv.strip())
 
     def test_download_events(self):

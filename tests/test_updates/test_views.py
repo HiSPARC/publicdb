@@ -25,7 +25,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual({'mustUpdate': ['0']}, data)
 
     def test_check_querystring_admin_update(self):
@@ -36,7 +36,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['2'], 'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]},
             data)
@@ -49,7 +49,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['1'], 'newVersionUser': ['2'], 'urlUser': [user_update.update.url]},
             data)
@@ -63,7 +63,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['3'],
              'newVersionUser': ['2'], 'urlUser': [user_update.update.url],
