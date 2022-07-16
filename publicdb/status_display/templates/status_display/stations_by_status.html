@@ -14,7 +14,7 @@
         {% for station in stations %}
           <li>
               <a href="{% url 'status:station:status' station.number %}">
-                <span class='statusCube {{ station.status }}'></span>
+                <span class='statusBall {{ station.status }}'></span>
                 {{ station.number }} &mdash; {{ station.name }}
               </a>
           </li>

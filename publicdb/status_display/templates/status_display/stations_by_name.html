@@ -12,11 +12,11 @@
       <li>
         {% if station.link %}
           <a href="{% url 'status:station:summary' station.number %}">
-            <span class='statusCube {{ station.status }}'></span>
+            <span class='statusBall {{ station.status }}'></span>
             {{ station.number }} &mdash; {{ station.name }}
           </a>
         {% else %}
-            <span class='statusCube {{ station.status }}'></span>
+            <span class='statusBall {{ station.status }}'></span>
             {{ station.number }} &mdash; {{ station.name }}
         {% endif %}
       </li>

@@ -101,12 +101,6 @@ h3 {
     border-radius: 50%;
     background-color: grey;}
 
-.statusCube {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
-    background-color: grey;}
-
 .down {background-color: rgba(255, 0, 0, 0.3);}
 .down:hover {background-color: rgba(255, 0, 0, 0.8);}
 

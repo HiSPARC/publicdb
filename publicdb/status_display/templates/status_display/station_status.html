@@ -15,7 +15,7 @@
             <h3>Data delivery status</h3>
             <p>The data delivery status is based on the station uploading events to the central server. Each night the uploaded events of the previous day are processed. Hence the status is based on data that was uploaded yesterday.<p>
             <p><b>Current status:</b></p>
-            <p><span class='statusCube {{ status }}'></span><b>
+            <p><span class='statusBall {{ status }}'></span><b>
             {% if status == 'up' %}
               Data was received yesterday. Status OK. No action required.
             {% elif status == 'down' %}
