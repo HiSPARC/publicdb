@@ -8,14 +8,13 @@
     library documentation and extended.
 
 """
-from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.server import SimpleXMLRPCRequestHandler
-import subprocess
-import io as StringIO
-import zipfile
-import os
 import base64
-import pwd
+import io as StringIO
+import os
+import subprocess
+import zipfile
+
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 
 OPENVPN_DIR = '/etc/openvpn'
 HOSTS_FILE = '/etc/hosts-hisparc'
@@ -27,11 +26,11 @@ def create_key(host, type, ip):
     if type == 'client':
         subprocess.check_call(['/usr/local/bin/create_keys.sh', OPENVPN_DIR, host])
         with open(os.path.join(OPENVPN_DIR, 'ccd', host), 'w') as file:
-            file.write('ifconfig-push %s 255.255.254.0\n' % ip)
+            file.write(f'ifconfig-push {ip} 255.255.254.0\n')
     elif type == 'admin':
         subprocess.check_call(['/usr/local/bin/create_admin_keys.sh', OPENVPN_DIR, host])
     else:
-        raise Exception('Unknown type %s' % type)
+        raise ValueError(f'Unsupported type; {type}')
 
     return True
 
@@ -41,7 +40,7 @@ def register_hosts_ip(host_list):
 
     with open(HOSTS_FILE, 'w') as file:
         for host, ip in host_list:
-            file.write('%s\t%s.his\n' % (ip, host))
+            file.write(f'{ip}\t{host}.his\n')
     subprocess.check_call(['/usr/bin/systemctl', 'restart', 'dnsmasq.service'])
 
     return True
@@ -55,19 +54,19 @@ def get_key(host, type):
 
     if type == 'client':
         key_dir = os.path.join(OPENVPN_DIR, 'keys')
-        zip_file.write('%s/%s.crt' % (key_dir, host), 'hisparc.crt')
-        zip_file.write('%s/%s.key' % (key_dir, host), 'hisparc.key')
-        zip_file.write('%s/ca.crt' % key_dir, 'ca.crt')
+        zip_file.write(f'{key_dir}/{host}.crt', 'hisparc.crt')
+        zip_file.write(f'{key_dir}/{host}.key', 'hisparc.key')
+        zip_file.write(f'{key_dir}/ca.crt', 'ca.crt')
     elif type == 'admin':
         key_dir = os.path.join(OPENVPN_DIR, 'adminkeys')
-        zip_file.write('%s/%s.crt' % (key_dir, host), 'hisparc_admin.crt')
-        zip_file.write('%s/%s.key' % (key_dir, host), 'hisparc_admin.key')
-        zip_file.write('%s/ca.crt' % key_dir, 'ca_admin.crt')
+        zip_file.write(f'{key_dir}/{host}.crt', 'hisparc_admin.crt')
+        zip_file.write(f'{key_dir}/{host}.key', 'hisparc_admin.key')
+        zip_file.write(f'{key_dir}/ca.crt', 'ca_admin.crt')
     else:
-        raise Exception('Unknown type %s' % type)
+        raise ValueError(f'Unsupported type; {type}')
 
     key_dir = os.path.join(OPENVPN_DIR, 'keys')
-    zip_file.write('%s/ta.key' % key_dir, 'ta.key')
+    zip_file.write(f'{key_dir}/ta.key', 'ta.key')
     zip_file.close()
 
     zip_file = memfile.getvalue()

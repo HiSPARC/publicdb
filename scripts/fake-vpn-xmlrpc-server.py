@@ -8,9 +8,10 @@
     library documentation and extended.
 
 """
+import base64
+
 from xmlrpc.server import SimpleXMLRPCServer
 from xmlrpc.server import SimpleXMLRPCRequestHandler
-import base64
 
 HOSTS_FILE = '/tmp/hosts-hisparc'
 
@@ -23,7 +24,7 @@ def create_key(host, type, ip):
     elif type == 'admin':
         print("create key Type was admin")
     else:
-        raise Exception('Unknown type %s' % type)
+        raise ValueError(f'Unsupported type; {type}')
 
     return True
 
@@ -47,7 +48,7 @@ def get_key(host, type):
     elif type == 'admin':
         print("Get key type was admin")
     else:
-        raise Exception('Unknown type %s' % type)
+        raise ValueError(f'Unsupported type; {type}')
 
     return base64.b64encode('test')
 
