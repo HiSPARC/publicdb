@@ -10,8 +10,7 @@
 """
 import base64
 
-from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.server import SimpleXMLRPCRequestHandler
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 
 HOSTS_FILE = '/tmp/hosts-hisparc'
 
@@ -53,14 +52,14 @@ def get_key(host, type):
     return base64.b64encode('test')
 
 
-if __name__ == '__main__':
+class RequestHandler(SimpleXMLRPCRequestHandler):
     # Restrict to a particular path.
-    class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+    rpc_paths = ('/RPC2',)
 
+
+if __name__ == '__main__':
     # Create server
-    server = SimpleXMLRPCServer(("localhost", 8001),
-                                requestHandler=RequestHandler)
+    server = SimpleXMLRPCServer(("0.0.0.0", 8001), requestHandler=RequestHandler)
     server.register_introspection_functions()
 
     server.register_function(create_key)

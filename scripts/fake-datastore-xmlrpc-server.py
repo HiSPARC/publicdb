@@ -9,15 +9,14 @@
     library documentation and extended.
 
 """
-from urllib.request import urlopen
 import hashlib
 
-from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.server import SimpleXMLRPCRequestHandler
+from urllib.request import urlopen
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
-CFG_URL = 'http://localhost:8003/config/datastore'
+CFG_URL = 'http://publicdb:8000/config/datastore'
 
 
 def reload_datastore():
@@ -47,14 +46,14 @@ def reload_datastore():
     return True
 
 
-if __name__ == '__main__':
+class RequestHandler(SimpleXMLRPCRequestHandler):
     # Restrict to a particular path.
-    class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+    rpc_paths = ('/RPC2',)
 
+
+if __name__ == '__main__':
     # Create server
-    server = SimpleXMLRPCServer(("localhost", 8002),
-                                requestHandler=RequestHandler)
+    server = SimpleXMLRPCServer(("0.0.0.0", 8002), requestHandler=RequestHandler)
     server.register_introspection_functions()
 
     server.register_function(reload_datastore)
