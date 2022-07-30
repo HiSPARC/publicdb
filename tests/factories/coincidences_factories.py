@@ -13,7 +13,7 @@ factory.Faker.add_provider(DataProvider)
 class CoincidenceFactory(factory.django.DjangoModelFactory):
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     time = factory.Faker('time_object')
-    nanoseconds = factory.Faker('random_int', min=0, max=int(1e9) - 1)
+    nanoseconds = factory.Faker('random_int', min=0, max=1_000_000_000 - 1)
 
     class Meta:
         model = models.Coincidence
@@ -22,7 +22,7 @@ class CoincidenceFactory(factory.django.DjangoModelFactory):
 class EventFactory(factory.django.DjangoModelFactory):
     date = factory.Faker('past_date', start_date=date(2004, 1, 1))
     time = factory.Faker('time_object')
-    nanoseconds = factory.Faker('random_int', min=0, max=int(1e9) - 1)
+    nanoseconds = factory.Faker('random_int', min=0, max=1_000_000_000 - 1)
     coincidence = factory.SubFactory(CoincidenceFactory)
     station = factory.SubFactory(StationFactory)
     pulseheights = factory.Faker('int_list', n=4, min=0, max=4000)
