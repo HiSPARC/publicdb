@@ -24,7 +24,7 @@ class Coincidence(models.Model):
         return self.events.count()
 
     def __str__(self):
-        return '%d-fold - %s %s %d' % (self.num_events(), self.date, self.time, self.nanoseconds)
+        return f'{self.num_events()}-fold - {self.date} {self.time} {self.nanoseconds}'
 
     class Meta:
         verbose_name = 'Coincidence'
@@ -48,4 +48,4 @@ class Event(models.Model):
         ordering = ['date', 'time', 'nanoseconds', 'station']
 
     def __str__(self):
-        return '%d - %s %s %d' % (self.station.number, self.date, self.time, self.nanoseconds)
+        return f'{self.station.number} - {self.date} {self.time} {self.nanoseconds}'

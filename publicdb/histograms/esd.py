@@ -217,8 +217,8 @@ def get_station_node_path(station):
     :return: path to station group as used in datastore / ESD files
 
     """
-    cluster = station.cluster.main_cluster()
-    return '/hisparc/cluster_%s/station_%d' % (cluster.lower(), station.number)
+    cluster_name = station.cluster.main_cluster().lower()
+    return f'/hisparc/cluster_{cluster_name}/station_{station.number}'
 
 
 def create_temporary_file():

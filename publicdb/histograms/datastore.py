@@ -126,7 +126,7 @@ def get_config_messages(cluster, station_number, date):
     path = get_data_path(date)
 
     file = tables.open_file(path, 'r')
-    parent = file.get_node('/hisparc/cluster_%s/station_%d' % (cluster.lower(), station_number))
+    parent = file.get_node(f'/hisparc/cluster_{cluster.lower()}/station_{station_number}')
     config = file.get_node(parent, 'config')
     blobs = file.get_node(parent, 'blobs')
     return file, config, blobs
