@@ -6,10 +6,6 @@ HiSPARC Public Database README
    :target: https://github.com/HiSPARC/publicdb/blob/master/LICENSE
 .. image:: http://img.shields.io/github/status-checks/HiSPARC/publicdb/master.svg
    :target: https://github.com/HiSPARC/publicdb/actions
-.. image:: http://img.shields.io/coveralls/github/HiSPARC/publicdb/master.svg?label=coveralls
-   :target: https://coveralls.io/github/HiSPARC/publicdb
-.. image:: http://img.shields.io/codecov/c/github/HiSPARC/publicdb/master.svg?label=codecov
-   :target: https://codecov.io/github/HiSPARC/publicdb
 
 
 Overview
