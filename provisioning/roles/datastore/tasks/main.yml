@@ -72,9 +72,9 @@
     requirements: ~/pip.list
     virtualenv: "{{ datastore_venv }}"
 
-- name: copy datastore.wsgi
+- name: copy datastore.py
   template:
-    src: datastore.wsgi
+    src: datastore.py
     dest: "{{ datastore_path }}"
     backup: yes
   notify: restart uWSGI
