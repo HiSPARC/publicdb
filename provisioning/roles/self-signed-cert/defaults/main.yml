@@ -1,5 +1,3 @@
----
-
 certificate_root: "/etc/nginx/ssl"
 certificate_CA_private_key: "{{ certificate_root }}/ca.key"
 certificate_CA_cert: "{{ certificate_root }}/ca.crt"

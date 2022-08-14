@@ -1,5 +1,3 @@
----
-
 - name: install shorewall firewall
   yum:
     name: shorewall

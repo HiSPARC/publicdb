@@ -1,5 +1,3 @@
----
-
 # hisparc needs specific uid:gid for NFS to work.
 - name: check if hisparc has uid=7712
   shell: "id -u hisparc"

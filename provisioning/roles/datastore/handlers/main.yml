@@ -1,5 +1,3 @@
----
-
 - name: restart datastore config server
   supervisorctl:
     name: datastore-config-server

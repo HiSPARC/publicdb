@@ -1,5 +1,3 @@
----
-
 publicdb_base: /srv/
 publicdb_path: "{{ publicdb_base }}publicdb/"
 

@@ -1,5 +1,3 @@
----
-
 - name: install postfix configuration
   copy:
     src: main.cf

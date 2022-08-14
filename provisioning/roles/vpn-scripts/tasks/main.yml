@@ -1,5 +1,3 @@
----
-
 # Do not create backups, it will result in many executables in /usr/local/bin
 - name: copy vpn/publicdb service scripts
   copy:

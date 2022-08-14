@@ -1,5 +1,3 @@
----
-
 - name: restart uWSGI
   supervisorctl:
     name: uwsgi

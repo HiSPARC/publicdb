@@ -1,5 +1,3 @@
----
-
 debug: True
 
 publicdb_repo: /vagrant/.git

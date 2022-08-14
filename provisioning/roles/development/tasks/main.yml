@@ -1,5 +1,3 @@
----
-
 - name: ensure /usr/local/bin is in sudoers
   lineinfile:
     dest: /etc/sudoers

@@ -1,5 +1,3 @@
----
-
 - name: install openvpn and dnsmasq
   yum:
     name:
