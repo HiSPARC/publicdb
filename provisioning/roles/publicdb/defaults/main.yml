@@ -8,7 +8,7 @@ publicdb_venv: "{{ publicdb_path }}publicdb_venv"
 publicdb_static: "{{ publicdb_path }}static/"
 publicdb_media: "{{ publicdb_path }}media/"
 
-publicdb_python_version: 2.7
+publicdb_python_version: 3.8
 
 jsparc_repo: https://github.com/HiSPARC/jsparc.git
 jsparc_path: "{{ publicdb_path }}jsparc/"
