@@ -46,7 +46,8 @@
   notify: restart uWSGI
 
 - name: remove compiled python code
-  ansible.builtin.command: "find {{ datastore_code }} -name *.pyc -delete"
+  ansible.builtin.command:
+    cmd: "find {{ datastore_code }} -name *.pyc -delete"
 
 - name: Copy conda requirements files
   ansible.builtin.copy:
