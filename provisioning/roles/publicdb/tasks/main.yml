@@ -41,9 +41,9 @@
   become: true
 
 - name: get local git HEAD (for dev VM)
-  local_action:
-    module: ansible.builtin.command
+  ansible.builtin.command:
     cmd: git rev-parse --verify HEAD
+  delegate_to: localhost
   register: local_head
   when: inventory_hostname == "publicdb"
 
@@ -202,7 +202,8 @@
   become: true
 
 - name: check if custom SELinux module (nginx-publicdb) is installed
-  ansible.builtin.shell: "semodule --list-modules | grep nginx-publicdb | cat"
+  ansible.builtin.shell:
+    cmd: "semodule --list-modules | grep nginx-publicdb | cat"
   register: module_nginx_installed
   become: true
 
