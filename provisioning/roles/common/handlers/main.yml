@@ -1,10 +1,10 @@
 - name: reboot
-  reboot:
+  ansible.builtin.reboot:
   notify:
     - fail if dev to remount shared folders
   become: true
 
 - name: fail if dev to remount shared folders
-  fail:
+  ansible.builtin.fail:
     msg: Reboot VM with vagrant to remount shared folders and continue provisioning, using `$ vagrant reload --provision [machine]`
   when: is_dev is defined
