@@ -49,13 +49,13 @@
 
 - name: download miniconda installer
   ansible.builtin.get_url:
-    url: "https://repo.continuum.io/miniconda/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
-    dest: "/usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
+    url: "https://repo.continuum.io/miniconda/Miniconda3-py38_{{ development_conda_version }}-Linux-x86_64.sh"
+    dest: "/usr/local/src/hisparc/Miniconda3-py38_{{ development_conda_version }}-Linux-x86_64.sh"
     checksum: "{{ development_conda_md5 }}"
 
 - name: install miniconda
-  ansible.builtin.command:
-    cmd: "/bin/sh /usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh -b -p /opt/miniconda"
+  ansible.builtin.shell:
+    cmd: "/usr/local/src/hisparc/Miniconda3-py38_{{ development_conda_version }}-Linux-x86_64.sh -b -p /opt/miniconda"
     creates: /opt/miniconda
   become: true
 
