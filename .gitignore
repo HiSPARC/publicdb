@@ -44,6 +44,7 @@ vagrant_ansible_inventory_default
 
 # Ansible
 *.retry
+.ansible
 
 # Other
 .remote-sync.json
