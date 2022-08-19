@@ -1,17 +1,17 @@
 - name: use custom .bashrc
-  template:
+  ansible.builtin.template:
     src: bashrc
     dest: ~/.bashrc
     backup: yes
 
 - name: ensure /srv directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ publicdb_base }}"
     state: directory
   become: true
 
 - name: ensure /srv/publicdb directory exists
-  file:
+  ansible.builtin.file:
     path: "{{ publicdb_path }}"
     state: directory
     owner: hisparc
@@ -20,7 +20,7 @@
   become: true
 
 - name: ensure /var/log/hisparc-*.log exists
-  file:
+  ansible.builtin.file:
     path: "/var/log/{{ item }}"
     state: touch
     owner: hisparc
@@ -32,7 +32,7 @@
   become: true
 
 - name: set default group write ACLs on /srv/publicdb
-  acl:
+  ansible.posix.acl:
     default: yes
     etype: group
     permissions: rwx
@@ -41,12 +41,14 @@
   become: true
 
 - name: get local git HEAD (for dev VM)
-  local_action: command git rev-parse --verify HEAD
+  local_action:
+    module: ansible.builtin.command
+    cmd: git rev-parse --verify HEAD
   register: local_head
   when: inventory_hostname == "publicdb"
 
 - name: checkout publicdb in /srv/publicdb/www
-  git:
+  ansible.builtin.git:
     repo: "{{ publicdb_repo }}"
     dest: "{{ publicdb_code }}"
     update: yes
@@ -55,10 +57,11 @@
   notify: restart uWSGI
 
 - name: remove compiled python code
-  command: "find {{ publicdb_code }} -name *.pyc -delete"
+  ansible.builtin.command:
+    cmd: "find {{ publicdb_code }} -name *.pyc -delete"
 
 - name: checkout jsparc in /srv/publicdb/jsparc
-  git:
+  ansible.builtin.git:
     repo: "{{ jsparc_repo }}"
     dest: "{{ jsparc_path }}"
     update: yes
@@ -66,46 +69,48 @@
     version: master
 
 - name: create django static folder
-  file:
+  ansible.builtin.file:
     path: "{{ publicdb_static }}"
     state: directory
 
 - name: create django media/raw_data folder
-  file:
+  ansible.builtin.file:
     path: "{{ publicdb_media }}raw_data"
     state: directory
 
 - name: Copy conda requirements files
-  copy:
+  ansible.builtin.copy:
     src: conda.list
     dest: ~/conda.list
 
 - name: Copy pip requirements files
-  copy:
+  ansible.builtin.copy:
     src: pip.list
     dest: ~/pip.list
 
 - name: create conda environment
-  shell: "/opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
-  args:
+  ansible.builtin.shell:
+    cmd: "/opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
     creates: "{{ publicdb_venv }}"
 
 - name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --file ~/conda.list --yes"
+  ansible.builtin.command:
+    cmd: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --file ~/conda.list --yes"
 
 # uwsgi fails to build from pip due to SSL version swamp
 - name: install uwsgi from conda-forge
-  command: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge uwsgi --yes"
+  ansible.builtin.command:
+    cmd: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge uwsgi --yes"
 
 - name: install packages in conda environment using pip
-  pip:
+  ansible.builtin.pip:
     requirements: ~/pip.list
     virtualenv: "{{ publicdb_venv }}"
 
 - name: setup the publicdb database in PostgreSQL
   become: true
   become_user: postgres
-  postgresql_db:
+  community.postgresql.postgresql_db:
     name: "{{ psql_database_name }}"
     encoding: UTF-8
     state: present
@@ -113,7 +118,7 @@
 - name: add hisparc user to the publicdb database
   become: true
   become_user: postgres
-  postgresql_user:
+  community.postgresql.postgresql_user:
     db: "{{ psql_database_name }}"
     name: hisparc
     priv: ALL
@@ -121,51 +126,51 @@
 - name: ensure hisparc user has no unnecessary privileges
   become: true
   become_user: postgres
-  postgresql_user:
+  community.postgresql.postgresql_user:
     name: hisparc
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: copy Django settings file
-  template:
+  ansible.builtin.template:
     src: settings.py
     dest: "{{ publicdb_code }}publicdb/settings.py"
     backup: yes
   notify: restart uWSGI
 
 - name: migrate Django apps
-  django_manage:
+  community.general.django_manage:
     command: migrate
     app_path: "{{ publicdb_code }}"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: collect static files of Django apps
-  django_manage:
+  community.general.django_manage:
     command: collectstatic
     app_path: "{{ publicdb_code }}"
     virtualenv: "{{ publicdb_venv }}"
 
 - name: copy uwsgi.ini
-  template:
+  ansible.builtin.template:
     src: uwsgi.ini
     dest: "{{ publicdb_code }}uwsgi.ini"
     backup: yes
   notify: restart uWSGI
 
 - name: install nginx
-  yum:
+  ansible.builtin.yum:
     name: nginx
     state: present
   become: true
 
 - name: copy nginx HTTP configuration
-  template:
+  ansible.builtin.template:
     src: nginx-http.conf
     dest: /etc/nginx/conf.d/
   notify: restart nginx
   become: true
 
 - name: start nginx on boot
-  service:
+  ansible.builtin.service:
     name: nginx
     state: started
     enabled: yes
@@ -173,7 +178,7 @@
 
 # do not overwrite let's encrypt https config on pique
 - name: copy nginx HTTPS configuration
-  template:
+  ansible.builtin.template:
     src: nginx-https.conf
     dest: /etc/nginx/conf.d/
   notify: restart nginx
@@ -184,26 +189,26 @@
 # SELinux stuff
 #
 - name: ensure /var/lib/selinux exists
-  file:
+  ansible.builtin.file:
     path: /var/lib/selinux
     state: directory
     mode: 0755
   become: true
 
 - name: copy SELinux type enforcement module
-  copy:
+  ansible.builtin.copy:
     src: nginx-publicdb.te
     dest: /var/lib/selinux/
   become: true
 
 - name: check if custom SELinux module (nginx-publicdb) is installed
-  shell: "semodule --list-modules | grep nginx-publicdb | cat"
+  ansible.builtin.shell: "semodule --list-modules | grep nginx-publicdb | cat"
   register: module_nginx_installed
   become: true
 
 - name: build and install custom SELinux module
-  command: "{{ item }}"
-  args:
+  ansible.builtin.command:
+    cmd: "{{ item }}"
     chdir: /var/lib/selinux
   with_items:
     - "checkmodule -M -m -o nginx-publicdb.mod nginx-publicdb.te"
@@ -216,12 +221,12 @@
 #
 
 - name: install supervisor daemon
-  pip:
+  ansible.builtin.pip:
     name: supervisor
   become: true
 
 - name: copy supervisord init script
-  copy:
+  ansible.builtin.copy:
     src: supervisord
     dest: /etc/init.d/supervisord
     backup: yes
@@ -231,7 +236,7 @@
   become: true
 
 - name: copy supervisord.conf
-  template:
+  ansible.builtin.template:
     src: supervisord.conf
     dest: /etc/supervisord.conf
     backup: yes
@@ -241,14 +246,14 @@
   become: true
 
 - name: start supervisord now and on boot
-  service:
+  ansible.builtin.service:
     name: supervisord
     state: started
     enabled: yes
   become: true
 
 - name: enable cron job for updating histograms and ESD
-  cron:
+  ansible.builtin.cron:
     name: "HiSPARC update"
     cron_file: hisparc
     minute: 0
@@ -259,7 +264,7 @@
   become: true
 
 - name: enable cron job for cleaning out downloaded raw_data files
-  cron:
+  ansible.builtin.cron:
     name: "clean downloaded data"
     cron_file: hisparc
     special_time: daily
@@ -269,7 +274,7 @@
   become: true
 
 - name: enable cron job for creating analysis sessions
-  cron:
+  ansible.builtin.cron:
     name: "create confirmed sessions"
     cron_file: hisparc
     minute: "*/2"
@@ -279,7 +284,7 @@
   become: true
 
 - name: enable cron job for daily backup of publicdb database
-  cron:
+  ansible.builtin.cron:
     name: "Publicdb dump"
     cron_file: hisparc
     minute: 0
@@ -290,7 +295,7 @@
   become: true
 
 - name: enable cron job for monthly backup of publicdb database
-  cron:
+  ansible.builtin.cron:
     name: "Monthly publicdb dump"
     cron_file: hisparc
     minute: 0

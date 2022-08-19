@@ -1,12 +1,12 @@
 - name: restart dnsmasq
-  service:
+  ansible.builtin.service:
     name: dnsmasq
     state: restarted
   become: true
 
 - name: restart openvpn
   when: is_dev is not defined
-  service:
+  ansible.builtin.service:
     name: "openvpn@{{ item }}.service"
     state: restarted
   with_items:
@@ -16,7 +16,7 @@
   notify: restart shorewall
 
 - name: restart shorewall
-  service:
+  ansible.builtin.service:
     name: shorewall
     state: restarted
   become: true

@@ -1,5 +1,5 @@
 - name: restart shorewall
-  service:
+  ansible.builtin.service:
     name: shorewall
     state: restarted
   become: true

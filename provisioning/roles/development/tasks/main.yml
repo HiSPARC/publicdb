@@ -1,5 +1,5 @@
 - name: ensure /usr/local/bin is in sudoers
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/sudoers
     regexp: 'secure_path'
     line: "Defaults    secure_path = /opt/miniconda/bin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin"
@@ -7,7 +7,7 @@
   become: true
 
 - name: ensure /usr/local/lib is in ld.so.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/ld.so.conf
     regexp: '/usr/local/lib'
     line: '/usr/local/lib'
@@ -15,7 +15,7 @@
   become: true
 
 - name: ensure local source directory exists
-  file:
+  ansible.builtin.file:
     path: /usr/local/src/hisparc
     state: directory
     owner: hisparc
@@ -24,7 +24,7 @@
   become: true
 
 - name: set default group write ACLs on /usr/local/src/hisparc
-  acl:
+  ansible.posix.acl:
     default: yes
     etype: group
     permissions: rwx
@@ -33,7 +33,7 @@
   become: true
 
 - name: install libraries
-  yum:
+  ansible.builtin.yum:
     name:
       - gcc
       - bzip2
@@ -48,19 +48,19 @@
   become: true
 
 - name: download miniconda installer
-  get_url:
+  ansible.builtin.get_url:
     url: "https://repo.continuum.io/miniconda/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
     dest: "/usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh"
     checksum: "{{ development_conda_md5 }}"
 
 - name: install miniconda
-  command: "/bin/sh /usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh -b -p /opt/miniconda"
-  args:
+  ansible.builtin.command:
+    cmd: "/bin/sh /usr/local/src/hisparc/Miniconda2-{{ development_conda_version }}-Linux-x86_64.sh -b -p /opt/miniconda"
     creates: /opt/miniconda
   become: true
 
 - name: ensure miniconda is in path
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/profile.d/path.sh
     create: yes
     mode: 0644
@@ -69,11 +69,12 @@
   become: true
 
 - name: install pip
-  command: "/opt/miniconda/bin/conda install pip conda={{ development_conda_version }} --yes"
+  ansible.builtin.command:
+    cmd: "/opt/miniconda/bin/conda install pip conda={{ development_conda_version }} --yes"
   become: true
 
 - name: install git
-  yum:
+  ansible.builtin.yum:
     name: git
     state: present
   become: true

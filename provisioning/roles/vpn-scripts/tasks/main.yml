@@ -1,6 +1,6 @@
 # Do not create backups, it will result in many executables in /usr/local/bin
 - name: copy vpn/publicdb service scripts
-  copy:
+  ansible.builtin.copy:
     src: vpn-scripts/
     dest: /usr/local/bin
     mode: 0755
@@ -8,22 +8,22 @@
   notify: restart hisparcvpnd
 
 - name: install pip
-  yum:
+  ansible.builtin.yum:
     name: python-pip
   become: true
 
 - name: install supervisord prerequisites
-  yum:
+  ansible.builtin.yum:
     name: python-meld3
   become: true
 
 - name: install supervisor daemon
-  pip:
+  ansible.builtin.pip:
     name: supervisor
   become: true
 
 - name: copy supervisord init script
-  copy:
+  ansible.builtin.copy:
     src: supervisord
     dest: /etc/init.d/supervisord
     backup: yes
@@ -33,7 +33,7 @@
   become: true
 
 - name: copy supervisord.conf
-  copy:
+  ansible.builtin.copy:
     src: supervisord.conf
     dest: /etc/supervisord.conf
     backup: yes
@@ -44,13 +44,13 @@
   notify: restart supervisord
 
 - name: start supervisord now and on boot
-  service:
+  ansible.builtin.service:
     name: supervisord
     state: started
     enabled: yes
   become: true
 
 - name: start hisparcvpnd
-  supervisorctl:
+  community.general.supervisorctl:
     name: hisparcvpnd
     state: started

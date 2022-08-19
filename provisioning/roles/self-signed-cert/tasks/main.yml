@@ -1,74 +1,80 @@
 - name: install openssl
-  yum:
+  ansible.builtin.yum:
     name: openssl
     state: present
   become: true
 
 - name: directory for certs
-  file:
+  ansible.builtin.file:
     path: "{{ certificate_root }}"
     state: directory
   become: true
 
 - name: copy san.cnf
-  template:
+  ansible.builtin.template:
     src: san.cnf
     dest: "{{ certificate_root }}/san.cnf"
   become: true
 
 - name: generate fake CA private key
-  command: /usr/bin/openssl genrsa \
-    -out "{{ certificate_CA_private_key }}" 1024
-  args:
+  ansible.builtin.command:
+    cmd: >-
+      /usr/bin/openssl genrsa
+      -out "{{ certificate_CA_private_key }}" 1024
     creates: "{{ certificate_CA_private_key }}"
   become: true
 
 - name: generate fake CA certificate
-  command: /usr/bin/openssl req -config "{{ certificate_root }}/san.cnf" \
-     -x509 -new \
-     -days 3650 -key {{certificate_CA_private_key}} \
-     -subj "/C=NL/L=Amsterdam/O=HiSPARC Fake CA/CN=HiSPARC Fake ROOT CA" \
-     -extensions v3_ca \
-     -set_serial 0x8BADF00D \
-     -out {{ certificate_CA_cert }}
-  args:
+  ansible.builtin.command:
+    cmd: >-
+      /usr/bin/openssl req
+      -config "{{ certificate_root }}/san.cnf"
+      -x509 -new
+      -days 3650 -key {{certificate_CA_private_key}}
+      -subj "/C=NL/L=Amsterdam/O=HiSPARC Fake CA/CN=HiSPARC Fake ROOT CA"
+      -extensions v3_ca
+      -set_serial 0x8BADF00D
+      -out {{ certificate_CA_cert }}
     creates: "{{ certificate_CA_cert }}"
   become: true
 
 - name: generate RSA private key
-  command: /usr/bin/openssl genrsa \
-    -out "{{ certificate_private_key }}" 1024
-  args:
+  ansible.builtin.command:
+    cmd: >-
+      /usr/bin/openssl genrsa
+      -out "{{ certificate_private_key }}" 1024
     creates: "{{ certificate_private_key }}"
   become: true
 
 - name: generate csr
-  command: /usr/bin/openssl req \
-    -new \
-    -subj '/C=NL/L=Amsterdam/O=HiSPARC/CN={{ cert_hostname }}'
-    -key "{{ certificate_private_key }}" \
-    -out "{{ certificate_csr }}"
-  args:
+  ansible.builtin.command:
+    cmd: >-
+      /usr/bin/openssl req
+      -new
+      -subj '/C=NL/L=Amsterdam/O=HiSPARC/CN={{ cert_hostname }}'
+      -key "{{ certificate_private_key }}"
+      -out "{{ certificate_csr }}"
     creates: "{{ certificate_csr }}"
   become: true
 
 - name: generate self-signed certificate
-  command: /usr/bin/openssl x509 \
-    -req \
-    -days 3650 \
-    -extfile "{{ certificate_root }}/san.cnf" \
-    -extensions v3_req \
-    -CA "{{ certificate_CA_cert}}" \
-    -CAkey "{{ certificate_CA_private_key}}" \
-    -set_serial 0xBAD \
-    -in "{{ certificate_csr }}" \
-    -out "{{ certificate_certificate }}"
-  args:
+  ansible.builtin.command:
+    cmd: >-
+      /usr/bin/openssl x509
+      -req
+      -days 3650
+      -extfile "{{ certificate_root }}/san.cnf"
+      -extensions v3_req
+      -CA "{{ certificate_CA_cert}}"
+      -CAkey "{{ certificate_CA_private_key}}"
+      -set_serial 0xBAD
+      -in "{{ certificate_csr }}"
+      -out "{{ certificate_certificate }}"
     creates: "{{ certificate_certificate }}"
   become: true
 
 - name: remove fake CA private key
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ certificate_CA_private_key }}"
   become: true

@@ -1,5 +1,5 @@
 - name: Increase conntrack hash table
-  lineinfile:
+  ansible.builtin.lineinfile:
     dest: /etc/modprobe.d/mitigate-dos.conf
     create: yes
     line: "options nf_conntrack hashsize=81920"

@@ -1,5 +1,5 @@
 - name: install openvpn and dnsmasq
-  yum:
+  ansible.builtin.yum:
     name:
       - openvpn
       - openssl
@@ -7,7 +7,7 @@
   become: true
 
 - name: copy dnsmasq config
-  copy:
+  ansible.builtin.copy:
     src: dnsmasq.conf
     dest: /etc/dnsmasq.conf
     backup: yes
@@ -15,7 +15,7 @@
   notify: restart dnsmasq
 
 - name: copy openvpn config. Including vendored easy_rsa
-  copy:
+  ansible.builtin.copy:
     src: openvpn/
     dest: /etc/openvpn
     backup: yes
@@ -23,7 +23,7 @@
   notify: restart openvpn
 
 - name: overwrite systemd openvpn configuration to enable MD5
-  copy:
+  ansible.builtin.copy:
     src: openvpn@client.service
     dest: /etc/systemd/system/openvpn@client.service
     backup: yes
@@ -31,7 +31,7 @@
   notify: restart openvpn
 
 - name: create private keys
-  copy:
+  ansible.builtin.copy:
     content: "{{ item.key }}"
     dest: "/etc/openvpn/{{ item.path }}"
     backup: no
@@ -42,14 +42,14 @@
   no_log: True
 
 - name: ensure ccd directory exists
-  file:
+  ansible.builtin.file:
     path: /etc/openvpn/ccd
     state: directory
   become: true
   notify: restart openvpn
 
 - name: ensure dnsmasq is started
-  service:
+  ansible.builtin.service:
     name: dnsmasq
     enabled: yes
     state: started
@@ -57,7 +57,7 @@
 
 - name: ensure openvpn is started
   when: is_dev is not defined
-  service:
+  ansible.builtin.service:
     name: "openvpn@{{ item }}.service"
     enabled: yes
     state: restarted
@@ -67,7 +67,7 @@
   become: true
 
 - name: create nikhef network resolv.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     create: yes
     dest: /etc/resolv.conf-nikhef
     line: "nameserver {{ item }}"
@@ -77,7 +77,7 @@
   become: true
 
 - name: copy resolv.conf
-  copy:
+  ansible.builtin.copy:
     src: resolv.conf
     dest: /etc/resolv.conf
     backup: yes
@@ -85,7 +85,7 @@
   become: true
 
 - name: enable cron job for daily backup of openvpn config and PKI
-  cron:
+  ansible.builtin.cron:
     name: "openvpn backup"
     cron_file: root
     minute: 0
@@ -96,7 +96,7 @@
   become: true
 
 - name: enable cron job for monthly backup of openvpn config and PKI
-  cron:
+  ansible.builtin.cron:
     name: "Monthly openvpn backup"
     cron_file: root
     minute: 0

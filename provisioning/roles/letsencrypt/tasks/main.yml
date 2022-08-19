@@ -1,5 +1,5 @@
 - name: install certbot
-  yum:
+  ansible.builtin.yum:
     name:
       - certbot
       - python2-certbot-nginx
@@ -8,13 +8,13 @@
 # run "certbot --nginx -n --cert-name data.hisparc.nl -d data.hisparc.nl"
 # or restore /etc/letsencrypt from backup
 - name: check if letsencrypt is installed or restored from backup
-  stat:
+  ansible.builtin.stat:
     path: /etc/letsencrypt
   register: le_dir
   failed_when: le_dir.stat.isdir is defined and not le_dir.stat.isdir
 
 - name: copy letsencrypt https 443 configuration
-  copy:
+  ansible.builtin.copy:
     src: nginx-https.conf
     dest: /etc/nginx/conf.d/
   notify: restart nginx
@@ -22,7 +22,7 @@
 
 # fix path for certbot to work (github issue gh-277)
 - name: Set PATH on top of crontab
-  cron:
+  ansible.builtin.cron:
     name: PATH
     cron_file: hisparc
     env: yes
@@ -30,7 +30,7 @@
   become: true
 
 - name: enable cron job for certificate renewal
-  cron:
+  ansible.builtin.cron:
     name: "certbot renew twice a day"
     cron_file: hisparc
     minute: "0"
@@ -41,7 +41,7 @@
   become: true
 
 - name: enable cron job for daily backup of letsencrypt
-  cron:
+  ansible.builtin.cron:
     name: "Daily /etc/letsencrypt backup"
     cron_file: hisparc
     minute: 0
@@ -52,7 +52,7 @@
   become: true
 
 - name: enable cron job for monthly backup of letsencrypt
-  cron:
+  ansible.builtin.cron:
     name: "Monthly /etc/letsencrypt backup"
     cron_file: hisparc
     minute: 0
