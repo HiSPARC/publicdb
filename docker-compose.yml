@@ -5,8 +5,9 @@ services:
     image: 'postgres:9.6-alpine'
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: publicdb
+      POSTGRES_USER: hisparc
+      POSTGRES_PASSWORD: postgres
     volumes:
       - 'pgdata:/var/lib/postgresql/data'
     ports:
