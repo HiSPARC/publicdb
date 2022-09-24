@@ -9,7 +9,7 @@ from django.test import TestCase, override_settings
 from publicdb.histograms import datastore
 
 
-@override_settings(DATASTORE_PATH=join(dirname(abspath(__file__)), '../data/datastore'))
+@override_settings(DATASTORE_PATH=join(dirname(__file__), '../data/datastore'))
 class TestDatastore(TestCase):
     def test_check_for_new_events(self):
         """Finds the test data file and the station's tables inside"""

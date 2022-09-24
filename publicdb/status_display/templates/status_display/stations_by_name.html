@@ -11,7 +11,7 @@
       {% for station in stations %}
       <li>
         {% if station.link %}
-          <a href="{% url 'status:station:summary' station.number %}">
+          <a href="{% url 'status:station:summary' station_number=station.number %}">
             <span class='statusBall {{ station.status }}'></span>
             {{ station.number }} &mdash; {{ station.name }}
           </a>

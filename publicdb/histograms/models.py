@@ -27,13 +27,11 @@ class NetworkSummary(models.Model):
     objects = NetworkSummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
-        kwargs = {'year': self.date.year,
-                  'month': self.date.month,
-                  'day': self.date.day}
+        kwargs = {'date': self.date}
         return reverse('status:network:coincidences', kwargs=kwargs)
 
     def __str__(self):
-        return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
+        return f'Network Summary: {self.date}'
 
     class Meta:
         verbose_name = 'Network summary'
@@ -90,14 +88,14 @@ class Summary(models.Model):
     objects = SummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
-        kwargs = {'station_number': self.station.number,
-                  'year': self.date.year,
-                  'month': self.date.month,
-                  'day': self.date.day}
+        kwargs = {
+            'station_number': self.station.number,
+            'date': self.date,
+        }
         return reverse('status:station:summary', kwargs=kwargs)
 
     def __str__(self):
-        return 'Summary: %d - %s' % (self.station.number, self.date.strftime('%d %b %Y'))
+        return f'Summary: {self.station.number} - {self.date}'
 
     class Meta:
         verbose_name = 'Summary'
@@ -197,7 +195,7 @@ class Configuration(models.Model):
     slv_ch2_comp_offset = models.FloatField()
 
     def __str__(self):
-        return "%d - %s" % (self.summary.station.number, self.timestamp)
+        return f'{self.summary.station.number} - {self.timestamp}'
 
     class Meta:
         verbose_name = 'Configuration'
@@ -307,13 +305,11 @@ class NetworkHistogram(models.Model):
     values = ArrayField(models.PositiveIntegerField())
 
     def get_absolute_url(self):
-        kwargs = {'year': self.network_summary.date.year,
-                  'month': self.network_summary.date.month,
-                  'day': self.network_summary.date.day}
+        kwargs = {'date': self.network_summary.date}
         return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
     def __str__(self):
-        return '{} - {}'.format(self.network_summary.date.strftime('%d %b %Y'), self.type)
+        return f'{self.network_summary.date} - {self.type}'
 
     class Meta:
         verbose_name = 'Network histogram'
@@ -326,16 +322,14 @@ class BaseDailyStationDataMixin(models.Model):
     """Base class for daily station data models"""
 
     def get_absolute_url(self):
-        kwargs = {'station_number': self.summary.station.number,
-                  'year': self.summary.date.year,
-                  'month': self.summary.date.month,
-                  'day': self.summary.date.day}
+        kwargs = {
+            'station_number': self.summary.station.number,
+            'date': self.summary.date,
+        }
         return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
     def __str__(self):
-        return "%d - %s - %s" % (self.summary.station.number,
-                                 self.summary.date.strftime('%d %b %Y'),
-                                 self.type)
+        return f'{self.summary.station.number} - {self.summary.date} - {self.type}'
 
     class Meta:
         abstract = True

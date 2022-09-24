@@ -15,7 +15,7 @@ class TestNetworkSummary(TestCase):
 
     def test_str(self):
         network_summary = histograms_factories.NetworkSummaryFactory(date=date(2016, 1, 12))
-        self.assertEqual('Network Summary: 12 Jan 2016', str(network_summary))
+        self.assertEqual('Network Summary: 2016-01-12', str(network_summary))
 
     def test_get_absolute_url(self):
         network_summary = histograms_factories.NetworkSummaryFactory(date=date(2016, 1, 12))
@@ -47,7 +47,7 @@ class TestSummary(TestCase):
 
     def test_str(self):
         summary = histograms_factories.SummaryFactory(date=date(2016, 1, 12), station=self.station)
-        self.assertEqual('Summary: 9 - 12 Jan 2016', str(summary))
+        self.assertEqual('Summary: 9 - 2016-01-12', str(summary))
 
     def test_get_absolute_url(self):
         summary = histograms_factories.SummaryFactory(date=date(2016, 1, 12), station=self.station)

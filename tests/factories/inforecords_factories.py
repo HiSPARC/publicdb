@@ -86,7 +86,7 @@ class StationFactory(factory.django.DjangoModelFactory):
 
 class PcTypeFactory(factory.django.DjangoModelFactory):
     description = factory.Faker('word')
-    slug = factory.Faker('slug')
+    slug = factory.Faker('random_element', elements=['admin', 'client'])  # TODO: Add 'display'?
 
     class Meta:
         model = models.PcType

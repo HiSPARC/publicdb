@@ -8,7 +8,7 @@ from django.urls import reverse
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(ESD_PATH=join(dirname(abspath(__file__)), '../data/esd'))
+@override_settings(ESD_PATH=join(dirname(__file__), '../data/esd'))
 class TestDownload(TestCase):
 
     def setUp(self):
@@ -26,7 +26,7 @@ class TestDownload(TestCase):
 
     def assert_download_equal_to_reference_tsv(self, data_type):
         # Expected data
-        reference_path = join(dirname(abspath(__file__)), f'../data/tsv/{data_type}-s501-20170101.tsv')
+        reference_path = join(dirname(__file__), f'../data/tsv/{data_type}-s501-20170101.tsv')
         with open(reference_path) as reference_file:
             reference_tsv = reference_file.read()
         # Get actual data

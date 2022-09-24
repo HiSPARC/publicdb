@@ -68,8 +68,8 @@
         <h3 class="term">Cluster</h3>
         <p class="meaning">
             Our detectors are grouped by clusters. A cluster is often a city or region
-            (e.g. <a href="{% url 'status:map:stations_on_map' "Groningen" %}">Groningen</a>
-            or <a href="{% url 'status:map:stations_on_map' "Bristol" %}">Bristol</a>).
+            (e.g. <a href="{% url 'status:map:stations_on_map' country="Netherlands" cluster="Groningen" %}">Groningen</a>
+            or <a href="{% url 'status:map:stations_on_map' country="United Kingdom" cluster="Bristol" %}">Bristol</a>).
             This makes it easy to find stations that are close together.
         </p>
     </div>

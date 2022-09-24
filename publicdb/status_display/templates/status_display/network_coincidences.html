@@ -25,7 +25,7 @@
             <h3>Coincidence histogram (number of coincidences per hour)</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#ct_histogram')">Image</a> |
-                <a href="{% url 'status:source:coincidencetime' link.0 link.1 link.2 %}">Source</a>
+                <a href="{% url 'status:source:coincidencetime' date=date %}">Source</a>
             </div>
             <div class="plot" id="ct_histogram"></div>
             <script>
@@ -46,7 +46,7 @@
             <h3>Number of stations histogram</h3>
             <div class="sourceLink">
                 <a onclick="downloadGraph('#cn_histogram')">Image</a> |
-                <a href="{% url 'status:source:coincidencenumber' link.0 link.1 link.2 %}">Source</a>
+                <a href="{% url 'status:source:coincidencenumber' date=date %}">Source</a>
             </div>
             <div class="plot" id="cn_histogram"></div>
             <script>
@@ -84,13 +84,13 @@
 {% block navigation_sidebar %}
     {{ block.super }}
 
-    <div id="download"><a href="{% url 'data:coincidences_download_form' date.isoformat tomorrow.isoformat %}">Download event summary data</a></div>
+    <div id="download"><a href="{% url 'data:coincidences_download_form' start=date.isoformat end=tomorrow.isoformat %}">Download event summary data</a></div>
 
   {% if prev %}
-     <a class='nextprev' id='prev' href="{% url 'status:network:coincidences' prev.year prev.month prev.day %}">&larr;</a>
+     <a class='nextprev' id='prev' href="{% url 'status:network:coincidences' date=prev %}">&larr;</a>
   {% endif %}
   {% if next %}
-     <a class='nextprev' id='next' href="{% url 'status:network:coincidences' next.year next.month next.day %}">&rarr;</a>
+     <a class='nextprev' id='next' href="{% url 'status:network:coincidences' date=next %}">&rarr;</a>
   {% endif %}
 
     <table id="calendar">

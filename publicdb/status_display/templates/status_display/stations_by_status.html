@@ -13,7 +13,7 @@
       <ul>
         {% for station in stations %}
           <li>
-              <a href="{% url 'status:station:status' station.number %}">
+              <a href="{% url 'status:station:status' station_number=station.number %}">
                 <span class='statusBall {{ station.status }}'></span>
                 {{ station.number }} &mdash; {{ station.name }}
               </a>

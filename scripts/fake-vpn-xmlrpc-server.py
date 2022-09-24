@@ -23,7 +23,8 @@ def create_key(host, type, ip):
     elif type == 'admin':
         print("create key Type was admin")
     else:
-        raise ValueError(f'Unsupported type; {type}')
+        print("Unexpected key {type=}")
+        # raise ValueError(f'Unsupported type; {type}')
 
     return True
 
@@ -47,7 +48,8 @@ def get_key(host, type):
     elif type == 'admin':
         print("Get key type was admin")
     else:
-        raise ValueError(f'Unsupported type; {type}')
+        print("Unexpected key {type=}")
+        # raise ValueError(f'Unsupported type; {type}')
 
     return base64.b64encode('test')
 

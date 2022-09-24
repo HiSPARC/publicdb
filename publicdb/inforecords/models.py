@@ -161,8 +161,7 @@ class Cluster(models.Model):
                 raise ValidationError("Cluster number must be multiple of 1000")
             if not 0 <= (self.number - self.country.number) < 10000:
                 raise ValidationError("Cluster number must be in range of "
-                                      "numbers for the country (%d, %d)." %
-                                      (self.country.number, self.country.number + 10000))
+                                      f"numbers for the country ({self.country.number}, {self.country.number + 10000}).")
         if self.parent is not None:
             if self.parent.parent is not None:
                 raise ValidationError("Subsubclusters are not allowed")
@@ -170,8 +169,7 @@ class Cluster(models.Model):
                 raise ValidationError("Subcluster number must be multiple of 100")
             if not 0 < (self.number - self.parent.number) < 1000:
                 raise ValidationError("Subcluster number must be in range of "
-                                      "numbers for the cluster (%d, %d)." %
-                                      (self.parent.number, self.parent.number + 1000))
+                                      f"numbers for the cluster ({self.parent.number}, {self.parent.number + 1000}).")
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -226,10 +224,9 @@ class Station(models.Model):
         if self.number is None:
             self.number = self.cluster.last_station_number() + 1
         if not 0 < (self.number - self.cluster.number) < 100:
-            raise ValidationError("Station number must be in range of "
-                                  "numbers for the (sub)cluster (%d, %d)." %
-                                  (self.cluster.number,
-                                   self.cluster.number + 100))
+            raise ValidationError(
+                "Station number must be in range of numbers for the (sub)cluster "
+                f"({self.cluster.number}, {self.cluster.number + 100}).")
 
     def save(self, *args, **kwargs):
         # Strip some problematic characters
@@ -358,11 +355,9 @@ class Pc(models.Model):
 
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
-        self.name = str(slugify(self.name)).replace('-', '').replace('_', '')
+        self.name = slugify(self.name).replace('-', '').replace('_', '')
 
-        if self.id:
-            super().save(*args, **kwargs)
-        else:
+        if self.id is None:
             if self.type.slug == "admin":
                 try:
                     last_ip = Pc.objects.filter(type__slug="admin").latest('id').ip
@@ -380,7 +375,7 @@ class Pc(models.Model):
             # First create keys, then issue final save
             create_keys(self)
 
-            super().save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
 
 def create_keys(pc):

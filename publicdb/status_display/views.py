@@ -198,14 +198,21 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 
 
 class NetworkSummaryDetailView(DateDetailView):
-    date_field = 'date'
     http_method_names = ['get']
-    month_format = '%m'
-    # SingleObjectMixin.get_object requires a lookup by pk or slug,
-    # so reuse part of the date as a 'slug'.
-    slug_field = 'date__year'
-    slug_url_kwarg = 'year'
     template_name = 'status_display/network_coincidences.html'
+
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        date = self.kwargs['date']
+
+        try:
+            obj = queryset.get(date=date)
+        except queryset.model.DoesNotExist:
+            raise Http404
+
+        return obj
 
     def get_queryset(self):
         return (
@@ -276,8 +283,7 @@ class NetworkSummaryDetailView(DateDetailView):
                         'month_list': month_list,
                         'year_list': year_list,
                         'prev': prev,
-                        'next': next,
-                        'link': (date.year, date.month, date.day)})
+                        'next': next})
         return context
 
     def nav_calendar(self):
@@ -350,24 +356,35 @@ class LatestNetworkSummaryRedirectView(RedirectView):
 
 
 class SummaryDetailView(DateDetailView):
-    date_field = 'date'
     http_method_names = ['get']
-    month_format = '%m'
-    slug_field = 'station__number'
-    slug_url_kwarg = 'station_number'
     template_name = 'status_display/station_data.html'
 
     def get_queryset(self):
         return Summary.objects.with_data()
 
-    def get_object(self):
-        qs = (
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
+        queryset = (
             self.get_queryset()
             .select_related('station')
             .prefetch_related('histograms', 'histograms__type', 'multi_histograms', 'multi_histograms__type',
                               'datasets', 'datasets__type', 'multi_datasets', 'multi_datasets__type')
         )
-        return super().get_object(queryset=qs)
+
+        date = self.kwargs['date']
+        station_numner = self.kwargs['station_number']
+
+        try:
+            obj = queryset.get(
+                date=date,
+                station__number=station_numner,
+            )
+        except queryset.model.DoesNotExist:
+            raise Http404
+
+        return obj
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -434,7 +451,6 @@ class SummaryDetailView(DateDetailView):
                         'year_list': year_list,
                         'previous': previous,
                         'next': next,
-                        'link': (station.number, date.year, date.month, date.day),
 
                         'has_data': True,
                         'has_config': has_config,
@@ -519,8 +535,6 @@ class LatestSummaryRedirectView(RedirectView):
 def station_status(request, station_number):
     """Show data status for a particular station"""
 
-    station_number = int(station_number)
-
     station = get_object_or_404(Station, number=station_number)
 
     has_data = station_has_data(station)
@@ -540,7 +554,6 @@ def station_status(request, station_number):
 def station_config(request, station_number):
     """Show configuration history for a particular station"""
 
-    station_number = int(station_number)
     today = datetime.date.today()
 
     station = get_object_or_404(Station, number=station_number)
@@ -595,7 +608,6 @@ def station_config(request, station_number):
 def station_latest(request, station_number):
     """Show daily histograms for a particular station"""
 
-    station_number = int(station_number)
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
     old_data = False
 
@@ -650,29 +662,35 @@ def station_latest(request, station_number):
                    'old_data': old_data})
 
 
-def get_specific_network_histogram_source(request, year, month, day, type):
-    data = get_histogram_source(year, month, day, type)
-    response = render(request, 'source/%s_histogram.tsv' % type,
-                      {'data': data,
-                       'date': '-'.join((year, month, day))},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=%s-network-%d%02d%02d.tsv' %
-        (type, int(year), int(month), int(day)))
+def get_specific_network_histogram_source(request, date, type):
+    data = get_histogram_source(date, type)
+    response = render(
+        request,
+        f'source/{type}_histogram.tsv',
+        {
+            'data': data,
+            'date': date,
+        },
+        content_type=MIME_TSV,
+    )
+    response['Content-Disposition'] = f'attachment; filename={type}-network-{date:%Y%-m%-d}.tsv'
     return response
 
 
-def get_specific_histogram_source(request, station_number, year, month, day, type):
+def get_specific_histogram_source(request, station_number, date, type):
     """Get a station histogram for a specific date"""
-    data = get_histogram_source(year, month, day, type, station_number)
-    response = render(request, 'source/%s_histogram.tsv' % type,
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=%s-s%s-%d%02d%02d.tsv' %
-        (type, station_number, int(year), int(month), int(day)))
+    data = get_histogram_source(date, type, station_number)
+    response = render(
+        request,
+        f'source/{type}_histogram.tsv',
+        {
+            'data': data,
+            'date': date,
+            'station_number': station_number,
+        },
+        content_type=MIME_TSV,
+    )
+    response['Content-Disposition'] = 'attachment; filename={type}-s{station_numer}-{date:%Y%-m%-d}.tsv'
     return response
 
 
@@ -707,15 +725,20 @@ def get_eventtime_source(request, station_number, start=None, end=None):
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source/eventtime.tsv',
-                      {'tsvdata': tsvdata,
-                       'start': start,
-                       'end': end,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
+    response = render(
+        request,
+        'source/eventtime.tsv',
+        {
+            'tsvdata': tsvdata,
+            'start': start,
+            'end': end,
+            'station_number': station_number,
+        },
+        content_type=MIME_TSV,
+    )
     response['Content-Disposition'] = (
-        'attachment; filename=eventtime-s%s-%s-%s.tsv' %
-        (station_number, start.strftime('%Y%m%d'), end.strftime('%Y%m%d')))
+        f'attachment; filename=eventtime-s{station_number}-{start:%Y%-m%-d}-{end:%Y%-m%-d}.tsv'
+    )
     return response
 
 
@@ -744,27 +767,34 @@ def get_eventtime_histogram_sources(station_number, start, end):
     return list(zip(bins, values))
 
 
-def get_specific_dataset_source(request, station_number, year, month, day, type):
-    data = get_dataset_source(year, month, day, type, station_number)
-    response = render(request, 'source/%s_dataset.tsv' % type,
-                      {'data': data,
-                       'date': '-'.join((year, month, day)),
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=%s-s%s-%d%02d%02d.tsv' %
-        (type, station_number, int(year), int(month), int(day)))
+def get_specific_dataset_source(request, station_number, date, type):
+    data = get_dataset_source(date, type, station_number)
+    response = render(
+        request,
+        f'source/{type}_dataset.tsv',
+        {
+            'data': data,
+            'date': date,
+            'station_number': station_number
+        },
+        content_type=MIME_TSV,
+    )
+    response['Content-Disposition'] = f'attachment; filename={type}-s{station_number}-{date:%Y%-m%-d}.tsv'
     return response
 
 
 def get_specific_config_source(request, station_number, type):
     data = get_config_source(station_number, type)
-    response = render(request, 'source/%s_config.tsv' % type,
-                      {'data': data,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        f'attachment; filename={type}-s{station_number}.tsv')
+    response = render(
+        request,
+        f'source/{type}_config.tsv',
+        {
+            'data': data,
+            'station_number': station_number
+        },
+        content_type=MIME_TSV,
+    )
+    response['Content-Disposition'] = f'attachment; filename={type}-s{station_number}.tsv'
     return response
 
 
@@ -783,9 +813,7 @@ def get_station_layout_source(request, station_number):
                       {'layouts': layouts,
                        'station_number': station_number},
                       content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=station_layout-s%s.tsv' %
-        station_number)
+    response['Content-Disposition'] = f'attachment; filename=station_layout-s{station_number}.tsv'
     return response
 
 
@@ -808,16 +836,11 @@ def get_detector_timing_offsets_source(request, station_number):
                       {'tsvdata': tsvdata,
                        'station_number': station_number},
                       content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        'attachment; filename=detector_timing_offsets-s%s.tsv' %
-        station_number)
+    response['Content-Disposition'] = f'attachment; filename=detector_timing_offsets-s{station_number}.tsv'
     return response
 
 
 def get_station_timing_offsets_source(request, ref_station_number, station_number):
-    ref_station_number = int(ref_station_number)
-    station_number = int(station_number)
-
     if ref_station_number >= station_number:
         raise Http404
 
@@ -855,21 +878,16 @@ def get_station_timing_offsets_source(request, ref_station_number, station_numbe
     return response
 
 
-def get_histogram_source(year, month, day, type, station_number=None):
+def get_histogram_source(date, type, station_number=None):
     """Get histogram data for a specific date
 
-    :param year,month,day: the date for which to get the histogram data.
+    :param date: the date for which to get the histogram data.
     :param type: the type of histogram to retrieve.
     :param station_number: if None a NetworkHistogram is looked for, otherwise
         a DailyHistogram for a specific station is looked for.
     :return: list of tuples containing (bin, value) pairs.
 
     """
-    try:
-        date = datetime.date(int(year), int(month), int(day))
-    except ValueError:
-        raise Http404
-
     if station_number is None:
         histogram = get_object_or_404(NetworkHistogram, network_summary__date=date, type__slug=type)
     else:
@@ -891,20 +909,15 @@ def get_histogram_source(year, month, day, type, station_number=None):
         return list(zip(histogram.bins, *histogram.values))
 
 
-def get_dataset_source(year, month, day, type, station_number):
+def get_dataset_source(date, type, station_number):
     """Get a dataset for a specific date and station
 
-    :param year,month,day: the date for which to get the dataset.
+    :param date: the date for which to get the dataset.
     :param type: the type of dataset to retrieve.
     :param station_number: the station to which the data belongs.
     :return: list of tuples containing (x, y) pairs.
 
     """
-    try:
-        date = datetime.date(int(year), int(month), int(day))
-    except ValueError:
-        raise Http404
-
     if type in ['barometer', 'temperature']:
         dataset_model = DailyDataset
     else:
@@ -939,8 +952,12 @@ def get_config_source(station_number, type):
         fields = ['timestamp', 'gps_latitude', 'gps_longitude', 'gps_altitude']
     elif type == 'trigger':
         fields = ['timestamp']
-        fields.extend('%s_ch%d_thres_%s' % (i, j, k) for k in ['low', 'high']
-                      for i in ['mas', 'slv'] for j in [1, 2])
+        fields.extend(
+            f'{i}_ch{j}_thres_{k}'
+            for k in ['low', 'high']
+            for i in ['mas', 'slv']
+            for j in [1, 2]
+        )
         fields.extend(['trig_low_signals', 'trig_high_signals', 'trig_and_or', 'trig_external'])
     elif type == 'electronics':
         pass
@@ -957,8 +974,10 @@ def get_config_source(station_number, type):
         raise Http404
 
     if type == 'electronics':
-        data = list((config.timestamp, config.master, config.slave, config.master_fpga, config.slave_fpga)
-                    for config in configs)
+        data = [
+            (config.timestamp, config.master, config.slave, config.master_fpga, config.slave_fpga)
+            for config in configs
+        ]
     else:
         data = list(configs.values_list(*fields))
 

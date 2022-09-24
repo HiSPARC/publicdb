@@ -194,7 +194,6 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
 
     """
     if data_type in ['events', 'weather', 'singles']:
-        station_number = int(station_number)
         station = get_object_or_404(Station, number=station_number)
 
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -232,7 +231,6 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         tsv_output = generate_singles_as_tsv(station, start, end)
         filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
     elif data_type == 'lightning':
-        lightning_type = int(lightning_type)
         if lightning_type not in list(range(6)):
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
