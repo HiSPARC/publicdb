@@ -22,17 +22,13 @@ class TestJobs(LiveServerTestCase):
 
     def setUp(self):
         super().setUp()
-        self._old_publicdb_base = environ.get('PUBLICDB_BASE')
+        publicdb_base = environ.get('PUBLICDB_BASE')
         environ['PUBLICDB_BASE'] = self.live_server_url
+        if publicdb_base:
+            self.addCleanup(environ.update, {'PUBLICDB_BASE': publicdb_base})
 
-    def tearDown(self):
-        super().tearDown()
-        if self._old_publicdb_base:
-            environ['PUBLICDB_BASE'] = self._old_publicdb_base
-
-    @patch('django.db.close_old_connections')
     @patch('publicdb.histograms.jobs.perform_update_tasks')
-    def test_update_all_histograms(self, mock_perform, mock_close):
+    def test_update_all_histograms(self, mock_perform):
         """The update function is called if previous check has finished"""
 
         self.assertTrue(jobs.update_all_histograms())
@@ -53,12 +49,12 @@ class TestJobs(LiveServerTestCase):
         cluster = inforecords_factories.ClusterFactory(name='Amsterdam', number=0, country__number=0)
         self.station = inforecords_factories.StationFactory(number=501, cluster=cluster)
 
-    @patch('django.db.close_old_connections')
     @override_settings(ESD_PATH=mkdtemp())
-    def test_perform_update_tasks(self, mock_close):
+    def test_perform_update_tasks(self):
         """Update the ESD for summaries in need of updates"""
 
         self.setup_station()
+
         summary = histograms_factories.SummaryFactory(
             station=self.station, date=date(2017, 1, 1),
             needs_update_events=True, num_events=168,
