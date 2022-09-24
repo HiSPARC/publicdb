@@ -1,22 +1,22 @@
-- name: install openssl
+- name: Install openssl
   ansible.builtin.yum:
     name: openssl
     state: present
   become: true
 
-- name: directory for certs
+- name: Directory for certs
   ansible.builtin.file:
     path: "{{ certificate_root }}"
     state: directory
   become: true
 
-- name: copy san.cnf
+- name: Copy san.cnf
   ansible.builtin.template:
     src: san.cnf
     dest: "{{ certificate_root }}/san.cnf"
   become: true
 
-- name: generate fake CA private key
+- name: Generate fake CA private key
   ansible.builtin.command:
     cmd: >-
       /usr/bin/openssl genrsa
@@ -24,7 +24,7 @@
     creates: "{{ certificate_ca_private_key }}"
   become: true
 
-- name: generate fake CA certificate
+- name: Generate fake CA certificate
   ansible.builtin.command:
     cmd: >-
       /usr/bin/openssl req
@@ -38,7 +38,7 @@
     creates: "{{ certificate_ca_cert }}"
   become: true
 
-- name: generate RSA private key
+- name: Generate RSA private key
   ansible.builtin.command:
     cmd: >-
       /usr/bin/openssl genrsa
@@ -46,7 +46,7 @@
     creates: "{{ certificate_private_key }}"
   become: true
 
-- name: generate csr
+- name: Generate csr
   ansible.builtin.command:
     cmd: >-
       /usr/bin/openssl req
@@ -57,7 +57,7 @@
     creates: "{{ certificate_csr }}"
   become: true
 
-- name: generate self-signed certificate
+- name: Generate self-signed certificate
   ansible.builtin.command:
     cmd: >-
       /usr/bin/openssl x509
@@ -73,7 +73,7 @@
     creates: "{{ certificate_certificate }}"
   become: true
 
-- name: remove fake CA private key
+- name: Remove fake CA private key
   ansible.builtin.file:
     state: absent
     path: "{{ certificate_ca_private_key }}"

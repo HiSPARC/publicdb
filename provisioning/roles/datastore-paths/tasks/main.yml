@@ -1,10 +1,10 @@
-- name: ensure /databases directory exists
+- name: Ensure /databases directory exists
   ansible.builtin.file:
     path: /databases
     state: directory
   become: true
 
-- name: ensure /databases/frome directory and subdirectories exist
+- name: Ensure /databases/frome directory and subdirectories exist
   ansible.builtin.file:
     path: "/databases/frome/{{ item }}"
     state: directory
