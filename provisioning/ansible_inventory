@@ -3,11 +3,6 @@ pique.nikhef.nl ansible_host=pique.nikhef.nl
 tietar.nikhef.nl ansible_host=tietar.nikhef.nl
 frome.nikhef.nl ansible_host=frome.nikhef.nl
 
-[dev]
-publicdb ansible_host=localhost ansible_port=2021 ansible_ssh_private_key_file=.vagrant/machines/publicdb/virtualbox/private_key
-vpn ansible_host=localhost ansible_port=2022 ansible_ssh_private_key_file=.vagrant/machines/vpn/virtualbox/private_key
-datastore ansible_host=localhost ansible_port=2023 ansible_ssh_private_key_file=.vagrant/machines/datastore/virtualbox/private_key
-
 [publicdb_group]
 pique.nikhef.nl
 publicdb

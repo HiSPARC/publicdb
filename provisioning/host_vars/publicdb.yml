@@ -1,6 +1,6 @@
 debug: True
 
-publicdb_repo: /vagrant/.git
+publicdb_repo: /base/.git
 
 psql_database_name: publicdb
 psql_user: "{{ ansible_user }}"
