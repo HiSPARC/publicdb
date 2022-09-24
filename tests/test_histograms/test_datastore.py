@@ -1,7 +1,7 @@
 import datetime
 import time
 
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 
 from django.conf import settings
 from django.test import TestCase, override_settings

@@ -1,6 +1,6 @@
 from datetime import date
 from os import environ
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 from shutil import rmtree
 from tempfile import mkdtemp
 from unittest.mock import patch
