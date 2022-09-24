@@ -1,6 +1,6 @@
 - name: install the PostgreSQL rpm from a remote repo
   ansible.builtin.yum:
-    name: "https://download.postgresql.org/pub/repos/yum/{{ psql_version }}/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm"
+    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
     state: present
   become: true
 
@@ -18,7 +18,7 @@
 
 - name: initiate database
   ansible.builtin.command:
-    cmd: "/usr/pgsql-{{ psql_version }}/bin/postgresql96-setup initdb"
+    cmd: "/usr/pgsql-{{ psql_version }}/bin/postgresql-{{ psql_version }}-setup initdb"
     creates: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
   become: true
 

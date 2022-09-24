@@ -11,7 +11,7 @@ jobs:
   tests:
     services:
       postgres:
-        image: postgres:9.6-alpine
+        image: postgres:14-alpine
         env:
           POSTGRES_DB: publicdb
           POSTGRES_USER: hisparc

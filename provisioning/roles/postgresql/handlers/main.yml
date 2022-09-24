@@ -1,5 +1,5 @@
 - name: restart postgresql
   ansible.builtin.service:
-    name: postgresql-9.6
+    name: postgresql-14
     state: restarted
   become: true
