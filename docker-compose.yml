@@ -33,7 +33,7 @@ services:
       - '8000:8000'
 
   vpn:
-     image: 'python:3.8'
+     image: 'python:3.10'
      restart: unless-stopped
      volumes:
        - './scripts:/base:ro'
@@ -43,7 +43,7 @@ services:
      command: 'python fake-vpn-xmlrpc-server.py'
 
   datastore:
-     image: 'python:3.8'
+     image: 'python:3.10'
      restart: unless-stopped
      volumes:
        - './scripts:/base:ro'
