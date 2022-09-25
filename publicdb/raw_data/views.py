@@ -612,8 +612,7 @@ def download_coincidences(request):
                 error_msg = "To few stations in query, give at least n."
             elif len(stations) >= 30:
                 error_msg = "To many stations in query, use less than 30."
-            elif (Station.objects.filter(number__in=stations).count() !=
-                  len(stations)):
+            elif Station.objects.filter(number__in=stations).count() != len(stations):
                 error_msg = "Not all station numbers are valid."
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
@@ -704,7 +703,6 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
     :yield: id, station number and event
 
     """
-    id = -1
     for t0, t1 in single_day_ranges(start, end):
         try:
             NetworkSummary.objects.get(date=t0)
@@ -721,8 +719,8 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
                 else:
                     coincidences = cq.timerange(start=ts0, stop=ts1)
                     events = cq.all_events(coincidences, n)
-                for id, coin in enumerate(events, id + 1):
-                    for number, event in coin:
+                for id, coincidence in enumerate(events):
+                    for number, event in coincidence:
                         yield id, number, event
             except (OSError, tables.NoSuchNodeError):
                 continue

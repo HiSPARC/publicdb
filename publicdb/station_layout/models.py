@@ -32,8 +32,8 @@ class StationLayout(models.Model):
 
     @property
     def has_four_detectors(self):
-        return (self.detector_3_radius is not None and
-                self.detector_4_radius is not None)
+        return (self.detector_3_radius is not None
+                and self.detector_4_radius is not None)
 
     class Meta:
         verbose_name = 'Station layout'
@@ -97,14 +97,16 @@ class StationLayoutQuarantine(models.Model):
         verbose_name_plural = 'Station layouts quarantine'
 
     def generate_hashes(self):
-        hashs = os.urandom(16).encode('hex')
-        hashr = os.urandom(16).encode('hex')
-        if (StationLayoutQuarantine.objects.filter(hash_submit=hashs) or
-                StationLayoutQuarantine.objects.filter(hash_review=hashr)):
+        hash_submit = os.urandom(16).encode('hex')
+        hash_review = os.urandom(16).encode('hex')
+        if (
+            StationLayoutQuarantine.objects.filter(hash_submit=hash_submit)
+            or StationLayoutQuarantine.objects.filter(hash_review=hash_review)
+        ):
             self.generate_hashes()
         else:
-            self.hash_submit = hashs
-            self.hash_review = hashr
+            self.hash_submit = hash_submit
+            self.hash_review = hash_review
 
     def sendmail_submit(self):
         subject = 'HiSPARC station layout submission'

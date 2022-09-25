@@ -160,8 +160,10 @@ def result(request):
     theta = request.GET.get('theta', 0)
     phi = request.GET.get('phi', 0)
 
-    if (coincidence.session.title.lower() != session_title.lower() or
-            coincidence.student.name.lower() != student_name.lower()):
+    if (
+        coincidence.session.title.lower() != session_title.lower()
+        or coincidence.student.name.lower() != student_name.lower()
+    ):
         return error_json(401, 'Wrong combination of data.')
 
     coincidence.core_position_x = longitude

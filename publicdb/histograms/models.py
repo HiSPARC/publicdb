@@ -50,8 +50,8 @@ class SummaryQuerySet(models.QuerySet):
     def with_data(self):
         """Filter with at least either events or weather data"""
         return self.valid_date().filter(
-            models.Q(num_events__isnull=False) |
-            models.Q(num_weather__isnull=False))
+            models.Q(num_events__isnull=False)
+            | models.Q(num_weather__isnull=False))
 
     def with_events(self):
         """Filter with at least events"""
@@ -371,12 +371,15 @@ class GeneratorState(models.Model):
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField(default=False)
 
-    def update_has_finished(self, day=datetime.date.today()):
+    def update_has_finished(self, day=None):
         """Determine if the daily update at date has finished successfully
 
         :param day: datetime.date
 
         """
+        if day is None:
+            day = datetime.date.today()
+
         if self.update_last_run.date() >= day and not self.update_is_running:
             return True
         else:

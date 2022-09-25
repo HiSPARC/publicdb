@@ -34,7 +34,7 @@ def get_updated_files(rootdir, last_check_time):
     for path in paths:
         if re.match('[0-9]+', path):
             path = os.path.join(rootdir, path)
-            for dirpath, dirnames, filenames in os.walk(path):
+            for dirpath, _, filenames in os.walk(path):
                 for file in filenames:
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
@@ -43,8 +43,10 @@ def get_updated_files(rootdir, last_check_time):
                             date = datetime.datetime.strptime(file, '%Y_%m_%d.h5').date()
                         except ValueError:
                             continue
-                        if (date != datetime.datetime.utcnow().date() and
-                                date != datetime.datetime.today()):
+                        if (
+                            date != datetime.datetime.utcnow().date()
+                            and date != datetime.datetime.today()
+                        ):
                             file_list.append((date, file_path))
 
     return file_list

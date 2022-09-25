@@ -86,7 +86,7 @@ def perform_update_tasks():
     update_histograms()
 
 
-def copy_temporary_and_set_flag(summary, needs_update_item, tmp_locations=[]):
+def copy_temporary_and_set_flag(summary, needs_update_item, tmp_locations=None):
     """Copy temporary data to the ESD and set a flag to False
 
     :param summary: Summary object for which the flag will be set to False.
@@ -97,6 +97,9 @@ def copy_temporary_and_set_flag(summary, needs_update_item, tmp_locations=[]):
         to the temporary file and the node to be copied.
 
     """
+    if tmp_locations is None:
+        tmp_locations = []
+
     for tmpfile_path, node_path in tmp_locations:
         esd.copy_temporary_esd_node_to_esd(summary, tmpfile_path, node_path)
     setattr(summary, needs_update_item, False)

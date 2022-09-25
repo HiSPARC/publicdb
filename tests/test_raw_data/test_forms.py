@@ -31,7 +31,7 @@ class TestDataDownloadForm(TestCase):
         ]
         for data in valid_form_data:
             form = DataDownloadForm(data)
-            self.assertTrue(form.is_valid(), form.errors.as_json())
+            self.assertTrue(form.is_valid(), msg=form.errors.as_json())
 
     def test_clean_invalid(self):
         invalid_form_data = [
@@ -70,7 +70,7 @@ class TestCoincidenceDownloadForm(TestCase):
         ]
         for data in valid_form_data:
             form = CoincidenceDownloadForm(data)
-            self.assertTrue(form.is_valid(), form.errors.as_json())
+            self.assertTrue(form.is_valid(), msg=form.errors.as_json())
 
     def test_clean_invalid(self):
         invalid_form_data = [
@@ -85,4 +85,4 @@ class TestCoincidenceDownloadForm(TestCase):
         for field, error_code, data in invalid_form_data:
             form = CoincidenceDownloadForm(data)
             self.assertFalse(form.is_valid())
-            self.assertTrue(form.has_error(field, error_code), (field, error_code, data))
+            self.assertTrue(form.has_error(field, error_code), msg=(field, error_code, data))

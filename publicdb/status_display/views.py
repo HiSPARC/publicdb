@@ -1094,8 +1094,8 @@ def stations_with_data():
 
     """
     return (Station.objects
-                   .filter(Q(summaries__num_events__isnull=False) |
-                           Q(summaries__num_weather__isnull=False),
+                   .filter(Q(summaries__num_events__isnull=False)
+                           | Q(summaries__num_weather__isnull=False),
                            summaries__date__gte=FIRSTDATE,
                            summaries__date__lte=datetime.date.today())
                    .distinct())
