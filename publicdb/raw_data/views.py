@@ -757,7 +757,7 @@ def clean_float_array(numbers, precision=5):
     if precision < 3:
         # Unable to preserve -999 if precision less than 3.
         precision = 3
-    return char.mod(f'%%.{precision}g', numbers)
+    return char.mod(f'%.{precision}g', numbers)
 
 
 def clean_floats(number, precision=4):
