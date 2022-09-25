@@ -873,8 +873,8 @@ def get_station_timing_offsets_source(request, ref_station_number, station_numbe
                        'station_number': station_number},
                       content_type=MIME_TSV)
     response['Content-Disposition'] = (
-        'attachment; filename=station_timing_offsets-s%d-s%d.tsv' %
-        (ref_station_number, station_number))
+        f'attachment; filename=station_timing_offsets-s{ref_station_number}-s{station_number}.tsv'
+    )
     return response
 
 

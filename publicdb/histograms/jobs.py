@@ -622,7 +622,7 @@ def save_offsets(summary, offsets):
 
     """
     logger.debug("Saving detector timing offsets for %s", summary)
-    off = {'offset_%d' % i: round_in_base(o, 0.25) if not np.isnan(o) else None
+    off = {f'offset_{i}': round_in_base(o, 0.25) if not np.isnan(o) else None
            for i, o in enumerate(offsets, 1)}
     DetectorTimingOffset.objects.update_or_create(summary=summary, defaults=off)
     logger.debug("Saved succesfully")

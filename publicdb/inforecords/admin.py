@@ -34,10 +34,10 @@ class ContactAdmin(admin.ModelAdmin):
         if obj.prefix_surname:
             return f"{obj.surname}, {obj.prefix_surname}"
         else:
-            return "%s" % obj.surname
+            return f'{obj.surname}'
 
     def email_work_link(self, obj):
-        return mark_safe("<a href='mailto:{email}'>{email}</a>".format(email=obj.email_work))
+        return mark_safe(f"<a href='mailto:{obj.email_work}'>{obj.email_work}</a>")
 
 
 @admin.register(models.Country)

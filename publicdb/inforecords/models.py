@@ -218,7 +218,7 @@ class Station(models.Model):
     info_page = models.TextField(blank=True)
 
     def __str__(self):
-        return '%5d: %s' % (self.number, self.name)
+        return f'{self.number:5}: {self.name}'
 
     def clean(self):
         if self.number is None:
@@ -324,20 +324,15 @@ class Pc(models.Model):
         return self.name
 
     def keys(self):
-        return mark_safe(
-            '<a href="{url}">Certificate {name}</a>'
-            .format(url=reverse('keys', kwargs={'host': self.name}), name=self.name)
-        )
+        url = reverse('keys', kwargs={'host': self.name})
+        return mark_safe(f'<a href="{url}">Certificate {self.name}</a>')
     keys.short_description = 'Certificates'
 
     def url(self):
         if self.type.slug == 'admin':
             return ''
         else:
-            return mark_safe(
-                '<a href="vnc://s{number}.his">s{number}.his</a>'
-                .format(number=self.station.number)
-            )
+            return mark_safe(f'<a href="vnc://s{self.station.number}.his">s{self.station.number}.his</a>')
     url.short_description = 'VNC URL'
 
     class Meta:
@@ -391,7 +386,7 @@ def update_aliases():
 
     if settings.VPN_PROXY is not None:
         proxy = ServerProxy(settings.VPN_PROXY)
-        aliases = [('s%d' % x.station.number, x.ip) for x in Pc.objects.all()]
+        aliases = [(f's{x.station.number}', x.ip) for x in Pc.objects.all()]
         aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
         proxy.register_hosts_ip(aliases)
 

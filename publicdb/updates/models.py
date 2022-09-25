@@ -22,7 +22,7 @@ class AdminUpdate(models.Model):
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='admin_updates')
 
     def __str__(self):
-        return 'Queue: %s - Admin Update v%d' % (self.queue, self.version)
+        return f'Queue: {self.queue} - Admin Update v{self.version}'
 
     def save(self, *args, **kwargs):
         match = re.search(r'_v(\d+)', self.update.name)
@@ -42,7 +42,7 @@ class UserUpdate(models.Model):
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='user_updates')
 
     def __str__(self):
-        return 'Queue: %s - User Update v%d' % (self.queue, self.version)
+        return f'Queue: {self.queue} - User Update v{self.version}'
 
     def save(self, *args, **kwargs):
         match = re.search(r'_v(\d+)', self.update.name)
@@ -65,7 +65,7 @@ class InstallerUpdate(models.Model):
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='installer_updates')
 
     def __str__(self):
-        return 'Installer v%s' % self.version
+        return f'Installer v{self.version}'
 
     def save(self, *args, **kwargs):
         match = re.search(r'_v(\d+\.\d+)', self.installer.name)

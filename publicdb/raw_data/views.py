@@ -117,8 +117,8 @@ def get_data_url(station_number, date, get_blobs=False):
 def get_raw_datafile(date):
     """Return a reference to the raw data file on a specified date"""
 
-    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.tm_year, date.tm_mon))
-    name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon, date.tm_mday))
+    dir = os.path.join(settings.DATASTORE_PATH, f'{date.tm_year}/{date.tm_mon}')
+    name = os.path.join(dir, f'{date.tm_year}_{date.tm_mon}_{date.tm_mday}.h5')
     try:
         datafile = tables.open_file(name, 'r')
     except OSError:
@@ -130,7 +130,7 @@ def get_raw_datafile(date):
 def get_station_node(datafile, station_number):
     """Return the requested station's node"""
 
-    station = 'station_%d' % station_number
+    station = f'station_{station_number}'
 
     for cluster in datafile.list_nodes('/hisparc'):
         if station in cluster:
@@ -223,26 +223,26 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
     timerange_string = prettyprint_timerange(start, end)
     if data_type == 'events':
         tsv_output = generate_events_as_tsv(station, start, end)
-        filename = 'events-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'events-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'weather':
         tsv_output = generate_weather_as_tsv(station, start, end)
-        filename = 'weather-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'weather-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'singles':
         tsv_output = generate_singles_as_tsv(station, start, end)
-        filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'singles-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'lightning':
         if lightning_type not in list(range(6)):
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
-        filename = 'lightning-knmi-%s.tsv' % (timerange_string)
+        filename = f'lightning-knmi-{timerange_string}.tsv'
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
-        content_disposition = 'attachment; filename="%s"' % filename
+        content_disposition = f'attachment; filename="{filename}"'
     else:
-        content_disposition = 'inline; filename="%s"' % filename
+        content_disposition = f'inline; filename="{filename}"'
     response['Content-Disposition'] = content_disposition
     response['Access-Control-Allow-Origin'] = '*'
 
@@ -483,7 +483,7 @@ def generate_lightning_as_tsv(lightning_type, start, end):
 
     types = ('Single-point', 'Cloud-cloud', 'Cloud-cloud mid',
              'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
-    type_str = '%d: %s' % (lightning_type, types[lightning_type])
+    type_str = f'{lightning_type}: {types[lightning_type]}'
 
     t = loader.get_template('raw_data/lightning_data.tsv')
     context = {'lightning_type': type_str, 'start': start, 'end': end}
@@ -633,14 +633,14 @@ def download_coincidences(request):
 
     timerange_string = prettyprint_timerange(start, end)
     tsv_output = generate_coincidences_as_tsv(start, end, cluster, stations, n)
-    filename = 'coincidences-%s.tsv' % (timerange_string)
+    filename = f'coincidences-{timerange_string}.tsv'
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
-        content_disposition = 'attachment; filename="%s"' % filename
+        content_disposition = f'attachment; filename="{filename}"'
     else:
-        content_disposition = 'inline; filename="%s"' % filename
+        content_disposition = f'inline; filename="{filename}"'
     response['Content-Disposition'] = content_disposition
     response['Access-Control-Allow-Origin'] = '*'
 
@@ -757,7 +757,7 @@ def clean_float_array(numbers, precision=5):
     if precision < 3:
         # Unable to preserve -999 if precision less than 3.
         precision = 3
-    return char.mod('%%.%dg' % precision, numbers)
+    return char.mod(f'%%.{precision}g', numbers)
 
 
 def clean_floats(number, precision=4):

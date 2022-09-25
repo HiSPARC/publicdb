@@ -578,7 +578,7 @@ def get_timedeltas(date, ref_station, station):
     try:
         with tables.open_file(path, 'r') as datafile:
             try:
-                table_path = '/time_deltas/station_%d/station_%d' % (ref_station, station)
+                table_path = f'/time_deltas/station_{ref_station}/station_{station}'
                 tablename = 'time_deltas'
                 table = datafile.get_node(table_path, tablename)
             except tables.NoSuchNodeError:

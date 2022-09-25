@@ -89,7 +89,7 @@ def process_possible_tables_for_network(date, table_name):
 
     """
     try:
-        update_flag_attr = 'needs_update_%s' % NETWORK_TABLES[table_name]
+        update_flag_attr = f'needs_update_{NETWORK_TABLES[table_name]}'
         logger.info("New %s data on %s.", table_name, date.strftime("%a %b %d %Y"))
         network_summary, _ = NetworkSummary.objects.get_or_create(date=date)
         setattr(network_summary, update_flag_attr, True)
@@ -116,8 +116,8 @@ def check_table_and_update_flags(table_name, num_events, summary):
     """Check a single table and update flags if new data"""
 
     if table_name in SUPPORTED_TABLES:
-        number_of_events_attr = 'num_%s' % table_name
-        update_flag_attr = 'needs_update_%s' % table_name
+        number_of_events_attr = f'num_{table_name}'
+        update_flag_attr = f'needs_update_{table_name}'
 
         if getattr(summary, number_of_events_attr) != num_events:
             logger.info("New data (%s) on %s for station %d",
