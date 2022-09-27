@@ -375,11 +375,11 @@ def config(request, station_number, date=None):
 
     try:
         summary = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
-        c = Configuration.objects.filter(summary=summary).latest()
+        configuration = Configuration.objects.filter(summary=summary).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
-    config = serializers.serialize("json", [c])
+    config = serializers.serialize("json", [configuration])
     config = json.loads(config)
     try:
         config = config[0]['fields']

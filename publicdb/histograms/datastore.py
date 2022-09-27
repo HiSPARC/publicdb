@@ -96,8 +96,8 @@ def get_stations(date):
     with tables.open_file(path, 'r') as file:
         for cluster in file.list_nodes('/hisparc'):
             for station in file.list_nodes(cluster):
-                m = re.match('station_(?P<station>[0-9]+)', station._v_name)
-                station_list.append(int(m.group('station')))
+                match = re.match('station_(?P<station>[0-9]+)', station._v_name)
+                station_list.append(int(match.group('station')))
 
     return station_list
 

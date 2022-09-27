@@ -60,13 +60,13 @@ def call_xmlrpc(request):
     else:
         # Show documentation on available methods
         response = HttpResponse()
-        t = loader.get_template('raw_data/xmlrpc.html')
+        template = loader.get_template('raw_data/xmlrpc.html')
         methods = []
         for method in dispatcher.system_listMethods():
             methods.append({'name': method,
                             'help': dispatcher.system_methodHelp(method)})
         context = {'methods': methods}
-        response.write(t.render(context))
+        response.write(template.render(context))
         return response
 
 
@@ -252,10 +252,10 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
 def generate_events_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/event_data.tsv')
+    template = loader.get_template('raw_data/event_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     events_returned = False
 
@@ -343,10 +343,10 @@ def get_events_from_esd_in_range(station, start, end):
 def generate_weather_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/weather_data.tsv')
+    template = loader.get_template('raw_data/weather_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     weather_returned = False
 
@@ -415,10 +415,10 @@ def get_weather_from_esd_in_range(station, start, end):
 def generate_singles_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/singles_data.tsv')
+    template = loader.get_template('raw_data/singles_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     singles_returned = False
 
@@ -485,10 +485,10 @@ def generate_lightning_as_tsv(lightning_type, start, end):
              'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
     type_str = f'{lightning_type}: {types[lightning_type]}'
 
-    t = loader.get_template('raw_data/lightning_data.tsv')
+    template = loader.get_template('raw_data/lightning_data.tsv')
     context = {'lightning_type': type_str, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
@@ -649,10 +649,10 @@ def download_coincidences(request):
 def generate_coincidences_as_tsv(start, end, cluster, stations, n):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/coincidences.tsv')
+    template = loader.get_template('raw_data/coincidences.tsv')
     context = {'start': start, 'end': end, 'cluster': cluster, 'stations': stations, 'n': n}
 
-    yield t.render(context)
+    yield template.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
