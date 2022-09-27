@@ -643,7 +643,7 @@ def station_latest(request, station_number):
     if 'barometer' not in plots:
         try:
             sum_weather = Summary.objects.filter(num_weather__isnull=False, date=summary.date)
-            weather_stations = [s[0] for s in sum_weather.values_list('station__number')]
+            weather_stations = sum_weather.values_list('station__number', flat=True)
             closest_station = min(weather_stations, key=lambda x: abs(x - station_number))
             summary_weather = sum_weather.get(station__number=closest_station)
             barometerdata = summary_weather.datasets.filter(type__slug='barometer').first()
@@ -953,10 +953,10 @@ def get_config_source(station_number, type):
     elif type == 'trigger':
         fields = ['timestamp']
         fields.extend(
-            f'{i}_ch{j}_thres_{k}'
-            for k in ['low', 'high']
-            for i in ['mas', 'slv']
-            for j in [1, 2]
+            f'{device}_ch{channel}_thres_{threshold}'
+            for threshold in ['low', 'high']
+            for device in ['mas', 'slv']
+            for channel in [1, 2]
         )
         fields.extend(['trig_low_signals', 'trig_high_signals', 'trig_and_or', 'trig_external'])
     elif type == 'electronics':
