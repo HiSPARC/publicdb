@@ -2,7 +2,7 @@
   ansible.builtin.template:
     src: bashrc
     dest: ~/.bashrc
-    backup: yes
+    backup: true
 
 - name: Ensure /srv directory exists
   ansible.builtin.file:
@@ -21,7 +21,7 @@
 
 - name: Set default group write ACLs on /srv/datastore
   ansible.posix.acl:
-    default: yes
+    default: true
     etype: group
     permissions: rwx
     path: "{{ datastore_path }}"
@@ -40,8 +40,8 @@
   ansible.builtin.git:
     repo: "{{ datastore_repo }}"
     dest: "{{ datastore_code }}"
-    update: yes
-    force: no
+    update: true
+    force: false
     version: master
   notify: restart uWSGI
 
