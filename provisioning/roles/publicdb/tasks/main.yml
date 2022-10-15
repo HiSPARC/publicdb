@@ -54,7 +54,7 @@
     update: yes
     force: no
     version: "{{ local_head.stdout | default('master') }}"
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Remove compiled python code
   ansible.builtin.command:
@@ -135,7 +135,7 @@
     src: settings.py
     dest: "{{ publicdb_code }}publicdb/settings.py"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Migrate Django apps
   community.general.django_manage:
@@ -154,7 +154,7 @@
     src: uwsgi.ini
     dest: "{{ publicdb_code }}uwsgi.ini"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Install nginx
   ansible.builtin.yum:

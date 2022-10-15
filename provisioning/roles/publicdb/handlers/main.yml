@@ -1,4 +1,4 @@
-- name: restart uWSGI
+- name: Restart uWSGI
   community.general.supervisorctl:
     name: uwsgi
     state: restarted

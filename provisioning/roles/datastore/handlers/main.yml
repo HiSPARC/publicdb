@@ -1,16 +1,16 @@
-- name: restart datastore config server
+- name: Restart datastore config server
   community.general.supervisorctl:
     name: datastore-config-server
     state: restarted
     supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
-- name: restart uWSGI
+- name: Restart uWSGI
   community.general.supervisorctl:
     name: uwsgi
     state: restarted
     supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
-- name: restart supervisord
+- name: Restart supervisord
   ansible.builtin.service:
     name: supervisord
     state: restarted

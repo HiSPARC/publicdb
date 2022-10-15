@@ -41,7 +41,7 @@
     group: root
     mode: 0644
   become: true
-  notify: restart supervisord
+  notify: Restart supervisord
 
 - name: Start supervisord now and on boot
   ansible.builtin.service:

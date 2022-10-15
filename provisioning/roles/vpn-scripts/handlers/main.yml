@@ -1,4 +1,4 @@
-- name: restart supervisord
+- name: Restart supervisord
   ansible.builtin.service:
     name: supervisord
     state: restarted

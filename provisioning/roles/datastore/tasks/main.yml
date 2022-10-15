@@ -43,7 +43,7 @@
     update: true
     force: false
     version: master
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Remove compiled python code
   ansible.builtin.command:
@@ -78,7 +78,7 @@
     src: datastore.py
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Copy writer_app.py
   ansible.builtin.template:
@@ -90,21 +90,21 @@
   ansible.builtin.template:
     src: datastore-config-server.py
     dest: "{{ datastore_path }}"
-  notify: restart datastore config server
+  notify: Restart datastore config server
 
 - name: Copy config.ini
   ansible.builtin.copy:
     src: config.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Copy uwsgi.ini
   ansible.builtin.template:
     src: uwsgi.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
 - name: Install supervisor daemon
   ansible.builtin.pip:
@@ -130,7 +130,7 @@
     group: root
     mode: 0644
   become: true
-  notify: restart supervisord
+  notify: Restart supervisord
 
 - name: Start supervisord now and on boot
   ansible.builtin.service:
