@@ -1,10 +1,11 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 app_name = 'updates'
 urlpatterns = [
-    url(r'^installer/latest/$', views.get_latest_installer, name="latest"),
-    url(r'^(?P<queue>[a-zA-Z0-9_]+)/check$', views.update_check_querystring, name="check"),
-    url(r'^(?P<queue>[a-zA-Z0-9_]+)/check/(?P<admin_version>\d+)/(?P<user_version>\d+)/?$', views.update_check, name="check"),
+    path('installer/latest/', views.get_latest_installer, name="latest"),
+    path('<slug:queue>/check', views.update_check_querystring, name="check"),
+    path('<slug:queue>/check/<int:admin_version>/<int:user_version>', views.update_check, name="check"),
+    path('<slug:queue>/check/<int:admin_version>/<int:user_version>/', views.update_check, name="check"),
 ]

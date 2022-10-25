@@ -27,13 +27,11 @@ class NetworkSummary(models.Model):
     objects = NetworkSummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
-        kwargs = {'year': self.date.year,
-                  'month': self.date.month,
-                  'day': self.date.day}
+        kwargs = {'date': self.date}
         return reverse('status:network:coincidences', kwargs=kwargs)
 
-    def __unicode__(self):
-        return 'Network Summary: %s' % (self.date.strftime('%d %b %Y'))
+    def __str__(self):
+        return f'Network Summary: {self.date}'
 
     class Meta:
         verbose_name = 'Network summary'
@@ -52,8 +50,8 @@ class SummaryQuerySet(models.QuerySet):
     def with_data(self):
         """Filter with at least either events or weather data"""
         return self.valid_date().filter(
-            models.Q(num_events__isnull=False) |
-            models.Q(num_weather__isnull=False))
+            models.Q(num_events__isnull=False)
+            | models.Q(num_weather__isnull=False))
 
     def with_events(self):
         """Filter with at least events"""
@@ -90,14 +88,14 @@ class Summary(models.Model):
     objects = SummaryQuerySet.as_manager()
 
     def get_absolute_url(self):
-        kwargs = {'station_number': self.station.number,
-                  'year': self.date.year,
-                  'month': self.date.month,
-                  'day': self.date.day}
+        kwargs = {
+            'station_number': self.station.number,
+            'date': self.date,
+        }
         return reverse('status:station:summary', kwargs=kwargs)
 
-    def __unicode__(self):
-        return 'Summary: %d - %s' % (self.station.number, self.date.strftime('%d %b %Y'))
+    def __str__(self):
+        return f'Summary: {self.station.number} - {self.date}'
 
     class Meta:
         verbose_name = 'Summary'
@@ -196,8 +194,8 @@ class Configuration(models.Model):
     slv_ch2_comp_gain = models.FloatField()
     slv_ch2_comp_offset = models.FloatField()
 
-    def __unicode__(self):
-        return "%d - %s" % (self.summary.station.number, self.timestamp)
+    def __str__(self):
+        return f'{self.summary.station.number} - {self.timestamp}'
 
     class Meta:
         verbose_name = 'Configuration'
@@ -276,7 +274,7 @@ class HistogramType(models.Model):
     value_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -292,7 +290,7 @@ class DatasetType(models.Model):
     y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     class Meta:
@@ -307,13 +305,11 @@ class NetworkHistogram(models.Model):
     values = ArrayField(models.PositiveIntegerField())
 
     def get_absolute_url(self):
-        kwargs = {'year': self.network_summary.date.year,
-                  'month': self.network_summary.date.month,
-                  'day': self.network_summary.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+        kwargs = {'date': self.network_summary.date}
+        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
-    def __unicode__(self):
-        return '%s - %s' % (self.network_summary.date.strftime('%d %b %Y'), self.type)
+    def __str__(self):
+        return f'{self.network_summary.date} - {self.type}'
 
     class Meta:
         verbose_name = 'Network histogram'
@@ -326,16 +322,14 @@ class BaseDailyStationDataMixin(models.Model):
     """Base class for daily station data models"""
 
     def get_absolute_url(self):
-        kwargs = {'station_number': self.summary.station.number,
-                  'year': self.summary.date.year,
-                  'month': self.summary.date.month,
-                  'day': self.summary.date.day}
-        return reverse('status:source:{type}'.format(type=self.type.slug), kwargs=kwargs)
+        kwargs = {
+            'station_number': self.summary.station.number,
+            'date': self.summary.date,
+        }
+        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
 
-    def __unicode__(self):
-        return "%d - %s - %s" % (self.summary.station.number,
-                                 self.summary.date.strftime('%d %b %Y'),
-                                 self.type)
+    def __str__(self):
+        return f'{self.summary.station.number} - {self.summary.date} - {self.type}'
 
     class Meta:
         abstract = True
@@ -377,12 +371,15 @@ class GeneratorState(models.Model):
     update_last_run = models.DateTimeField()
     update_is_running = models.BooleanField(default=False)
 
-    def update_has_finished(self, day=datetime.date.today()):
+    def update_has_finished(self, day=None):
         """Determine if the daily update at date has finished successfully
 
         :param day: datetime.date
 
         """
+        if day is None:
+            day = datetime.date.today()
+
         if self.update_last_run.date() >= day and not self.update_is_running:
             return True
         else:

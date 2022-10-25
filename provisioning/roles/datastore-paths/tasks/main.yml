@@ -1,13 +1,11 @@
----
-
-- name: ensure /databases directory exists
-  file:
+- name: Ensure /databases directory exists
+  ansible.builtin.file:
     path: /databases
     state: directory
   become: true
 
-- name: ensure /databases/frome directory and subdirectories exist
-  file:
+- name: Ensure /databases/frome directory and subdirectories exist
+  ansible.builtin.file:
     path: "/databases/frome/{{ item }}"
     state: directory
     owner: hisparc

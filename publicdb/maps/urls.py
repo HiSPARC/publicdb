@@ -1,12 +1,12 @@
-from django.conf.urls import url
+from django.urls import path
 
 from . import views
 
 app_name = 'maps'
 urlpatterns = [
-    url(r'^$', views.stations_on_map, name="map"),
-    url(r'^(?P<station_number>\d+)/$', views.station_on_map, name="map"),
-    url(r'^(?P<country>[a-zA-Z \-]+)/$', views.stations_on_map, name="map"),
-    url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="map"),
-    url(r'^(?P<country>[a-zA-Z \-]+)/(?P<cluster>[a-zA-Z \-]+)/(?P<subcluster>[a-zA-Z \-]+)/$', views.stations_on_map, name="map"),
+    path('', views.stations_on_map, name="map"),
+    path('<int:station_number>/', views.station_on_map, name="map"),
+    path('<str:country>/', views.stations_on_map, name="map"),
+    path('<str:country>/<str:cluster>/', views.stations_on_map, name="map"),
+    path('<str:country>/<str:cluster>/<str:subcluster>/', views.stations_on_map, name="map"),
 ]

@@ -217,8 +217,8 @@ def get_station_node_path(station):
     :return: path to station group as used in datastore / ESD files
 
     """
-    cluster = station.cluster.main_cluster()
-    return '/hisparc/cluster_%s/station_%d' % (cluster.lower(), station.number)
+    cluster_name = station.cluster.main_cluster().lower()
+    return f'/hisparc/cluster_{cluster_name}/station_{station.number}'
 
 
 def create_temporary_file():
@@ -292,7 +292,7 @@ def get_or_create_esd_data_path(date):
 
     if not os.path.exists(dirpath):
         # create dir and parent dirs with mode rwxr-xr-x
-        os.makedirs(dirpath, 0755)
+        os.makedirs(dirpath, 0o755)
 
     return filepath
 
@@ -560,7 +560,7 @@ def get_time_series(summary, tablename, quantity):
         else:
             col1 = table.col('timestamp')
             col2 = table.col(quantity)
-            data = zip(col1, col2)
+            data = list(zip(col1, col2))
             data.sort(key=itemgetter(0))
 
     return data
@@ -578,7 +578,7 @@ def get_timedeltas(date, ref_station, station):
     try:
         with tables.open_file(path, 'r') as datafile:
             try:
-                table_path = '/time_deltas/station_%d/station_%d' % (ref_station, station)
+                table_path = f'/time_deltas/station_{ref_station}/station_{station}'
                 tablename = 'time_deltas'
                 table = datafile.get_node(table_path, tablename)
             except tables.NoSuchNodeError:
@@ -586,7 +586,7 @@ def get_timedeltas(date, ref_station, station):
                 data = None
             else:
                 data = table.col('delta')
-    except IOError:
+    except OSError:
         logger.debug("ESD file %s does not exists", path)
         return None
     return data

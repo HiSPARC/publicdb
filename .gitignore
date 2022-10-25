@@ -11,6 +11,7 @@ public.db
 *.sql
 /mediaroot/
 /staticroot/
+docker-compose.override.yml
 
 # Coverage
 /htmlcov/
@@ -35,14 +36,9 @@ Thumbs.db
 # Vim
 *.swp
 
-# Vagrant / Packer
-.vagrant
-vagrant_ansible_inventory_default
-*.iso
-*.box
-
 # Ansible
 *.retry
+.ansible
 
 # Other
 .remote-sync.json

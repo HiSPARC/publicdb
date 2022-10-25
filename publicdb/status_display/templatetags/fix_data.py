@@ -41,9 +41,9 @@ def fix_timestamps(values):
 def fix_timestamps_in_data(values):
     """Convert timestamps to hour of day"""
 
-    x, y = zip(*values)
-    seconds_in_day = [u % 86400 for u in x]
-    hours_in_day = [u / 3600. for u in seconds_in_day]
+    x, y = list(zip(*values))
+    seconds_in_day = [timestamp % 86400 for timestamp in x]
+    hours_in_day = [seconds / 3600. for seconds in seconds_in_day]
     values = [list(u) for u in zip(hours_in_day, y)]
 
     return values

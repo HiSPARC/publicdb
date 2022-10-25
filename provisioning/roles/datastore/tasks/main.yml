@@ -1,18 +1,17 @@
----
-- name: use custom .bashrc
-  template:
+- name: Use custom .bashrc
+  ansible.builtin.template:
     src: bashrc
     dest: ~/.bashrc
-    backup: yes
+    backup: true
 
-- name: ensure /srv directory exists
-  file:
+- name: Ensure /srv directory exists
+  ansible.builtin.file:
     path: "{{ datastore_base }}"
     state: directory
   become: true
 
-- name: ensure /srv/datastore directory exists
-  file:
+- name: Ensure /srv/datastore directory exists
+  ansible.builtin.file:
     path: "{{ datastore_path }}"
     state: directory
     owner: hisparc
@@ -20,98 +19,100 @@
     mode: 02775
   become: true
 
-- name: set default group write ACLs on /srv/datastore
-  acl:
-    default: yes
+- name: Set default group write ACLs on /srv/datastore
+  ansible.posix.acl:
+    default: true
     etype: group
     permissions: rwx
     path: "{{ datastore_path }}"
     state: present
   become: true
 
-- name: ensure /var/log/hisparc directory exists
-  file:
+- name: Ensure /var/log/hisparc directory exists
+  ansible.builtin.file:
     path: /var/log/hisparc
     state: directory
     group: hisparc
     mode: 0775
   become: true
 
-- name: checkout datastore in /srv/datastore/code
-  git:
+- name: Checkout datastore in /srv/datastore/code
+  ansible.builtin.git:
     repo: "{{ datastore_repo }}"
     dest: "{{ datastore_code }}"
-    update: yes
-    force: no
+    update: true
+    force: false
     version: master
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
-- name: remove compiled python code
-  command: "find {{ datastore_code }} -name *.pyc -delete"
+- name: Remove compiled python code
+  ansible.builtin.command:
+    cmd: "find {{ datastore_code }} -name *.pyc -delete"
 
 - name: Copy conda requirements files
-  copy:
+  ansible.builtin.copy:
     src: conda.list
     dest: ~/conda.list
 
 - name: Copy pip requirements files
-  copy:
+  ansible.builtin.copy:
     src: pip.list
     dest: ~/pip.list
 
-- name: create conda environment
-  shell: "/opt/miniconda/bin/conda create --prefix {{ datastore_venv }} python={{ datastore_python_version }} --yes"
-  args:
+- name: Create conda environment
+  ansible.builtin.shell:
+    cmd: "/opt/miniconda/bin/conda create --prefix {{ datastore_venv }} python={{ datastore_python_version }} --yes"
     creates: "{{ datastore_venv }}"
 
-- name: install conda packages in conda environment
-  command: "/opt/miniconda/bin/conda install --prefix {{ datastore_venv }} --file ~/conda.list --yes"
+- name: Install conda packages in conda environment
+  ansible.builtin.command:
+    cmd: "/opt/miniconda/bin/conda install --prefix {{ datastore_venv }} --file ~/conda.list --yes"
 
-- name: install packages in conda environment using pip
-  pip:
+- name: Install packages in conda environment using pip
+  ansible.builtin.pip:
     requirements: ~/pip.list
     virtualenv: "{{ datastore_venv }}"
 
-- name: copy datastore.wsgi
-  template:
-    src: datastore.wsgi
+- name: Copy datastore.py
+  ansible.builtin.template:
+    src: datastore.py
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
-- name: copy writer_app.py
-  template:
+- name: Copy writer_app.py
+  ansible.builtin.template:
     src: writer_app.py
     dest: "{{ datastore_path }}"
     backup: yes
 
-- name: copy datastore config server
-  template:
+- name: Copy datastore config server
+  ansible.builtin.template:
     src: datastore-config-server.py
     dest: "{{ datastore_path }}"
-  notify: restart datastore config server
+  notify: Restart datastore config server
 
-- name: copy config.ini
-  copy:
+- name: Copy config.ini
+  ansible.builtin.copy:
     src: config.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
-- name: copy uwsgi.ini
-  template:
+- name: Copy uwsgi.ini
+  ansible.builtin.template:
     src: uwsgi.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: restart uWSGI
+  notify: Restart uWSGI
 
-- name: install supervisor daemon
-  pip:
+- name: Install supervisor daemon
+  ansible.builtin.pip:
     name: supervisor
   become: true
 
-- name: copy supervisord init script
-  copy:
+- name: Copy supervisord init script
+  ansible.builtin.copy:
     src: supervisord
     dest: /etc/init.d/supervisord
     backup: yes
@@ -120,8 +121,8 @@
     mode: 0755
   become: true
 
-- name: copy supervisord.conf
-  template:
+- name: Copy supervisord.conf
+  ansible.builtin.template:
     src: supervisord.conf
     dest: /etc/supervisord.conf
     backup: yes
@@ -129,10 +130,10 @@
     group: root
     mode: 0644
   become: true
-  notify: restart supervisord
+  notify: Restart supervisord
 
-- name: start supervisord now and on boot
-  service:
+- name: Start supervisord now and on boot
+  ansible.builtin.service:
     name: supervisord
     state: started
     enabled: yes

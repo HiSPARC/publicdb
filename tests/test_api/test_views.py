@@ -1,11 +1,10 @@
 from datetime import date, timedelta
 
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories.histograms_factories import ConfigurationFactory
 from ..factories.inforecords_factories import PcFactory, StationFactory
-from ..utils import date_as_kwargs
 
 
 class TestViews(TestCase):
@@ -13,11 +12,10 @@ class TestViews(TestCase):
     """Test if all endpoints work and sometimes that the expected data is returned"""
 
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.config = ConfigurationFactory(summary__station=self.station)
         self.pc = PcFactory(station=self.station, is_test=False)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_json(self, url):
         """Get url and check if the response is OK and valid json"""
@@ -51,7 +49,10 @@ class TestViews(TestCase):
         self.get_json(reverse('api:has_weather', kwargs=kwargs))
         self.get_json(reverse('api:num_events', kwargs=kwargs))
 
-        kwargs.update({'day': 5})
+        kwargs = {
+            'station_number': self.station.number,
+            'date': date(2011, 9, 5),
+        }
         self.get_json(reverse('api:station', kwargs=kwargs))
         self.get_json(reverse('api:has_data', kwargs=kwargs))
         self.get_json(reverse('api:has_weather', kwargs=kwargs))
@@ -61,8 +62,7 @@ class TestViews(TestCase):
         self.get_json(reverse('api:num_events', kwargs=kwargs))
 
         config_date = self.config.summary.date
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(config_date))
+        kwargs = {'station_number': self.station.number, 'date': config_date}
         self.get_json(reverse('api:config', kwargs=kwargs))
 
         # Invalid station
@@ -86,18 +86,18 @@ class TestViews(TestCase):
         self.get_json(reverse('api:data_stations', kwargs=kwargs))
         self.get_json(reverse('api:weather_stations', kwargs=kwargs))
 
-        kwargs.update({'day': 5})
+        kwargs = {'date': date(2011, 9, 5)}
         self.get_json(reverse('api:data_stations', kwargs=kwargs))
         self.get_json(reverse('api:weather_stations', kwargs=kwargs))
 
         # Invalid dates
         tomorrow = date.today() + timedelta(days=1)
-        kwargs = date_as_kwargs(tomorrow)
+        kwargs = {'date': tomorrow}
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 
         before_hisparc = date(2003, 12, 30)
-        kwargs = date_as_kwargs(before_hisparc)
+        kwargs = {'date': before_hisparc}
         self.assert_not_found(reverse('api:data_stations', kwargs=kwargs))
         self.assert_not_found(reverse('api:weather_stations', kwargs=kwargs))
 

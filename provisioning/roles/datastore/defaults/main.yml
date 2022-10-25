@@ -1,5 +1,3 @@
----
-
 datastore_base: /srv/
 datastore_path: "{{ datastore_base }}datastore/"
 datastore_code: "{{ datastore_path }}code"
@@ -7,4 +5,4 @@ datastore_venv: "{{ datastore_path }}datastore_venv"
 
 datastore_repo: https://github.com/HiSPARC/datastore.git
 
-datastore_python_version: 3.6
+datastore_python_version: '3.10'

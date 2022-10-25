@@ -34,7 +34,7 @@ def get_updated_files(rootdir, last_check_time):
     for path in paths:
         if re.match('[0-9]+', path):
             path = os.path.join(rootdir, path)
-            for dirpath, dirnames, filenames in os.walk(path):
+            for dirpath, _, filenames in os.walk(path):
                 for file in filenames:
                     file_path = os.path.join(dirpath, file)
                     mtime = os.path.getmtime(file_path)
@@ -43,8 +43,10 @@ def get_updated_files(rootdir, last_check_time):
                             date = datetime.datetime.strptime(file, '%Y_%m_%d.h5').date()
                         except ValueError:
                             continue
-                        if (date != datetime.datetime.utcnow().date() and
-                                date != datetime.datetime.today()):
+                        if (
+                            date != datetime.datetime.utcnow().date()
+                            and date != datetime.datetime.today()
+                        ):
                             file_list.append((date, file_path))
 
     return file_list
@@ -94,8 +96,8 @@ def get_stations(date):
     with tables.open_file(path, 'r') as file:
         for cluster in file.list_nodes('/hisparc'):
             for station in file.list_nodes(cluster):
-                m = re.match('station_(?P<station>[0-9]+)', station._v_name)
-                station_list.append(int(m.group('station')))
+                match = re.match('station_(?P<station>[0-9]+)', station._v_name)
+                station_list.append(int(match.group('station')))
 
     return station_list
 
@@ -126,7 +128,7 @@ def get_config_messages(cluster, station_number, date):
     path = get_data_path(date)
 
     file = tables.open_file(path, 'r')
-    parent = file.get_node('/hisparc/cluster_%s/station_%d' % (cluster.lower(), station_number))
+    parent = file.get_node(f'/hisparc/cluster_{cluster.lower()}/station_{station_number}')
     config = file.get_node(parent, 'config')
     blobs = file.get_node(parent, 'blobs')
     return file, config, blobs

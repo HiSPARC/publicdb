@@ -45,13 +45,13 @@ class TestContactInformation(TestCase):
         contact = inforecords_factories.ContactFactory(contactinformation=contact_info)
         station = inforecords_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0,
                                                        contactinformation=contact_info)
-        self.assertEqual('{}, {}'.format(contact, station), contact_info.contact_owner)
+        self.assertEqual(f'{contact}, {station}', contact_info.contact_owner)
 
     def test_contact_owner_with_multiple_contacts(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         contact = inforecords_factories.ContactFactory(surname='A', contactinformation=contact_info)
         contact2 = inforecords_factories.ContactFactory(surname='B', contactinformation=contact_info)
-        self.assertEqual('{}, {}'.format(contact, contact2), contact_info.contact_owner)
+        self.assertEqual(f'{contact}, {contact2}', contact_info.contact_owner)
 
     def test_str(self):
         contact_info = inforecords_factories.ContactInformationFactory()
@@ -85,7 +85,7 @@ class TestCluster(TestCase):
 class TestStation(TestCase):
     def test_str(self):
         station = inforecords_factories.StationFactory(number=0, cluster__number=0, cluster__country__number=0)
-        self.assertEqual('{:5d}: {}'.format(station.number, station.name), str(station))
+        self.assertEqual(f'{station.number:5d}: {station.name}', str(station))
 
     def test_number_of_detectors(self):
         station = inforecords_factories.StationFactory(number=0, cluster__number=0, cluster__country__number=0)

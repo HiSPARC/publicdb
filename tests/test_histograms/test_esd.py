@@ -1,6 +1,6 @@
 import datetime
 
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 
 from django.test import TestCase, override_settings
 
@@ -9,7 +9,7 @@ from publicdb.histograms import esd
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(ESD_PATH=join(dirname(abspath(__file__)), '../data/esd'))
+@override_settings(ESD_PATH=join(dirname(__file__), '../data/esd'))
 class TestESD(TestCase):
 
     def setup_station(self):

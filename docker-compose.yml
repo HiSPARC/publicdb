@@ -2,11 +2,12 @@ version: '3.3'
 services:
 
   postgres:
-    image: 'postgres:9.6-alpine'
+    image: 'postgres:14-alpine'
     restart: unless-stopped
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: publicdb
+      POSTGRES_USER: hisparc
+      POSTGRES_PASSWORD: postgres
     volumes:
       - 'pgdata:/var/lib/postgresql/data'
     ports:
@@ -30,6 +31,26 @@ services:
       - postgres
     ports:
       - '8000:8000'
+
+  vpn:
+     image: 'python:3.10'
+     restart: unless-stopped
+     volumes:
+       - './scripts:/base:ro'
+     ports:
+       - '8001:8001'
+     working_dir: '/base'
+     command: 'python fake-vpn-xmlrpc-server.py'
+
+  datastore:
+     image: 'python:3.10'
+     restart: unless-stopped
+     volumes:
+       - './scripts:/base:ro'
+     ports:
+       - '8002:8002'
+     working_dir: '/base'
+     command: 'python fake-datastore-xmlrpc-server.py'
 
 volumes:
   pgdata:

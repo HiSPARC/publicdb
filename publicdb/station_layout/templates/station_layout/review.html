@@ -69,13 +69,13 @@
 
     <div style="clear: both;"></div>
 
-    <form style="display: inline-block;" action="{% url 'layout:validate_review' hash %}" method="post">
+    <form style="display: inline-block;" action="{% url 'layout:validate_review' hash=hash %}" method="post">
     {% csrf_token %}
         <input id="id_approved" name="approved" type="hidden" value="1">
         <input type="submit" value="Accept">
     </form>
 
-    <form style="display: inline-block;" action="{% url 'layout:validate_review' hash %}" method="post">
+    <form style="display: inline-block;" action="{% url 'layout:validate_review' hash=hash %}" method="post">
     {% csrf_token %}
         <input type="submit" value="Decline">
     </form>

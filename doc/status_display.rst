@@ -11,4 +11,3 @@ Contents:
 .. toctree::
 
    status_display_views
-   status_display_nagios

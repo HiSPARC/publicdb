@@ -56,7 +56,7 @@ First load the required libraries (requires the numpy package).
 
     >>> from datetime import datetime
     >>> from urllib import urlencode
-    >>> from urllib2 import urlopen
+    >>> from urllib.request import urlopen
     >>> from StringIO import StringIO
     >>> from numpy import genfromtxt
 

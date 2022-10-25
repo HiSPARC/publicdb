@@ -32,12 +32,12 @@ class ContactAdmin(admin.ModelAdmin):
 
     def last_name(self, obj):
         if obj.prefix_surname:
-            return "%s, %s" % (obj.surname, obj.prefix_surname)
+            return f"{obj.surname}, {obj.prefix_surname}"
         else:
-            return "%s" % obj.surname
+            return f'{obj.surname}'
 
     def email_work_link(self, obj):
-        return mark_safe("<a href='mailto:{email}'>{email}</a>".format(email=obj.email_work))
+        return mark_safe(f"<a href='mailto:{obj.email_work}'>{obj.email_work}</a>")
 
 
 @admin.register(models.Country)
@@ -71,32 +71,13 @@ class ContactInformationAdmin(admin.ModelAdmin):
     inlines = (ContactInline, StationInline)
 
 
-class EnabledServiceInline(admin.TabularInline):
-    model = models.EnabledService
-    extra = 10
-
-
-@admin.register(models.MonitorService)
-class MonitorServiceAdmin(admin.ModelAdmin):
-    list_display = ('description', 'is_default_service', 'nagios_command')
-    inlines = (EnabledServiceInline,)
-
-
 @admin.register(models.Pc)
 class PcAdmin(admin.ModelAdmin):
     list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url',
                     'keys')
     list_filter = ('is_active', 'is_test')
     ordering = ('station',)
-    inlines = (EnabledServiceInline,)
     list_per_page = 200
-
-
-@admin.register(models.EnabledService)
-class EnabledServiceAdmin(admin.ModelAdmin):
-    list_display = ('pc', 'monitor_service', 'min_critical', 'max_critical',
-                    'min_warning', 'max_warning')
-    list_filter = ('pc', 'monitor_service')
 
 
 admin.site.register(models.Profession)

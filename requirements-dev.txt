@@ -1,16 +1,17 @@
 # unittests
 coverage
-Faker==0.9.2
+Faker
 factory_boy
 
 # flake8 tests
 flake8
+flake8-assertive
+flake8-bugbear
 flake8-isort
 pep8-naming
 
 # Docs
 sphinx
-mock
 
 # Provisioning tests
 ansible-lint

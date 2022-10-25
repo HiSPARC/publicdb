@@ -9,7 +9,7 @@ from ..status_display.views import stations_with_data
 def station_on_map(request, station_number):
     """Zoom in on a specific station on a map"""
 
-    station = get_object_or_404(Station, number=int(station_number))
+    station = get_object_or_404(Station, number=station_number)
     center = station.latest_location()
     if center['latitude'] is None and center['longitude'] is None:
         raise Http404

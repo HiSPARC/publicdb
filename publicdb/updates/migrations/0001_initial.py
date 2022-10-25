@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 import publicdb.updates.models
@@ -52,7 +49,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('version', models.PositiveSmallIntegerField()),
                 ('update', models.FileField(upload_to=publicdb.updates.models.upload_queue)),
-                ('queue', models.ForeignKey(to='updates.UpdateQueue')),
+                ('queue', models.ForeignKey(on_delete=models.CASCADE, to='updates.UpdateQueue')),
             ],
             options={
                 'ordering': ('version',),
@@ -61,26 +58,26 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='userupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
         migrations.AddField(
             model_name='installerupdate',
             name='queue',
-            field=models.ForeignKey(to='updates.UpdateQueue'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='updates.UpdateQueue'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
             name='installerupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
         migrations.AddField(
             model_name='adminupdate',
             name='queue',
-            field=models.ForeignKey(to='updates.UpdateQueue'),
+            field=models.ForeignKey(on_delete=models.CASCADE, to='updates.UpdateQueue'),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
             name='adminupdate',
-            unique_together=set([('queue', 'version')]),
+            unique_together={('queue', 'version')},
         ),
     ]

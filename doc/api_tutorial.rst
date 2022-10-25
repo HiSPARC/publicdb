@@ -151,7 +151,7 @@ following lines of code:
 
 .. code-block:: python
 
-    >>> from urllib2 import urlopen
+    >>> from urllib.request import urlopen
     >>> from datetime import date, timedelta
     >>> from pylab import plot, show
     >>> id = 501

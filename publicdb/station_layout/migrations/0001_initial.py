@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 
@@ -32,7 +29,7 @@ class Migration(migrations.Migration):
                 ('detector_4_alpha', models.FloatField(null=True, blank=True)),
                 ('detector_4_beta', models.FloatField(null=True, blank=True)),
                 ('detector_4_height', models.FloatField(null=True, blank=True)),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
             },
@@ -67,7 +64,7 @@ class Migration(migrations.Migration):
                 ('detector_4_alpha', models.FloatField(null=True, blank=True)),
                 ('detector_4_beta', models.FloatField(null=True, blank=True)),
                 ('detector_4_height', models.FloatField(null=True, blank=True)),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
             },
@@ -75,6 +72,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterUniqueTogether(
             name='stationlayout',
-            unique_together=set([('station', 'active_date')]),
+            unique_together={('station', 'active_date')},
         ),
     ]

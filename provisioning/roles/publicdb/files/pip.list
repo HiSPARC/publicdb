@@ -1,8 +1,8 @@
-uwsgitop==0.10
+uwsgitop==0.11
 
-Django>=1.11,<2.0
-python-dateutil==2.6.1
+Django~=3.2.14
+python-dateutil==2.8.2
 
-raven
+sentry-sdk
 
-hisparc-sapphire==1.7.1
+hisparc-sapphire==2.0.0

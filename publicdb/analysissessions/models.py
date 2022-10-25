@@ -19,7 +19,7 @@ from ..inforecords.models import Station
 
 class AnalysisSession(models.Model):
     session_request = models.OneToOneField('SessionRequest', models.CASCADE)
-    title = models.CharField(max_length=40, blank=False, unique=True)
+    title = models.CharField(max_length=255, blank=False, unique=True)
     slug = models.SlugField(unique=True)
     hash = models.CharField(max_length=32)
     pin = models.CharField(max_length=4)
@@ -32,11 +32,11 @@ class AnalysisSession(models.Model):
     in_progress.boolean = True
 
     def save(self, *args, **kwargs):
-        self.hash = hashlib.md5(self.slug).hexdigest()
-        super(AnalysisSession, self).save(*args, **kwargs)
+        self.hash = hashlib.md5(self.slug.encode('utf-8')).hexdigest()
+        super().save(*args, **kwargs)
         Student(session=self, name='Test student').save()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.title
 
     class Meta:
@@ -46,10 +46,10 @@ class AnalysisSession(models.Model):
 
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
-    name = models.CharField(max_length=40)
+    name = models.CharField(max_length=255)
 
-    def __unicode__(self):
-        return '%s - %s' % (self.session, self.name)
+    def __str__(self):
+        return f'{self.session} - {self.name}'
 
     class Meta:
         verbose_name = 'Student'
@@ -68,8 +68,8 @@ class AnalyzedCoincidence(models.Model):
     phi = models.FloatField(null=True, blank=True)
     error_estimate = models.FloatField(null=True, blank=True)
 
-    def __unicode__(self):
-        return "%s - %s" % (self.coincidence, self.student)
+    def __str__(self):
+        return f"{self.coincidence} - {self.student}"
 
     class Meta:
         verbose_name = 'Analyzed coincidence'
@@ -78,10 +78,10 @@ class AnalyzedCoincidence(models.Model):
 
 
 class SessionRequest(models.Model):
-    first_name = models.CharField(max_length=50)
-    sur_name = models.CharField(max_length=50)
+    first_name = models.CharField(max_length=255)
+    sur_name = models.CharField(max_length=255)
     email = models.EmailField()
-    school = models.CharField(max_length=50)
+    school = models.CharField(max_length=255)
     cluster = models.ForeignKey('inforecords.Cluster', models.CASCADE, related_name='session_requests')
     events_to_create = models.IntegerField()
     events_created = models.IntegerField()
@@ -91,7 +91,7 @@ class SessionRequest(models.Model):
     session_pending = models.BooleanField(default=False)
     session_created = models.BooleanField(default=False)
     url = models.CharField(max_length=20)
-    sid = models.CharField(max_length=50, blank=True, null=True)
+    sid = models.CharField(max_length=255, blank=True, null=True)
     pin = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -100,7 +100,7 @@ class SessionRequest(models.Model):
 
     @property
     def name(self):
-        return "%s %s" % (self.first_name, self.sur_name)
+        return f"{self.first_name} {self.sur_name}"
 
     def create_session(self):
         self.session_pending = False
@@ -206,15 +206,15 @@ class SessionRequest(models.Model):
     def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
         message = textwrap.dedent(
-            '''\
-            Hello %s,
+            f'''\
+            Hello {self.name},
 
             Please click on this link to confirm your request for an analysis session with jSparc:
-            https://data.hisparc.nl/analysis-session/request/%s/
+            https://data.hisparc.nl/analysis-session/request/{self.url}/
 
             Greetings,
-            The HiSPARC Team''' %
-            (self.name, self.url))
+            The HiSPARC Team'''
+        )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
@@ -223,63 +223,63 @@ class SessionRequest(models.Model):
     def sendmail_created(self):
         subject = 'HiSPARC analysis session created'
         message = textwrap.dedent(
-            '''\
-            Hello %s,
+            f'''\
+            Hello {self.name},
 
             Your analysis session for jSparc has been created.
-            Title = %s
-            Pin = %d
-            Events created = %d
+            Title = {self.sid}
+            Pin = {self.pin}
+            Events created = {self.events_created}
 
             Go here to start analysing events:
             https://data.hisparc.nl/media/jsparc/jsparc.html
 
             During the session you can view the results at:
-            https://data.hisparc.nl/analysis-session/%s/data/
+            https://data.hisparc.nl/analysis-session/{slugify(self.sid)}/data/
 
             Greetings,
-            The HiSPARC Team''' %
-            (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+            The HiSPARC Team'''
+        )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
         message = textwrap.dedent(
-            '''\
-            Hello %s,
+            f'''\
+            Hello {self.name},
 
             Your analysis session for jSparc has been created.
-            Title = %s
-            Pin = %d
+            Title = {self.sid}
+            Pin = {self.pin}
 
             However, we were unable to find the amount of events you requested.
-            Events created = %d
+            Events created = {self.events_created}
 
             Go here to start analysing events:
             https://data.hisparc.nl/media/jsparc/jsparc.html
 
             During the session you can view the results at:
-            https://data.hisparc.nl/analysis-session/%s/data/
+            https://data.hisparc.nl/analysis-session/{slugify(self.sid)}/data/
 
             Greetings,
-            The HiSPARC Team''' %
-            (self.name, self.sid, self.pin, self.events_created, slugify(self.sid)))
+            The HiSPARC Team'''
+        )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
         message = textwrap.dedent(
-            '''\
-            Hello %s,
+            f'''\
+            Hello {self.name},
 
             Your analysis session for jSparc could not be created.
             Perhaps there was no data for the date and/or stations you selected.
             Please try selecting a different cluster or date.
 
             Greetings,
-            The HiSPARC Team''' %
-            self.name)
+            The HiSPARC Team'''
+        )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)

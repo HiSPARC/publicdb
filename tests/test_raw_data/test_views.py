@@ -1,18 +1,17 @@
 import datetime
 
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 
-from django.test import Client, TestCase, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(ESD_PATH=join(dirname(abspath(__file__)), '../data/esd'))
+@override_settings(ESD_PATH=join(dirname(__file__), '../data/esd'))
 class TestDownload(TestCase):
 
     def setUp(self):
-        self.client = Client()
         # Required models
         cluster = inforecords_factories.ClusterFactory(name='Amsterdam', number=0, country__number=0)
         self.station = inforecords_factories.StationFactory(name='Nikhef', number=501, cluster=cluster)
@@ -27,15 +26,14 @@ class TestDownload(TestCase):
 
     def assert_download_equal_to_reference_tsv(self, data_type):
         # Expected data
-        reference_path = join(dirname(abspath(__file__)),
-                              '../data/tsv/{data_type}-s501-20170101.tsv'.format(data_type=data_type))
-        with open(reference_path, 'r') as reference_file:
+        reference_path = join(dirname(__file__), f'../data/tsv/{data_type}-s501-20170101.tsv')
+        with open(reference_path) as reference_file:
             reference_tsv = reference_file.read()
         # Get actual data
         kwargs = {'station_number': self.station.number}
-        url = reverse('data:{data_type}'.format(data_type=data_type), kwargs=kwargs)
+        url = reverse(f'data:{data_type}', kwargs=kwargs)
         response = self.client.get(url, {'start': self.summary.date.isoformat()})
-        tsv = ''.join(response.streaming_content)
+        tsv = b''.join(response.streaming_content).decode('utf-8')
         self.assertEqual(reference_tsv.strip(), tsv.strip())
 
     def test_download_events(self):

@@ -13,14 +13,16 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'publicdb',
-        'USER': 'postgres',
-        'PASSWORD': '',
+        'USER': 'hisparc',
+        'PASSWORD': 'postgres',
         'HOST': 'localhost',
-        'PORT': '',
+        'PORT': '5432',
     }
 }
 
@@ -42,9 +44,6 @@ DATASTORE_PROXY = None  # 'http://localhost:8002'
 # VPN and datastore host names
 VPN_HOST = 'localhost'
 DATASTORE_HOST = 'localhost'
-
-# Webserver of the publicdb where Nagios will retrieve active check results
-PUBLICDB_HOST_FOR_NAGIOS = 'https://data.hisparc.nl'
 
 # Process data with multiple threads. Default is disabled (False).
 # Disable multiprocessing for debugging purposes. When multithreaded
@@ -84,7 +83,9 @@ TEMPLATES = [
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': [
+                'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
             ],
         },
     },
@@ -130,8 +131,6 @@ INSTALLED_APPS = (
     'publicdb.maps',
     'publicdb.station_layout',
     'publicdb.default',
-
-    'raven.contrib.django.raven_compat',
 )
 
 LOGGING = {
@@ -172,5 +171,3 @@ LOGGING = {
         }
     },
 }
-
-RAVEN_CONFIG = {}

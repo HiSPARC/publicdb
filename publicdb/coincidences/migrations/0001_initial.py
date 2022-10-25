@@ -1,6 +1,3 @@
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-
 from django.db import migrations, models
 
 import publicdb.coincidences.models
@@ -36,7 +33,7 @@ class Migration(migrations.Migration):
                 ('pulseheights', publicdb.coincidences.models.SerializedDataField()),
                 ('integrals', publicdb.coincidences.models.SerializedDataField()),
                 ('traces', publicdb.coincidences.models.SerializedDataField()),
-                ('station', models.ForeignKey(to='inforecords.Station')),
+                ('station', models.ForeignKey(on_delete=models.CASCADE, to='inforecords.Station')),
             ],
             options={
                 'ordering': ('date', 'time', 'nanoseconds', 'station'),

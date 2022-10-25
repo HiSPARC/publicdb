@@ -31,9 +31,9 @@
             </div>
 
             <div class="keyvalue"><span class="key">Station</span>
-                <span class="value {% if not has_data %}nolink">Data</span>{% else %}"><a class="{% block current_data %}{% endblock %}" href="{% url 'status:station:summary' station.number %}">Data</a></span>{% endif %}
-                <span class="value"><a class="{% block current_status %}{% endblock %}" href="{% url 'status:station:status' station.number %}">PC Status</a></span>
-                <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status:station:config' station.number %}">Config</a></span>{% endif %}
+                <span class="value {% if not has_data %}nolink">Data</span>{% else %}"><a class="{% block current_data %}{% endblock %}" href="{% url 'status:station:summary' station_number=station.number %}">Data</a></span>{% endif %}
+                <span class="value"><a class="{% block current_status %}{% endblock %}" href="{% url 'status:station:status' station_number=station.number %}">PC Status</a></span>
+                <span class="value {% if not has_config %}nolink">Config</a></span>{% else %}"><a class="{% block current_config %}{% endblock %}" href="{% url 'status:station:config' station_number=station.number %}">Config</a></span>{% endif %}
             </div>
           {% endblock %}
         </div>

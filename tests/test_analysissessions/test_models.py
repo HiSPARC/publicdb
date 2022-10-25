@@ -10,7 +10,7 @@ from ..factories.inforecords_factories import ClusterFactory
 
 class TestAnalysisSession(TestCase):
     def setUp(self):
-        super(TestAnalysisSession, self).setUp()
+        super().setUp()
         self.cluster = ClusterFactory(number=0, country__number=0)
         self.analysis_session = AnalysisSessionFactory(session_request__cluster=self.cluster)
 
@@ -32,7 +32,7 @@ class TestAnalysisSession(TestCase):
         self.assertFalse(analysis_session.in_progress())
 
     def test_hash(self):
-        self.assertEqual(hashlib.md5(self.analysis_session.slug).hexdigest(), self.analysis_session.hash)
+        self.assertEqual(hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(), self.analysis_session.hash)
 
     def test_str(self):
         self.assertEqual(self.analysis_session.title, str(self.analysis_session))
@@ -44,7 +44,7 @@ class TestAnalysisSession(TestCase):
 
 class TestStudent(TestCase):
     def setUp(self):
-        super(TestStudent, self).setUp()
+        super().setUp()
         cluster = ClusterFactory(number=0, country__number=0)
         self.student = StudentFactory(name='Eugene', session__title='VU1', session__session_request__cluster=cluster)
 
@@ -54,7 +54,7 @@ class TestStudent(TestCase):
 
 class TestAnalyzedCoincidence(TestCase):
     def setUp(self):
-        super(TestAnalyzedCoincidence, self).setUp()
+        super().setUp()
         cluster = ClusterFactory(number=0, country__number=0)
         session_request = SessionRequestFactory(cluster=cluster)
         session = AnalysisSessionFactory(session_request=session_request)
@@ -62,13 +62,13 @@ class TestAnalyzedCoincidence(TestCase):
 
     def test_str(self):
         self.assertEqual(
-            '%s - %s' % (self.analyzed_coincidence.coincidence, self.analyzed_coincidence.student),
+            f'{self.analyzed_coincidence.coincidence} - {self.analyzed_coincidence.student}',
             str(self.analyzed_coincidence))
 
 
 class TestSessionRequest(TestCase):
     def setUp(self):
-        super(TestSessionRequest, self).setUp()
+        super().setUp()
         self.cluster = ClusterFactory(number=0, country__number=0)
 
     def test_session_request(self):

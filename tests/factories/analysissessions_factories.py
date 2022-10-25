@@ -11,7 +11,7 @@ from .providers import DataProvider
 factory.Faker.add_provider(DataProvider)
 
 
-class SessionRequestFactory(factory.DjangoModelFactory):
+class SessionRequestFactory(factory.django.DjangoModelFactory):
     first_name = factory.Faker('first_name')
     sur_name = factory.Faker('last_name')
     email = factory.Faker('safe_email')
@@ -39,7 +39,7 @@ class NewSessionRequestFactory(SessionRequestFactory):
     session_created = False
 
 
-class AnalysisSessionFactory(factory.DjangoModelFactory):
+class AnalysisSessionFactory(factory.django.DjangoModelFactory):
     session_request = factory.SubFactory(SessionRequestFactory)
     title = factory.Faker('word')
     slug = factory.Faker('slug')
@@ -53,7 +53,7 @@ class AnalysisSessionFactory(factory.DjangoModelFactory):
         django_get_or_create = ('slug',)
 
 
-class StudentFactory(factory.DjangoModelFactory):
+class StudentFactory(factory.django.DjangoModelFactory):
     session = factory.SubFactory(AnalysisSessionFactory)
     name = factory.Faker('first_name')
 
@@ -61,7 +61,7 @@ class StudentFactory(factory.DjangoModelFactory):
         model = models.Student
 
 
-class AnalyzedCoincidenceFactory(factory.DjangoModelFactory):
+class AnalyzedCoincidenceFactory(factory.django.DjangoModelFactory):
     session = factory.SubFactory(AnalysisSessionFactory)
     coincidence = factory.SubFactory(CoincidenceFactory)
     student = factory.SubFactory(StudentFactory)

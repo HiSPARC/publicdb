@@ -19,12 +19,6 @@
     width: 609px;
     margin-bottom: 20px;}
 
-#nagios {
-    position: absolute;
-    z-index: -1;
-    width: 850px;
-    height: 600px;}
-
 #ct_histogram,
 #cn_histogram {
     height: 250px;}
@@ -105,12 +99,6 @@ h3 {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background-color: grey;}
-
-.statusCube {
-    display: inline-block;
-    width: 40px;
-    height: 40px;
     background-color: grey;}
 
 .down {background-color: rgba(255, 0, 0, 0.3);}

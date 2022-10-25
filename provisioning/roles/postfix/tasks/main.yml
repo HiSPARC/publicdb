@@ -1,7 +1,5 @@
----
-
-- name: install postfix configuration
-  copy:
+- name: Install postfix configuration
+  ansible.builtin.copy:
     src: main.cf
     dest: /etc/postfix/main.cf
     backup: yes

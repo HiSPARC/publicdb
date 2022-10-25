@@ -1,7 +1,7 @@
 from tempfile import mkdtemp
-from urlparse import parse_qs
+from urllib.parse import parse_qs
 
-from django.test import Client, TestCase, override_settings
+from django.test import TestCase, override_settings
 from django.urls import reverse
 
 from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFactory, UserUpdateFactory
@@ -10,7 +10,6 @@ from ..factories.updates_factories import AdminUpdateFactory, InstallerUpdateFac
 @override_settings(MEDIA_ROOT=mkdtemp(prefix='mediaroot'))
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.admin_update = AdminUpdateFactory(queue__slug='hisparc')
         self.user_update = UserUpdateFactory(queue__slug='hisparc')
         self.installer_update = InstallerUpdateFactory(queue__slug='hisparc')
@@ -26,7 +25,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual({'mustUpdate': ['0']}, data)
 
     def test_check_querystring_admin_update(self):
@@ -37,7 +36,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['2'], 'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]},
             data)
@@ -50,7 +49,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['1'], 'newVersionUser': ['2'], 'urlUser': [user_update.update.url]},
             data)
@@ -64,7 +63,7 @@ class TestViews(TestCase):
         response = self.client.get(reverse('updates:check', kwargs=kwargs), query)
         self.assertEqual(200, response.status_code)
 
-        data = parse_qs(response.content)
+        data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
             {'mustUpdate': ['3'],
              'newVersionUser': ['2'], 'urlUser': [user_update.update.url],

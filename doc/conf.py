@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 #
 # Public Database documentation build configuration file
 #
@@ -10,7 +9,7 @@
 
 import sys
 import os
-import mock
+from unittest import mock
 
 MOCK_MODULES = ['numpy', 'scipy', 'tables',
                 'sapphire', 'sapphire.utils', 'sapphire.storage',
@@ -49,8 +48,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'Public Database'
-copyright = u'2015, HiSPARC'
+project = 'Public Database'
+copyright = '2015, HiSPARC'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -194,8 +193,8 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'publicdb.tex', u'Public Database Documentation',
-   u'Arne de Laat', 'manual'),
+  ('index', 'publicdb.tex', 'Public Database Documentation',
+   'Arne de Laat', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -224,8 +223,8 @@ latex_logo = 'logo/logo.pdf'
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'publicdb', u'Public Database Documentation',
-     [u'Arne de Laat'], 1)
+    ('index', 'publicdb', 'Public Database Documentation',
+     ['Arne de Laat'], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -238,8 +237,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'publicdb', u'Public Database Documentation',
-   u'Arne de Laat', 'publicdb', 'One line description of project.',
+  ('index', 'publicdb', 'Public Database Documentation',
+   'Arne de Laat', 'publicdb', 'One line description of project.',
    'Miscellaneous'),
 ]
 
@@ -256,10 +255,10 @@ texinfo_documents = [
 # -- Options for Epub output ---------------------------------------------------
 
 # Bibliographic Dublin Core info.
-epub_title = u'publicdb'
-epub_author = u'Arne de Laat'
-epub_publisher = u'Arne de Laat'
-epub_copyright = u'2013, Arne de Laat'
+epub_title = 'publicdb'
+epub_author = 'Arne de Laat'
+epub_publisher = 'Arne de Laat'
+epub_copyright = '2013, Arne de Laat'
 
 # The language of the text. It defaults to the language option
 # or en if the language is not set.

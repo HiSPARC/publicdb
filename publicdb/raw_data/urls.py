@@ -1,19 +1,19 @@
-from django.conf.urls import url
+from django.urls import path
 from django.views.generic import RedirectView
 
 from . import views
 
 app_name = 'data'
 urlpatterns = [
-    url(r'^$', RedirectView.as_view(url='download', permanent=False)),
-    url(r'^download/$', views.download_form, name="download_form"),
-    url(r'^download/(?P<station_number>\d+)/(?P<start>[^/]+)/(?P<end>[^/]+)/$', views.download_form, name="download_form"),
-    url(r'^download/coincidences/$', views.coincidences_download_form, name="coincidences_download_form"),
-    url(r'^download/coincidences/(?P<start>[^/]+)/(?P<end>[^/]+)/$', views.coincidences_download_form, name="coincidences_download_form"),
-    url(r'^rpc$', views.call_xmlrpc, name="rpc"),
-    url(r'^(?P<station_number>\d+)/events/$', views.download_data, {'data_type': 'events'}, name="events"),
-    url(r'^(?P<station_number>\d+)/weather/$', views.download_data, {'data_type': 'weather'}, name="weather"),
-    url(r'^(?P<station_number>\d+)/singles/$', views.download_data, {'data_type': 'singles'}, name="singles"),
-    url(r'^knmi/lightning/(?P<lightning_type>\d+)/$', views.download_data, {'data_type': 'lightning'}, name="lightning"),
-    url(r'^network/coincidences/$', views.download_coincidences, name="coincidences"),
+    path('', RedirectView.as_view(url='download', permanent=False)),
+    path('download/', views.download_form, name="download_form"),
+    path('download/<int:station_number>/<str:start>/<str:end>/', views.download_form, name="download_form"),
+    path('download/coincidences/', views.coincidences_download_form, name="coincidences_download_form"),
+    path('download/coincidences/<str:start>/<str:end>/', views.coincidences_download_form, name="coincidences_download_form"),
+    path('rpc', views.call_xmlrpc, name="rpc"),
+    path('<int:station_number>/events/', views.download_data, {'data_type': 'events'}, name="events"),
+    path('<int:station_number>/weather/', views.download_data, {'data_type': 'weather'}, name="weather"),
+    path('<int:station_number>/singles/', views.download_data, {'data_type': 'singles'}, name="singles"),
+    path('knmi/lightning/<int:lightning_type>/', views.download_data, {'data_type': 'lightning'}, name="lightning"),
+    path('network/coincidences/', views.download_coincidences, name="coincidences"),
 ]

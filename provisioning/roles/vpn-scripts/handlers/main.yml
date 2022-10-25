@@ -1,12 +1,10 @@
----
-
-- name: restart supervisord
-  service:
+- name: Restart supervisord
+  ansible.builtin.service:
     name: supervisord
     state: restarted
   become: true
 
 - name: restart hisparcvpnd
-  supervisorctl:
+  community.general.supervisorctl:
     name: hisparcvpnd
     state: restarted

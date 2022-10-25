@@ -2,11 +2,13 @@ import csv
 import datetime
 import os
 import tempfile
-import urllib
-import urlparse
+import urllib.error
+import urllib.parse
+import urllib.request
 
-from cStringIO import StringIO
-from SimpleXMLRPCServer import SimpleXMLRPCDispatcher
+from io import StringIO
+from urllib.parse import urljoin
+from xmlrpc.server import SimpleXMLRPCDispatcher
 
 import dateutil.parser
 import tables
@@ -58,13 +60,13 @@ def call_xmlrpc(request):
     else:
         # Show documentation on available methods
         response = HttpResponse()
-        t = loader.get_template('raw_data/xmlrpc.html')
+        template = loader.get_template('raw_data/xmlrpc.html')
         methods = []
         for method in dispatcher.system_listMethods():
             methods.append({'name': method,
                             'help': dispatcher.system_methodHelp(method)})
         context = {'methods': methods}
-        response.write(t.render(context))
+        response.write(template.render(context))
         return response
 
 
@@ -85,7 +87,7 @@ def get_data_url(station_number, date, get_blobs=False):
     and provide a link to download that file.
 
     :param station_number: the HiSPARC station number
-    :param date: a xmlrpclib.DateTime instance; retrieve events from this day
+    :param date: a xmlrpc.client.DateTime instance; retrieve events from this day
 
     """
     date = date.timetuple()
@@ -103,8 +105,8 @@ def get_data_url(station_number, date, get_blobs=False):
             if node.name != 'blobs':
                 datafile.copy_node(node, target_node)
 
-    url = urlparse.urljoin(settings.MEDIA_URL, 'raw_data/')
-    url = urlparse.urljoin(url, os.path.basename(target.filename))
+    url = urljoin(settings.MEDIA_URL, 'raw_data/')
+    url = urljoin(url, os.path.basename(target.filename))
 
     datafile.close()
     target.close()
@@ -115,11 +117,11 @@ def get_data_url(station_number, date, get_blobs=False):
 def get_raw_datafile(date):
     """Return a reference to the raw data file on a specified date"""
 
-    dir = os.path.join(settings.DATASTORE_PATH, '%d/%d' % (date.tm_year, date.tm_mon))
-    name = os.path.join(dir, '%d_%d_%d.h5' % (date.tm_year, date.tm_mon, date.tm_mday))
+    dir = os.path.join(settings.DATASTORE_PATH, f'{date.tm_year}/{date.tm_mon}')
+    name = os.path.join(dir, f'{date.tm_year}_{date.tm_mon}_{date.tm_mday}.h5')
     try:
         datafile = tables.open_file(name, 'r')
-    except IOError:
+    except OSError:
         raise Exception("No data for that date")
 
     return datafile
@@ -128,7 +130,7 @@ def get_raw_datafile(date):
 def get_station_node(datafile, station_number):
     """Return the requested station's node"""
 
-    station = 'station_%d' % station_number
+    station = f'station_{station_number}'
 
     for cluster in datafile.list_nodes('/hisparc'):
         if station in cluster:
@@ -156,15 +158,15 @@ def download_form(request, station_number=None, start=None, end=None):
             end = form.cleaned_data['end']
             download = form.cleaned_data['download']
             data_type = form.cleaned_data['data_type']
-            query_string = urllib.urlencode({'start': start, 'end': end, 'download': download})
+            query_string = urllib.parse.urlencode({'start': start, 'end': end, 'download': download})
             if data_type == 'lightning':
                 lightning_type = form.cleaned_data['lightning_type']
                 url = reverse('data:lightning', kwargs={'lightning_type': lightning_type})
             else:
                 station = form.cleaned_data['station']
-                url = reverse('data:{data_type}'.format(data_type=data_type),
+                url = reverse(f'data:{data_type}',
                               kwargs={'station_number': station.number})
-            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
+            return HttpResponseRedirect(f'{url}?{query_string}')
     else:
         if station_number:
             station = get_object_or_404(Station, number=station_number)
@@ -192,7 +194,6 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
 
     """
     if data_type in ['events', 'weather', 'singles']:
-        station_number = int(station_number)
         station = get_object_or_404(Station, number=station_number)
 
     yesterday = datetime.date.today() - datetime.timedelta(days=1)
@@ -222,27 +223,26 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
     timerange_string = prettyprint_timerange(start, end)
     if data_type == 'events':
         tsv_output = generate_events_as_tsv(station, start, end)
-        filename = 'events-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'events-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'weather':
         tsv_output = generate_weather_as_tsv(station, start, end)
-        filename = 'weather-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'weather-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'singles':
         tsv_output = generate_singles_as_tsv(station, start, end)
-        filename = 'singles-s%d-%s.tsv' % (station_number, timerange_string)
+        filename = f'singles-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'lightning':
-        lightning_type = int(lightning_type)
-        if lightning_type not in range(6):
+        if lightning_type not in list(range(6)):
             msg = ("Incorrect lightning type, should be a value between 0-5")
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
-        filename = 'lightning-knmi-%s.tsv' % (timerange_string)
+        filename = f'lightning-knmi-{timerange_string}.tsv'
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
-        content_disposition = 'attachment; filename="%s"' % filename
+        content_disposition = f'attachment; filename="{filename}"'
     else:
-        content_disposition = 'inline; filename="%s"' % filename
+        content_disposition = f'inline; filename="{filename}"'
     response['Content-Disposition'] = content_disposition
     response['Access-Control-Allow-Origin'] = '*'
 
@@ -252,10 +252,10 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
 def generate_events_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/event_data.tsv')
+    template = loader.get_template('raw_data/event_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     events_returned = False
 
@@ -334,7 +334,7 @@ def get_events_from_esd_in_range(station, start, end):
                     event_ids = events_table.get_where_list('(ts0 <= timestamp) & (timestamp < ts1)')
                     events = events_table.read_coordinates(event_ids)
                     reconstructions = reconstructions_table[event_ids]
-        except IOError:
+        except OSError:
             continue
         else:
             yield events, reconstructions
@@ -343,10 +343,10 @@ def get_events_from_esd_in_range(station, start, end):
 def generate_weather_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/weather_data.tsv')
+    template = loader.get_template('raw_data/weather_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     weather_returned = False
 
@@ -406,7 +406,7 @@ def get_weather_from_esd_in_range(station, start, end):
                     ts0 = datetime_to_gps(t0)  # noqa: F841
                     ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.weather.read_where('(ts0 <= timestamp) & (timestamp < ts1)')
-        except (IOError, tables.NoSuchNodeError):
+        except (OSError, tables.NoSuchNodeError):
             continue
         else:
             yield events
@@ -415,10 +415,10 @@ def get_weather_from_esd_in_range(station, start, end):
 def generate_singles_as_tsv(station, start, end):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/singles_data.tsv')
+    template = loader.get_template('raw_data/singles_data.tsv')
     context = {'station': station, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     singles_returned = False
 
@@ -472,7 +472,7 @@ def get_singles_from_esd_in_range(station, start, end):
                     ts0 = datetime_to_gps(t0)  # noqa: F841
                     ts1 = datetime_to_gps(t1)  # noqa: F841
                     events = station_node.singles.read_where('(ts0 <= timestamp) & (timestamp < ts1)')
-        except (IOError, tables.NoSuchNodeError):
+        except (OSError, tables.NoSuchNodeError):
             continue
         else:
             yield events
@@ -483,12 +483,12 @@ def generate_lightning_as_tsv(lightning_type, start, end):
 
     types = ('Single-point', 'Cloud-cloud', 'Cloud-cloud mid',
              'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
-    type_str = '%d: %s' % (lightning_type, types[lightning_type])
+    type_str = f'{lightning_type}: {types[lightning_type]}'
 
-    t = loader.get_template('raw_data/lightning_data.tsv')
+    template = loader.get_template('raw_data/lightning_data.tsv')
     context = {'lightning_type': type_str, 'start': start, 'end': end}
 
-    yield t.render(context)
+    yield template.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
@@ -527,9 +527,8 @@ def get_lightning_in_range(lightning_type, start, end):
             with tables.open_file(filepath) as f:
                 ts0 = datetime_to_gps(t0)
                 ts1 = datetime_to_gps(t1)
-                for event in knmi_lightning.discharges(f, ts0, ts1, type=lightning_type):
-                    yield event
-        except (IOError, tables.NoSuchNodeError):
+                yield from knmi_lightning.discharges(f, ts0, ts1, type=lightning_type)
+        except (OSError, tables.NoSuchNodeError):
             continue
 
 
@@ -543,11 +542,13 @@ def coincidences_download_form(request, start=None, end=None):
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
-            query_string = urllib.urlencode({'cluster': cluster, 'stations': stations,
-                                             'start': start, 'end': end,
-                                             'n': n, 'download': download})
+            query_string = urllib.parse.urlencode({
+                'cluster': cluster, 'stations': stations,
+                'start': start, 'end': end,
+                'n': n, 'download': download
+            })
             url = reverse('data:coincidences')
-            return HttpResponseRedirect('{url}?{query}'.format(url=url, query=query_string))
+            return HttpResponseRedirect(f'{url}?{query_string}')
     else:
         form = CoincidenceDownloadForm(initial={'filter_by': 'network', 'start': start, 'end': end, 'n': 2})
 
@@ -611,8 +612,7 @@ def download_coincidences(request):
                 error_msg = "To few stations in query, give at least n."
             elif len(stations) >= 30:
                 error_msg = "To many stations in query, use less than 30."
-            elif (Station.objects.filter(number__in=stations).count() !=
-                  len(stations)):
+            elif Station.objects.filter(number__in=stations).count() != len(stations):
                 error_msg = "Not all station numbers are valid."
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
@@ -632,14 +632,14 @@ def download_coincidences(request):
 
     timerange_string = prettyprint_timerange(start, end)
     tsv_output = generate_coincidences_as_tsv(start, end, cluster, stations, n)
-    filename = 'coincidences-%s.tsv' % (timerange_string)
+    filename = f'coincidences-{timerange_string}.tsv'
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
     if download:
-        content_disposition = 'attachment; filename="%s"' % filename
+        content_disposition = f'attachment; filename="{filename}"'
     else:
-        content_disposition = 'inline; filename="%s"' % filename
+        content_disposition = f'inline; filename="{filename}"'
     response['Content-Disposition'] = content_disposition
     response['Access-Control-Allow-Origin'] = '*'
 
@@ -649,10 +649,10 @@ def download_coincidences(request):
 def generate_coincidences_as_tsv(start, end, cluster, stations, n):
     """Render TSV output as an iterator."""
 
-    t = loader.get_template('raw_data/coincidences.tsv')
+    template = loader.get_template('raw_data/coincidences.tsv')
     context = {'start': start, 'end': end, 'cluster': cluster, 'stations': stations, 'n': n}
 
-    yield t.render(context)
+    yield template.render(context)
 
     line_buffer = SingleLineStringIO()
     writer = csv.writer(line_buffer, delimiter='\t', lineterminator='\n')
@@ -703,7 +703,6 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
     :yield: id, station number and event
 
     """
-    id = -1
     for t0, t1 in single_day_ranges(start, end):
         try:
             NetworkSummary.objects.get(date=t0)
@@ -720,10 +719,10 @@ def get_coincidences_from_esd_in_range(start, end, stations, n):
                 else:
                     coincidences = cq.timerange(start=ts0, stop=ts1)
                     events = cq.all_events(coincidences, n)
-                for id, coin in enumerate(events, id + 1):
-                    for number, event in coin:
+                for id, coincidence in enumerate(events):
+                    for number, event in coincidence:
                         yield id, number, event
-            except (IOError, tables.NoSuchNodeError):
+            except (OSError, tables.NoSuchNodeError):
                 continue
 
 
@@ -756,7 +755,7 @@ def clean_float_array(numbers, precision=5):
     if precision < 3:
         # Unable to preserve -999 if precision less than 3.
         precision = 3
-    return char.mod('%%.%dg' % precision, numbers)
+    return char.mod(f'%.{precision}g', numbers)
 
 
 def clean_floats(number, precision=4):
@@ -796,17 +795,17 @@ def prettyprint_timerange(t0, t1):
 
     duration = t1 - t0
     if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or t0.hour > 0):
-        timerange = '%s %s' % (t0, t1)
+        timerange = f'{t0} {t1}'
     elif duration.days == 1:
         timerange = str(t0.date())
     else:
-        timerange = '%s %s' % (t0.date(), t1.date())
+        timerange = f'{t0.date()} {t1.date()}'
 
     timerange = timerange.replace('-', '').replace(' ', '_').replace(':', '')
     return timerange
 
 
-class FakeReconstructionsTable(object):
+class FakeReconstructionsTable:
 
     """Used as standin for a missing reconstruction table
 

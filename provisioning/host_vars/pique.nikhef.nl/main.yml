@@ -1,5 +1,3 @@
----
-
 debug: False
 
 publicdb_repo: https://github.com/HiSPARC/publicdb.git

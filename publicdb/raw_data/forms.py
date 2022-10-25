@@ -39,15 +39,15 @@ class DataDownloadForm(forms.Form):
     def clean(self):
         """Check the choices to ensure the combination of choices are valid"""
 
-        cleaned_data = super(DataDownloadForm, self).clean()
+        cleaned_data = super().clean()
         data_type = cleaned_data.get('data_type')
 
         for station_data_type in ['events', 'weather', 'singles']:
-            station_field = 'station_{}'.format(station_data_type)
+            station_field = f'station_{station_data_type}'
             if data_type == station_data_type:
                 station = cleaned_data.get(station_field)
                 if not station:
-                    self.add_error(station_field, u'Choose a station')
+                    self.add_error(station_field, 'Choose a station')
                 else:
                     cleaned_data["station"] = station
             else:
@@ -69,7 +69,7 @@ class CoincidenceDownloadForm(forms.Form):
     def clean(self):
         """Check the choices to ensure the combination of choices are valid"""
 
-        cleaned_data = super(CoincidenceDownloadForm, self).clean()
+        cleaned_data = super().clean()
         filter_by = cleaned_data.get('filter_by')
         if filter_by == 'network':
             del cleaned_data["cluster"]
@@ -78,25 +78,25 @@ class CoincidenceDownloadForm(forms.Form):
             del cleaned_data["stations"]
             cluster = cleaned_data.get('cluster')
             if not cluster:
-                self.add_error("cluster", ValidationError(u'Choose a cluster.', 'invalid_choice'))
+                self.add_error("cluster", ValidationError('Choose a cluster.', 'invalid_choice'))
         elif filter_by == 'stations':
             del cleaned_data["cluster"]
             msg = None
             stations = cleaned_data.get('stations')
             if not stations:
-                msg = ValidationError(u'A list of stations is required.', 'required')
+                msg = ValidationError('A list of stations is required.', 'required')
             else:
                 try:
                     s_numbers = [int(x) for x in stations.strip('[]()').split(',')]
                 except Exception:
-                    msg = ValidationError(u'Incorrect station entry.', 'incorrect_entry')
+                    msg = ValidationError('Incorrect station entry.', 'incorrect_entry')
                 else:
                     if len(s_numbers) < cleaned_data.get('n'):
-                        msg = ValidationError(u'Enter at least N stations.', 'too_few')
+                        msg = ValidationError('Enter at least N stations.', 'too_few')
                     elif len(s_numbers) > 30:
-                        msg = ValidationError(u'Exceeded limit of 30 stations.', 'too_many')
+                        msg = ValidationError('Exceeded limit of 30 stations.', 'too_many')
                     elif not Station.objects.filter(number__in=s_numbers).count() == len(s_numbers):
-                        msg = ValidationError(u'Invalid station numbers.', 'invalid_choices')
+                        msg = ValidationError('Invalid station numbers.', 'invalid_choices')
             if msg is not None:
                 self.add_error('stations', msg)
 

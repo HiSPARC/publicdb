@@ -160,8 +160,10 @@ def result(request):
     theta = request.GET.get('theta', 0)
     phi = request.GET.get('phi', 0)
 
-    if (coincidence.session.title.lower() != session_title.lower() or
-            coincidence.student.name.lower() != student_name.lower()):
+    if (
+        coincidence.session.title.lower() != session_title.lower()
+        or coincidence.student.name.lower() != student_name.lower()
+    ):
         return error_json(401, 'Wrong combination of data.')
 
     coincidence.core_position_x = longitude
@@ -298,7 +300,7 @@ def validate_request_form(request):
 def confirm_request(request, url):
     sessionrequest = get_object_or_404(SessionRequest, url=url)
     if sessionrequest.session_confirmed is False:
-        sessionrequest.sid = '{school}{id}'.format(school=sessionrequest.school, id=sessionrequest.id)
+        sessionrequest.sid = f'{sessionrequest.school}{sessionrequest.id}'
         sessionrequest.pin = randint(1000, 9999)
         sessionrequest.session_confirmed = True
         sessionrequest.save()

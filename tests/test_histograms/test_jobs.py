@@ -1,10 +1,9 @@
 from datetime import date
 from os import environ
-from os.path import abspath, dirname, join
+from os.path import dirname, join
 from shutil import rmtree
 from tempfile import mkdtemp
-
-from mock import patch
+from unittest.mock import patch
 
 from django.conf import settings
 from django.test import LiveServerTestCase, override_settings
@@ -16,24 +15,20 @@ from publicdb.histograms import jobs, models
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(DATASTORE_PATH=join(dirname(abspath(__file__)), '../data/datastore'))
+@override_settings(DATASTORE_PATH=join(dirname(__file__), '../data/datastore'))
 class TestJobs(LiveServerTestCase):
 
     fixtures = ['initial_generator_state.json']
 
     def setUp(self):
-        super(TestJobs, self).setUp()
-        self._old_publicdb_base = environ.get('PUBLICDB_BASE')
+        super().setUp()
+        publicdb_base = environ.get('PUBLICDB_BASE')
         environ['PUBLICDB_BASE'] = self.live_server_url
+        if publicdb_base:
+            self.addCleanup(environ.update, {'PUBLICDB_BASE': publicdb_base})
 
-    def tearDown(self):
-        super(TestJobs, self).tearDown()
-        if self._old_publicdb_base:
-            environ['PUBLICDB_BASE'] = self._old_publicdb_base
-
-    @patch('django.db.close_old_connections')
     @patch('publicdb.histograms.jobs.perform_update_tasks')
-    def test_update_all_histograms(self, mock_perform, mock_close):
+    def test_update_all_histograms(self, mock_perform):
         """The update function is called if previous check has finished"""
 
         self.assertTrue(jobs.update_all_histograms())
@@ -54,12 +49,12 @@ class TestJobs(LiveServerTestCase):
         cluster = inforecords_factories.ClusterFactory(name='Amsterdam', number=0, country__number=0)
         self.station = inforecords_factories.StationFactory(number=501, cluster=cluster)
 
-    @patch('django.db.close_old_connections')
     @override_settings(ESD_PATH=mkdtemp())
-    def test_perform_update_tasks(self, mock_close):
+    def test_perform_update_tasks(self):
         """Update the ESD for summaries in need of updates"""
 
         self.setup_station()
+
         summary = histograms_factories.SummaryFactory(
             station=self.station, date=date(2017, 1, 1),
             needs_update_events=True, num_events=168,
@@ -73,7 +68,7 @@ class TestJobs(LiveServerTestCase):
 
         # Created data should equal reference file
         test_data = join(settings.ESD_PATH, '2017/1/2017_1_1.h5')
-        reference_path = join(dirname(abspath(__file__)), '../data/esd/2017/1/2017_1_1.h5')
+        reference_path = join(dirname(__file__), '../data/esd/2017/1/2017_1_1.h5')
         validate_results(self, test_data, reference_path)
         rmtree(settings.ESD_PATH)
 

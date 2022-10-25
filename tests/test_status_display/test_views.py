@@ -1,26 +1,22 @@
 from io import BytesIO
 
-from mock import patch
 from numpy import genfromtxt
 
-from django.test import Client, TestCase
+from django.test import TestCase
 from django.urls import reverse
 
 from ..factories import histograms_factories
 from ..factories.inforecords_factories import StationFactory
 from ..factories.station_layout_factories import StationLayoutFactory
-from ..utils import date_as_kwargs
 
 
-@patch('publicdb.status_display.nagios.retrieve_station_status', new=lambda q: [])
 class TestViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         histograms_factories.EventtimeHistogramFactory(summary=self.summary)
         histograms_factories.ConfigurationFactory(summary=self.summary)
-        super(TestViews, self).setUp()
+        super().setUp()
 
     def get_html(self, url):
         """Get url and check if the response is OK and valid json"""
@@ -56,19 +52,15 @@ class TestViews(TestCase):
         kwargs = {'station_number': self.station.number}
         response = self.client.get(reverse('status:station:summary', kwargs=kwargs))
         self.assertEqual(302, response.status_code)
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(self.summary.date))
+        kwargs = {'station_number': self.station.number, 'date': self.summary.date}
         self.assertEqual(reverse('status:station:summary', kwargs=kwargs), response['Location'])
 
     def test_stations_data(self):
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(self.summary.date))
+        kwargs = {'station_number': self.station.number, 'date': self.summary.date}
         self.get_html(reverse('status:station:summary', kwargs=kwargs))
 
     def test_stations_data_invalid_date(self):
-        kwargs = {'station_number': self.station.number}
-        kwargs.update(date_as_kwargs(self.summary.date))
-        kwargs['month'] = 13
+        kwargs = {'station_number': self.station.number, 'date': self.summary.date.replace(year=2002)}
         response = self.client.get(reverse('status:station:summary', kwargs=kwargs))
         self.assertEqual(404, response.status_code)
 
@@ -78,11 +70,10 @@ class TestViews(TestCase):
 
 class TestSourceViews(TestCase):
     def setUp(self):
-        self.client = Client()
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station)
         self.network_summary = histograms_factories.NetworkSummaryFactory(date=self.summary.date)
-        super(TestSourceViews, self).setUp()
+        super().setUp()
 
     def get_tsv(self, url):
         """Get url and check if the response is OK and valid TSV"""
@@ -105,13 +96,14 @@ class TestSourceViews(TestCase):
             histograms_factories.CoincidencenumberHistogramFactory
         ]
         for factory in factories:
-            data = factory(network_summary=self.network_summary)
-            response = self.get_tsv(data.get_absolute_url())
-            expected_context = {
-                'data': zip(data.bins, data.values),
-                'date': self.network_summary.date.strftime('%-Y-%-m-%-d'),
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(factory=factory):
+                data = factory(network_summary=self.network_summary)
+                response = self.get_tsv(data.get_absolute_url())
+                expected_context = {
+                    'data': list(zip(data.bins, data.values)),
+                    'date': self.network_summary.date,
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_daily_histograms(self):
         factories = [
@@ -120,14 +112,15 @@ class TestSourceViews(TestCase):
             histograms_factories.ZenithHistogramFactory
         ]
         for factory in factories:
-            data = factory(summary=self.summary)
-            response = self.get_tsv(data.get_absolute_url())
-            expected_context = {
-                'data': zip(data.bins, data.values),
-                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
-                'station_number': str(self.station.number)
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(factory=factory):
+                data = factory(summary=self.summary)
+                response = self.get_tsv(data.get_absolute_url())
+                expected_context = {
+                    'data': list(zip(data.bins, data.values)),
+                    'date': self.summary.date,
+                    'station_number': self.station.number,
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_multi_daily_histograms(self):
         factories = [
@@ -137,14 +130,15 @@ class TestSourceViews(TestCase):
             histograms_factories.SingleshighHistogramFactory
         ]
         for factory in factories:
-            data = factory(summary=self.summary)
-            response = self.get_tsv(data.get_absolute_url())
-            expected_context = {
-                'data': zip(data.bins, *data.values),
-                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
-                'station_number': str(self.station.number)
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(factory=factory):
+                data = factory(summary=self.summary)
+                response = self.get_tsv(data.get_absolute_url())
+                expected_context = {
+                    'data': list(zip(data.bins, *data.values)),
+                    'date': self.summary.date,
+                    'station_number': self.station.number,
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_full_eventtime_data(self):
         histograms_factories.EventtimeHistogramFactory(summary=self.summary)
@@ -157,14 +151,15 @@ class TestSourceViews(TestCase):
             histograms_factories.TemperatureDatasetFactory,
         ]
         for factory in factories:
-            data = factory(summary=self.summary)
-            response = self.get_tsv(data.get_absolute_url())
-            expected_context = {
-                'data': zip(data.x, data.y),
-                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
-                'station_number': str(self.station.number)
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(factory=factory):
+                data = factory(summary=self.summary)
+                response = self.get_tsv(data.get_absolute_url())
+                expected_context = {
+                    'data': list(zip(data.x, data.y)),
+                    'date': self.summary.date,
+                    'station_number': self.station.number,
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_multi_daily_datasets(self):
         factories = [
@@ -172,26 +167,28 @@ class TestSourceViews(TestCase):
             histograms_factories.SinglesratehighDatasetFactory,
         ]
         for factory in factories:
-            data = factory(summary=self.summary)
-            response = self.get_tsv(data.get_absolute_url())
-            expected_context = {
-                'data': zip(data.x, *data.y),
-                'date': self.summary.date.strftime('%-Y-%-m-%-d'),
-                'station_number': str(self.station.number)
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(factory=factory):
+                data = factory(summary=self.summary)
+                response = self.get_tsv(data.get_absolute_url())
+                expected_context = {
+                    'data': list(zip(data.x, *data.y)),
+                    'date': self.summary.date,
+                    'station_number': self.station.number,
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_configs(self):
         kwargs = {'station_number': self.station.number}
         histograms_factories.ConfigurationFactory(summary=self.summary)
 
         for config_type in ['electronics', 'voltage', 'current', 'gps', 'trigger']:
-            response = self.get_tsv(reverse('status:source:{type}'.format(type=config_type), kwargs=kwargs))
-            expected_context = {
-                'station_number': str(self.station.number)
-                # data structures are a bit more work to check.
-            }
-            self.assert_context_contains(expected_context, response.context)
+            with self.subTest(config_type=config_type):
+                response = self.get_tsv(reverse(f'status:source:{config_type}', kwargs=kwargs))
+                expected_context = {
+                    'station_number': self.station.number
+                    # data structures are a bit more work to check.
+                }
+                self.assert_context_contains(expected_context, response.context)
 
     def test_station_layout(self):
         kwargs = {'station_number': self.station.number}

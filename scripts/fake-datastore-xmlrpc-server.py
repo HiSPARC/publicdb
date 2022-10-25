@@ -9,26 +9,26 @@
     library documentation and extended.
 
 """
-from SimpleXMLRPCServer import SimpleXMLRPCServer
-from SimpleXMLRPCServer import SimpleXMLRPCRequestHandler
-import urllib2
 import hashlib
+
+from urllib.request import urlopen
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 
 HASH = '/tmp/hash_datastore'
 DATASTORE_CFG = '/tmp/station_list.csv'
-CFG_URL = 'http://localhost:8003/config/datastore'
+CFG_URL = 'http://publicdb:8000/config/datastore'
 
 
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
-    datastore_cfg = urllib2.urlopen(CFG_URL).read()
+    datastore_cfg = urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:
-        with open(HASH, 'r') as file:
+        with open(HASH) as file:
             old_hash = file.readline()
-    except IOError:
+    except OSError:
         old_hash = None
 
     if new_hash == old_hash:
@@ -46,14 +46,14 @@ def reload_datastore():
     return True
 
 
-if __name__ == '__main__':
+class RequestHandler(SimpleXMLRPCRequestHandler):
     # Restrict to a particular path.
-    class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+    rpc_paths = ('/RPC2',)
 
+
+if __name__ == '__main__':
     # Create server
-    server = SimpleXMLRPCServer(("localhost", 8002),
-                                requestHandler=RequestHandler)
+    server = SimpleXMLRPCServer(("0.0.0.0", 8002), requestHandler=RequestHandler)
     server.register_introspection_functions()
 
     server.register_function(reload_datastore)

@@ -7,7 +7,7 @@ from ..factories.station_layout_factories import StationLayoutFactory
 class TestModels(TestCase):
     def setUp(self):
         self.station = StationFactory(number=1, cluster__number=0, cluster__country__number=0)
-        super(TestModels, self).setUp()
+        super().setUp()
 
     def test_has_four_detectors(self):
         """Check property to verify number of detectors"""

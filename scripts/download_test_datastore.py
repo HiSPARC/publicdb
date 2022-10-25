@@ -45,7 +45,7 @@ def main():
 
 
 def test_for_datastore_directory():
-    print("Checking for datastore path at %s ..." % datastore_path,)
+    print("Checking for datastore path at {datastore_path} ...",)
     if not os.path.exists(datastore_path):
         raise RuntimeError("Datastore path cannot be found!")
     else:
@@ -102,7 +102,7 @@ def open_or_create_file(data_dir, date):
 
     if not os.path.exists(dir):
         # create dir and parent dirs with mode rwxr-xr-x
-        os.makedirs(dir, 0755)
+        os.makedirs(dir, 0o755)
 
     return tables.open_file(file, 'a')
 
@@ -125,7 +125,7 @@ def get_or_create_cluster_group(file, cluster):
         cluster = file.get_node(hisparc, node_name)
     except tables.NoSuchNodeError:
         cluster = file.create_group(hisparc, node_name,
-                                    'HiSPARC cluster %s data' % cluster)
+                                    f'HiSPARC cluster {cluster} data')
         file.flush()
 
     return cluster
@@ -140,12 +140,12 @@ def get_or_create_station_group(file, cluster, station_number):
 
     """
     cluster = get_or_create_cluster_group(file, cluster)
-    node_name = 'station_%d' % station_number
+    node_name = f'station_{station_number}'
     try:
         station = file.get_node(cluster, node_name)
     except tables.NoSuchNodeError:
         station = file.create_group(cluster, node_name,
-                                    'HiSPARC station %d data' % station_number)
+                                    f'HiSPARC station {station_number} data')
         file.flush()
 
     return station

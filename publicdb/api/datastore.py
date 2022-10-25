@@ -34,7 +34,7 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
     :param timestamp, nanoseconds: time of the event
 
     """
-    event = node.events.read_where('(timestamp == %d) & (nanoseconds == %d)' % (timestamp, nanoseconds))[0]
+    event = node.events.read_where(f'(timestamp == {timestamp}) & (nanoseconds == {nanoseconds})')[0]
     traces_idx = event['traces']
     baselines = event['baseline']
     traces_str = [zlib.decompress(node.blobs[trace_idx]).split(',')
@@ -48,9 +48,8 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
 
 
 def get_station_node(file, station):
-    node = file.get_node('/hisparc/cluster_%s/station_%d' %
-                         (station.cluster.main_cluster().lower(),
-                          station.number))
+    cluster_name = station.cluster.main_cluster().lower()
+    node = file.get_node(f'/hisparc/cluster_{cluster_name}/station_{station.number}')
     return node
 
 
@@ -72,5 +71,5 @@ def split_ext_timestamp(ext_timestamp):
     """Separate timestamp and nanoseconds from ext_timestamp"""
     ext_timestamp = int(ext_timestamp)  # cast numpy.uint64 (if read from datastore hdf5) to int
     timestamp = int(ext_timestamp / 1e9)
-    nanoseconds = ext_timestamp % int(1e9)
+    nanoseconds = ext_timestamp % 1_000_000_000
     return timestamp, nanoseconds

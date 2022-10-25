@@ -1,52 +1,29 @@
----
-
 # Do not create backups, it will result in many executables in /usr/local/bin
-- name: copy vpn/publicdb service scripts
-  copy:
+- name: Copy vpn/publicdb service scripts
+  ansible.builtin.copy:
     src: vpn-scripts/
     dest: /usr/local/bin
     mode: 0755
   become: true
   notify: restart hisparcvpnd
 
-- name: add nagios config script to cron
-  cron:
-    name: check if nagios config needs to be updated (run every minute)
-    cron_file: hisparc-nagios
-    user: root
-    job: /usr/local/bin/hisparc-nagios
-  become: true
-
-- name: refresh nagios config from publicdb
-  file:
-    path: /tmp/flag_nagios_reload
-    state: touch
-    owner: nagios
-  become: true
-
-- name: remove old nagios config hash
-  file:
-    path: /tmp/hash_nagios
-    state: absent
-  become: true
-
-- name: install pip
-  yum:
+- name: Install pip
+  ansible.builtin.yum:
     name: python-pip
   become: true
 
-- name: install supervisord prerequisites
-  yum:
+- name: Install supervisord prerequisites
+  ansible.builtin.yum:
     name: python-meld3
   become: true
 
-- name: install supervisor daemon
-  pip:
+- name: Install supervisor daemon
+  ansible.builtin.pip:
     name: supervisor
   become: true
 
-- name: copy supervisord init script
-  copy:
+- name: Copy supervisord init script
+  ansible.builtin.copy:
     src: supervisord
     dest: /etc/init.d/supervisord
     backup: yes
@@ -55,8 +32,8 @@
     mode: 0755
   become: true
 
-- name: copy supervisord.conf
-  copy:
+- name: Copy supervisord.conf
+  ansible.builtin.copy:
     src: supervisord.conf
     dest: /etc/supervisord.conf
     backup: yes
@@ -64,16 +41,16 @@
     group: root
     mode: 0644
   become: true
-  notify: restart supervisord
+  notify: Restart supervisord
 
-- name: start supervisord now and on boot
-  service:
+- name: Start supervisord now and on boot
+  ansible.builtin.service:
     name: supervisord
     state: started
     enabled: yes
   become: true
 
-- name: start hisparcvpnd
-  supervisorctl:
+- name: Start hisparcvpnd
+  community.general.supervisorctl:
     name: hisparcvpnd
     state: started

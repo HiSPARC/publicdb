@@ -1,25 +1,24 @@
----
-
-- name: install shorewall firewall
-  yum:
+- name: Install shorewall firewall
+  ansible.builtin.yum:
     name: shorewall
   become: true
 
-- name: copy shorewall config
-  copy:
+- name: Copy shorewall config
+  ansible.builtin.copy:
     src: vpn-shorewall/
     dest: /etc/shorewall
     backup: yes
   become: true
   notify: restart shorewall
 
-- name: update shorewall configuration
-  command: shorewall update -A
+- name: Update shorewall configuration
+  ansible.builtin.command:
+    cmd: shorewall update -A
   become: true
   notify: restart shorewall
 
-- name: ensure shorewall is started
-  service:
+- name: Ensure shorewall is started
+  ansible.builtin.service:
     name: shorewall
     enabled: yes
     state: started

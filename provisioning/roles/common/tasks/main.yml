@@ -1,18 +1,16 @@
----
-
 # hisparc needs specific uid:gid for NFS to work.
-- name: check if hisparc has uid=7712
-  shell: "id -u hisparc"
+- name: Check if hisparc has uid=7712
+  ansible.builtin.shell: "id -u hisparc"
   register: hisparc_uid
   failed_when: hisparc_uid.stdout != "7712"
 
-- name: check if hisparc has gid=7100
-  shell: "id -g hisparc"
+- name: Check if hisparc has gid=7100
+  ansible.builtin.shell: "id -g hisparc"
   register: hisparc_gid
   failed_when: hisparc_gid.stdout != "7100"
 
-- name: add SSH keys for hisparc user
-  authorized_key:
+- name: Add SSH keys for hisparc user
+  ansible.posix.authorized_key:
     user: hisparc
     key: "{{ item }}"
   with_file:
@@ -23,50 +21,50 @@
     - public_keys/tond.pub
     - public_keys/danielk.pub
 
-- name: upgrade all packages
-  yum:
+- name: Upgrade all packages
+  ansible.builtin.yum:
     name: "*"
     state: latest
   become: true
 
-- name: flag a reboot if necessary
-  script: flag_reboot.sh
+- name: Flag a reboot if necessary
+  ansible.builtin.script: flag_reboot.sh
   register: result
   changed_when: result.rc == 0
   failed_when: result.rc >= 2
   notify: reboot
 
-- name: install epel-release package
-  yum:
+- name: Install epel-release package
+  ansible.builtin.yum:
     name: epel-release
   become: true
 
-- name: install ACL utilities
-  yum:
+- name: Install ACL utilities
+  ansible.builtin.yum:
     name: acl
   become: true
 
-- name: install screen
-  yum:
+- name: Install screen
+  ansible.builtin.yum:
     name: screen
   become: true
 
 # Install mailcap for the mime.types file
-- name: install mailcap
-  yum:
+- name: Install mailcap
+  ansible.builtin.yum:
     name: mailcap
   become: true
 
-- name: install troubleshooting tools
-  yum:
+- name: Install troubleshooting tools
+  ansible.builtin.yum:
     name:
       - nmap
       - tcpdump
       - conntrack-tools
   become: true
 
-- name: install SELinux tools
-  yum:
+- name: Install SELinux tools
+  ansible.builtin.yum:
     name:
       - setroubleshoot
       - setools

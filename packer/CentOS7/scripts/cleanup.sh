@@ -1,1 +1,0 @@
-yum -y clean all

@@ -1,43 +1,46 @@
----
-
-- hosts: all
+- name: Common provisioning for all hosts
+  hosts: all
   roles:
     - common
 
-- hosts: publicdb:datastore
+- name: Ensure required datastore paths exist
+  hosts: publicdb:datastore
   roles:
     - datastore-paths
 
-- hosts: publicdb_group:datastore_group
+- name: Setup firewall and development tools are installed
+  hosts: publicdb_group:datastore_group
   roles:
     - simple-firewall
     - development
 
-- hosts: publicdb_group
+- name: Setup public database server
+  hosts: publicdb_group
   roles:
     - postgresql
     - self-signed-cert
     - publicdb
 
-- hosts: pique.nikhef.nl
+- name: Setup lets encrypt for HTTPS
+  hosts: pique.nikhef.nl
   roles:
     - letsencrypt
 
-- hosts: datastore_group
+- name: Setup datastore server
+  hosts: datastore_group
   roles:
     - datastore
 
-- hosts: tietar.nikhef.nl
+- name: Setup network config for tietar
+  hosts: tietar.nikhef.nl
   roles:
     - network-tietar
-  handlers:
-    - include: roles/network-tietar/handlers/main.yml
 
-- hosts: vpn_group
+- name: Setup VPN server
+  hosts: vpn_group
   roles:
     - dos
     - postfix
     - shorewall-firewall
     - openvpn
-    - nagios
     - vpn-scripts

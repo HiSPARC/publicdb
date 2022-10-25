@@ -13,13 +13,6 @@ from . import datastore
 FIRSTDATE = datetime.date(2004, 1, 1)
 
 
-class Nagios:
-    ok = (0, 'OK')
-    warning = (1, 'WARNING')
-    critical = (2, 'CRITICAL')
-    unknown = (3, 'UNKNOWN')
-
-
 def json_dict(result):
     """Create a json HTTPResponse"""
     response = HttpResponse(json.dumps(result, sort_keys=True),
@@ -65,15 +58,13 @@ def network_status(request):
     stations = []
     for station in Station.objects.exclude(pcs__type__slug='admin'):
         status = station_status.get_status(station.number)
-        nagios_status = 'unknown'
 
         stations.append({'number': station.number,
-                         'status': status,
-                         'nagios_status': nagios_status})
+                         'status': status})
     return json_dict(stations)
 
 
-def station(request, station_number, year=None, month=None, day=None):
+def station(request, station_number, year=None, month=None, date=None):
     """Get station info
 
     Retrieve general information about a station. If no date if given
@@ -81,20 +72,14 @@ def station(request, station_number, year=None, month=None, day=None):
     before the given date.
 
     :param station_number: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
+    :param date: the date for which to get station info.
 
     :return: dictionary containing info about the station. Most importantly,
              this contains information about the location of the station GPS
              and the relative locations of the individual scintillators.
 
     """
-    if year and month and day:
-        date = datetime.date(int(year), int(month), int(day))
-        if not validate_date(date):
-            return HttpResponseNotFound()
-    else:
+    if not date:
         date = datetime.date.today()
 
     try:
@@ -168,14 +153,14 @@ def stations(request, subcluster_number=None):
     return json_dict(stations)
 
 
-def stations_with_data(request, type=None, year=None, month=None, day=None):
+def stations_with_data(request, type=None, year=None, month=None, date=None):
     """Get stations with event or weather data
 
     Retrieve a list of all stations which have recorded events, singles or
     weather data in the given year, month, day or at all.
 
     :param type: data type to check for: events, singles or weather.
-    :param year,month,day: the date, this has to be within the time
+    :param year,month,date: the date, this has to be within the time
         HiSPARC has been operational and can be as specific as you desire.
 
     :return: list of dictionaries containing the name and number of each
@@ -193,20 +178,19 @@ def stations_with_data(request, type=None, year=None, month=None, day=None):
     else:
         return HttpResponseNotFound()
 
-    if not year:
+    if date:
+        filters['summaries__date'] = date
+    elif month:
+        date = datetime.date(int(year), int(month), 1)
+        filters['summaries__date__year'] = year
+        filters['summaries__date__month'] = month
+    elif year:
+        date = datetime.date(int(year), 1, 1)
+        filters['summaries__date__year'] = year
+    else:
         date = datetime.date.today()
         filters['summaries__date__gte'] = FIRSTDATE
         filters['summaries__date__lte'] = date
-    elif not month:
-        date = datetime.date(int(year), 1, 1)
-        filters['summaries__date__year'] = date.year
-    elif not day:
-        date = datetime.date(int(year), int(month), 1)
-        filters['summaries__date__year'] = date.year
-        filters['summaries__date__month'] = date.month
-    else:
-        date = datetime.date(int(year), int(month), int(day))
-        filters['summaries__date'] = date
 
     if not validate_date(date):
         return HttpResponseNotFound()
@@ -318,8 +302,7 @@ def get_country_dict():
     return list(Country.objects.all().order_by('number').values('number', 'name'))
 
 
-def has_data(request, station_number, type=None, year=None, month=None,
-             day=None):
+def has_data(request, station_number, type=None, year=None, month=None, date=None):
     """Check for presence of cosmic ray data
 
     Find out if the given station has measured shower data, either on a
@@ -327,7 +310,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
 
     :param station_number: a stationn number identifier.
     :param type: the data type: events, singles or weather.
-    :param year,month,day: the date, this has to be within the time
+    :param year,month,date: the date, this has to be within the time
             HiSPARC has been operational and can be as specific as
             you desire.
 
@@ -348,8 +331,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
     elif type == 'singles':
         summaries = summaries.filter(num_singles__isnull=False)
 
-    if day:
-        date = datetime.date(int(year), int(month), int(day))
+    if date:
         summaries = summaries.filter(date=date)
     elif month:
         date = datetime.date(int(year), int(month), 1)
@@ -369,7 +351,7 @@ def has_data(request, station_number, type=None, year=None, month=None,
     return json_dict(has_data)
 
 
-def config(request, station_number, year=None, month=None, day=None):
+def config(request, station_number, date=None):
     """Get station config settings
 
     Retrieve the entire configuration of a station. If no date if given the
@@ -377,9 +359,7 @@ def config(request, station_number, year=None, month=None, day=None):
     date.
 
     :param station_number: a station number identifier.
-    :param year: the year part of the date.
-    :param month: the month part of the date.
-    :param day: the day part of the date.
+    :param date: the date for which to get a configuration.
 
     :return: dictionary containing the entire configuration from
              the HiSPARC DAQ.
@@ -390,20 +370,16 @@ def config(request, station_number, year=None, month=None, day=None):
     except Station.DoesNotExist:
         return HttpResponseNotFound()
 
-    if year and month and day:
-        date = datetime.date(int(year), int(month), int(day))
-        if not validate_date(date):
-            return HttpResponseNotFound()
-    else:
+    if not date:
         date = datetime.date.today()
 
     try:
         summary = Summary.objects.filter(station=station, num_config__isnull=False, date__lte=date).latest()
-        c = Configuration.objects.filter(summary=summary).latest()
+        configuration = Configuration.objects.filter(summary=summary).latest()
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
-    config = serializers.serialize("json", [c])
+    config = serializers.serialize("json", [configuration])
     config = json.loads(config)
     try:
         config = config[0]['fields']
@@ -413,7 +389,7 @@ def config(request, station_number, year=None, month=None, day=None):
     return json_dict(config)
 
 
-def num_events(request, station_number, year=None, month=None, day=None, hour=None):
+def num_events(request, station_number, year=None, month=None, date=None, hour=None):
     """Get number of events for a station
 
     Retrieve the number of events that a station has measured during its
@@ -421,7 +397,7 @@ def num_events(request, station_number, year=None, month=None, day=None, hour=No
     month, day or an hour.
 
     :param station_number: a stationn number identifier.
-    :param year,month,day,hour: the date, this has to be within the time
+    :param year,month,date,hour: the date, this has to be within the time
         HiSPARC has been operational and can be as specific as you desire.
     :return: integer containing the total number of events ever recorded by
              the given station.
@@ -435,47 +411,37 @@ def num_events(request, station_number, year=None, month=None, day=None, hour=No
     histogram_type = HistogramType.objects.get(slug='eventtime')
     filters = {'type': histogram_type, 'summary__station': station}
 
-    if not year:
+    if hour:
+        hour = int(hour)
+        if not 0 <= hour <= 23:
+            return HttpResponseNotFound()
+        try:
+            histogram_values = DailyHistogram.objects.get(summary__date=date, **filters).values
+            num_events = histogram_values[hour]
+        except DailyHistogram.DoesNotExist:
+            num_events = 0
+    elif date:
+        # Events on specific day
+        filters['summary__date'] = date
+    elif month:
+        # Events in specific month
+        date = datetime.date(year, month, 1)
+        filters['summary__date__year'] = year
+        filters['summary__date__month'] = month
+    elif year:
+        # Events in specific year
+        date = datetime.date(year, 1, 1)
+        filters['summary__date__year'] = year
+    else:
         # All events
         date = datetime.date.today()
         filters['summary__date__gte'] = FIRSTDATE
         filters['summary__date__lt'] = date
-    elif not month:
-        # Events in specific year
-        date = datetime.date(int(year), 1, 1)
-        filters['summary__date__year'] = date.year
-    elif not day:
-        # Events in specific month
-        try:
-            date = datetime.date(int(year), int(month), 1)
-        except ValueError:
-            return HttpResponseNotFound()
-        filters['summary__date__year'] = date.year
-        filters['summary__date__month'] = date.month
-    elif not hour:
-        # Events on specific day
-        try:
-            date = datetime.date(int(year), int(month), int(day))
-        except ValueError:
-            return HttpResponseNotFound()
-        filters['summary__date'] = date
-    else:
-        if not 0 <= int(hour) <= 23:
-            return HttpResponseNotFound()
-        try:
-            date = datetime.date(int(year), int(month), int(day))
-        except ValueError:
-            return HttpResponseNotFound()
-        try:
-            histogram_values = DailyHistogram.objects.get(summary__date=date, **filters).values
-            num_events = histogram_values[int(hour)]
-        except DailyHistogram.DoesNotExist:
-            num_events = 0
 
     if not validate_date(date):
         return HttpResponseNotFound()
 
-    if not hour:
+    if hour is None:
         histograms = DailyHistogram.objects.filter(**filters)
         num_events = sum(sum(histogram.values) for histogram in histograms)
 
@@ -493,7 +459,6 @@ def get_event_traces(request, station_number, ext_timestamp):
     :return: two or four traces.
 
     """
-    ext_timestamp = int(ext_timestamp)
     raw = 'raw' in request.GET
 
     try:
