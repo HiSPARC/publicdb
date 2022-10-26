@@ -11,6 +11,5 @@ class StationLayoutAdmin(admin.ModelAdmin):
 
 @admin.register(models.StationLayoutQuarantine)
 class StationLayoutQuarantineAdmin(admin.ModelAdmin):
-    list_display = ('station', 'active_date', 'email_verified', 'approved',
-                    'reviewed')
+    list_display = ('station', 'active_date', 'email_verified', 'approved', 'reviewed')
     list_filter = ('station', 'email_verified', 'approved', 'reviewed')

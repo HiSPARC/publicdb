@@ -73,25 +73,29 @@ def get_events(analyzed_coincidence):
     events = []
     for event in analyzed_coincidence.coincidence.events.all():
         try:
-            config = (Configuration.objects
-                                   .filter(summary__station=event.station, summary__date__lte=event.date)
-                                   .exclude(gps_latitude=0, gps_longitude=0).latest())
+            config = (
+                Configuration.objects.filter(summary__station=event.station, summary__date__lte=event.date)
+                .exclude(gps_latitude=0, gps_longitude=0)
+                .latest()
+            )
         except Configuration.DoesNotExist:
             continue
 
         timestamp = datetime_to_gps(datetime.combine(event.date, event.time))
-        event_dict = dict(timestamp=timestamp,
-                          nanoseconds=event.nanoseconds,
-                          number=event.station.number,
-                          latitude=config.gps_latitude,
-                          longitude=config.gps_longitude,
-                          altitude=config.gps_altitude,
-                          status='on',
-                          detectors=len(event.traces),
-                          traces=event.traces,
-                          pulseheights=event.pulseheights,
-                          integrals=event.integrals,
-                          mips=[ph / 200. if ph > 0 else ph for ph in event.pulseheights])
+        event_dict = dict(
+            timestamp=timestamp,
+            nanoseconds=event.nanoseconds,
+            number=event.station.number,
+            latitude=config.gps_latitude,
+            longitude=config.gps_longitude,
+            altitude=config.gps_altitude,
+            status='on',
+            detectors=len(event.traces),
+            traces=event.traces,
+            pulseheights=event.pulseheights,
+            integrals=event.integrals,
+            mips=[ph / 200.0 if ph > 0 else ph for ph in event.pulseheights],
+        )
         events.append(event_dict)
     return events
 
@@ -99,10 +103,12 @@ def get_events(analyzed_coincidence):
 def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
     timestamp = datetime_to_gps(datetime.combine(coincidence.coincidence.date, coincidence.coincidence.time))
-    data = dict(pk=coincidence.pk,
-                timestamp=timestamp,
-                nanoseconds=coincidence.coincidence.nanoseconds,
-                events=events)
+    data = dict(
+        pk=coincidence.pk,
+        timestamp=timestamp,
+        nanoseconds=coincidence.coincidence.nanoseconds,
+        events=events,
+    )
     response = HttpResponse(json.dumps(data), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -130,9 +136,15 @@ def top_lijst(slug):
             avg_error = np.average(error)
             wgh_error = avg_error / num_events
             min_error = min(error)
-            scores.append({'name': student.name, 'avg_error': avg_error,
-                           'wgh_error': wgh_error, 'min_error': min_error,
-                           'num_events': num_events})
+            scores.append(
+                {
+                    'name': student.name,
+                    'avg_error': avg_error,
+                    'wgh_error': wgh_error,
+                    'min_error': min_error,
+                    'num_events': num_events,
+                }
+            )
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
 
@@ -205,20 +217,25 @@ def data_display(request, slug):
     star_map = None  # create_star_map(slug, coincidences)
     scores = top_lijst(slug)
 
-    return render(request, 'analysissessions/results.html',
-                  {'energy_histogram': energy_histogram,
-                   'core_map': core_map,
-                   'star_map': star_map,
-                   'scores': scores,
-                   'slug': slug,
-                   'session': session})
+    return render(
+        request,
+        'analysissessions/results.html',
+        {
+            'energy_histogram': energy_histogram,
+            'core_map': core_map,
+            'star_map': star_map,
+            'scores': scores,
+            'slug': slug,
+            'session': session,
+        },
+    )
 
 
 def create_energy_histogram(slug, coincidences):
     """Create an energy histogram"""
 
     energies = [x.log_energy for x in coincidences]
-    good_energies = [x.log_energy for x in coincidences.filter(error_estimate__lte=100.)]
+    good_energies = [x.log_energy for x in coincidences.filter(error_estimate__lte=100.0)]
 
     v1, bins = np.histogram(energies, bins=np.arange(14, 23, 1))
     v2, bins = np.histogram(good_energies, bins=np.arange(14, 23, 1))
@@ -278,17 +295,19 @@ def validate_request_form(request):
     data = {}
     data.update(form.cleaned_data)
 
-    new_request = SessionRequest(first_name=data['first_name'],
-                                 sur_name=data['sur_name'],
-                                 email=data['email'],
-                                 school=data['school'],
-                                 cluster=data['cluster'],
-                                 start_date=data['start_date'],
-                                 mail_send=False,
-                                 session_created=False,
-                                 session_pending=True,
-                                 events_to_create=data['number_of_events'],
-                                 events_created=0)
+    new_request = SessionRequest(
+        first_name=data['first_name'],
+        sur_name=data['sur_name'],
+        email=data['email'],
+        school=data['school'],
+        cluster=data['cluster'],
+        start_date=data['start_date'],
+        mail_send=False,
+        session_created=False,
+        session_pending=True,
+        events_to_create=data['number_of_events'],
+        events_created=0,
+    )
 
     new_request.generate_url()
     new_request.save()
@@ -304,4 +323,8 @@ def confirm_request(request, url):
         sessionrequest.pin = randint(1000, 9999)
         sessionrequest.session_confirmed = True
         sessionrequest.save()
-    return render(request, 'analysissessions/confirm.html', {'id': sessionrequest.sid, 'pin': sessionrequest.pin})
+    return render(
+        request,
+        'analysissessions/confirm.html',
+        {'id': sessionrequest.sid, 'pin': sessionrequest.pin},
+    )

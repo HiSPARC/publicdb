@@ -26,31 +26,85 @@ station_patterns = [
 ]
 
 source_patterns = [
-    # Network histograms
-    path(f'{type}/<date:date>/', views.get_specific_network_histogram_source, {'type': type}, name=type)
-    for type in ['coincidencetime', 'coincidencenumber']
-] + [
-    # Histograms
-    path(f'{type}/<int:station_number>/<date:date>/', views.get_specific_histogram_source, {'type': type}, name=type)
-    for type in ['eventtime', 'pulseheight', 'pulseintegral', 'singleslow', 'singleshigh', 'zenith', 'azimuth']
-] + [
-    # Datasets
-    path(f'{type}/<int:station_number>/<date:date>', views.get_specific_dataset_source, {'type': type}, name=type)
-    for type in ['barometer', 'temperature', 'singlesratelow', 'singlesratehigh']
-] + [
-    # Configurations
-    path(f'{type}/<int:station_number>/', views.get_specific_config_source, {'type': type}, name=type)
-    for type in ['electronics', 'voltage', 'current', 'gps', 'trigger']
-] + [
-    # Histograms
-    path('eventtime/<int:station_number>/', views.get_eventtime_source, name='eventtime'),
-
-    # Configurations
-    path('layout/<int:station_number>/', views.get_station_layout_source, name='layout'),
-
-    # Calibrations
-    path('detector_timing_offsets/<int:station_number>/', views.get_detector_timing_offsets_source, name="detector_offsets"),
-    path('station_timing_offsets/<int:ref_station_number>/<int:station_number>/', views.get_station_timing_offsets_source, name="station_offsets"),
+    *[
+        # Network histograms
+        path(
+            f'{type}/<date:date>/',
+            views.get_specific_network_histogram_source,
+            {'type': type},
+            name=type,
+        )
+        for type in [
+            'coincidencetime',
+            'coincidencenumber',
+        ]
+    ],
+    *[
+        # Histograms
+        path(
+            f'{type}/<int:station_number>/<date:date>/',
+            views.get_specific_histogram_source,
+            {'type': type},
+            name=type,
+        )
+        for type in [
+            'eventtime',
+            'pulseheight',
+            'pulseintegral',
+            'singleslow',
+            'singleshigh',
+            'zenith',
+            'azimuth',
+        ]
+    ],
+    *[
+        # Datasets
+        path(
+            f'{type}/<int:station_number>/<date:date>',
+            views.get_specific_dataset_source,
+            {'type': type},
+            name=type,
+        )
+        for type in [
+            'barometer',
+            'temperature',
+            'singlesratelow',
+            'singlesratehigh',
+        ]
+    ],
+    *[
+        # Configurations
+        path(
+            f'{type}/<int:station_number>/',
+            views.get_specific_config_source,
+            {'type': type},
+            name=type,
+        )
+        for type in [
+            'electronics',
+            'voltage',
+            'current',
+            'gps',
+            'trigger',
+        ]
+    ],
+    *[
+        # Histograms
+        path('eventtime/<int:station_number>/', views.get_eventtime_source, name='eventtime'),
+        # Configurations
+        path('layout/<int:station_number>/', views.get_station_layout_source, name='layout'),
+        # Calibrations
+        path(
+            'detector_timing_offsets/<int:station_number>/',
+            views.get_detector_timing_offsets_source,
+            name="detector_offsets",
+        ),
+        path(
+            'station_timing_offsets/<int:ref_station_number>/<int:station_number>/',
+            views.get_station_timing_offsets_source,
+            name="station_offsets",
+        ),
+    ],
 ]
 
 app_name = 'status'
@@ -60,11 +114,9 @@ urlpatterns = [
     path('stations_by_name/', views.stations_by_name, name="stations_by_name"),
     path('stations_by_number/', views.stations_by_number, name="stations_by_number"),
     path('stations_by_status/', views.stations_by_status, name="stations_by_status"),
-
     path('stations_on_map/', include((maps_patterns, 'map'))),
     path('network/', include((network_patterns, 'network'))),
     path('stations/', include((station_patterns, 'station'))),
     path('source/', include((source_patterns, 'source'))),
-
     path('help/', views.help, name="help"),
 ]

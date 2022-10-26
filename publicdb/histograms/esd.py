@@ -49,10 +49,12 @@ def search_coincidences_and_store_in_esd(network_summary):
     date = network_summary.date
 
     # Get non-test stations with events on the specified date
-    stations = Station.objects.filter(summaries__date=date,
-                                      summaries__num_events__isnull=False,
-                                      summaries__needs_update=False,
-                                      pcs__is_test=False).distinct()
+    stations = Station.objects.filter(
+        summaries__date=date,
+        summaries__num_events__isnull=False,
+        summaries__needs_update=False,
+        pcs__is_test=False,
+    ).distinct()
 
     station_numbers = [station.number for station in stations]
     station_groups = [get_station_node_path(station) for station in stations]
@@ -105,8 +107,7 @@ def process_events_and_store_temporary_esd(summary):
         source_node = get_station_node(source_file, station)
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
-            process = ProcessEventsFromSourceWithTriggerOffset(
-                source_file, tmp_file, source_node, '/', station.number)
+            process = ProcessEventsFromSourceWithTriggerOffset(source_file, tmp_file, source_node, '/', station.number)
             process.process_and_store_results()
             node_path = process.destination._v_pathname
     return tmp_filename, node_path
@@ -177,7 +178,8 @@ def reconstruct_events_and_store_temporary_esd(summary):
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             reconstruct = ReconstructESDEventsFromSource(
-                source_file, tmp_file, source_path, '/', station.number, progress=False)
+                source_file, tmp_file, source_path, '/', station.number, progress=False
+            )
             reconstruct.reconstruct_and_store()
             node_path = reconstruct.reconstructions._v_pathname
     return tmp_filename, node_path

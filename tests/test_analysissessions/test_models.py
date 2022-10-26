@@ -25,18 +25,22 @@ class TestAnalysisSession(TestCase):
         analysis_session = AnalysisSessionFactory(
             session_request__cluster=self.cluster,
             starts=datetime.datetime.utcnow() + datetime.timedelta(days=3),
-            ends=datetime.datetime.utcnow() + datetime.timedelta(days=7))
+            ends=datetime.datetime.utcnow() + datetime.timedelta(days=7),
+        )
         self.assertFalse(analysis_session.in_progress())
 
     def test_not_yet_in_progress(self):
         analysis_session = AnalysisSessionFactory(
             session_request__cluster=self.cluster,
             starts=datetime.datetime.utcnow() - datetime.timedelta(days=7),
-            ends=datetime.datetime.utcnow() - datetime.timedelta(days=3))
+            ends=datetime.datetime.utcnow() - datetime.timedelta(days=3),
+        )
         self.assertFalse(analysis_session.in_progress())
 
     def test_hash(self):
-        self.assertEqual(hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(), self.analysis_session.hash)
+        self.assertEqual(
+            hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(), self.analysis_session.hash
+        )
 
     def test_str(self):
         self.assertEqual(self.analysis_session.title, str(self.analysis_session))
@@ -67,7 +71,8 @@ class TestAnalyzedCoincidence(TestCase):
     def test_str(self):
         self.assertEqual(
             f'{self.analyzed_coincidence.coincidence} - {self.analyzed_coincidence.student}',
-            str(self.analyzed_coincidence))
+            str(self.analyzed_coincidence),
+        )
 
 
 class TestSessionRequest(TestCase):

@@ -27,11 +27,12 @@ class TestDatastore(TestCase):
                         'satellites': 0,
                         'singles_old': 86400,
                         'config': 1,
-                        'events': 168
+                        'events': 168,
                     }
                 }
             },
-            event_summary)
+            event_summary,
+        )
 
     def test_get_stations(self):
         """Get all stations with a node in the test data"""
@@ -41,7 +42,10 @@ class TestDatastore(TestCase):
     def test_get_data_path(self):
         """Get all stations with a node in the test data"""
 
-        self.assertEqual(join(settings.DATASTORE_PATH, '2017/1/2017_1_1.h5'), datastore.get_data_path(datetime.date(2017, 1, 1)))
+        self.assertEqual(
+            join(settings.DATASTORE_PATH, '2017/1/2017_1_1.h5'),
+            datastore.get_data_path(datetime.date(2017, 1, 1)),
+        )
 
     def test_get_config_messages(self):
         """Get all stations with a node in the test data"""

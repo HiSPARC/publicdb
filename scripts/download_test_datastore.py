@@ -27,6 +27,7 @@ import datetime
 from sapphire.publicdb import download_data
 
 import django
+
 django.setup()
 
 from django.conf import settings
@@ -45,7 +46,7 @@ def main():
 
 
 def test_for_datastore_directory():
-    print("Checking for datastore path at {datastore_path} ...",)
+    print("Checking for datastore path at {datastore_path} ...", end=' ')
     if not os.path.exists(datastore_path):
         raise RuntimeError("Datastore path cannot be found!")
     else:
@@ -82,9 +83,7 @@ def download_and_store_station_data(f, station, date, get_blobs=True):
     cluster = station.cluster.main_cluster()
     station_group = get_or_create_station_group(f, cluster, station.number)
 
-    download_data(f, station_group, station.number,
-                  start, end,
-                  get_blobs=get_blobs)
+    download_data(f, station_group, station.number, start, end, get_blobs=get_blobs)
 
 
 def open_or_create_file(data_dir, date):
@@ -124,8 +123,7 @@ def get_or_create_cluster_group(file, cluster):
     try:
         cluster = file.get_node(hisparc, node_name)
     except tables.NoSuchNodeError:
-        cluster = file.create_group(hisparc, node_name,
-                                    f'HiSPARC cluster {cluster} data')
+        cluster = file.create_group(hisparc, node_name, f'HiSPARC cluster {cluster} data')
         file.flush()
 
     return cluster
@@ -144,8 +142,7 @@ def get_or_create_station_group(file, cluster, station_number):
     try:
         station = file.get_node(cluster, node_name)
     except tables.NoSuchNodeError:
-        station = file.create_group(cluster, node_name,
-                                    f'HiSPARC station {station_number} data')
+        station = file.create_group(cluster, node_name, f'HiSPARC station {station_number} data')
         file.flush()
 
     return station

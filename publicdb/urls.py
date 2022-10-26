@@ -6,9 +6,7 @@ from .inforecords.views import create_datastore_config, keys
 
 urlpatterns = [
     path('', RedirectView.as_view(url='show/stations', permanent=False)),
-
     path('robots.txt', TemplateView.as_view(template_name='robots.txt', content_type='text/plain')),
-
     path('api/', include('publicdb.api.urls')),
     path('show/', include('publicdb.status_display.urls')),
     path('maps/', include('publicdb.maps.urls')),
@@ -17,10 +15,7 @@ urlpatterns = [
     path('software-updates/', include('publicdb.updates.urls')),
     path('raw_data/', include('publicdb.raw_data.urls', namespace='raw_data')),
     path('data/', include('publicdb.raw_data.urls')),
-
     path('config/datastore', create_datastore_config, name='datatore_config'),
-
     path('keys/<slug:host>/', keys, name='keys'),
-
     path('admin/', admin.site.urls),
 ]

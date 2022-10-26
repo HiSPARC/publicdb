@@ -8,6 +8,7 @@ sys.path.append(publicdb_path)
 os.environ['DJANGO_SETTINGS_MODULE'] = 'publicdb.settings'
 
 import django
+
 django.setup()
 
 from publicdb.inforecords.models import *

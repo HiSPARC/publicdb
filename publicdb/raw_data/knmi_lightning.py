@@ -35,11 +35,13 @@ def discharges(datafile, start, end, type=4):
     for idx in cg_idx[0]:
         ts, ns = get_gps_timestamp(reference_date, discharge_table.time_offset[idx])
         if start <= ts < end:
-            yield {'timestamp': ts,
-                   'nanoseconds': ns,
-                   'latitude': discharge_table.latitude[idx],
-                   'longitude': discharge_table.longitude[idx],
-                   'current': discharge_table.current[idx]}
+            yield {
+                'timestamp': ts,
+                'nanoseconds': ns,
+                'latitude': discharge_table.latitude[idx],
+                'longitude': discharge_table.longitude[idx],
+                'current': discharge_table.current[idx],
+            }
 
 
 def data_path(date):

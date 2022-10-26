@@ -114,12 +114,13 @@ class SessionRequest(models.Model):
             ends=ends,
             pin=str(self.pin),
             slug=slugify(self.sid),
-            title=self.sid)
+            title=self.sid,
+        )
         session.save()
         date = self.start_date
         search_length = datetime.timedelta(weeks=3)
         enddate = min([self.start_date + search_length, datetime.date.today()])
-        while (self.events_created < self.events_to_create and date < enddate):
+        while self.events_created < self.events_to_create and date < enddate:
             self.events_created += self.find_coincidence(date, session)
             date += datetime.timedelta(days=1)
         if self.events_created <= 0:
@@ -139,8 +140,9 @@ class SessionRequest(models.Model):
         Then return the number of found coincidences.
 
         """
-        stations = Station.objects.filter(cluster=self.cluster,
-                                          pcs__is_test=False).distinct().values_list('number', flat=True)
+        stations = (
+            Station.objects.filter(cluster=self.cluster, pcs__is_test=False).distinct().values_list('number', flat=True)
+        )
         path = get_esd_data_path(date)
 
         if not os.path.isfile(path):
@@ -174,19 +176,23 @@ class SessionRequest(models.Model):
             event_datetime = gps_to_datetime(trace_timestamp)
             event_timestamps.append((event_datetime, trace_nanoseconds))
 
-            event = Event(date=event_datetime.date(),
-                          time=event_datetime.time(),
-                          nanoseconds=trace_nanoseconds,
-                          station=station,
-                          pulseheights=event['pulseheights'].tolist(),
-                          integrals=event['integrals'].tolist(),
-                          traces=traces)
+            event = Event(
+                date=event_datetime.date(),
+                time=event_datetime.time(),
+                nanoseconds=trace_nanoseconds,
+                station=station,
+                pulseheights=event['pulseheights'].tolist(),
+                integrals=event['integrals'].tolist(),
+                traces=traces,
+            )
             event_objects.append(event)
 
         first_timestamp = min(event_timestamps)
-        coincidence = Coincidence(date=first_timestamp[0].date(),
-                                  time=first_timestamp[0].time(),
-                                  nanoseconds=first_timestamp[1])
+        coincidence = Coincidence(
+            date=first_timestamp[0].date(),
+            time=first_timestamp[0].time(),
+            nanoseconds=first_timestamp[1],
+        )
         coincidence.save()
 
         for event in event_objects:

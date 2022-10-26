@@ -38,8 +38,7 @@ def single_day_ranges(start, end):
 
     """
     cur = start
-    next_day = (cur.replace(hour=0, minute=0, second=0, microsecond=0)
-                + datetime.timedelta(days=1))
+    next_day = cur.replace(hour=0, minute=0, second=0, microsecond=0) + datetime.timedelta(days=1)
 
     while next_day < end:
         yield cur, next_day

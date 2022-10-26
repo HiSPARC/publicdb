@@ -3,35 +3,38 @@ from django.core.exceptions import ValidationError
 
 from ..inforecords.models import Cluster, Station
 
-TYPES = [('events', 'Events'),
-         ('weather', 'Weather'),
-         ('lightning', 'Lightning'),
-         ('singles', 'Singles')]
+TYPES = [('events', 'Events'), ('weather', 'Weather'), ('lightning', 'Lightning'), ('singles', 'Singles')]
 
-LGT_TYPES = [('0', 'Single-point'),
-             ('1', 'Cloud-cloud'),
-             ('2', 'Cloud-cloud mid'),
-             ('3', 'Cloud-cloud end'),
-             ('4', 'Cloud-ground'),
-             ('5', 'Cloud-ground return')]
+LGT_TYPES = [
+    ('0', 'Single-point'),
+    ('1', 'Cloud-cloud'),
+    ('2', 'Cloud-cloud mid'),
+    ('3', 'Cloud-cloud end'),
+    ('4', 'Cloud-ground'),
+    ('5', 'Cloud-ground return'),
+]
 
-FILTER = [('network', 'Network'),
-          ('cluster', 'Cluster'),
-          ('stations', 'Stations')]
+FILTER = [('network', 'Network'), ('cluster', 'Cluster'), ('stations', 'Stations')]
 
 
 class DataDownloadForm(forms.Form):
     data_type = forms.ChoiceField(choices=TYPES, widget=forms.RadioSelect())
     station_events = forms.ModelChoiceField(
         Station.objects.filter(summaries__num_events__isnull=False).distinct(),
-        empty_label='---------', required=False)
+        empty_label='---------',
+        required=False,
+    )
     station_weather = forms.ModelChoiceField(
         Station.objects.filter(summaries__num_weather__isnull=False).distinct(),
-        empty_label='---------', required=False)
+        empty_label='---------',
+        required=False,
+    )
     lightning_type = forms.ChoiceField(choices=LGT_TYPES, initial=4, required=False)
     station_singles = forms.ModelChoiceField(
         Station.objects.filter(summaries__num_singles__isnull=False).distinct(),
-        empty_label='---------', required=False)
+        empty_label='---------',
+        required=False,
+    )
     start = forms.DateTimeField(help_text="e.g. '2013-5-17', or '2013-5-17 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2013-5-18', or '2013-5-18 9:05'")
     download = forms.BooleanField(initial=True, required=False)
@@ -57,9 +60,7 @@ class DataDownloadForm(forms.Form):
 
 class CoincidenceDownloadForm(forms.Form):
     filter_by = forms.ChoiceField(choices=FILTER, widget=forms.RadioSelect())
-    cluster = forms.ModelChoiceField(Cluster.objects.filter(parent=None),
-                                     empty_label='---------',
-                                     required=False)
+    cluster = forms.ModelChoiceField(Cluster.objects.filter(parent=None), empty_label='---------', required=False)
     stations = forms.CharField(help_text="e.g. '103, 104, 105'", required=False)
     start = forms.DateTimeField(help_text="e.g. '2014-4-5', or '2014-4-18 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2014-4-29', or '2014-04-30 9:05'")

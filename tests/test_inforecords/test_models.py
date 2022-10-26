@@ -21,8 +21,9 @@ class TestContactInformation(TestCase):
 
     def test_type_with_station(self):
         contact_info = inforecords_factories.ContactInformationFactory()
-        inforecords_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0,
-                                             contactinformation=contact_info)
+        inforecords_factories.StationFactory(
+            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+        )
         self.assertEqual('Station', contact_info.type)
 
     def test_contact_owner(self):
@@ -36,15 +37,17 @@ class TestContactInformation(TestCase):
 
     def test_contact_owner_with_station(self):
         contact_info = inforecords_factories.ContactInformationFactory()
-        station = inforecords_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0,
-                                                       contactinformation=contact_info)
+        station = inforecords_factories.StationFactory(
+            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+        )
         self.assertEqual(str(station), contact_info.contact_owner)
 
     def test_contact_owner_with_contact_and_station(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         contact = inforecords_factories.ContactFactory(contactinformation=contact_info)
-        station = inforecords_factories.StationFactory(number=1, cluster__number=0, cluster__country__number=0,
-                                                       contactinformation=contact_info)
+        station = inforecords_factories.StationFactory(
+            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+        )
         self.assertEqual(f'{contact}, {station}', contact_info.contact_owner)
 
     def test_contact_owner_with_multiple_contacts(self):
@@ -56,8 +59,8 @@ class TestContactInformation(TestCase):
     def test_str(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         self.assertEqual(
-            ' '.join([contact_info.city, contact_info.street_1, contact_info.email_work]),
-            str(contact_info))
+            ' '.join([contact_info.city, contact_info.street_1, contact_info.email_work]), str(contact_info)
+        )
 
 
 class TestContact(TestCase):
