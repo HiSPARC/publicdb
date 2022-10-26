@@ -63,69 +63,27 @@ config values. To run the playbook, issue::
 
    $ ansible-playbook provisioning/playbook.yml
 
-Beware, however, that this will run provisioning for *all* production *and* virtual servers.
+Beware, however, that this will run provisioning for *all* production servers.
 It is *very* useful to limit the hosts for which to run the provisioner, e.g.::
 
-   $ ansible-playbook provisioning/playbook.yml -l tietar.nikhef.nl
+   $ ansible-playbook provisioning/playbook.yml -l publicdb
 
 If you want to check first what the provisioner would like to change, without actually changing anything, use the ``-C`` option::
 
-   $ ansible-playbook provisioning/playbook.yml -l tietar.nikhef.nl -C
+   $ ansible-playbook provisioning/playbook.yml -l publicdb -C
 
 
 Running a provisioner from a remote location
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To manage the servers from somewhere out on the internet, you have to work with an SSH
-tunnel. Basically, you SSH into ``login.nikhef.nl`` and route all traffic destined for the
-production servers through that connection. So you never log into Tietar or Pique from
-your remote location. Instead, from your location, you log into ``login.nikhef.nl``, and
-from there, you log into Tietar or Pique. To make that work more or less transparently,
-we'll have to setup a few things. Every tunnel needs a port number, and I (DF) have chosen
-a few completely arbitrary ones:
+The servers can not be accessed directly from outside the university network.
+However, if there is a jump server available, it can easily be configured to
+automatically be used by setting it in your ssh configuration.
 
-==========  ===========  ===========
-Local port  Remote host  Remote port
-==========  ===========  ===========
-2201        pique        22
-2202        tietar       22
-2203        frome        22
-==========  ===========  ===========
+Add this to your ``.ssh/config``::
 
-If you're using some unix-style OS, like Linux, OS X or macOS, you can use the provided setup-tunnel.sh like so::
-
-   $ sh provisioning/setup-tunnel.sh <nikhef_username>
-
-For example::
-
-   $ sh provisioning/setup-tunnel.sh davidf
-
-You can also use an application like *SSH Tunnel Manager* by Tynsoe or *SSH Tunnel* by Codinn.
-
-If you're on Windows or something, you can look into PuTTY and setup the tunnels that way.
-
-Once you have everything up and running, you have to use a different Ansible inventory
-file. That is needed to tell Ansible to use the tunnels, and not a direct connection. One
-is provided, so you can run::
-
-   $ ansible-playbook provisioning/playbook.yml -i provisioning/ansible_inventory_tunnel -l tietar.nikhef.nl
-
-If you want to provision all servers at once, you can leave off the ``-l`` option.
-
-
-Provisioning using a Windows host
----------------------------------
-
-Ansible does not support windows as a host (control machine). On Windows
-the ``ansible_local`` provisioner is used.
-
-All scripts that are passed to ``/bin/bash`` on the target CentOS6 machine
-will fail miserably when carriage returns (CR, ^M, 0x0D) are present. This
-will cause all sorts of strange, hard to track down, errors. Make sure all
-files have unix-like line-endings (LF not CRLF)::
-
-   $ git config --global core.autocrlf "input"
-   $ git clone git@github.com:HiSPARC/publicdb.git
+    Host hisparc-data hisparc-raw
+        ProxyJump notchpeak1.chpc.utah.edu
 
 
 Running with Docker-compose
