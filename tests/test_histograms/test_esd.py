@@ -11,16 +11,20 @@ from ..factories import histograms_factories, inforecords_factories
 
 @override_settings(ESD_PATH=join(dirname(__file__), '../data/esd'))
 class TestESD(TestCase):
-
     def setup_station(self):
         cluster = inforecords_factories.ClusterFactory(name='Amsterdam', number=0, country__number=0)
         self.station = inforecords_factories.StationFactory(number=501, cluster=cluster)
         self.summary = histograms_factories.SummaryFactory(
-            station=self.station, date=datetime.date(2017, 1, 1),
-            needs_update_events=False, num_events=168,
-            needs_update_weather=False, num_weather=60,
-            needs_update_config=False, num_config=1,
-            needs_update_singles=False, num_singles=301,
+            station=self.station,
+            date=datetime.date(2017, 1, 1),
+            needs_update_events=False,
+            num_events=168,
+            needs_update_weather=False,
+            num_weather=60,
+            needs_update_config=False,
+            num_config=1,
+            needs_update_singles=False,
+            num_singles=301,
             needs_update=False,
         )
 

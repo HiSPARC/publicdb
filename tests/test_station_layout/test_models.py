@@ -25,6 +25,6 @@ class TestModels(TestCase):
             detector_4_radius=None,
             detector_4_alpha=None,
             detector_4_height=None,
-            detector_4_beta=None
+            detector_4_beta=None,
         )
         self.assertFalse(layout.has_four_detectors)

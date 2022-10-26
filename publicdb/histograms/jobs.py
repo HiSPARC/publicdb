@@ -19,9 +19,21 @@ from sapphire.utils import round_in_base
 
 from ..station_layout.models import StationLayout
 from . import datastore, esd
-from .models import (Configuration, DailyDataset, DailyHistogram, DatasetType, DetectorTimingOffset,
-                     GeneratorState, HistogramType, MultiDailyDataset, MultiDailyHistogram, NetworkHistogram,
-                     NetworkSummary, StationTimingOffset, Summary)
+from .models import (
+    Configuration,
+    DailyDataset,
+    DailyHistogram,
+    DatasetType,
+    DetectorTimingOffset,
+    GeneratorState,
+    HistogramType,
+    MultiDailyDataset,
+    MultiDailyHistogram,
+    NetworkHistogram,
+    NetworkSummary,
+    StationTimingOffset,
+    Summary,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -207,7 +219,7 @@ def update_histograms():
 
 
 def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
-    """ Front office for doing tasks
+    """Front office for doing tasks
 
     Depending on the USE_MULTIPROCESSING flag, the manager either does the
     tasks himself or he grabs some workers and let them do it.
@@ -489,7 +501,7 @@ def update_temperature_dataset(summary):
 
     logger.debug("Updating temperature dataset for %s", summary)
     temperature = esd.get_temperature(summary)
-    error_values = [-999, -2 ** 15]
+    error_values = [-999, -(2**15)]
     temperature = [(x, y) for x, y in temperature if y not in error_values]
     if temperature != []:
         temperature = shrink_dataset(temperature, INTERVAL_TEMP)
@@ -534,8 +546,7 @@ def shrink(column, bin_idxs, n_bins):
     """
     with warnings.catch_warnings():  # suppress "Mean of empty slice"
         warnings.simplefilter("ignore", category=RuntimeWarning)
-        data = np.nan_to_num([np.nanmean(column[bin_idxs[i]:bin_idxs[i + 1]])
-                              for i in range(n_bins)])
+        data = np.nan_to_num([np.nanmean(column[bin_idxs[i] : bin_idxs[i + 1]]) for i in range(n_bins)])
     return data.tolist()
 
 
@@ -547,7 +558,7 @@ def update_config(summary):
         logger.error('%s: Too many configs: %d. Skipping.', summary, num_config)
         return summary.num_config
 
-    for config in configs[summary.num_config:]:
+    for config in configs[summary.num_config :]:
         new_config = Configuration(summary=summary)
         for var in vars(new_config):
             if var in ['summary', 'id', 'summary_id'] or var[0] == '_':
@@ -625,8 +636,7 @@ def save_offsets(summary, offsets):
 
     """
     logger.debug("Saving detector timing offsets for %s", summary)
-    off = {f'offset_{i}': round_in_base(o, 0.25) if not np.isnan(o) else None
-           for i, o in enumerate(offsets, 1)}
+    off = {f'offset_{i}': round_in_base(o, 0.25) if not np.isnan(o) else None for i, o in enumerate(offsets, 1)}
     DetectorTimingOffset.objects.update_or_create(summary=summary, defaults=off)
     logger.debug("Saved succesfully")
 

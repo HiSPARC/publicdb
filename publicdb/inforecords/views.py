@@ -37,6 +37,9 @@ def create_datastore_config(request):
     if socket.gethostbyaddr(request.META["REMOTE_ADDR"])[0] != settings.DATASTORE_HOST:
         raise PermissionDenied
 
-    return render(request, 'inforecords/datastore.cfg',
-                  {'stations': Station.objects.all().select_related('cluster__parent')},
-                  content_type='text/plain')
+    return render(
+        request,
+        'inforecords/datastore.cfg',
+        {'stations': Station.objects.all().select_related('cluster__parent')},
+        content_type='text/plain',
+    )

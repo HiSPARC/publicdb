@@ -23,11 +23,9 @@ class TestDaterange(SimpleTestCase):
     def test_stop_days_after_start(self):
         stop = self.start + timedelta(days=3)
         self.assertEqual(
-            [self.start,
-             self.start + timedelta(days=1),
-             self.start + timedelta(days=2),
-             stop],
-            list(daterange(self.start, stop)))
+            [self.start, self.start + timedelta(days=1), self.start + timedelta(days=2), stop],
+            list(daterange(self.start, stop)),
+        )
 
 
 class TestSingleDayRanges(SimpleTestCase):
@@ -35,32 +33,25 @@ class TestSingleDayRanges(SimpleTestCase):
         self.start = datetime(2010, 3, 1, 5, 20, 13)
 
     def test_stop_is_start(self):
-        self.assertEqual(
-            [(self.start, self.start)],
-            list(single_day_ranges(self.start, self.start))
-        )
+        self.assertEqual([(self.start, self.start)], list(single_day_ranges(self.start, self.start)))
 
     def test_stop_before_start(self):
         stop = self.start - timedelta(days=7)
-        self.assertEqual(
-            [(self.start, stop)],
-            list(single_day_ranges(self.start, stop))
-        )
+        self.assertEqual([(self.start, stop)], list(single_day_ranges(self.start, stop)))
 
     def test_stop_end_of_same_day_as_start(self):
         stop = self.start.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
-        self.assertEqual(
-            [(self.start, stop)],
-            list(single_day_ranges(self.start, stop))
-        )
+        self.assertEqual([(self.start, stop)], list(single_day_ranges(self.start, stop)))
 
     def test_stop_days_after_start(self):
         stop = self.start + timedelta(days=3)
         midnight = self.start.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
         self.assertEqual(
-            [(self.start, midnight),
-             (midnight, midnight + timedelta(days=1)),
-             (midnight + timedelta(days=1), midnight + timedelta(days=2)),
-             (midnight + timedelta(days=2), stop)],
-            list(single_day_ranges(self.start, stop))
+            [
+                (self.start, midnight),
+                (midnight, midnight + timedelta(days=1)),
+                (midnight + timedelta(days=1), midnight + timedelta(days=2)),
+                (midnight + timedelta(days=2), stop),
+            ],
+            list(single_day_ranges(self.start, stop)),
         )

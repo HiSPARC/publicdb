@@ -72,9 +72,7 @@ def process_possible_stations_for_date(date, station_list):
 
     """
     logger.info('Now processing %s', date)
-    unique_table_list = {table_name
-                         for table_list in station_list.values()
-                         for table_name in table_list.keys()}
+    unique_table_list = {table_name for table_list in station_list.values() for table_name in table_list.keys()}
     for table_name in unique_table_list:
         process_possible_tables_for_network(date, table_name)
     for station, table_list in station_list.items():
@@ -120,10 +118,12 @@ def check_table_and_update_flags(table_name, num_events, summary):
         update_flag_attr = f'needs_update_{table_name}'
 
         if getattr(summary, number_of_events_attr) != num_events:
-            logger.info("New data (%s) on %s for station %d",
-                        table_name,
-                        summary.date.strftime("%a %b %d %Y"),
-                        summary.station.number)
+            logger.info(
+                "New data (%s) on %s for station %d",
+                table_name,
+                summary.date.strftime("%a %b %d %Y"),
+                summary.station.number,
+            )
             # only record number of events for *some* tables at this time
             if table_name in RECORD_EARLY_NUM_EVENTS:
                 setattr(summary, number_of_events_attr, num_events)

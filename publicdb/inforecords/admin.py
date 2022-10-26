@@ -48,8 +48,7 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(models.Station)
 class StationAdmin(admin.ModelAdmin):
-    list_display = ('number', 'name', 'cluster', 'contactinformation',
-                    'contact')
+    list_display = ('number', 'name', 'cluster', 'contactinformation', 'contact')
     search_fields = ('number', 'name', 'cluster__name')
     list_filter = ('cluster__country',)
     list_per_page = 200
@@ -57,7 +56,6 @@ class StationAdmin(admin.ModelAdmin):
 
 @admin.register(models.ContactInformation)
 class ContactInformationAdmin(admin.ModelAdmin):
-
     def owner_name(self, obj):
         return obj.contact_owner
 
@@ -73,8 +71,7 @@ class ContactInformationAdmin(admin.ModelAdmin):
 
 @admin.register(models.Pc)
 class PcAdmin(admin.ModelAdmin):
-    list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url',
-                    'keys')
+    list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url', 'keys')
     list_filter = ('is_active', 'is_test')
     ordering = ('station',)
     list_per_page = 200

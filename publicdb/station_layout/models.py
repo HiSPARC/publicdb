@@ -32,8 +32,7 @@ class StationLayout(models.Model):
 
     @property
     def has_four_detectors(self):
-        return (self.detector_3_radius is not None
-                and self.detector_4_radius is not None)
+        return self.detector_3_radius is not None and self.detector_4_radius is not None
 
     class Meta:
         verbose_name = 'Station layout'
@@ -46,16 +45,14 @@ class StationLayout(models.Model):
         super().save(*args, **kwargs)
         try:
             next_layout = StationLayout.objects.filter(
-                station=self.station,
-                active_date__gt=self.active_date).earliest()
+                station=self.station, active_date__gt=self.active_date
+            ).earliest()
             next_date = next_layout.active_date
         except StationLayout.DoesNotExist:
             next_date = date.today()
         if self.has_four_detectors:
             # Only for 4 detector stations
-            summaries = Summary.objects.filter(station=self.station,
-                                               date__gte=self.active_date,
-                                               date__lt=next_date)
+            summaries = Summary.objects.filter(station=self.station, date__gte=self.active_date, date__lt=next_date)
             for summary in summaries:
                 if summary.num_events:
                     summary.needs_update_events = True
@@ -99,9 +96,8 @@ class StationLayoutQuarantine(models.Model):
     def generate_hashes(self):
         hash_submit = os.urandom(16).encode('hex')
         hash_review = os.urandom(16).encode('hex')
-        if (
-            StationLayoutQuarantine.objects.filter(hash_submit=hash_submit)
-            or StationLayoutQuarantine.objects.filter(hash_review=hash_review)
+        if StationLayoutQuarantine.objects.filter(hash_submit=hash_submit) or StationLayoutQuarantine.objects.filter(
+            hash_review=hash_review
         ):
             self.generate_hashes()
         else:
@@ -141,8 +137,7 @@ class StationLayoutQuarantine(models.Model):
             The HiSPARC Team'''
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
-        send_mail(subject, message, sender, ['beheer@hisparc.nl'],
-                  fail_silently=False)
+        send_mail(subject, message, sender, ['beheer@hisparc.nl'], fail_silently=False)
 
     def sendmail_accepted(self):
         subject = 'HiSPARC station layout accepted'

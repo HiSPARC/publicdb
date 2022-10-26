@@ -16,9 +16,7 @@ def station_on_map(request, station_number):
 
     subclusters = get_subclusters()
 
-    return render(request, 'maps/map.html',
-                  {'subclusters': subclusters,
-                   'center': center})
+    return render(request, 'maps/map.html', {'subclusters': subclusters, 'center': center})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -43,9 +41,7 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
 
     subclusters = get_subclusters()
 
-    return render(request, 'maps/map.html',
-                  {'subclusters': subclusters,
-                   'focus': focus})
+    return render(request, 'maps/map.html', {'subclusters': subclusters, 'focus': focus})
 
 
 def get_subclusters():
@@ -59,13 +55,14 @@ def get_subclusters():
             link = station in data_stations
             status = station_status.get_status(station.number)
             location = station.latest_location()
-            station_data = {'number': station.number,
-                            'name': station.name,
-                            'cluster': subcluster,
-                            'link': link,
-                            'status': status}
+            station_data = {
+                'number': station.number,
+                'name': station.name,
+                'cluster': subcluster,
+                'link': link,
+                'status': status,
+            }
             station_data.update(location)
             stations.append(station_data)
-        subclusters.append({'name': subcluster.name,
-                            'stations': stations})
+        subclusters.append({'name': subcluster.name, 'stations': stations})
     return subclusters
