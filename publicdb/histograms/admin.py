@@ -162,7 +162,7 @@ class SummaryAdmin(admin.ModelAdmin):
 
 @admin.register(models.Configuration)
 class ConfigurationAdmin(admin.ModelAdmin):
-    list_display = ('station', 'master', 'slave', 'timestamp')
+    list_display = ('station', 'primary', 'secondary', 'timestamp')
     list_filter = ('timestamp', 'summary__station__number')
     raw_id_fields = ('summary',)
 

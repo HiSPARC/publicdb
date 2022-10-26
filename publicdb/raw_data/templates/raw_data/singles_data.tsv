@@ -12,14 +12,14 @@
 # date:                 time of event [GPS calendar date]
 # time:                 time of event [GPS time of day]
 # timestamp:            time of event [UNIX timestamp]
-# mas_ch1_low           singles rate master channel 1 above low threshold
-# mas_ch1_high          singles rate master channel 1 above high threshold
-# mas_ch2_low           singles rate master channel 2 above low threshold
-# mas_ch2_high          singles rate master channel 2  above high threshold
-# slv_ch1_low           singles rate slave channel 1 above low threshold
-# slv_ch1_high          singles rate slave channel 1 above high threshold
-# slv_ch2_low           singles rate slave channel 2 above low threshold
-# slv_ch2_high          singles rate slave channel 2 above high threshold
+# mas_ch1_low           singles rate primary channel 1 above low threshold
+# mas_ch1_high          singles rate primary channel 1 above high threshold
+# mas_ch2_low           singles rate primary channel 2 above low threshold
+# mas_ch2_high          singles rate primary channel 2  above high threshold
+# slv_ch1_low           singles rate secondary channel 1 above low threshold
+# slv_ch1_high          singles rate secondary channel 1 above high threshold
+# slv_ch2_low           singles rate secondary channel 2 above low threshold
+# slv_ch2_high          singles rate secondary channel 2 above high threshold
 # Values of -1 or -999 indicate a problem in that measurement or
 # the absence of that sensor.
 #

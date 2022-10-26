@@ -196,23 +196,23 @@
     </div>
     <div id="master">
         <div class="sectionTitle">
-            Master
+            Primary
             <span class="sourceLink">
                 <a href="{% url 'status:source:electronics' station_number=station.number %}">Source</a>
             </span>
         </div>
-        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.master }}</span></div>
-        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.primary }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.primary_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch1">Ch1 Threshold</span><span class="value">{{ config.mas_ch1_thres_low|mv_to_adc }} ADC {{ config.mas_ch1_thres_high|mv_to_adc }} ADC</span></div>
         <div class="keyvalue"><span class="key ch2">Ch2 Threshold</span><span class="value">{{ config.mas_ch2_thres_low|mv_to_adc }} ADC {{ config.mas_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
-    {% if has_slave %}
-    <div id="slave">
-        <div class="sectionTitle">Slave</div>
-        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.slave }}</span></div>
-        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
+    {% if has_secondary %}
+    <div id="secondary">
+        <div class="sectionTitle">Secondary</div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.secondary }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.secondary_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch3">Ch3 Threshold</span><span class="value">{{ config.slv_ch1_thres_low|mv_to_adc }} ADC {{ config.slv_ch1_thres_high|mv_to_adc }} ADC</span></div>
@@ -223,9 +223,9 @@
         <div class="sectionTitle">Settings</div>
         <div class="keyvalue">
             <span class="key">Trigger</span>
-          {% if has_slave and config.trig_low_signals == 3 and config.trig_high_signals == 2 and config.trig_and_or and config.trig_external == 0 %}
+          {% if has_secondary and config.trig_low_signals == 3 and config.trig_high_signals == 2 and config.trig_and_or and config.trig_external == 0 %}
             <span class="value good">&#x2713;</span>
-          {% elif not has_slave and config.trig_low_signals == 2 and config.trig_high_signals == 0 and not config.trig_and_or and config.trig_external == 0 %}
+          {% elif not has_secondary and config.trig_low_signals == 2 and config.trig_high_signals == 0 and not config.trig_and_or and config.trig_external == 0 %}
             <span class="value good">&#x2713;</span>
           {% else %}
             <span class="value bad">&#x2717;</span>

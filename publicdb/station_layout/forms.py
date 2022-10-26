@@ -33,7 +33,7 @@ class StationLayoutQuarantineForm(forms.Form):
     detector_2_height = height_field()
     detector_2_beta = beta_field()
 
-    # Optional slave detectors
+    # Optional secondary detectors
     detector_3_radius = radius_field(required=False)
     detector_3_alpha = alpha_field(required=False)
     detector_3_height = height_field(required=False)

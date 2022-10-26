@@ -335,19 +335,19 @@
 {% block config %}
   {% if config %}
     <div id="master">
-        <div class="sectionTitle">Master</div>
-        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.master }}</span></div>
-        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.master_fpga }}</span></div>
+        <div class="sectionTitle">Primary</div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.primary }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.primary_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch1">HV Ch1</span><span class="value">{{ config.mas_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch2">HV Ch2</span><span class="value">{{ config.mas_ch2_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch1">Ch1 Thresholds</span><span class="value">{{ config.mas_ch1_thres_low|mv_to_adc }} ADC {{ config.mas_ch1_thres_high|mv_to_adc }} ADC</span></div>
         <div class="keyvalue"><span class="key ch2">Ch2 Thresholds</span><span class="value">{{ config.mas_ch2_thres_low|mv_to_adc }} ADC {{ config.mas_ch2_thres_high|mv_to_adc }} ADC</span></div>
     </div>
-    {% if has_slave %}
-    <div id="slave">
-        <div class="sectionTitle">Slave</div>
-        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.slave }}</span></div>
-        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.slave_fpga }}</span></div>
+    {% if has_secondary %}
+    <div id="secondary">
+        <div class="sectionTitle">Secondary</div>
+        <div class="keyvalue"><span class="key">Serial</span><span class="value">{{ config.secondary }}</span></div>
+        <div class="keyvalue"><span class="key">FPGA</span><span class="value">{{ config.secondary_fpga }}</span></div>
         <div class="keyvalue"><span class="key ch3">HV Ch3</span><span class="value">{{ config.slv_ch1_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch4">HV Ch4</span><span class="value">{{ config.slv_ch2_voltage|floatformat:0 }} V</span></div>
         <div class="keyvalue"><span class="key ch3">Ch3 Thresholds</span><span class="value">{{ config.slv_ch1_thres_low|mv_to_adc }} ADC {{ config.slv_ch1_thres_high|mv_to_adc }} ADC</span></div>

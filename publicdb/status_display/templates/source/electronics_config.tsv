@@ -8,10 +8,10 @@
 # This data contains the following columns:
 #
 # timestamp: time of configuration in seconds after 1970-1-1 [UNIX timestamp]
-# hardware serial (2x): hardware serial number for Master and Slave
-# FPGA version (2x): FPGA firmware version for Master and Slave
+# hardware serial (2x): hardware serial number for Primary and Secondary
+# FPGA version (2x): FPGA firmware version for Primary and Secondary
 #
 #
-# timestamp	master_serial	slave_serial	master_fpga	slave_fpga
+# timestamp	primary_serial	secondary_serial	primary_fpga	secondary_fpga
 {% for row in data %}{% ifchanged row|slice:"1:" %}{{ row.0|date:"U" }}{% for value in row|slice:"1:" %}	{{ value }}{% endfor %}
 {% endifchanged %}{% endfor %}
