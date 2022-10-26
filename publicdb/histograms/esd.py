@@ -12,10 +12,17 @@ import tables
 
 from django.conf import settings
 
-from sapphire import (CoincidencesESD, DetermineStationTimingOffsets, HiSPARCStations,
-                      ProcessEventsFromSourceWithTriggerOffset, ProcessSinglesFromSource, ProcessTimeDeltas,
-                      ProcessWeatherFromSource, ReconstructESDEventsFromSource,
-                      determine_detector_timing_offsets)
+from sapphire import (
+    CoincidencesESD,
+    DetermineStationTimingOffsets,
+    HiSPARCStations,
+    ProcessEventsFromSourceWithTriggerOffset,
+    ProcessSinglesFromSource,
+    ProcessTimeDeltas,
+    ProcessWeatherFromSource,
+    ReconstructESDEventsFromSource,
+    determine_detector_timing_offsets,
+)
 from sapphire.analysis.calibration import datetime_range
 
 from ..inforecords.models import Station

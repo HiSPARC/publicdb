@@ -16,9 +16,18 @@ from django.views.generic import DateDetailView, RedirectView
 
 from sapphire.transformations import clock
 
-from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DetectorTimingOffset,
-                                 MultiDailyDataset, MultiDailyHistogram, NetworkHistogram, NetworkSummary,
-                                 StationTimingOffset, Summary)
+from ..histograms.models import (
+    Configuration,
+    DailyDataset,
+    DailyHistogram,
+    DetectorTimingOffset,
+    MultiDailyDataset,
+    MultiDailyHistogram,
+    NetworkHistogram,
+    NetworkSummary,
+    StationTimingOffset,
+    Summary,
+)
 from ..inforecords.models import Cluster, Country, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout

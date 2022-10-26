@@ -3,8 +3,12 @@ import hashlib
 
 from django.test import TestCase
 
-from ..factories.analysissessions_factories import (AnalysisSessionFactory, AnalyzedCoincidenceFactory,
-                                                    SessionRequestFactory, StudentFactory)
+from ..factories.analysissessions_factories import (
+    AnalysisSessionFactory,
+    AnalyzedCoincidenceFactory,
+    SessionRequestFactory,
+    StudentFactory,
+)
 from ..factories.inforecords_factories import ClusterFactory
 
 
