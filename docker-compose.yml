@@ -29,8 +29,6 @@ services:
     tty: true
     depends_on:
       - postgres
-    ports:
-      - '8000:8000'
 
   vpn:
      image: 'python:3.10'
