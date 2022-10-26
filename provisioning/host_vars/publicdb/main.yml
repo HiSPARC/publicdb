@@ -1,3 +1,5 @@
+ansible_host: hisparc-data
+
 debug: False
 
 publicdb_repo: https://github.com/HiSPARC/publicdb.git
@@ -5,10 +7,10 @@ publicdb_repo: https://github.com/HiSPARC/publicdb.git
 psql_database_name: publicdb
 psql_user: "{{ ansible_user }}"
 
-vpn_host: tietar.nikhef.nl
-vpn_proxy: http://tietar.nikhef.nl:8001
-datastore_host: frome.nikhef.nl
-datastore_proxy: http://frome.nikhef.nl:8001
+vpn_host: hisparc-data.chpc.utah.edu
+vpn_proxy: http://hisparc-data.chpc.utah.edu:8001
+datastore_host: hisparc-raw.chpc.utah.edu
+datastore_proxy: http://hisparc-raw.chpc.utah.edu:8001
 
 cert_name: publicdb
 cert_hostname: data.hisparc.nl

@@ -1,3 +1,5 @@
+ansible_host: hisparc-data
+
 private_keys:
   - path: adminkeys/ca.key
     key: "{{ vault.adminkeys_ca_key }}"

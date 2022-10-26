@@ -1,3 +1,5 @@
+ansible_host: hisparc-raw
+
 datastore_config_url: https://data.hisparc.nl/config/datastore
-datastore_host: frome.nikhef.nl
+datastore_host: hisparc-raw.chpc.utah.edu
 datastore_port: 8001
