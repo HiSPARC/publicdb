@@ -1,7 +1,7 @@
-- name: Common provisioning for all hosts
-  hosts: all
-  roles:
-    - common
+# - name: Common provisioning for all hosts
+#   hosts: all
+#   roles:
+#     - common
 
 - name: Ensure required datastore paths exist
   hosts: publicdb:datastore
