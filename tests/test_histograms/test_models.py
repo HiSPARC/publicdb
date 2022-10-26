@@ -94,7 +94,7 @@ class TestConfiguration(TestCase):
         self.assertEqual(9, self.configuration.station())
 
     def test_primary(self):
-        master_version = int(self.configuration.mas_version.split(' ')[1])
+        primary_version = int(self.configuration.mas_version.split(' ')[1])
         self.assertEqual(primary_version, self.configuration.primary)
 
     def test_secondary(self):
