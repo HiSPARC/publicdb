@@ -20,7 +20,7 @@ def keys(request, host):
 
     if settings.VPN_PROXY is not None:
         proxy = ServerProxy(settings.VPN_PROXY)
-        key_file = proxy.get_key(host.name, host.type.slug)
+        key_file = proxy.get_key(host.name, host.type.slug).data
         key_file = base64.b64decode(key_file)
     else:
         key_file = 'dummy'
