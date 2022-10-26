@@ -140,11 +140,11 @@ If this is the first run you should now run database migrations::
     $ docker-compose exec publicdb ./manage.py migrate
 
 In order to populate the database you can use a dump of the production
-database:
+database::
 
     $ docker-compose exec -T postgres pg_restore --username=hisparc --dbname=publicdb < publicdb_dump.sql
 
-or create some fake data:
+or create some fake data::
 
     $ docker-compose exec publicdb ./manage.py createfakedata
 
