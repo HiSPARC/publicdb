@@ -27,5 +27,5 @@ VPN_PROXY = 'http://vpn:8001'
 DATASTORE_PROXY = 'http://datastore:8002'
 
 # VPN and datastore host names
-VPN_HOST = 'vpn'
-DATASTORE_HOST = 'datastore'
+VPN_HOST = 'publicdb_vpn_1.publicdb_default'
+DATASTORE_HOST = 'publicdb_datastore_1.publicdb_default'
