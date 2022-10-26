@@ -4,3 +4,4 @@ numpy
 pytables
 scipy
 psycopg2
+uwsgi

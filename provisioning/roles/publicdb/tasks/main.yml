@@ -4,48 +4,20 @@
     dest: ~/.bashrc
     backup: yes
 
-- name: Ensure /srv directory exists
-  ansible.builtin.file:
-    path: "{{ publicdb_base }}"
-    state: directory
-  become: true
-
-- name: Ensure /srv/publicdb directory exists
+- name: Ensure publicdb directory exists
   ansible.builtin.file:
     path: "{{ publicdb_path }}"
     state: directory
-    owner: hisparc
-    group: hisparc
     mode: 02775
-  become: true
 
-- name: Ensure /var/log/hisparc-*.log exists
+- name: Ensure hisparc-*.log exists
   ansible.builtin.file:
-    path: "/var/log/{{ item }}"
+    path: "{{ publicdb_logs }}/{{ item }}"
     state: touch
-    owner: hisparc
-    group: hisparc
     mode: 0644
   with_items:
     - hisparc-update.log
     - hisparc-django-errors.log
-  become: true
-
-- name: Set default group write ACLs on /srv/publicdb
-  ansible.posix.acl:
-    default: yes
-    etype: group
-    permissions: rwx
-    path: "{{ publicdb_path }}"
-    state: present
-  become: true
-
-- name: Get local git HEAD (for dev VM)
-  ansible.builtin.command:
-    cmd: git rev-parse --verify HEAD
-  delegate_to: localhost
-  register: local_head
-  when: inventory_hostname == "publicdb"
 
 - name: Checkout publicdb in /srv/publicdb/www
   ansible.builtin.git:
@@ -53,7 +25,7 @@
     dest: "{{ publicdb_code }}"
     update: yes
     force: no
-    version: "{{ local_head.stdout | default('master') }}"
+    version: master
   notify: Restart uWSGI
 
 - name: Remove compiled python code
@@ -75,7 +47,7 @@
 
 - name: Create django media/raw_data folder
   ansible.builtin.file:
-    path: "{{ publicdb_media }}raw_data"
+    path: "{{ publicdb_media }}/raw_data"
     state: directory
 
 - name: Copy conda requirements files
@@ -90,17 +62,12 @@
 
 - name: Create conda environment
   ansible.builtin.shell:
-    cmd: "/opt/miniconda/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
+    cmd: "{{ miniconda_dir }}/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
     creates: "{{ publicdb_venv }}"
 
 - name: Install conda packages in conda environment
   ansible.builtin.command:
-    cmd: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --file ~/conda.list --yes"
-
-# uwsgi fails to build from pip due to SSL version swamp
-- name: Install uwsgi from conda-forge
-  ansible.builtin.command:
-    cmd: "/opt/miniconda/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge uwsgi --yes"
+    cmd: "{{ miniconda_dir }}/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge --file ~/conda.list --yes"
 
 - name: Install packages in conda environment using pip
   ansible.builtin.pip:
@@ -133,7 +100,7 @@
 - name: Copy Django settings file
   ansible.builtin.template:
     src: settings.py
-    dest: "{{ publicdb_code }}publicdb/settings.py"
+    dest: "{{ publicdb_code }}/publicdb/settings.py"
     backup: yes
   notify: Restart uWSGI
 
@@ -149,109 +116,7 @@
     app_path: "{{ publicdb_code }}"
     virtualenv: "{{ publicdb_venv }}"
 
-- name: Copy uwsgi.ini
-  ansible.builtin.template:
-    src: uwsgi.ini
-    dest: "{{ publicdb_code }}uwsgi.ini"
-    backup: yes
-  notify: Restart uWSGI
-
-- name: Install nginx
-  ansible.builtin.yum:
-    name: nginx
-    state: present
-  become: true
-
-- name: Copy nginx HTTP configuration
-  ansible.builtin.template:
-    src: nginx-http.conf
-    dest: /etc/nginx/conf.d/
-  notify: restart nginx
-  become: true
-
-- name: Start nginx on boot
-  ansible.builtin.service:
-    name: nginx
-    state: started
-    enabled: yes
-  become: true
-
-# do not overwrite let's encrypt https config on pique
-- name: Copy nginx HTTPS configuration
-  ansible.builtin.template:
-    src: nginx-https.conf
-    dest: /etc/nginx/conf.d/
-  notify: restart nginx
-  become: true
-  when: is_dev is defined
-
-#
-# SELinux stuff
-#
-- name: Ensure /var/lib/selinux exists
-  ansible.builtin.file:
-    path: /var/lib/selinux
-    state: directory
-    mode: 0755
-  become: true
-
-- name: Copy SELinux type enforcement module
-  ansible.builtin.copy:
-    src: nginx-publicdb.te
-    dest: /var/lib/selinux/
-  become: true
-
-- name: Check if custom SELinux module (nginx-publicdb) is installed
-  ansible.builtin.shell:
-    cmd: "semodule --list-modules | grep nginx-publicdb | cat"
-  register: module_nginx_installed
-  become: true
-
-- name: Build and install custom SELinux module
-  ansible.builtin.command:
-    cmd: "{{ item }}"
-    chdir: /var/lib/selinux
-  with_items:
-    - "checkmodule -M -m -o nginx-publicdb.mod nginx-publicdb.te"
-    - "semodule_package -o nginx-publicdb.pp -m nginx-publicdb.mod"
-    - "semodule -i nginx-publicdb.pp"
-  when: not module_nginx_installed.stdout
-  become: true
-#
-# End of SELinux stuff
-#
-
-- name: Install supervisor daemon
-  ansible.builtin.pip:
-    name: supervisor
-  become: true
-
-- name: Copy supervisord init script
-  ansible.builtin.copy:
-    src: supervisord
-    dest: /etc/init.d/supervisord
-    backup: yes
-    owner: root
-    group: root
-    mode: 0755
-  become: true
-
-- name: Copy supervisord.conf
-  ansible.builtin.template:
-    src: supervisord.conf
-    dest: /etc/supervisord.conf
-    backup: yes
-    owner: root
-    group: root
-    mode: 0644
-  become: true
-
-- name: Start supervisord now and on boot
-  ansible.builtin.service:
-    name: supervisord
-    state: started
-    enabled: yes
-  become: true
+#### TODO: set up Apache / mod_wsgi
 
 - name: Enable cron job for updating histograms and ESD
   ansible.builtin.cron:
@@ -261,8 +126,7 @@
     hour: 4
     state: present
     user: hisparc
-    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py updatehistograms"
-  become: true
+    job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}/manage.py updatehistograms"
 
 - name: Enable cron job for cleaning out downloaded raw_data files
   ansible.builtin.cron:
@@ -270,9 +134,8 @@
     cron_file: hisparc
     special_time: daily
     state: present
-    user: root
-    job: "find {{ publicdb_media }}raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
-  become: true
+    user: hisparc
+    job: "find {{ publicdb_media }}/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
 
 - name: Enable cron job for creating analysis sessions
   ansible.builtin.cron:
@@ -282,7 +145,6 @@
     state: present
     user: hisparc
     job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py createsessions"
-  become: true
 
 - name: Enable cron job for daily backup of publicdb database
   ansible.builtin.cron:
@@ -292,8 +154,7 @@
     hour: 1
     state: present
     user: hisparc
-    job: "if [ -f '/mysqldumps/publicdb_dump.sql' ]; then mv /mysqldumps/publicdb_dump.sql /mysqldumps/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump.sql"
-  become: true
+    job: "if [ -f '{{ publicdb_dumps }}/publicdb_dump.sql' ]; then mv {{ publicdb_dumps }}/publicdb_dump.sql {{ publicdb_dumps }}/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file={{ publicdb_dumps }}/publicdb_dump.sql"
 
 - name: Enable cron job for monthly backup of publicdb database
   ansible.builtin.cron:
@@ -304,5 +165,4 @@
     day: 1
     state: present
     user: hisparc
-    job: "if [ -f '/mysqldumps/publicdb_dump_this_month.sql' ]; then mv /mysqldumps/publicdb_dump_this_month.sql /mysqldumps/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file=/mysqldumps/publicdb_dump_this_month.sql"
-  become: true
+    job: "if [ -f '{{ publicdb_dumps }}/publicdb_dump_this_month.sql' ]; then mv {{ publicdb_dumps }}/publicdb_dump_this_month.sql {{ publicdb_dumps }}/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file={{ publicdb_dumps }}/publicdb_dump_this_month.sql"

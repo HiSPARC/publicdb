@@ -10,12 +10,13 @@ from sentry_sdk.integrations.django import DjangoIntegration
 dirname = path.dirname(__file__)
 PUBLICDB_PATH = path.join(dirname, '..')
 
-DEBUG = {{ debug }}
+DEBUG = False
 
 ADMINS = (
-    ('Kasper van Dam', 'kaspervd@nikhef.nl'),
+    ('Kasper van Dam', 'kaspervandam@gmail.com'),
     ('Arne de Laat', 'arne@delaat.net'),
     ('Tom Kooij', 'hisparc@tomkooij.nl'),
+    ('David Fokkema', 'davidfokkema@icloud.com'),
 )
 MANAGERS = ADMINS
 
@@ -35,14 +36,14 @@ DATABASES = {
 }
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '/databases/frome'
+DATASTORE_PATH = '{{ datastore_path }}'
 TEST_DATASTORE_PATH = path.join(PUBLICDB_PATH, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder
-ESD_PATH = '/srv/publicdb/www/esd'
+ESD_PATH = '{{ esd_path }}'
 
 # Path of the mounted KNMI Lightning data root folder
-LGT_PATH = '/databases/knmi_lightning'
+LGT_PATH = '{{ lgt_path }}'
 
 # VPN and datastore XML-RPC Proxies
 VPN_PROXY = '{{ vpn_proxy }}'
@@ -64,7 +65,7 @@ EMAIL_BACKEND = '{{ email_backend }}'
 EMAIL_HOST = '{{ email_host }}'
 EMAIL_PORT = {{ email_port }}
 
-TIME_ZONE = 'Europe/Amsterdam'
+TIME_ZONE = 'US/Mountain'
 
 LANGUAGE_CODE = 'en-us'
 
@@ -113,7 +114,7 @@ MIDDLEWARE = (
 ROOT_URLCONF = 'publicdb.urls'
 
 ALLOWED_HOSTS = [
-    'data.hisparc.nl',
+    '{{ publicdb_host }}',
 ]
 
 if DEBUG:

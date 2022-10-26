@@ -2,7 +2,7 @@
 
 devinstall:
 	pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
-	conda install --quiet --yes --file provisioning/roles/publicdb/files/conda.list
+	conda install --quiet --yes --channel conda-forge --file provisioning/roles/publicdb/files/conda.list
 	pip install -r provisioning/roles/publicdb/files/pip.list
 
 test: coveragetests flaketest doctest ansibletest
