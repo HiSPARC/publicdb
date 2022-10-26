@@ -51,7 +51,7 @@ def get_key(host, type):
         print("Unexpected key {type=}")
         # raise ValueError(f'Unsupported type; {type}')
 
-    return base64.b64encode('test')
+    return base64.b64encode(b'test')
 
 
 class RequestHandler(SimpleXMLRPCRequestHandler):
