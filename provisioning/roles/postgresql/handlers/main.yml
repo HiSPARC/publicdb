@@ -1,5 +1,5 @@
 - name: restart postgresql
   ansible.builtin.service:
-    name: postgresql-14
+    name: "postgresql-{{ psql_version }}"
     state: restarted
   become: true

@@ -1,33 +1,9 @@
-- name: Install the PostgreSQL rpm from a remote repo
-  ansible.builtin.yum:
-    name: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm"
-    state: present
-  become: true
-
-- name: Install the PostgreSQL server
-  ansible.builtin.yum:
-    name: "postgresql{{ psql_version|replace('.', '') }}-server"
-    state: present
-  become: true
-
-- name: Install the Python package to interface with the PostgreSQL server
-  ansible.builtin.yum:
-    name: python-psycopg2
-    state: present
-  become: true
-
-- name: Initiate database
-  ansible.builtin.command:
-    cmd: "/usr/pgsql-{{ psql_version }}/bin/postgresql-{{ psql_version }}-setup initdb"
-    creates: "/var/lib/pgsql/{{ psql_version }}/data/postgresql.conf"
-  become: true
-
 - name: Copy PostgreSQL authentication config file
   become: true
   become_user: postgres
   ansible.builtin.template:
     src: pg_hba.conf
-    dest: "/var/lib/pgsql/{{ psql_version }}/data/pg_hba.conf"
+    dest: "/usr/pgsql-14/share/pg_hba.conf"
     mode: 0600
   notify: restart postgresql
 

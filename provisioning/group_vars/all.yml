@@ -1,1 +1,3 @@
 ansible_user: hisparc
+hisparc_dir: /uufs/chpc.utah.edu/common/home/hisparc
+miniconda_dir: /uufs/chpc.utah.edu/common/home/hisparc/miniconda

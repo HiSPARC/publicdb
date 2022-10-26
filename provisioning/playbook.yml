@@ -9,38 +9,31 @@
     - datastore-paths
 
 - name: Setup firewall and development tools are installed
-  hosts: publicdb_group:datastore_group
+  hosts: publicdb:datastore
   roles:
-    - simple-firewall
+    # - simple-firewall
     - development
 
 - name: Setup public database server
-  hosts: publicdb_group
+  hosts: publicdb
   roles:
     - postgresql
-    - self-signed-cert
     - publicdb
 
-- name: Setup lets encrypt for HTTPS
-  hosts: pique.nikhef.nl
-  roles:
-    - letsencrypt
-
 - name: Setup datastore server
-  hosts: datastore_group
+  hosts: datastore
   roles:
     - datastore
+# - name: Setup network config for tietar
+#   hosts: tietar.nikhef.nl
+#   roles:
+#     - network-tietar
 
-- name: Setup network config for tietar
-  hosts: tietar.nikhef.nl
-  roles:
-    - network-tietar
-
-- name: Setup VPN server
-  hosts: vpn_group
-  roles:
-    - dos
-    - postfix
-    - shorewall-firewall
-    - openvpn
-    - vpn-scripts
+# - name: Setup VPN server
+#   hosts: vpn_group
+#   roles:
+#     - dos
+#     - postfix
+#     - shorewall-firewall
+#     - openvpn
+#     - vpn-scripts
