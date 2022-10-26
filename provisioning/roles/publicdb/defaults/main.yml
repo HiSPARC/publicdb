@@ -6,11 +6,7 @@ publicdb_venv: "{{ publicdb_path }}publicdb_venv"
 publicdb_static: "{{ publicdb_path }}static/"
 publicdb_media: "{{ publicdb_path }}media/"
 
-publicdb_python_version: '3.10'
+publicdb_python_version: "3.10"
 
 jsparc_repo: https://github.com/HiSPARC/jsparc.git
 jsparc_path: "{{ publicdb_path }}jsparc/"
-
-certificate_root: "/etc/nginx/ssl"
-certificate_private_key: "{{ certificate_root }}/private_key.key"
-certificate_certificate: "{{ certificate_root }}/{{ cert_name }}.crt"

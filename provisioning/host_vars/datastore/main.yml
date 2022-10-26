@@ -1,5 +1,5 @@
 ansible_host: hisparc-raw
 
-datastore_config_url: https://data.hisparc.nl/config/datastore
-datastore_host: hisparc-raw.chpc.utah.edu
-datastore_port: 8001
+miniconda_dir: "{{ hisparc_dir }}/datastore/miniconda"
+
+datastore_config_url: "https://{{ publicdb_host }}/config/datastore"

@@ -2,26 +2,22 @@ ansible_host: hisparc-data
 
 debug: False
 
+miniconda_dir: "{{ hisparc_dir }}/publicdb/miniconda"
+
 publicdb_repo: https://github.com/HiSPARC/publicdb.git
 
 psql_database_name: publicdb
 psql_user: "{{ ansible_user }}"
 
-vpn_host: hisparc-data.chpc.utah.edu
-vpn_proxy: http://hisparc-data.chpc.utah.edu:8001
-datastore_host: hisparc-raw.chpc.utah.edu
-datastore_proxy: http://hisparc-raw.chpc.utah.edu:8001
-
-cert_name: publicdb
-cert_hostname: data.hisparc.nl
+vpn_proxy: "http://{{ vpn_host }}:{{ vpn_port }}"
+datastore_proxy: "http://{{ datastore_host }}:{{ datastore_port }}"
 
 email_backend: django.core.mail.backends.smtp.EmailBackend
 email_host: smtp.nikhef.nl
 email_port: 25
 
-publicdb_host: https://data.hisparc.nl
-media_url: http://data.hisparc.nl/media/
-static_url: https://data.hisparc.nl/static/
+media_url: "https://{{ publicdb_host }}/media/"
+static_url: "https://{{ publicdb_host }}/static/"
 
 secret_key: "{{ vault.secret_key }}"
 sentry_dsn: "{{ vault.sentry_dsn }}"

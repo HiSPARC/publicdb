@@ -1,3 +1,8 @@
 ansible_user: hisparc
 hisparc_dir: /uufs/chpc.utah.edu/common/home/hisparc
-miniconda_dir: /uufs/chpc.utah.edu/common/home/hisparc/miniconda
+
+publicdb_host: hisparc-data.chpc.utah.edu
+datastore_host: hisparc-raw.chpc.utah.edu
+datastore_port: 8001
+vpn_host: hisparc-data.chpc.utah.edu
+vpn_port: 8001
