@@ -94,9 +94,7 @@ class Contact(models.Model):
 
     @property
     def name(self):
-        return (' '.join((self.title, self.first_name, self.prefix_surname, self.surname))
-                   .replace('  ', ' ')
-                   .strip())
+        return ' '.join((self.title, self.first_name, self.prefix_surname, self.surname)).replace('  ', ' ').strip()
 
     class Meta:
         verbose_name = 'contact'
@@ -160,16 +158,20 @@ class Cluster(models.Model):
             if self.number % 1000:
                 raise ValidationError("Cluster number must be multiple of 1000")
             if not 0 <= (self.number - self.country.number) < 10000:
-                raise ValidationError("Cluster number must be in range of "
-                                      f"numbers for the country ({self.country.number}, {self.country.number + 10000}).")
+                raise ValidationError(
+                    "Cluster number must be in range of "
+                    f"numbers for the country ({self.country.number}, {self.country.number + 10000})."
+                )
         if self.parent is not None:
             if self.parent.parent is not None:
                 raise ValidationError("Subsubclusters are not allowed")
             if self.number % 100:
                 raise ValidationError("Subcluster number must be multiple of 100")
             if not 0 < (self.number - self.parent.number) < 1000:
-                raise ValidationError("Subcluster number must be in range of "
-                                      f"numbers for the cluster ({self.parent.number}, {self.parent.number + 1000}).")
+                raise ValidationError(
+                    "Subcluster number must be in range of "
+                    f"numbers for the cluster ({self.parent.number}, {self.parent.number + 1000})."
+                )
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -226,7 +228,8 @@ class Station(models.Model):
         if not 0 < (self.number - self.cluster.number) < 100:
             raise ValidationError(
                 "Station number must be in range of numbers for the (sub)cluster "
-                f"({self.cluster.number}, {self.cluster.number + 100}).")
+                f"({self.cluster.number}, {self.cluster.number + 100})."
+            )
 
     def save(self, *args, **kwargs):
         # Strip some problematic characters
@@ -250,7 +253,7 @@ class Station(models.Model):
         today = datetime.datetime.utcnow()
 
         try:
-            config = (Configuration.objects.filter(summary__station=self, timestamp__lte=today).latest())
+            config = Configuration.objects.filter(summary__station=self, timestamp__lte=today).latest()
         except Configuration.DoesNotExist:
             n_detectors = 4
         else:
@@ -278,10 +281,9 @@ class Station(models.Model):
             summaries = Summary.objects.with_config().filter(station=self, date__lte=date).reverse()
             for summary in summaries:
                 try:
-                    config = (Configuration.objects
-                                           .filter(summary=summary)
-                                           .exclude(gps_latitude=0, gps_longitude=0)
-                                           .latest())
+                    config = (
+                        Configuration.objects.filter(summary=summary).exclude(gps_latitude=0, gps_longitude=0).latest()
+                    )
                 except Configuration.DoesNotExist:
                     pass
                 else:
@@ -289,9 +291,11 @@ class Station(models.Model):
         except Summary.DoesNotExist:
             pass
 
-        return {'latitude': (round(config.gps_latitude, 7) if config.gps_latitude is not None else None),
-                'longitude': (round(config.gps_longitude, 7) if config.gps_longitude is not None else None),
-                'altitude': (round(config.gps_altitude, 2) if config.gps_altitude is not None else None)}
+        return {
+            'latitude': (round(config.gps_latitude, 7) if config.gps_latitude is not None else None),
+            'longitude': (round(config.gps_longitude, 7) if config.gps_longitude is not None else None),
+            'altitude': (round(config.gps_altitude, 2) if config.gps_altitude is not None else None),
+        }
 
     class Meta:
         verbose_name = 'Station'
@@ -326,6 +330,7 @@ class Pc(models.Model):
     def keys(self):
         url = reverse('keys', kwargs={'host': self.name})
         return mark_safe(f'<a href="{url}">Certificate {self.name}</a>')
+
     keys.short_description = 'Certificates'
 
     def url(self):
@@ -333,6 +338,7 @@ class Pc(models.Model):
             return ''
         else:
             return mark_safe(f'<a href="vnc://s{self.station.number}.his">s{self.station.number}.his</a>')
+
     url.short_description = 'VNC URL'
 
     class Meta:

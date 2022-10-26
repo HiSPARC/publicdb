@@ -56,11 +56,16 @@ class TestJobs(LiveServerTestCase):
         self.setup_station()
 
         summary = histograms_factories.SummaryFactory(
-            station=self.station, date=date(2017, 1, 1),
-            needs_update_events=True, num_events=168,
-            needs_update_weather=True, num_weather=60,
-            needs_update_config=True, num_config=None,
-            needs_update_singles=True, num_singles=301,
+            station=self.station,
+            date=date(2017, 1, 1),
+            needs_update_events=True,
+            num_events=168,
+            needs_update_weather=True,
+            num_weather=60,
+            needs_update_config=True,
+            num_config=None,
+            needs_update_singles=True,
+            num_singles=301,
             needs_update=True,
         )
 

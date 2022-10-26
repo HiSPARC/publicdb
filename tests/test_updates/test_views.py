@@ -37,9 +37,7 @@ class TestViews(TestCase):
         self.assertEqual(200, response.status_code)
 
         data = parse_qs(response.content.decode('utf-8'))
-        self.assertEqual(
-            {'mustUpdate': ['2'], 'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]},
-            data)
+        self.assertEqual({'mustUpdate': ['2'], 'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]}, data)
 
     def test_check_querystring_user_update(self):
         kwargs = {'queue': 'hisparc'}
@@ -50,9 +48,7 @@ class TestViews(TestCase):
         self.assertEqual(200, response.status_code)
 
         data = parse_qs(response.content.decode('utf-8'))
-        self.assertEqual(
-            {'mustUpdate': ['1'], 'newVersionUser': ['2'], 'urlUser': [user_update.update.url]},
-            data)
+        self.assertEqual({'mustUpdate': ['1'], 'newVersionUser': ['2'], 'urlUser': [user_update.update.url]}, data)
 
     def test_check_querystring_admin_and_user_update(self):
         kwargs = {'queue': 'hisparc'}
@@ -65,10 +61,15 @@ class TestViews(TestCase):
 
         data = parse_qs(response.content.decode('utf-8'))
         self.assertEqual(
-            {'mustUpdate': ['3'],
-             'newVersionUser': ['2'], 'urlUser': [user_update.update.url],
-             'newVersionAdmin': ['2'], 'urlAdmin': [admin_update.update.url]},
-            data)
+            {
+                'mustUpdate': ['3'],
+                'newVersionUser': ['2'],
+                'urlUser': [user_update.update.url],
+                'newVersionAdmin': ['2'],
+                'urlAdmin': [admin_update.update.url],
+            },
+            data,
+        )
 
     def test_check_querystring_missing_versions(self):
         kwargs = {'queue': 'hisparc'}

@@ -15,8 +15,7 @@ FIRSTDATE = datetime.date(2004, 1, 1)
 
 def json_dict(result):
     """Create a json HTTPResponse"""
-    response = HttpResponse(json.dumps(result, sort_keys=True),
-                            content_type='application/json')
+    response = HttpResponse(json.dumps(result, sort_keys=True), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
@@ -59,8 +58,7 @@ def network_status(request):
     for station in Station.objects.exclude(pcs__type__slug='admin'):
         status = station_status.get_status(station.number)
 
-        stations.append({'number': station.number,
-                         'status': status})
+        stations.append({'number': station.number, 'status': status})
     return json_dict(stations)
 
 
@@ -97,32 +95,50 @@ def station(request, station_number, year=None, month=None, date=None):
 
     is_active = Pc.objects.filter(station=station, is_active=True).exists()
 
-    scintillators = [{'radius': layout.detector_1_radius,
-                      'alpha': layout.detector_1_alpha,
-                      'height': layout.detector_1_height,
-                      'beta': layout.detector_1_beta}]
-    scintillators.append({'radius': layout.detector_2_radius,
-                          'alpha': layout.detector_2_alpha,
-                          'height': layout.detector_2_height,
-                          'beta': layout.detector_2_beta})
+    scintillators = [
+        {
+            'radius': layout.detector_1_radius,
+            'alpha': layout.detector_1_alpha,
+            'height': layout.detector_1_height,
+            'beta': layout.detector_1_beta,
+        }
+    ]
+    scintillators.append(
+        {
+            'radius': layout.detector_2_radius,
+            'alpha': layout.detector_2_alpha,
+            'height': layout.detector_2_height,
+            'beta': layout.detector_2_beta,
+        }
+    )
 
     if station.number_of_detectors() == 4:
-        scintillators.append({'radius': layout.detector_3_radius,
-                              'alpha': layout.detector_3_alpha,
-                              'height': layout.detector_3_height,
-                              'beta': layout.detector_3_beta})
-        scintillators.append({'radius': layout.detector_4_radius,
-                              'alpha': layout.detector_4_alpha,
-                              'height': layout.detector_4_height,
-                              'beta': layout.detector_4_beta})
+        scintillators.append(
+            {
+                'radius': layout.detector_3_radius,
+                'alpha': layout.detector_3_alpha,
+                'height': layout.detector_3_height,
+                'beta': layout.detector_3_beta,
+            }
+        )
+        scintillators.append(
+            {
+                'radius': layout.detector_4_radius,
+                'alpha': layout.detector_4_alpha,
+                'height': layout.detector_4_height,
+                'beta': layout.detector_4_beta,
+            }
+        )
 
-    station_info = {'number': station.number,
-                    'name': station.name,
-                    'subcluster': station.cluster.name,
-                    'cluster': station.cluster.main_cluster(),
-                    'country': station.cluster.country.name,
-                    'active': is_active,
-                    'scintillators': scintillators}
+    station_info = {
+        'number': station.number,
+        'name': station.name,
+        'subcluster': station.cluster.name,
+        'cluster': station.cluster.main_cluster(),
+        'country': station.cluster.country.name,
+        'active': is_active,
+        'scintillators': scintillators,
+    }
     station_info.update(location)
 
     return json_dict(station_info)

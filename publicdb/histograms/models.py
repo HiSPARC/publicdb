@@ -43,30 +43,23 @@ class NetworkSummary(models.Model):
 class SummaryQuerySet(models.QuerySet):
     def valid_date(self):
         """Filter by date to dates between start and today"""
-        return self.filter(
-            date__gte=FIRSTDATE,
-            date__lte=datetime.date.today())
+        return self.filter(date__gte=FIRSTDATE, date__lte=datetime.date.today())
 
     def with_data(self):
         """Filter with at least either events or weather data"""
-        return self.valid_date().filter(
-            models.Q(num_events__isnull=False)
-            | models.Q(num_weather__isnull=False))
+        return self.valid_date().filter(models.Q(num_events__isnull=False) | models.Q(num_weather__isnull=False))
 
     def with_events(self):
         """Filter with at least events"""
-        return self.valid_date().filter(
-            num_events__isnull=False)
+        return self.valid_date().filter(num_events__isnull=False)
 
     def with_config(self):
         """Filter with at least configurations"""
-        return self.valid_date().filter(
-            num_config__isnull=False)
+        return self.valid_date().filter(num_config__isnull=False)
 
     def with_events_in_last_hour(self):
         """Filter with events in last hour"""
-        return self.valid_date().filter(
-            events_in_last_hour=True)
+        return self.valid_date().filter(events_in_last_hour=True)
 
 
 class Summary(models.Model):
@@ -205,16 +198,19 @@ class Configuration(models.Model):
 
     def station(self):
         return self.summary.station.number
+
     station.admin_order_field = 'summary__station__number'
 
     def _master(self):
         return self.extract_hardware_serial(self.mas_version)
+
     _master.admin_order_field = 'mas_version'
 
     master = property(_master)
 
     def _slave(self):
         return self.extract_hardware_serial(self.slv_version)
+
     _slave.admin_order_field = 'slv_version'
 
     slave = property(_slave)

@@ -21,6 +21,7 @@ DATASTORE_CFG = '/databases/frome/station_list.csv'
 CFG_URL = '{{ datastore_config_url }}'
 RELOAD_PATH = '/tmp/uwsgi-reload.me'
 
+
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
@@ -55,8 +56,7 @@ if __name__ == '__main__':
         rpc_paths = ('/RPC2',)
 
     # Create server
-    server = SimpleXMLRPCServer(('{{ datastore_host }}', {{ datastore_port }}),
-                                requestHandler=RequestHandler)
+    server = SimpleXMLRPCServer(('{{ datastore_host }}', {{datastore_port}}), requestHandler=RequestHandler)
     server.register_introspection_functions()
 
     server.register_function(reload_datastore)

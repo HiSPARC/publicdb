@@ -9,7 +9,6 @@ from ..factories import histograms_factories, inforecords_factories
 
 
 class TestChecks(TestCase):
-
     @patch('publicdb.histograms.checks.check_for_new_events_and_update_flags')
     def test_check_for_updates(self, mock_flags):
         """The check function is called if previous check has finished"""
@@ -44,7 +43,7 @@ class TestChecks(TestCase):
                     'satellites': 0,
                     'singles_old': 86400,
                     'config': 1,
-                    'events': 168
+                    'events': 168,
                 }
             }
         }
@@ -80,17 +79,22 @@ class TestChecks(TestCase):
                     'satellites': 0,
                     'singles_old': 86400,
                     'config': 1,
-                    'events': 168
+                    'events': 168,
                 }
             }
         }
         self.setup_station()
         summary = histograms_factories.SummaryFactory(
-            station=self.station, date=date(2017, 1, 1),
-            needs_update_events=False, num_events=100,
-            needs_update_weather=False, num_weather=None,
-            needs_update_config=False, num_config=None,
-            needs_update_singles=False, num_singles=10,
+            station=self.station,
+            date=date(2017, 1, 1),
+            needs_update_events=False,
+            num_events=100,
+            needs_update_weather=False,
+            num_weather=None,
+            needs_update_config=False,
+            num_config=None,
+            needs_update_singles=False,
+            num_singles=10,
         )
 
         state = Mock(check_last_run=datetime(2004, 1, 1, 1, 0, 0))

@@ -18,8 +18,7 @@ class Command(BaseCommand):
         with factory.Faker.override_default_locale('nl_NL'):
             # Inforecords
             countries = [
-                inforecords_factories.CountryFactory(number=country_number)
-                for country_number in range(0, 20001, 10000)
+                inforecords_factories.CountryFactory(number=country_number) for country_number in range(0, 20001, 10000)
             ]
             clusters = [
                 inforecords_factories.ClusterFactory(country=country, number=cluster_number + country.number)
@@ -27,7 +26,9 @@ class Command(BaseCommand):
                 for cluster_number in range(0, 3001, 1000)
             ]
             subclusters = [
-                inforecords_factories.ClusterFactory(country=cluster.country, parent=cluster, number=cluster_number + cluster.number)
+                inforecords_factories.ClusterFactory(
+                    country=cluster.country, parent=cluster, number=cluster_number + cluster.number
+                )
                 for cluster in clusters
                 for cluster_number in range(100, 201, 100)
             ]
@@ -47,10 +48,7 @@ class Command(BaseCommand):
         dates = [date(2017, 1, 1), date(2017, 1, 2), date(2017, 2, 10), date(2018, 4, 1)]
 
         # Histograms and datasets
-        network_summaries = [
-            histograms_factories.NetworkSummaryFactory(date=summary_date)
-            for summary_date in dates
-        ]
+        network_summaries = [histograms_factories.NetworkSummaryFactory(date=summary_date) for summary_date in dates]
 
         for network_summary in network_summaries:
             histograms_factories.CoincidencetimeHistogramFactory(network_summary=network_summary)

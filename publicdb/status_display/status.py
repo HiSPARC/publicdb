@@ -24,9 +24,19 @@ class DataStatus:
         self.status_available = update_state.update_has_finished(yesterday)
 
         self.stations = Station.objects.values_list('number', flat=True)
-        self.stations_with_current_data = Summary.objects.with_events_in_last_hour().filter(date__exact=yesterday).values_list('station__number', flat=True)
-        self.stations_with_recent_data = Summary.objects.with_events_in_last_hour().filter(date__gte=recent_day).values_list('station__number', flat=True)
-        self.stations_with_pc = Pc.objects.exclude(type__slug='admin').filter(is_active=True).values_list('station__number', flat=True)
+        self.stations_with_current_data = (
+            Summary.objects.with_events_in_last_hour()
+            .filter(date__exact=yesterday)
+            .values_list('station__number', flat=True)
+        )
+        self.stations_with_recent_data = (
+            Summary.objects.with_events_in_last_hour()
+            .filter(date__gte=recent_day)
+            .values_list('station__number', flat=True)
+        )
+        self.stations_with_pc = (
+            Pc.objects.exclude(type__slug='admin').filter(is_active=True).values_list('station__number', flat=True)
+        )
 
     def _get_datetime_yesterday(self):
         """Determine the datetime of `yesterday`

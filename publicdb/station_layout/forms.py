@@ -10,7 +10,7 @@ ANGLE_LIMITS = {'min_value': -360, 'max_value': 360}  # degrees
 
 radius_field = partial(forms.FloatField, **DISTANCE_LIMITS)
 alpha_field = partial(forms.FloatField, **ANGLE_LIMITS)
-height_field = partial(forms.FloatField, initial=0., **DISTANCE_LIMITS)
+height_field = partial(forms.FloatField, initial=0.0, **DISTANCE_LIMITS)
 beta_field = partial(forms.FloatField, **ANGLE_LIMITS)
 
 
@@ -18,10 +18,10 @@ class StationLayoutQuarantineForm(forms.Form):
     name = forms.CharField(max_length=255)
     email = forms.EmailField()
 
-    station = forms.ModelChoiceField(
-        queryset=Station.objects.filter(pcs__is_test=False).distinct())
+    station = forms.ModelChoiceField(queryset=Station.objects.filter(pcs__is_test=False).distinct())
     active_date = forms.DateTimeField(
-        help_text="Date the detectors were placed in this configuration, e.g. '2010-5-17 12:45'.")
+        help_text="Date the detectors were placed in this configuration, e.g. '2010-5-17 12:45'."
+    )
 
     # Master detectors
     detector_1_radius = radius_field()

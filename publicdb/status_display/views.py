@@ -16,9 +16,18 @@ from django.views.generic import DateDetailView, RedirectView
 
 from sapphire.transformations import clock
 
-from ..histograms.models import (Configuration, DailyDataset, DailyHistogram, DetectorTimingOffset,
-                                 MultiDailyDataset, MultiDailyHistogram, NetworkHistogram, NetworkSummary,
-                                 StationTimingOffset, Summary)
+from ..histograms.models import (
+    Configuration,
+    DailyDataset,
+    DailyHistogram,
+    DetectorTimingOffset,
+    MultiDailyDataset,
+    MultiDailyHistogram,
+    NetworkHistogram,
+    NetworkSummary,
+    StationTimingOffset,
+    Summary,
+)
 from ..inforecords.models import Cluster, Country, Station
 from ..raw_data.date_generator import daterange
 from ..station_layout.models import StationLayout
@@ -45,16 +54,13 @@ def stations_by_country(request):
     countries = OrderedDict()
     test_stations = []
 
-    for station in (Station.objects
-                           .exclude(pcs__type__slug='admin')
-                           .select_related('cluster__country', 'cluster__parent')):
+    for station in Station.objects.exclude(pcs__type__slug='admin').select_related(
+        'cluster__country', 'cluster__parent'
+    ):
         link = station in data_stations
         status = station_status.get_status(station.number)
 
-        station_info = {'number': station.number,
-                        'name': station.name,
-                        'link': link,
-                        'status': status}
+        station_info = {'number': station.number, 'name': station.name, 'link': link, 'status': status}
 
         country = station.cluster.country.name
         if station.cluster.parent:
@@ -74,10 +80,11 @@ def stations_by_country(request):
             countries[country][cluster][subcluster] = []
         countries[country][cluster][subcluster].append(station_info)
 
-    return render(request, 'status_display/stations_by_country.html',
-                  {'countries': countries,
-                   'test_stations': test_stations,
-                   'statuscount': statuscount})
+    return render(
+        request,
+        'status_display/stations_by_country.html',
+        {'countries': countries, 'test_stations': test_stations, 'statuscount': statuscount},
+    )
 
 
 def stations_by_number(request):
@@ -92,13 +99,9 @@ def stations_by_number(request):
         link = station in data_stations
         status = station_status.get_status(station.number)
 
-        stations.append({'number': station.number,
-                         'name': station.name,
-                         'link': link,
-                         'status': status})
+        stations.append({'number': station.number, 'name': station.name, 'link': link, 'status': status})
 
-    return render(request, 'status_display/stations_by_number.html',
-                  {'stations': stations, 'statuscount': statuscount})
+    return render(request, 'status_display/stations_by_number.html', {'stations': stations, 'statuscount': statuscount})
 
 
 def stations_by_status(request):
@@ -116,14 +119,13 @@ def stations_by_status(request):
 
         # use setdefault() to automatically include unforeseen status labels without crashing
         group = station_groups.setdefault(status, [])
-        group.append({'number': station.number,
-                      'name': station.name,
-                      'link': link,
-                      'status': status})
+        group.append({'number': station.number, 'name': station.name, 'link': link, 'status': status})
 
-    return render(request, 'status_display/stations_by_status.html',
-                  {'station_groups': station_groups,
-                   'statuscount': statuscount})
+    return render(
+        request,
+        'status_display/stations_by_status.html',
+        {'station_groups': station_groups, 'statuscount': statuscount},
+    )
 
 
 def stations_by_name(request):
@@ -138,15 +140,11 @@ def stations_by_name(request):
         link = station in data_stations
         status = station_status.get_status(station.number)
 
-        stations.append({'number': station.number,
-                         'name': station.name,
-                         'link': link,
-                         'status': status})
+        stations.append({'number': station.number, 'name': station.name, 'link': link, 'status': status})
 
     stations = sorted(stations, key=itemgetter('name'))
 
-    return render(request, 'status_display/stations_by_name.html',
-                  {'stations': stations, 'statuscount': statuscount})
+    return render(request, 'status_display/stations_by_name.html', {'stations': stations, 'statuscount': statuscount})
 
 
 def stations_on_map(request, country=None, cluster=None, subcluster=None):
@@ -181,20 +179,22 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             status = station_status.get_status(station.number)
 
             location = station.latest_location()
-            station_data = {'number': station.number,
-                            'name': station.name,
-                            'cluster': subcluster,
-                            'link': link,
-                            'status': status}
+            station_data = {
+                'number': station.number,
+                'name': station.name,
+                'cluster': subcluster,
+                'link': link,
+                'status': status,
+            }
             station_data.update(location)
             stations.append(station_data)
-        subclusters.append({'name': subcluster.name,
-                            'stations': stations})
+        subclusters.append({'name': subcluster.name, 'stations': stations})
 
-    return render(request, 'status_display/stations_on_map.html',
-                  {'subclusters': subclusters,
-                   'focus': focus,
-                   'statuscount': statuscount})
+    return render(
+        request,
+        'status_display/stations_on_map.html',
+        {'subclusters': subclusters, 'focus': focus, 'statuscount': statuscount},
+    )
 
 
 class NetworkSummaryDetailView(DateDetailView):
@@ -215,9 +215,8 @@ class NetworkSummaryDetailView(DateDetailView):
         return obj
 
     def get_queryset(self):
-        return (
-            NetworkSummary.objects.with_coincidences()
-            .prefetch_related('network_histograms', 'network_histograms__type')
+        return NetworkSummary.objects.with_coincidences().prefetch_related(
+            'network_histograms', 'network_histograms__type'
         )
 
     def get_context_data(self, **kwargs):
@@ -226,33 +225,24 @@ class NetworkSummaryDetailView(DateDetailView):
 
         # Find previous/next dates with data
         try:
-            prev = (NetworkSummary.objects
-                                  .with_coincidences()
-                                  .filter(date__lt=date)
-                                  .latest()
-                                  .date)
+            prev = NetworkSummary.objects.with_coincidences().filter(date__lt=date).latest().date
         except NetworkSummary.DoesNotExist:
             prev = None
 
         try:
-            next = (NetworkSummary.objects
-                                  .with_coincidences()
-                                  .filter(date__gt=date)
-                                  .earliest()
-                                  .date)
+            next = NetworkSummary.objects.with_coincidences().filter(date__gt=date).earliest().date
         except NetworkSummary.DoesNotExist:
             next = None
 
         # Number of non-test stations with data on this date
-        n_stations = (Station.objects
-                             .filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
-                             .distinct()
-                             .count())
-        histograms = (DailyHistogram.objects
-                                    .filter(summary__date=date,
-                                            summary__station__pcs__is_test=False,
-                                            type__slug='eventtime')
-                                    .distinct())
+        n_stations = (
+            Station.objects.filter(summaries__date=date, summaries__num_events__isnull=False, pcs__is_test=False)
+            .distinct()
+            .count()
+        )
+        histograms = DailyHistogram.objects.filter(
+            summary__date=date, summary__station__pcs__is_test=False, type__slug='eventtime'
+        ).distinct()
         number_of_events = sum(sum(histogram.values) for histogram in histograms)
         status = {'station_count': n_stations, 'n_events': number_of_events}
 
@@ -265,25 +255,26 @@ class NetworkSummaryDetailView(DateDetailView):
         plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.network_histograms.all()}
 
         # data for singles plots
-        singles_datasets = (MultiDailyDataset.objects
-                                             .filter(summary__date=date,
-                                                     summary__station__pcs__is_test=False,
-                                                     type__slug='singlesratelow')
-                                             .distinct())
+        singles_datasets = MultiDailyDataset.objects.filter(
+            summary__date=date, summary__station__pcs__is_test=False, type__slug='singlesratelow'
+        ).distinct()
         singles_plots = [(dataset.summary.station.number, plot_dataset(dataset)) for dataset in singles_datasets]
         singles_plots = sorted(singles_plots)
 
-        context.update({'date': date,
-                        'tomorrow': date + datetime.timedelta(days=1),
-                        'status': status,
-
-                        'plots': plots,
-                        'singles_plots': singles_plots,
-                        'thismonth': thismonth,
-                        'month_list': month_list,
-                        'year_list': year_list,
-                        'prev': prev,
-                        'next': next})
+        context.update(
+            {
+                'date': date,
+                'tomorrow': date + datetime.timedelta(days=1),
+                'status': status,
+                'plots': plots,
+                'singles_plots': singles_plots,
+                'thismonth': thismonth,
+                'month_list': month_list,
+                'year_list': year_list,
+                'prev': prev,
+                'next': next,
+            }
+        )
         return context
 
     def nav_calendar(self):
@@ -322,9 +313,9 @@ class NetworkSummaryDetailView(DateDetailView):
         month_list = [{'month': month} for month in calendar.month_abbr[1:]]
 
         for date in date_list:
-            first_of_month = (self.get_queryset()
-                                  .filter(date__year=date.year, date__month=date.month)
-                                  .earliest().get_absolute_url())
+            first_of_month = (
+                self.get_queryset().filter(date__year=date.year, date__month=date.month).earliest().get_absolute_url()
+            )
             month_list[date.month - 1]['link'] = first_of_month
 
         return month_list
@@ -369,8 +360,16 @@ class SummaryDetailView(DateDetailView):
         queryset = (
             self.get_queryset()
             .select_related('station')
-            .prefetch_related('histograms', 'histograms__type', 'multi_histograms', 'multi_histograms__type',
-                              'datasets', 'datasets__type', 'multi_datasets', 'multi_datasets__type')
+            .prefetch_related(
+                'histograms',
+                'histograms__type',
+                'multi_histograms',
+                'multi_histograms__type',
+                'datasets',
+                'datasets__type',
+                'multi_datasets',
+                'multi_datasets__type',
+            )
         )
 
         date = self.kwargs['date']
@@ -393,8 +392,7 @@ class SummaryDetailView(DateDetailView):
 
         # Find previous/next dates with data
         try:
-            previous = (self.get_queryset().filter(station=station, date__lt=date)
-                            .latest().get_absolute_url())
+            previous = self.get_queryset().filter(station=station, date__lt=date).latest().get_absolute_url()
         except Summary.DoesNotExist:
             previous = None
         try:
@@ -404,10 +402,7 @@ class SummaryDetailView(DateDetailView):
 
         # Get most recent configuration
         try:
-            summary = (Summary.objects
-                              .with_config()
-                              .filter(station=station, date__lte=date)
-                              .latest())
+            summary = Summary.objects.with_config().filter(station=station, date__lte=date).latest()
             config = Configuration.objects.filter(summary=summary).latest()
             if config.slave == -1:
                 has_slave = False
@@ -433,28 +428,31 @@ class SummaryDetailView(DateDetailView):
 
         # Data for the plots
         plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.histograms.all()}
-        plots.update({histogram.type.slug: plot_histogram(histogram) for histogram in self.object.multi_histograms.all()})
+        plots.update(
+            {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.multi_histograms.all()}
+        )
         plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.datasets.all()})
         plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.multi_datasets.all()})
 
-        context.update({'station': station,
-                        'date': date,
-                        'tomorrow': date + datetime.timedelta(days=1),
-                        'config': config,
-                        'location': location,
-                        'has_slave': has_slave,
-
-                        'plots': plots,
-
-                        'thismonth': thismonth,
-                        'month_list': month_list,
-                        'year_list': year_list,
-                        'previous': previous,
-                        'next': next,
-
-                        'has_data': True,
-                        'has_config': has_config,
-                        'coincidences_found': coincidences_found})
+        context.update(
+            {
+                'station': station,
+                'date': date,
+                'tomorrow': date + datetime.timedelta(days=1),
+                'config': config,
+                'location': location,
+                'has_slave': has_slave,
+                'plots': plots,
+                'thismonth': thismonth,
+                'month_list': month_list,
+                'year_list': year_list,
+                'previous': previous,
+                'next': next,
+                'has_data': True,
+                'has_config': has_config,
+                'coincidences_found': coincidences_found,
+            }
+        )
         return context
 
     def nav_calendar(self):
@@ -463,9 +461,11 @@ class SummaryDetailView(DateDetailView):
         date = self.object.date
         month = calendar.Calendar().monthdatescalendar(date.year, date.month)
 
-        days_with_data = self.get_queryset().filter(station=self.object.station,
-                                                    date__year=date.year,
-                                                    date__month=date.month)
+        days_with_data = self.get_queryset().filter(
+            station=self.object.station,
+            date__year=date.year,
+            date__month=date.month,
+        )
         days_with_data = {day.date: day.get_absolute_url() for day in days_with_data}
 
         weeks = []
@@ -487,16 +487,20 @@ class SummaryDetailView(DateDetailView):
     def nav_months(self):
         """Create list of months with links"""
 
-        months_with_data = (self.get_queryset().filter(station=self.object.station,
-                                                       date__year=self.object.date.year)
-                                .dates('date', 'month'))
+        months_with_data = (
+            self.get_queryset()
+            .filter(station=self.object.station, date__year=self.object.date.year)
+            .dates('date', 'month')
+        )
         month_list = [{'month': month} for month in calendar.month_abbr[1:]]
 
         for date in months_with_data:
-            first_of_month = (self.get_queryset().filter(station=self.object.station,
-                                                         date__year=date.year,
-                                                         date__month=date.month)
-                                  .earliest().get_absolute_url())
+            first_of_month = (
+                self.get_queryset()
+                .filter(station=self.object.station, date__year=date.year, date__month=date.month)
+                .earliest()
+                .get_absolute_url()
+            )
             month_list[date.month - 1]['link'] = first_of_month
 
         return month_list
@@ -510,8 +514,12 @@ class SummaryDetailView(DateDetailView):
         year_list = []
         for year in range(years_with_data[0], years_with_data[-1] + 1):
             if year in years_with_data:
-                first_of_year = (self.get_queryset().filter(station=self.object.station, date__year=year)
-                                     .earliest().get_absolute_url())
+                first_of_year = (
+                    self.get_queryset()
+                    .filter(station=self.object.station, date__year=year)
+                    .earliest()
+                    .get_absolute_url()
+                )
                 year_list.append({'year': year, 'link': first_of_year})
             else:
                 year_list.append({'year': year, 'link': None})
@@ -523,11 +531,9 @@ class LatestSummaryRedirectView(RedirectView):
 
     def get_redirect_url(self, *args, **kwargs):
         try:
-            return (Summary.objects
-                           .with_data()
-                           .filter(station__number=kwargs['station_number'])
-                           .latest()
-                           .get_absolute_url())
+            return (
+                Summary.objects.with_data().filter(station__number=kwargs['station_number']).latest().get_absolute_url()
+            )
         except Summary.DoesNotExist:
             return None
 
@@ -543,12 +549,17 @@ def station_status(request, station_number):
     station_status = DataStatus()
     status = station_status.get_status(station_number)
 
-    return render(request, 'status_display/station_status.html',
-                  {'station': station,
-                   'has_data': has_data,
-                   'has_config': has_config,
-                   'status': status,
-                   'coincidences_found': True})
+    return render(
+        request,
+        'status_display/station_status.html',
+        {
+            'station': station,
+            'has_data': has_data,
+            'has_config': has_config,
+            'status': status,
+            'coincidences_found': True,
+        },
+    )
 
 
 def station_config(request, station_number):
@@ -557,10 +568,12 @@ def station_config(request, station_number):
     today = datetime.date.today()
 
     station = get_object_or_404(Station, number=station_number)
-    configs = get_list_or_404(Configuration.objects.order_by('timestamp'),
-                              summary__station=station,
-                              timestamp__gte=FIRSTDATE,
-                              timestamp__lte=today)
+    configs = get_list_or_404(
+        Configuration.objects.order_by('timestamp'),
+        summary__station=station,
+        timestamp__gte=FIRSTDATE,
+        timestamp__lte=today,
+    )
 
     has_data = station_has_data(station)
 
@@ -583,26 +596,27 @@ def station_config(request, station_number):
     timingoffsetgraph = plot_timing_offsets(station.number)
     altitudegraph = plot_config('altitude', configs)
     gpstrack = set(gpslocations)
-    layout = (StationLayout.objects
-                           .filter(station=station,
-                                   active_date__gte=FIRSTDATE,
-                                   active_date__lte=today)
-                           .last())
+    layout = StationLayout.objects.filter(station=station, active_date__gte=FIRSTDATE, active_date__lte=today).last()
 
-    return render(request, 'status_display/station_config.html',
-                  {'station': station,
-                   'config': config,
-                   'lla': lla,
-                   'voltagegraph': voltagegraph,
-                   'currentgraph': currentgraph,
-                   'timingoffsetgraph': timingoffsetgraph,
-                   'altitudegraph': altitudegraph,
-                   'gpstrack': gpstrack,
-                   'layout': layout,
-                   'has_slave': has_slave,
-                   'has_data': has_data,
-                   'has_config': True,
-                   'coincidences_found': True})
+    return render(
+        request,
+        'status_display/station_config.html',
+        {
+            'station': station,
+            'config': config,
+            'lla': lla,
+            'voltagegraph': voltagegraph,
+            'currentgraph': currentgraph,
+            'timingoffsetgraph': timingoffsetgraph,
+            'altitudegraph': altitudegraph,
+            'gpstrack': gpstrack,
+            'layout': layout,
+            'has_slave': has_slave,
+            'has_data': has_data,
+            'has_config': True,
+            'coincidences_found': True,
+        },
+    )
 
 
 def station_latest(request, station_number):
@@ -613,30 +627,30 @@ def station_latest(request, station_number):
 
     station = get_object_or_404(Station, number=station_number)
     try:
-        summary = (Summary.objects
-                          .get(num_events__isnull=False,
-                               station=station,
-                               date=yesterday))
+        summary = Summary.objects.get(num_events__isnull=False, station=station, date=yesterday)
     except Summary.DoesNotExist:
         # Do something nice, get older data
         old_data = True
-        summary = (Summary.objects
-                          .valid_date()
-                          .filter(num_events__isnull=False,
-                                  station=station)
-                          .latest())
+        summary = Summary.objects.valid_date().filter(num_events__isnull=False, station=station).latest()
 
     station_status = DataStatus()
     status = station_status.get_status(station.number)
 
     date = summary.date
 
-    plots = {histogram.type.slug: plot_histogram(histogram)
-             for histogram in summary.histograms.filter(type__slug='eventtime')}
-    plots.update({histogram.type.slug: plot_histogram(histogram)
-                  for histogram in summary.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])})
-    plots.update({dataset.type.slug: plot_dataset(dataset)
-                  for dataset in summary.datasets.filter(type__slug='barometer')})
+    plots = {
+        histogram.type.slug: plot_histogram(histogram)
+        for histogram in summary.histograms.filter(type__slug='eventtime')
+    }
+    plots.update(
+        {
+            histogram.type.slug: plot_histogram(histogram)
+            for histogram in summary.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])
+        }
+    )
+    plots.update(
+        {dataset.type.slug: plot_dataset(dataset) for dataset in summary.datasets.filter(type__slug='barometer')}
+    )
 
     # Show alternative
     extra_station = None
@@ -653,13 +667,18 @@ def station_latest(request, station_number):
         except IndexError:
             pass
 
-    return render(request, 'status_display/station_latest.html',
-                  {'station': station,
-                   'date': date,
-                   'status': status,
-                   'plots': plots,
-                   'extra_station': extra_station,
-                   'old_data': old_data})
+    return render(
+        request,
+        'status_display/station_latest.html',
+        {
+            'station': station,
+            'date': date,
+            'status': status,
+            'plots': plots,
+            'extra_station': extra_station,
+            'old_data': old_data,
+        },
+    )
 
 
 def get_specific_network_histogram_source(request, date, type):
@@ -699,22 +718,24 @@ def get_eventtime_source(request, station_number, start=None, end=None):
 
     if end is None:
         try:
-            last = (Summary.objects
-                           .valid_date()
-                           .filter(station__number=station_number, num_events__isnull=False)
-                           .latest()
-                           .date)
+            last = (
+                Summary.objects.valid_date()
+                .filter(station__number=station_number, num_events__isnull=False)
+                .latest()
+                .date
+            )
         except Summary.DoesNotExist:
             raise Http404
         end = last + datetime.timedelta(days=1)
     if start is None:
         # Get first date with data
         try:
-            start = (Summary.objects
-                            .valid_date()
-                            .filter(station__number=station_number, date__lt=end, num_events__isnull=False)
-                            .earliest()
-                            .date)
+            start = (
+                Summary.objects.valid_date()
+                .filter(station__number=station_number, date__lt=end, num_events__isnull=False)
+                .earliest()
+                .date
+            )
         except Summary.DoesNotExist:
             raise Http404
 
@@ -736,9 +757,9 @@ def get_eventtime_source(request, station_number, start=None, end=None):
         },
         content_type=MIME_TSV,
     )
-    response['Content-Disposition'] = (
-        f'attachment; filename=eventtime-s{station_number}-{start:%Y%-m%-d}-{end:%Y%-m%-d}.tsv'
-    )
+    response[
+        'Content-Disposition'
+    ] = f'attachment; filename=eventtime-s{station_number}-{start:%Y%-m%-d}-{end:%Y%-m%-d}.tsv'
     return response
 
 
@@ -746,8 +767,10 @@ def get_eventtime_histogram_sources(station_number, start, end):
     histograms = get_list_or_404(
         DailyHistogram.objects.select_related('summary'),
         summary__station__number=station_number,
-        summary__date__gte=start, summary__date__lt=end,
-        type__slug='eventtime')
+        summary__date__gte=start,
+        summary__date__lt=end,
+        type__slug='eventtime',
+    )
     bins = []
     values = []
     hours = arange(24) * 3600
@@ -772,11 +795,7 @@ def get_specific_dataset_source(request, station_number, date, type):
     response = render(
         request,
         f'source/{type}_dataset.tsv',
-        {
-            'data': data,
-            'date': date,
-            'station_number': station_number
-        },
+        {'data': data, 'date': date, 'station_number': station_number},
         content_type=MIME_TSV,
     )
     response['Content-Disposition'] = f'attachment; filename={type}-s{station_number}-{date:%Y%-m%-d}.tsv'
@@ -788,10 +807,7 @@ def get_specific_config_source(request, station_number, type):
     response = render(
         request,
         f'source/{type}_config.tsv',
-        {
-            'data': data,
-            'station_number': station_number
-        },
+        {'data': data, 'station_number': station_number},
         content_type=MIME_TSV,
     )
     response['Content-Disposition'] = f'attachment; filename={type}-s{station_number}.tsv'
@@ -799,20 +815,23 @@ def get_specific_config_source(request, station_number, type):
 
 
 def get_station_layout_source(request, station_number):
-    layouts = (StationLayout.objects
-                            .filter(station__number=station_number,
-                                    active_date__gte=FIRSTDATE,
-                                    active_date__lte=datetime.date.today()))
+    layouts = StationLayout.objects.filter(
+        station__number=station_number,
+        active_date__gte=FIRSTDATE,
+        active_date__lte=datetime.date.today(),
+    )
     if not layouts:
         raise Http404
 
     for layout in layouts:
         layout.timestamp = calendar.timegm(layout.active_date.utctimetuple())
 
-    response = render(request, 'source/station_layout.tsv',
-                      {'layouts': layouts,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
+    response = render(
+        request,
+        'source/station_layout.tsv',
+        {'layouts': layouts, 'station_number': station_number},
+        content_type=MIME_TSV,
+    )
     response['Content-Disposition'] = f'attachment; filename=station_layout-s{station_number}.tsv'
     return response
 
@@ -824,18 +843,28 @@ def get_detector_timing_offsets_source(request, station_number):
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1, 2, 3, 4))]
 
-    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]), none_to_nan(r[2]), none_to_nan(r[3]), none_to_nan(r[4]))
-            for r in data]
+    data = [
+        (
+            clock.datetime_to_gps(r[0]),
+            none_to_nan(r[1]),
+            none_to_nan(r[2]),
+            none_to_nan(r[3]),
+            none_to_nan(r[4]),
+        )
+        for r in data
+    ]
 
     buffer = StringIO()
     writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source/detector_timing_offsets.tsv',
-                      {'tsvdata': tsvdata,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
+    response = render(
+        request,
+        'source/detector_timing_offsets.tsv',
+        {'tsvdata': tsvdata, 'station_number': station_number},
+        content_type=MIME_TSV,
+    )
     response['Content-Disposition'] = f'attachment; filename=detector_timing_offsets-s{station_number}.tsv'
     return response
 
@@ -859,22 +888,22 @@ def get_station_timing_offsets_source(request, ref_station_number, station_numbe
 
     data = [next(rows) for _, rows in groupby(data, key=itemgetter(1))]
 
-    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]), none_to_nan(r[2]))
-            for r in data]
+    data = [(clock.datetime_to_gps(r[0]), none_to_nan(r[1]), none_to_nan(r[2])) for r in data]
 
     buffer = StringIO()
     writer = csv.writer(buffer, delimiter='\t', lineterminator='\n')
     writer.writerows(data)
     tsvdata = buffer.getvalue().strip('\n')
 
-    response = render(request, 'source/station_timing_offsets.tsv',
-                      {'tsvdata': tsvdata,
-                       'ref_station_number': ref_station_number,
-                       'station_number': station_number},
-                      content_type=MIME_TSV)
-    response['Content-Disposition'] = (
-        f'attachment; filename=station_timing_offsets-s{ref_station_number}-s{station_number}.tsv'
+    response = render(
+        request,
+        'source/station_timing_offsets.tsv',
+        {'tsvdata': tsvdata, 'ref_station_number': ref_station_number, 'station_number': station_number},
+        content_type=MIME_TSV,
     )
+    response[
+        'Content-Disposition'
+    ] = f'attachment; filename=station_timing_offsets-s{ref_station_number}-s{station_number}.tsv'
     return response
 
 
@@ -897,10 +926,12 @@ def get_histogram_source(date, type, station_number=None):
         else:
             histogram_model = MultiDailyHistogram
 
-        histogram = get_object_or_404(histogram_model,
-                                      summary__station__number=station_number,
-                                      summary__date=date,
-                                      type__slug=type)
+        histogram = get_object_or_404(
+            histogram_model,
+            summary__station__number=station_number,
+            summary__date=date,
+            type__slug=type,
+        )
 
     if type in ['eventtime', 'zenith', 'azimuth', 'coincidencetime', 'coincidencenumber']:
         return list(zip(histogram.bins, histogram.values))
@@ -923,10 +954,12 @@ def get_dataset_source(date, type, station_number):
     else:
         dataset_model = MultiDailyDataset
 
-    dataset = get_object_or_404(dataset_model,
-                                summary__station__number=int(station_number),
-                                summary__date=date,
-                                type__slug=type)
+    dataset = get_object_or_404(
+        dataset_model,
+        summary__station__number=int(station_number),
+        summary__date=date,
+        type__slug=type,
+    )
 
     if type in ['barometer', 'temperature']:
         return list(zip(dataset.x, dataset.y))
@@ -964,19 +997,18 @@ def get_config_source(station_number, type):
     else:
         return None
 
-    configs = (Configuration.objects
-                            .filter(summary__station__number=station_number,
-                                    timestamp__gte=FIRSTDATE,
-                                    timestamp__lte=datetime.date.today())
-                            .order_by('timestamp'))
+    configs = Configuration.objects.filter(
+        summary__station__number=station_number,
+        timestamp__gte=FIRSTDATE,
+        timestamp__lte=datetime.date.today(),
+    ).order_by('timestamp')
 
     if not configs:
         raise Http404
 
     if type == 'electronics':
         data = [
-            (config.timestamp, config.master, config.slave, config.master_fpga, config.slave_fpga)
-            for config in configs
+            (config.timestamp, config.master, config.slave, config.master_fpga, config.slave_fpga) for config in configs
         ]
     else:
         data = list(configs.values_list(*fields))
@@ -1002,17 +1034,21 @@ def plot_config(type, configs):
     x_label = 'Date (month/year)'
 
     if type == 'voltage':
-        values = [[config.mas_ch1_voltage, config.mas_ch2_voltage, config.slv_ch1_voltage, config.slv_ch2_voltage]
-                  for config in configs]
+        values = [
+            [config.mas_ch1_voltage, config.mas_ch2_voltage, config.slv_ch1_voltage, config.slv_ch2_voltage]
+            for config in configs
+        ]
         values = list(zip(*values))
         y_label = 'PMT Voltage (V)'
     elif type == 'current':
-        values = [[config.mas_ch1_current, config.mas_ch2_current, config.slv_ch1_current, config.slv_ch2_current]
-                  for config in configs]
+        values = [
+            [config.mas_ch1_current, config.mas_ch2_current, config.slv_ch1_current, config.slv_ch2_current]
+            for config in configs
+        ]
         values = list(zip(*values))
         y_label = 'PMT Current (mA)'
     if type == 'altitude':
-        values = [config.gps_altitude for config in configs if config.gps_altitude != 0.]
+        values = [config.gps_altitude for config in configs if config.gps_altitude != 0.0]
         if not len(values):
             return None
         y_label = 'Altitude (m)'
@@ -1044,7 +1080,8 @@ def get_detector_timing_offsets(station_number):
     offsets = DetectorTimingOffset.objects.filter(
         summary__station__number=station_number,
         summary__date__gte=FIRSTDATE,
-        summary__date__lte=datetime.date.today())
+        summary__date__lte=datetime.date.today(),
+    )
 
     data = offsets.values_list('summary__date', 'offset_1', 'offset_2', 'offset_3', 'offset_4')
     return data
@@ -1061,7 +1098,8 @@ def get_station_timing_offsets(ref_station_number, station_number):
         ref_summary__station__number=ref_station_number,
         summary__station__number=station_number,
         summary__date__gte=FIRSTDATE,
-        summary__date__lte=datetime.date.today())
+        summary__date__lte=datetime.date.today(),
+    )
 
     data = offsets.values_list('summary__date', 'offset', 'error')
     return data
@@ -1070,17 +1108,18 @@ def get_station_timing_offsets(ref_station_number, station_number):
 def get_gpslocations(configs):
     """Get all valid GPS locations from the configs"""
 
-    gps = [(config.gps_latitude, config.gps_longitude, config.gps_altitude)
-           for config in configs
-           if config.gps_latitude != 0. and config.gps_longitude != 0.]
+    gps = [
+        (config.gps_latitude, config.gps_longitude, config.gps_altitude)
+        for config in configs
+        if config.gps_latitude != 0.0 and config.gps_longitude != 0.0
+    ]
     return gps
 
 
 def create_plot_object(x_values, y_series, x_label, y_label):
     if type(y_series[0]) not in [list, tuple]:
         y_series = [y_series]
-    data = [[[xv, yv] for xv, yv in zip(x_values, y_values) if yv is not None]
-            for y_values in y_series]
+    data = [[[xv, yv] for xv, yv in zip(x_values, y_values) if yv is not None] for y_values in y_series]
 
     plot_object = {'data': data, 'x_label': x_label, 'y_label': y_label}
     return plot_object
@@ -1093,12 +1132,11 @@ def stations_with_data():
              weather or shower, between 2004 and now.
 
     """
-    return (Station.objects
-                   .filter(Q(summaries__num_events__isnull=False)
-                           | Q(summaries__num_weather__isnull=False),
-                           summaries__date__gte=FIRSTDATE,
-                           summaries__date__lte=datetime.date.today())
-                   .distinct())
+    return Station.objects.filter(
+        Q(summaries__num_events__isnull=False) | Q(summaries__num_weather__isnull=False),
+        summaries__date__gte=FIRSTDATE,
+        summaries__date__lte=datetime.date.today(),
+    ).distinct()
 
 
 def station_has_config(station):

@@ -63,8 +63,7 @@ def call_xmlrpc(request):
         template = loader.get_template('raw_data/xmlrpc.html')
         methods = []
         for method in dispatcher.system_listMethods():
-            methods.append({'name': method,
-                            'help': dispatcher.system_methodHelp(method)})
+            methods.append({'name': method, 'help': dispatcher.system_methodHelp(method)})
         context = {'methods': methods}
         response.write(template.render(context))
         return response
@@ -76,6 +75,7 @@ def xmlrpc(uri):
     def register_xmlrpc(fn):
         dispatcher.register_function(fn, uri)
         return fn
+
     return register_xmlrpc
 
 
@@ -164,20 +164,23 @@ def download_form(request, station_number=None, start=None, end=None):
                 url = reverse('data:lightning', kwargs={'lightning_type': lightning_type})
             else:
                 station = form.cleaned_data['station']
-                url = reverse(f'data:{data_type}',
-                              kwargs={'station_number': station.number})
+                url = reverse(f'data:{data_type}', kwargs={'station_number': station.number})
             return HttpResponseRedirect(f'{url}?{query_string}')
     else:
         if station_number:
             station = get_object_or_404(Station, number=station_number)
         else:
             station = None
-        form = DataDownloadForm(initial={'station_events': station,
-                                         'station_weather': station,
-                                         'station_singles': station,
-                                         'start': start,
-                                         'end': end,
-                                         'data_type': 'events'})
+        form = DataDownloadForm(
+            initial={
+                'station_events': station,
+                'station_weather': station,
+                'station_singles': station,
+                'start': start,
+                'end': end,
+                'data_type': 'events',
+            }
+        )
 
     return render(request, 'raw_data/data_download.html', {'form': form})
 
@@ -210,8 +213,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        msg = ("Incorrect optional parameters (start [datetime], "
-               "end [datetime])")
+        msg = "Incorrect optional parameters (start [datetime], " "end [datetime])"
         return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
 
     download = request.GET.get('download', False)
@@ -232,7 +234,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         filename = f'singles-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'lightning':
         if lightning_type not in list(range(6)):
-            msg = ("Incorrect lightning type, should be a value between 0-5")
+            msg = "Incorrect lightning type, should be a value between 0-5"
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
         filename = f'lightning-knmi-{timerange_string}.tsv'
@@ -264,30 +266,33 @@ def generate_events_as_tsv(station, start, end):
         if not len(events):
             continue
         dt = events['timestamp'].astype('datetime64[s]')
-        data = column_stack([
-            dt.astype('datetime64[D]'),
-            [value.time() for value in dt.tolist()],
-            events['timestamp'],
-            events['nanoseconds'],
-            events['pulseheights'][:, 0],
-            events['pulseheights'][:, 1],
-            events['pulseheights'][:, 2],
-            events['pulseheights'][:, 3],
-            events['integrals'][:, 0],
-            events['integrals'][:, 1],
-            events['integrals'][:, 2],
-            events['integrals'][:, 3],
-            clean_float_array(events['n1']),
-            clean_float_array(events['n2']),
-            clean_float_array(events['n3']),
-            clean_float_array(events['n4']),
-            clean_float_array(events['t1']),
-            clean_float_array(events['t2']),
-            clean_float_array(events['t3']),
-            clean_float_array(events['t4']),
-            clean_float_array(events['t_trigger']),
-            clean_angle_array(reconstructions['zenith']),
-            clean_angle_array(reconstructions['azimuth'])])
+        data = column_stack(
+            [
+                dt.astype('datetime64[D]'),
+                [value.time() for value in dt.tolist()],
+                events['timestamp'],
+                events['nanoseconds'],
+                events['pulseheights'][:, 0],
+                events['pulseheights'][:, 1],
+                events['pulseheights'][:, 2],
+                events['pulseheights'][:, 3],
+                events['integrals'][:, 0],
+                events['integrals'][:, 1],
+                events['integrals'][:, 2],
+                events['integrals'][:, 3],
+                clean_float_array(events['n1']),
+                clean_float_array(events['n2']),
+                clean_float_array(events['n3']),
+                clean_float_array(events['n4']),
+                clean_float_array(events['t1']),
+                clean_float_array(events['t2']),
+                clean_float_array(events['t3']),
+                clean_float_array(events['t4']),
+                clean_float_array(events['t_trigger']),
+                clean_angle_array(reconstructions['zenith']),
+                clean_angle_array(reconstructions['azimuth']),
+            ]
+        )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
         writer.writerows(data)
@@ -353,24 +358,27 @@ def generate_weather_as_tsv(station, start, end):
     weather_events = get_weather_from_esd_in_range(station, start, end)
     for events in weather_events:
         dt = events['timestamp'].astype('datetime64[s]')
-        data = column_stack([
-            dt.astype('datetime64[D]'),
-            [value.time() for value in dt.tolist()],
-            events['timestamp'],
-            clean_float_array(events['temp_inside']),
-            clean_float_array(events['temp_outside']),
-            events['humidity_inside'],
-            events['humidity_outside'],
-            clean_float_array(events['barometer']),
-            events['wind_dir'],
-            events['wind_speed'],
-            events['solar_rad'],
-            events['uv'],
-            clean_float_array(events['evapotranspiration']),
-            clean_float_array(events['rain_rate']),
-            events['heat_index'],
-            clean_float_array(events['dew_point']),
-            clean_float_array(events['wind_chill'])])
+        data = column_stack(
+            [
+                dt.astype('datetime64[D]'),
+                [value.time() for value in dt.tolist()],
+                events['timestamp'],
+                clean_float_array(events['temp_inside']),
+                clean_float_array(events['temp_outside']),
+                events['humidity_inside'],
+                events['humidity_outside'],
+                clean_float_array(events['barometer']),
+                events['wind_dir'],
+                events['wind_speed'],
+                events['solar_rad'],
+                events['uv'],
+                clean_float_array(events['evapotranspiration']),
+                clean_float_array(events['rain_rate']),
+                events['heat_index'],
+                clean_float_array(events['dew_point']),
+                clean_float_array(events['wind_chill']),
+            ]
+        )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
         writer.writerows(data)
@@ -425,18 +433,21 @@ def generate_singles_as_tsv(station, start, end):
     singles_events = get_singles_from_esd_in_range(station, start, end)
     for events in singles_events:
         dt = events['timestamp'].astype('datetime64[s]')
-        data = column_stack([
-            dt.astype('datetime64[D]'),
-            [value.time() for value in dt.tolist()],
-            events['timestamp'],
-            events['mas_ch1_low'],
-            events['mas_ch1_high'],
-            events['mas_ch2_low'],
-            events['mas_ch2_high'],
-            events['slv_ch1_low'],
-            events['slv_ch1_high'],
-            events['slv_ch2_low'],
-            events['slv_ch2_high']])
+        data = column_stack(
+            [
+                dt.astype('datetime64[D]'),
+                [value.time() for value in dt.tolist()],
+                events['timestamp'],
+                events['mas_ch1_low'],
+                events['mas_ch1_high'],
+                events['mas_ch2_low'],
+                events['mas_ch2_high'],
+                events['slv_ch1_low'],
+                events['slv_ch1_high'],
+                events['slv_ch2_low'],
+                events['slv_ch2_high'],
+            ]
+        )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
         writer.writerows(data)
@@ -481,8 +492,14 @@ def get_singles_from_esd_in_range(station, start, end):
 def generate_lightning_as_tsv(lightning_type, start, end):
     """Render TSV output as an iterator."""
 
-    types = ('Single-point', 'Cloud-cloud', 'Cloud-cloud mid',
-             'Cloud-cloud end', 'Cloud-ground', 'Cloud-ground return')
+    types = (
+        'Single-point',
+        'Cloud-cloud',
+        'Cloud-cloud mid',
+        'Cloud-cloud end',
+        'Cloud-ground',
+        'Cloud-ground return',
+    )
     type_str = f'{lightning_type}: {types[lightning_type]}'
 
     template = loader.get_template('raw_data/lightning_data.tsv')
@@ -497,12 +514,15 @@ def generate_lightning_as_tsv(lightning_type, start, end):
     events = get_lightning_in_range(lightning_type, start, end)
     for event in events:
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
-        row = [dt.date(), dt.time(),
-               event['timestamp'],
-               event['nanoseconds'],
-               clean_floats(event['latitude'], precision=6),
-               clean_floats(event['longitude'], precision=6),
-               int(event['current'])]
+        row = [
+            dt.date(),
+            dt.time(),
+            event['timestamp'],
+            event['nanoseconds'],
+            clean_floats(event['latitude'], precision=6),
+            clean_floats(event['longitude'], precision=6),
+            int(event['current']),
+        ]
         writer.writerow(row)
         yield line_buffer.line
         lightning_returned = True
@@ -542,11 +562,16 @@ def coincidences_download_form(request, start=None, end=None):
             end = form.cleaned_data['end']
             n = form.cleaned_data['n']
             download = form.cleaned_data['download']
-            query_string = urllib.parse.urlencode({
-                'cluster': cluster, 'stations': stations,
-                'start': start, 'end': end,
-                'n': n, 'download': download
-            })
+            query_string = urllib.parse.urlencode(
+                {
+                    'cluster': cluster,
+                    'stations': stations,
+                    'start': start,
+                    'end': end,
+                    'n': n,
+                    'download': download,
+                }
+            )
             url = reverse('data:coincidences')
             return HttpResponseRedirect(f'{url}?{query_string}')
     else:
@@ -582,7 +607,7 @@ def download_coincidences(request):
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        error_msg = ("Incorrect optional parameters (start [datetime], end [datetime])")
+        error_msg = "Incorrect optional parameters (start [datetime], end [datetime])"
         return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
     try:
@@ -603,8 +628,7 @@ def download_coincidences(request):
         error_msg = "Both stations and cluster are defined."
     elif stations:
         try:
-            stations = [int(number.strip('"\' '))
-                        for number in stations.strip('[](), ').split(',')]
+            stations = [int(number.strip('"\' ')) for number in stations.strip('[](), ').split(',')]
         except ValueError:
             error_msg = "Unable to parse station numbers."
         else:
@@ -616,8 +640,9 @@ def download_coincidences(request):
                 error_msg = "Not all station numbers are valid."
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
-        stations = (Station.objects.filter(Q(cluster__parent=cluster) | Q(cluster=cluster))
-                                   .values_list('number', flat=True))
+        stations = Station.objects.filter(Q(cluster__parent=cluster) | Q(cluster=cluster)).values_list(
+            'number', flat=True
+        )
         if len(stations) >= 30:
             error_msg = "To many stations in this cluster, manually select a subset of stations."
 
@@ -660,29 +685,33 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
 
     for id, number, event in get_coincidences_from_esd_in_range(start, end, stations, n):
         dt = datetime.datetime.utcfromtimestamp(event['timestamp'])
-        row = [id,
-               number,
-               dt.date(), dt.time(),
-               event['timestamp'],
-               event['nanoseconds'],
-               event['pulseheights'][0],
-               event['pulseheights'][1],
-               event['pulseheights'][2],
-               event['pulseheights'][3],
-               event['integrals'][0],
-               event['integrals'][1],
-               event['integrals'][2],
-               event['integrals'][3],
-               clean_floats(event['n1']),
-               clean_floats(event['n2']),
-               clean_floats(event['n3']),
-               clean_floats(event['n4']),
-               clean_floats(event['t1']),
-               clean_floats(event['t2']),
-               clean_floats(event['t3']),
-               clean_floats(event['t4']),
-               clean_floats(event['t_trigger']),
-               -999, -999]
+        row = [
+            id,
+            number,
+            dt.date(),
+            dt.time(),
+            event['timestamp'],
+            event['nanoseconds'],
+            event['pulseheights'][0],
+            event['pulseheights'][1],
+            event['pulseheights'][2],
+            event['pulseheights'][3],
+            event['integrals'][0],
+            event['integrals'][1],
+            event['integrals'][2],
+            event['integrals'][3],
+            clean_floats(event['n1']),
+            clean_floats(event['n2']),
+            clean_floats(event['n3']),
+            clean_floats(event['n4']),
+            clean_floats(event['t1']),
+            clean_floats(event['t2']),
+            clean_floats(event['t3']),
+            clean_floats(event['t4']),
+            clean_floats(event['t_trigger']),
+            -999,
+            -999,
+        ]
         writer.writerow(row)
         yield line_buffer.line
         coincidences_returned = True
@@ -794,7 +823,7 @@ def prettyprint_timerange(t0, t1):
     """Pretty print a time range."""
 
     duration = t1 - t0
-    if (duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or t0.hour > 0):
+    if duration.seconds > 0 or t0.second > 0 or t0.minute > 0 or t0.hour > 0:
         timerange = f'{t0} {t1}'
     elif duration.days == 1:
         timerange = str(t0.date())

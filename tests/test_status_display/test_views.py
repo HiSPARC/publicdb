@@ -93,7 +93,7 @@ class TestSourceViews(TestCase):
     def test_network_histograms(self):
         factories = [
             histograms_factories.CoincidencetimeHistogramFactory,
-            histograms_factories.CoincidencenumberHistogramFactory
+            histograms_factories.CoincidencenumberHistogramFactory,
         ]
         for factory in factories:
             with self.subTest(factory=factory):
@@ -109,7 +109,7 @@ class TestSourceViews(TestCase):
         factories = [
             histograms_factories.EventtimeHistogramFactory,
             histograms_factories.AzimuthHistogramFactory,
-            histograms_factories.ZenithHistogramFactory
+            histograms_factories.ZenithHistogramFactory,
         ]
         for factory in factories:
             with self.subTest(factory=factory):
@@ -127,7 +127,7 @@ class TestSourceViews(TestCase):
             histograms_factories.PulseintegralHistogramFactory,
             histograms_factories.PulseheightHistogramFactory,
             histograms_factories.SingleslowHistogramFactory,
-            histograms_factories.SingleshighHistogramFactory
+            histograms_factories.SingleshighHistogramFactory,
         ]
         for factory in factories:
             with self.subTest(factory=factory):
@@ -207,7 +207,7 @@ class TestSourceViews(TestCase):
 
         kwargs = {
             'ref_station_number': min(other_station.number, self.station.number),
-            'station_number': max(other_station.number, self.station.number)
+            'station_number': max(other_station.number, self.station.number),
         }
 
         self.get_tsv(reverse('status:source:station_offsets', kwargs=kwargs))
