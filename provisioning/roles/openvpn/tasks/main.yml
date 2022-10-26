@@ -56,7 +56,6 @@
   become: true
 
 - name: Ensure openvpn is started
-  when: is_dev is not defined
   ansible.builtin.service:
     name: "openvpn@{{ item }}.service"
     enabled: yes
@@ -81,7 +80,6 @@
     src: resolv.conf
     dest: /etc/resolv.conf
     backup: yes
-  when: is_dev is not defined
   become: true
 
 - name: Enable cron job for daily backup of openvpn config and PKI

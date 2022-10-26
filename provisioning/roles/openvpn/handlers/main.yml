@@ -5,7 +5,6 @@
   become: true
 
 - name: restart openvpn
-  when: is_dev is not defined
   ansible.builtin.service:
     name: "openvpn@{{ item }}.service"
     state: restarted
