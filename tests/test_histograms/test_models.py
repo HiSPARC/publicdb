@@ -93,23 +93,21 @@ class TestConfiguration(TestCase):
     def test_station(self):
         self.assertEqual(9, self.configuration.station())
 
-    def test_master(self):
-        master_version = int(self.configuration.mas_version.split(' ')[1])
-        self.assertEqual(master_version, self.configuration.master)
-        self.assertEqual(self.configuration._master(), self.configuration.master)
+    def test_primary(self):
+        primary_version = int(self.configuration.mas_version.split(' ')[1])
+        self.assertEqual(primary_version, self.configuration.primary)
 
-    def test_slave(self):
-        slave_version = int(self.configuration.slv_version.split(' ')[1])
-        self.assertEqual(slave_version, self.configuration.slave)
-        self.assertEqual(self.configuration._slave(), self.configuration.slave)
+    def test_secondary(self):
+        secondary_version = int(self.configuration.slv_version.split(' ')[1])
+        self.assertEqual(secondary_version, self.configuration.secondary)
 
-    def test_master_fpga(self):
-        master_fpga_version = int(self.configuration.mas_version.split(' ')[3])
-        self.assertEqual(master_fpga_version, self.configuration.master_fpga)
+    def test_primary_fpga(self):
+        primary_fpga_version = int(self.configuration.mas_version.split(' ')[3])
+        self.assertEqual(primary_fpga_version, self.configuration.primary_fpga)
 
-    def test_slave_fpga(self):
-        slave_fpga_version = int(self.configuration.slv_version.split(' ')[3])
-        self.assertEqual(slave_fpga_version, self.configuration.slave_fpga)
+    def test_secondary_fpga(self):
+        secondary_fpga_version = int(self.configuration.slv_version.split(' ')[3])
+        self.assertEqual(secondary_fpga_version, self.configuration.secondary_fpga)
 
     def test_extract_hardware_serial(self):
         self.assertEqual(123, self.configuration.extract_hardware_serial('Foo 123 Bar 456'))

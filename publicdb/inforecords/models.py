@@ -244,7 +244,7 @@ class Station(models.Model):
         reload_datastore()
 
     def number_of_detectors(self):
-        """Get number of detectors, based on presence of Slave electronics
+        """Get number of detectors, based on presence of Secondary electronics
 
         Returns 4 if no config is present to be on the safe side.
 
@@ -257,7 +257,7 @@ class Station(models.Model):
         except Configuration.DoesNotExist:
             n_detectors = 4
         else:
-            if config.slave == -1:
+            if config.secondary == -1:
                 n_detectors = 2
             else:
                 n_detectors = 4

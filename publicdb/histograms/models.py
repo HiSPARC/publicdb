@@ -1,6 +1,7 @@
 import datetime
 import re
 
+from django.contrib import admin
 from django.contrib.postgres.fields import ArrayField
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -201,26 +202,22 @@ class Configuration(models.Model):
 
     station.admin_order_field = 'summary__station__number'
 
-    def _master(self):
+    @property
+    @admin.display(ordering='mas_version')
+    def primary(self):
         return self.extract_hardware_serial(self.mas_version)
 
-    _master.admin_order_field = 'mas_version'
-
-    master = property(_master)
-
-    def _slave(self):
+    @property
+    @admin.display(ordering='slv_version')
+    def secondary(self):
         return self.extract_hardware_serial(self.slv_version)
 
-    _slave.admin_order_field = 'slv_version'
-
-    slave = property(_slave)
-
     @property
-    def master_fpga(self):
+    def primary_fpga(self):
         return self.extract_fpga_version(self.mas_version)
 
     @property
-    def slave_fpga(self):
+    def secondary_fpga(self):
         return self.extract_fpga_version(self.slv_version)
 
     def extract_hardware_serial(self, electronics_version):

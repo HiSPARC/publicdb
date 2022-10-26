@@ -404,13 +404,13 @@ class SummaryDetailView(DateDetailView):
         try:
             summary = Summary.objects.with_config().filter(station=station, date__lte=date).latest()
             config = Configuration.objects.filter(summary=summary).latest()
-            if config.slave == -1:
-                has_slave = False
+            if config.secondary == -1:
+                has_secondary = False
             else:
-                has_slave = True
+                has_secondary = True
         except (Summary.DoesNotExist, Configuration.DoesNotExist):
             config = None
-            has_slave = False
+            has_secondary = False
 
         location = station.latest_location(date=date)
 
@@ -441,7 +441,7 @@ class SummaryDetailView(DateDetailView):
                 'tomorrow': date + datetime.timedelta(days=1),
                 'config': config,
                 'location': location,
-                'has_slave': has_slave,
+                'has_secondary': has_secondary,
                 'plots': plots,
                 'thismonth': thismonth,
                 'month_list': month_list,
@@ -578,10 +578,10 @@ def station_config(request, station_number):
     has_data = station_has_data(station)
 
     config = configs[-1]
-    if config.slave == -1:
-        has_slave = False
+    if config.secondary == -1:
+        has_secondary = False
     else:
-        has_slave = True
+        has_secondary = True
 
     gpslocations = get_gpslocations(configs)
 
@@ -611,7 +611,7 @@ def station_config(request, station_number):
             'altitudegraph': altitudegraph,
             'gpstrack': gpstrack,
             'layout': layout,
-            'has_slave': has_slave,
+            'has_secondary': has_secondary,
             'has_data': has_data,
             'has_config': True,
             'coincidences_found': True,
@@ -1008,7 +1008,7 @@ def get_config_source(station_number, type):
 
     if type == 'electronics':
         data = [
-            (config.timestamp, config.master, config.slave, config.master_fpga, config.slave_fpga) for config in configs
+            (config.timestamp, config.primary, config.secondary, config.primary_fpga, config.secondary_fpga) for config in configs
         ]
     else:
         data = list(configs.values_list(*fields))
