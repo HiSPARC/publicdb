@@ -5,7 +5,7 @@
     supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
 - name: Restart webserver
-  ansible.builltin.service:
+  ansible.builtin.service:
     name: httpd
     state: restarted
 
