@@ -1,4 +1,4 @@
-ansible_user: hisparc
+ansible_user: hisparcsa
 hisparc_dir: /uufs/chpc.utah.edu/common/home/hisparc
 
 publicdb_host: hisparc-data.chpc.utah.edu

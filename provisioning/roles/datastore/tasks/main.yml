@@ -4,7 +4,7 @@
     dest: ~/.bashrc
     backup: true
 
-- name: Ensure /srv/datastore directory exists
+- name: "Ensure {{ datastore-path }} directory exists"
   ansible.builtin.file:
     path: "{{ datastore_path }}"
     state: directory
@@ -23,7 +23,7 @@
     update: true
     force: false
     version: master
-  notify: Restart uWSGI
+  notify: Restart webserver
 
 - name: Remove compiled python code
   ansible.builtin.command:
@@ -53,7 +53,7 @@
     src: datastore.py
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: Restart uWSGI
+  notify: Restart webserver
 
 - name: Copy writer_app.py
   ansible.builtin.template:
@@ -72,4 +72,4 @@
     src: config.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: Restart uWSGI
+  notify: Restart webserver

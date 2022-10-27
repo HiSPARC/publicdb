@@ -8,8 +8,6 @@
   ansible.builtin.file:
     path: "{{ hisparc_dir }}/raw/{{ item }}"
     state: directory
-    owner: hisparc
-    group: hisparc
     mode: 02775
   with_items:
     - /
@@ -17,4 +15,3 @@
     - incoming
     - partial
     - suspicious
-  become: true
