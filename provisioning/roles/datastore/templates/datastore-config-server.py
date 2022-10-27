@@ -17,7 +17,7 @@ import subprocess
 import os
 
 HASH = '/tmp/hash_datastore'
-DATASTORE_CFG = '/databases/frome/station_list.csv'
+DATASTORE_CFG = '{{ datastore_config }}'
 CFG_URL = '{{ datastore_config_url }}'
 RELOAD_PATH = '/tmp/uwsgi-reload.me'
 

@@ -36,7 +36,7 @@ DATABASES = {
 }
 
 # Path of the mounted HiSPARC datastore root folder
-DATASTORE_PATH = '{{ datastore_path }}'
+DATASTORE_PATH = '{{ datastore_data_path }}'
 TEST_DATASTORE_PATH = path.join(PUBLICDB_PATH, 'datastore_test')
 
 # Path of the mounted HiSPARC event summary datastore (ESD) root folder

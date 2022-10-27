@@ -7,4 +7,4 @@ datastore_port: 8001
 vpn_host: hisparc-data.chpc.utah.edu
 vpn_port: 8001
 
-datastore_path: "{{ hisparc_dir }}/data/datastore"
+datastore_data_path: "{{ hisparc_dir }}/data/datastore"

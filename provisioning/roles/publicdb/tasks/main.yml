@@ -19,7 +19,7 @@
     - hisparc-update.log
     - hisparc-django-errors.log
 
-- name: Checkout publicdb in /srv/publicdb/www
+- name: "Checkout publicdb in {{ publicdb_code }}"
   ansible.builtin.git:
     repo: "{{ publicdb_repo }}"
     dest: "{{ publicdb_code }}"
@@ -32,7 +32,7 @@
   ansible.builtin.command:
     cmd: "find {{ publicdb_code }} -name *.pyc -delete"
 
-- name: Checkout jsparc in /srv/publicdb/jsparc
+- name: "Checkout jsparc in {{ jsparc_path }}"
   ansible.builtin.git:
     repo: "{{ jsparc_repo }}"
     dest: "{{ jsparc_path }}"
