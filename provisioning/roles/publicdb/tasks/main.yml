@@ -89,7 +89,6 @@
     state: present
   vars:
     ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
-  tags: wip
 
 - name: Add hisparc user to the publicdb database
   become: true
@@ -100,7 +99,6 @@
     priv: ALL
   vars:
     ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
-  tags: wip
 
 - name: Ensure hisparc user has no unnecessary privileges
   become: true
@@ -110,7 +108,6 @@
     role_attr_flags: NOSUPERUSER,NOCREATEDB
   vars:
     ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
-  tags: wip
 
 - name: Copy Django settings file
   ansible.builtin.template:
