@@ -167,13 +167,13 @@ LOGGING = {
         'file': {
             'level': 'INFO',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/hisparc-update.log',
+            'filename': '{{ publicdb_logs }}/hisparc-update.log',
             'formatter': 'verbose',
         },
         'file2': {
             'level': 'ERROR',
             'class': 'logging.FileHandler',
-            'filename': '/var/log/hisparc-django-errors.log',
+            'filename': '{{ publicdb_logs }}/hisparc-django-errors.log',
             'formatter': 'verbose',
         },
     },

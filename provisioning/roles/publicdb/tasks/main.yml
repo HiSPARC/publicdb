@@ -83,7 +83,6 @@
 - name: Setup the publicdb database in PostgreSQL
   become: true
   become_user: postgres
-  # become_method: community.general.sudosu
   community.postgresql.postgresql_db:
     name: "{{ psql_database_name }}"
     encoding: UTF-8
@@ -99,6 +98,9 @@
     db: "{{ psql_database_name }}"
     name: "{{ ansible_user }}"
     priv: ALL
+  vars:
+    ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
+  tags: wip
 
 - name: Ensure hisparc user has no unnecessary privileges
   become: true
@@ -106,6 +108,9 @@
   community.postgresql.postgresql_user:
     name: "{{ ansible_user }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
+  vars:
+    ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
+  tags: wip
 
 - name: Copy Django settings file
   ansible.builtin.template:
@@ -118,61 +123,54 @@
   community.general.django_manage:
     command: migrate
     app_path: "{{ publicdb_code }}"
-    virtualenv: "{{ publicdb_venv }}"
+  environment:
+    PATH: "{{ publicdb_venv }}/bin:{{ ansible_env.PATH }}"
 
 - name: Collect static files of Django apps
   community.general.django_manage:
     command: collectstatic
     app_path: "{{ publicdb_code }}"
-    virtualenv: "{{ publicdb_venv }}"
+  environment:
+    PATH: "{{ publicdb_venv }}/bin:{{ ansible_env.PATH }}"
 
 #### TODO: set up Apache / mod_wsgi
 
 - name: Enable cron job for updating histograms and ESD
   ansible.builtin.cron:
     name: "HiSPARC update"
-    # cron_file: hisparc
     minute: 0
     hour: 4
     state: present
-    user: hisparcsa
     job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}/manage.py updatehistograms"
 
 - name: Enable cron job for cleaning out downloaded raw_data files
   ansible.builtin.cron:
     name: "clean downloaded data"
-    # cron_file: hisparc
     special_time: daily
     state: present
-    user: hisparcsa
     job: "find {{ publicdb_media }}/raw_data/ -name 'tmp*.h5' -mtime +1 -delete"
 
 - name: Enable cron job for creating analysis sessions
   ansible.builtin.cron:
     name: "create confirmed sessions"
-    # cron_file: hisparc
     minute: "*/2"
-    state: present
-    user: hisparcsa
+    # For now, disable. Re-enable when everything works and analysis sessions are planned.
+    state: absent
     job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py createsessions"
 
 - name: Enable cron job for daily backup of publicdb database
   ansible.builtin.cron:
     name: "Publicdb dump"
-    # cron_file: hisparc
     minute: 0
     hour: 1
     state: present
-    user: hisparcsa
     job: "if [ -f '{{ publicdb_dumps }}/publicdb_dump.sql' ]; then mv {{ publicdb_dumps }}/publicdb_dump.sql {{ publicdb_dumps }}/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file={{ publicdb_dumps }}/publicdb_dump.sql"
 
 - name: Enable cron job for monthly backup of publicdb database
   ansible.builtin.cron:
     name: "Monthly publicdb dump"
-    # cron_file: hisparc
     minute: 0
     hour: 20
     day: 1
     state: present
-    user: hisparcsa
     job: "if [ -f '{{ publicdb_dumps }}/publicdb_dump_this_month.sql' ]; then mv {{ publicdb_dumps }}/publicdb_dump_this_month.sql {{ publicdb_dumps }}/publicdb_dump_prev_month.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file={{ publicdb_dumps }}/publicdb_dump_this_month.sql"
