@@ -130,7 +130,22 @@
   environment:
     PATH: "{{ publicdb_venv }}/bin:{{ ansible_env.PATH }}"
 
-#### TODO: set up Apache / mod_wsgi
+- name: Copy Apache httpd config file
+  ansible.builtin.template:
+    src: hisparc-httpd.conf
+    dest: /tmp/hisparc-httpd.conf
+  register: httpdconf
+  tags: wip
+
+- name: Sudoedit Apache httpd config file
+  ansible.builtin.shell:
+    cmd: "sudo sudoedit /etc/httpd/conf.d/hisparc-httpd.conf"
+    stdin: ":1,$d|:r /tmp/hisparc-httpd.conf|:wq"
+  environment:
+    SUDO_EDITOR: /usr/bin/vi
+  when: httpdconf.changed
+  notify: Restart webserver
+  tags: wip
 
 - name: Enable cron job for updating histograms and ESD
   ansible.builtin.cron:
