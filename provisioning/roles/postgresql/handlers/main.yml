@@ -1,5 +1,3 @@
 - name: restart postgresql
-  ansible.builtin.service:
-    name: "postgresql-{{ psql_version }}"
-    state: restarted
-  become: true
+  ansible.builtin.shell:
+    cmd: "sudo systemctl restart postgresql-{{ psql_version }}"

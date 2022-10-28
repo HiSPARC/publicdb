@@ -1,4 +1,3 @@
 - name: Restart webserver
-  ansible.builtin.service:
-    name: httpd
-    state: restarted
+  ansible.builtin.shell:
+    cmd: "sudo systemctl restart postgresql-{{ psql_version }}"

@@ -13,11 +13,5 @@
   when: postgresconf.changed
   notify: restart postgresql
 
-- name: Start PostgreSQL server now and on boot
-  ansible.builtin.service:
-    name: "postgresql-{{ psql_version }}"
-    state: started
-    enabled: yes
-  become: true
 - name: Flush handlers
   meta: flush_handlers
