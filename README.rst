@@ -58,7 +58,12 @@ Provisioning production servers
 -------------------------------
 
 We use Ansible for all our provisioning needs. You can run it from the top repository
-directory. At that location, there is a file called ``ansible.cfg`` which sets up a few
+directory. First install ansible and its requirements::
+
+    $ pip install ansible
+    $ ansible-galaxy install -r requirements.yml
+
+At that location, there is a file called ``ansible.cfg`` which sets up a few
 config values. To run the playbook, issue::
 
    $ ansible-playbook provisioning/playbook.yml
@@ -66,11 +71,11 @@ config values. To run the playbook, issue::
 Beware, however, that this will run provisioning for *all* production servers.
 It is *very* useful to limit the hosts for which to run the provisioner, e.g.::
 
-   $ ansible-playbook provisioning/playbook.yml -l publicdb
+   $ ansible-playbook provisioning/playbook.yml --limit publicdb
 
 If you want to check first what the provisioner would like to change, without actually changing anything, use the ``-C`` option::
 
-   $ ansible-playbook provisioning/playbook.yml -l publicdb -C
+   $ ansible-playbook provisioning/playbook.yml --limit publicdb --check
 
 
 Running a provisioner from a remote location
