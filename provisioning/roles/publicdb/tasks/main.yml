@@ -10,6 +10,12 @@
     state: directory
     mode: 02775
 
+- name: Ensure publicdb log directory exists
+  ansible.builtin.file:
+    path: "{{ publicdb_logs }}"
+    state: directory
+    mode: 02775
+
 - name: Ensure hisparc-*.log exists
   ansible.builtin.file:
     path: "{{ publicdb_logs }}/{{ item }}"
@@ -62,39 +68,43 @@
 
 - name: Create conda environment
   ansible.builtin.shell:
-    cmd: "{{ miniconda_dir }}/bin/conda create --prefix {{ publicdb_venv }} python={{ publicdb_python_version }} --yes"
+    cmd: "{{ miniconda_path }}/bin/conda create -n publicdb_venv python={{ publicdb_python_version }} --yes"
     creates: "{{ publicdb_venv }}"
 
 - name: Install conda packages in conda environment
   ansible.builtin.command:
-    cmd: "{{ miniconda_dir }}/bin/conda install --prefix {{ publicdb_venv }} --channel conda-forge --file ~/conda.list --yes"
+    cmd: "{{ miniconda_path }}/bin/conda install -n publicdb_venv --channel conda-forge --file ~/conda.list --yes"
 
 - name: Install packages in conda environment using pip
   ansible.builtin.pip:
     requirements: ~/pip.list
-    virtualenv: "{{ publicdb_venv }}"
+    executable: "{{ publicdb_venv }}/bin/pip"
 
 - name: Setup the publicdb database in PostgreSQL
   become: true
   become_user: postgres
+  # become_method: community.general.sudosu
   community.postgresql.postgresql_db:
     name: "{{ psql_database_name }}"
     encoding: UTF-8
     state: present
+  vars:
+    ansible_python_interpreter: "{{ publicdb_venv }}/bin/python"
+  tags: wip
 
 - name: Add hisparc user to the publicdb database
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
     db: "{{ psql_database_name }}"
-    name: hisparc
+    name: "{{ ansible_user }}"
     priv: ALL
 
 - name: Ensure hisparc user has no unnecessary privileges
   become: true
   become_user: postgres
   community.postgresql.postgresql_user:
-    name: hisparc
+    name: "{{ ansible_user }}"
     role_attr_flags: NOSUPERUSER,NOCREATEDB
 
 - name: Copy Django settings file

@@ -11,5 +11,5 @@
 
 - name: Install miniconda
   ansible.builtin.shell:
-    cmd: "{{ hisparc_dir }}/src/Miniconda3-latest-Linux-x86_64.sh -b -p {{ miniconda_dir }}"
-    creates: "{{ miniconda_dir }}"
+    cmd: "{{ hisparc_dir }}/src/Miniconda3-latest-Linux-x86_64.sh -b -p {{ miniconda_path }}"
+    creates: "{{ miniconda_path }}"

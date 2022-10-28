@@ -1,10 +1,16 @@
 - name: Copy PostgreSQL authentication config file
-  become: true
-  become_user: postgres
   ansible.builtin.template:
     src: pg_hba.conf
-    dest: "/usr/pgsql-14/share/pg_hba.conf"
-    mode: 0600
+    dest: "/tmp/pg_hba.conf"
+  register: postgresconf
+
+- name: Sudoedit PostgreSQL authentication config file
+  ansible.builtin.shell:
+    cmd: "sudo sudoedit /usr/pgsql-14/share/pg_hba.conf"
+    stdin: ":1,$d|:r /tmp/pg_hba.conf|:wq"
+  environment:
+    SUDO_EDITOR: /usr/bin/vi
+  when: postgresconf.changed
   notify: restart postgresql
 
 - name: Start PostgreSQL server now and on boot
@@ -13,3 +19,5 @@
     state: started
     enabled: yes
   become: true
+- name: Flush handlers
+  meta: flush_handlers

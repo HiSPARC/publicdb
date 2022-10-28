@@ -1,7 +1,6 @@
 publicdb_path: "{{ hisparc_dir }}/publicdb/"
 
 publicdb_code: "{{ publicdb_path }}/www/"
-publicdb_venv: "{{ publicdb_path }}/publicdb_venv"
 publicdb_static: "{{ publicdb_path }}/static/"
 publicdb_media: "{{ publicdb_path }}/media/"
 publicdb_logs: "{{ publicdb_path }}/logs/"
