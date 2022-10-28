@@ -2,12 +2,10 @@
   community.general.supervisorctl:
     name: datastore-config-server
     state: restarted
-    supervisorctl_path: /opt/miniconda/bin/supervisorctl
 
 - name: Restart webserver
-  ansible.builtin.service:
-    name: httpd
-    state: restarted
+  ansible.builtin.shell:
+    cmd: "sudo systemctl restart httpd"
 
 - name: Restart supervisord
   ansible.builtin.service:

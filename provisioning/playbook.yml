@@ -1,5 +1,5 @@
 - name: Ensure required datastore paths exist
-  hosts: publicdb:datastore
+  hosts: datastore
   roles:
     - datastore-paths
 

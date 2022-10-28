@@ -34,23 +34,25 @@
     src: conda.list
     dest: ~/conda.list
 
-- name: Copy pip requirements files
-  ansible.builtin.copy:
-    src: pip.list
-    dest: ~/pip.list
-
 - name: Create conda environment
   ansible.builtin.shell:
-    cmd: "{{ miniconda_path }}/bin/conda create --prefix {{ datastore_venv }} python={{ datastore_python_version }} --yes"
+    cmd: "{{ miniconda_path }}/bin/conda create -n datastore_venv python={{ datastore_python_version }} --yes"
     creates: "{{ datastore_venv }}"
 
 - name: Install conda packages in conda environment
   ansible.builtin.command:
-    cmd: "{{ miniconda_path }}/bin/conda install --prefix {{ datastore_venv }} --channel conda-forge --file ~/conda.list --yes"
+    cmd: "{{ miniconda_path }}/bin/conda install -n datastore_venv --channel conda-forge --file ~/conda.list --yes"
 
 - name: Copy datastore.py
   ansible.builtin.template:
     src: datastore.py
+    dest: "{{ datastore_path }}"
+    backup: yes
+  notify: Restart webserver
+
+- name: Copy config.ini
+  ansible.builtin.template:
+    src: config.ini
     dest: "{{ datastore_path }}"
     backup: yes
   notify: Restart webserver
@@ -65,11 +67,18 @@
   ansible.builtin.template:
     src: datastore-config-server.py
     dest: "{{ datastore_path }}"
-  notify: Restart datastore config server
+  # notify: Restart datastore config server
 
-- name: Copy config.ini
-  ansible.builtin.template:
-    src: config.ini
-    dest: "{{ datastore_path }}"
-    backup: yes
-  notify: Restart webserver
+- name: copy supervisor config file
+  template:
+    src: hisparc-supervisor.conf
+    dest: /tmp/hisparc-supervisor.conf
+  register: supervisorconf
+# - name: Sudoedit supervisor config file
+#   ansible.builtin.shell:
+#     cmd: "sudo sudoedit /etc/supervisor.d/hisparc-supervisor.conf"
+#     stdin: ":1,$d|:r /tmp/hisparc-supervisor.conf|:wq"
+#   environment:
+#     SUDO_EDITOR: /usr/bin/vi
+#   when: httpdconf.changed
+#   notify: Restart webserver
