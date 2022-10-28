@@ -1,11 +1,11 @@
-- name: "Ensure {{ hisparc_dir }} directory exists"
+- name: "Ensure {{ hisparc_path }} directory exists"
   ansible.builtin.file:
-    path: "{{ hisparc_dir }}"
+    path: "{{ hisparc_path }}"
     state: directory
 
-- name: "Ensure {{ hisparc_dir }}/raw directory and subdirectories exist"
+- name: "Ensure {{ hisparc_path }}/raw directory and subdirectories exist"
   ansible.builtin.file:
-    path: "{{ hisparc_dir }}/raw/{{ item }}"
+    path: "{{ hisparc_path }}/raw/{{ item }}"
     state: directory
     mode: 02775
   with_items:

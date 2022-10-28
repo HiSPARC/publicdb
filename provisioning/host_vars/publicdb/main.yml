@@ -2,7 +2,7 @@ ansible_host: hisparc-data
 
 debug: False
 
-miniconda_path: "{{ hisparc_dir }}/publicdb/miniconda"
+miniconda_path: "{{ hisparc_path }}/publicdb/miniconda"
 publicdb_venv: "{{ miniconda_path }}/envs/publicdb_venv"
 
 publicdb_repo: https://github.com/HiSPARC/publicdb.git

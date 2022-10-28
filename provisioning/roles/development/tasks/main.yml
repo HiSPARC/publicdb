@@ -1,15 +1,15 @@
-- name: "Ensure {{ hisparc_dir }}/src directory exists"
+- name: "Ensure {{ hisparc_path }}/src directory exists"
   ansible.builtin.file:
-    path: "{{ hisparc_dir }}/src"
+    path: "{{ hisparc_path }}/src"
     state: directory
 
 - name: Download miniconda installer
   ansible.builtin.get_url:
     url: "https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh"
-    dest: "{{ hisparc_dir }}/src/Miniconda3-latest-Linux-x86_64.sh"
+    dest: "{{ hisparc_path }}/src/Miniconda3-latest-Linux-x86_64.sh"
     mode: 0755
 
 - name: Install miniconda
   ansible.builtin.shell:
-    cmd: "{{ hisparc_dir }}/src/Miniconda3-latest-Linux-x86_64.sh -b -p {{ miniconda_path }}"
+    cmd: "{{ hisparc_path }}/src/Miniconda3-latest-Linux-x86_64.sh -b -p {{ miniconda_path }}"
     creates: "{{ miniconda_path }}"

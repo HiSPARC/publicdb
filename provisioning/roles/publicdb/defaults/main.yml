@@ -1,4 +1,4 @@
-publicdb_path: "{{ hisparc_dir }}/publicdb/"
+publicdb_path: "{{ hisparc_path }}/publicdb/"
 
 publicdb_code: "{{ publicdb_path }}/www/"
 publicdb_static: "{{ publicdb_path }}/static/"

@@ -1,4 +1,4 @@
-datastore_path: "{{ hisparc_dir }}/datastore/"
+datastore_path: "{{ hisparc_path }}/datastore/"
 datastore_code: "{{ datastore_path }}/code/"
 datastore_venv: "{{ datastore_path }}/datastore_venv/"
 datastore_logs: "{{ datastore_path }}/logs/"
