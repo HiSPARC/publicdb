@@ -1,6 +1,6 @@
 pip
 ipython
 numpy
-pytables
+pytables==3.6.1
 scipy
 psycopg2
