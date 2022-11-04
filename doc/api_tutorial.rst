@@ -34,13 +34,13 @@ this format can be understood by many programming languages.
 
 To see what options the |api| has we will look at it in a browser. Open
 the following link in your browser (this will not work in Internet
-Explorer): `http://data.hisparc.nl/api/ <http://data.hisparc.nl/api/>`_.
+Explorer): `https://data.hisparc.nl/api/ <https://data.hisparc.nl/api/>`_.
 
 You should now see some text, like this:
 
 .. code-block:: javascript
 
-    {"base_url": "http://data.hisparc.nl/api/",
+    {"base_url": "https://data.hisparc.nl/api/",
      "clusters": "clusters/",
      "clusters_in_country": "countries/{country_id}/",
      "configuration": "station/{station_id}/config/{year}/{month}/{day}/",
@@ -62,7 +62,7 @@ Cluster list
 This tells us that if we want a list of all clusters we need to use the
 clusters option by appending :code:`"clusters/"` to the base url,
 resulting in the following:
-`http://data.hisparc.nl/api/clusters/ <http://data.hisparc.nl/api/clusters/>`_.
+`https://data.hisparc.nl/api/clusters/ <https://data.hisparc.nl/api/clusters/>`_.
 
 With this result:
 
@@ -102,7 +102,7 @@ your own HTML file with this code:
         $(function() {
             // Get an up-to-date list of HiSPARC stations
             $.getJSON(
-                'http://data.hisparc.nl/api/stations/',
+                'https://data.hisparc.nl/api/stations/',
                 function(data) {
                     // Create the drop-down menu
                     var select = $('<select>');
@@ -117,7 +117,7 @@ your own HTML file with this code:
             $('#get_station').on('click', function() {
                 var id = $('#station_list').find('select').val();
                 // Get info for selected station and display it in a nice way
-                $.getJSON('http://data.hisparc.nl/api/station/' + id + '/',
+                $.getJSON('https://data.hisparc.nl/api/station/' + id + '/',
                           function(data) {
                               $('#station_info').text(JSON.stringify(data, undefined, 4));
                           });
@@ -157,7 +157,7 @@ following lines of code:
     >>> id = 501
     >>> datum = date(2010, 10, 1)
     >>> end_datum = date(2011, 2, 1)
-    >>> base = 'http://data.hisparc.nl/api/station/%d/num_events/%d/%d/%d'
+    >>> base = 'https://data.hisparc.nl/api/station/%d/num_events/%d/%d/%d'
     >>> events = []
     >>> dates = []
     >>> while datum < end_datum:
@@ -176,4 +176,4 @@ SAPPHiRE
 The HiSPARC Python framework SAPPHiRE includes an API module. This module
 simplifies access to the API. See the SAPPHiRE documentation for more
 information:
-`http://docs.hisparc.nl/sapphire/ <http://docs.hisparc.nl/sapphire/>`_.
+`https://docs.hisparc.nl/sapphire/ <https://docs.hisparc.nl/sapphire/>`_.

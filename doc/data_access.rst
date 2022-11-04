@@ -6,11 +6,11 @@ Data access
 There are several ways in which the |hisparc| data can be accessed:
 
 - Via the Public database `download forms
-  <http://data.hisparc.nl/data/download/>`_.
+  <https://data.hisparc.nl/data/download/>`_.
 - Via Python using the |sapphire| framework (see `SAPPHiRE Tutorial
-  <http://docs.hisparc.nl/sapphire/tutorial.html#downloading-and-accessing
+  <https://docs.hisparc.nl/sapphire/tutorial.html#downloading-and-accessing
   -hisparc-data>`_).
-- Via the `jSparc <http://data.hisparc.nl/media/jsparc/>`_ web applications.
+- Via the `jSparc <https://data.hisparc.nl/media/jsparc/>`_ web applications.
 
 To access metadata, like a list of all stations or information about a
 specific station see the :doc:`api_tutorial`.
@@ -20,10 +20,10 @@ Download form
 -------------
 
 When looking at the data page for a station (i.e. `Kaj Munk College
-<http://data.hisparc.nl/show/stations/202/>`_), you will see a 'Download
+<https://data.hisparc.nl/show/stations/202/>`_), you will see a 'Download
 event summary data' link on the right. When this link is clicked you
 will be taken to the `Data download form
-<http://data.hisparc.nl/data/download>`_. On this page you can select
+<https://data.hisparc.nl/data/download>`_. On this page you can select
 the station, the start and end date for which you want to download the
 data. There is also an option to download weather data instead of events,
 however, not all stations gather weather data.
@@ -72,7 +72,7 @@ the url (and choose a station that has weather data, e.g. 3 or 501).
 
 .. code-block:: python
 
-    >>> url = 'http://data.hisparc.nl/data/202/events'
+    >>> url = 'https://data.hisparc.nl/data/202/events'
     >>> start = str(datetime(2013, 7, 2, 11, 0))
     >>> end = str(datetime(2013, 7, 2, 12, 0))
     >>> query = urlencode({'download': False, 'start': start,'end': end})

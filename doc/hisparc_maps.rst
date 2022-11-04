@@ -13,13 +13,13 @@ via the API (:doc:`api`) and in the raw data.
 Map
 ---
 
-Using the `Leafet <http://leafletjs.com>`_ library with `CARTO
+Using the `Leafet <https://leafletjs.com>`_ library with `CARTO
 <https://carto.com>`_ maps tiles (based on `OpenStreetMap
-<http://www.openstreetmap.org>`_ data) we are able to visualize the
+<https://www.openstreetmap.org>`_ data) we are able to visualize the
 detector network by showing the locations of the stations on a map.
 
 Here is an overview of the network: `Stations on map
-<http://data.hisparc.nl/show/stations_on_map/>`_
+<https://data.hisparc.nl/show/stations_on_map/>`_
 
 
 Station info
@@ -49,15 +49,15 @@ On several public database pages a map is embedded to show the station
 location or provide an overview of multiple stations. Moreover, maps are
 also used on our main website to give an overview of the station
 organization and clustering (e.g. `Bristol
-<http://www.hisparc.nl/over-hisparc/organisatie/bristol-uk/>`_, `Science
+<https://www.hisparc.nl/over-hisparc/organisatie/bristol-uk/>`_, `Science
 Park
-<http://www.hisparc.nl/over-hisparc/organisatie/amsterdam/science-park/>`_
+<https://www.hisparc.nl/over-hisparc/organisatie/amsterdam/science-park/>`_
 ). This is accomplished by placing an iframe on those pages that
 shows another page which only has the map as its content. Example code:
 
 .. code-block:: html
 
-    <iframe src="http://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/"
+    <iframe src="https://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/"
             scrolling="no" frameborder="0" width="600" height="300"></iframe>
 
 Result:
@@ -65,7 +65,7 @@ Result:
 .. raw:: html
 
     <div style="margin-top:10px;">
-      <iframe src="http://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/"
+      <iframe src="https://data.hisparc.nl/maps/Netherlands/Amsterdam/Science%20Park/"
             scrolling="no" frameborder="0" width="600" height="300"></iframe>
     </div>
 
@@ -76,35 +76,35 @@ Syntax
 To show a map of a specific region or location, use the syntax explained
 here. First start with the base url::
 
-    http://data.hisparc.nl/maps/
+    https://data.hisparc.nl/maps/
 
 When no extra options are given the page zooms and positions the map
 such that all stations fit in the window. But you can also focus on a
 specific region or station. Several levels of regions are possible::
 
-    http://data.hisparc.nl/maps/[Country]/[Cluster]/[Subcluster]/
-    http://data.hisparc.nl/maps/[Station number]/
+    https://data.hisparc.nl/maps/[Country]/[Cluster]/[Subcluster]/
+    https://data.hisparc.nl/maps/[Station number]/
 
 An overview of countries, clusters and subclusters can be found on
-http://data.hisparc.nl/ . First you can choose to focus on a Country:
+https://data.hisparc.nl/ . First you can choose to focus on a Country:
 
-- http://data.hisparc.nl/maps/Netherlands/
-- http://data.hisparc.nl/maps/Denmark/
+- https://data.hisparc.nl/maps/Netherlands/
+- https://data.hisparc.nl/maps/Denmark/
 
 Then focus more closely on a cluster, note that you also need to give
 the country:
 
-- http://data.hisparc.nl/maps/Netherlands/Enschede/
-- http://data.hisparc.nl/maps/Netherlands/Utrecht/
-- http://data.hisparc.nl/maps/United%20Kingdom/Bristol/
+- https://data.hisparc.nl/maps/Netherlands/Enschede/
+- https://data.hisparc.nl/maps/Netherlands/Utrecht/
+- https://data.hisparc.nl/maps/United%20Kingdom/Bristol/
 
 And to focus on a subcluster, also specifying the country and cluster:
 
-- http://data.hisparc.nl/maps/Netherlands/Amsterdam/Zaanstad/
-- http://data.hisparc.nl/maps/Netherlands/Enschede/Enschede/
+- https://data.hisparc.nl/maps/Netherlands/Amsterdam/Zaanstad/
+- https://data.hisparc.nl/maps/Netherlands/Enschede/Enschede/
 
 Finally you can also focus on one specific station by simply giving its
 station number:
 
-- http://data.hisparc.nl/maps/8005/
-- http://data.hisparc.nl/maps/8103/
+- https://data.hisparc.nl/maps/8005/
+- https://data.hisparc.nl/maps/8103/

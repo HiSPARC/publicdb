@@ -38,19 +38,19 @@ For each detector 3 (or 4) coordinates need to be determined:
 
 For more information about the coordinate systems used in HiSPARC see:
 `Coordinate systems and units in HiSPARC
-<http://docs.hisparc.nl/coordinates/HiSPARC_coordinates.pdf>`_.
+<https://docs.hisparc.nl/coordinates/HiSPARC_coordinates.pdf>`_.
 
 For Dutch schools we have an assignment sheet in the infopakket which
 walks students through the process of measuring the station layout:
 `De stationsplattegrond
-<http://docs.hisparc.nl/infopakket/pdf/station_map.pdf>`_.
+<https://docs.hisparc.nl/infopakket/pdf/station_map.pdf>`_.
 
 
 Submitting the measurements
 ---------------------------
 
 New layouts can be submitted via the `layout submit form
-<http://data.hisparc.nl/layout/submit/>`_. A verification e-mail will be sent
+<https://data.hisparc.nl/layout/submit/>`_. A verification e-mail will be sent
 to the submitter. The submitted measurements will be reviewed before they are
 made available on the website and via the API.
 
