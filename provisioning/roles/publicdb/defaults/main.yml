@@ -13,3 +13,5 @@ publicdb_python_version: "3.10"
 
 jsparc_repo: https://github.com/HiSPARC/jsparc.git
 jsparc_path: "{{ publicdb_path }}/jsparc/"
+
+supervisord_path: "{{ publicdb_path }}/supervisord"

@@ -4,3 +4,5 @@ numpy
 pytables==3.6.1
 scipy
 psycopg2
+supervisor
+uwsgi

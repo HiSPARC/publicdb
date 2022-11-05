@@ -1,3 +1,9 @@
+- name: Restart uWSGI
+  community.general.supervisorctl:
+    name: uwsgi
+    state: restarted
+    config: "{{ supervisord_path }}/supervisord.conf"
+
 - name: Restart webserver
   ansible.builtin.shell:
     cmd: "sudo systemctl restart httpd"

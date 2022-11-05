@@ -130,6 +130,25 @@
   environment:
     PATH: "{{ publicdb_venv }}/bin:{{ ansible_env.PATH }}"
 
+- name: Ensure supervisord directory exists
+  ansible.builtin.file:
+    path: "{{ supervisord_path }}"
+    state: directory
+    mode: 02775
+
+- name: copy supervisord configuration
+  ansible.builtin.template:
+    src: supervisord.conf
+    dest: "{{ supervisord_path }}/supervisord.conf"
+  # FIXME notify: restart supervisord
+
+- name: copy uwsgi.ini
+  ansible.builtin.template:
+    src: uwsgi.ini
+    dest: "{{ supervisord_path }}/uwsgi.ini"
+    backup: yes
+  notify: Restart uWSGI
+
 - name: Copy Apache httpd config file
   ansible.builtin.template:
     src: hisparc-httpd.conf
