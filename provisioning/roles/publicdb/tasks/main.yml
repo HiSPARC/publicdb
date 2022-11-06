@@ -114,7 +114,7 @@
     src: settings.py
     dest: "{{ publicdb_code }}/publicdb/settings.py"
     backup: yes
-  notify: Restart webserver
+  notify: Restart uWSGI
 
 - name: Migrate Django apps
   community.general.django_manage:
@@ -154,7 +154,6 @@
     src: hisparc-httpd.conf
     dest: /tmp/hisparc-httpd.conf
   register: httpdconf
-  tags: wip
 
 - name: Sudoedit Apache httpd config file
   ansible.builtin.shell:
@@ -164,7 +163,6 @@
     SUDO_EDITOR: /usr/bin/vi
   when: httpdconf.changed
   notify: Restart webserver
-  tags: wip
 
 - name: Enable cron job for updating histograms and ESD
   ansible.builtin.cron:
