@@ -140,7 +140,26 @@
   ansible.builtin.template:
     src: supervisord.conf
     dest: "{{ supervisord_path }}/supervisord.conf"
-  # FIXME notify: restart supervisord
+  notify: Restart supervisord
+
+- name: Enable cron job for starting supervisord at boot time
+  ansible.builtin.cron:
+    name: Start supervisord at boot time
+    special_time: reboot
+    state: present
+    job: "{{ publicdb_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
+
+- name: Check if supervisord is running
+  ansible.builtin.command:
+    cmd: pgrep supervisord
+  register: supervisord
+  failed_when: False
+  changed_when: supervisord.rc == 1
+
+- name: Start supervisord
+  ansible.builtin.command:
+    cmd: "{{ publicdb_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
+  when: supervisord is changed
 
 - name: copy uwsgi.ini
   ansible.builtin.template:

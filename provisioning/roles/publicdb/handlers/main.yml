@@ -1,3 +1,7 @@
+- name: Restart supervisord
+  ansible.builtin.shell:
+    cmd: "killall -w supervisord; {{ publicdb_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
+
 - name: Restart uWSGI
   community.general.supervisorctl:
     name: uwsgi
