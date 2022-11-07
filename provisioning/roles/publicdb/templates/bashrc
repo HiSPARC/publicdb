@@ -21,14 +21,21 @@ else
 fi
 unset __conda_setup
 # <<< conda initialize <<<
-
-conda activate publicdb_venv
-
+    
 # Activate env
+conda activate publicdb_venv
 alias envpub='conda activate {{ publicdb_venv }}'
+
+# Supervisor aliases
+alias startsupd='supervisord -c {{ supervisord_path }}/supervisord.conf'
+alias stopsupd='killall -w supervisord'
+alias statussupd="if pgrep supervisord >/dev/null; then echo 'RUNNING'; else echo 'NOT RUNNING'; fi"
+alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
+
 # Go to publicdb repository
 alias cdpub='cd {{ publicdb_code }}'
 alias cdjsp='cd {{ jsparc_path }}'
+
 # Collect static files, and reload uwsgi
 alias collectreload='envpub && cdpub && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
