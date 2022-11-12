@@ -32,11 +32,14 @@
     update: yes
     force: no
     version: master
+  register: git_result
+  changed_when: "git_result.after|default('after') != git_result.before|default('before')"
   notify: Restart webserver
 
 - name: Remove compiled python code
   ansible.builtin.command:
     cmd: "find {{ publicdb_code }} -name *.pyc -delete"
+  changed_when: False
 
 - name: "Checkout jsparc in {{ jsparc_path }}"
   ansible.builtin.git:
@@ -74,6 +77,8 @@
 - name: Install conda packages in conda environment
   ansible.builtin.command:
     cmd: "{{ miniconda_path }}/bin/conda install -n publicdb_venv --channel conda-forge --file ~/conda.list --yes"
+  register: conda_result
+  changed_when: "'INSTALLED' in conda_result.stdout"
 
 - name: Install packages in conda environment using pip
   ansible.builtin.pip:
