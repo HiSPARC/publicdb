@@ -33,7 +33,7 @@
 - name: Copy conda requirements files
   ansible.builtin.copy:
     src: conda.list
-    dest: ~/conda.list
+    dest: "{{ datastore_path }}/conda.list"
 
 - name: Create conda environment
   ansible.builtin.shell:
@@ -42,7 +42,7 @@
 
 - name: Install conda packages in conda environment
   ansible.builtin.command:
-    cmd: "{{ miniconda_path }}/bin/conda install -n datastore_venv --channel conda-forge --file ~/conda.list --yes"
+    cmd: "{{ miniconda_path }}/bin/conda install -n datastore_venv --channel conda-forge --file {{ datastore_path }}/conda.list --yes"
   register: conda_result
   changed_when: "'Executing transaction' in conda_result.stdout"
 
