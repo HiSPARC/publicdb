@@ -1,11 +1,4 @@
-# .bashrc
-
-# Source global definitions
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
-fi
-
-# User specific aliases and functions
+# .bashrc for publicdb host
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -49,6 +42,3 @@ alias uphis='envpub && cdpub && ./manage.py updatehistograms'
 alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && collectreload'
 # Update jSparc to latest master
 alias upjs='envpub && cdjsp && git fetch && git reset --hard origin/master'
-
-# Prompt
-[[ -n "$SSH_CLIENT" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '

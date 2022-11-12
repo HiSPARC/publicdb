@@ -1,7 +1,7 @@
 - name: Use custom .bashrc
   ansible.builtin.template:
     src: bashrc
-    dest: ~/.bashrc
+    dest: ~/.bashrc-datastore
     backup: true
 
 - name: "Ensure {{ datastore-path }} directory exists"

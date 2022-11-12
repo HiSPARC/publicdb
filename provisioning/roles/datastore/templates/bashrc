@@ -1,11 +1,4 @@
-# .bashrc
-
-# Source global definitions
-if [ -f /etc/bashrc ]; then
-	. /etc/bashrc
-fi
-
-# User specific aliases and functions
+# .bashrc for datastore
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
@@ -41,6 +34,3 @@ alias reload='touch /tmp/uwsgi-reload.me'
 
 # Update datastore to latest master
 alias updata='envdata && cddata && git fetch && git reset --hard origin/master && reload'
-
-# Prompt
-[[ -n "$SSH_CLIENT" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '

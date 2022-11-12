@@ -1,0 +1,5 @@
+- name: Use custom .bashrc for shared account
+  ansible.builtin.template:
+    src: bashrc
+    dest: ~/.bashrc
+    backup: yes

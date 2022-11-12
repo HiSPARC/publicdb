@@ -1,0 +1,17 @@
+# .bashrc
+
+# Source global definitions
+if [ -f /etc/bashrc ]; then
+	. /etc/bashrc
+fi
+
+# User specific aliases and functions
+
+if [ "$HOSTNAME" == "{{ publicdb_host }}" ]; then
+    . ~/.bashrc-publicdb
+elif [ "$HOSTNAME" == "{{ datastore_host }}" ]; then
+    . ~/.bashrc-datastore
+fi
+
+# Prompt
+[[ -n "$SSH_CLIENT" ]] && PS1='\[\e[1;30m\]$(date +%y%m%d\ %H:%M:%S) \[\e[1;32m\]\u@\h \[\e[1;34m\]\w\n$CONDA_DEFAULT_ENV\[\e[m\]> '

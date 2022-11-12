@@ -1,7 +1,7 @@
 - name: Use custom .bashrc
   ansible.builtin.template:
     src: bashrc
-    dest: ~/.bashrc
+    dest: ~/.bashrc-publicdb
     backup: yes
 
 - name: Ensure publicdb directory exists
