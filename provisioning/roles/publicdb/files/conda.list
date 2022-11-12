@@ -1,7 +1,7 @@
 pip
 ipython
 numpy
-pytables==3.6.1
+pytables
 scipy
 psycopg2
 supervisor
