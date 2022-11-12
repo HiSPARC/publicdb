@@ -1,9 +1,10 @@
 datastore_path: "{{ hisparc_path }}/datastore/"
 datastore_code: "{{ datastore_path }}/code/"
-datastore_venv: "{{ datastore_path }}/datastore_venv/"
 datastore_logs: "{{ datastore_path }}/logs/"
 datastore_config: "{{ datastore_path }}/station_list.csv"
 
 datastore_repo: https://github.com/HiSPARC/datastore.git
 
 datastore_python_version: "3.10"
+
+supervisord_path: "{{ datastore_path }}/supervisord"

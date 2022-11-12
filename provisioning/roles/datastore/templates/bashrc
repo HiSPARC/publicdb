@@ -22,12 +22,20 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-conda activate datastore_venv
-
+    
 # Activate env
+conda activate datastore_venv
 alias envdata='conda activate {{ datastore_venv }}'
+
+# Supervisor aliases
+alias startsupd='supervisord -c {{ supervisord_path }}/supervisord.conf'
+alias stopsupd='killall -w supervisord'
+alias statussupd="if pgrep supervisord >/dev/null; then echo 'RUNNING'; else echo 'NOT RUNNING'; fi"
+alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
+
 # Go to datastore repository
 alias cddata='cd {{ datastore_code }}'
+
 # Reload web server
 alias reload='touch /tmp/uwsgi-reload.me'
 

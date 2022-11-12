@@ -1,5 +1,6 @@
 ansible_host: hisparc-raw
 
 miniconda_path: "{{ hisparc_path }}/datastore/miniconda"
+datastore_venv: "{{ miniconda_path }}/envs/datastore_venv/"
 
 datastore_config_url: "https://{{ publicdb_host }}/config/datastore"
