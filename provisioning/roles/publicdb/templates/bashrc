@@ -36,6 +36,9 @@ alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
 alias cdpub='cd {{ publicdb_code }}'
 alias cdjsp='cd {{ jsparc_path }}'
 
+# Reload web server
+alias reload='touch /tmp/uwsgi-reload.me'
+
 # Collect static files, and reload uwsgi
 alias collectreload='envpub && cdpub && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
