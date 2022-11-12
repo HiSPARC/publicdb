@@ -78,7 +78,7 @@
   ansible.builtin.command:
     cmd: "{{ miniconda_path }}/bin/conda install -n publicdb_venv --channel conda-forge --file ~/conda.list --yes"
   register: conda_result
-  changed_when: "'INSTALLED' in conda_result.stdout"
+  changed_when: "'Executing transaction' in conda_result.stdout"
 
 - name: Install packages in conda environment using pip
   ansible.builtin.pip:
