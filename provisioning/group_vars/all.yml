@@ -1,4 +1,5 @@
 ansible_user: hisparcsa
+ansible_python_interpreter: /usr/bin/python3
 hisparc_path: /uufs/chpc.utah.edu/common/home/hisparc
 
 publicdb_host: hisparc-data.chpc.utah.edu
