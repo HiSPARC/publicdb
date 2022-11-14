@@ -23,7 +23,7 @@
     update: true
     force: false
     version: master
-  notify: Restart webserver
+  notify: Restart uWSGI
 
 - name: Remove compiled python code
   ansible.builtin.command:
@@ -51,14 +51,14 @@
     src: datastore.py
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: Restart webserver
+  notify: Restart uWSGI
 
 - name: Copy config.ini
   ansible.builtin.template:
     src: config.ini
     dest: "{{ datastore_path }}"
     backup: yes
-  notify: Restart webserver
+  notify: Restart uWSGI
 
 - name: Copy writer_app.py
   ansible.builtin.template:

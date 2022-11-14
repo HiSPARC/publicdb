@@ -3,9 +3,9 @@
     path: "{{ hisparc_path }}"
     state: directory
 
-- name: "Ensure {{ hisparc_path }}/raw directory and subdirectories exist"
+- name: "Ensure {{ datastore_data_path }} directory and subdirectories exist"
   ansible.builtin.file:
-    path: "{{ hisparc_path }}/raw/{{ item }}"
+    path: "{{ datastore_data_path }}/{{ item }}"
     state: directory
     mode: 02775
   with_items:
