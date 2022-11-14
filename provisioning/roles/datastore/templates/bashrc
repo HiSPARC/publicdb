@@ -27,7 +27,7 @@ alias statussupd="if pgrep supervisord >/dev/null; then echo 'RUNNING'; else ech
 alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
 
 # Go to datastore repository
-alias cddata='cd {{ datastore_code }}'
+alias cddata='cd {{ datastore_path }}'
 
 # Reload web server
 alias reload='touch /tmp/uwsgi-reload.me'

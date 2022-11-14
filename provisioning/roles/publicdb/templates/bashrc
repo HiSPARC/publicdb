@@ -26,7 +26,7 @@ alias statussupd="if pgrep supervisord >/dev/null; then echo 'RUNNING'; else ech
 alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
 
 # Go to publicdb repository
-alias cdpub='cd {{ publicdb_code }}'
+alias cdpub='cd {{ publicdb_path }}'
 alias cdjsp='cd {{ jsparc_path }}'
 
 # Reload web server
