@@ -4,11 +4,22 @@
     dest: ~/.bashrc-datastore
     backup: true
 
-- name: "Ensure {{ datastore-path }} directory exists"
+- name: "Ensure {{ datastore_data_path }} directory and subdirectories exist"
   ansible.builtin.file:
-    path: "{{ datastore_path }}"
+    path: "{{ datastore_data_path }}/{{ item }}"
     state: directory
     mode: 02775
+  with_items:
+    - /
+    - tmp
+    - incoming
+    - partial
+    - suspicious
+
+- name: "Ensure station list exists"
+  ansible.builtin.file:
+    path: "{{ datastore_config }}"
+    state: touch
 
 - name: Ensure log directory exists
   ansible.builtin.file:
@@ -84,6 +95,13 @@
     dest: "{{ supervisord_path }}/supervisord.conf"
   notify: Restart supervisord
 
+- name: copy uwsgi.ini
+  ansible.builtin.template:
+    src: uwsgi.ini
+    dest: "{{ supervisord_path }}/uwsgi.ini"
+    backup: yes
+  notify: Restart uWSGI
+
 - name: Enable cron job for starting supervisord at boot time
   ansible.builtin.cron:
     name: Start supervisord at boot time
@@ -102,13 +120,6 @@
   ansible.builtin.command:
     cmd: "{{ datastore_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
   when: supervisord is changed
-
-- name: copy uwsgi.ini
-  ansible.builtin.template:
-    src: uwsgi.ini
-    dest: "{{ supervisord_path }}/uwsgi.ini"
-    backup: yes
-  notify: Restart uWSGI
 
 - name: Copy Apache httpd config file
   ansible.builtin.template:

@@ -18,7 +18,6 @@
 - name: Setup datastore server
   hosts: datastore
   roles:
-    - datastore-paths
     - datastore
 # - name: Setup network config for tietar
 #   hosts: tietar.nikhef.nl
