@@ -19,6 +19,10 @@
   hosts: datastore
   roles:
     - datastore
+# Datastore Firewall (nftables)
+# HiSPARC datastore configuration server
+# ip saddr hisparc-data tcp dport { 8001 } accept
+
 # - name: Setup network config for tietar
 #   hosts: tietar.nikhef.nl
 #   roles:
