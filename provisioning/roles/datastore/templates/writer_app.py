@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 """Wrapper for the writer application"""
 
 import sys

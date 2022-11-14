@@ -1,4 +1,5 @@
 #!/usr/local/bin/python
+# {{ ansible_managed }}
 """ Simple XML-RPC Server to run on the datastore server.
 
     This daemon should be run on HiSPARC's datastore server.  It will

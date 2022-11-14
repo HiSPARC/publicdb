@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 import sys
 import functools
 

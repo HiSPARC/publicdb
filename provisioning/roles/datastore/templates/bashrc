@@ -1,3 +1,4 @@
+# {{ ansible_managed }}
 # .bashrc for datastore
 
 # >>> conda initialize >>>
@@ -15,7 +16,7 @@ fi
 unset __conda_setup
 # <<< conda initialize <<<
 
-    
+
 # Activate env
 conda activate datastore_venv
 alias envdata='conda activate {{ datastore_venv }}'
