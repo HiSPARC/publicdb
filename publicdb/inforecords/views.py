@@ -18,7 +18,7 @@ def keys(request, host):
 
     host = get_object_or_404(Pc, name=host)
 
-    if settings.VPN_PROXY is not None:
+    if settings.VPN_PROXY:
         proxy = ServerProxy(settings.VPN_PROXY)
         key_file = proxy.get_key(host.name, host.type.slug).data
         key_file = base64.b64decode(key_file)

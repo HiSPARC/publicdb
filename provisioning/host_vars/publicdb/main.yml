@@ -10,7 +10,8 @@ publicdb_repo: https://github.com/HiSPARC/publicdb.git
 psql_database_name: publicdb
 psql_user: "{{ ansible_user }}"
 
-vpn_proxy: "http://{{ vpn_host }}:{{ vpn_port }}"
+# vpn_proxy: "http://{{ vpn_host }}:{{ vpn_port }}"
+vpn_proxy:
 datastore_proxy: "http://{{ datastore_host }}:{{ datastore_port }}"
 
 email_backend: django.core.mail.backends.smtp.EmailBackend

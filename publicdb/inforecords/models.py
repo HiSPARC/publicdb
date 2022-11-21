@@ -382,7 +382,7 @@ class Pc(models.Model):
 def create_keys(pc):
     """Create VPN keys for the given Pc"""
 
-    if settings.VPN_PROXY is not None:
+    if settings.VPN_PROXY:
         proxy = ServerProxy(settings.VPN_PROXY)
         proxy.create_key(pc.name, pc.type.slug, pc.ip)
 
@@ -390,7 +390,7 @@ def create_keys(pc):
 def update_aliases():
     """Update VPN aliases"""
 
-    if settings.VPN_PROXY is not None:
+    if settings.VPN_PROXY:
         proxy = ServerProxy(settings.VPN_PROXY)
         aliases = [(f's{x.station.number}', x.ip) for x in Pc.objects.all()]
         aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
