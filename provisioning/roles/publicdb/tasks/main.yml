@@ -141,7 +141,7 @@
     state: directory
     mode: 02775
 
-- name: copy supervisord configuration
+- name: Copy supervisord configuration
   ansible.builtin.template:
     src: supervisord.conf
     dest: "{{ supervisord_path }}/supervisord.conf"
@@ -166,7 +166,7 @@
     cmd: "{{ publicdb_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
   when: supervisord is changed
 
-- name: copy uwsgi.ini
+- name: Copy uwsgi.ini
   ansible.builtin.template:
     src: uwsgi.ini
     dest: "{{ supervisord_path }}/uwsgi.ini"

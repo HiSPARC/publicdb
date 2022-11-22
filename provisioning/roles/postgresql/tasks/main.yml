@@ -11,7 +11,7 @@
   environment:
     SUDO_EDITOR: /usr/bin/vi
   when: postgresconf.changed
-  notify: restart postgresql
+  notify: Restart postgresql
 
 - name: Flush handlers
   meta: flush_handlers
