@@ -4,7 +4,7 @@
     dest: ~/.bashrc-datastore
     backup: true
 
-- name: "Ensure {{ datastore_data_path }} directory and subdirectories exist"
+- name: Ensure datastore data directory and subdirectories exist
   ansible.builtin.file:
     path: "{{ datastore_data_path }}/{{ item }}"
     state: directory
@@ -16,7 +16,7 @@
     - partial
     - suspicious
 
-- name: "Ensure station list exists"
+- name: Ensure station list exists
   ansible.builtin.file:
     path: "{{ datastore_config }}"
     state: touch

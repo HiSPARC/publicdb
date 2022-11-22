@@ -1,4 +1,4 @@
-- name: "Ensure {{ hisparc_path }}/src directory exists"
+- name: Ensure src directory exists
   ansible.builtin.file:
     path: "{{ hisparc_path }}/src"
     state: directory
