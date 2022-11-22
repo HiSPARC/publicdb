@@ -117,6 +117,10 @@ To clean the database again to fill it with new fake data use::
     $ docker-compose exec publicdb ./manage.py loaddata publicdb/histograms/fixtures/initial_generator_state.json
     $ docker-compose exec publicdb ./manage.py loaddata publicdb/histograms/fixtures/initial_types.json
 
+To run the tests use::
+
+    $ docker-compose exec publicdb make coveragetests
+
 
 Hints for running a development publicdb server
 -----------------------------------------------
