@@ -45,10 +45,10 @@ DATASTORE_PROXY = None  # 'http://localhost:8002'
 VPN_HOST = 'localhost'
 DATASTORE_HOST = 'localhost'
 
-# Process data with multiple threads. Default is disabled (False).
+# Process data with multiple threads. Default is enabled (True).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
-USE_MULTIPROCESSING = False
+USE_MULTIPROCESSING = True
 
 # Disable emailing
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

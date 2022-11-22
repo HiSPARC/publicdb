@@ -56,10 +56,10 @@ DATASTORE_HOST = '{{ datastore_host }}'
 # Configure HiSPARC public database url for SAPPHiRE
 environ['PUBLICDB_BASE'] = '{{ publicdb_host }}'
 
-# Process data with multiple threads. Default is disabled (False).
+# Process data with multiple threads. Default is enabled (True).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
-USE_MULTIPROCESSING = False
+USE_MULTIPROCESSING = True
 
 EMAIL_BACKEND = '{{ email_backend }}'
 EMAIL_HOST = '{{ email_host }}'
