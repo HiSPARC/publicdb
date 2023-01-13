@@ -233,6 +233,10 @@ def perform_tasks_manager(model, needs_update_item, perform_certain_tasks):
     """
     summaries = model.objects.filter(**{needs_update_item: True, 'needs_update': False}).reverse()
 
+    if not summaries:
+        # exit early if there's nothing to do
+        return
+
     if settings.USE_MULTIPROCESSING:
         worker_pool = multiprocessing.Pool()
         results = worker_pool.imap(perform_certain_tasks, summaries)
