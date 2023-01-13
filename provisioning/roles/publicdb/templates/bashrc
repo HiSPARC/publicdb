@@ -28,18 +28,19 @@ alias supctl='supervisorctl -c {{ supervisord_path }}/supervisord.conf'
 
 # Go to publicdb repository
 alias cdpub='cd {{ publicdb_path }}'
+alias cdpubwww='cd {{ publicdb_path }}/www'
 alias cdjsp='cd {{ jsparc_path }}'
 
 # Reload web server
 alias reload='touch /tmp/uwsgi-reload.me'
 
 # Collect static files, and reload uwsgi
-alias collectreload='envpub && cdpub && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
+alias collectreload='envpub && cdpubwww && ./manage.py collectstatic --noinput && touch /tmp/uwsgi-reload.me'
 
 # Perform the daily hisparc-update task
-alias uphis='envpub && cdpub && ./manage.py updatehistograms'
+alias uphis='envpub && cdpubwww && ./manage.py updatehistograms'
 
 # Update publicdb to latest master
-alias uppub='envpub && cdpub && git fetch && git reset --hard origin/master && collectreload'
+alias uppub='envpub && cdpubwww && git fetch && git reset --hard origin/master && collectreload'
 # Update jSparc to latest master
 alias upjs='envpub && cdjsp && git fetch && git reset --hard origin/master'
