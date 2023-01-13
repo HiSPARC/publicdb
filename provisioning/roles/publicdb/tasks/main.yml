@@ -211,6 +211,12 @@
     state: absent
     job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}manage.py createsessions"
 
+- name: Ensure publicdb sqldumps directory exists
+  ansible.builtin.file:
+    path: "{{ publicdb_dumps }}"
+    state: directory
+    mode: 02775
+
 - name: Enable cron job for daily backup of publicdb database
   ansible.builtin.cron:
     name: "Publicdb dump"
