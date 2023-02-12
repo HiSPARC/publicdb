@@ -4,3 +4,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+
+  - package-ecosystem: 'pip'
+    directory: '/provisioning/roles/publicdb/files'
+    schedule:
+      interval: 'weekly'
