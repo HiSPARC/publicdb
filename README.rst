@@ -4,7 +4,7 @@ HiSPARC Public Database README
 
 .. image:: http://img.shields.io/badge/license-GPLv3-blue.svg
    :target: https://github.com/HiSPARC/publicdb/blob/master/LICENSE
-.. image:: http://img.shields.io/github/status-checks/HiSPARC/publicdb/master.svg
+.. image:: https://img.shields.io/github/actions/workflow/status/HiSPARC/publicdb/tests.yml?branch=master
    :target: https://github.com/HiSPARC/publicdb/actions
 
 
