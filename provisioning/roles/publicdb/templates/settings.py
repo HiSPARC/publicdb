@@ -54,7 +54,7 @@ VPN_HOST = '{{ vpn_host }}'
 DATASTORE_HOST = '{{ datastore_host }}'
 
 # Configure HiSPARC public database url for SAPPHiRE
-environ['PUBLICDB_BASE'] = '{{ publicdb_host }}'
+environ['PUBLICDB_BASE'] = 'http://{{ publicdb_host }}'
 
 # Process data with multiple threads. Default is enabled (True).
 # Disable multiprocessing for debugging purposes. When multithreaded

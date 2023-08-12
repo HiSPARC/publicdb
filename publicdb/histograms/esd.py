@@ -642,7 +642,7 @@ def get_station_numbers_from_esd_coincidences(network_summary):
     with tables.open_file(filepath, 'r') as data:
         s_index = data.root.coincidences.s_index
         re_number = re.compile('[0-9]+$')
-        s_numbers = [int(re_number.search(s_path).group()) for s_path in s_index]
+        s_numbers = [int(re_number.search(s_path.decode()).group()) for s_path in s_index]
     return s_numbers
 
 
