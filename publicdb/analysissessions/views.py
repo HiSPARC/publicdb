@@ -254,7 +254,7 @@ def get_cores(slug, coincidences):
 
 
 def create_plot_object(x_values, y_series, x_label, y_label):
-    if type(y_series[0]) != list:
+    if not isinstance(y_series[0], list):
         y_series = [y_series]
 
     data = [[[xv, yv] for xv, yv in zip(x_values, y_values)] for y_values in y_series]
