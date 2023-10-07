@@ -8,3 +8,19 @@ extend-exclude = '''
     | /templates/
 )
 '''
+
+[tool.coverage.run]
+branch = true
+source = [
+    'publicdb',
+    'tests',
+]
+omit = [
+    '*/migrations/*',
+    'publicdb/settings.py',
+]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+skip_covered = true
