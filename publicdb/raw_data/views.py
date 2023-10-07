@@ -122,7 +122,7 @@ def get_raw_datafile(date):
     try:
         datafile = tables.open_file(name, 'r')
     except OSError:
-        raise Exception("No data for that date")
+        raise Exception('No data for that date')
 
     return datafile
 
@@ -136,7 +136,7 @@ def get_station_node(datafile, station_number):
         if station in cluster:
             return datafile.get_node(cluster, station)
 
-    raise Exception("No data available for this station on that date")
+    raise Exception('No data available for this station on that date')
 
 
 def get_target():
@@ -179,7 +179,7 @@ def download_form(request, station_number=None, start=None, end=None):
                 'start': start,
                 'end': end,
                 'data_type': 'events',
-            }
+            },
         )
 
     return render(request, 'raw_data/data_download.html', {'form': form})
@@ -213,7 +213,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        msg = "Incorrect optional parameters (start [datetime], " "end [datetime])"
+        msg = 'Incorrect optional parameters (start [datetime], end [datetime])'
         return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
 
     download = request.GET.get('download', False)
@@ -234,7 +234,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         filename = f'singles-s{station_number}-{timerange_string}.tsv'
     elif data_type == 'lightning':
         if lightning_type not in list(range(6)):
-            msg = "Incorrect lightning type, should be a value between 0-5"
+            msg = 'Incorrect lightning type, should be a value between 0-5'
             return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
         tsv_output = generate_lightning_as_tsv(lightning_type, start, end)
         filename = f'lightning-knmi-{timerange_string}.tsv'
@@ -291,7 +291,7 @@ def generate_events_as_tsv(station, start, end):
                 clean_float_array(events['t_trigger']),
                 clean_angle_array(reconstructions['zenith']),
                 clean_angle_array(reconstructions['azimuth']),
-            ]
+            ],
         )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
@@ -300,9 +300,9 @@ def generate_events_as_tsv(station, start, end):
         events_returned = True
 
     if not events_returned:
-        yield "# No events found for the chosen query."
+        yield '# No events found for the chosen query.'
     else:
-        yield "# Finished downloading."
+        yield '# Finished downloading.'
 
 
 def get_events_from_esd_in_range(station, start, end):
@@ -377,7 +377,7 @@ def generate_weather_as_tsv(station, start, end):
                 events['heat_index'],
                 clean_float_array(events['dew_point']),
                 clean_float_array(events['wind_chill']),
-            ]
+            ],
         )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
@@ -386,9 +386,9 @@ def generate_weather_as_tsv(station, start, end):
         weather_returned = True
 
     if not weather_returned:
-        yield "# No weather data found for the chosen query."
+        yield '# No weather data found for the chosen query.'
     else:
-        yield "# Finished downloading."
+        yield '# Finished downloading.'
 
 
 def get_weather_from_esd_in_range(station, start, end):
@@ -446,7 +446,7 @@ def generate_singles_as_tsv(station, start, end):
                 events['slv_ch1_high'],
                 events['slv_ch2_low'],
                 events['slv_ch2_high'],
-            ]
+            ],
         )
         block_buffer = StringIO()
         writer = csv.writer(block_buffer, delimiter='\t', lineterminator='\n')
@@ -455,9 +455,9 @@ def generate_singles_as_tsv(station, start, end):
         singles_returned = True
 
     if not singles_returned:
-        yield "# No singles data found for the chosen query."
+        yield '# No singles data found for the chosen query.'
     else:
-        yield "# Finished downloading."
+        yield '# Finished downloading.'
 
 
 def get_singles_from_esd_in_range(station, start, end):
@@ -528,9 +528,9 @@ def generate_lightning_as_tsv(lightning_type, start, end):
         lightning_returned = True
 
     if not lightning_returned:
-        yield "# No lightning data found for the chosen query."
+        yield '# No lightning data found for the chosen query.'
     else:
-        yield "# Finished downloading."
+        yield '# Finished downloading.'
 
 
 def get_lightning_in_range(lightning_type, start, end):
@@ -570,7 +570,7 @@ def coincidences_download_form(request, start=None, end=None):
                     'end': end,
                     'n': n,
                     'download': download,
-                }
+                },
             )
             url = reverse('data:coincidences')
             return HttpResponseRedirect(f'{url}?{query_string}')
@@ -607,7 +607,7 @@ def download_coincidences(request):
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        error_msg = "Incorrect optional parameters (start [datetime], end [datetime])"
+        error_msg = 'Incorrect optional parameters (start [datetime], end [datetime])'
         return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
     try:
@@ -625,26 +625,27 @@ def download_coincidences(request):
 
     error_msg = None
     if stations and cluster:
-        error_msg = "Both stations and cluster are defined."
+        error_msg = 'Both stations and cluster are defined.'
     elif stations:
         try:
             stations = [int(number.strip('"\' ')) for number in stations.strip('[](), ').split(',')]
         except ValueError:
-            error_msg = "Unable to parse station numbers."
+            error_msg = 'Unable to parse station numbers.'
         else:
             if len(stations) < n:
-                error_msg = "To few stations in query, give at least n."
+                error_msg = 'To few stations in query, give at least n.'
             elif len(stations) >= 30:
-                error_msg = "To many stations in query, use less than 30."
+                error_msg = 'To many stations in query, use less than 30.'
             elif Station.objects.filter(number__in=stations).count() != len(stations):
-                error_msg = "Not all station numbers are valid."
+                error_msg = 'Not all station numbers are valid.'
     elif cluster:
         cluster = get_object_or_404(Cluster, name=cluster)
         stations = Station.objects.filter(Q(cluster__parent=cluster) | Q(cluster=cluster)).values_list(
-            'number', flat=True
+            'number',
+            flat=True,
         )
         if len(stations) >= 30:
-            error_msg = "To many stations in this cluster, manually select a subset of stations."
+            error_msg = 'To many stations in this cluster, manually select a subset of stations.'
 
     if error_msg is not None:
         return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
@@ -717,9 +718,9 @@ def generate_coincidences_as_tsv(start, end, cluster, stations, n):
         coincidences_returned = True
 
     if not coincidences_returned:
-        yield "# No coincidences found for the chosen query."
+        yield '# No coincidences found for the chosen query.'
     else:
-        yield "# Finished downloading."
+        yield '# Finished downloading.'
 
 
 def get_coincidences_from_esd_in_range(start, end, stations, n):

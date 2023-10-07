@@ -72,7 +72,7 @@ def process_possible_stations_for_date(date, station_list):
 
     """
     logger.info('Now processing %s', date)
-    unique_table_list = {table_name for table_list in station_list.values() for table_name in table_list.keys()}
+    unique_table_list = {table_name for table_list in station_list.values() for table_name in table_list}
     for table_name in unique_table_list:
         process_possible_tables_for_network(date, table_name)
     for station, table_list in station_list.items():
@@ -88,7 +88,7 @@ def process_possible_tables_for_network(date, table_name):
     """
     try:
         update_flag_attr = f'needs_update_{NETWORK_TABLES[table_name]}'
-        logger.info("New %s data on %s.", table_name, date.strftime("%a %b %d %Y"))
+        logger.info('New %s data on %s.', table_name, date.strftime('%a %b %d %Y'))
         network_summary, _ = NetworkSummary.objects.get_or_create(date=date)
         setattr(network_summary, update_flag_attr, True)
         network_summary.needs_update = True
@@ -119,9 +119,9 @@ def check_table_and_update_flags(table_name, num_events, summary):
 
         if getattr(summary, number_of_events_attr) != num_events:
             logger.info(
-                "New data (%s) on %s for station %d",
+                'New data (%s) on %s for station %d',
                 table_name,
-                summary.date.strftime("%a %b %d %Y"),
+                summary.date.strftime('%a %b %d %Y'),
                 summary.station.number,
             )
             # only record number of events for *some* tables at this time

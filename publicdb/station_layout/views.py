@@ -86,13 +86,15 @@ def review_layout(request, hash):
         active_date = submitted_layout.active_date.replace(hour=23, minute=59, second=59)
         config = (
             Configuration.objects.filter(
-                summary__station=station, timestamp__gte=FIRSTDATE, timestamp__lte=active_date
+                summary__station=station,
+                timestamp__gte=FIRSTDATE,
+                timestamp__lte=active_date,
             ).exclude(gps_latitude=0.0)
         ).latest()
     except Configuration.DoesNotExist:
         try:
             configs = Configuration.objects.filter(summary__station=station, timestamp__gte=active_date).exclude(
-                gps_latitude=0.0
+                gps_latitude=0.0,
             )
             config = configs.earliest()
         except Configuration.DoesNotExist:

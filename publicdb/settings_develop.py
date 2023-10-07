@@ -7,9 +7,7 @@ PUBLICDB_PATH = os.path.join(BASE_PATH, '..')
 
 DEBUG = True
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+ADMINS = ()
 
 MANAGERS = ADMINS
 
@@ -23,7 +21,7 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
-    }
+    },
 }
 
 # Path of the mounted HiSPARC datastore root folder

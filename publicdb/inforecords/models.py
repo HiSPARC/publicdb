@@ -43,7 +43,7 @@ class ContactInformation(models.Model):
     url = models.URLField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.city} {self.street_1} {self.email_work}"
+        return f'{self.city} {self.street_1} {self.email_work}'
 
     @property
     def type(self):
@@ -72,8 +72,8 @@ class ContactInformation(models.Model):
             return 'no owner'
 
     class Meta:
-        verbose_name = "Contact information"
-        verbose_name_plural = "Contact information"
+        verbose_name = 'Contact information'
+        verbose_name_plural = 'Contact information'
         ordering = ['city', 'street_1', 'email_work']
 
 
@@ -94,7 +94,7 @@ class Contact(models.Model):
 
     @property
     def name(self):
-        return ' '.join((self.title, self.first_name, self.prefix_surname, self.surname)).replace('  ', ' ').strip()
+        return f'{self.title} {self.first_name} {self.prefix_surname} {self.surname}'.replace('  ', ' ').strip()
 
     class Meta:
         verbose_name = 'contact'
@@ -119,7 +119,7 @@ class Country(models.Model):
                 self.number = 0
 
         if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
+            raise ValidationError('Country number must be multiple of 10000')
 
     def last_cluster_number(self):
         clusters = self.clusters.filter(parent=None)
@@ -130,8 +130,8 @@ class Country(models.Model):
             return self.number - 1000
 
     class Meta:
-        verbose_name = "Country"
-        verbose_name_plural = "Countries"
+        verbose_name = 'Country'
+        verbose_name_plural = 'Countries'
         ordering = ['number']
 
 
@@ -156,21 +156,21 @@ class Cluster(models.Model):
 
         if self.parent is None:
             if self.number % 1000:
-                raise ValidationError("Cluster number must be multiple of 1000")
+                raise ValidationError('Cluster number must be multiple of 1000')
             if not 0 <= (self.number - self.country.number) < 10000:
                 raise ValidationError(
-                    "Cluster number must be in range of "
-                    f"numbers for the country ({self.country.number}, {self.country.number + 10000})."
+                    'Cluster number must be in range of '
+                    f'numbers for the country ({self.country.number}, {self.country.number + 10000}).',
                 )
         if self.parent is not None:
             if self.parent.parent is not None:
-                raise ValidationError("Subsubclusters are not allowed")
+                raise ValidationError('Subsubclusters are not allowed')
             if self.number % 100:
-                raise ValidationError("Subcluster number must be multiple of 100")
+                raise ValidationError('Subcluster number must be multiple of 100')
             if not 0 < (self.number - self.parent.number) < 1000:
                 raise ValidationError(
-                    "Subcluster number must be in range of "
-                    f"numbers for the cluster ({self.parent.number}, {self.parent.number + 1000})."
+                    'Subcluster number must be in range of '
+                    f'numbers for the cluster ({self.parent.number}, {self.parent.number + 1000}).',
                 )
 
     def save(self, *args, **kwargs):
@@ -227,8 +227,8 @@ class Station(models.Model):
             self.number = self.cluster.last_station_number() + 1
         if not 0 < (self.number - self.cluster.number) < 100:
             raise ValidationError(
-                "Station number must be in range of numbers for the (sub)cluster "
-                f"({self.cluster.number}, {self.cluster.number + 100})."
+                'Station number must be in range of numbers for the (sub)cluster '
+                f'({self.cluster.number}, {self.cluster.number + 100}).',
             )
 
     def save(self, *args, **kwargs):
@@ -359,15 +359,15 @@ class Pc(models.Model):
         self.name = slugify(self.name).replace('-', '').replace('_', '')
 
         if self.id is None:
-            if self.type.slug == "admin":
+            if self.type.slug == 'admin':
                 try:
-                    last_ip = Pc.objects.filter(type__slug="admin").latest('id').ip
+                    last_ip = Pc.objects.filter(type__slug='admin').latest('id').ip
                 except Pc.DoesNotExist:
                     # Initial Admin IP
                     last_ip = '172.16.66.1'
             else:
                 try:
-                    last_ip = Pc.objects.exclude(type__slug="admin").latest('id').ip
+                    last_ip = Pc.objects.exclude(type__slug='admin').latest('id').ip
                 except Pc.DoesNotExist:
                     # Initial station IP
                     last_ip = '194.171.82.1'

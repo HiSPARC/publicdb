@@ -52,7 +52,7 @@ class DataDownloadForm(forms.Form):
                 if not station:
                     self.add_error(station_field, 'Choose a station')
                 else:
-                    cleaned_data["station"] = station
+                    cleaned_data['station'] = station
             else:
                 del cleaned_data[station_field]
         return cleaned_data
@@ -64,7 +64,7 @@ class CoincidenceDownloadForm(forms.Form):
     stations = forms.CharField(help_text="e.g. '103, 104, 105'", required=False)
     start = forms.DateTimeField(help_text="e.g. '2014-4-5', or '2014-4-18 12:45'")
     end = forms.DateTimeField(help_text="e.g. '2014-4-29', or '2014-04-30 9:05'")
-    n = forms.IntegerField(min_value=2, help_text="Minimum number of events in a coincidence")
+    n = forms.IntegerField(min_value=2, help_text='Minimum number of events in a coincidence')
     download = forms.BooleanField(initial=True, required=False)
 
     def clean(self):
@@ -73,15 +73,15 @@ class CoincidenceDownloadForm(forms.Form):
         cleaned_data = super().clean()
         filter_by = cleaned_data.get('filter_by')
         if filter_by == 'network':
-            del cleaned_data["cluster"]
-            del cleaned_data["stations"]
+            del cleaned_data['cluster']
+            del cleaned_data['stations']
         elif filter_by == 'cluster':
-            del cleaned_data["stations"]
+            del cleaned_data['stations']
             cluster = cleaned_data.get('cluster')
             if not cluster:
-                self.add_error("cluster", ValidationError('Choose a cluster.', 'invalid_choice'))
+                self.add_error('cluster', ValidationError('Choose a cluster.', 'invalid_choice'))
         elif filter_by == 'stations':
-            del cleaned_data["cluster"]
+            del cleaned_data['cluster']
             msg = None
             stations = cleaned_data.get('stations')
             if not stations:
@@ -96,7 +96,7 @@ class CoincidenceDownloadForm(forms.Form):
                         msg = ValidationError('Enter at least N stations.', 'too_few')
                     elif len(s_numbers) > 30:
                         msg = ValidationError('Exceeded limit of 30 stations.', 'too_many')
-                    elif not Station.objects.filter(number__in=s_numbers).count() == len(s_numbers):
+                    elif Station.objects.filter(number__in=s_numbers).count() != len(s_numbers):
                         msg = ValidationError('Invalid station numbers.', 'invalid_choices')
             if msg is not None:
                 self.add_error('stations', msg)

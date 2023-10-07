@@ -15,23 +15,38 @@ class TestManagement(TestCase):
 
         # Newly created
         self.new = SessionRequestFactory(
-            session_confirmed=False, session_pending=True, session_created=False, cluster=cluster
+            session_confirmed=False,
+            session_pending=True,
+            session_created=False,
+            cluster=cluster,
         )
         # Email confirmed
         self.confirmed = SessionRequestFactory(
-            session_confirmed=True, session_pending=True, session_created=False, cluster=cluster
+            session_confirmed=True,
+            session_pending=True,
+            session_created=False,
+            cluster=cluster,
         )
         # Selected for create session
         self.selected = SessionRequestFactory(
-            session_confirmed=False, session_pending=True, session_created=False, cluster=cluster
+            session_confirmed=False,
+            session_pending=True,
+            session_created=False,
+            cluster=cluster,
         )
         # Create session started
         self.started = SessionRequestFactory(
-            session_confirmed=False, session_pending=False, session_created=False, cluster=cluster
+            session_confirmed=False,
+            session_pending=False,
+            session_created=False,
+            cluster=cluster,
         )
         # Session created
         self.created = SessionRequestFactory(
-            session_confirmed=False, session_pending=False, session_created=True, cluster=cluster
+            session_confirmed=False,
+            session_pending=False,
+            session_created=True,
+            cluster=cluster,
         )
 
     @patch('publicdb.analysissessions.models.SessionRequest.create_session')

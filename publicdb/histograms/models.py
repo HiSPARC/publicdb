@@ -373,10 +373,7 @@ class GeneratorState(models.Model):
         if day is None:
             day = datetime.date.today()
 
-        if self.update_last_run.date() >= day and not self.update_is_running:
-            return True
-        else:
-            return False
+        return bool(self.update_last_run.date() >= day and not self.update_is_running)
 
 
 class DetectorTimingOffset(models.Model):
@@ -400,9 +397,9 @@ class StationTimingOffset(models.Model):
 
     def clean(self):
         if self.ref_summary.station == self.summary.station:
-            raise ValidationError("The stations may not be the same")
+            raise ValidationError('The stations may not be the same')
         if self.ref_summary.date != self.summary.date:
-            raise ValidationError("The summary dates should be the same")
+            raise ValidationError('The summary dates should be the same')
 
     class Meta:
         verbose_name = 'Station timing offset'

@@ -55,7 +55,8 @@ def stations_by_country(request):
     test_stations = []
 
     for station in Station.objects.exclude(pcs__type__slug='admin').select_related(
-        'cluster__country', 'cluster__parent'
+        'cluster__country',
+        'cluster__parent',
     ):
         link = station in data_stations
         status = station_status.get_status(station.number)
@@ -216,7 +217,8 @@ class NetworkSummaryDetailView(DateDetailView):
 
     def get_queryset(self):
         return NetworkSummary.objects.with_coincidences().prefetch_related(
-            'network_histograms', 'network_histograms__type'
+            'network_histograms',
+            'network_histograms__type',
         )
 
     def get_context_data(self, **kwargs):
@@ -241,7 +243,9 @@ class NetworkSummaryDetailView(DateDetailView):
             .count()
         )
         histograms = DailyHistogram.objects.filter(
-            summary__date=date, summary__station__pcs__is_test=False, type__slug='eventtime'
+            summary__date=date,
+            summary__station__pcs__is_test=False,
+            type__slug='eventtime',
         ).distinct()
         number_of_events = sum(sum(histogram.values) for histogram in histograms)
         status = {'station_count': n_stations, 'n_events': number_of_events}
@@ -256,7 +260,9 @@ class NetworkSummaryDetailView(DateDetailView):
 
         # data for singles plots
         singles_datasets = MultiDailyDataset.objects.filter(
-            summary__date=date, summary__station__pcs__is_test=False, type__slug='singlesratelow'
+            summary__date=date,
+            summary__station__pcs__is_test=False,
+            type__slug='singlesratelow',
         ).distinct()
         singles_plots = [(dataset.summary.station.number, plot_dataset(dataset)) for dataset in singles_datasets]
         singles_plots = sorted(singles_plots)
@@ -273,7 +279,7 @@ class NetworkSummaryDetailView(DateDetailView):
                 'year_list': year_list,
                 'prev': prev,
                 'next': next,
-            }
+            },
         )
         return context
 
@@ -429,7 +435,7 @@ class SummaryDetailView(DateDetailView):
         # Data for the plots
         plots = {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.histograms.all()}
         plots.update(
-            {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.multi_histograms.all()}
+            {histogram.type.slug: plot_histogram(histogram) for histogram in self.object.multi_histograms.all()},
         )
         plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.datasets.all()})
         plots.update({dataset.type.slug: plot_dataset(dataset) for dataset in self.object.multi_datasets.all()})
@@ -451,7 +457,7 @@ class SummaryDetailView(DateDetailView):
                 'has_data': True,
                 'has_config': has_config,
                 'coincidences_found': coincidences_found,
-            }
+            },
         )
         return context
 
@@ -646,10 +652,10 @@ def station_latest(request, station_number):
         {
             histogram.type.slug: plot_histogram(histogram)
             for histogram in summary.multi_histograms.filter(type__slug__in=['pulseheight', 'pulseintegral'])
-        }
+        },
     )
     plots.update(
-        {dataset.type.slug: plot_dataset(dataset) for dataset in summary.datasets.filter(type__slug='barometer')}
+        {dataset.type.slug: plot_dataset(dataset) for dataset in summary.datasets.filter(type__slug='barometer')},
     )
 
     # Show alternative
@@ -1008,7 +1014,8 @@ def get_config_source(station_number, type):
 
     if type == 'electronics':
         data = [
-            (config.timestamp, config.primary, config.secondary, config.primary_fpga, config.secondary_fpga) for config in configs
+            (config.timestamp, config.primary, config.secondary, config.primary_fpga, config.secondary_fpga)
+            for config in configs
         ]
     else:
         data = list(configs.values_list(*fields))

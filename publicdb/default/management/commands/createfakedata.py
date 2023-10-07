@@ -27,7 +27,9 @@ class Command(BaseCommand):
             ]
             subclusters = [
                 inforecords_factories.ClusterFactory(
-                    country=cluster.country, parent=cluster, number=cluster_number + cluster.number
+                    country=cluster.country,
+                    parent=cluster,
+                    number=cluster_number + cluster.number,
                 )
                 for cluster in clusters
                 for cluster_number in range(100, 201, 100)

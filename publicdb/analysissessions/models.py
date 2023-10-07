@@ -69,7 +69,7 @@ class AnalyzedCoincidence(models.Model):
     error_estimate = models.FloatField(null=True, blank=True)
 
     def __str__(self):
-        return f"{self.coincidence} - {self.student}"
+        return f'{self.coincidence} - {self.student}'
 
     class Meta:
         verbose_name = 'Analyzed coincidence'
@@ -100,7 +100,7 @@ class SessionRequest(models.Model):
 
     @property
     def name(self):
-        return f"{self.first_name} {self.sur_name}"
+        return f'{self.first_name} {self.sur_name}'
 
     def create_session(self):
         self.session_pending = False
@@ -157,7 +157,7 @@ class SessionRequest(models.Model):
             all_coincidences = cq.any(stations)
             coincidences = cq.events_from_stations(all_coincidences, stations, n=3)
             for coincidence in coincidences:
-                # Todo: Double check for multiple events from same station,
+                # TODO: Double check for multiple events from same station,
                 self.save_coincidence(coincidence, session)
                 number_of_coincidences += 1
 
@@ -212,14 +212,14 @@ class SessionRequest(models.Model):
     def sendmail_request(self):
         subject = 'HiSPARC analysis session request'
         message = textwrap.dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             Please click on this link to confirm your request for an analysis session with jSparc:
             https://data.hisparc.nl/analysis-session/request/{self.url}/
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
@@ -229,7 +229,7 @@ class SessionRequest(models.Model):
     def sendmail_created(self):
         subject = 'HiSPARC analysis session created'
         message = textwrap.dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             Your analysis session for jSparc has been created.
@@ -244,7 +244,7 @@ class SessionRequest(models.Model):
             https://data.hisparc.nl/analysis-session/{slugify(self.sid)}/data/
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
@@ -252,7 +252,7 @@ class SessionRequest(models.Model):
     def sendmail_created_less(self):
         subject = 'HiSPARC analysis session created with less events'
         message = textwrap.dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             Your analysis session for jSparc has been created.
@@ -269,7 +269,7 @@ class SessionRequest(models.Model):
             https://data.hisparc.nl/analysis-session/{slugify(self.sid)}/data/
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
@@ -277,7 +277,7 @@ class SessionRequest(models.Model):
     def sendmail_zero(self):
         subject = 'HiSPARC analysis session creation failed'
         message = textwrap.dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             Your analysis session for jSparc could not be created.
@@ -285,7 +285,7 @@ class SessionRequest(models.Model):
             Please try selecting a different cluster or date.
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)

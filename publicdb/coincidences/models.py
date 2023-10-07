@@ -5,7 +5,6 @@ from ..inforecords.models import Station
 
 
 class SerializedDataField(models.Field):
-
     system_check_removed_details = {
         'hint': 'Use ArrayField instead.',
     }

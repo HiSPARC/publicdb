@@ -22,7 +22,7 @@ def update_check_querystring(request, queue):
         admin_version = request.GET['admin_version']
         user_version = request.GET['user_version']
     except KeyError:
-        return http.HttpResponseBadRequest("Incomplete request.")
+        return http.HttpResponseBadRequest('Incomplete request.')
 
     return update_check(request, queue, admin_version, user_version)
 
@@ -31,7 +31,7 @@ def update_check(request, queue, admin_version, user_version):
     try:
         queue = UpdateQueue.objects.get(slug=queue)
     except UpdateQueue.DoesNotExist:
-        return http.HttpResponseBadRequest("Queue does not exist.")
+        return http.HttpResponseBadRequest('Queue does not exist.')
 
     answer = {'mustUpdate': 0b00}
 

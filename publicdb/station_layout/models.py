@@ -45,7 +45,8 @@ class StationLayout(models.Model):
         super().save(*args, **kwargs)
         try:
             next_layout = StationLayout.objects.filter(
-                station=self.station, active_date__gt=self.active_date
+                station=self.station,
+                active_date__gt=self.active_date,
             ).earliest()
             next_date = next_layout.active_date
         except StationLayout.DoesNotExist:
@@ -97,7 +98,7 @@ class StationLayoutQuarantine(models.Model):
         hash_submit = os.urandom(16).encode('hex')
         hash_review = os.urandom(16).encode('hex')
         if StationLayoutQuarantine.objects.filter(hash_submit=hash_submit) or StationLayoutQuarantine.objects.filter(
-            hash_review=hash_review
+            hash_review=hash_review,
         ):
             self.generate_hashes()
         else:
@@ -107,7 +108,7 @@ class StationLayoutQuarantine(models.Model):
     def sendmail_submit(self):
         subject = 'HiSPARC station layout submission'
         message = dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             Please click on this link to confirm your submission
@@ -115,7 +116,7 @@ class StationLayoutQuarantine(models.Model):
             https://data.hisparc.nl/layout/confirm/{self.hash_submit}/
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
@@ -123,7 +124,7 @@ class StationLayoutQuarantine(models.Model):
     def sendmail_review(self):
         subject = 'HiSPARC station layout review'
         message = dedent(
-            f'''\
+            f"""\
             Hello,
 
             A new station layout has been submitted for station {self.station}.
@@ -134,7 +135,7 @@ class StationLayoutQuarantine(models.Model):
             https://data.hisparc.nl/layout/review/{self.hash_review}/
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, ['beheer@hisparc.nl'], fail_silently=False)
@@ -142,14 +143,14 @@ class StationLayoutQuarantine(models.Model):
     def sendmail_accepted(self):
         subject = 'HiSPARC station layout accepted'
         message = dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             The station layout which you submitted for station {self.station}
             has been approved by the reviewer.
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
@@ -157,14 +158,14 @@ class StationLayoutQuarantine(models.Model):
     def sendmail_declined(self):
         subject = 'HiSPARC station layout declined'
         message = dedent(
-            f'''\
+            f"""\
             Hello {self.name},
 
             The station layout which you submitted for station {self.station}
             has been declined by the reviewer.
 
             Greetings,
-            The HiSPARC Team'''
+            The HiSPARC Team""",
         )
         sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)

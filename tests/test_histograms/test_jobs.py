@@ -17,7 +17,6 @@ from ..factories import histograms_factories, inforecords_factories
 
 @override_settings(DATASTORE_PATH=join(dirname(__file__), '../data/datastore'))
 class TestJobs(LiveServerTestCase):
-
     fixtures = ['initial_generator_state.json']
 
     def setUp(self):
