@@ -1,13 +1,58 @@
-[tool.black]
-target-version = ['py310']
+[tool.ruff]
 line-length = 120
-skip-string-normalization = true
-extend-exclude = '''
-(
-    /migrations/
-    | /templates/
-)
-'''
+target-version = 'py310'
+select = ['ALL']  # https://docs.astral.sh/ruff/rules/
+extend-exclude = [
+    '*/migrations/*',
+    '*/templates/*',
+    'scripts/*',
+    'doc/conf.py',
+]
+ignore = [
+    'ANN',  # Requires type annotation
+    'ARG002',  # Unused function arguments
+    'B904',  # Exception causes
+    'D',  # Docstrings
+    'DTZ',  # Timezone aware datetimes
+    'EM',  # String literals in exceptions
+    'FIX',  # Using FIXME/TODO/XXX comments
+    'ICN001',  # Common package import alias
+    'PT',  # Requires pytest
+    'RET',  # Logic around return
+    'RUF012',  # Requires type annotation
+    'SIM108',  # Requires ternary operator instead of if-else
+    'SLF001',  # Using 'private' members, e.g. _v_name
+    'TD001',  # Allow FIXME
+    'TD002',  # Requires TODO author
+    'TD003',  # Requires TODO issue link
+    'TID252',  # Requires absolute imports
+    'TRY003',  # Long messages for common exception classes
+    'TRY200',  # Requires cause for raise in except
+]
+
+[tool.ruff.isort]
+lines-between-types = 1
+section-order = [
+    'future',
+    'standard-library',
+    'third-party',
+    'django',
+    'sapphire',
+    'first-party',
+    'tests',
+    'local-folder',
+]
+
+[tool.ruff.isort.sections]
+django = ['django']
+sapphire = ['sapphire']
+tests = ['tests']
+
+[tool.ruff.flake8-quotes]
+inline-quotes = 'single'
+
+[tool.ruff.format]
+quote-style = 'single'
 
 [tool.coverage.run]
 branch = true
