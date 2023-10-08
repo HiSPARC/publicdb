@@ -122,7 +122,7 @@ def get_raw_datafile(date):
     try:
         datafile = tables.open_file(name, 'r')
     except OSError:
-        raise Exception('No data for that date')
+        raise ValueError('No data for that date')
 
     return datafile
 
@@ -136,7 +136,7 @@ def get_station_node(datafile, station_number):
         if station in cluster:
             return datafile.get_node(cluster, station)
 
-    raise Exception('No data available for this station on that date')
+    raise ValueError('No data available for this station on that date')
 
 
 def get_target():

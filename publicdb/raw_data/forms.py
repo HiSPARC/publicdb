@@ -89,7 +89,7 @@ class CoincidenceDownloadForm(forms.Form):
             else:
                 try:
                     s_numbers = [int(x) for x in stations.strip('[]()').split(',')]
-                except Exception:
+                except ValueError:
                     msg = ValidationError('Incorrect station entry.', 'incorrect_entry')
                 else:
                     if len(s_numbers) < cleaned_data.get('n'):

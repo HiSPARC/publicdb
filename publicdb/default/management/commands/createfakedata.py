@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(*args, **options):
         if not settings.DEBUG:
-            raise Exception('Never run this on a production database!!')
+            raise RuntimeError('Never run this on a production database!!')
 
         with factory.Faker.override_default_locale('nl_NL'):
             # Inforecords
