@@ -5,7 +5,7 @@ devinstall:
 	pip install -r provisioning/roles/publicdb/files/requirements-pip.txt
 
 .PHONY: test
-test: coveragetests flaketest doctest ansibletest
+test: coveragetests linttest doctest ansibletest
 
 .PHONY: unittests
 unittests:
@@ -15,9 +15,9 @@ unittests:
 coveragetests: unittests
 	coverage report
 
-.PHONY: flaketest
-flaketest:
-	flake8
+.PHONY: linttest
+linttest:
+	ruff check .
 
 .PHONY: doctest
 doctest:
