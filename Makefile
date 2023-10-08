@@ -18,6 +18,7 @@ coveragetests: unittests
 .PHONY: linttest
 linttest:
 	ruff check .
+	typos .
 
 .PHONY: doctest
 doctest:
