@@ -61,9 +61,10 @@ def call_xmlrpc(request):
         # Show documentation on available methods
         response = HttpResponse()
         template = loader.get_template('raw_data/xmlrpc.html')
-        methods = []
-        for method in dispatcher.system_listMethods():
-            methods.append({'name': method, 'help': dispatcher.system_methodHelp(method)})
+        methods = [
+            {'name': method, 'help': dispatcher.system_methodHelp(method)}
+            for method in dispatcher.system_listMethods()
+        ]
         context = {'methods': methods}
         response.write(template.render(context))
         return response
@@ -213,14 +214,8 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
         else:
             end = start + datetime.timedelta(days=1)
     except ValueError:
-        msg = 'Incorrect optional parameters (start [datetime], end [datetime])'
-        return HttpResponseBadRequest(msg, content_type=MIME_PLAIN)
-
-    download = request.GET.get('download', False)
-    if download in ['true', 'True']:
-        download = True
-    else:
-        download = False
+        error_msg = 'Incorrect optional parameters (start [datetime], end [datetime])'
+        return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
     timerange_string = prettyprint_timerange(start, end)
     if data_type == 'events':
@@ -241,7 +236,7 @@ def download_data(request, data_type='events', station_number=None, lightning_ty
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
-    if download:
+    if request.GET.get('download', False) in ['true', 'True']:
         content_disposition = f'attachment; filename="{filename}"'
     else:
         content_disposition = f'inline; filename="{filename}"'
@@ -650,19 +645,13 @@ def download_coincidences(request):
     if error_msg is not None:
         return HttpResponseBadRequest(error_msg, content_type=MIME_PLAIN)
 
-    download = request.GET.get('download', False)
-    if download in ['true', 'True']:
-        download = True
-    else:
-        download = False
-
     timerange_string = prettyprint_timerange(start, end)
     tsv_output = generate_coincidences_as_tsv(start, end, cluster, stations, n)
     filename = f'coincidences-{timerange_string}.tsv'
 
     response = StreamingHttpResponse(tsv_output, content_type=MIME_TSV)
 
-    if download:
+    if request.GET.get('download', False) in ['true', 'True']:
         content_disposition = f'attachment; filename="{filename}"'
     else:
         content_disposition = f'inline; filename="{filename}"'
