@@ -41,6 +41,8 @@ jobs:
           cache-dependency-path: 'requirements-dev.txt'
       - run: pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
       - run: make linttest
+        env:
+          RUFF_OUTPUT_FORMAT: github
 
   ansible-lint:
     runs-on: ubuntu-latest
