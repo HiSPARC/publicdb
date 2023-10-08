@@ -606,7 +606,7 @@ def save_histograms(summary, slug, bins, values):
         DailyHistogram.objects.update_or_create(summary=summary, type=type, defaults=histogram)
     else:
         MultiDailyHistogram.objects.update_or_create(summary=summary, type=type, defaults=histogram)
-    logger.debug('Saved succesfully')
+    logger.debug('Saved successfully')
 
 
 def save_network_histograms(network_summary, slug, bins, values):
@@ -615,7 +615,7 @@ def save_network_histograms(network_summary, slug, bins, values):
     type = HistogramType.objects.get(slug=slug)
     histogram = {'bins': bins, 'values': values}
     NetworkHistogram.objects.update_or_create(network_summary=network_summary, type=type, defaults=histogram)
-    logger.debug('Saved succesfully')
+    logger.debug('Saved successfully')
 
 
 def save_dataset(summary, slug, x, y):
@@ -627,7 +627,7 @@ def save_dataset(summary, slug, x, y):
         DailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
     else:
         MultiDailyDataset.objects.update_or_create(summary=summary, type=type, defaults=dataset)
-    logger.debug('Saved succesfully')
+    logger.debug('Saved successfully')
 
 
 def save_offsets(summary, offsets):
@@ -641,7 +641,7 @@ def save_offsets(summary, offsets):
     logger.debug('Saving detector timing offsets for %s', summary)
     off = {f'offset_{i}': round_in_base(o, 0.25) if not np.isnan(o) else None for i, o in enumerate(offsets, 1)}
     DetectorTimingOffset.objects.update_or_create(summary=summary, defaults=off)
-    logger.debug('Saved succesfully')
+    logger.debug('Saved successfully')
 
 
 def save_station_offset(ref_summary, summary, offset, error):
@@ -663,7 +663,7 @@ def save_station_offset(ref_summary, summary, offset, error):
         field['error'] = None
 
     StationTimingOffset.objects.update_or_create(summary=summary, ref_summary=ref_summary, defaults=field)
-    logger.debug('Saved succesfully')
+    logger.debug('Saved successfully')
 
 
 def get_station_cluster_number(station):

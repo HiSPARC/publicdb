@@ -109,7 +109,7 @@ class TestViews(TestCase):
         data = self.get_json(reverse('api:stations', kwargs=kwargs))
         self.assertEqual([{'number': 1, 'name': self.station.name}], data)
 
-        # Non existant subcluster number
+        # Non existent subcluster number
         kwargs = {'subcluster_number': 1337}
         self.assert_not_found(reverse('api:stations', kwargs=kwargs))
 
@@ -121,7 +121,7 @@ class TestViews(TestCase):
         data = self.get_json(reverse('api:subclusters', kwargs=kwargs))
         self.assertEqual([{'number': 0, 'name': self.station.cluster.name}], data)
 
-        # Non existant cluster number
+        # Non existent cluster number
         kwargs = {'cluster_number': 1337}
         self.assert_not_found(reverse('api:subclusters', kwargs=kwargs))
 
@@ -133,6 +133,6 @@ class TestViews(TestCase):
         data = self.get_json(reverse('api:clusters', kwargs=kwargs))
         self.assertEqual([{'number': 0, 'name': self.station.cluster.name}], data)
 
-        # Non existant country number
+        # Non existent country number
         kwargs = {'country_number': 1337}
         self.assert_not_found(reverse('api:clusters', kwargs=kwargs))

@@ -76,7 +76,7 @@ class TestJobs(LiveServerTestCase):
         validate_results(self, test_data, reference_path)
         rmtree(settings.ESD_PATH)
 
-        # Procesed configuration from data into database
+        # Processed configuration from data into database
         self.assertEqual(1, models.Configuration.objects.filter(summary=summary).count())
 
         # Calculated detector offsets

@@ -388,12 +388,12 @@ class SummaryDetailView(DateDetailView):
         )
 
         date = self.kwargs['date']
-        station_numner = self.kwargs['station_number']
+        station_number = self.kwargs['station_number']
 
         try:
             obj = queryset.get(
                 date=date,
-                station__number=station_numner,
+                station__number=station_number,
             )
         except queryset.model.DoesNotExist:
             raise Http404
@@ -724,7 +724,7 @@ def get_specific_histogram_source(request, station_number, date, type):
         },
         content_type=MIME_TSV,
     )
-    response['Content-Disposition'] = 'attachment; filename={type}-s{station_numer}-{date:%Y%-m%-d}.tsv'
+    response['Content-Disposition'] = 'attachment; filename={type}-s{station_number}-{date:%Y%-m%-d}.tsv'
     return response
 
 
