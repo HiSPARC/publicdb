@@ -21,6 +21,12 @@ class AdminUpdate(models.Model):
     update = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='admin_updates')
 
+    class Meta:
+        verbose_name = 'Admin update'
+        verbose_name_plural = 'Admin updates'
+        unique_together = ('queue', 'version')
+        ordering = ['-version']
+
     def __str__(self):
         return f'Queue: {self.queue} - Admin Update v{self.version}'
 
@@ -29,17 +35,17 @@ class AdminUpdate(models.Model):
         self.version = int(match.group(1))
         super().save(*args, **kwargs)
 
-    class Meta:
-        verbose_name = 'Admin update'
-        verbose_name_plural = 'Admin updates'
-        unique_together = ('queue', 'version')
-        ordering = ['-version']
-
 
 class UserUpdate(models.Model):
     version = models.PositiveSmallIntegerField()
     update = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='user_updates')
+
+    class Meta:
+        verbose_name = 'User update'
+        verbose_name_plural = 'User updates'
+        unique_together = ('queue', 'version')
+        ordering = ['-version']
 
     def __str__(self):
         return f'Queue: {self.queue} - User Update v{self.version}'
@@ -52,17 +58,17 @@ class UserUpdate(models.Model):
         except IntegrityError:
             return
 
-    class Meta:
-        verbose_name = 'User update'
-        verbose_name_plural = 'User updates'
-        unique_together = ('queue', 'version')
-        ordering = ['-version']
-
 
 class InstallerUpdate(models.Model):
     version = models.CharField(max_length=5)
     installer = models.FileField(upload_to=upload_queue)
     queue = models.ForeignKey(UpdateQueue, models.CASCADE, related_name='installer_updates')
+
+    class Meta:
+        verbose_name = 'Installer update'
+        verbose_name_plural = 'Installer updates'
+        unique_together = ('queue', 'version')
+        ordering = ['-version']
 
     def __str__(self):
         return f'Installer v{self.version}'
@@ -71,9 +77,3 @@ class InstallerUpdate(models.Model):
         match = re.search(r'_v(\d+\.\d+)', self.installer.name)
         self.version = match.group(1)
         super().save(*args, **kwargs)
-
-    class Meta:
-        verbose_name = 'Installer update'
-        verbose_name_plural = 'Installer updates'
-        unique_together = ('queue', 'version')
-        ordering = ['-version']

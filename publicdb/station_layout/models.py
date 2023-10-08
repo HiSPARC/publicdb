@@ -30,10 +30,6 @@ class StationLayout(models.Model):
     detector_4_height = models.FloatField(null=True, blank=True)
     detector_4_beta = models.FloatField(null=True, blank=True)
 
-    @property
-    def has_four_detectors(self):
-        return self.detector_3_radius is not None and self.detector_4_radius is not None
-
     class Meta:
         verbose_name = 'Station layout'
         verbose_name_plural = 'Station layouts'
@@ -58,6 +54,10 @@ class StationLayout(models.Model):
                 if summary.num_events:
                     summary.needs_update_events = True
                     summary.save()
+
+    @property
+    def has_four_detectors(self):
+        return self.detector_3_radius is not None and self.detector_4_radius is not None
 
 
 class StationLayoutQuarantine(models.Model):

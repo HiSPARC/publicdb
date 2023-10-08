@@ -19,16 +19,16 @@ class Coincidence(models.Model):
     time = models.TimeField()
     nanoseconds = models.IntegerField()
 
-    def num_events(self):
-        return self.events.count()
-
-    def __str__(self):
-        return f'{self.num_events()}-fold - {self.date} {self.time} {self.nanoseconds}'
-
     class Meta:
         verbose_name = 'Coincidence'
         verbose_name_plural = 'Coincidences'
         ordering = ['date', 'time', 'nanoseconds']
+
+    def __str__(self):
+        return f'{self.num_events()}-fold - {self.date} {self.time} {self.nanoseconds}'
+
+    def num_events(self):
+        return self.events.count()
 
 
 class Event(models.Model):

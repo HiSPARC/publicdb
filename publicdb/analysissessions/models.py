@@ -26,34 +26,34 @@ class AnalysisSession(models.Model):
     starts = models.DateTimeField()
     ends = models.DateTimeField()
 
-    def in_progress(self):
-        return self.starts <= datetime.datetime.now() < self.ends
+    class Meta:
+        verbose_name = 'Analysis session'
+        verbose_name_plural = 'Analysis sessions'
 
-    in_progress.boolean = True
+    def __str__(self):
+        return self.title
 
     def save(self, *args, **kwargs):
         self.hash = hashlib.md5(self.slug.encode('utf-8')).hexdigest()
         super().save(*args, **kwargs)
         Student(session=self, name='Test student').save()
 
-    def __str__(self):
-        return self.title
+    def in_progress(self):
+        return self.starts <= datetime.datetime.now() < self.ends
 
-    class Meta:
-        verbose_name = 'Analysis session'
-        verbose_name_plural = 'Analysis sessions'
+    in_progress.boolean = True
 
 
 class Student(models.Model):
     session = models.ForeignKey(AnalysisSession, models.CASCADE, related_name='students')
     name = models.CharField(max_length=255)
 
-    def __str__(self):
-        return f'{self.session} - {self.name}'
-
     class Meta:
         verbose_name = 'Student'
         verbose_name_plural = 'Students'
+
+    def __str__(self):
+        return f'{self.session} - {self.name}'
 
 
 class AnalyzedCoincidence(models.Model):
@@ -68,13 +68,13 @@ class AnalyzedCoincidence(models.Model):
     phi = models.FloatField(null=True, blank=True)
     error_estimate = models.FloatField(null=True, blank=True)
 
-    def __str__(self):
-        return f'{self.coincidence} - {self.student}'
-
     class Meta:
         verbose_name = 'Analyzed coincidence'
         verbose_name_plural = 'Analyzed coincidences'
         ordering = ['coincidence']
+
+    def __str__(self):
+        return f'{self.coincidence} - {self.student}'
 
 
 class SessionRequest(models.Model):
