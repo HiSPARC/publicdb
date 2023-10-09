@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.12
 
 # hadolint ignore=DL3008
 RUN \
