@@ -28,8 +28,8 @@ class TestDatastore(TestCase):
                         'singles_old': 86400,
                         'config': 1,
                         'events': 168,
-                    }
-                }
+                    },
+                },
             },
             event_summary,
         )

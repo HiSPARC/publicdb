@@ -15,7 +15,7 @@ urlpatterns = [
     path('software-updates/', include('publicdb.updates.urls')),
     path('raw_data/', include('publicdb.raw_data.urls', namespace='raw_data')),
     path('data/', include('publicdb.raw_data.urls')),
-    path('config/datastore', create_datastore_config, name='datatore_config'),
+    path('config/datastore', create_datastore_config, name='datastore_config'),
     path('keys/<slug:host>/', keys, name='keys'),
     path('admin/', admin.site.urls),
 ]

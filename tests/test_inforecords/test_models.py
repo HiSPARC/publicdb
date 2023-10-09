@@ -22,7 +22,10 @@ class TestContactInformation(TestCase):
     def test_type_with_station(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         inforecords_factories.StationFactory(
-            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+            number=1,
+            cluster__number=0,
+            cluster__country__number=0,
+            contactinformation=contact_info,
         )
         self.assertEqual('Station', contact_info.type)
 
@@ -38,7 +41,10 @@ class TestContactInformation(TestCase):
     def test_contact_owner_with_station(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         station = inforecords_factories.StationFactory(
-            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+            number=1,
+            cluster__number=0,
+            cluster__country__number=0,
+            contactinformation=contact_info,
         )
         self.assertEqual(str(station), contact_info.contact_owner)
 
@@ -46,7 +52,10 @@ class TestContactInformation(TestCase):
         contact_info = inforecords_factories.ContactInformationFactory()
         contact = inforecords_factories.ContactFactory(contactinformation=contact_info)
         station = inforecords_factories.StationFactory(
-            number=1, cluster__number=0, cluster__country__number=0, contactinformation=contact_info
+            number=1,
+            cluster__number=0,
+            cluster__country__number=0,
+            contactinformation=contact_info,
         )
         self.assertEqual(f'{contact}, {station}', contact_info.contact_owner)
 
@@ -59,7 +68,8 @@ class TestContactInformation(TestCase):
     def test_str(self):
         contact_info = inforecords_factories.ContactInformationFactory()
         self.assertEqual(
-            ' '.join([contact_info.city, contact_info.street_1, contact_info.email_work]), str(contact_info)
+            f'{contact_info.city} {contact_info.street_1} {contact_info.email_work}',
+            str(contact_info),
         )
 
 

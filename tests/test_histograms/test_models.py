@@ -84,7 +84,8 @@ class TestConfiguration(TestCase):
         self.station = inforecords_factories.StationFactory(number=9, cluster__number=0, cluster__country__number=0)
         self.summary = histograms_factories.SummaryFactory(station=self.station, date=date(2016, 1, 12))
         self.configuration = histograms_factories.ConfigurationFactory(
-            summary=self.summary, timestamp=datetime.combine(self.summary.date, time(10, 11, 20))
+            summary=self.summary,
+            timestamp=datetime.combine(self.summary.date, time(10, 11, 20)),
         )
 
     def test_str(self):
@@ -144,26 +145,30 @@ class TestStationTimingOffset(TestCase):
 
     def test_clean(self):
         offset = histograms_factories.StationTimingOffsetFactory.build(
-            ref_summary=self.ref_summary, summary=self.summary
+            ref_summary=self.ref_summary,
+            summary=self.summary,
         )
         offset.clean()
 
     def test_clean_same_station(self):
         offset = histograms_factories.StationTimingOffsetFactory.build(
-            ref_summary=self.ref_summary, summary=self.ref_summary
+            ref_summary=self.ref_summary,
+            summary=self.ref_summary,
         )
         with self.assertRaisesMessage(ValidationError, 'stations'):
             offset.clean()
 
         offset = histograms_factories.StationTimingOffsetFactory.build(
-            ref_summary=self.ref_summary, summary=self.ref_summary_date
+            ref_summary=self.ref_summary,
+            summary=self.ref_summary_date,
         )
         with self.assertRaisesMessage(ValidationError, 'stations'):
             offset.clean()
 
     def test_clean_different_date(self):
         offset = histograms_factories.StationTimingOffsetFactory.build(
-            ref_summary=self.ref_summary, summary=self.summary_date
+            ref_summary=self.ref_summary,
+            summary=self.summary_date,
         )
         with self.assertRaisesMessage(ValidationError, 'summary dates'):
             offset.clean()

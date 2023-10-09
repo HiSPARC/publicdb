@@ -39,7 +39,8 @@ class TestAnalysisSession(TestCase):
 
     def test_hash(self):
         self.assertEqual(
-            hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(), self.analysis_session.hash
+            hashlib.md5(self.analysis_session.slug.encode('utf-8')).hexdigest(),
+            self.analysis_session.hash,
         )
 
     def test_str(self):

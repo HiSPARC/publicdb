@@ -44,8 +44,8 @@ class TestChecks(TestCase):
                     'singles_old': 86400,
                     'config': 1,
                     'events': 168,
-                }
-            }
+                },
+            },
         }
         self.setup_station()
         state = Mock(check_last_run=datetime(2004, 1, 1, 1, 0, 0))
@@ -80,8 +80,8 @@ class TestChecks(TestCase):
                     'singles_old': 86400,
                     'config': 1,
                     'events': 168,
-                }
-            }
+                },
+            },
         }
         self.setup_station()
         summary = histograms_factories.SummaryFactory(

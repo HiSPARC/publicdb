@@ -1,6 +1,6 @@
 # Django settings for when dunning publicdb via docker-compose.
 
-from .settings_develop import *  # noqa: F401,F403
+from .settings_develop import *  # noqa: F403
 
 DATABASES = {
     'default': {
@@ -10,7 +10,7 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'postgres',
         'PORT': '5432',
-    }
+    },
 }
 
 ALLOWED_HOSTS += [

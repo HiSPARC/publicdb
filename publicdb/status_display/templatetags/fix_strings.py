@@ -7,4 +7,4 @@ register = template.Library()
 def remove_hyphens(value):
     """Remove hyphens from string"""
 
-    return value.replace("-", "")
+    return value.replace('-', '')

@@ -30,7 +30,7 @@ jobs:
       - run: make devinstall
       - run: make coveragetests
 
-  flake:
+  lint:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -40,7 +40,9 @@ jobs:
           cache: pip
           cache-dependency-path: 'requirements-dev.txt'
       - run: pip install --upgrade --upgrade-strategy eager -r requirements-dev.txt
-      - run: make flaketest
+      - run: make linttest
+        env:
+          RUFF_OUTPUT_FORMAT: github
 
   ansible-lint:
     runs-on: ubuntu-latest
@@ -62,7 +64,7 @@ jobs:
 
   docs:
     if: github.ref == 'refs/heads/master'
-    needs: [tests, flake, ansible-lint, hadolint]
+    needs: [tests, lint, ansible-lint, hadolint]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

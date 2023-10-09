@@ -11,7 +11,7 @@ def fix_histogram_data(value):
     """Append one value to end of data, to fix step histogram"""
 
     if len(value) > 1:
-        return value + [[value[-1][0] + (value[-1][0] - value[-2][0]), value[-1][1]]]
+        return [*value, [value[-1][0] + (value[-1][0] - value[-2][0]), value[-1][1]]]
     else:
         return value
 
@@ -26,7 +26,7 @@ def fix_histogram_time(value):
     tomorrow = datetime.date.today() + datetime.timedelta(days=1)
     timestamp = calendar.timegm(tomorrow.timetuple())
 
-    return value + [[timestamp, value[-1][1]]]
+    return [*value, [timestamp, value[-1][1]]]
 
 
 @register.filter

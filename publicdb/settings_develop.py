@@ -7,9 +7,7 @@ PUBLICDB_PATH = os.path.join(BASE_PATH, '..')
 
 DEBUG = True
 
-ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
-)
+ADMINS = ()
 
 MANAGERS = ADMINS
 
@@ -23,7 +21,7 @@ DATABASES = {
         'PASSWORD': 'postgres',
         'HOST': 'localhost',
         'PORT': '5432',
-    }
+    },
 }
 
 # Path of the mounted HiSPARC datastore root folder
@@ -48,7 +46,7 @@ DATASTORE_HOST = 'localhost'
 # Process data with multiple threads. Default is enabled (True).
 # Disable multiprocessing for debugging purposes. When multithreaded
 # processing is enabled the traceback doesn't go to the exact location.
-USE_MULTIPROCESSING = True
+USE_MULTIPROCESSING = False
 
 # Disable emailing
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

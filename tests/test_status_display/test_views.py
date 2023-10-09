@@ -185,7 +185,7 @@ class TestSourceViews(TestCase):
             with self.subTest(config_type=config_type):
                 response = self.get_tsv(reverse(f'status:source:{config_type}', kwargs=kwargs))
                 expected_context = {
-                    'station_number': self.station.number
+                    'station_number': self.station.number,
                     # data structures are a bit more work to check.
                 }
                 self.assert_context_contains(expected_context, response.context)

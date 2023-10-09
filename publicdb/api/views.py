@@ -24,24 +24,24 @@ def man(request):
     """Give overview of the possible urls"""
 
     man = {
-        "base_url": 'https://data.hisparc.nl/api/',
-        "stations": 'stations/',
-        "stations_in_subcluster": 'subclusters/{subcluster_number}/',
-        "subclusters": 'subclusters/',
-        "subclusters_in_cluster": 'clusters/{cluster_number}/',
-        "clusters": 'clusters/',
-        "clusters_in_country": 'countries/{country_number}/',
-        "countries": 'countries/',
-        "stations_with_data": 'stations/data/{year}/{month}/{day}/',
-        "stations_with_weather": 'stations/weather/{year}/{month}/{day}/',
-        "stations_with_singles": 'stations/singles/{year}/{month}/{day}/',
-        "station_info": 'station/{station_number}/{year}/{month}/{day}/',
-        "has_data": 'station/{station_number}/data/{year}/{month}/{day}/',
-        "has_weather": 'station/{station_number}/weather/{year}/{month}/{day}/',
-        "has_singles": 'station/{station_number}/singles/{year}/{month}/{day}/',
-        "configuration": 'station/{station_number}/config/{year}/{month}/{day}/',
-        "number_of_events": 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
-        "event_trace": 'station/{station_number}/trace/{ext_timestamp}/',
+        'base_url': 'https://data.hisparc.nl/api/',
+        'stations': 'stations/',
+        'stations_in_subcluster': 'subclusters/{subcluster_number}/',
+        'subclusters': 'subclusters/',
+        'subclusters_in_cluster': 'clusters/{cluster_number}/',
+        'clusters': 'clusters/',
+        'clusters_in_country': 'countries/{country_number}/',
+        'countries': 'countries/',
+        'stations_with_data': 'stations/data/{year}/{month}/{day}/',
+        'stations_with_weather': 'stations/weather/{year}/{month}/{day}/',
+        'stations_with_singles': 'stations/singles/{year}/{month}/{day}/',
+        'station_info': 'station/{station_number}/{year}/{month}/{day}/',
+        'has_data': 'station/{station_number}/data/{year}/{month}/{day}/',
+        'has_weather': 'station/{station_number}/weather/{year}/{month}/{day}/',
+        'has_singles': 'station/{station_number}/singles/{year}/{month}/{day}/',
+        'configuration': 'station/{station_number}/config/{year}/{month}/{day}/',
+        'number_of_events': 'station/{station_number}/num_events/{year}/{month}/{day}/{hour}/',
+        'event_trace': 'station/{station_number}/trace/{ext_timestamp}/',
     }
 
     return json_dict(man)
@@ -101,7 +101,7 @@ def station(request, station_number, year=None, month=None, date=None):
             'alpha': layout.detector_1_alpha,
             'height': layout.detector_1_height,
             'beta': layout.detector_1_beta,
-        }
+        },
     ]
     scintillators.append(
         {
@@ -109,7 +109,7 @@ def station(request, station_number, year=None, month=None, date=None):
             'alpha': layout.detector_2_alpha,
             'height': layout.detector_2_height,
             'beta': layout.detector_2_beta,
-        }
+        },
     )
 
     if station.number_of_detectors() == 4:
@@ -119,7 +119,7 @@ def station(request, station_number, year=None, month=None, date=None):
                 'alpha': layout.detector_3_alpha,
                 'height': layout.detector_3_height,
                 'beta': layout.detector_3_beta,
-            }
+            },
         )
         scintillators.append(
             {
@@ -127,7 +127,7 @@ def station(request, station_number, year=None, month=None, date=None):
                 'alpha': layout.detector_4_alpha,
                 'height': layout.detector_4_height,
                 'beta': layout.detector_4_beta,
-            }
+            },
         )
 
     station_info = {
@@ -395,7 +395,7 @@ def config(request, station_number, date=None):
     except (Configuration.DoesNotExist, Summary.DoesNotExist):
         return HttpResponseNotFound()
 
-    config = serializers.serialize("json", [configuration])
+    config = serializers.serialize('json', [configuration])
     config = json.loads(config)
     try:
         config = config[0]['fields']

@@ -19,12 +19,12 @@ FIRSTDATE = datetime.date(2004, 1, 1)
 class Profession(models.Model):
     description = models.CharField(max_length=255, unique=True)
 
-    def __str__(self):
-        return self.description
-
     class Meta:
         verbose_name = 'Profession'
         verbose_name_plural = 'Professions'
+
+    def __str__(self):
+        return self.description
 
 
 class ContactInformation(models.Model):
@@ -42,8 +42,13 @@ class ContactInformation(models.Model):
     email_private = models.EmailField(null=True, blank=True)
     url = models.URLField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Contact information'
+        verbose_name_plural = 'Contact information'
+        ordering = ['city', 'street_1', 'email_work']
+
     def __str__(self):
-        return f"{self.city} {self.street_1} {self.email_work}"
+        return f'{self.city} {self.street_1} {self.email_work}'
 
     @property
     def type(self):
@@ -71,11 +76,6 @@ class ContactInformation(models.Model):
         else:
             return 'no owner'
 
-    class Meta:
-        verbose_name = "Contact information"
-        verbose_name_plural = "Contact information"
-        ordering = ['city', 'street_1', 'email_work']
-
 
 class Contact(models.Model):
     profession = models.ForeignKey(Profession, models.CASCADE, related_name='contacts')
@@ -84,6 +84,12 @@ class Contact(models.Model):
     prefix_surname = models.CharField(max_length=255, blank=True)
     surname = models.CharField(max_length=255)
     contactinformation = models.ForeignKey(ContactInformation, models.CASCADE, related_name='contacts')
+
+    class Meta:
+        verbose_name = 'contact'
+        verbose_name_plural = 'contacts'
+        unique_together = ('first_name', 'prefix_surname', 'surname')
+        ordering = ['surname', 'first_name']
 
     def __str__(self):
         return self.name
@@ -94,18 +100,17 @@ class Contact(models.Model):
 
     @property
     def name(self):
-        return ' '.join((self.title, self.first_name, self.prefix_surname, self.surname)).replace('  ', ' ').strip()
-
-    class Meta:
-        verbose_name = 'contact'
-        verbose_name_plural = 'contacts'
-        unique_together = ('first_name', 'prefix_surname', 'surname')
-        ordering = ['surname', 'first_name']
+        return f'{self.title} {self.first_name} {self.prefix_surname} {self.surname}'.replace('  ', ' ').strip()
 
 
 class Country(models.Model):
     name = models.CharField(max_length=255, unique=True)
     number = models.IntegerField(unique=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Country'
+        verbose_name_plural = 'Countries'
+        ordering = ['number']
 
     def __str__(self):
         return self.name
@@ -119,7 +124,7 @@ class Country(models.Model):
                 self.number = 0
 
         if self.number % 10000:
-            raise ValidationError("Country number must be multiple of 10000")
+            raise ValidationError('Country number must be multiple of 10000')
 
     def last_cluster_number(self):
         clusters = self.clusters.filter(parent=None)
@@ -129,11 +134,6 @@ class Country(models.Model):
         else:
             return self.number - 1000
 
-    class Meta:
-        verbose_name = "Country"
-        verbose_name_plural = "Countries"
-        ordering = ['number']
-
 
 class Cluster(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -142,8 +142,17 @@ class Cluster(models.Model):
     country = models.ForeignKey(Country, models.CASCADE, related_name='clusters')
     url = models.URLField(null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Cluster'
+        verbose_name_plural = 'Clusters'
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        reload_datastore()
 
     def clean(self):
         if self.number is None:
@@ -156,26 +165,22 @@ class Cluster(models.Model):
 
         if self.parent is None:
             if self.number % 1000:
-                raise ValidationError("Cluster number must be multiple of 1000")
+                raise ValidationError('Cluster number must be multiple of 1000')
             if not 0 <= (self.number - self.country.number) < 10000:
                 raise ValidationError(
-                    "Cluster number must be in range of "
-                    f"numbers for the country ({self.country.number}, {self.country.number + 10000})."
+                    'Cluster number must be in range of '
+                    f'numbers for the country ({self.country.number}, {self.country.number + 10000}).',
                 )
         if self.parent is not None:
             if self.parent.parent is not None:
-                raise ValidationError("Subsubclusters are not allowed")
+                raise ValidationError('Subsubclusters are not allowed')
             if self.number % 100:
-                raise ValidationError("Subcluster number must be multiple of 100")
+                raise ValidationError('Subcluster number must be multiple of 100')
             if not 0 < (self.number - self.parent.number) < 1000:
                 raise ValidationError(
-                    "Subcluster number must be in range of "
-                    f"numbers for the cluster ({self.parent.number}, {self.parent.number + 1000})."
+                    'Subcluster number must be in range of '
+                    f'numbers for the cluster ({self.parent.number}, {self.parent.number + 1000}).',
                 )
-
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        reload_datastore()
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
@@ -203,11 +208,6 @@ class Cluster(models.Model):
         else:
             return self.number
 
-    class Meta:
-        verbose_name = 'Cluster'
-        verbose_name_plural = 'Clusters'
-        ordering = ['name']
-
 
 class Station(models.Model):
     name = models.CharField(max_length=255)
@@ -219,17 +219,13 @@ class Station(models.Model):
     password = models.CharField(max_length=255)
     info_page = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = 'Station'
+        verbose_name_plural = 'Stations'
+        ordering = ['number']
+
     def __str__(self):
         return f'{self.number:5}: {self.name}'
-
-    def clean(self):
-        if self.number is None:
-            self.number = self.cluster.last_station_number() + 1
-        if not 0 < (self.number - self.cluster.number) < 100:
-            raise ValidationError(
-                "Station number must be in range of numbers for the (sub)cluster "
-                f"({self.cluster.number}, {self.cluster.number + 100})."
-            )
 
     def save(self, *args, **kwargs):
         # Strip some problematic characters
@@ -238,6 +234,15 @@ class Station(models.Model):
             self.number = self.cluster.last_station_number() + 1
         super().save(*args, **kwargs)
         reload_datastore()
+
+    def clean(self):
+        if self.number is None:
+            self.number = self.cluster.last_station_number() + 1
+        if not 0 < (self.number - self.cluster.number) < 100:
+            raise ValidationError(
+                'Station number must be in range of numbers for the (sub)cluster '
+                f'({self.cluster.number}, {self.cluster.number + 100}).',
+            )
 
     def delete(self, *args, **kwargs):
         super().delete(*args, **kwargs)
@@ -297,22 +302,17 @@ class Station(models.Model):
             'altitude': (round(config.gps_altitude, 2) if config.gps_altitude is not None else None),
         }
 
-    class Meta:
-        verbose_name = 'Station'
-        verbose_name_plural = 'Stations'
-        ordering = ['number']
-
 
 class PcType(models.Model):
     description = models.CharField(max_length=255, unique=True)
     slug = models.CharField(max_length=255)
 
-    def __str__(self):
-        return self.description
-
     class Meta:
         verbose_name = 'PC Type'
         verbose_name_plural = 'PC Types'
+
+    def __str__(self):
+        return self.description
 
 
 class Pc(models.Model):
@@ -324,8 +324,37 @@ class Pc(models.Model):
     ip = models.GenericIPAddressField(unique=True, blank=True, null=True, protocol='ipv4')
     notes = models.TextField(blank=True)
 
+    class Meta:
+        verbose_name = 'PC and certificates'
+        verbose_name_plural = 'PCs and certificates'
+        ordering = ['name']
+
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        # slugify the short name to keep it clean
+        self.name = slugify(self.name).replace('-', '').replace('_', '')
+
+        if self.id is None:
+            if self.type.slug == 'admin':
+                try:
+                    last_ip = Pc.objects.filter(type__slug='admin').latest('id').ip
+                except Pc.DoesNotExist:
+                    # Initial Admin IP
+                    last_ip = '172.16.66.1'
+            else:
+                try:
+                    last_ip = Pc.objects.exclude(type__slug='admin').latest('id').ip
+                except Pc.DoesNotExist:
+                    # Initial station IP
+                    last_ip = '194.171.82.1'
+            self.ip = self.get_next_ip_address(last_ip)
+
+            # First create keys, then issue final save
+            create_keys(self)
+
+        super().save(*args, **kwargs)
 
     def keys(self):
         url = reverse('keys', kwargs={'host': self.name})
@@ -341,11 +370,6 @@ class Pc(models.Model):
 
     url.short_description = 'VNC URL'
 
-    class Meta:
-        verbose_name = 'PC and certificates'
-        verbose_name_plural = 'PCs and certificates'
-        ordering = ['name']
-
     def get_next_ip_address(self, ip):
         """Generate new IP address
 
@@ -353,30 +377,6 @@ class Pc(models.Model):
 
         """
         return str(ipaddress.ip_address(ip) + 1)
-
-    def save(self, *args, **kwargs):
-        # slugify the short name to keep it clean
-        self.name = slugify(self.name).replace('-', '').replace('_', '')
-
-        if self.id is None:
-            if self.type.slug == "admin":
-                try:
-                    last_ip = Pc.objects.filter(type__slug="admin").latest('id').ip
-                except Pc.DoesNotExist:
-                    # Initial Admin IP
-                    last_ip = '172.16.66.1'
-            else:
-                try:
-                    last_ip = Pc.objects.exclude(type__slug="admin").latest('id').ip
-                except Pc.DoesNotExist:
-                    # Initial station IP
-                    last_ip = '194.171.82.1'
-            self.ip = self.get_next_ip_address(last_ip)
-
-            # First create keys, then issue final save
-            create_keys(self)
-
-        super().save(*args, **kwargs)
 
 
 def create_keys(pc):

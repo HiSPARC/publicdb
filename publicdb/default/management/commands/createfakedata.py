@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(*args, **options):
         if not settings.DEBUG:
-            raise Exception('Never run this on a production database!!')
+            raise RuntimeError('Never run this on a production database!!')
 
         with factory.Faker.override_default_locale('nl_NL'):
             # Inforecords
@@ -27,7 +27,9 @@ class Command(BaseCommand):
             ]
             subclusters = [
                 inforecords_factories.ClusterFactory(
-                    country=cluster.country, parent=cluster, number=cluster_number + cluster.number
+                    country=cluster.country,
+                    parent=cluster,
+                    number=cluster_number + cluster.number,
                 )
                 for cluster in clusters
                 for cluster_number in range(100, 201, 100)

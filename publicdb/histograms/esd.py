@@ -178,7 +178,12 @@ def reconstruct_events_and_store_temporary_esd(summary):
         tmp_filename = create_temporary_file()
         with tables.open_file(tmp_filename, 'w') as tmp_file:
             reconstruct = ReconstructESDEventsFromSource(
-                source_file, tmp_file, source_path, '/', station.number, progress=False
+                source_file,
+                tmp_file,
+                source_path,
+                '/',
+                station.number,
+                progress=False,
             )
             reconstruct.reconstruct_and_store()
             node_path = reconstruct.reconstructions._v_pathname
@@ -382,12 +387,12 @@ def determine_detector_timing_offsets_for_summary(summary):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, 'events')
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table events for %s", summary)
+            logger.error('Cannot find table events for %s', summary)
             offsets = [np.nan, np.nan, np.nan, np.nan]
         else:
             try:
                 station = HiSPARCStations([station.number]).stations[0]
-            except Exception:
+            except (KeyError, RuntimeError):
                 station = None
             offsets = determine_detector_timing_offsets(table, station)
 
@@ -472,7 +477,7 @@ def get_data(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, summary)
+            logger.error('Cannot find table %s for %s', tablename, summary)
             data = None
         else:
             data = table.col(quantity)
@@ -497,7 +502,7 @@ def get_table(summary, tablename):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, summary)
+            logger.error('Cannot find table %s for %s', tablename, summary)
             return None
 
         return table.read()
@@ -538,7 +543,7 @@ def get_coincidences(network_summary, tablename, quantity):
             coincidences_node = get_coincidences_node(datafile)
             table = datafile.get_node(coincidences_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, network_summary)
+            logger.error('Cannot find table %s for %s', tablename, network_summary)
             data = None
         else:
             data = table.col(quantity)
@@ -564,7 +569,7 @@ def get_time_series(summary, tablename, quantity):
             station_node = get_station_node(datafile, station)
             table = datafile.get_node(station_node, tablename)
         except tables.NoSuchNodeError:
-            logger.error("Cannot find table %s for %s", tablename, summary)
+            logger.error('Cannot find table %s for %s', tablename, summary)
             data = None
         else:
             col1 = table.col('timestamp')
@@ -591,12 +596,12 @@ def get_timedeltas(date, ref_station, station):
                 tablename = 'time_deltas'
                 table = datafile.get_node(table_path, tablename)
             except tables.NoSuchNodeError:
-                logger.debug("Cannot find table %s %s for %s", table_path, tablename, date)
+                logger.debug('Cannot find table %s %s for %s', table_path, tablename, date)
                 data = None
             else:
                 data = table.col('delta')
     except OSError:
-        logger.debug("ESD file %s does not exists", path)
+        logger.debug('ESD file %s does not exists', path)
         return None
     return data
 

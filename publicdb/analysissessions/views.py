@@ -45,7 +45,7 @@ def get_coincidence(request):
         raise
     else:
         if not session.in_progress():
-            return error_json(404, "The requested session has not started yet or is already expired.")
+            return error_json(404, 'The requested session has not started yet or is already expired.')
 
     if not student_name:
         student = Student.objects.get(session=session, name='Test student')
@@ -61,7 +61,7 @@ def get_coincidence(request):
             analyzed_coincidence.student = student
             analyzed_coincidence.save()
         except IndexError:
-            return error_json(404, "No unanalysed coincidences available, request a new session.")
+            return error_json(404, 'No unanalysed coincidences available, request a new session.')
 
     events = get_events(analyzed_coincidence)
     response = data_json(analyzed_coincidence, events)
@@ -82,20 +82,20 @@ def get_events(analyzed_coincidence):
             continue
 
         timestamp = datetime_to_gps(datetime.combine(event.date, event.time))
-        event_dict = dict(
-            timestamp=timestamp,
-            nanoseconds=event.nanoseconds,
-            number=event.station.number,
-            latitude=config.gps_latitude,
-            longitude=config.gps_longitude,
-            altitude=config.gps_altitude,
-            status='on',
-            detectors=len(event.traces),
-            traces=event.traces,
-            pulseheights=event.pulseheights,
-            integrals=event.integrals,
-            mips=[ph / 200.0 if ph > 0 else ph for ph in event.pulseheights],
-        )
+        event_dict = {
+            'timestamp': timestamp,
+            'nanoseconds': event.nanoseconds,
+            'number': event.station.number,
+            'latitude': config.gps_latitude,
+            'longitude': config.gps_longitude,
+            'altitude': config.gps_altitude,
+            'status': 'on',
+            'detectors': len(event.traces),
+            'traces': event.traces,
+            'pulseheights': event.pulseheights,
+            'integrals': event.integrals,
+            'mips': [ph / 200.0 if ph > 0 else ph for ph in event.pulseheights],
+        }
         events.append(event_dict)
     return events
 
@@ -103,12 +103,12 @@ def get_events(analyzed_coincidence):
 def data_json(coincidence, events):
     """Construct json with data for jSparc to display"""
     timestamp = datetime_to_gps(datetime.combine(coincidence.coincidence.date, coincidence.coincidence.time))
-    data = dict(
-        pk=coincidence.pk,
-        timestamp=timestamp,
-        nanoseconds=coincidence.coincidence.nanoseconds,
-        events=events,
-    )
+    data = {
+        'pk': coincidence.pk,
+        'timestamp': timestamp,
+        'nanoseconds': coincidence.coincidence.nanoseconds,
+        'events': events,
+    }
     response = HttpResponse(json.dumps(data), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -116,7 +116,7 @@ def data_json(coincidence, events):
 
 def error_json(error_code, message):
     """Construct error response json for jSparc requests"""
-    data = dict(message=message, code=error_code)
+    data = {'message': message, 'code': error_code}
     response = HttpResponse(json.dumps(data), status=error_code, content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
@@ -143,7 +143,7 @@ def top_lijst(slug):
                     'wgh_error': wgh_error,
                     'min_error': min_error,
                     'num_events': num_events,
-                }
+                },
             )
 
     return sorted(scores, key=operator.itemgetter('wgh_error'))
@@ -192,17 +192,17 @@ def result(request):
         rank = [x['name'] for x in ranking].index(student_name) + 1
     except ValueError:
         rank = None
-    msg = "OK [result stored]"
-    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)), content_type='application/json')
+    msg = 'OK [result stored]'
+    response = HttpResponse(json.dumps({'msg': msg, 'rank': rank}), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 
 
 def test_result():
     """Generate random ranking for test sessions"""
-    msg = "Test session, result not stored"
+    msg = 'Test session, result not stored'
     rank = randint(1, 10)
-    response = HttpResponse(json.dumps(dict(msg=msg, rank=rank)), content_type='application/json')
+    response = HttpResponse(json.dumps({'msg': msg, 'rank': rank}), content_type='application/json')
     response['Access-Control-Allow-Origin'] = '*'
     return response
 

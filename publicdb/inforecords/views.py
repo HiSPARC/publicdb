@@ -34,7 +34,7 @@ def create_datastore_config(request):
     """Create the datastore configuration"""
 
     # Limit access to only allow access from the Datastore server
-    if socket.gethostbyaddr(request.META["REMOTE_ADDR"])[0] != settings.DATASTORE_HOST:
+    if socket.gethostbyaddr(request.META['REMOTE_ADDR'])[0] != settings.DATASTORE_HOST:
         raise PermissionDenied
 
     return render(

@@ -27,18 +27,18 @@ class NetworkSummary(models.Model):
 
     objects = NetworkSummaryQuerySet.as_manager()
 
-    def get_absolute_url(self):
-        kwargs = {'date': self.date}
-        return reverse('status:network:coincidences', kwargs=kwargs)
-
-    def __str__(self):
-        return f'Network Summary: {self.date}'
-
     class Meta:
         verbose_name = 'Network summary'
         verbose_name_plural = 'Network summaries'
         ordering = ['date']
         get_latest_by = 'date'
+
+    def __str__(self):
+        return f'Network Summary: {self.date}'
+
+    def get_absolute_url(self):
+        kwargs = {'date': self.date}
+        return reverse('status:network:coincidences', kwargs=kwargs)
 
 
 class SummaryQuerySet(models.QuerySet):
@@ -81,22 +81,22 @@ class Summary(models.Model):
 
     objects = SummaryQuerySet.as_manager()
 
-    def get_absolute_url(self):
-        kwargs = {
-            'station_number': self.station.number,
-            'date': self.date,
-        }
-        return reverse('status:station:summary', kwargs=kwargs)
-
-    def __str__(self):
-        return f'Summary: {self.station.number} - {self.date}'
-
     class Meta:
         verbose_name = 'Summary'
         verbose_name_plural = 'Summaries'
         unique_together = ('station', 'date')
         ordering = ['date', 'station']
         get_latest_by = 'date'
+
+    def __str__(self):
+        return f'Summary: {self.station.number} - {self.date}'
+
+    def get_absolute_url(self):
+        kwargs = {
+            'station_number': self.station.number,
+            'date': self.date,
+        }
+        return reverse('status:station:summary', kwargs=kwargs)
 
 
 class Configuration(models.Model):
@@ -188,14 +188,14 @@ class Configuration(models.Model):
     slv_ch2_comp_gain = models.FloatField()
     slv_ch2_comp_offset = models.FloatField()
 
-    def __str__(self):
-        return f'{self.summary.station.number} - {self.timestamp}'
-
     class Meta:
         verbose_name = 'Configuration'
         verbose_name_plural = 'Configurations'
         get_latest_by = 'timestamp'
         ordering = ['summary']
+
+    def __str__(self):
+        return f'{self.summary.station.number} - {self.timestamp}'
 
     def station(self):
         return self.summary.station.number
@@ -267,12 +267,12 @@ class HistogramType(models.Model):
     value_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Histogram type'
         verbose_name_plural = 'Histogram types'
+
+    def __str__(self):
+        return self.name
 
 
 class DatasetType(models.Model):
@@ -283,12 +283,12 @@ class DatasetType(models.Model):
     y_axis_title = models.CharField(max_length=40)
     description = models.TextField(blank=True)
 
-    def __str__(self):
-        return self.name
-
     class Meta:
         verbose_name = 'Dataset type'
         verbose_name_plural = 'Dataset types'
+
+    def __str__(self):
+        return self.name
 
 
 class NetworkHistogram(models.Model):
@@ -297,22 +297,30 @@ class NetworkHistogram(models.Model):
     bins = ArrayField(models.PositiveIntegerField())
     values = ArrayField(models.PositiveIntegerField())
 
-    def get_absolute_url(self):
-        kwargs = {'date': self.network_summary.date}
-        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
-
-    def __str__(self):
-        return f'{self.network_summary.date} - {self.type}'
-
     class Meta:
         verbose_name = 'Network histogram'
         verbose_name_plural = 'Network histograms'
         unique_together = ('network_summary', 'type')
         ordering = ['network_summary', 'type']
 
+    def __str__(self):
+        return f'{self.network_summary.date} - {self.type}'
+
+    def get_absolute_url(self):
+        kwargs = {'date': self.network_summary.date}
+        return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
+
 
 class BaseDailyStationDataMixin(models.Model):
     """Base class for daily station data models"""
+
+    class Meta:
+        abstract = True
+        unique_together = ('summary', 'type')
+        ordering = ['summary', 'type']
+
+    def __str__(self):
+        return f'{self.summary.station.number} - {self.summary.date} - {self.type}'
 
     def get_absolute_url(self):
         kwargs = {
@@ -320,14 +328,6 @@ class BaseDailyStationDataMixin(models.Model):
             'date': self.summary.date,
         }
         return reverse(f'status:source:{self.type.slug}', kwargs=kwargs)
-
-    def __str__(self):
-        return f'{self.summary.station.number} - {self.summary.date} - {self.type}'
-
-    class Meta:
-        abstract = True
-        unique_together = ('summary', 'type')
-        ordering = ['summary', 'type']
 
 
 class DailyHistogram(BaseDailyStationDataMixin):
@@ -373,10 +373,7 @@ class GeneratorState(models.Model):
         if day is None:
             day = datetime.date.today()
 
-        if self.update_last_run.date() >= day and not self.update_is_running:
-            return True
-        else:
-            return False
+        return bool(self.update_last_run.date() >= day and not self.update_is_running)
 
 
 class DetectorTimingOffset(models.Model):
@@ -398,14 +395,14 @@ class StationTimingOffset(models.Model):
     offset = models.FloatField(blank=True, null=True)
     error = models.FloatField(blank=True, null=True)
 
-    def clean(self):
-        if self.ref_summary.station == self.summary.station:
-            raise ValidationError("The stations may not be the same")
-        if self.ref_summary.date != self.summary.date:
-            raise ValidationError("The summary dates should be the same")
-
     class Meta:
         verbose_name = 'Station timing offset'
         verbose_name_plural = 'Station timing offsets'
         unique_together = ('ref_summary', 'summary')
         ordering = ['ref_summary']
+
+    def clean(self):
+        if self.ref_summary.station == self.summary.station:
+            raise ValidationError('The stations may not be the same')
+        if self.ref_summary.date != self.summary.date:
+            raise ValidationError('The summary dates should be the same')
