@@ -62,8 +62,7 @@ def call_xmlrpc(request):
         response = HttpResponse()
         template = loader.get_template('raw_data/xmlrpc.html')
         methods = [
-            {'name': method, 'help': dispatcher.system_methodHelp(method)}
-            for method in dispatcher.system_listMethods()
+            {'name': method, 'help': dispatcher.system_methodHelp(method)} for method in dispatcher.system_listMethods()
         ]
         context = {'methods': methods}
         response.write(template.render(context))
