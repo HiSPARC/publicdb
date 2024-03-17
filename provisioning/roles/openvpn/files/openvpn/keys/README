@@ -1,5 +1,0 @@
-The PKI of the station vpn lives here.
-
-Keys/certificates here are not used by OpenVPN. But are 
-created and stored here. `hisparcvpnd` uses `easy_rsa` to create
-keys here and transfers them to pique from here.

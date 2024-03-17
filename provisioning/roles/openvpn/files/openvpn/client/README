@@ -1,5 +1,0 @@
-The keys for the client (station) VPN live here.
-
-server.key and ta.key SHOULD BE KEPT SECRET
-
-dh2048.pem (not secret) and ta.key (secret) are also used by the admin VPN.
