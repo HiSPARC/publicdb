@@ -71,7 +71,7 @@ class ContactInformationAdmin(admin.ModelAdmin):
 
 @admin.register(models.Pc)
 class PcAdmin(admin.ModelAdmin):
-    list_display = ('station', 'name', 'is_active', 'is_test', 'ip', 'url', 'keys')
+    list_display = ('station', 'name', 'is_active', 'is_test', 'ip')
     list_filter = ('is_active', 'is_test')
     ordering = ('station',)
     list_per_page = 200

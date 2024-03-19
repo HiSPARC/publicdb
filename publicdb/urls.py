@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 
-from .inforecords.views import create_datastore_config, keys
+from .inforecords.views import create_datastore_config
 
 urlpatterns = [
     path('', RedirectView.as_view(url='show/stations', permanent=False)),
@@ -16,6 +16,5 @@ urlpatterns = [
     path('raw_data/', include('publicdb.raw_data.urls', namespace='raw_data')),
     path('data/', include('publicdb.raw_data.urls')),
     path('config/datastore', create_datastore_config, name='datastore_config'),
-    path('keys/<slug:host>/', keys, name='keys'),
     path('admin/', admin.site.urls),
 ]

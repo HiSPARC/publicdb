@@ -9,5 +9,4 @@ Disallow: /maps/
 Disallow: /analysis-session/
 Disallow: /software-updates/
 Disallow: /config/
-Disallow: /keys/
 Disallow: /admin/
