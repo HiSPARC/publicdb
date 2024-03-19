@@ -1,4 +1,4 @@
-# Django settings for when dunning publicdb via docker-compose.
+# Django settings for when running publicdb via docker-compose.
 
 from .settings_develop import *  # noqa: F403
 
