@@ -106,9 +106,6 @@ skip_covered = true
 [tool.typos.files]
 extend-exclude = [
     'publicdb/default/static/scripts/',
-    'provisioning/roles/openvpn/files/dnsmasq.conf',
-    'provisioning/roles/openvpn/files/openvpn/',
-    'provisioning/roles/openvpn/files/openvpn/README.md',  # Dutch
 ]
 
 [tool.typos.default.extend-words]
