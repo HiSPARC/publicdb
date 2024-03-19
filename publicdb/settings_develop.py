@@ -34,13 +34,11 @@ ESD_PATH = os.path.join(PUBLICDB_PATH, 'esd')
 # Path of the mounted KNMI Lightning data root folder
 LGT_PATH = os.path.join(PUBLICDB_PATH, 'knmi_lightning')
 
-# VPN and datastore XML-RPC Proxies
-# These are None in tests/development to disable attempts at connections
-VPN_PROXY = None  # 'http://localhost:8001'
+# Datastore XML-RPC Proxy
+# This is None in tests/development to disable attempts at connections
 DATASTORE_PROXY = None  # 'http://localhost:8002'
 
-# VPN and datastore host names
-VPN_HOST = 'localhost'
+# Datastore host name
 DATASTORE_HOST = 'localhost'
 
 # Process data with multiple threads. Default is enabled (True).

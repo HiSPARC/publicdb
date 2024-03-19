@@ -21,11 +21,9 @@ SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
 SECURE_SSL_REDIRECT = False
 
-# VPN and datastore XML-RPC Proxies
-# These are None in tests/development to disable attempts at connections
-VPN_PROXY = 'http://vpn:8001'
+# Datastore XML-RPC Proxy
+# This is None in tests/development to disable attempts at connections
 DATASTORE_PROXY = 'http://datastore:8002'
 
-# VPN and datastore host names
-VPN_HOST = 'publicdb_vpn_1.publicdb_default'
+# Datastore host name
 DATASTORE_HOST = 'publicdb_datastore_1.publicdb_default'
