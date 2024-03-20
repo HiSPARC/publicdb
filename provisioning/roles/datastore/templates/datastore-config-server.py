@@ -1,4 +1,4 @@
-#!/usr/local/bin/python
+#!/usr/bin/env python
 # {{ ansible_managed }}
 """ Simple XML-RPC Server to run on the datastore server.
 
@@ -10,52 +10,48 @@
     library documentation and extended.
 
 """
-from xmlrpc.server import SimpleXMLRPCServer
-from xmlrpc.server import SimpleXMLRPCRequestHandler
-import urllib.request, urllib.error, urllib.parse
 import hashlib
-import subprocess
-import os
 
-HASH = '/tmp/hash_datastore'
-DATASTORE_CFG = '{{ datastore_config }}'
+from pathlib import Path
+from urllib.request import urlopen
+from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
+
+HASH = Path('/tmp/hash_datastore')
+DATASTORE_CFG = Path('{{ datastore_config }}')
 CFG_URL = '{{ datastore_config_url }}'
-RELOAD_PATH = '/tmp/uwsgi-reload.me'
+RELOAD_PATH = Path('/tmp/uwsgi-reload.me')
 
 
 def reload_datastore():
     """Load datastore config and reload datastore, if necessary"""
 
-    datastore_cfg = urllib.request.urlopen(CFG_URL).read()
+    datastore_cfg = urlopen(CFG_URL).read()
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:
-        with open(HASH) as file:
-            old_hash = file.readline()
+        old_hash = HASH.read_text()
     except OSError:
         old_hash = None
 
     if new_hash == old_hash:
         return True
     else:
-        with open(DATASTORE_CFG, 'wb') as file:
-            file.write(datastore_cfg)
+        DATASTORE_CFG.write_bytes(datastore_cfg)
 
         # reload uWSGI
-        with open(RELOAD_PATH, 'a'):
-            os.utime(RELOAD_PATH, None)
+        Path(RELOAD_PATH).touch()
 
-        with open(HASH, 'w') as file:
-            file.write(new_hash)
+        HASH.write_text(new_hash)
 
     return True
 
 
-if __name__ == '__main__':
+class RequestHandler(SimpleXMLRPCRequestHandler):
     # Restrict to a particular path.
-    class RequestHandler(SimpleXMLRPCRequestHandler):
-        rpc_paths = ('/RPC2',)
+    rpc_paths = ('/RPC2',)
 
+
+if __name__ == '__main__':
     # Create server
     server = SimpleXMLRPCServer(('{{ datastore_host }}', {{datastore_port}}), requestHandler=RequestHandler)
     server.register_introspection_functions()
