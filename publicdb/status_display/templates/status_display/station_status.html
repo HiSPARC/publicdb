@@ -3,19 +3,22 @@
 {% load fix_data %}
 {% load static %}
 
-{% block current_config %}currentPage{% endblock %}
+{% block current_status %}currentPage{% endblock %}
 
 {% block title %}{{ block.super }} - Status{% endblock %}
 
 {% block data %}
     <div id="graphs">
-        More information about this page can be found on the <a href="https://www.hisparc.nl/station-status/">HiSPARC website</a>.
-
-        <div id="data_status">
-            <h3>Data delivery status</h3>
-            <p>The data delivery status is based on the station uploading events to the central server. Each night the uploaded events of the previous day are processed. Hence the status is based on data that was uploaded yesterday.<p>
-            <p><b>Current status:</b></p>
-            <p><span class='statusBall {{ status }}'></span><b>
+        <h3>Data delivery status</h3>
+        <p>
+            The data delivery status is based on the station uploading events to the central server.
+            Each night the uploaded events of the previous day are processed. Hence the status is based on
+            data that was uploaded yesterday.
+        </p>
+        <p><b>Current status:</b></p>
+        <p>
+            <span class='statusBall {{ status }}'></span>
+            <b>
             {% if status == 'up' %}
               Data was received yesterday. Status OK. No action required.
             {% elif status == 'down' %}
@@ -27,14 +30,20 @@
             {% else %}
               There was an internal error. Status cannot be displayed.
             {% endif %}
-            </b></p>
-            <p>Frequent problems and solutions:</p>
-            <ul>
-              <li>Unknown failure / PC not responding / Nothing works. <br><i>Solution:</i> Reboot/restart the data acquisition PC
-              <li>The DAQ is running, but the hisparc monitor and/or updater are not running (missing from the taskbar).<br><i>Solution:</i> Use "start HiSPARC software" from start menu.
-            </ul>
-            Problem not listed above? Please restart the data acquisition PC.
-            <p>For more information and troubleshooting consult the <a href="https://docs.hisparc.nl/maintenance/"> documentation</a>, <a href="https://docs.hisparc.nl/maintenance/faq.html">FAQ</a> and/or <a href="https://docs.hisparc.nl/maintenance/known-issues.html">known issues</a>. Daily maintenance of a station is described <a href="https://docs.hisparc.nl/infopakket/pdf/controle_station.pdf">this article</a> (in Dutch).</p>
-        </div>
+            </b>
+        </p>
+        <p>Frequent problems and solutions:</p>
+        <ul>
+          <li>Unknown failure / PC not responding / Nothing works.<br><i>Solution:</i> Reboot/restart the data acquisition PC.
+          <li>The DAQ is running, but the hisparc monitor and/or updater are not running (missing from the taskbar).<br><i>Solution:</i> Use "start HiSPARC software" from start menu.
+        </ul>
+        <p>Problem not listed above? Please restart the data acquisition PC.</p>
+        <p>
+            For more information and troubleshooting consult the <a href="https://docs.hisparc.nl/maintenance/">
+            documentation</a>, <a href="https://docs.hisparc.nl/maintenance/faq.html">FAQ</a> and/or
+            <a href="https://docs.hisparc.nl/maintenance/known-issues.html">known issues</a>. Daily maintenance
+            of a station is described <a href="https://docs.hisparc.nl/infopakket/pdf/controle_station.pdf">
+            this article</a> (in Dutch).
+        </p>
     </div>
 {% endblock %}

@@ -96,8 +96,8 @@ h3 {
 
 .statusBall {
     display: inline-block;
-    width: 40px;
-    height: 40px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
     background-color: grey;}
 
