@@ -21,14 +21,14 @@
     column-count: 2;}
 
 .cluster {
-    display: block;}
-
-.subcluster {
     display: block;
     break-inside: avoid-column;
     -webkit-column-break-inside: avoid;
     -moz-column-break-inside: avoid;
     column-break-inside: avoid;}
+
+.subcluster {
+    display: block;}
 
 .country h1, .status_group h1 {
     font-size: 32px;
