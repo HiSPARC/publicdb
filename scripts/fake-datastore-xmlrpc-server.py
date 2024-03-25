@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 """ Simple XML-RPC Server to run on the datastore server.
 
     This daemon should be run on HiSPARC's datastore server.  It will
@@ -11,11 +11,12 @@
 """
 import hashlib
 
+from pathlib import Path
 from urllib.request import urlopen
 from xmlrpc.server import SimpleXMLRPCRequestHandler, SimpleXMLRPCServer
 
-HASH = '/tmp/hash_datastore'
-DATASTORE_CFG = '/tmp/station_list.csv'
+HASH = Path('/tmp/hash_datastore')
+DATASTORE_CFG = Path('/tmp/station_list.csv')
 CFG_URL = 'http://publicdb:8000/config/datastore'
 
 
@@ -26,8 +27,7 @@ def reload_datastore():
     new_hash = hashlib.sha1(datastore_cfg).hexdigest()
 
     try:
-        with open(HASH) as file:
-            old_hash = file.readline()
+        old_hash = HASH.read_text()
     except OSError:
         old_hash = None
 
@@ -35,13 +35,11 @@ def reload_datastore():
         print("New hash is old hash")
         return True
     else:
-        with open(DATASTORE_CFG, 'wb') as file:
-            file.write(datastore_cfg)
+        DATASTORE_CFG.write_bytes(datastore_cfg)
 
         print("New hash received")
 
-        with open(HASH, 'w') as file:
-            file.write(new_hash)
+        HASH.write_text(new_hash)
 
     return True
 
