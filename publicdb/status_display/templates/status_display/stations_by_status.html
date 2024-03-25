@@ -11,6 +11,9 @@
     <div class="status_group">
       <h1>{{ status_group | capfirst }}</h1>
       <ul>
+        {% if not stations %}
+          <li>None with this status
+        {% endif %}
         {% for station in stations %}
           <li>
               <a href="{% url 'status:station:status' station_number=station.number %}">
