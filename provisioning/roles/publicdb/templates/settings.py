@@ -45,12 +45,10 @@ ESD_PATH = '{{ esd_path }}'
 # Path of the mounted KNMI Lightning data root folder
 LGT_PATH = '{{ lgt_path }}'
 
-# VPN and datastore XML-RPC Proxies
-VPN_PROXY = '{{ vpn_proxy }}'
+# Datastore XML-RPC Proxy
 DATASTORE_PROXY = '{{ datastore_proxy }}'
 
-# VPN and datastore host names
-VPN_HOST = '{{ vpn_host }}'
+# Datastore host name
 DATASTORE_HOST = '{{ datastore_host }}'
 
 # Configure HiSPARC public database url for SAPPHiRE

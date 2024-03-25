@@ -1,5 +1,4 @@
 import datetime
-import ipaddress
 
 from xmlrpc.client import ServerProxy
 
@@ -7,8 +6,6 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models, transaction
 from django.db.models import Max
-from django.urls import reverse
-from django.utils.safestring import mark_safe
 from django.utils.text import slugify
 
 from ..histograms.models import Configuration, Summary
@@ -335,66 +332,7 @@ class Pc(models.Model):
     def save(self, *args, **kwargs):
         # slugify the short name to keep it clean
         self.name = slugify(self.name).replace('-', '').replace('_', '')
-
-        if self.id is None:
-            if self.type.slug == 'admin':
-                try:
-                    last_ip = Pc.objects.filter(type__slug='admin').latest('id').ip
-                except Pc.DoesNotExist:
-                    # Initial Admin IP
-                    last_ip = '172.16.66.1'
-            else:
-                try:
-                    last_ip = Pc.objects.exclude(type__slug='admin').latest('id').ip
-                except Pc.DoesNotExist:
-                    # Initial station IP
-                    last_ip = '194.171.82.1'
-            self.ip = self.get_next_ip_address(last_ip)
-
-            # First create keys, then issue final save
-            create_keys(self)
-
         super().save(*args, **kwargs)
-
-    def keys(self):
-        url = reverse('keys', kwargs={'host': self.name})
-        return mark_safe(f'<a href="{url}">Certificate {self.name}</a>')
-
-    keys.short_description = 'Certificates'
-
-    def url(self):
-        if self.type.slug == 'admin':
-            return ''
-        else:
-            return mark_safe(f'<a href="vnc://s{self.station.number}.his">s{self.station.number}.his</a>')
-
-    url.short_description = 'VNC URL'
-
-    def get_next_ip_address(self, ip):
-        """Generate new IP address
-
-        Increments given IP address by 1.
-
-        """
-        return str(ipaddress.ip_address(ip) + 1)
-
-
-def create_keys(pc):
-    """Create VPN keys for the given Pc"""
-
-    if settings.VPN_PROXY:
-        proxy = ServerProxy(settings.VPN_PROXY)
-        proxy.create_key(pc.name, pc.type.slug, pc.ip)
-
-
-def update_aliases():
-    """Update VPN aliases"""
-
-    if settings.VPN_PROXY:
-        proxy = ServerProxy(settings.VPN_PROXY)
-        aliases = [(f's{x.station.number}', x.ip) for x in Pc.objects.all()]
-        aliases.extend([(x.name, x.ip) for x in Pc.objects.all()])
-        proxy.register_hosts_ip(aliases)
 
 
 def reload_datastore():

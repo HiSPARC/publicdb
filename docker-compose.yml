@@ -30,16 +30,6 @@ services:
     depends_on:
       - postgres
 
-  vpn:
-     image: 'python:3.10'
-     restart: unless-stopped
-     volumes:
-       - './scripts:/base:ro'
-     ports:
-       - '8001:8001'
-     working_dir: '/base'
-     command: 'python fake-vpn-xmlrpc-server.py'
-
   datastore:
      image: 'python:3.10'
      restart: unless-stopped

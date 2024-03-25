@@ -1,7 +1,6 @@
-- name: Setup firewall and development tools are installed
+- name: Setup prepare Python environment
   hosts: publicdb:datastore
   roles:
-    # - simple-firewall
     - development
 
 - name: Setup bashrc on shared user account
@@ -19,20 +18,7 @@
   hosts: datastore
   roles:
     - datastore
+
 # Datastore Firewall (nftables)
 # HiSPARC datastore configuration server
 # ip saddr hisparc-data tcp dport { 8001 } accept
-
-# - name: Setup network config for tietar
-#   hosts: tietar.nikhef.nl
-#   roles:
-#     - network-tietar
-
-# - name: Setup VPN server
-#   hosts: vpn_group
-#   roles:
-#     - dos
-#     - postfix
-#     - shorewall-firewall
-#     - openvpn
-#     - vpn-scripts

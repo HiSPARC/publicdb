@@ -5,7 +5,5 @@ hisparc_path: /uufs/chpc.utah.edu/common/home/hisparc
 publicdb_host: hisparc-data.chpc.utah.edu
 datastore_host: hisparc-raw.chpc.utah.edu
 datastore_port: 8001
-vpn_host:
-vpn_port:
 
 datastore_data_path: "{{ hisparc_path }}/data/datastore"
