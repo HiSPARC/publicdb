@@ -14,13 +14,13 @@
 {% block list %}
   {% for country, clusters in countries.items %}
     <div class="country">
-        <h1><a href="{% url 'status:map:stations_on_map' country=country %}">{{ country }}</a></h1>
+        <h2><a href="{% url 'status:map:stations_on_map' country=country %}">{{ country }}</a></h2>
           {% for cluster, subclusters in clusters.items %}
             <div class="cluster">
-                <h2><a href="{% url 'status:map:stations_on_map' country=country cluster=cluster %}">{{ cluster }}</a></h2>
+                <h3><a href="{% url 'status:map:stations_on_map' country=country cluster=cluster %}">{{ cluster }}</a></h3>
                 {% for subcluster, stations in subclusters.items %}
                 <div class="subcluster">
-                    <h3><a href="{% url 'status:map:stations_on_map' country=country cluster=cluster subcluster=subcluster %}">{{ subcluster }}</a></h3>
+                    <h4><a href="{% url 'status:map:stations_on_map' country=country cluster=cluster subcluster=subcluster %}">{{ subcluster }}</a></h4>
                     <ul>
                       {% for station in stations %}
                         <li>
@@ -44,7 +44,7 @@
   {% endfor %}
   {% if test_stations %}
     <div class="country">
-        <h1>Test stations</h1>
+        <h2>Test stations</h2>
         <ul>
           {% for station in test_stations %}
             <li>

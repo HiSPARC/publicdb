@@ -9,7 +9,7 @@
 {% block list %}
   {% for status_group, stations in station_groups.items %}
     <div class="status_group">
-      <h1>{{ status_group | capfirst }}</h1>
+      <h2>{{ status_group | capfirst }}</h2>
       <ul>
         {% if not stations %}
           <li>None with this status
