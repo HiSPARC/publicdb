@@ -1,10 +1,10 @@
 publicdb_path: "{{ hisparc_path }}/publicdb/"
 
-publicdb_code: "{{ publicdb_path }}/www/"
-publicdb_static: "{{ publicdb_path }}/static/"
-publicdb_media: "{{ publicdb_path }}/media/"
-publicdb_logs: "{{ publicdb_path }}/logs/"
-publicdb_dumps: "{{ publicdb_path }}/sqldumps/"
+publicdb_code: "{{ publicdb_path }}www/"
+publicdb_static: "{{ publicdb_path }}static/"
+publicdb_media: "{{ publicdb_path }}media/"
+publicdb_logs: "{{ publicdb_path }}logs/"
+publicdb_dumps: "{{ publicdb_path }}sqldumps/"
 
 esd_path: "{{ hisparc_path }}/data/esd/"
 lgt_path: "{{ hisparc_path }}/data/knmi_lightning/"
@@ -12,6 +12,6 @@ lgt_path: "{{ hisparc_path }}/data/knmi_lightning/"
 publicdb_python_version: "3.10"
 
 jsparc_repo: https://github.com/HiSPARC/jsparc.git
-jsparc_path: "{{ publicdb_path }}/jsparc/"
+jsparc_path: "{{ publicdb_path }}jsparc/"
 
-supervisord_path: "{{ publicdb_path }}/supervisord"
+supervisord_path: "{{ publicdb_path }}supervisord"
