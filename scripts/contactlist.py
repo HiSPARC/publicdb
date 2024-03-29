@@ -13,8 +13,8 @@ django.setup()
 
 from publicdb.inforecords.models import *
 
-active_pcs = Pc.objects.exclude(type__slug='admin').filter(is_active=True)
-# all_pcs = Pc.objects.exclude(type__slug='admin').all()
+active_pcs = Pc.objects.filter(is_active=True)
+# all_pcs = Pc.objects.all()
 
 contacts = set()
 for pc in active_pcs:

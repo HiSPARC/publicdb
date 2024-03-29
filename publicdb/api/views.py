@@ -55,7 +55,7 @@ def network_status(request):
     """
     station_status = DataStatus()
     stations = []
-    for station in Station.objects.exclude(pcs__type__slug='admin'):
+    for station in Station.objects.all():
         status = station_status.get_status(station.number)
 
         stations.append({'number': station.number, 'status': status})

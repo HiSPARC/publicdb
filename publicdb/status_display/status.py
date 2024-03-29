@@ -35,7 +35,7 @@ class DataStatus:
             .values_list('station__number', flat=True)
         )
         self.stations_with_pc = (
-            Pc.objects.exclude(type__slug='admin').filter(is_active=True).values_list('station__number', flat=True)
+            Pc.objects.filter(is_active=True).values_list('station__number', flat=True)
         )
 
     def _get_datetime_yesterday(self):

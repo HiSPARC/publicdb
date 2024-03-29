@@ -54,7 +54,7 @@ def stations_by_country(request):
     countries = OrderedDict()
     test_stations = []
 
-    for station in Station.objects.exclude(pcs__type__slug='admin').select_related(
+    for station in Station.objects.all().select_related(
         'cluster__country',
         'cluster__parent',
     ):
@@ -96,7 +96,7 @@ def stations_by_number(request):
 
     data_stations = stations_with_data()
     stations = []
-    for station in Station.objects.exclude(pcs__type__slug='admin'):
+    for station in Station.objects.all():
         link = station in data_stations
         status = station_status.get_status(station.number)
 
@@ -137,7 +137,7 @@ def stations_by_name(request):
 
     data_stations = stations_with_data()
     stations = []
-    for station in Station.objects.exclude(pcs__type__slug='admin'):
+    for station in Station.objects.all():
         link = station in data_stations
         status = station_status.get_status(station.number)
 
