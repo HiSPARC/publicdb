@@ -13,7 +13,6 @@ PUBLICDB_PATH = path.join(dirname, '..')
 DEBUG = False
 
 ADMINS = (
-    ('Kasper van Dam', 'kaspervandam@gmail.com'),
     ('Arne de Laat', 'arne@delaat.net'),
     ('Tom Kooij', 'hisparc@tomkooij.nl'),
     ('David Fokkema', 'davidfokkema@icloud.com'),
