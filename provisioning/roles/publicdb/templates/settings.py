@@ -112,6 +112,8 @@ ROOT_URLCONF = 'publicdb.urls'
 
 ALLOWED_HOSTS = [
     '{{ publicdb_host }}',
+    'data.hisparc.nl',
+    '155.101.19.145',
 ]
 
 if DEBUG:
