@@ -105,12 +105,6 @@ class TestStation(TestCase):
         self.assertEqual(4, station.number_of_detectors())
 
 
-class TestPcType(TestCase):
-    def test_str(self):
-        pc_type = inforecords_factories.PcTypeFactory()
-        self.assertEqual(pc_type.description, str(pc_type))
-
-
 class TestPc(TestCase):
     def test_str(self):
         station = inforecords_factories.StationFactory(number=0, cluster__number=0, cluster__country__number=0)

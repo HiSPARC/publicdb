@@ -84,18 +84,8 @@ class StationFactory(factory.django.DjangoModelFactory):
         django_get_or_create = ('number',)
 
 
-class PcTypeFactory(factory.django.DjangoModelFactory):
-    description = factory.Faker('word')
-    slug = factory.Faker('random_element', elements=['admin', 'client'])  # TODO: Add 'display'?
-
-    class Meta:
-        model = models.PcType
-        django_get_or_create = ('slug',)
-
-
 class PcFactory(factory.django.DjangoModelFactory):
     station = factory.SubFactory(StationFactory)
-    type = factory.SubFactory(PcTypeFactory)
     name = factory.Faker('word')
     is_active = factory.Faker('boolean', chance_of_getting_true=90)
     is_test = factory.Faker('boolean', chance_of_getting_true=5)

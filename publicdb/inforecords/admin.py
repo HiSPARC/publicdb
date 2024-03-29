@@ -78,4 +78,3 @@ class PcAdmin(admin.ModelAdmin):
 
 
 admin.site.register(models.Profession)
-admin.site.register(models.PcType)

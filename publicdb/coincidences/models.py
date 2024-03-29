@@ -4,16 +4,6 @@ from django.db import models
 from ..inforecords.models import Station
 
 
-class SerializedDataField(models.Field):
-    system_check_removed_details = {
-        'hint': 'Use ArrayField instead.',
-    }
-
-    def db_type(self, connection):
-        # Required for old migrations
-        return 'BYTEA'
-
-
 class Coincidence(models.Model):
     date = models.DateField()
     time = models.TimeField()

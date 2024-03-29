@@ -300,21 +300,8 @@ class Station(models.Model):
         }
 
 
-class PcType(models.Model):
-    description = models.CharField(max_length=255, unique=True)
-    slug = models.CharField(max_length=255)
-
-    class Meta:
-        verbose_name = 'PC Type'
-        verbose_name_plural = 'PC Types'
-
-    def __str__(self):
-        return self.description
-
-
 class Pc(models.Model):
     station = models.ForeignKey(Station, models.CASCADE, related_name='pcs')
-    type = models.ForeignKey(PcType, models.CASCADE, related_name='pcs')
     name = models.CharField(max_length=255, unique=True)
     is_active = models.BooleanField(default=False)
     is_test = models.BooleanField(default=False)
@@ -322,8 +309,8 @@ class Pc(models.Model):
     notes = models.TextField(blank=True)
 
     class Meta:
-        verbose_name = 'PC and certificates'
-        verbose_name_plural = 'PCs and certificates'
+        verbose_name = 'PC'
+        verbose_name_plural = 'PCs'
         ordering = ['name']
 
     def __str__(self):
