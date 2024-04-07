@@ -25,6 +25,13 @@ class StationInline(admin.StackedInline):
     can_delete = False
 
 
+class PcInline(admin.StackedInline):
+    model = models.Pc
+    extra = 0  # this stops empty forms being shown
+    max_num = 0  # this removes the add more button
+    can_delete = False
+
+
 @admin.register(models.Contact)
 class ContactAdmin(admin.ModelAdmin):
     list_display = ('first_name', 'last_name', 'email_work_link')
@@ -52,6 +59,8 @@ class StationAdmin(admin.ModelAdmin):
     search_fields = ('number', 'name', 'cluster__name')
     list_filter = ('cluster__country',)
     list_per_page = 200
+
+    inlines = (PcInline,)
 
 
 @admin.register(models.ContactInformation)
