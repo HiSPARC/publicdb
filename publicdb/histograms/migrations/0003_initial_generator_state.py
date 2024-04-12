@@ -19,7 +19,7 @@ def load_fixture(apps, schema_editor):
 
 
 def unload_fixture(apps, schema_editor):
-    """Delete all entries from the geenrator state"""
+    """Delete all entries from the generator state"""
 
     generator_state_model = apps.get_model('histograms', 'GeneratorState')
     generator_state_model.objects.all().delete()
