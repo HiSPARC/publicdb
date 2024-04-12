@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.db.models import Max
 from django.utils.text import slugify
 
-from ..histograms.models import Configuration, Summary
+from ..histograms.models import Configuration
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 
