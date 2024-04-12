@@ -8,7 +8,7 @@ from django.db import models, transaction
 from django.db.models import Max
 from django.utils.text import slugify
 
-from ..histograms.models import Configuration, Summary
+from ..histograms.models import Configuration
 
 FIRSTDATE = datetime.date(2004, 1, 1)
 
@@ -276,22 +276,17 @@ class Station(models.Model):
         if date is None:
             date = datetime.date.today()
 
-        # Initialize new config with all None values.
-        config = Configuration()
-
         try:
-            summaries = Summary.objects.with_config().filter(station=self, date__lte=date).reverse()
-            for summary in summaries:
-                try:
-                    config = (
-                        Configuration.objects.filter(summary=summary).exclude(gps_latitude=0, gps_longitude=0).latest()
-                    )
-                except Configuration.DoesNotExist:
-                    pass
-                else:
-                    break
-        except Summary.DoesNotExist:
-            pass
+            config = (
+                Configuration.objects.exclude(
+                    gps_latitude=0,
+                    gps_longitude=0,
+                    timestamp__gt=date,
+                ).filter(summary__station=self).latest()
+            )
+        except Configuration.DoesNotExist:
+            # Initialize new config with all None values.
+            config = Configuration()
 
         return {
             'latitude': (round(config.gps_latitude, 7) if config.gps_latitude is not None else None),
