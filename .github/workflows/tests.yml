@@ -75,7 +75,7 @@ jobs:
       - run: make devinstall
       - run: pip install Sphinx
       - run: make doctest
-      - uses: peaceiris/actions-gh-pages@v3.9.3
+      - uses: peaceiris/actions-gh-pages@v4.0.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: doc/_build/html
