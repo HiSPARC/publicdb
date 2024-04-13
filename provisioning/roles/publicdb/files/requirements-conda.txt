@@ -1,8 +1,8 @@
 pip
-ipython
-numpy
-pytables
-scipy
-psycopg2
-supervisor
-uwsgi
+ipython~=8.10.0
+numpy~=1.26.4
+pytables~=3.7.0
+scipy~=1.10.1
+psycopg2~=2.9.3
+supervisor~=4.2.5
+uwsgi~=2.0.20
