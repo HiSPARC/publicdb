@@ -15,7 +15,7 @@ from publicdb.histograms import jobs, models
 from ..factories import histograms_factories, inforecords_factories
 
 
-@override_settings(DATASTORE_PATH=join(dirname(__file__), '../data/datastore'))
+@override_settings(DATASTORE_PATH=join(dirname(__file__), '../data/datastore'), DATASTORE_PROXY=None)
 class TestJobs(LiveServerTestCase):
     fixtures = ['initial_generator_state.json', 'initial_types.json']
 
