@@ -150,4 +150,15 @@
         "name": "SinglesrateHigh",
         "slug": "singlesratehigh"
     }
+},
+{
+    "pk": 5,
+    "model": "histograms.datasettype",
+    "fields": {
+        "description": "Amount of rain per hour",
+        "x_axis_title": "Hour of day (GPS)",
+        "y_axis_title": "Rain rate (mm/h)",
+        "name": "Rainrate",
+        "slug": "rain_rate"
+    }
 }]
