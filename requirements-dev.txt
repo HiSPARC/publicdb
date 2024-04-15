@@ -1,6 +1,6 @@
 # lint & format
 ruff==0.3.5
-typos==1.20.4
+typos==1.20.8
 
 # unittests
 coverage
