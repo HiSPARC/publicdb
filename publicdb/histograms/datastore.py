@@ -32,7 +32,7 @@ def get_updated_files(rootdir, last_check_time):
     file_list = []
     paths = os.listdir(rootdir)
     for path in paths:
-        if re.match('[0-9]+', path):
+        if re.fullmatch('[0-9]+', path):
             path = os.path.join(rootdir, path)
             for dirpath, _, filenames in os.walk(path):
                 for file in filenames:
