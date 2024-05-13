@@ -3,4 +3,4 @@ python-dateutil==2.9.0.post0
 
 sentry-sdk~=2.1.1
 
-hisparc-sapphire==2.0.0
+hisparc-sapphire==3.0.0
