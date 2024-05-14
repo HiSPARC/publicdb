@@ -9,6 +9,9 @@ updates:
     directory: '/provisioning/roles/publicdb/files'
     schedule:
       interval: 'weekly'
+    ignore:
+      - dependency-name: 'Django'
+        update-types: ['version-update:semver-major']
 
   - package-ecosystem: 'pip'
     directory: '/'
