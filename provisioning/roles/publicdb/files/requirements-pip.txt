@@ -1,6 +1,6 @@
 Django~=4.2.11
 python-dateutil==2.9.0.post0
 
-sentry-sdk~=2.1.1
+sentry-sdk~=2.2.0
 
 hisparc-sapphire==3.0.0
