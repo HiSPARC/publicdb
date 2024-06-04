@@ -19,7 +19,7 @@ ADMINS = (
 )
 MANAGERS = ADMINS
 
-SERVER_EMAIL = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
+SERVER_EMAIL = 'HiSPARC Project <hisparc@utah.edu>'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 

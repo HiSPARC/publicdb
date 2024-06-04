@@ -221,7 +221,7 @@ class SessionRequest(models.Model):
             Greetings,
             The HiSPARC Team""",
         )
-        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
+        sender = 'HiSPARC Project <hisparc@utah.edu>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
         self.mail_send = True
         self.save()
@@ -246,7 +246,7 @@ class SessionRequest(models.Model):
             Greetings,
             The HiSPARC Team""",
         )
-        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
+        sender = 'HiSPARC Project <hisparc@utah.edu>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_created_less(self):
@@ -271,7 +271,7 @@ class SessionRequest(models.Model):
             Greetings,
             The HiSPARC Team""",
         )
-        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
+        sender = 'HiSPARC Project <hisparc@utah.edu>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
 
     def sendmail_zero(self):
@@ -287,5 +287,5 @@ class SessionRequest(models.Model):
             Greetings,
             The HiSPARC Team""",
         )
-        sender = 'Beheer HiSPARC <bhrhispa@nikhef.nl>'
+        sender = 'HiSPARC Project <hisparc@utah.edu>'
         send_mail(subject, message, sender, [self.email], fail_silently=False)
