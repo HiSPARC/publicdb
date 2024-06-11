@@ -41,7 +41,7 @@ def retrieve_traces(node, timestamp, nanoseconds, raw=False):
                   for trace_idx in traces_idx if trace_idx != -1]
 
     traces = [
-        [int(value) if baseline == -999 or raw else int(value) - baseline for value in trace_str if value != '']
+        [int(value) if baseline == -999 or raw else int(value) - int(baseline) for value in trace_str if value != '']
         for baseline, trace_str in zip(baselines, traces_str)
     ]
 
