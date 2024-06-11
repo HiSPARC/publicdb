@@ -115,7 +115,7 @@ def get_reference_datetime(datafile):
     :return: datetime object of the reference datetime
 
     """
-    date_string = datafile.root.discharge1._f_getattr('reference_datetime')[0]
+    date_string = datafile.root.discharge1._f_getattr('reference_datetime')[0].decode()
     ref_date = datetime.strptime(date_string, '%d-%b-%Y;%H:%M:%S.%f')
 
     return ref_date
