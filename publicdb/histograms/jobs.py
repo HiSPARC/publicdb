@@ -6,9 +6,11 @@ import calendar
 import datetime
 import logging
 import multiprocessing
+import os
 import warnings
 
 import numpy as np
+import sentry_sdk
 
 import django.db
 
@@ -131,14 +133,16 @@ def update_esd():
         results = worker_pool.imap_unordered(process_and_store_temporary_esd_for_summary, summaries)
 
         for summary, tmp_locations in results:
-            copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
+            if summary:
+                copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
 
         worker_pool.close()
         worker_pool.join()
     else:
         for summary in summaries:
             summary, tmp_locations = process_and_store_temporary_esd_for_summary(summary)
-            copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
+            if summary:
+                copy_temporary_and_set_flag(summary, 'needs_update', tmp_locations)
 
 
 def update_coincidences():
@@ -154,18 +158,20 @@ def update_coincidences():
         results = worker_pool.imap_unordered(search_and_store_coincidences, network_summaries)
 
         for network_summary in results:
-            network_summary.needs_update = False
-            django.db.close_old_connections()
-            network_summary.save()
+            if network_summary:
+                network_summary.needs_update = False
+                django.db.close_old_connections()
+                network_summary.save()
 
         worker_pool.close()
         worker_pool.join()
     else:
         for network_summary in network_summaries:
             network_summary = search_and_store_coincidences(network_summary)
-            network_summary.needs_update = False
-            django.db.close_old_connections()
-            network_summary.save()
+            if network_summary:
+                network_summary.needs_update = False
+                django.db.close_old_connections()
+                network_summary.save()
 
 
 def process_and_store_temporary_esd_for_summary(summary):
@@ -178,15 +184,22 @@ def process_and_store_temporary_esd_for_summary(summary):
     """
     django.db.close_old_connections()
     tmp_locations = []
-    if summary.needs_update_events:
-        logger.info('Processing events and storing ESD for %s', summary)
-        tmp_locations.append(esd.process_events_and_store_temporary_esd(summary))
-    if summary.needs_update_weather:
-        logger.info('Processing weather and storing ESD for %s', summary)
-        tmp_locations.append(esd.process_weather_and_store_temporary_esd(summary))
-    if summary.needs_update_singles:
-        logger.info('Processing singles and storing ESD for %s', summary)
-        tmp_locations.append(esd.process_singles_and_store_temporary_esd(summary))
+    try:
+        if summary.needs_update_events:
+            logger.info('Processing events and storing ESD for %s', summary)
+            tmp_locations.append(esd.process_events_and_store_temporary_esd(summary))
+        if summary.needs_update_weather:
+            logger.info('Processing weather and storing ESD for %s', summary)
+            tmp_locations.append(esd.process_weather_and_store_temporary_esd(summary))
+        if summary.needs_update_singles:
+            logger.info('Processing singles and storing ESD for %s', summary)
+            tmp_locations.append(esd.process_singles_and_store_temporary_esd(summary))
+    except Exception:
+        sentry_sdk.capture_exception()
+        summary = None
+        for tmp_location in tmp_locations:
+            os.remove(tmp_location)
+
     return summary, tmp_locations
 
 
@@ -197,13 +210,18 @@ def search_and_store_coincidences(network_summary):
 
     """
     django.db.close_old_connections()
-    if network_summary.needs_update_coincidences:
-        logger.info('Processing coincidences and storing ESD for %s', network_summary)
-        num_coincidences = esd.search_coincidences_and_store_in_esd(network_summary)
-        network_summary.num_coincidences = num_coincidences
+    try:
+        if network_summary.needs_update_coincidences:
+            logger.info('Processing coincidences and storing ESD for %s', network_summary)
+            num_coincidences = esd.search_coincidences_and_store_in_esd(network_summary)
+            network_summary.num_coincidences = num_coincidences
 
-        logger.info('Processing time deltas and storing ESD for %s', network_summary)
-        esd.determine_time_delta_and_store_in_esd(network_summary)
+            logger.info('Processing time deltas and storing ESD for %s', network_summary)
+            esd.determine_time_delta_and_store_in_esd(network_summary)
+    except Exception:
+        sentry_sdk.capture_exception()
+        network_summary = None
+
     return network_summary
 
 
