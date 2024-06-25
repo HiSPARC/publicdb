@@ -59,6 +59,7 @@ ignore = [
 'publicdb/settings_docker.py' = ['F405']  # Star imports
 # FIXME: The following should be fixable
 'publicdb/inforecords/models.py' = ['S110', 'BLE001']  # Capture specific exceptions and handle it
+'publicdb/histograms/jobs.py' = ['BLE001']  # Capture specific exceptions and handle it
 
 [tool.ruff.lint.isort]
 lines-between-types = 1
