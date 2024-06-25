@@ -1,5 +1,5 @@
 # lint & format
-ruff==0.4.9
+ruff==0.4.10
 typos==1.22.7
 
 # unittests
