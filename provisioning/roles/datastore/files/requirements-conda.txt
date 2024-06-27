@@ -2,4 +2,4 @@ pip
 ipython==8.25.0
 pytables==3.7.0
 supervisor==4.2.5
-uwsgi==2.0.20
+uwsgi==2.0.22
