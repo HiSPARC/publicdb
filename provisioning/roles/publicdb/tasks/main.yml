@@ -191,8 +191,8 @@
 - name: Enable cron job for updating histograms and ESD
   ansible.builtin.cron:
     name: "HiSPARC update"
-    minute: 0
-    hour: 4
+    minute: 30
+    hour: 0
     state: present
     job: "{{ publicdb_venv }}/bin/python {{ publicdb_code }}/manage.py updatehistograms"
 
@@ -221,7 +221,7 @@
   ansible.builtin.cron:
     name: "Publicdb dump"
     minute: 0
-    hour: 1
+    hour: 12
     state: present
     job: "if [ -f '{{ publicdb_dumps }}/publicdb_dump.sql' ]; then mv {{ publicdb_dumps }}/publicdb_dump.sql {{ publicdb_dumps }}/publicdb_dump_yesterday.sql; fi; pg_dump --format=c --compress=1 --schema=public --dbname=publicdb --file={{ publicdb_dumps }}/publicdb_dump.sql"
 
