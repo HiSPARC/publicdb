@@ -121,6 +121,22 @@
     cmd: "{{ datastore_venv }}/bin/supervisord -c {{ supervisord_path }}/supervisord.conf"
   when: supervisord is changed
 
+- name: Add cron job to stop writer before histogram update
+  ansible.builtin.cron:
+    name: "Stop writer before update"
+    minute: 0
+    hour: 0
+    state: present
+    job: "{{ datastore_venv }}/bin/supervisorctl -c {{ supervisord_path }}/supervisord.conf stop datastore-writer"
+
+- name: Add cron job to start writer after histogram update
+  ansible.builtin.cron:
+    name: "Start writer after update"
+    minute: 0
+    hour: 3
+    state: present
+    job: "{{ datastore_venv }}/bin/supervisorctl -c {{ supervisord_path }}/supervisord.conf start datastore-writer"
+
 - name: Copy Apache httpd config file
   ansible.builtin.template:
     src: hisparc-httpd.conf
