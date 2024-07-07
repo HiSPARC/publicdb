@@ -4,7 +4,7 @@ from ..histograms.models import GeneratorState, Summary
 from ..inforecords.models import Pc, Station
 
 RECENT_NUM_DAYS = 7
-UPDATE_STARTS_AT_HOUR = 3  # am UTC
+UPDATE_STARTS_AT_HOUR = 7  # am UTC
 
 
 class DataStatus:
