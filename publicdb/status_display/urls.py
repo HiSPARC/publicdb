@@ -60,7 +60,7 @@ source_patterns = [
     *[
         # Datasets
         path(
-            f'{type}/<int:station_number>/<date:date>',
+            f'{type}/<int:station_number>/<date:date>/',
             views.get_specific_dataset_source,
             {'type': type},
             name=type,
