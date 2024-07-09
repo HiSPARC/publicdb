@@ -724,7 +724,7 @@ def get_specific_histogram_source(request, station_number, date, type):
         },
         content_type=MIME_TSV,
     )
-    response['Content-Disposition'] = 'attachment; filename={type}-s{station_number}-{date:%Y%-m%-d}.tsv'
+    response['Content-Disposition'] = f'attachment; filename={type}-s{station_number}-{date:%Y%-m%-d}.tsv'
     return response
 
 
