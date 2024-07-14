@@ -4,7 +4,13 @@
 
 {% block head_styles %}
     {{ block.super }}
-    <style type="text/css" media="all">#stationList {-webkit-column-count: 1; -moz-column-count: 1; column-count: 1;}</style>
+    <style>
+        #stationList {
+            -webkit-column-count: 1;
+            -moz-column-count: 1;
+            column-count: 1;
+        }
+    </style>
 {% endblock %}
 
 {% block header %}

@@ -1,54 +1,65 @@
 #header {
-    margin-bottom: 10px;}
+    margin-bottom: 10px;
+}
 
 #stationList {
     float: left;
     margin-bottom: 30px;
     width: 619px;
     font-size: 10pt;
-    column-count: 2;}
+    column-count: 2;
+}
 
 #stationMap {
     float: left;
     width: 585px;
-    height: 550px;}
+    height: 550px;
+}
 
 .country {
-    column-count: 2;}
+    column-count: 2;
+}
 
 .cluster {
     display: block;
-    break-inside: avoid-column;}
+    break-inside: avoid-column;
+}
 
 .subcluster {
-    display: block;}
+    display: block;
+}
 
 .country h2,
 .status_group h2 {
-    column-span: all;}
+    column-span: all;
+}
 
 #stationList ul {
     margin: 0 0 15px 0;
     padding-left: 15px;
     list-style: none;
-    font-size: 10pt;}
+    font-size: 10pt;
+}
 
 #stationList li {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    line-height: 140%;}
+    line-height: 140%;
+}
 
 #stationList ul a,
 #stationLink a,
 #clusterLink a {
     color: #23B;
-    text-decoration: none;}
+    text-decoration: none;
+}
 
 #stationList ul a:hover,
 #stationLink a:hover {
     color: #005;
-    text-decoration: underline;}
+    text-decoration: underline;
+}
 
 #stationLink,
 #clusterLink {
@@ -56,38 +67,45 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 10pt;}
+    font-size: 10pt;
+}
 
 h2 {
-    font-size: 28px;}
+    font-size: 28px;
+}
 
 h3 {
     margin-top: 0;
-    font-size: 24px;}
+    font-size: 24px;
+}
 
 h4 {
-    font-size: 18px;}
+    font-size: 18px;
+}
 
 h4 a,
 h3 a,
 h2 a,
 h1 a {
     color: #000;
-    text-decoration: none;}
+    text-decoration: none;
+}
 
 h4 a:hover,
 h3 a:hover,
 h2 a:hover,
 h1 a:hover {
     color: #027;
-    text-decoration: underline;}
+    text-decoration: underline;
+}
 
 .statusBall {
     display: inline-block;
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background-color: grey;}
+    background-color: grey;
+}
 
 .down {background-color: rgba(255, 0, 0, 0.3);}
 .down:hover {background-color: rgba(255, 0, 0, 0.8);}
@@ -106,12 +124,14 @@ h1 a:hover {
 
 #sidebar {
     float: right;
-    font-size: 9pt;}
+    font-size: 9pt;
+}
 
 #legend,
 #extra,
 #help {
-    margin-top: 20px;}
+    margin-top: 20px;
+}
 
 #legend,
 #extra,
@@ -119,60 +139,73 @@ h1 a:hover {
 #navigation {
     padding-left: 20px;
     width: 260px;
-    border-left: 1px solid black;}
+    border-left: 1px solid black;
+}
 
 #navigation .nolink {
     color: black;
-    font-weight: normal;}
+    font-weight: normal;
+}
 
 #navigation .nolink:hover {
     color: black;
-    text-decoration: none;}
+    text-decoration: none;
+}
 
 #navigation a,
 #navigation .nolink {
-    padding: 3px;}
+    padding: 3px;
+}
 
 #navigation a:hover {
     color: #005;
-    text-decoration: underline;}
+    text-decoration: underline;
+}
 
 #help a,
 #navigation a {
     border-radius: 3px;
     color: #25B;
     text-decoration: none;
-    font-weight: bold;}
+    font-weight: bold;
+}
 
 #navigation a.currentDate:hover,
 #navigation a.currentPage:hover,
 #navigation a.currentDate,
 #navigation a.currentPage {
     background: #075EBB;
-    color: white;}
+    color: white;
+}
 
 #navigation > div,
 #config > div {
     padding-top: 10px;
-    padding-bottom: 10px;}
+    padding-bottom: 10px;
+}
 
 .sectionTitle {
     margin-top: 5px;
     padding-top: 5px;
     padding-bottom: 5px;
     font-weight: bold;
-    font-size: 130%;}
+    font-size: 130%;
+}
 
 .keyvalue {
     margin-top: 5px;
-    margin-bottom: 5px;}
+    margin-bottom: 5px;
+}
 
 .key {
     margin-right: 10px;
-    font-weight: bold;}
+    font-weight: bold;
+}
 
 .thin {
-    font-weight: normal;}
+    font-weight: normal;
+}
 
 .value {
-    margin-right: 2px;}
+    margin-right: 2px;
+}

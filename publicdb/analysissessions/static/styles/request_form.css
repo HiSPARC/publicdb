@@ -1,15 +1,20 @@
 #container {
-    width: 650px;}
+    width: 650px;
+}
 
 #pageHeader {
-    left: 430px;}
+    left: 430px;
+}
 
 ul {
-    list-style: none;}
+    list-style: none;
+}
 
 .helptext {
-    font-size: 0.8em;}
+    font-size: 0.8em;
+}
 
 .errorlist {
-    color: red;}
+    color: red;
+}
 

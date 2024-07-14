@@ -9,45 +9,55 @@
 
 {% block head_styles %}
     {{ block.super }}
-    <style type="text/css" media="all">
+    <style>
         body {
             overflow: hidden;
-            margin: 0px;}
+            margin: 0px;
+        }
         h3 {
-            text-align: center;}
+            text-align: center;
+        }
         #pageHeader {
             top: 0px;
-            left: 1030px;}
+            left: 1030px;
+        }
       {% if old_data %}
         #date {
-            color: darkred;}
+            color: darkred;
+        }
         #date:after {
-            content: " (no recent data available)";}
+            content: " (no recent data available)";
+        }
       {% endif %}
         #header {
-            text-align: center;}
+            text-align: center;
+        }
         #container {
             padding: 5px;
-            width: 1270px;}
+            width: 1270px;
+        }
         #graphs {
             width: 100%;
-            float: none;}
+            float: none;
+        }
         #sidebar {
-            display: none;}
+            display: none;
+        }
         .histogram {
-            display: inline-block;}
+            display: inline-block;
+        }
 
         .statusBall {
             display: inline-block;
             border-radius: 5px;
             padding: 5px;
             background-color: grey;
-            opacity: 0.9;}
+            opacity: 0.9;
+        }
         .down {background-color: red;}
         .problem {background-color: gold;}
         .up {background-color: green;}
         .unknown {background-color: grey;}
-
     </style>
 {% endblock %}
 
@@ -58,9 +68,11 @@
 
         function refresh() {
             if (new Date().getTime() - time >= 600000) {
-                window.location.reload(true);}
+                window.location.reload(true);
+            }
             else {
-                setTimeout(refresh, 10000);}
+                setTimeout(refresh, 10000);
+            }
         }
 
         setTimeout(refresh, 10000);
