@@ -182,9 +182,9 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
     statuscount = station_status.get_status_counts()
 
     subclusters = []
-    for subcluster in Cluster.objects.all():
+    for subcluster_object in Cluster.objects.all():
         stations = []
-        for station in subcluster.stations.filter(pcs__is_test=False).distinct():
+        for station in subcluster_object.stations.filter(pcs__is_test=False).distinct():
             link = station in data_stations
             status = station_status.get_status(station.number)
 
@@ -192,13 +192,13 @@ def stations_on_map(request, country=None, cluster=None, subcluster=None):
             station_data = {
                 'number': station.number,
                 'name': station.name,
-                'cluster': subcluster,
+                'cluster': subcluster_object,
                 'link': link,
                 'status': status,
             }
             station_data.update(location)
             stations.append(station_data)
-        subclusters.append({'name': subcluster.name, 'stations': stations})
+        subclusters.append({'name': subcluster_object.name, 'stations': stations})
 
     return render(
         request,
