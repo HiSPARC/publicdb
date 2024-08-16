@@ -4,6 +4,6 @@ ipython==8.25.0
 numpy==1.26.4
 psycopg2-binary==2.9.9
 python-dateutil==2.9.0.post0
-scipy==1.10.1
+scipy==1.14.0
 sentry-sdk~=2.5.1
 supervisor==4.2.5
