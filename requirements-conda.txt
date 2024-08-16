@@ -1,0 +1,2 @@
+pytables==3.7.0
+uwsgi==2.0.20

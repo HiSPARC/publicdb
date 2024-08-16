@@ -59,16 +59,6 @@
     path: "{{ publicdb_media }}/raw_data"
     state: directory
 
-- name: Copy conda requirements files
-  ansible.builtin.copy:
-    src: requirements-conda.txt
-    dest: "{{ publicdb_path }}requirements-conda.txt"
-
-- name: Copy pip requirements files
-  ansible.builtin.copy:
-    src: requirements-pip.txt
-    dest: "{{ publicdb_path }}requirements-pip.txt"
-
 - name: Create conda environment
   ansible.builtin.shell:
     cmd: "{{ miniconda_path }}/bin/conda create -n publicdb_venv python={{ publicdb_python_version }} --yes"
@@ -76,13 +66,13 @@
 
 - name: Install conda packages in conda environment
   ansible.builtin.command:
-    cmd: "{{ miniconda_path }}/bin/conda install -n publicdb_venv --channel conda-forge --file {{ publicdb_path }}requirements-conda.txt --yes"
+    cmd: "{{ miniconda_path }}/bin/conda install -n publicdb_venv --channel conda-forge --file {{ publicdb_code }}requirements-conda.txt --yes"
   register: conda_result
   changed_when: "'Executing transaction' in conda_result.stdout"
 
 - name: Install packages in conda environment using pip
   ansible.builtin.pip:
-    requirements: "{{ publicdb_path }}requirements-pip.txt"
+    requirements: "{{ publicdb_code }}requirements.txt"
     executable: "{{ publicdb_venv }}/bin/pip"
 
 - name: Setup the publicdb database in PostgreSQL
