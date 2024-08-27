@@ -6,14 +6,6 @@ updates:
       interval: "weekly"
 
   - package-ecosystem: 'pip'
-    directory: '/provisioning/roles/publicdb/files'
-    schedule:
-      interval: 'weekly'
-    ignore:
-      - dependency-name: 'Django'
-        update-types: ['version-update:semver-major']
-
-  - package-ecosystem: 'pip'
     directory: '/'
     schedule:
       interval: 'weekly'

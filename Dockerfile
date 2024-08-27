@@ -24,11 +24,11 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK 1
 RUN conda update --yes conda
 
 # Install requirements
-COPY provisioning/roles/publicdb/files/requirements-conda.txt ./
+COPY requirements-conda.txt ./
 RUN conda install --yes --file requirements-conda.txt
 
-COPY provisioning/roles/publicdb/files/requirements-pip.txt ./
-RUN pip install -r requirements-pip.txt
+COPY requirements.txt ./
+RUN pip install -r requirements.txt
 
 COPY requirements-dev.txt ./
 RUN pip install -r requirements-dev.txt
