@@ -1,5 +1,5 @@
 # lint & format
-ruff==0.6.2
+ruff==0.6.3
 
 # spelling
 typos==1.24.1
