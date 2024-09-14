@@ -42,7 +42,7 @@ def fix_timestamps_in_data(values):
 
     x, y = list(zip(*values))
     seconds_in_day = [timestamp % 86400 for timestamp in x]
-    hours_in_day = [seconds // 3600.0 for seconds in seconds_in_day]
+    hours_in_day = [seconds / 3600.0 for seconds in seconds_in_day]
     values = [list(u) for u in zip(hours_in_day, y)]
 
     return values
