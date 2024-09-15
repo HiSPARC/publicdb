@@ -9,7 +9,7 @@ test: coveragetests linttest doctest ansibletest
 
 .PHONY: unittests
 unittests:
-	coverage run ./manage.py test --shuffle $(tests)
+	coverage run ./manage.py test $(tests) --shuffle
 
 .PHONY: coveragetests
 coveragetests: unittests
