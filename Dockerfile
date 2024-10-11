@@ -25,7 +25,7 @@ RUN conda update --yes conda
 
 # Install requirements
 COPY requirements-conda.txt ./
-RUN conda install --yes --file requirements-conda.txt
+RUN conda install --yes --channel conda-forge --file requirements-conda.txt
 
 COPY requirements.txt ./
 RUN pip install -r requirements.txt
