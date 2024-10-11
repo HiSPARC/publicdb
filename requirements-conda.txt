@@ -1,2 +1,2 @@
-conda-forge::hdf5==1.14.3
-conda-forge::uwsgi==2.0.20
+hdf5==1.14.3
+uwsgi==2.0.20
