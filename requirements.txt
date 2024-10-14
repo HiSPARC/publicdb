@@ -1,4 +1,4 @@
-Django~=4.2.11
+Django~=5.1.2
 hisparc-sapphire==3.1.0
 ipython==8.26.0
 numpy==1.26.4
