@@ -102,8 +102,8 @@ class Summary(models.Model):
 class Configuration(models.Model):
     summary = models.ForeignKey(Summary, models.CASCADE, related_name='configurations')
     timestamp = models.DateTimeField()
-    gps_latitude = models.FloatField()
-    gps_longitude = models.FloatField()
+    gps_latitude = models.FloatField(min_value=-90, max_value=90)
+    gps_longitude = models.FloatField(min_value=-360, max_value=360)
     gps_altitude = models.FloatField()
     mas_version = models.CharField(max_length=40)
     slv_version = models.CharField(max_length=40)
