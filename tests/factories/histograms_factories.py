@@ -168,6 +168,7 @@ class NetworkHistogramFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.NetworkHistogram
+        django_get_or_create = ('network_summary', 'type')
 
 
 class CoincidencetimeHistogramFactory(NetworkHistogramFactory):
@@ -190,6 +191,7 @@ class DailyHistogramFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.DailyHistogram
+        django_get_or_create = ('summary', 'type')
 
 
 class EventtimeHistogramFactory(DailyHistogramFactory):
@@ -249,6 +251,7 @@ class DailyDatasetFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.DailyDataset
+        django_get_or_create = ('summary', 'type')
 
 
 class TemperatureDatasetFactory(DailyDatasetFactory):
@@ -301,3 +304,4 @@ class StationTimingOffsetFactory(factory.django.DjangoModelFactory):
 
     class Meta:
         model = models.StationTimingOffset
+        django_get_or_create = ('ref_summary', 'summary')
