@@ -26,4 +26,4 @@ SECURE_SSL_REDIRECT = False
 DATASTORE_PROXY = 'http://datastore:8002'
 
 # Datastore host name
-DATASTORE_HOST = 'publicdb_datastore_1.publicdb_default'
+DATASTORE_HOST = 'datastore'

@@ -581,16 +581,27 @@ def update_config(summary):
 
     for config in configs[summary.num_config :]:
         new_config = Configuration(summary=summary)
-        for var in vars(new_config):
-            if var in ['summary', 'id', 'summary_id'] or var[0] == '_':
-                pass
-            elif var in ['mas_version', 'slv_version']:
-                vars(new_config)[var] = blobs[config[var]]
-            elif var == 'timestamp':
-                ts = datetime.datetime.utcfromtimestamp(config[var])
-                vars(new_config)[var] = ts
+        for field in new_config._meta.get_fields():
+            field_name = field.name
+            if field_name in ['summary', 'id']:
+                continue
+            elif field_name in ['mas_version', 'slv_version']:
+                value = blobs[config[field_name]]
+            elif field_name == 'timestamp':
+                value = datetime.datetime.utcfromtimestamp(config[field_name])
+            elif field_name == 'gps_latitude':
+                if -90 <= config[field_name] <= 90:
+                    value = config[field_name]
+                else:
+                    value = 0
+            elif field_name == 'gps_longitude':
+                if -360 <= config[field_name] <= 360:
+                    value = config[field_name]
+                else:
+                    value = 0
             else:
-                vars(new_config)[var] = config[var]
+                value = config[field_name]
+            setattr(new_config, field_name, value)
         django.db.close_old_connections()
         new_config.save()
 
