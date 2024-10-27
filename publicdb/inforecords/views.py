@@ -1,5 +1,3 @@
-import socket
-
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
@@ -11,7 +9,7 @@ def create_datastore_config(request):
     """Create the datastore configuration"""
 
     # Limit access to only allow access from the Datastore server
-    if socket.gethostbyaddr(request.META['REMOTE_ADDR'])[0] != settings.DATASTORE_HOST:
+    if request.META['REMOTE_HOST'] != settings.DATASTORE_HOST:
         raise PermissionDenied
 
     return render(
