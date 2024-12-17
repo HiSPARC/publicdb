@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Reference &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Views Reference" href="api_views.html" />
+    <link rel="prev" title="HiSPARC station layout" href="station_layout.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_views.html" title="API Views Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="station_layout.html" title="HiSPARC station layout"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-publicdb.api">
+<span id="api-reference"></span><h1>API Reference<a class="headerlink" href="#module-publicdb.api" title="Link to this heading">¶</a></h1>
+<p>Application Programming Interface for HiSPARC Public Database</p>
+<p>The API simplifies data access for data contained in the
+<a class="reference external" href="https://data.hisparc.nl">HiSPARC Public Database</a>.  It was born out of the
+need for easy access to up-to-date information about stations.</p>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api_views.html">API Views Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.clusters"><code class="docutils literal notranslate"><span class="pre">clusters()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.config"><code class="docutils literal notranslate"><span class="pre">config()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.countries"><code class="docutils literal notranslate"><span class="pre">countries()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.get_cluster_dict"><code class="docutils literal notranslate"><span class="pre">get_cluster_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.get_country_dict"><code class="docutils literal notranslate"><span class="pre">get_country_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.get_event_traces"><code class="docutils literal notranslate"><span class="pre">get_event_traces()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.get_station_dict"><code class="docutils literal notranslate"><span class="pre">get_station_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.get_subcluster_dict"><code class="docutils literal notranslate"><span class="pre">get_subcluster_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.has_data"><code class="docutils literal notranslate"><span class="pre">has_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.json_dict"><code class="docutils literal notranslate"><span class="pre">json_dict()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.man"><code class="docutils literal notranslate"><span class="pre">man()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.network_status"><code class="docutils literal notranslate"><span class="pre">network_status()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.num_events"><code class="docutils literal notranslate"><span class="pre">num_events()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.station"><code class="docutils literal notranslate"><span class="pre">station()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.stations"><code class="docutils literal notranslate"><span class="pre">stations()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.stations_with_data"><code class="docutils literal notranslate"><span class="pre">stations_with_data()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.subclusters"><code class="docutils literal notranslate"><span class="pre">subclusters()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="api_views.html#publicdb.api.views.validate_date"><code class="docutils literal notranslate"><span class="pre">validate_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="station_layout.html"
+                          title="previous chapter">HiSPARC station layout</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="api_views.html"
+                          title="next chapter">API Views Reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_views.html" title="API Views Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="station_layout.html" title="HiSPARC station layout"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

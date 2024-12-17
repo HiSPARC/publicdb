@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>HiSPARC station layout &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="HiSPARC maps" href="hisparc_maps.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="hisparc_maps.html" title="HiSPARC maps"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HiSPARC station layout</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="hisparc-station-layout">
+<h1>HiSPARC station layout<a class="headerlink" href="#hisparc-station-layout" title="Link to this heading">¶</a></h1>
+<p>Each HiSPARC station has a GPS antenne and either 2 or 4 scintillator
+detectors. This GPS is used to determine the exact location of the
+station. However, the GPS is often not at the center of the station,
+moreover, not all stations are oriented the same way, and the distances
+between detector may differ. For reconstruction of the measured data it
+is important to know the location of each detector, this section
+explains how the location of the detectors can be measured and
+communicated to us.</p>
+<section id="compass-coordinates">
+<h2>Compass coordinates<a class="headerlink" href="#compass-coordinates" title="Link to this heading">¶</a></h2>
+<p>The coordinate system we have chosen for describing the position of
+detectors is illustrated in the following figure.</p>
+<a class="reference internal image-reference" href="_images/coordinate_system.png"><img alt="_images/coordinate_system.png" src="_images/coordinate_system.png" style="width: 313px;" />
+</a>
+<p>For each detector 3 (or 4) coordinates need to be determined:</p>
+<ul class="simple">
+<li><p>First the distance (<code class="code docutils literal notranslate"><span class="pre">r</span></code>) from the GPS to the center of the
+scintillator (in meters).</p></li>
+<li><p>Next the alpha angle (<code class="code docutils literal notranslate"><span class="pre">α</span></code>) which is the clock-wise turning angle
+between North and the detector as seen from the GPS (in degrees).</p></li>
+<li><p>A height (<code class="code docutils literal notranslate"><span class="pre">z</span></code>) coordinate can be measured if there is a
+significant altitude difference between the GPS antenna and the
+detectors, or if the detectors are not at the same height. Up is
+positive (in meters).</p></li>
+<li><p>The rotation of the detector is described by the beta angle
+(<code class="code docutils literal notranslate"><span class="pre">β</span></code>), which is the clock-wise turning rotation of the long side
+of the detector relative to North (in degrees).</p></li>
+</ul>
+<p>For more information about the coordinate systems used in HiSPARC see:
+<a class="reference external" href="https://docs.hisparc.nl/coordinates/HiSPARC_coordinates.pdf">Coordinate systems and units in HiSPARC</a>.</p>
+<p>For Dutch schools we have an assignment sheet in the infopakket which
+walks students through the process of measuring the station layout:
+<a class="reference external" href="https://docs.hisparc.nl/infopakket/pdf/station_map.pdf">De stationsplattegrond</a>.</p>
+</section>
+<section id="submitting-the-measurements">
+<h2>Submitting the measurements<a class="headerlink" href="#submitting-the-measurements" title="Link to this heading">¶</a></h2>
+<p>New layouts can be submitted via the <a class="reference external" href="https://data.hisparc.nl/layout/submit/">layout submit form</a>. A verification e-mail will be sent
+to the submitter. The submitted measurements will be reviewed before they are
+made available on the website and via the API.</p>
+</section>
+<section id="accessing-the-data">
+<h2>Accessing the data<a class="headerlink" href="#accessing-the-data" title="Link to this heading">¶</a></h2>
+<p>The detector coordinates can be accessed via the <a class="reference internal" href="api_tutorial.html"><span class="doc">API</span></a>.
+These can, for example, be used when analysing data or when making a schematic
+drawing of the station layout.</p>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">HiSPARC station layout</a><ul>
+<li><a class="reference internal" href="#compass-coordinates">Compass coordinates</a></li>
+<li><a class="reference internal" href="#submitting-the-measurements">Submitting the measurements</a></li>
+<li><a class="reference internal" href="#accessing-the-data">Accessing the data</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="hisparc_maps.html"
+                          title="previous chapter">HiSPARC maps</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="api.html"
+                          title="next chapter">API Reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/station_layout.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="hisparc_maps.html" title="HiSPARC maps"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">HiSPARC station layout</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

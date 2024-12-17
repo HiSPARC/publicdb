@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Data access &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Tutorial" href="api_tutorial.html" />
+    <link rel="prev" title="Public Database documentation!" href="index.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_tutorial.html" title="API Tutorial"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Public Database documentation!"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Data access</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="data-access">
+<h1>Data access<a class="headerlink" href="#data-access" title="Link to this heading">¶</a></h1>
+<p>There are several ways in which the HiSPARC data can be accessed:</p>
+<ul class="simple">
+<li><p>Via the Public database <a class="reference external" href="https://data.hisparc.nl/data/download/">download forms</a>.</p></li>
+<li><p>Via Python using the SAPPHiRE framework (see <a class="reference external" href="https://docs.hisparc.nl/sapphire/tutorial.html#downloading-and-accessing-hisparc-data">SAPPHiRE Tutorial</a>).</p></li>
+<li><p>Via the <a class="reference external" href="https://data.hisparc.nl/media/jsparc/">jSparc</a> web applications.</p></li>
+</ul>
+<p>To access metadata, like a list of all stations or information about a
+specific station see the <a class="reference internal" href="api_tutorial.html"><span class="doc">API Tutorial</span></a>.</p>
+<section id="download-form">
+<h2>Download form<a class="headerlink" href="#download-form" title="Link to this heading">¶</a></h2>
+<p>When looking at the data page for a station (i.e. <a class="reference external" href="https://data.hisparc.nl/show/stations/202/">Kaj Munk College</a>), you will see a ‘Download
+event summary data’ link on the right. When this link is clicked you
+will be taken to the <a class="reference external" href="https://data.hisparc.nl/data/download">Data download form</a>. On this page you can select
+the station, the start and end date for which you want to download the
+data. There is also an option to download weather data instead of events,
+however, not all stations gather weather data.</p>
+<p>When you click the Submit button without checking the checkbox to
+Download, the data should (Firefox always downloads the data) show up in
+your browser window. If you check the Download box the data will be
+downloaded to your PC as a csv file.</p>
+<p>This csv file can be read by many programs, including Excel. Use the
+Import option in Excel to make it recognize tabs as delimiter between
+columns.</p>
+</section>
+<section id="downloading-via-python">
+<h2>Downloading via Python<a class="headerlink" href="#downloading-via-python" title="Link to this heading">¶</a></h2>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>An easy to use module has been added to SAPPHiRE to download
+data from the ESD. The following is an old (but working) example.</p>
+</div>
+<p>This is an example of how to download the data from the Public database
+in Python. In this example we will download 1 hour of data for station
+202 on July 2, 2013.</p>
+<p>First load the required libraries (requires the numpy package).</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urllib</span> <span class="kn">import</span> <span class="n">urlencode</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">StringIO</span> <span class="kn">import</span> <span class="n">StringIO</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">numpy</span> <span class="kn">import</span> <span class="n">genfromtxt</span>
+</pre></div>
+</div>
+<p>Then define the url and place the start and end datetime in the query.
+To download weather data instead, replace ‘events’ by ‘weather’ in
+the url (and choose a station that has weather data, e.g. 3 or 501).</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Do not pass the query to the urlopen ‘data’ argument because that
+changes the request into a <em>POST</em> request, but you need a <em>GET</em>
+request.</p>
+</div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">url</span> <span class="o">=</span> <span class="s1">&#39;https://data.hisparc.nl/data/202/events&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">start</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">datetime</span><span class="p">(</span><span class="mi">2013</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">query</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">({</span><span class="s1">&#39;download&#39;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span> <span class="s1">&#39;start&#39;</span><span class="p">:</span> <span class="n">start</span><span class="p">,</span><span class="s1">&#39;end&#39;</span><span class="p">:</span> <span class="n">end</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">full_url</span> <span class="o">=</span> <span class="n">url</span> <span class="o">+</span> <span class="s1">&#39;?&#39;</span> <span class="o">+</span> <span class="n">query</span>
+</pre></div>
+</div>
+<p>Download the data and store it in a variable</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">full_url</span><span class="p">)</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Now use numpy to convert the data from csv to a numpy array.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">format</span> <span class="o">=</span> <span class="p">[(</span><span class="s1">&#39;date&#39;</span><span class="p">,</span> <span class="s1">&#39;datetime64[D]&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;time&#39;</span><span class="p">,</span> <span class="s1">&#39;|S8&#39;</span><span class="p">),</span>
+<span class="go">              (&#39;timestamp&#39;, &#39;uint32&#39;), (&#39;nanoseconds&#39;, &#39;uint32&#39;),</span>
+<span class="go">              (&#39;pulseheights&#39;, &#39;4int16&#39;), (&#39;integrals&#39;, &#39;4int32&#39;),</span>
+<span class="go">              (&#39;n1&#39;, &#39;float32&#39;), (&#39;n2&#39;, &#39;float32&#39;),</span>
+<span class="go">              (&#39;n3&#39;, &#39;float32&#39;), (&#39;n4&#39;, &#39;float32&#39;),</span>
+<span class="go">              (&#39;t1&#39;, &#39;float32&#39;), (&#39;t2&#39;, &#39;float32&#39;),</span>
+<span class="go">              (&#39;t3&#39;, &#39;float32&#39;), (&#39;t4&#39;, &#39;float32&#39;),</span>
+<span class="go">              (&#39;t_trigger&#39;, &#39;float32&#39;),</span>
+<span class="go">              (&#39;zenith&#39;, &#39;int16&#39;), (&#39;azimuth&#39;, &#39;int16&#39;)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">a</span> <span class="o">=</span> <span class="n">genfromtxt</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">data</span><span class="p">),</span> <span class="n">delimiter</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">format</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="go">(datetime.date(2013, 7, 2), &#39;11:00:02&#39;, 1372762802L, 466307811L,</span>
+<span class="go"> [78, 798, -1, -1], [535, 10882, -1, -1],</span>
+<span class="go"> 0.14720000326633453, 3.854599952697754, -1.0, -1.0,</span>
+<span class="go"> 345.0, 12.5, -1.0, -1.0, 345.0, -999, -999)</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Data access</a><ul>
+<li><a class="reference internal" href="#download-form">Download form</a></li>
+<li><a class="reference internal" href="#downloading-via-python">Downloading via Python</a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="index.html"
+                          title="previous chapter">Public Database documentation!</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="api_tutorial.html"
+                          title="next chapter">API Tutorial</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/data_access.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="api_tutorial.html" title="API Tutorial"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="Public Database documentation!"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Data access</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>
