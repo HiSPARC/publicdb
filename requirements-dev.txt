@@ -5,12 +5,12 @@ ruff==0.6.3
 typos==1.24.1
 
 # unittests
-coverage
-Faker
-factory_boy
+coverage==7.6.9
+Faker==33.1.0
+factory_boy==3.3.1
 
 # Docs
-sphinx
+sphinx==8.1.3
 
 # Provisioning tests
-ansible-lint
+ansible-lint==24.12.2
