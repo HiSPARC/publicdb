@@ -242,9 +242,9 @@ def create_temporary_file():
     it for writing
 
     """
-    f = tempfile.NamedTemporaryFile(delete=False)
-    f.close()
-    return f.name
+    with tempfile.NamedTemporaryFile(delete=False) as file:
+        pass
+    return file.name
 
 
 def copy_temporary_esd_node_to_esd(summary, file_path, node_path):
