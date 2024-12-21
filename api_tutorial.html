@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Tutorial &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="HiSPARC maps" href="hisparc_maps.html" />
+    <link rel="prev" title="Data access" href="data_access.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hisparc_maps.html" title="HiSPARC maps"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="data_access.html" title="Data access"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Tutorial</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="api-tutorial">
+<h1>API Tutorial<a class="headerlink" href="#api-tutorial" title="Link to this heading">¶</a></h1>
+<p>The HiSPARC API (Application Programming Interface) simplifies
+metadata access from other applications. In this tutorial, we’ll give
+some examples of how this data can be accessed and used with Javascript
+(<a class="reference external" href="http://www.jquery.com/">jQuery</a>) and <a class="reference external" href="http://www.python.org">Python</a>. We’ll show you how to do some neat things.
+How can you get a list of all HiSPARC stations in Denmark? What is the
+position of station 201? Which stations had data on 20 October 2010? How
+does the number of measured events change during a few weeks? This
+tutorial will give you an overview of some of possibilities with the
+HiSPARC API. For details on all available classes and methods,
+please see the <a class="reference internal" href="api.html"><span class="doc">API Reference</span></a>.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>We’ll require you to know some basic programming, i.e. to understand
+what an <code class="code docutils literal notranslate"><span class="pre">if</span></code> statement is and <code class="code docutils literal notranslate"><span class="pre">for</span></code> loop does. If you
+are new to coding you can try a tutorial online, for instance
+<a class="reference external" href="http://www.codecademy.com/">Codeacademy</a>, we recommend learning
+Python or jQuery.</p>
+</div>
+<section id="first-look">
+<h2>First look<a class="headerlink" href="#first-look" title="Link to this heading">¶</a></h2>
+<p>First we will just look at what this API is. The API can be accessed
+via the internet by opening urls. Instead of a website you get data as a
+response. This data is formatted as a JSON (JavaScript Object Notation),
+this format can be understood by many programming languages.</p>
+<p>To see what options the API has we will look at it in a browser. Open
+the following link in your browser (this will not work in Internet
+Explorer): <a class="reference external" href="https://data.hisparc.nl/api/">https://data.hisparc.nl/api/</a>.</p>
+<p>You should now see some text, like this:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">{</span><span class="s2">&quot;base_url&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;https://data.hisparc.nl/api/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="s2">&quot;clusters&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;clusters/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="s2">&quot;clusters_in_country&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;countries/{country_id}/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="s2">&quot;configuration&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;station/{station_id}/config/{year}/{month}/{day}/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="s2">&quot;countries&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;countries/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="s2">&quot;has_data&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;station/{station_id}/data/{year}/{month}/{day}/&quot;</span><span class="p">,</span>
+<span class="w"> </span><span class="p">...</span>
+<span class="w"> </span><span class="s2">&quot;subclusters_in_cluster&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;clusters/{cluster_id}/&quot;</span><span class="p">}</span>
+</pre></div>
+</div>
+<p>This is the JSON, it is a dictionary (indicated by the <code class="code docutils literal notranslate"><span class="pre">{</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">}</span></code> enclosing brackets): an object which has keys and values. Each
+key (<code class="code docutils literal notranslate"><span class="pre">&quot;clusters&quot;</span></code>, <code class="code docutils literal notranslate"><span class="pre">&quot;has_data&quot;</span></code>) refers to a value
+(<code class="code docutils literal notranslate"><span class="pre">&quot;clusters/&quot;</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">&quot;station/{station_id}/data/{year}/{month}/{day}/&quot;</span></code>).</p>
+<section id="cluster-list">
+<h3>Cluster list<a class="headerlink" href="#cluster-list" title="Link to this heading">¶</a></h3>
+<p>This tells us that if we want a list of all clusters we need to use the
+clusters option by appending <code class="code docutils literal notranslate"><span class="pre">&quot;clusters/&quot;</span></code> to the base url,
+resulting in the following:
+<a class="reference external" href="https://data.hisparc.nl/api/clusters/">https://data.hisparc.nl/api/clusters/</a>.</p>
+<p>With this result:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="p">[{</span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Amsterdam&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">0</span><span class="p">},</span>
+<span class="w"> </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Utrecht&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">1000</span><span class="p">},</span>
+<span class="w"> </span><span class="p">...</span>
+<span class="w"> </span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="o">:</span><span class="w"> </span><span class="s2">&quot;Karlsruhe&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="s2">&quot;number&quot;</span><span class="o">:</span><span class="w"> </span><span class="mf">70000</span><span class="p">}]</span>
+</pre></div>
+</div>
+<p>This JSON is a list (indicated by the <code class="code docutils literal notranslate"><span class="pre">[</span></code> and <code class="code docutils literal notranslate"><span class="pre">]</span></code> enclosing
+brackets) of dictionaries, one for each cluster. Each dictionary
+contains the name and number of a cluster. This way information about
+the network of stations can be retrieved.</p>
+</section>
+</section>
+<section id="javascript-example">
+<h2>Javascript example<a class="headerlink" href="#javascript-example" title="Link to this heading">¶</a></h2>
+<p>The following code example will generate a webpage which will use the
+API to get an up-to-date list of stations. It will then show a
+drop-down menu from which a station can be selected, once you have
+chosen a station you can click the <code class="code docutils literal notranslate"><span class="pre">Get</span> <span class="pre">info</span></code> button to make
+Javascript get the station information. To try this you can either use
+this example page: <a class="reference external" href="http://jsfiddle.net/NCWXq/2/">jsFiddle</a> or create
+your own HTML file with this code:</p>
+<div class="highlight-html notranslate"><div class="highlight"><pre><span></span><span class="p">&lt;</span><span class="nt">html</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span> <span class="na">src</span><span class="o">=</span><span class="s">&quot;http://code.jquery.com/jquery-1.11.1.min.js&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="w">    </span><span class="nx">$</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Get an up-to-date list of HiSPARC stations</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span>
+<span class="w">            </span><span class="s1">&#39;https://data.hisparc.nl/api/stations/&#39;</span><span class="p">,</span>
+<span class="w">            </span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="c1">// Create the drop-down menu</span>
+<span class="w">                </span><span class="kd">var</span><span class="w"> </span><span class="nx">select</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;select&gt;&#39;</span><span class="p">);</span>
+<span class="w">                </span><span class="kd">var</span><span class="w"> </span><span class="nx">id</span><span class="p">,</span><span class="w"> </span><span class="nx">name</span><span class="p">;</span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kd">var</span><span class="w"> </span><span class="nx">i</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="nx">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">number</span><span class="p">;</span>
+<span class="w">                    </span><span class="nx">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">data</span><span class="p">[</span><span class="nx">i</span><span class="p">].</span><span class="nx">name</span><span class="p">;</span>
+<span class="w">                    </span><span class="nx">select</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;option&gt;&#39;</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span><span class="w"> </span><span class="nx">id</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nx">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39; - &#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">name</span><span class="p">));}</span>
+<span class="w">                </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#station_list&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">select</span><span class="p">);});</span>
+
+<span class="w">        </span><span class="c1">// Attach a function to the Get info button</span>
+<span class="w">        </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#get_station&#39;</span><span class="p">).</span><span class="nx">on</span><span class="p">(</span><span class="s1">&#39;click&#39;</span><span class="p">,</span><span class="w"> </span><span class="kd">function</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kd">var</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#station_list&#39;</span><span class="p">).</span><span class="nx">find</span><span class="p">(</span><span class="s1">&#39;select&#39;</span><span class="p">).</span><span class="nx">val</span><span class="p">();</span>
+<span class="w">            </span><span class="c1">// Get info for selected station and display it in a nice way</span>
+<span class="w">            </span><span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="s1">&#39;https://data.hisparc.nl/api/station/&#39;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nx">id</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s1">&#39;/&#39;</span><span class="p">,</span>
+<span class="w">                      </span><span class="kd">function</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                          </span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;#station_info&#39;</span><span class="p">).</span><span class="nx">text</span><span class="p">(</span><span class="nb">JSON</span><span class="p">.</span><span class="nx">stringify</span><span class="p">(</span><span class="nx">data</span><span class="p">,</span><span class="w"> </span><span class="kc">undefined</span><span class="p">,</span><span class="w"> </span><span class="mf">4</span><span class="p">));</span>
+<span class="w">                      </span><span class="p">});</span>
+<span class="w">            </span><span class="p">});</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="p">&lt;/</span><span class="nt">script</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">head</span><span class="p">&gt;</span>
+<span class="p">&lt;</span><span class="nt">body</span> <span class="na">style</span><span class="o">=</span><span class="s">&quot;font-family: sans-serif;&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">h2</span><span class="p">&gt;</span>Station info<span class="p">&lt;/</span><span class="nt">h2</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">p</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;station_list&quot;</span><span class="p">&gt;</span>Choose a station: <span class="p">&lt;/</span><span class="nt">p</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">input</span> <span class="na">type</span><span class="o">=</span><span class="s">&quot;submit&quot;</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;get_station&quot;</span> <span class="na">value</span><span class="o">=</span><span class="s">&quot;Get info&quot;</span><span class="p">&gt;</span>
+    <span class="p">&lt;</span><span class="nt">pre</span> <span class="na">id</span><span class="o">=</span><span class="s">&quot;station_info&quot;</span><span class="p">&gt;&lt;/</span><span class="nt">pre</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">body</span><span class="p">&gt;</span>
+<span class="p">&lt;/</span><span class="nt">html</span><span class="p">&gt;</span>
+</pre></div>
+</div>
+</section>
+<section id="python-example">
+<h2>Python example<a class="headerlink" href="#python-example" title="Link to this heading">¶</a></h2>
+<p>In this example we will use several standard Python libraries and the
+popular plotting library <a class="reference external" href="http://matplotlib.org">matplotlib</a> (pylab).
+We start by importing the required libraries, one to get data from the
+urls, one to make working with dates easy and the plotting library. Then
+define the start values and perpare two empty lists in which the data
+can be placed. Then a while loop is used to loop over all days between
+datum and end_datum, reading each corresponding url. Finally a plot is
+made, setting the dates against their values.</p>
+<p>Start Python and type (or copy/paste without the <code class="code docutils literal notranslate"><span class="pre">&gt;&gt;&gt;</span></code>) the
+following lines of code:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">urllib.request</span> <span class="kn">import</span> <span class="n">urlopen</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">date</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">pylab</span> <span class="kn">import</span> <span class="n">plot</span><span class="p">,</span> <span class="n">show</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">id</span> <span class="o">=</span> <span class="mi">501</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">datum</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2010</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">end_datum</span> <span class="o">=</span> <span class="n">date</span><span class="p">(</span><span class="mi">2011</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">base</span> <span class="o">=</span> <span class="s1">&#39;https://data.hisparc.nl/api/station/</span><span class="si">%d</span><span class="s1">/num_events/</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">/</span><span class="si">%d</span><span class="s1">&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">events</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dates</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">while</span> <span class="n">datum</span> <span class="o">&lt;</span> <span class="n">end_datum</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">url</span> <span class="o">=</span> <span class="n">urlopen</span><span class="p">(</span><span class="n">base</span> <span class="o">%</span> <span class="p">(</span><span class="nb">id</span><span class="p">,</span> <span class="n">datum</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="n">datum</span><span class="o">.</span><span class="n">month</span><span class="p">,</span> <span class="n">datum</span><span class="o">.</span><span class="n">day</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="n">events</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">url</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="n">dates</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">datum</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">datum</span> <span class="o">+=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">step</span><span class="p">(</span><span class="n">dates</span><span class="p">,</span> <span class="n">events</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+<section id="sapphire">
+<h3>SAPPHiRE<a class="headerlink" href="#sapphire" title="Link to this heading">¶</a></h3>
+<p>The HiSPARC Python framework SAPPHiRE includes an API module. This module
+simplifies access to the API. See the SAPPHiRE documentation for more
+information:
+<a class="reference external" href="https://docs.hisparc.nl/sapphire/">https://docs.hisparc.nl/sapphire/</a>.</p>
+</section>
+</section>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">API Tutorial</a><ul>
+<li><a class="reference internal" href="#first-look">First look</a><ul>
+<li><a class="reference internal" href="#cluster-list">Cluster list</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#javascript-example">Javascript example</a></li>
+<li><a class="reference internal" href="#python-example">Python example</a><ul>
+<li><a class="reference internal" href="#sapphire">SAPPHiRE</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="data_access.html"
+                          title="previous chapter">Data access</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="hisparc_maps.html"
+                          title="next chapter">HiSPARC maps</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_tutorial.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="hisparc_maps.html" title="HiSPARC maps"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="data_access.html" title="Data access"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Tutorial</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

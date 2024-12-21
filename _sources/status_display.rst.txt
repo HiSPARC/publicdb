@@ -1,0 +1,13 @@
+Status Display Reference
+========================
+
+.. automodule:: publicdb.status_display
+   :members:
+   :undoc-members:
+
+
+Contents:
+
+.. toctree::
+
+   status_display_views

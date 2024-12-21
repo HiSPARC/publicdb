@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>API Views Reference &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Status Display Reference" href="status_display.html" />
+    <link rel="prev" title="API Reference" href="api.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" accesskey="U">API Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Views Reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-publicdb.api.views">
+<span id="api-views-reference"></span><h1>API Views Reference<a class="headerlink" href="#module-publicdb.api.views" title="Link to this heading">¶</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.clusters">
+<span class="sig-name descname"><span class="pre">clusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.clusters" title="Link to this definition">¶</a></dt>
+<dd><p>Get cluster list</p>
+<p>Retrieve a list of all clusters or only the clusters in a specific country.
+By cluster we here mean the main clusters, which contain subclusters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>country_number</strong> – a country number identifier, give this to only get
+clusters from a specific country.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dictionaries containing the name and number of all
+clusters that matched the given parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.config">
+<span class="sig-name descname"><span class="pre">config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.config" title="Link to this definition">¶</a></dt>
+<dd><p>Get station config settings</p>
+<p>Retrieve the entire configuration of a station. If no date if given the
+latest config will be sent, otherwise the latest on or before the given
+date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – a station number identifier.</p></li>
+<li><p><strong>date</strong> – the date for which to get a configuration.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary containing the entire configuration from
+the HiSPARC DAQ.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.countries">
+<span class="sig-name descname"><span class="pre">countries</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.countries" title="Link to this definition">¶</a></dt>
+<dd><p>Get country list</p>
+<p>Retrieve a list of all countries.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list of dictionaries containing the name and number of
+all countries.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.get_cluster_dict">
+<span class="sig-name descname"><span class="pre">get_cluster_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.get_cluster_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.get_country_dict">
+<span class="sig-name descname"><span class="pre">get_country_dict</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.get_country_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.get_event_traces">
+<span class="sig-name descname"><span class="pre">get_event_traces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ext_timestamp</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.get_event_traces" title="Link to this definition">¶</a></dt>
+<dd><p>Get the traces for an event</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – a station number identifier.</p></li>
+<li><p><strong>ext_timestamp</strong> – extended timestamp (nanoseconds since UNIX epoch).</p></li>
+<li><p><strong>raw</strong> – (optional, GET) if present get the raw trace, i.e. without
+subtracted baseline.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>two or four traces.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.get_station_dict">
+<span class="sig-name descname"><span class="pre">get_station_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">subcluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.get_station_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Return list of station numbers and names</p>
+<p>For all non-test stations in the given subcluster</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.get_subcluster_dict">
+<span class="sig-name descname"><span class="pre">get_subcluster_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.get_subcluster_dict" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.has_data">
+<span class="sig-name descname"><span class="pre">has_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.has_data" title="Link to this definition">¶</a></dt>
+<dd><p>Check for presence of cosmic ray data</p>
+<p>Find out if the given station has measured shower data, either on a
+specific date, or at all.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – a stationn number identifier.</p></li>
+<li><p><strong>type</strong> – the data type: events, singles or weather.</p></li>
+<li><p><strong>year</strong><strong>,</strong><strong>month</strong><strong>,</strong><strong>date</strong> – the date, this has to be within the time
+HiSPARC has been operational and can be as specific as
+you desire.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>boolean, True if the given station has data, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.json_dict">
+<span class="sig-name descname"><span class="pre">json_dict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">result</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.json_dict" title="Link to this definition">¶</a></dt>
+<dd><p>Create a json HTTPResponse</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.man">
+<span class="sig-name descname"><span class="pre">man</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.man" title="Link to this definition">¶</a></dt>
+<dd><p>Give overview of the possible urls</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.network_status">
+<span class="sig-name descname"><span class="pre">network_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.network_status" title="Link to this definition">¶</a></dt>
+<dd><p>Get status of the network</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>dictionary containing status info for each station.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.num_events">
+<span class="sig-name descname"><span class="pre">num_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hour</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.num_events" title="Link to this definition">¶</a></dt>
+<dd><p>Get number of events for a station</p>
+<p>Retrieve the number of events that a station has measured during its
+entire operation or during a specific period, which can be a year,
+month, day or an hour.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – a stationn number identifier.</p></li>
+<li><p><strong>year</strong><strong>,</strong><strong>month</strong><strong>,</strong><strong>date</strong><strong>,</strong><strong>hour</strong> – the date, this has to be within the time
+HiSPARC has been operational and can be as specific as you desire.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>integer containing the total number of events ever recorded by
+the given station.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.station">
+<span class="sig-name descname"><span class="pre">station</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.station" title="Link to this definition">¶</a></dt>
+<dd><p>Get station info</p>
+<p>Retrieve general information about a station. If no date if given
+the latest valid info will be sent, otherwise the latest on or
+before the given date.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – a station number identifier.</p></li>
+<li><p><strong>date</strong> – the date for which to get station info.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dictionary containing info about the station. Most importantly,
+this contains information about the location of the station GPS
+and the relative locations of the individual scintillators.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.stations">
+<span class="sig-name descname"><span class="pre">stations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcluster_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.stations" title="Link to this definition">¶</a></dt>
+<dd><p>Get station list</p>
+<p>Retrieve a list of all stations or all stations in a subcluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>subcluster_number</strong> – a subcluster number identifier. If given, only
+stations belonging to that subcluster will be included in the list.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list containing dictionaries which consist of the name and number
+of each station (matching the subcluster).</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.stations_with_data">
+<span class="sig-name descname"><span class="pre">stations_with_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">year</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">month</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.stations_with_data" title="Link to this definition">¶</a></dt>
+<dd><p>Get stations with event or weather data</p>
+<p>Retrieve a list of all stations which have recorded events, singles or
+weather data in the given year, month, day or at all.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>type</strong> – data type to check for: events, singles or weather.</p></li>
+<li><p><strong>year</strong><strong>,</strong><strong>month</strong><strong>,</strong><strong>date</strong> – the date, this has to be within the time
+HiSPARC has been operational and can be as specific as you desire.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dictionaries containing the name and number of each
+station that has measured weather data in the given year.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.subclusters">
+<span class="sig-name descname"><span class="pre">subclusters</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.subclusters" title="Link to this definition">¶</a></dt>
+<dd><p>Get subcluster list</p>
+<p>Retrieve a list of all subclusters or all subclusters in a specific
+cluster.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>cluster_number</strong> – a cluster number identifier, give this to only get
+subclusters from this cluster.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of dictionaries containing the name and number of all
+subclusters that matched the given parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.api.views.validate_date">
+<span class="sig-name descname"><span class="pre">validate_date</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.api.views.validate_date" title="Link to this definition">¶</a></dt>
+<dd><p>Check if date is outside HiSPARC project range</p>
+<p>If not valid, a 404 (Not Found) should be returned to the user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>boolean, True if the date is in the range, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">API Views Reference</a><ul>
+<li><a class="reference internal" href="#publicdb.api.views.clusters"><code class="docutils literal notranslate"><span class="pre">clusters()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.config"><code class="docutils literal notranslate"><span class="pre">config()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.countries"><code class="docutils literal notranslate"><span class="pre">countries()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.get_cluster_dict"><code class="docutils literal notranslate"><span class="pre">get_cluster_dict()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.get_country_dict"><code class="docutils literal notranslate"><span class="pre">get_country_dict()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.get_event_traces"><code class="docutils literal notranslate"><span class="pre">get_event_traces()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.get_station_dict"><code class="docutils literal notranslate"><span class="pre">get_station_dict()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.get_subcluster_dict"><code class="docutils literal notranslate"><span class="pre">get_subcluster_dict()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.has_data"><code class="docutils literal notranslate"><span class="pre">has_data()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.json_dict"><code class="docutils literal notranslate"><span class="pre">json_dict()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.man"><code class="docutils literal notranslate"><span class="pre">man()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.network_status"><code class="docutils literal notranslate"><span class="pre">network_status()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.num_events"><code class="docutils literal notranslate"><span class="pre">num_events()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.station"><code class="docutils literal notranslate"><span class="pre">station()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.stations"><code class="docutils literal notranslate"><span class="pre">stations()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.stations_with_data"><code class="docutils literal notranslate"><span class="pre">stations_with_data()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.subclusters"><code class="docutils literal notranslate"><span class="pre">subclusters()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.api.views.validate_date"><code class="docutils literal notranslate"><span class="pre">validate_date()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="api.html"
+                          title="previous chapter">API Reference</a></p>
+  </div>
+  <div>
+    <h4>Next topic</h4>
+    <p class="topless"><a href="status_display.html"
+                          title="next chapter">Status Display Reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/api_views.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="api.html" title="API Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="api.html" >API Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">API Views Reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Status Display Views Reference &#8212; Public Database 0.4 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="_static/nature.css?v=279e0f84" />
+    <link rel="stylesheet" type="text/css" href="_static/hisparc_style.css?v=a8046f9d" />
+    <script src="_static/documentation_options.js?v=7f00635f"></script>
+    <script src="_static/doctools.js?v=9bcbadda"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="icon" href="_static/favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Status Display Reference" href="status_display.html" /> 
+  </head><body>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="status_display.html" accesskey="U">Status Display Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Status Display Views Reference</a></li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <section id="module-publicdb.status_display.views">
+<span id="status-display-views-reference"></span><h1>Status Display Views Reference<a class="headerlink" href="#module-publicdb.status_display.views" title="Link to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="publicdb.status_display.views.LatestNetworkSummaryRedirectView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LatestNetworkSummaryRedirectView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView" title="Link to this definition">¶</a></dt>
+<dd><p>Show most recent coincidence data page</p>
+<p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.LatestNetworkSummaryRedirectView.get_redirect_url">
+<span class="sig-name descname"><span class="pre">get_redirect_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView.get_redirect_url" title="Link to this definition">¶</a></dt>
+<dd><p>Return the URL redirect to. Keyword arguments from the URL pattern
+match generating the redirect request are provided as kwargs to this
+method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="publicdb.status_display.views.LatestSummaryRedirectView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">LatestSummaryRedirectView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestSummaryRedirectView" title="Link to this definition">¶</a></dt>
+<dd><p>Show most recent data for a particular station</p>
+<p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.LatestSummaryRedirectView.get_redirect_url">
+<span class="sig-name descname"><span class="pre">get_redirect_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.LatestSummaryRedirectView.get_redirect_url" title="Link to this definition">¶</a></dt>
+<dd><p>Return the URL redirect to. Keyword arguments from the URL pattern
+match generating the redirect request are provided as kwargs to this
+method.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">NetworkSummaryDetailView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView" title="Link to this definition">¶</a></dt>
+<dd><p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.get_object">
+<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_object" title="Link to this definition">¶</a></dt>
+<dd><p>Get the object this request displays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_queryset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the <cite>QuerySet</cite> that will be used to look up the object.</p>
+<p>This method is called by the default implementation of get_object() and
+may not be called if get_object() is overridden.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.http_method_names">
+<span class="sig-name descname"><span class="pre">http_method_names</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['get']</span></em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.http_method_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.nav_calendar">
+<span class="sig-name descname"><span class="pre">nav_calendar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_calendar" title="Link to this definition">¶</a></dt>
+<dd><p>Create a month calendar with links</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.nav_months">
+<span class="sig-name descname"><span class="pre">nav_months</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_months" title="Link to this definition">¶</a></dt>
+<dd><p>Create list of months with links</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.nav_years">
+<span class="sig-name descname"><span class="pre">nav_years</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_years" title="Link to this definition">¶</a></dt>
+<dd><p>Create list of previous years</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="publicdb.status_display.views.NetworkSummaryDetailView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'status_display/network_coincidences.html'</span></em><a class="headerlink" href="#publicdb.status_display.views.NetworkSummaryDetailView.template_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">SummaryDetailView</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView" title="Link to this definition">¶</a></dt>
+<dd><p>Constructor. Called in the URLconf; can contain helpful extra
+keyword arguments, and other things.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.get_context_data">
+<span class="sig-name descname"><span class="pre">get_context_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_context_data" title="Link to this definition">¶</a></dt>
+<dd><p>Insert the single object into the context dict.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.get_object">
+<span class="sig-name descname"><span class="pre">get_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">queryset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_object" title="Link to this definition">¶</a></dt>
+<dd><p>Get the object this request displays.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.get_queryset">
+<span class="sig-name descname"><span class="pre">get_queryset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.get_queryset" title="Link to this definition">¶</a></dt>
+<dd><p>Return the <cite>QuerySet</cite> that will be used to look up the object.</p>
+<p>This method is called by the default implementation of get_object() and
+may not be called if get_object() is overridden.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.http_method_names">
+<span class="sig-name descname"><span class="pre">http_method_names</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">['get']</span></em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.http_method_names" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.nav_calendar">
+<span class="sig-name descname"><span class="pre">nav_calendar</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_calendar" title="Link to this definition">¶</a></dt>
+<dd><p>Create a month calendar with links</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.nav_months">
+<span class="sig-name descname"><span class="pre">nav_months</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_months" title="Link to this definition">¶</a></dt>
+<dd><p>Create list of months with links</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.nav_years">
+<span class="sig-name descname"><span class="pre">nav_years</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.nav_years" title="Link to this definition">¶</a></dt>
+<dd><p>Create list of previous years</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="publicdb.status_display.views.SummaryDetailView.template_name">
+<span class="sig-name descname"><span class="pre">template_name</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'status_display/station_data.html'</span></em><a class="headerlink" href="#publicdb.status_display.views.SummaryDetailView.template_name" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.create_plot_object">
+<span class="sig-name descname"><span class="pre">create_plot_object</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x_values</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_series</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">x_label</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">y_label</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.create_plot_object" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_config_source">
+<span class="sig-name descname"><span class="pre">get_config_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_config_source" title="Link to this definition">¶</a></dt>
+<dd><p>Get configuration data for a specific station</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>station_number</strong> – station for which to get the configuration data.</p></li>
+<li><p><strong>type</strong> – the type of configuration data to get. The following
+are supported: voltage, current, gps, trigger.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of lists containing the configuration history.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_dataset_source">
+<span class="sig-name descname"><span class="pre">get_dataset_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_dataset_source" title="Link to this definition">¶</a></dt>
+<dd><p>Get a dataset for a specific date and station</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – the date for which to get the dataset.</p></li>
+<li><p><strong>type</strong> – the type of dataset to retrieve.</p></li>
+<li><p><strong>station_number</strong> – the station to which the data belongs.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of tuples containing (x, y) pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_detector_timing_offsets">
+<span class="sig-name descname"><span class="pre">get_detector_timing_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_detector_timing_offsets" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_detector_timing_offsets_source">
+<span class="sig-name descname"><span class="pre">get_detector_timing_offsets_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_detector_timing_offsets_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_eventtime_histogram_sources">
+<span class="sig-name descname"><span class="pre">get_eventtime_histogram_sources</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_eventtime_histogram_sources" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_eventtime_source">
+<span class="sig-name descname"><span class="pre">get_eventtime_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_eventtime_source" title="Link to this definition">¶</a></dt>
+<dd><p>Get all eventtime data from start to end</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_focus">
+<span class="sig-name descname"><span class="pre">get_focus</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_focus" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_gpslocations">
+<span class="sig-name descname"><span class="pre">get_gpslocations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">configs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_gpslocations" title="Link to this definition">¶</a></dt>
+<dd><p>Get all valid GPS locations from the configs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_histogram_source">
+<span class="sig-name descname"><span class="pre">get_histogram_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_histogram_source" title="Link to this definition">¶</a></dt>
+<dd><p>Get histogram data for a specific date</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>date</strong> – the date for which to get the histogram data.</p></li>
+<li><p><strong>type</strong> – the type of histogram to retrieve.</p></li>
+<li><p><strong>station_number</strong> – if None a NetworkHistogram is looked for, otherwise
+a DailyHistogram for a specific station is looked for.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of tuples containing (bin, value) pairs.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_specific_config_source">
+<span class="sig-name descname"><span class="pre">get_specific_config_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_config_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_specific_dataset_source">
+<span class="sig-name descname"><span class="pre">get_specific_dataset_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_dataset_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_specific_histogram_source">
+<span class="sig-name descname"><span class="pre">get_specific_histogram_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_histogram_source" title="Link to this definition">¶</a></dt>
+<dd><p>Get a station histogram for a specific date</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_specific_network_histogram_source">
+<span class="sig-name descname"><span class="pre">get_specific_network_histogram_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">type</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_specific_network_histogram_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_station_layout_source">
+<span class="sig-name descname"><span class="pre">get_station_layout_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_layout_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_station_timing_offsets">
+<span class="sig-name descname"><span class="pre">get_station_timing_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ref_station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_timing_offsets" title="Link to this definition">¶</a></dt>
+<dd><p>Get all station timing offsets for a station pair</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ref_station_number</strong><strong>,</strong><strong>station_number</strong> – station numbers.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of tuples with date, offset, and error.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.get_station_timing_offsets_source">
+<span class="sig-name descname"><span class="pre">get_station_timing_offsets_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ref_station_number</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.get_station_timing_offsets_source" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.help">
+<span class="sig-name descname"><span class="pre">help</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.help" title="Link to this definition">¶</a></dt>
+<dd><p>Show the static help page</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.none_to_nan">
+<span class="sig-name descname"><span class="pre">none_to_nan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.none_to_nan" title="Link to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.plot_config">
+<span class="sig-name descname"><span class="pre">plot_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">type</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">configs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_config" title="Link to this definition">¶</a></dt>
+<dd><p>Create a plot object from station configs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.plot_dataset">
+<span class="sig-name descname"><span class="pre">plot_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_dataset" title="Link to this definition">¶</a></dt>
+<dd><p>Create a dataset plot object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.plot_histogram">
+<span class="sig-name descname"><span class="pre">plot_histogram</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">histogram</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_histogram" title="Link to this definition">¶</a></dt>
+<dd><p>Create a histogram object</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.plot_timing_offsets">
+<span class="sig-name descname"><span class="pre">plot_timing_offsets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.plot_timing_offsets" title="Link to this definition">¶</a></dt>
+<dd><p>Create a plot object from station configs</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.station_config">
+<span class="sig-name descname"><span class="pre">station_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_config" title="Link to this definition">¶</a></dt>
+<dd><p>Show configuration history for a particular station</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.station_has_config">
+<span class="sig-name descname"><span class="pre">station_has_config</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_has_config" title="Link to this definition">¶</a></dt>
+<dd><p>Check if there is a valid configuration for the given station</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>station</strong> – Station object for which to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>boolean indicating if the station has a configuration available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.station_has_data">
+<span class="sig-name descname"><span class="pre">station_has_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">station</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_has_data" title="Link to this definition">¶</a></dt>
+<dd><p>Check if there is valid event or weather data for the given station</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>station</strong> – Station object for which to check.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>boolean indicating if the station has recorded data, either
+weather or shower, between 2002 and now.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.station_latest">
+<span class="sig-name descname"><span class="pre">station_latest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_latest" title="Link to this definition">¶</a></dt>
+<dd><p>Show daily histograms for a particular station</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.station_status">
+<span class="sig-name descname"><span class="pre">station_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">station_number</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.station_status" title="Link to this definition">¶</a></dt>
+<dd><p>Show data status for a particular station</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations">
+<span class="sig-name descname"><span class="pre">stations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations" title="Link to this definition">¶</a></dt>
+<dd><p>Show the default station list</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_by_country">
+<span class="sig-name descname"><span class="pre">stations_by_country</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_country" title="Link to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by country, cluster and subcluster</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_by_name">
+<span class="sig-name descname"><span class="pre">stations_by_name</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_name" title="Link to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by station name</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_by_number">
+<span class="sig-name descname"><span class="pre">stations_by_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_number" title="Link to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by number</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_by_status">
+<span class="sig-name descname"><span class="pre">stations_by_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_by_status" title="Link to this definition">¶</a></dt>
+<dd><p>Show a list of stations, ordered by status</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_on_map">
+<span class="sig-name descname"><span class="pre">stations_on_map</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">country</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subcluster</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_on_map" title="Link to this definition">¶</a></dt>
+<dd><p>Show all stations from a subcluster on a map</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="publicdb.status_display.views.stations_with_data">
+<span class="sig-name descname"><span class="pre">stations_with_data</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#publicdb.status_display.views.stations_with_data" title="Link to this definition">¶</a></dt>
+<dd><p>Get list of station numbers with valid event or weather data</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>list with station numbers for stations that recorded data, either
+weather or shower, between 2004 and now.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+
+
+            <div class="clearer"></div>
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/header.png" alt="Logo of Public Database"/>
+            </a></p>
+  <div>
+    <h3><a href="index.html">Table of Contents</a></h3>
+    <ul>
+<li><a class="reference internal" href="#">Status Display Views Reference</a><ul>
+<li><a class="reference internal" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView"><code class="docutils literal notranslate"><span class="pre">LatestNetworkSummaryRedirectView</span></code></a><ul>
+<li><a class="reference internal" href="#publicdb.status_display.views.LatestNetworkSummaryRedirectView.get_redirect_url"><code class="docutils literal notranslate"><span class="pre">LatestNetworkSummaryRedirectView.get_redirect_url()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publicdb.status_display.views.LatestSummaryRedirectView"><code class="docutils literal notranslate"><span class="pre">LatestSummaryRedirectView</span></code></a><ul>
+<li><a class="reference internal" href="#publicdb.status_display.views.LatestSummaryRedirectView.get_redirect_url"><code class="docutils literal notranslate"><span class="pre">LatestSummaryRedirectView.get_redirect_url()</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView</span></code></a><ul>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_context_data"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_object"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.get_object()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.get_queryset"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.http_method_names"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.http_method_names</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_calendar"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.nav_calendar()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_months"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.nav_months()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.nav_years"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.nav_years()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.NetworkSummaryDetailView.template_name"><code class="docutils literal notranslate"><span class="pre">NetworkSummaryDetailView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView</span></code></a><ul>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.get_context_data"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.get_context_data()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.get_object"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.get_object()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.get_queryset"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.get_queryset()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.http_method_names"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.http_method_names</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.nav_calendar"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.nav_calendar()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.nav_months"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.nav_months()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.nav_years"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.nav_years()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.SummaryDetailView.template_name"><code class="docutils literal notranslate"><span class="pre">SummaryDetailView.template_name</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#publicdb.status_display.views.create_plot_object"><code class="docutils literal notranslate"><span class="pre">create_plot_object()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_config_source"><code class="docutils literal notranslate"><span class="pre">get_config_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_dataset_source"><code class="docutils literal notranslate"><span class="pre">get_dataset_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_detector_timing_offsets"><code class="docutils literal notranslate"><span class="pre">get_detector_timing_offsets()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_detector_timing_offsets_source"><code class="docutils literal notranslate"><span class="pre">get_detector_timing_offsets_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_eventtime_histogram_sources"><code class="docutils literal notranslate"><span class="pre">get_eventtime_histogram_sources()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_eventtime_source"><code class="docutils literal notranslate"><span class="pre">get_eventtime_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_focus"><code class="docutils literal notranslate"><span class="pre">get_focus()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_gpslocations"><code class="docutils literal notranslate"><span class="pre">get_gpslocations()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_histogram_source"><code class="docutils literal notranslate"><span class="pre">get_histogram_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_specific_config_source"><code class="docutils literal notranslate"><span class="pre">get_specific_config_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_specific_dataset_source"><code class="docutils literal notranslate"><span class="pre">get_specific_dataset_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_specific_histogram_source"><code class="docutils literal notranslate"><span class="pre">get_specific_histogram_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_specific_network_histogram_source"><code class="docutils literal notranslate"><span class="pre">get_specific_network_histogram_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_station_layout_source"><code class="docutils literal notranslate"><span class="pre">get_station_layout_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_station_timing_offsets"><code class="docutils literal notranslate"><span class="pre">get_station_timing_offsets()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.get_station_timing_offsets_source"><code class="docutils literal notranslate"><span class="pre">get_station_timing_offsets_source()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.help"><code class="docutils literal notranslate"><span class="pre">help()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.none_to_nan"><code class="docutils literal notranslate"><span class="pre">none_to_nan()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.plot_config"><code class="docutils literal notranslate"><span class="pre">plot_config()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.plot_dataset"><code class="docutils literal notranslate"><span class="pre">plot_dataset()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.plot_histogram"><code class="docutils literal notranslate"><span class="pre">plot_histogram()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.plot_timing_offsets"><code class="docutils literal notranslate"><span class="pre">plot_timing_offsets()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.station_config"><code class="docutils literal notranslate"><span class="pre">station_config()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.station_has_config"><code class="docutils literal notranslate"><span class="pre">station_has_config()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.station_has_data"><code class="docutils literal notranslate"><span class="pre">station_has_data()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.station_latest"><code class="docutils literal notranslate"><span class="pre">station_latest()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.station_status"><code class="docutils literal notranslate"><span class="pre">station_status()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations"><code class="docutils literal notranslate"><span class="pre">stations()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_by_country"><code class="docutils literal notranslate"><span class="pre">stations_by_country()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_by_name"><code class="docutils literal notranslate"><span class="pre">stations_by_name()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_by_number"><code class="docutils literal notranslate"><span class="pre">stations_by_number()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_by_status"><code class="docutils literal notranslate"><span class="pre">stations_by_status()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_on_map"><code class="docutils literal notranslate"><span class="pre">stations_on_map()</span></code></a></li>
+<li><a class="reference internal" href="#publicdb.status_display.views.stations_with_data"><code class="docutils literal notranslate"><span class="pre">stations_with_data()</span></code></a></li>
+</ul>
+</li>
+</ul>
+
+  </div>
+  <div>
+    <h4>Previous topic</h4>
+    <p class="topless"><a href="status_display.html"
+                          title="previous chapter">Status Display Reference</a></p>
+  </div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/status_display_views.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="Related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="status_display.html" title="Status Display Reference"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="index.html">Public Database 0.4 documentation</a> &#187;</li>
+          <li class="nav-item nav-item-1"><a href="status_display.html" >Status Display Reference</a> &#187;</li>
+        <li class="nav-item nav-item-this"><a href="">Status Display Views Reference</a></li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+    &#169; Copyright 2015, HiSPARC.
+      Created using <a href="https://www.sphinx-doc.org/">Sphinx</a> 8.1.3.
+    </div>
+  </body>
+</html>
