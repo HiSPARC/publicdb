@@ -156,13 +156,13 @@ def stations(request, subcluster_number=None):
              of each station (matching the subcluster).
 
     """
-    if subcluster_number:
+    if subcluster_number is None:
+        subcluster = None
+    else:
         try:
             subcluster = Cluster.objects.get(number=subcluster_number)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
-    else:
-        subcluster = None
 
     stations = get_station_dict(subcluster=subcluster)
 
@@ -229,13 +229,13 @@ def subclusters(request, cluster_number=None):
              subclusters that matched the given parameters.
 
     """
-    if cluster_number:
+    if cluster_number is None:
+        cluster = None
+    else:
         try:
             cluster = Cluster.objects.get(number=cluster_number, parent=None)
         except Cluster.DoesNotExist:
             return HttpResponseNotFound()
-    else:
-        cluster = None
 
     subclusters = get_subcluster_dict(cluster=cluster)
 
@@ -255,13 +255,13 @@ def clusters(request, country_number=None):
              clusters that matched the given parameters.
 
     """
-    if country_number:
+    if country_number is None:
+        country = None
+    else:
         try:
             country = Country.objects.get(number=country_number)
         except Country.DoesNotExist:
             return HttpResponseNotFound()
-    else:
-        country = None
 
     clusters = get_cluster_dict(country=country)
 
