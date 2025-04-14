@@ -95,8 +95,8 @@ class StationLayoutQuarantine(models.Model):
         verbose_name_plural = 'Station layouts quarantine'
 
     def generate_hashes(self):
-        hash_submit = os.urandom(16).encode('hex')
-        hash_review = os.urandom(16).encode('hex')
+        hash_submit = os.urandom(16).hex()
+        hash_review = os.urandom(16).hex()
         if StationLayoutQuarantine.objects.filter(hash_submit=hash_submit) or StationLayoutQuarantine.objects.filter(
             hash_review=hash_review,
         ):
