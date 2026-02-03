@@ -120,7 +120,7 @@
       {% for month in month_list %}
         <li>
           {% if month.link %}
-            <a {% if date.month == month.month %}class='currentDate'{% endif %} href="{{ month.link }}">{{ month.month }}</a>
+            <a {% if date.month == forloop.counter %}class='currentDate'{% endif %} href="{{ month.link }}">{{ month.month }}</a>
           {% else %}
             <span class="nolink">{{ month.month }}</span>
           {% endif %}
